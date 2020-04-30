@@ -1,0 +1,80 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('registrations') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%  breadcrumb :placement_registrations_index,@placementevent%>
+    <%=render_breadcrumbs%>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <% unless @placement_registrations.empty? %>
+      <tr class="tr-head">    <td><%= t('student_text') %></td>  <td><%= t('batch') %></td> <td><%= t('registration') %></td><td><%= t('attendance') %></td> <td><%= t('placement_status') %></td></tr>
+      <tr class="tr-blank"></tr>
+      <% @placement_registrations.each do |registration| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1">
+            <% if permitted_to?:profile,:student and registration.member.user.is_deleted!=true %>
+              <%=  link_to "#{registration.member.full_name}", :controller=>:student,:action=>:profile, :id =>registration.student.id%>
+            <% else %>
+              <%= "#{registration.member.full_name}" %>
+            <% end %>
+          </td>
+          <td class="col-1">
+            <%="#{registration.member.batch.full_name}"%>
+          </td>
+
+          <td class="col-2">
+            <% if  registration.is_placed%>
+              <p><%= t('placed') %></p>
+            <% elsif  registration.is_applied && registration.is_approved.nil? %>
+              <p><%= link_to "#{t('approve_registration')}" ,{:controller=>:placement_registrations, :action=>:approve_registration ,:id=>registration.id,:status=>"1"} %> |
+                <%= link_to "#{t('reject_registration')}" ,{:controller=>:placement_registrations, :action=>:approve_registration ,:id=>registration.id,:status=>"0"} %></p>
+            <% elsif   registration.is_approved %>
+              <p><%= link_to "#{t('reject_registration')}" ,{:controller=>:placement_registrations, :action=>:approve_registration ,:id=>registration.id ,:status=>"0"}%></p>
+            <% elsif registration.is_approved == false %>
+              <%= link_to "#{t('approve_registration')}" ,{:controller=>:placement_registrations, :action=>:approve_registration ,:id=>registration.id,:status=>"1"} %> (<%= t('resubmitted_application') %>)
+            <% else %>
+              <p><%= t('awaiting_response') %></p>
+            <% end %>
+          </td>
+
+          <td class="col-2">
+            <% if  (registration.is_attended and registration.placementevent.date==Date.today) and registration.is_approved%>
+              <% if registration.is_placed %>
+                <p><%= t('attended') %> |<%= t('not_attended')%></p>
+              <% else %>
+                <p><%= t('attended') %> | <%= link_to "#{t('not_attended')}" ,{:controller=>:placement_registrations, :action=>:approve_attendance ,:id=>registration.id,:status=>"0"} %></p>
+              <% end %>
+            <% elsif registration.placementevent.date==Date.today and registration.is_approved %>
+              <p><%= t('not_attended') %> | <%= link_to "#{t('attended')}" ,{:controller=>:placement_registrations, :action=>:approve_attendance ,:id=>registration.id,:status=>"1"} %></p>
+            <%else%>
+              <p><%= t('attended') %> |<%= t('not_attended')%></p>
+            <% end %>
+          </td>
+
+          <td class="col-1">
+            <% if  registration.is_placed  %>
+              <p><%= link_to "#{t('disapprove_placement')}" ,{:controller=>:placement_registrations, :action=>:approve_placement ,:id=>registration.id ,:status=>"0"}%></p>
+            <% elsif !registration.is_placed and registration.is_attended and registration.is_applied %>
+              <p><%= link_to "#{t('approve_placement')}" ,{:controller=>:placement_registrations, :action=>:approve_placement ,:id=>registration.id ,:status=>"1"}%></p>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="tr-odd">
+        <td class="col-1"><%= t('no_students_were_invited') %> </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @placement_registrations %>
+</div>
+

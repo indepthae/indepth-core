@@ -1,0 +1,37 @@
+<div class ="templates_section" id="<%= @base_template.name %>_templates" style="display:none;">
+  <hr/>
+  <div class="div_link" onClick="build_templates_form('apply');"><%= @custom_report.present? ? t('update_changes_in_template') : t('save_as_a_report_template') %></div>
+</div>
+<div id="templates_list">
+  <div class="description"><%= t('save_template_desc') %></div>
+  <% form_for :template_values, :html => {:id => "template_form", :onsubmit => "return false;"} do |f| %>
+    <div class="label-field-pair">
+      <label for="category_name"><%= t('report_template_name') %></label>
+      <% temp_name = (@custom_report.present? ? @custom_report.name : "") %>
+      <div class="text-input-bg"><%= f.text_field :name, :value => temp_name, :def_val => temp_name %></div>
+      <div class="wrapper"><div class="error-icon"></div><div class="error-msg" id="name_error"></div></div>
+    </div>
+    <hr/>
+    <%= render_template_fields %>
+  <% end %>
+  <div id="template_columns" style="display:none">
+    <% if @base_template.templates.present? %>
+      <hr/>
+    <% end %>
+    <div class="header_text"><%= t('customized_columns').titleize %></div>
+    <div class="description"><%= t('customized_columns_desc') %></div>
+    <div class="fields">
+      <%= check_box_tag 'template_values[columns]', true, true, :id => "save_columns" %>
+      <label for="save_columns"><%= t('save_columns_with_template') %></label>
+    </div>
+  </div>
+</div>
+<div id="templates_form_footer">
+  <%= submit_tag "#{(@custom_report.present? ? t('update_template') : t('save_template'))}", :class => 'submit-button', :id => 'submit_button', :onclick => "send_template();" %>
+  <%= submit_tag "#{t('cancel')}", :class => 'submit-button', :id => 'cancel-btn', :onclick => "hide_popup_box();" %>
+</div>
+<script type="text/javascript">
+  j(document).ready(function(){
+    build_multiselect();
+  });
+</script>

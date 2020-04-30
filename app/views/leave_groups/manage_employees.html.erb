@@ -1,0 +1,221 @@
+<%= javascript_include_tag 'jquery.multiple.select' %>
+<%= stylesheet_link_tag 'multiple-select' %>
+<script type="text/javascript">
+  function search_employee_ajax() {
+      var elm = j(this);
+      var delay = 1000;
+      clearTimeout(elm.data('timer'));
+      elm.data('timer', setTimeout(function () {
+          elm.removeData('timer');
+          if ($('name_or_employee_number_as').value.include("%"))
+              return;
+<%="#{remote_function(:url => {:action => "manage_employees"},
+:with =>  "'search[name_or_employee_number_as]='+ escape($('name_or_employee_number_as').value)",
+:before => "Element.show('loader1'); j('#employee_department_id').val('')",
+:success => "Element.hide('loader1')"
+)}"%>
+      }, delay));
+  }
+  j('#name_or_employee_number_as').bind('input', search_employee_ajax);
+  function showOverlay() {
+      j('#loading').show();
+  }
+
+  function drawTable(data) {
+      section = j('<div></div', {class: "container"});
+      table = j('<table></table', {'width': '100%', 'cellpadding': 1, 'cellspacing': 1});
+      thead = j('<thead></thead');
+      table_head = j('<tr></tr>', {'class': "header"});
+      json_data.header.each(function (h) {
+          cell = j('<th></th>', {'class': h});
+          div_text = j('<div></div', {'text': json_data.thead[h]});
+          cell.append(div_text);
+          table_head.append(cell)
+      });
+      thead.append(table_head);
+      table.append(thead);
+      if (Object.keys(json_data.tbody).length > 0) {
+          j.each(json_data.tbody, function (id, key) {
+              table_row = j('<tr></tr>');
+              json_data.header.each(function (h) {
+                  if (h == "action") {
+                      cell = j('<td></td>', {'class': h});
+                      link = j('<a></a>', {'href': "#", 'class': "remove_emp", 'onclick': "removeConfirmation(this)", 'id': id, 'text': key[h], 'emp_name': key["name"]});
+                      cell.append(link);
+                  } else if (h == "name") {
+                      cell = j('<td></td>', {'class': h});
+                      link = j('<a></a>', {'href': (window.location.origin + "/employee/profile/" + id), 'html': key[h]});
+                      cell.append(link);
+                  } else
+                      cell = j('<td></td>', {'html': key[h], 'class': h});
+                  table_row.append(cell);
+              });
+              table.append(table_row);
+          });
+      } else {
+          table_row = j('<tr></tr>');
+          cell = j('<td></td>', {'html': '<%= t('nothing_to_list') %>', 'colspan': 5});
+          table_row.append(cell);
+          table.append(table_row);
+      }
+      section.append(table);
+      j('.employees_table').append(section);
+  }
+
+  function hideOverlay() {
+      j('#loading').hide();
+      j('#employees_form').show();
+  }
+
+  function removeConfirmation(elm) {
+      build_modal_box({title: '<%= t('remove_employee_from_leave_group') %>', popup_class: 'remove_emp_popup'});
+      j('.remove_emp_popup #popup_content').append('<%= t('remove_employee_confirmation_message', {:name => @leave_group.name}) %>');
+      j('#popup_content span').html('<b>' + j(elm).attr('emp_name') + '</b>')
+      j('.remove_emp_popup #MB_close').attr('onclick', 'remove_popup_box()');
+      j('.remove_emp_popup').prev('#popup_box_overlay').click(remove_popup_box);
+      cancel_btn = j('<div></div>', {class: 'submit-button', onclick: 'remove_popup_box()', text: '<%= t('cancel') %>'});
+      submit_btn = j('<div></div>', {class: 'submit-button', onclick: 'removeEmployee(' + elm.id + ')', text: '<%= t('ok') %>', id: 'add_lop_condition'});
+      j('.remove_emp_popup #popup_footer').append(submit_btn);
+      j('.remove_emp_popup #popup_footer').append(cancel_btn);
+      if (j('html').attr('dir') == 'ltr')
+          j('.remove_emp_popup').css({left: (j('body').width() - j('.remove_emp_popup').width()) / 2});
+      else
+          j('.remove_emp_popup').css({right: (j('body').width() - j('.remove_emp_popup').width()) / 2});
+  }
+
+  function removeEmployee(id)
+  {
+      new Ajax.Request('/leave_groups/remove_employee', {
+          parameters: {'id': '<%= @leave_group.id %>', 'employee_id': id},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+          },
+          onComplete: function (resp) {
+              result = resp.responseText;
+              if (parseInt(result) == 1) {
+                  elm = j("#" + id);
+                  delete changed_data.tbody[id];
+                  len = Object.keys(changed_data.tbody).length
+                  if (len == 0) {
+                      cell = j('<td></td>', {'html': '<%= t('nothing_to_list') %>', 'colspan': 5});
+                      elm.closest('tr').html(cell);
+                      j('#status').hide();
+                  } else {
+                      elm.closest('tr').remove();
+                      j('#status span').text(len);
+                  }
+                  changed_data.total--;
+                  changed_data.employees_total--;
+                  j('#search_result span').text(changed_data.total);
+                  j('#employees_count b').text(changed_data.employees_total);
+                  j('#status span').text(changed_data.total);
+              }
+              remove_popup_box()
+          }
+      });
+  }
+</script>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_management') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('leave_groups') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if @leave_group.employees.present? %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "+ #{t('add_employees')}", add_employees_leave_group_path(@leave_group) %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_groups_manage_employees, @leave_group %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div id="group_details">
+        <div class="fields-details">
+            <div class="field-label"><%= t('leave_group') %></div>
+            <div class="fields-val" id="group_name">: <b><%= @leave_group.name %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('description') %></div>
+            <div class="fields-val">: <%= (@leave_group.description.present? ? @leave_group.description : "-") %></div>
+        </div>
+    </div>  
+    <div id="group_status">
+        <div class="fields-details">
+            <div class="field-label"><%= t('leave_types') %></div>
+            <div class="fields-val">: <b><%= @leave_group.leave_types_count %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('assigned_employees') %></div>
+            <div class="fields-val" id="employees_count">: <b><%= @leave_group.employees_count %></b></div>
+        </div>
+    </div>  
+    <hr/>
+    <div id="header"><%= t('employees_to_leave_group') %></div>
+    <div id="description"><%= t('employees_to_leave_group_description') %></div>
+    <% unless @search_filters.present? %>
+      <div id="filters">
+          <div class="label-field-pair dept_name">
+              <label for="department"><%= t('department') %></label>
+              <div class="text-input-bg">
+                  <%= select_tag :employee_department_id, options_for_select([["#{t('select_the_department')}","no"]] + @departments.map { |c| [c.name, c.id] }, (params[:search]||{})[:employee_department_id].to_i), {:onchange =>  "#{remote_function(:url => {:action => "manage_employees"},
+                    :with => "'search[employee_department_id]='+value",
+                    :before => "Element.show('loader'); j('#name_or_employee_number_as').val('')",
+                    :success => "Element.hide('loader')")}"} %>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader",
+                    :style =>"display: none;" ) %>
+              </div>
+          </div>
+          <%= link_to_remote "#{t('advanced_search_text')}", :url => advanced_search_leave_group_path(@leave_group), :method => :get, :html => {:id => 'advanced_search'} %>
+          <div class="label-field-pair emp_name">
+              <label for="department"><%= t('autosuggest_menu.search_employees') %></label>
+              <div class="text-input-bg">
+                  <%= text_field_tag :name_or_employee_number_as, nil, {:placeholder => t('employee_name_or_no')} %>
+              </div>
+          </div>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader1",
+            :style =>"display: none;" ) %>    
+      </div>
+    <% else %>
+      <div id="filter_result">
+          <div id="search_status">
+              <div id="search_result"><%= t('showing_employees_count', :count => @employees.length) %></div>
+              <%= link_to_remote "#{t('change_filters')}", :url => advanced_search_leave_group_path(@leave_group, {:advanced_search => params[:advanced_search]}), :method => :get, :html => {:class => "add-link"} %>
+              <%= link_to "#{t('reset')}", manage_employees_leave_group_path(@leave_group), :class => "add-link" %>
+          </div>
+          <% @search_filters.each do |filters| %>
+            <div class="filters_sec">
+                <% filters.each do |filter| %>
+                  <div class="fields-details">
+                      <div class="field-label"><%= filter.first.first %></div>
+                      <% if filter.first.last.length == 1 %>
+                        <div class="fields-val">: <%= filter.first.last %></div>
+                      <% else %>
+                        <div class="fields-val" tooltip="<%= filter.first.last.join(", ") %>">: <%= t('count_selected', {:count => filter.first.last.length}) %></div>
+                      <% end %>
+                  </div>
+                <% end %>
+            </div>
+          <% end %>
+      </div>
+    <% end %>
+    <div id="employee_list">
+        <%= render :partial => "list_selected_employees" %>
+    </div>
+</div>
+<script type="text/javascript">
+  j('#name_or_employee_number_as').bind('input', search_employee_ajax);
+</script>

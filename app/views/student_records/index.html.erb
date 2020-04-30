@@ -1,0 +1,29 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('index') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="box">
+    <%if (@current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name('ManageStudentRecord')))%>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('record_groups')}",record_groups_path%></div>
+        <div class="link-descr"><%= "#{t('record_groups_desc')}" %></div>
+      </div>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('courses_and_batches')}",manage_record_groups_record_groups_path%></div>
+        <div class="link-descr"><%= "#{t('manage_record_group_for_courses_desc')}" %></div>
+      </div>
+    <%end%>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('student_records')}", manage_student_records_student_records_path%></div>
+      <div class="link-descr"><%= "#{t('manage_student_records_desc')}" %></div>
+    </div>
+
+  </div>
+</div>

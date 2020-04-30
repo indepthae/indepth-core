@@ -1,0 +1,43 @@
+<div id="filter">
+    <div class="heading"><%= t('filter') %>
+        <%= image_tag("Loader-transparant.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+
+    <div class="label-field-pair" id="status_filter">
+        <div class="text-input-bg"><%= select_tag :notification_filter, options_for_select([["#{t('all')}",'all']] + @filters.map {|f| [f, f]},:selected=>@filter), :onchange =>"#{remote_function(:url => {:action => "apply_filter"},
+            :with => "'filter='+value",
+            :before => "Element.show('loader1')",
+            :success => "Element.hide('loader1')")}"%></div>
+    </div>
+</div>
+<% if @notifications.present? %>
+  <div id="notifications_container">
+      <% @notifications.each do |notification| %>
+        <div class="notifications_strip">
+            <div class="notification_header">
+                <%=show_notification_icon(notification.initiator)%>
+                <div class="notification_intiator"><%= notification.initiator %></div>
+                <div class="notification_date">
+                    <% date = notification.created_at %>
+                    <% if date < Date.today.beginning_of_year %>
+                      <%= format_date(date,:format => :short)  %>
+                    <% elsif(date.to_date - Date.today).to_i < 0 %>
+                      <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M %p")  %>
+                    <% else %>
+                      <%=  change_time_to_local_time(date).strftime("%I:%M %p")  %>
+                    <% end %>
+                </div>
+            </div>
+            <div class="notification_content">
+                <span><%=notification.content%></span><span class="ref_links"><%= notification_reference_link(notification.payload) %></span>
+            </div>
+        </div>
+      <% end %>
+      <% @notifications.total_pages.to_i.times do |i| %>
+        <div id="infinite_thread_<%=i+2%>"></div>
+      <% end %>
+      <div id="notification_scroll"><%= will_paginate @notifications %></div>
+  </div>
+<%else%>
+  <p class="flash-msg"> <%= t('no_notifications') %> </p>
+<%end%> 

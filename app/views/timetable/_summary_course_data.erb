@@ -1,0 +1,108 @@
+
+<div class="summary_section">
+  <div class="section_heading">
+    <%= "#{t('courses_text')} - #{t('batches_text')}" %>
+  </div>
+  <div class="section_data">
+    <div class="section_row section_head_row">
+      <div class="section_column_1 heading">
+        <%= t('courses_text') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:courses][:total_count] %>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+    <div class="section_row section_head_row">
+      <div class="section_column_1 heading">
+        <%= t('batches_text') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:batches][:total_count] || 0%>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+    
+    <% total_batches = @timetable_summary[:batches][:total_count] %>
+
+    <div class="section_row has_tooltip">
+      <% completely_allocated_count = @timetable_summary[:batches][:completely_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless completely_allocated_count.zero?  %>
+          <%= link_to "#{t('completely_allocated')}", :controller=>"timetable",:action => 'batch_allocation_list', :id => @timetable.id, :type => 2 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_completely_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('completely_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{completely_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{total_batches.zero? ? '-' : ((completely_allocated_count.to_f * 100) / total_batches ).round(2)}%" %>
+      </div>
+      <div class="notifier"><%= t('batches_completely_allocated_info') %></div>
+    </div>
+    <div class="section_row has_tooltip">
+      <% partially_allocated_count = @timetable_summary[:batches][:partially_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless partially_allocated_count.zero?  %>
+          <%= link_to "#{t('partially_allocated')}", :controller=>"timetable",:action => 'batch_allocation_list', :id => @timetable.id, :type => 1 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_partially_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('partially_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{partially_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{total_batches.zero? ? '-' : ((partially_allocated_count.to_f * 100) / total_batches).round(2)}%" %>
+      </div>
+      <div class="notifier"><%= t('batches_partially_allocated_info') %></div>
+    </div>
+    <div class="section_row has_tooltip">
+      <% not_allocated_count = @timetable_summary[:batches][:not_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless not_allocated_count.zero?  %>
+          <%= link_to "#{t('not_allocated')}", :controller=>"timetable",:action => 'batch_allocation_list', :id => @timetable.id, :type => 0 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_not_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('not_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{not_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{total_batches.zero? ? '-' : ((not_allocated_count.to_f * 100) / total_batches).round(2)}%" %>
+      </div>
+      <div class="notifier"><%= t('batches_not_allocated_info') %></div>
+    </div>
+    <div class="section_row has_tooltip">
+      <% not_eligible_count = @timetable_summary[:batches][:not_eligible][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless not_eligible_count.zero?  %>
+          <%= link_to "#{t('not_eligible')}", :controller=>"timetable",:action => 'batch_allocation_list', :id => @timetable.id, :type => -1 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_not_eligible", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('not_eligible') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= not_eligible_count %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{total_batches.zero? ? '-' : ((not_eligible_count.to_f * 100) / total_batches).round(2)}%" %>
+      </div>
+      <div class="notifier">
+        <%= t('batches_not_eligible_info') %>
+        <ul>
+          <li><%= t('batches_not_eligible_reason_1') %></li>
+          <li><%= t('batches_not_eligible_reason_2') %></li>
+          <li><%= t('batches_not_eligible_reason_3') %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

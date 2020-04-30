@@ -1,0 +1,161 @@
+<div class="derived__formula">
+    <div class="formula__head"><%=t('formula_for_derived_assessments')%></div>
+    <div class="formula__box">
+        <% formula = settings[:formula] if local_assigns[:settings] %>
+        <% ag_count = settings[:other_settings][:ag_count] if local_assigns[:settings] and settings[:other_settings].present? %>
+        <div class="formula__select__pair">
+            <%= radio_button :derived_assessment_group_settings, :formula, 'sum', :class=>'choose__formula', :onchange=>"updateFormula(this)", :checked=> (formula.present? ? (formula == 'sum') : true)  %>
+            <label class="label__for__formula" for="derived_assessment_group_settings_formula_sum"><%=t('sum')%></label>
+            <div class="desc__for__formula"><%=t('derived_sum_formula_desc', {:exam_type => (local_assigns[:exam_type] ? exam_type : t('derived'))})%></div>
+        </div>
+        <div class="formula__select__pair">
+            <%= radio_button :derived_assessment_group_settings,:formula, 'average', :class=>'choose__formula', :onchange=>"updateFormula(this)", :checked => (formula == 'average')  %>
+            <label class="label__for__formula" for="derived_assessment_group_settings_formula_average"><%=t('average')%></label>
+            <div class="desc__for__formula"><%=t('derived_average_formula_desc')%></div>
+        </div>
+        <div class="formula__select__pair">
+            <%= radio_button :derived_assessment_group_settings,:formula, 'bestof', :class=>'choose__formula', :onchange=>"updateFormula(this)", :checked => (formula == 'bestof')  %>
+            <label class="label__for__formula" for="derived_assessment_group_settings_formula_bestof"><%=t('best_of')%></label>
+            <div class="desc__for__formula"><%=t('derived_bestof_formula_desc',{:exam_type => (local_assigns[:exam_type] ? exam_type : t('derived'))})%></div>
+        </div>
+        <div class="formula__select__pair">
+            <%= radio_button :derived_assessment_group_settings,:formula, 'percentage', :class=>'choose__formula', :onchange=>"updateFormula(this)", :checked => (formula == 'percentage')  %>
+            <label class="label__for__formula" for="derived_assessment_group_settings_formula_percentage"><%=t('specific_weightage_percentage')%></label>
+            <div class="desc__for__formula"><%=t('percentage_formula_derived_desc',{:exam_type => (local_assigns[:exam_type] ? exam_type : t('derived'))})%></div>
+        </div>
+        <div class="formula__select__pair">
+            <%= radio_button :derived_assessment_group_settings,:formula, 'avg_bestof', :class=>'choose__formula', :onchange=>"updateFormula(this)", :checked => (formula == 'avg_bestof')  %>
+            <label class="label__for__formula" for="derived_assessment_group_settings_formula_avg_bestof"><%=t('avg_best_of')%></label>
+            <div class="desc__for__formula"><%=t('derived_avg_bestof_formula_desc')%></div>
+        </div>
+    </div>
+    <div class="formula__show__box">
+        <div class="box__head"><%= t('derived_exam') %></div>
+        <table>
+            <tr><td class="label formula_label"><%= t('formula') %></td>
+                <td class="value" id='formula_text'>
+                    <div id='fomula_value'></div>
+                    <table align="center" width="100%" cellpadding="1" cellspacing="1" id='weightage' style="display: none;">
+                        <tr class="tr-head">
+                            <td><%= t('subject_based_exams') %></td>
+                            <td><%= t('weightage_with_perc') %></td>
+                        </tr>
+                        <% weightage = settings[:weightage] if local_assigns[:settings] %>
+                        <% assessments.each do |assessment|  %>
+                          <tr>
+                              <td><%= assessment.name_with_code %></td>
+                              <td>
+                                <%= text_field_tag "derived_assessment_group_settings[weightage][#{assessment.id}]" ,(weightage.present? ? weightage[assessment.id.to_s] : '' ),
+                                  {:class => 'core_field weightage_field',:id => "perc_#{assessment.id}", :disabled => true, :onchange => 'calculateTotalWeightage()', :onkeypress => "return isNumberKey(event,this)"}%>
+                              </td>
+                          </tr>
+                        <% end %>
+                        <% derived_assessments = [] if local_assigns[:derived_assessments].nil? %>
+                          <% derived_assessments.each do |assessment|  %>
+                            <tr>
+                                <td><%= assessment.name_with_code %></td>
+                                <td>
+                                  <%= text_field_tag "derived_assessment_group_settings[weightage][#{assessment.id}]" ,(weightage.present? ? weightage[assessment.id.to_s] : '' ),
+                                    {:class => 'core_field weightage_field',:id => "perc_#{assessment.id}", :disabled => true, :onchange => 'calculateTotalWeightage()', :onkeypress => "return isNumberKey(event,this)"}%>
+                                </td>
+                            </tr>                            
+                          <% end %>
+                          <tr>
+                              <td><%= t('total_weghtage') %></td>
+                              <td id="total_weightage">0 %</td>
+                          </tr>
+                    </table>
+                    <%= g.hidden_field :weightage if obj.derived_assessment? %>
+                </td>
+            </tr>
+            <!-- <tr id='derived_max_mark'><td class="label"><%#= t('derived_max_marks') %></td><td class="value" id="formula_applied_value"><%#= t('formula') %></td></tr> -->
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    updateFormula = function(el){
+      if($check_ags.length > 1){
+        j('.formula__show__box').show();
+        max_vals = []
+        j('.select_assess:checked').each(function(){
+          max_vals.push(j(this).attr('max_marks'))
+        })
+        switch(el.value) {
+        case 'sum':
+          j('#formula_text #fomula_value').html($check_ags.join(' + '))
+          refreshFormulaBox();
+          break;
+        case 'average':
+          j('#formula_text #fomula_value').html('Avg(' + $check_ags.join(' + ') + ')')
+          refreshFormulaBox();
+          break;
+        case 'bestof':
+          j('#formula_text #fomula_value').html('BestOf(' + $check_ags.join(' , ') + ')')
+          refreshFormulaBox();
+          break;
+        case 'avg_bestof':
+          j('#formula_text #fomula_value').html("<%=escape_javascript(render :partial => "avg_bestof_field", :locals => {:formula=>formula, :ag_count => ag_count, :g=>g, :obj => obj})%>")
+          j('#ag_count_helper').html(', '+ $check_ags.join(' , ') + ' ' )
+          refreshFormulaBox();
+          j('#formula_text .fieldWithErrors').show()
+          break;
+        default:
+          j('#formula_text #fomula_value').html('');
+          copyTable();
+          break;
+        }
+      }else{
+        j('.formula__show__box').hide();
+        j('#formula_text .fieldWithErrors').show()
+      }
+    }
+    
+    refreshFormulaBox = function(){
+      j('#weightage').hide();
+      j('#formula_text .fieldWithErrors').hide()
+      j('.formula_label').removeClass('percentage_label');
+      //j('#derived_max_mark').show();
+    }
+    
+    
+    
+    calculateTotalWeightage = function(){
+      total = 0.0;
+      j('.weightage_field:visible').each(function(){
+        parsed = parseFloat(j(this).val())
+        val = isNaN(parsed) ? 0.0 : parsed.toFixed(2)
+        total += parseFloat(val)
+      })
+      if(!isNaN(total))
+        j('#total_weightage').html(total.toFixed(2) + ' %');
+    }
+    
+    copyTable = function(){
+      j('#weightage').css('display','table');
+      j('#weightage .weightage_field').each(function(){
+          j(this).parent().parent().css('display','none');
+          j(this).prop('disabled','true');
+      })
+      j('.formula_label').addClass('percentage_label');
+      j('.select_assess:checked').each(function(){
+        id = j(this).val();
+        j('#perc_'+id).prop('disabled', false);
+        j('#perc_'+id).parent().parent().css('display', 'table-row');
+      })
+      calculateTotalWeightage();
+    } 
+    
+    function isNumberKey(evt,element){
+      var charCode = (evt.which) ? evt.which : evt.keyCode
+       if ((charCode != 46 || j(element).val().indexOf('.') != -1) && (charCode < 48 || charCode > 57))
+           return false;
+       return true;
+    }
+    
+    function isIntegerKey(evt,element){
+      var charCode = (evt.which) ? evt.which : evt.keyCode
+       if (charCode == 46 || charCode < 49 || charCode > 57)
+           return false;
+       return true;
+    }
+</script>

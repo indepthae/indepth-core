@@ -1,0 +1,267 @@
+#timetable,#teacher{
+    padding: 10px;
+    background-color: #C3D9FF;
+    border-radius: 8px;
+}
+#teacher{
+    border-right: none;
+    width: 150px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+#timetable{
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: none;
+    padding-left: 0px;
+}
+#timetable-container{
+    font-weight: bold;
+}
+#timetable-container *{
+    font-family: Arial !important;
+}
+.batch{
+    height: 80px;
+}
+#weekday-header{
+    background-color: #fff;
+    height: 30px;
+    font-size: 12px;
+}
+#timetable td{
+    text-align: center;
+    min-width: 70px;
+}
+.batch_name{
+    background-color: #fff;
+    height: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0px 10px;
+}
+.tte{
+    padding: 0 8px;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #fff;
+    width: 70px;
+    max-width: 70px;
+}
+#table-viewer{
+    margin-left: 0px;
+    overflow-x: scroll;
+    width: 810px;
+    float: left;
+}
+.employee_list{
+    float: left;
+    width: 150px;
+}
+.gap{
+    float: left;
+    width: 100%;
+    height: 10px;
+}
+
+#timetable_view{
+    margin-top: 20px;
+}
+#teacher_timetable_view{
+    float: left;
+    width: 100%;
+}
+
+#timetable-container{
+    border: 5px solid #c3d9ff;
+    min-height: 621px;
+}
+.employee_timetable_header{
+    float: none;
+    width: 950px;
+    padding: 6px 10px;
+    height: 20px;
+    color: #666;
+    font-size: 14px;
+    border-bottom: 5px solid #c3d9ff;
+}
+.employee_timetable_header .employee, .employee_timetable_header .emp_dept {
+    width: 50%;
+    height: 100%;
+}
+.employee_timetable_header .employee {
+    float: left;
+}
+.employee_timetable_header .emp_dept {
+    float: right;
+    text-align: right;
+    font-weight: normal;
+}
+.emp_lbl {
+    font-size: 14px;
+    font-weight: normal;
+}
+#employee_timetable{
+    overflow: hidden;
+}
+.weekdays{
+    width: 49px;
+    border-right: 1px solid #c3d9ff;
+    float: left;
+}
+.weekday-name {
+    color: #666;
+    vertical-align: middle;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 116px;
+    border-bottom: 1px solid #c3d9ff;
+    font-size: 12px;
+    font-weight: normal;
+}
+.weekday{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    display: block;
+    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -moz-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -ms-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -o-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+}
+.timetable_entries_table {
+    width: 920px;
+    min-height: 585px;
+    float: left;
+    overflow-x: auto;
+}
+.timetable_entries_table table{
+    border-collapse: collapse;
+    width: 100%;
+}
+.timetable_entries_table .tte_row {
+    border-bottom: 1px solid #c3d9ff;
+    float: none;
+    min-width: 920px;
+    height: 116px;
+    display: flex; /* other browsers */
+    display: -webkit-flex; /* safari */
+    white-space: nowrap;
+}
+
+.tte{
+    padding: 8px;
+    font-size: 13px;
+    background-color: #fff;
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    height: 100px;
+    float: left;
+    display: inline-block;
+    border-right: 1px solid #C3D9FF;
+}
+.tte .batch_name{
+    height: 30px !important;
+    white-space: normal;
+    max-width: 150px;
+    word-break: break-all;
+}
+#table-viewer {
+    float: left;
+    margin-left: 0;
+    max-width: 810px;
+    overflow: auto;
+    width: 810px;
+}
+.batch_code{
+    float: left;
+    width: 100%;
+    color: black;
+    font-weight: normal;
+}
+.sub_name{
+    float: left;
+    width: 150px;
+    color: #444444;
+    text-align: left;
+    height: 35px;
+    padding-bottom: 5px;
+    word-break: break-all;
+    max-width: 150px;
+    white-space: normal;
+}
+.sub_name .elective_title{
+    font-weight: normal !important;
+}
+.no_padding{
+    padding: 0;
+}
+.class_timings{
+    height: 25px;
+    font-weight: normal;
+}
+
+.class_timings span{
+    font-size: 11px;
+    color: #666;
+    padding: 5px;
+    text-align: center;
+    width: 118px;
+}
+.tte:last-child {
+    margin-right: -2px;
+}
+.tte1{
+    text-align: center;
+}
+.tte-more .warning {
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    background-position: -44px -342px !important;
+    padding: 0px;
+    width: 12px;
+    height: 12px;
+    float: left;
+    position: relative;
+    display: block;
+    padding-top: 1px;
+}
+.tte-more{
+    width: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0px;
+    height: 116px;
+}
+.tte-more .batch{
+    float: left;
+    width: 150px;
+    border-right: 1px solid #ccc;
+    padding: 8px;
+    padding-top: 6px;
+    padding-bottom: 7px;
+    padding-right: 8px;
+    height: 74px !important;
+}
+.tte-more .batch:last-child{
+    border-right: 0px;
+    margin-right: 2px;
+    padding-right: 6px;
+}
+.tte:last-child {
+    margin-right: -2px;
+}
+.tte-more .class_timings {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    height: 20px;
+    padding-top: 6px;
+    padding-bottom: 2px;
+}
+.ct_align{
+    width: 125px;
+    margin: 0px auto;
+}

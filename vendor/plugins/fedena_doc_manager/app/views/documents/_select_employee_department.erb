@@ -1,0 +1,12 @@
+
+<div class="label-field-pair-document">
+  <label for="select_department"><%= t('select_department') %></label>
+  <div class="text-input-bg">
+    <% departments = @departments %>
+    <%= select :select_department, :department, departments.map { |s| [s.name, s.id] },
+      {:prompt => "#{t('select_department')}"},
+      {:onChange => "#{remote_function(:url => to_employees_documents_path, :with => "'dept_id='+value",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')")}"} %>
+  </div>
+</div>

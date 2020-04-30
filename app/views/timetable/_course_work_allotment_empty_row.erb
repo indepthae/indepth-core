@@ -1,0 +1,14 @@
+<div class="batch-row-header">
+  <div class="batch-column-1">
+    <%= t('batches_text') %>
+  </div>
+  <div class="batch-column-2">
+    <%= t('subjects_text') %>
+  </div>
+  <div class="batch-column-3">
+    <%= t('allocation_status') %>
+  </div>
+  <div class="batch-column-4">
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader-#{@course.id}", :style =>"display: none;" ) %>
+  </div>
+</div>

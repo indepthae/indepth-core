@@ -1,0 +1,102 @@
+
+<%- form_for :generate_report, :url => {:action=>"preview", :id=> @student.id}  do |f| -%>
+  <%= hidden_field_tag "generate_report[student_id]", @student.id %>
+
+
+
+  <div class="certificate_number">
+      <label for="student_admission_no"><%= t('certificate_no') %> <span class="necessary-field">*</span> </label>
+      <div class="text-input-bg certficate-no">
+  <%#= text_field_tag "generate_report[certificate_number]", "#{@serial_number}",:readonly => !(@serial_number_type == "Manual") %>
+          <%= text_field_tag "generate_report[certificate_number]", "#{@serial_number}" %>
+      </div>
+
+  </div>
+  <% if @date_of_issue_labels.is_enabled %>
+    <% if @date_of_issue_labels.value == "" %>
+      <% date_text = t('date_of_issue') %>
+    <% else %>
+      <% date_text = @date_of_issue_labels.value %>
+    <% end %>
+    <div class="date_of_issue_field">
+        <label for="generate_report[date_of_issue]"><%= date_text%> <span class="necessary-field">*</span> </label>
+        <div class="text-input-bg certficate-no">
+            <%= calendar_date_select_tag "generate_report[date_of_issue]",
+              I18n.l(@date_of_issue || FedenaTimeSet.current_time_to_local_time(Time.now).to_date,:format=>:default) , :year_range => 72.years.ago..0.years.ago,:popup=>"force" %>
+        </div>
+    </div>
+  <%else%>
+      <%=hidden_field_tag "generate_report[date_of_issue]",Date.today%>
+  <% end %>
+  <% unless @previous_serial_number.nil? %>
+    <div id="warning_infos">
+        <p><%= "#{t('previous_certificate_number')} " %> : <span class="previous_serial_number_field"><%= " #{@previous_serial_number}" %></span></p>
+    </div>
+  <% end %>
+  <div class ="other_details">
+      <% if @student_details.empty? %>
+        <p class="flash-msg"><%= "#{t('no_student_details_entered')}"%>.</p>
+      <%end%>
+      <table>
+          <% @student_details_ids.each do |id| %>
+            <%=render :partial=>'student_details_field_parent', :locals=>{:id=>id} %>
+            <% keys = get_child_field_ids(id) %>
+            <% for key in keys do %>
+              <%=render :partial=>'student_details_field_sub', :locals=>{:id=>id,:key=>key,:value=>@student_details[id][:sub_fields][key]}%>
+            <% end %>
+          <% end %>
+      </table>
+  </div>
+
+  <div class="submit_button">
+      <%=submit_tag " #{t('proceed_to_certificate')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+  </div>
+<% if @preview == true %>
+  <%=submit_tag " #{t('cancel')}", :class=>"submit-button"%>
+<%else%>
+  <%= link_to "#{t('cancel')}", {:action=>'index'}, :class => "submit-button", :method => :get  %>
+<%end%>
+<%end%>
+
+<script type="text/javascript">
+  var width = 0;
+  j(".field_names").each(function () {
+      var div_width = get_width(this);
+      if (div_width > width) {
+          width = div_width;
+      }
+  });
+  j(".tc_field_labels_edit").width(width + 15);
+
+  function get_width(el) {
+      var html_org = j(el).html();
+      var html_calc = '<span>' + html_org + '</span>';
+      j(el).html(html_calc);
+      var width = j(el).find('span:first').width();
+      j(el).html(html_org);
+      var parent_width = j(".field_names").parent().parent().parent().width();
+      var max_width = parent_width * 0.25;
+      if (width > max_width) {
+          return max_width;
+      } else {
+          return width;
+      }
+  }
+  ;
+
+  function set_date_in_words(el, id, status) {
+      if (status == true) {
+          j.ajax({
+              type: 'GET',
+              url: "/tc_template_generate_certificates/date_in_words",
+              data: {
+                  date: el.value,
+                  id: id
+              },
+              success: function (data) {
+                  Element.hide('loader_'+id);
+              }
+          });
+      }
+  }
+</script>

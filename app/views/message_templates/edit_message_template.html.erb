@@ -1,0 +1,133 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('message_templates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+    <div class="error_messages" id="error_messages">
+    </div>
+    <div class="template_creation">
+      <% remote_form_for @message_template ,:url=>update_message_template_message_templates_path(:id=>@message_template.id) , :html=>{ :method=>:post} do |f| %>
+      <div class="field_set">
+        <label class="head_label"><%= t('message_template_name') %></label>
+        <%= f.text_field :template_name, :placeholder=>t('message_template_name_place'), :maxlength=> 50%>
+      </div>
+      <div class="field_set user_type_selector">
+        <label class="head_label"><%= t('targeted_user_type') %></label>
+        <div class="user_type_selector">
+          <%if @intended_users[:student]==true%>
+            <label class="tag_label user_type"><%= f.check_box :student_template_enabled,  :class=>"bulk_check" %> <%= t('single_student')%> </label>
+          <%end%>
+          <%if @intended_users[:employee]==true%>
+            <label class="tag_label user_type"><%= f.check_box :employee_template_enabled, :class=>"bulk_check" %> <%= t('employee_text')%> </label>
+          <%end%>
+          <%if @intended_users[:guardian]==true%>
+            <label class="tag_label user_type"><%= f.check_box :guardian_template_enabled, :class=>"bulk_check" %> <%= t('guardian')%> </label>
+          <%end%>
+        </div>
+      </div>
+      
+      
+      <% f.fields_for :student_template_content do |s| %>
+      <div class="field_set" id="student_message_content">
+        <label class="head_label"><%= t('message_template_content') %> - <%= t('single_student') %></label>
+        <%= s.text_area :content, :rows=>6%>
+        <%= s.hidden_field :user_type  %>
+      </div>
+      <%end%>
+      
+      <% f.fields_for :employee_template_content do |e| %>
+      <div class="field_set" id="employee_message_content">
+        <label class="head_label"><%= t('message_template_content') %> - <%= t('employee_text') %></label>
+        <%= e.text_area :content, :rows=>6%>
+        <%= e.hidden_field :user_type  %>
+      </div>
+      <%end%>
+      
+      <% f.fields_for :guardian_template_content do |g| %>
+      <div class="field_set" id="guardian_message_content">
+        <label class="head_label"><%= t('message_template_content') %> - <%= t('guardian') %></label>
+        <%= g.text_area :content, :rows=>6%>
+        <%= g.hidden_field :user_type  %>
+      </div>
+      <%end%>
+      
+        <div class="submit_controls">
+          <%=f.submit t("update_template"), :class=>"solid_button" %>
+          <%=link_to t('cancel'), message_templates_message_templates_path ,:class=>"plain_button cancel"  %>
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+        </div>  
+      <%end%>
+    </div>
+    <div class="field_codes_area">
+      <div id="template_keys">
+      </div>
+      <div class="fixed_keys">
+        <%= render "common_keys"%>
+        <%= render "automated_keys"%>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  
+  load_template_keys();
+  message_box_display();
+  j(".user_type").change(function(){
+    load_template_keys();
+    message_box_display();
+  });
+  
+  function message_box_display(){
+    if(j("#message_template_student_template_enabled").prop("checked")==true){
+      j("#student_message_content").css("display","block");
+    }else{
+      j("#student_message_content").css("display","none");
+    }
+    
+    if(j("#message_template_employee_template_enabled").prop("checked")==true){
+      j("#employee_message_content").css("display","block");
+    }else{
+      j("#employee_message_content").css("display","none");
+    }
+    
+    if(j("#message_template_guardian_template_enabled").prop("checked")==true){
+      j("#guardian_message_content").css("display","block");
+    }else{
+      j("#guardian_message_content").css("display","none");
+    }
+  }
+  
+  function load_template_keys(){
+    j.ajax({
+      url: "list_keys_for_template",
+      type: 'POST',
+      data: {
+        user_types: {
+          student_template_enabled: j("#message_template_student_template_enabled").prop("checked") ,
+          employee_template_enabled: j("#message_template_employee_template_enabled").prop("checked") ,
+          guardian_template_enabled: j("#message_template_guardian_template_enabled").prop("checked")
+        } 
+      },
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  }
+  
+</script>
+

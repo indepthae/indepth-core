@@ -1,0 +1,158 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="/javascripts/JsBarcode.all.min.js"></script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('id_cards') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('bulk_export') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="error_messages" id="error_messages">
+    </div>
+  <div id="box">
+    
+    
+    <div class="academic_year_container">
+      <div class="academic_year_switcher">
+        <label class="normal"><%= t('academic_year') %></label>
+        <%= select '', :academic_year , @academic_years.map{|a| [a.name,a.id]}, {:include_blank=>t('all')}, :class=>"academic_year_selector", :id=>"academic_year",
+        :onchange => "#{remote_function(:url => {:action => "generated_id_cards_list"},:with => "'academic_year_id='+value+'&id_card_template_id=#{@id_card_template.id}' " )}" %>
+      </div>
+    </div>
+
+    <%form_for :bulk_export ,:url=>'', :html=>{:id=>"bulk_export", :method=>:post} do |f| %>
+    <div class="head">
+    </div>
+    <div class="initial_values">
+      <div class="id_card_template">
+
+        <div class="field_section">
+          <div class="field_head">
+            <%= t('id_card_type')%>
+          </div>
+          <div class="field">
+            <%= select_tag "id_card_template",
+              options_for_select(([t('id_card_type_placeholder')]+@id_card_templates.map{|c| [c.name,c.id]})), :class=>"input_box", :id=>"template_selector",
+            :onchange => "#{remote_function(:url => {:action => "bulk_export_group_selector"},:with => "'id_card_template_id='+value" )}" %>
+              <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+        </div>
+
+        <div id="selector">
+        </div>
+      </div>
+    </div>
+
+    <div class="select_key_values">
+      <div class="template_keys" id="template_key_form">
+      </div>
+      <div class="id_cards_keys" id="id_card_key_form">
+      </div>
+    </div>
+
+    <div class="id_card_for" id="id_card_for">
+    </div>
+    
+    <div id="layouts" class="id_card_preview exclude_font">  
+    </div>
+
+
+    <div class="line">
+    </div>
+
+
+    <div class="submit_controls">
+      <button class="solid_button save_button" id="save_button" value=true name="single_page_enabled" type="submit"><%= t('generate_id_card') %></button>
+
+      <%=link_to t('cancel'), id_card_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+    <%end%>
+  </div>
+  
+  <div id="hidden_generation" class="hidden_generation">
+  </div>
+  
+</div>
+
+<script>
+  var template_app;
+  var VAppCounter;
+  var VAppCounterBack;
+  var actMet;
+  var lock_save = false; 
+
+  
+  function get_id_card_id(){
+    if (j("#template_selector").val()!= undefined && j("#template_selector").val()!=""){
+      return j("#template_selector").val();
+    }
+    return false;
+  }
+  
+  function get_batch_id()
+  {
+    if (j("#batch_selector").val()!= undefined && j("#batch_selector").val()!=""){
+      return j("#batch_selector").val();
+    }
+    return false;
+  }
+  
+  j("#generate_id_card").click(function(e){
+    var id_card_id = get_id_card_id();
+    if(id_card_id == false || j(".bulk_check:checked").length==0){
+      e.preventDefault();
+    }
+  });
+  
+  j("#template_selector").change(function(e){
+    j.ajax({
+      url: "generate_bulk_export_sample_preview",
+      type: 'POST',
+      data:  {
+        id_card_template_id: j(this).val()
+      },
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  });
+  
+  j("#bulk_export").submit(function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (j(".bulk_check:checked").length > 0){
+      Element.show('loader1');
+      var form_url = j("#bulk_export").attr('action');
+      var formData = new FormData(this);
+      j.ajax({
+        url: form_url,
+        type: 'POST',
+        data:  formData,
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: function(data, textStatus, jqXHR)
+        {
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+        }
+      });
+    }
+  });
+
+
+</script>

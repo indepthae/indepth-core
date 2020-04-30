@@ -1,0 +1,11 @@
+<%#*<script>%>
+j('#sortable').append('<%= escape_javascript render :partial=>"sortable_questions",:locals=>{:question_positions=>@question_positions,:exam_group=>@exam_group} %>');
+div_height = j('#sorting-div').height();
+j('#overlay-div').height(div_height);
+<% if @question_positions.next_page %>
+  j('.pagination').replaceWith('<%= escape_javascript will_paginate @question_positions %>');
+<% else %>
+  j(window).off('scroll');
+  j('.pagination').remove();
+<% end %>
+<%#*</script>%>

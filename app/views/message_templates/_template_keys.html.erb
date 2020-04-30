@@ -1,0 +1,26 @@
+<% if @keys[:student].present? || @keys[:employee].present? || @keys[:guardian].present? %>
+<div class="field_code_head">
+  <%= t('field_codes')%>
+</div>
+<div class="field_codes_table">
+    <%user_types = [:student, :employee, :guardian] %>
+    <%user_type_heads = {:student => "#{t('single_student')}", :employee => "#{t('employee_text')}", :guardian => "#{t('guardian')}" } %>
+    <%user_types.each do |user_type|%>
+    <%if @keys[user_type].present? %>
+    <table class="block_table"><td class="key_sub_heads"> <%= "#{user_type_heads[user_type]} #{t('template_keys')}" %></td></table>
+    <div class="key_set_container">
+    <table class="block_table">
+      <%@keys[user_type].each do |key,value| %>
+        <tr>
+          <td><%= value %></td>
+          <td class="center_text"><%= " {{#{key.to_s}}} "%></td>
+        </tr>
+      <%end%>
+    </table>
+  </div>
+  <%end%>
+    <%end%>
+    
+</div>
+
+<%end%>

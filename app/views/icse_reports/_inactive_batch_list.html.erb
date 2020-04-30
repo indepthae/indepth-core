@@ -1,0 +1,6 @@
+<div class="label-field-pair2">
+  <label for="batch_id">Batch</label>
+  <div  class="text-input-bg2" id="exam-group-select">
+    <%=select :subject_report,:batch_id, @batches.map{|a| [a.name,a.id]},:prompt=> "Select a batch" %>
+  </div>
+</div>

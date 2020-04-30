@@ -1,0 +1,65 @@
+<% display_type = @leave_group.present? ? (params[:display_type].present? ? params[:display_type] : "leave_group") : "all" %>
+<table>
+  <tr class="tr-head">
+    <td class="col-2"></td>
+    <td class="col-2"><%= t('total') %></td>
+    <% @leave_types.each do |lt| %>
+      <td class="col-2"><%= lt.name %></td>
+    <% end %>
+  </tr>
+    <tr>
+      <td><%= t('available_leaves') %></td>
+      <td>
+        <%= total_leave_balance(@leaves,nil,display_type) %>
+      </td>
+      <% @leave_types.each do |lt| %>
+        <td>
+          <%= total_leave_balance(@leaves,lt) %>
+        </td>
+      <% end %>
+    </tr>
+  <tr>
+    <td><%= t('earned_leaves') %></td>
+    <td>
+      <%= emp_leave_count(@leaves, @start_date, @end_date, nil, display_type) %>
+    </td>
+    <% @leave_types.each do |lt| %>
+      <td>
+        <%= emp_leave_count(@leaves, @start_date, @end_date, lt.id) %>
+      </td>
+
+    <% end %>
+  </tr>
+  <tr>
+    <td><%= t('additional_leaves') %></td>
+    <td>
+      <%= total_additional_leave_count(@leaves,@start_date,@end_date,nil, display_type) %>
+    </td>
+    <% @leave_types.each do |lt| %>
+
+      <td>
+        <%= total_additional_leave_count(@leaves,@start_date, @end_date, lt.id) %>
+      </td>
+
+
+    <% end %>
+  </tr>
+  <tr>
+    <td><%= t('lop') %></td>
+    <td>
+      <%= total_lop_count(@leaves, @start_date,@end_date,nil,display_type) %>
+    </td>
+    <% @leave_types.each do |lt| %>
+      <td>
+        <%= total_lop_count(@leaves, @start_date, @end_date, lt.id) %>
+      </td>
+    <%end%>
+  </tr>
+</table>
+
+<script type="text/javascript">
+
+  width = j("#leave_summary").width();
+  if (width > 980){ j("#leave_summary").css({"overflow-x":"scroll","width":"980"}) };
+
+</script>

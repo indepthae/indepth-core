@@ -1,0 +1,135 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('gallery') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('galleries.albums') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <% if params[:id].present? %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('student_profile')}", :controller => 'student', :action => 'profile', :id => params[:id] %></li>
+    <% end %>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+
+<div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice]  %> </p>
+<% end %>
+
+
+<%if @valid_search==true %>
+
+  <% if @categories.count>0 %>
+
+    <div class="album_block">
+  <div class="published_count">
+    <div class="count">
+      <b><%=t('galleries.search_results')%></b>
+      &#x200E;(<%=@total_albums%>)&#x200E;
+      <%= link_to t('galleries.clear_search_results') ,galleries_path,:class=>"home_link themed_text" %>
+   </div>
+
+     <div class="search">
+       <% form_for :search ,:url=>search_album_galleries_path, :html=>{:method=>:post } do |f| %>
+        <%= f.error_messages %>
+          <%= f.text_field :search_tag ,:class=>"search_box" ,:id=>"search_box" ,:placeholder=>t('galleries.search_all_albums') %>
+          <%= f.submit "Search",:class=>"plain_button"%>
+      <%end%>
+
+
+    </div>
+  </div>
+
+  <% @categories.each_with_index do |category,index| %>
+  <% index= index+1%>
+
+  <%= '<div class="row row_spacing">' if ((index+2)%3) == 0  %>
+  <div class='album<%= (index+1)%3 == 0 ? " album_middle" : "" %>' onClick="openAlbum(<%= category.id %>)"  >
+    <%if !category.published?%>
+    <div class="published_tag <%= "published_tag_corner" if category.gallery_photos.count < 4 %>"><%= t('galleries.published_status_unpublished') %></div>
+    <%end%>
+  <%if category.gallery_photos.count >= 4 %>
+  <%four_photos=category.gallery_photos.all(:order => "id DESC", :limit => 4)%>
+      <div class="imagebox grid_spacing">
+        <div class="row">
+          <%= "<div class='four_images left_side'  style=\" background-image: url('#{four_photos[0].photo.url(:small, false)}');\">"%>
+          </div>
+            <%= "<div class='four_images right_side' style=\" background-image: url('#{four_photos[1].photo.url(:small, false)}');\">"%>
+          </div>
+        </div>
+        <div class="row">
+            <%= "<div class='four_images left_side' style=\" background-image: url('#{four_photos[2].photo.url(:small, false)}');\">"%>
+          </div>
+            <%= "<div class='four_images right_side' style=\" background-image: url('#{four_photos[3].photo.url(:small, false)}');\">"%>
+          </div>
+        </div>
+      </div>
+   <%else%>
+   <% img=category.gallery_photos.last%>
+   <div class="imagebox">
+          <%= "<div class='#{category.gallery_photos.count== 0 ? "single_image stub" : "single_image"}' #{category.gallery_photos.count== 0 ? "" : "style=\" background-image: url('#{img.photo.url(:thumb, false)}');\"" }>"%>
+          </div>
+    </div>
+   <%end%>
+      <div class="album_description">
+        <div class="album_head">
+          <%=category.name%>
+        </div>
+        <div class="tags">
+          <div class="tag date_tag">
+            <%= category.published_date.present? ? format_date(category.published_date) : "&nbsp;"%>
+          </div>
+          <div class="tag count_tag">
+            <%= category.gallery_photos.count%> Photos
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% #row %>
+  <%= '</div>'if (index%3) == 0%>
+  <%end%>
+
+  <% #In case row doesnt get closed - In last case where no of album is less than 3 %>
+  <%= '</div>'if (@categories.count%3) != 0%>
+</div>
+
+  <% else %>
+    <p class="flash-msg"><%= "#{t('no_category')}" %></p>
+  <% end %>
+<%= will_paginate @categories,:params=>{:controller => "galleries",:action => "search_album", :search => params[:search]}%>
+<%end%>
+</div>
+
+
+<script>
+var search_tag="<%= raw (sanitize params[:search][:search_tag]).to_s %>";
+var q = jQuery.noConflict();
+function openAlbum(id){
+  window.open('/galleries/category_show/'+id+' ','_self')
+}
+j("#search_box").val(search_tag);
+
+var searchbox = document.getElementById("search_box");
+if(searchbox!=null){
+  searchbox.addEventListener("input", function() {
+    if(this.value.length>0){
+      j('#search_submit').prop('disabled', false);
+    }
+    else{
+      j('#search_submit').prop('disabled', true);
+    }
+
+  });
+}
+
+
+</script>

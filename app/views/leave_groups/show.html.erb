@@ -1,0 +1,146 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_management') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('leave_groups') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if @leave_group.employees.present? %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "+ #{t('add_employees')}", add_employees_leave_group_path(@leave_group) %></li>
+            <% end %>
+            <% if permitted_to? :delete_group, :leave_groups %>
+              <% unless @leave_group.employees.present? %>
+                <% message = t('leave_group_will_be_deleted', {:name => @leave_group.name}) %>
+              <% else %>
+                <% message = "<p>#{t('leave_group_deleting_warning')}</p><p><b>#{t('leave_group_deleting_warning_employee_leave_warning', {:count => @leave_group.employees_count})}</b></p><p>#{t('leave_group_deleting_confirmation')}</p>" %>
+              <% end %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to t('delete'), delete_group_leave_group_path(@leave_group), :onclick => "return make_popup_box(this, 'confirm', '#{message}',{'ok' : '#{t('delete_leave_group')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_leave_group')}', 'popup_class' : 'remove_lt'});" %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_groups_show, @leave_group %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="group_details">
+        <div class="fields-details">
+            <div class="field-label"><%= t('leave_group') %>: </div>
+            <div class="fields-val" id="group_name"><b><%= @leave_group.name %></b></div>
+            <%= link_to_remote "#{t('edit')}", :url => edit_leave_group_path(@leave_group) ,:method => :get, :html => {:class => "add-link"} %>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('description') %>: </div>
+            <div class="fields-val"><%= (@leave_group.description.present? ? @leave_group.description : "-") %></div>
+        </div>
+    </div>  
+    <div id="group_status">
+        <div class="fields-details">
+            <div class="field-label"><%= t('leave_types') %></div>
+            <div class="fields-val">: <b><%= @leave_group.leave_types_count %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('assigned_employees') %></div>
+            <div class="fields-val">: <b><%= @leave_group.employees_count %></b></div>
+        </div>
+    </div>  
+    <hr/>
+    <div id="left">
+        <div id ="header"><%= t('assigned_leave_types') %></div>
+        <%= link_to_remote "+ #{t('manage_leave_types')}", :url => add_leave_types_leave_group_path(@leave_group) ,:method => :get, :html => {:class => "add-link"} %>
+        <% if @leave_group.employee_leave_types.present? %>
+          <table align="center" width="100%" cellpadding="1" cellspacing="1">
+              <tr class="tr-head">
+                  <td class="type_name"><%= t('leave_types') %></td>
+                  <td class="type_count"><%= t('leave_count').titleize %></td>
+                  <td class="action"></td>
+              </tr>
+              <% @leave_group.leave_group_leave_types.each do |type| %>
+                <% if type.employee_leave_type.present? and type.employee_leave_type.is_active %>
+                  <tr>
+                      <td class="type_name"><%= type.employee_leave_type.name_with_code %></td>
+                      <td class="type_count">
+                           <% leave_credit_type = leave_credit_type(type.employee_leave_type_id) %>
+                          <% if leave_credit_type == "Slab" and type.display_leave_count == nil %>
+                          <%= t("slab_type") %>
+                          <% else %>
+                          <%= type.display_leave_count %>
+                          <% end %>
+                      </td>
+                      <td class="action"><%= link_to t('remove'), {:controller => "leave_groups", :action => "remove_leave_type", :id => @leave_group.id, :leave_type_id => type.id}, :onclick => "return make_popup_box(this, 'confirm', '#{t('remove_leave_type_confirmation_message', {:name => type.employee_leave_type.name_with_code, :group_name => @leave_group.name})}',{'ok' : '#{t('remove')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('remove_leave_type')}', 'popup_class' : 'remove_lt'});" %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+          </table>
+        <% else %>
+          <div class="blank-div"><%= t('add_leave_types_to_this_group') %></div>
+        <% end %>
+    </div>
+    <div id="right">
+        <div id ="header"><%= t('employee_summary') %></div>
+        <% if @leave_group.employees.present? %>
+          <%= link_to "#{t('manange_employees')}", manage_employees_leave_group_path(@leave_group) ,:method => :get, :class => "add-link" %>
+          <% if @employee_departments.present? %>
+            <table align="center" width="100%" cellpadding="1" cellspacing="1">
+                <tr class="tr-head">
+                    <td class="type_name"><%= t('department') %></td>
+                    <td class="type_count"><%= t('multiple_employees') %></td>
+                    <td class="action"></td>
+                </tr>
+                <% @employee_departments.each do |dep| %>
+                  <tr>
+                      <td class="type_name"><%= dep.name %></td>
+                      <td class="type_count"><%= dep.employees_count %></td>
+                      <td class="action"><%= link_to t('view_employees'), {:controller => "leave_groups", :action => "manage_employees", :id => @leave_group.id, :search => {:employee_department_id => dep.id}} %></td>
+                  </tr>
+                <% end %>
+            </table>
+          <% end %>
+        <% else %>
+          <%= link_to "+ #{t('add_employees')}", add_employees_leave_group_path(@leave_group), :class => "add-link" %>
+          <div class="blank-div"><%= t('add_employees_to_this_group') %></div>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  function checkAll()
+  {
+      if (j('.select_all').prop('checked') == true)
+      {
+          j('.select_leave').each(function () {
+              j(this).prop('checked', true);
+              selectLeaveType(this);
+          });
+      } else {
+          j('.select_leave').each(function () {
+              j(this).prop('checked', false);
+              selectLeaveType(this);
+          });
+      }
+  }
+
+  function selectLeaveType(elm)
+  {
+      if (j(elm).prop('checked') == true)
+          j(elm).parent().siblings('.lev_count').children('.leave_count').attr('readonly', false)
+      else
+          j(elm).parent().siblings('.lev_count').children('.leave_count').attr('readonly', true)
+      allLeaves();
+  }
+
+  function allLeaves()
+  {
+      if (j(".select_leave").not(":checked").length > 0)
+          j('.select_all').prop("checked", false);
+      else
+          j('.select_all').prop("checked", true);
+  }
+
+</script>

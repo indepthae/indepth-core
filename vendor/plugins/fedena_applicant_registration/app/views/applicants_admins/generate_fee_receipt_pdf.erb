@@ -1,0 +1,76 @@
+
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag "#{RAILS_ROOT}/public/stylesheets/rtl/applicants_admins/generate_fee_receipt_pdf.css" ,:media=>"all"%>
+  <%else %>
+    <%= stylesheet_link_tag "#{RAILS_ROOT}/public/stylesheets/applicants_admins/generate_fee_receipt_pdf.css" ,:media=>"all"%>
+  <% end %>
+<% end %>
+<div id="page-yield">
+    <%=render :partial=>'fee_report_header'%>
+    <div class="subsection">
+        <hr class="light_hor_line"/>
+        <div id="sub_text_left"><%=t('particular')%></div>
+        <div id="sub_text_right" class=""><%=t('amount')%> (<%= @currency %>)</div>
+        <hr class="light_hor_line"/>
+        <div class="extender"></div>
+    </div>
+    <% i = 1 %>
+    <div class="particulars_list">
+        <div class="slno"><%= i %>.</div>
+        <div class="particalar_name"><%="#{t('applicants.application_fee')}"%></div>
+        <div class="particalar_amount"><%= precision_label @application_fee %></div>
+    </div>
+    <% if @subject_amounts.present? %>
+      <%  unless  @normal_subject_amount == 0.to_f %>
+        <% i = i+1 %>
+        <div class="particulars_list">
+            <div class="slno"><%= i %>.</div>
+            <div class="particalar_name"><%="#{t('subject_fees')}"%></div>
+            <div class="particalar_amount"><%= precision_label @normal_subject_amount %></div>
+        </div>
+      <% end %>
+      <%  if @elective_subjects.present?  %>
+        <% i = i+1 %>
+        <div class="particulars_list">
+            <div class="slno"><%= i %>.</div>
+            <div class="particalar_name">&#x200E;<%="#{t('elective_subject_fees')} ("%><%= @elective_subjects %>)&#x200E;</div>
+            <div class="particalar_amount"><%= precision_label @elective_subject_amount %></div>
+        </div>
+      <%  end %>
+    <% end %>
+    <div id="payment_info_section">
+    <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%="#{t('payment_mode')} :"%></div>
+              <div class="value_span" style="font-weight:bold;"><%= @online_transaction_id.present? ? t('online') : t('offline') %></div>
+          </div>   
+      </div>
+    <% if @online_transaction_id.present? %>
+      <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%="#{t('transaction_id')} :"%></div>
+              <div class="value_span" style="font-weight:bold;"><%= @online_transaction_id %></div>
+          </div>   
+      </div>
+    <% end %>
+    </div>
+    <div class="receipt-footer-bottom words_bottom" style="border: 1px solid #999999;">
+        <div class="left_info amount_margin" style="display:<%= (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") ? 'block' : 'none' %>;"><span style="font-weight: bold;" class="float-left"><%= "#{ t('amount_in_words')}: "%>&nbsp;&nbsp;</span><span class="float-left"><%= NumberToWord.convert(precision_label(@financetransaction.amount.to_f), @config[:pdf_receipt_nsystem], @default_currency) %></span></div>    
+        <div class="right_total amount_paid">
+            <b>
+                <div class="right_total_label"><%= "#{t('total_amount_paid')}" %></div>
+                <div class="right_total_amount"><%= precision_label(@financetransaction.amount.to_f) %></div>
+            </b>
+        </div>
+    </div>
+    <div id="pdf-footer-second">
+        <div class="note_part"><%= @config[:pdf_receipt_custom_footer] %></div>    
+        <div class="signature_part">
+            <% if @config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1" %>
+              <%= @config[:pdf_receipt_signature_name].blank? ? t('signature') :  @config[:pdf_receipt_signature_name] %>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="page-break"></div>

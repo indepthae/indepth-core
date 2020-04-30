@@ -1,0 +1,214 @@
+<% s3_enabled =  FedenaSetting.s3_enabled? %>
+
+<%if @keys[:full_name].present?%>
+  template_app.full_name = <%= @employee.full_name.to_json%>;
+<%end%>
+
+<%if @keys[:first_name].present?%>
+  template_app.first_name = <%= @employee.first_name.to_json%>;
+<%end%>
+
+<%if @keys[:middle_name].present?%>
+  template_app.middle_name = <%= @employee.middle_name.to_json%>;
+<%end%>
+
+<%if @keys[:last_name].present?%>
+  template_app.last_name = <%= @employee.last_name.to_json%>;
+<%end%>
+
+<%if @keys[:employee_number].present?%>
+  template_app.employee_number = <%= @employee.employee_number.to_json%>;
+<%end%>
+
+<%if @keys[:joining_date].present?%>
+  template_app.joining_date = <%= (format_date(@employee.joining_date)).to_s.to_json %>;
+<%end%>
+<%if @keys[:joining_date_in_words].present?%>
+  template_app.joining_date_in_words = <%= get_date_in_words(@employee.joining_date).to_json %>; 
+<%end%>
+
+<%if @keys[:department].present?%>
+  template_app.department = <%= @employee.employee_department.name.to_json %>;
+<%end%>
+
+<%if @keys[:category].present?%>
+  template_app.category = <%= @employee.employee_category.name.to_json %>;
+<%end%>
+
+<%if @keys[:position].present?%>
+  <%if @employee.employee_position.present?%>
+    template_app.position = <%= @employee.employee_position.name.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:grade].present?%>
+  <%unless @employee.employee_grade.nil?%>
+    template_app.grade = <%= @employee.employee_grade.name.to_json  %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:job_title].present?%>
+  template_app.job_title = <%= @employee.job_title.to_json %>;
+<%end%>
+
+<%if @keys[:email].present?%>
+  template_app.email = <%= @employee.email.to_json %>;
+<%end%>
+
+<%if @keys[:qualification].present?%>
+  template_app.qualification = <%= @employee.qualification.to_json %>;
+<%end%>
+
+<%if @keys[:total_experience].present?%>
+  template_app.total_experience = <%= @employee.total_experience_tag.to_json %>;
+<%end%>
+
+<%if @keys[:biometric_id].present?%>
+  <% @biometric_id = BiometricInformation.find_by_user_id(@employee.user_id).try(:biometric_id) %>
+  template_app.biometric_id = <%= @biometric_id.to_json %>;
+<%end%>
+
+<%if @keys[:date_of_birth].present?%>
+  template_app.date_of_birth = <%= (format_date(@employee.date_of_birth)).to_json %>;
+<%end%>
+
+<%if @keys[:dob_in_words].present?%>
+  template_app.dob_in_words = <%= get_date_in_words(@employee.date_of_birth).to_json %>;
+<%end%>
+
+<%if @keys[:marital_status].present?%>
+  <%if @employee.marital_status.present?%>
+    template_app.marital_status = <%= (t(@employee.marital_status)).to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:no_of_children].present?%>
+  template_app.no_of_children = <%= @employee.children_count.to_json %>;
+<%end%>
+
+<%if @keys[:fathers_name].present?%>
+  template_app.fathers_name = <%= @employee.father_name.to_json %>;
+<%end%>
+
+<%if @keys[:mothers_name].present?%>
+  template_app.mothers_name = <%= @employee.mother_name.to_json %>;
+<%end%>
+
+<% unless @employee.marital_status == "single" %>
+  <%if @keys[:spouse_name].present?%>
+    template_app.spouse_name = <%= @employee.husband_name.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:blood_group].present?%>
+  template_app.blood_group = <%= @employee.blood_group.to_json %>;
+<%end%>
+
+<%if @keys[:nationality].present?%>
+  <%if @employee.nationality.present?%>
+    template_app.nationality = <%= @employee.nationality.full_name.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:home_address].present?%>
+  template_app.home_address = <%= "#{@employee.home_address_line1}  #{@employee.home_address_line2}".to_json  %>;
+<%end%>
+
+<%if @keys[:home_city].present?%>
+  template_app.home_city = <%= @employee.home_city.to_json %>;
+<%end%>
+
+<%if @keys[:home_state].present?%>
+  template_app.home_state = <%= @employee.home_state.to_json %>;
+<%end%>
+
+<%if @keys[:home_country].present?%>
+  template_app.home_country = <%= (@employee.home_country.try(:full_name)).to_json %>;
+<%end%>
+
+<%if @keys[:home_pin_code].present?%>
+  template_app.home_pin_code = <%= @employee.home_pin_code.to_json %>;
+<%end%>
+
+<%if @keys[:office_address].present?%>
+  template_app.office_address = <%= "#{@employee.office_address_line1}  #{@employee.office_address_line2}".to_json %>;
+<%end%>
+
+<%if @keys[:office_city].present?%>
+  template_app.office_city = <%= @employee.office_city.to_json %>;
+<%end%>
+
+<%if @keys[:office_state].present?%>
+  template_app.office_state = <%= @employee.office_state.to_json %>;
+<%end%>
+
+<%if @keys[:office_country].present?%>
+  template_app.office_country = <%= (@employee.office_country.try(:full_name)).to_json %>;
+<%end%>
+
+<%if @keys[:office_pin_code].present?%>
+  template_app.office_pin_code = <%= @employee.office_pin_code.to_json %>;
+<%end%>
+
+<%if @keys[:office_phone_1].present?%>
+  template_app.office_phone_1 = <%= @employee.office_phone1.to_json %>;
+<%end%>
+
+<%if @keys[:office_phone_2].present?%>
+  template_app.office_phone_2 = <%= @employee.office_phone2.to_json %>;
+<%end%>
+
+<%if @keys[:mobile].present?%>
+  template_app.mobile = <%= @employee.mobile_phone.to_json %>;
+<%end%>
+
+<%if @keys[:home_phone].present?%>
+  template_app.home_phone = <%= @employee.home_phone.to_json %>;
+<%end%>
+
+<%if @keys[:gender].present?%>
+  template_app.gender = <%= @employee.gender_tag.to_json %>;
+<%end%>
+
+<%if @keys[:fax].present?%>
+  template_app.fax = <%= @employee.fax.to_json %>;
+<%end%>
+
+<%if @keys[:gross_pay].present?%>
+  <%  if @employee.employee_salary_structure.present?%>
+    template_app.gross_pay = <%=  "#{precision_label(@employee.employee_salary_structure.gross_salary)}".to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:experience_info].present?%>
+  template_app.experience_info = <%=   @employee.experience_detail.to_json %>;
+<%end%>
+
+<%if @keys[:employee_photo].present?%>
+  <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled%>
+    <%if @employee.photo.present?%>
+      template_app.employee_photo = <%= (File.join(RAILS_ROOT, @employee.photo.path)).to_json %>;
+    <%end%>
+  <%else%>
+    template_app.employee_photo = <%= @employee.photo.url(:original,false).to_json %>;
+  <%end%>
+<%end%>
+
+<% if @keys[:barcode].present?%>
+  <% # linked_to = -1 indicates linked to employee_number %>
+  <%if @base_template.barcode_property.present? && @base_template.barcode_property.linked_to != "-1" %>
+    <%barcode_property = @base_template.barcode_property %>
+      template_app.barcode.barcode_value = <%= @additional_field_values[barcode_property.linked_to.to_s].present? ? @additional_field_values[barcode_property.linked_to.to_s].to_json : "barcode".to_json  %>;
+      template_app.barcode.compute_barcode();
+  <%else%>
+    template_app.barcode.barcode_value = <%= @employee.employee_number.to_json%>;
+    template_app.barcode.compute_barcode();
+  <%end%>
+<%end%>
+
+<% #ADDITIONAL FIELDS FOR EMPLOYEE %>
+<%@additional_field_values.each do |key, value|%>
+  <%if @keys[key.to_sym].present?%>
+    template_app.<%= key.to_s %> = <%= value.to_json %>;
+  <%end%>
+<%end%>

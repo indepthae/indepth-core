@@ -1,0 +1,175 @@
+<% form_for  :message ,:url=>save_message_template_message_templates_path, :html=>{ :method=>:post, :id=>"sms_form"} do |f| %>
+  <%= f.hidden_field :user_type , :value =>  @user_type  %>
+  <%= f.hidden_field 'date', :value => @date %>
+  <%= f.hidden_field 'send_type', :value => @send_type %>
+  <%= session_fingerprint_field %>
+  <div class="template_new_message_switcher">
+      <label class="check_label"  >
+          <%= f.radio_button  "type", "template", :class=>"check", :checked=>"checked" %>
+          <%= t('select_from_template') %>
+      </label>
+      <label class="check_label" >
+          <%= f.radio_button  "type", "new_message", :class=>"check" %>
+          <%= t('create_new_message') %>
+      </label>
+  </div>
+  <div id="template_message_creator" class="template">
+      <div class="field_set">
+          <label class="head_label"><%= t('select_template') %></label>
+          <%= f.select :template , @templates.map{|t| [t.template_name,t.id]}, {:include_blank=>t('select_template')},  :class=>"drop_select", :id=>"template" %>
+      </div>
+
+      <%= f.hidden_field "user_type", :value => @user_type, :id=> "send_user_type" %>
+      <div id="template_content">
+          <div class="field_set">
+              <% if @user_type == "GroupMembers"%>
+                <label class="head_label"><%= t('student_template') %></label>
+                <%= f.text_area "template_message[student]", :rows=>6, :class=>"template_content_check"%>
+                <label class="head_label"><%= t('employee_template') %></label>
+                <%= f.text_area "template_message[employee]", :rows=>6, :class=>"template_content_check"%>
+                <label class="head_label"><%= t('guardian_template') %></label>
+                <%= f.text_area "template_message[guardian]", :rows=>6, :class=>"template_content_check"%>
+              <%else%>
+                <label class="head_label"><%= t('template') %></label>
+                <%= f.text_area :template_message, :rows=>6, :class=>"template_content_check" %>
+              <%end%>
+          </div>
+      </div>
+
+  </div>
+  <div id="message_creator" class="new_message">
+      <div class="field_set">
+          <label class="head_label"><%= t('message') %></label>
+          <%= f.text_area :message, :rows=>6, :class=>"content_check", :onkeyup => "fetch_sms_length(this);"%>
+          <div id="sms_count"><div id="sms_word_count">0</div><%= t('characters') %></div>
+      </div>
+  </div>
+
+  <% if @user_type == 'Student' %>
+    <div class="send_copy">
+        <div class="copy_all"><%= t('send_copy') %></div>
+        <div class="send_parents"><%= check_box_tag "all_parents" %>  <label class="head_label"><%= t('all_parents') %></label></div>
+        <div class="send_immediate"><%= check_box_tag "all_immediate" %><label class="head_label"><%= t('all_immediate') %></label></div>
+    </div>
+  <% end %>
+  <div class="submit_controls"><%= f.submit t("send_sms"), :class=>"solid_button" %></div>
+<%end%>
+
+
+
+<script>
+  switch_message_creator();
+
+  j("input[name='message[type]']").change(function () {
+      switch_message_creator();
+  });
+  function switch_message_creator() {
+      if (j("#message_type_template").prop("checked") == true) {
+          j("#template_message_creator").css("display", "block");
+      } else {
+          j("#template_message_creator").css("display", "none");
+      }
+
+      if (j("#message_type_new_message").prop("checked") == true) {
+          j("#message_creator").css("display", "block");
+      } else {
+          j("#message_creator").css("display", "none");
+      }
+  }
+
+
+  j("#template").change(function () {
+      j.ajax({
+          url: "/sms/template_content_for_send",
+          type: 'POST',
+          data: {
+              user_type: j("#send_user_type").val(),
+              template_id: j(this).val()
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+
+
+  j("#sms_form").submit(function (e) {
+      e.preventDefault();
+      if (validate_sms_send() == true)
+      {
+          var formData = new FormData(e.target);
+          recipients = Object.toJSON(user_selector.selected_values());
+          formData.append("recipients", recipients);
+          formData.append("group_id", j(".group_selector").val());
+          formData.append("group_type", j('input[name="user_type_selector[user_type]"]:checked').val());
+          j.ajax({
+              url: "/sms/send_sms_to_recipients",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (data, textStatus, jqXHR)
+              {
+              },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+              }
+          });
+      }
+  });
+
+  function validate_sms_send() {
+      //content check
+      j(".error_msg_box").remove();
+      failure = false;
+      if (j("#message_type_template")[0].checked == true) {
+          j(".template_content_check").each(function (e) {
+              if (this.value == "") {
+                  failure = true;
+                  set_error_properties(this, <%= t('sms_content_cannot_be_blank').to_json %>);
+              }
+          });
+      }
+      else if (j("#message_type_new_message")[0].checked == true) {
+          j(".content_check").each(function (e) {
+              if (this.value.trim() == "") {
+                  failure = true;
+                  set_error_properties(this, <%= t('sms_content_cannot_be_blank').to_json %>);
+              }
+          });
+      }
+      else {
+      }
+
+      //recipients check
+      var list = user_selector.selected_values()[0]["b1"]["list"];
+      var at_least_one_recipient_present = false;
+      for (var i = 0; i < list.length; i++) {
+          console.log(list[i])
+          if (list[i].selected == 1 || list[i].selected == 2) {
+              at_least_one_recipient_present = true;
+              break;
+          }
+      }
+      if (at_least_one_recipient_present == false) {
+          failure = true;
+          set_error_properties(j(".selector_box")[0], <%= t('select_atleast_one_recipient').to_json %>);
+      }
+
+      if (failure == true) {
+          return false;
+      }
+      {
+          return true
+      }
+  }
+
+  function set_error_properties(element, message) {
+      var error_box = "<div class='wrapper error_msg_box'><div class='error-icon'></div><div class='error-msg'>" + message + "</div></div>"
+      j(element).after(error_box);
+  }
+
+</script>

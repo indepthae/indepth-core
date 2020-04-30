@@ -1,0 +1,371 @@
+@page {
+    margin: 0mm;
+    /*margin: 10mm 10mm 10mm 10mm;*/
+    size: A5 portrait;
+    margin-left: 6mm;
+    margin-right: 6mm;
+    margin-top: 6mm;
+    margin-bottom: 6mm;
+    width: 148mm;
+    height: 210mm;
+    /*width: 138.5mm*/
+}
+
+body {
+    font-size: 12px;
+    margin-top: 0;
+    font-family: arial !important;
+    font-size: 13px;
+    min-width: 125mm;
+    margin: 0px;
+    float: left;
+}
+
+.receipt-container {
+    /*border-width: 1px;
+    border-style: solid;*/
+    /*height: 200mm;*/
+    /*min-height: 200mm;
+    width: 142mm;*/
+    /*height: 400px;  /* temp */
+    /* A5 dimensions*/
+    width: 135mm;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    /*height: 210mm;*/
+    min-height: 150mm;
+    page-break-inside: avoid;
+    page-break-after: always;
+}
+
+.receipt-header {
+    border: none;
+}
+
+.institution_header {
+    /*width: 550px;*/
+    width: 82%;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    float: right;
+    /*width: 100%;*/
+    /*margin: 10px;*/
+
+    /*float: left;*/
+}
+
+.institution_name {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    /*margin-top: 5px;*/
+}
+
+.institution_address {
+    font-size: 11px;
+}
+
+.top {
+    padding-left: 10px;
+}
+
+.top span {
+    width: 33%;
+    float: left;
+}
+
+.top .title {
+    font-size: 14px;
+    /*font-weight: bold;*/
+}
+
+.top .receipt_no {
+    text-align: center;
+}
+
+.top .date {
+    text-align: right;
+
+}
+
+.receipt-details {
+    overflow: hidden; /* TODO implement better method */
+
+}
+
+.receipt-details-list {
+    float: left;
+    /*width: 350px;*/
+    margin-left: 10px;
+    width: 45%;
+}
+
+.receipt-details-list:last-child {
+    float: right;
+    margin-right: 10px;
+}
+
+.receipt-details-list-item {
+    clear: both;
+    height: 35px;
+    margin-top: 5px;
+
+}
+
+.receipt-details-list-item .left {
+    float: left;
+    width: 100%;
+
+}
+
+.receipt-details-list-item .right {
+    float: left;
+    /*width: 140px;*/
+    width: 265px;
+    margin-top: 5px;
+}
+
+section.particulars-header {
+    /*margin-left: 10px;*/
+    /*margin-right: 10px;*/
+    /*font-weight: bold;*/
+    border-top: 0px;
+}
+
+.particulars-header-left {
+    float: left;
+    margin-left: 10px;
+}
+
+.particulars-header-right {
+    float: right;
+    margin-right: 10px;
+}
+
+.particulars {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.particular-wise-particulars {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    overflow: hidden;
+}
+
+.particular_wise_item {
+    padding-left: 5px;
+    padding-right: 5px;
+    border: 0px;
+}
+
+.fine, .discounts, .tax {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.particulars-item {
+    float: left;
+    width: 100%;
+    line-height: 20px;
+}
+
+.particulars-item-left {
+    float: left;
+    /*margin-left: 5px;*/
+}
+
+.particulars-item-right {
+    float: right;
+    text-align: right;
+    /*margin-right: 5px;*/
+}
+
+.payment-mode {
+
+}
+
+.payment-mode div {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+.summary {
+    /*margin-left: 10px;*/
+    /*margin-right: 10px;*/
+    border-top: 0px;
+    border-left: none;
+    border-right: none;
+}
+
+.summary .left, .summary .right {
+    float: left;
+}
+
+.summary .right .row span {
+    float: right;
+    margin-right: 8px;
+}
+
+.summary .left {
+    width: 46%;
+    margin-left: 10px;
+    /*width: 310px;*/
+}
+
+.summary .right {
+    width: 48%;
+    float: right;
+    /*width: 205px;*/
+}
+
+section {
+    /*border-bottom:2px solid #333;*/
+    border: 1px solid #333;
+    border-collapse: collapse;
+    clear: both;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    overflow: auto;
+    margin-top: -1px; /* workaround for border collapse*/
+    margin-bottom: -1px; /* workaround for border collapse*/
+}
+
+/*Particular wise*/
+.particular_wise_item {
+
+}
+
+.particular_wise_item .particular_name {
+    /*font-weight: bold;*/
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
+    /*width: 210px;*/
+    width: 42%;
+}
+
+.particular_wise_item .particular_wise_item_details {
+    font-weight: normal;
+    float: right;
+    width: 100%;
+    margin-left: 5px;
+    margin-right: 5px;
+    line-height: 14px;
+}
+
+.particular_wise_item_details_list {
+    float: left;
+    /*width: 324px;*/
+    width: 55%;
+}
+
+.particular_wise_item_details .left {
+    width: 70%;
+    text-align: right;
+
+}
+
+.particular_wise_item_details .right {
+    width: 30%;
+    text-align: right;
+}
+
+.sub-receipt-details-list-item {
+    float: left;
+    width: 50%;
+}
+
+.receipt-footer {
+    margin: 10px;
+}
+
+.payment-mode {
+    border-bottom-width: 0px;
+}
+
+.dont-break {
+    page-break-inside: avoid;
+}
+
+.dont-break {
+    border: 1px solid #333;
+}
+
+.border-fix {
+    border-right: none;
+    border-left: none;
+}
+
+.words_bottom {
+    font-weight: bold;
+    border-right: 1px solid #333;
+    border-left: 1px solid #333;
+}
+
+.pdf-footer-second {
+    /*float: right;*/
+    border: none !important;
+}
+
+.note_part {
+    width: 70% !important;
+    margin: 0 auto !important;
+    font-size: 11px;
+}
+
+.signature_part {
+    width: 20% !important;
+    float: right !important;
+    margin-top: 45px;
+    font-size: 13px;
+}
+
+.payment-mode {
+    border-right: none;
+    border-left: none;
+}
+
+.logo {
+    width: 66px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 2px;
+    padding-bottom: 3px;
+    /*display: none;*/
+}
+
+.logo img {
+    width: 100%;
+    display: block
+}
+
+.none {
+    width: 98% !important;
+    /*padding-right: 4px;*/
+    padding-left: 4px;
+}
+
+.amount_margin {
+    font-weight: lighter;
+}
+
+.amount_in_words {
+    font-weight: bold;
+}
+
+.no-top-border {
+    border-top: 0px;
+}
+
+.no_bold {
+    font-weight: normal !important;
+}

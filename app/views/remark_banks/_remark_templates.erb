@@ -1,0 +1,19 @@
+<table>
+    <tr class="tr-head">
+        <td class="col-1"><%= t('sl_no') %></td>
+        <td class="col-3"><%= t('name') %></td>
+        <td class="col-4"><%= t('template') %></td>
+    </tr>
+    <% @remark_templates.each_with_index do |rt,i| %>
+      <tr>
+          <% sl=((@remark_templates.current_page - 1)*@remark_templates.per_page)+(i+1) %>
+          <td class="col-1"><%= sl %></td>
+          <td class="col-3"><%= rt.name %></td>
+          <td class="col-4"><%= rt.template_body %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @remark_templates.present? %>
+  <%= pagination_status(@remark_templates) %>
+<% end %>
+<%= will_paginate @remark_templates, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "remark_banks",:action => "show",:id => @remark_bank.id}%>

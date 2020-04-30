@@ -1,0 +1,17 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('task_text') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('edit_task') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :tasks_edit,@task%>
+    <%=render_breadcrumbs%>
+  </div>
+ <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+    <%= error_messages_for 'task', :header_message => nil %>
+<%= render :partial => "edit_task" %>
+</div>

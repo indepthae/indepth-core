@@ -1,0 +1,66 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('rejected_payslips') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% if params[:from] == 'payslip_employees' %>
+        <% breadcrumb :employee_payslips_view_all_rejected_payslips_finance, params[:from] %>
+      <% else %>
+        <% breadcrumb :group_payslips_view_all_rejected_payslips_finance %>
+      <% end %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="header">
+    <%= t('rejected_payslips').titleize %>
+  </div>
+
+  <div>
+    <div id="description">
+      <%= params[:finance].present? ? t('view_all_rejected_payslips_finance_desc') : t('view_all_rejected_payslips_desc') %>
+    </div>
+    <div id="filters">
+      <div class="heading"><%= t('filters') %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+
+      <div class="label-field-pair" id="status_filter">
+        <label for="employee_department"><%= t('payroll_group') %> </label>
+        <div class="text-input-bg"><%= select_tag :payroll_group_id, options_for_select([["#{t('all_payroll_groups')}",'All']] + @payroll_groups.map{|pg| [pg.name,pg.id]}, 'All'), :onchange =>"#{remote_function(:url => {:action => "view_all_rejected_payslips", :finance => params[:finance], :from => params[:from]},
+          :with => "'pg_id='+value+'&dpt_id='+j('#department_id').val()",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')")}"%></div>
+      </div>
+
+      <div class="label-field-pair" id="employees_filter">
+        <label for="employee_department"><%= t('employee_department') %> </label>
+        <div class="text-input-bg"><%= select_tag :department_id, options_for_select([["#{t('all_departments')}",'All']] + @departments.map { |c| [c.name, c.id] }, 'All'), :onchange =>"#{remote_function(:url => {:action => "view_all_rejected_payslips", :finance => params[:finance], :from => params[:from]},
+          :with => "'dpt_id='+value+'&pg_id='+j('#payroll_group_id').val()",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')")}"%>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="employees">
+    <%= render :partial => "rejected_employee_list" %>
+  </div>
+</div>

@@ -1,0 +1,90 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= render_help_wizard %>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('settings')}" ,:controller=>'transport',:action=>'configurations' %> </div>
+            <div class="link-descr"><%= t('transport_settings_desc') %></div>
+        </div> 
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('vehicle_stops.stops')}" ,:controller=>'vehicle_stops',:action=>'index' %> </div>
+            <div class="link-descr"><%= t('vehicle_stops.vehicle_stops_desc') %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('vehicles')}" ,:controller=>'vehicles',:action=>'index'  %>  </div>
+            <div class="link-descr"><%= t('vehicle_details') %></div>
+        </div>        
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('transport_employees.manage_drivers_and_attendant')}" ,:controller=>'transport_employees',:action=>'index'  %>  </div>
+            <div class="link-descr"><%= t('transport_employees.manage_drivers_and_attendant_desc') %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('set_routes')}" ,:controller=>'routes',:action=>'index' %> </div>
+            <div class="link-descr"><%= t('set_routes_for_vehicle') %></div>
+        </div> 
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('assign_transport')}" ,:controller=>'transport' , :action=>'index' %></div>
+            <div class="link-descr"><%= t('transport_details_text') %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('transport_fee_text')}",:controller=>'transport_fee'  ,:action=>'index' %></div>
+            <div class="link-descr"><%= t('transport_fee_details') %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('transport_attendance.transport_attendance_text')}",:controller=>'transport_attendance'  ,:action=>'index' %></div>
+            <div class="link-descr"><%= "#{t('transport_attendance.transport_attendance_desc')}" %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('vehicle_maintenances.vehicle_maintenance_text')}" ,:controller=>'vehicle_maintenances',:action=>'index'  %>  </div>
+            <div class="link-descr"><%= t('vehicle_maintenances.vehicle_maintenance_desc') %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('transport_imports.transport_import_text')}",:controller=>'transport_imports'  ,:action=>'new' %></div>
+            <div class="link-descr"><%= "#{t('transport_imports.transport_imports_desc')}" %></div>
+        </div>
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('transport_reports.transport_report')}",:controller=>'transport_reports'  ,:action=>'index' %></div>
+            <div class="link-descr"><%= "#{t('transport_reports.transport_related_report')}" %></div>
+        </div>
+        
+        <% unless validate_edit_sms_template.is_enabled == false %>
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('notification')}",:controller=>'transport'  ,:action=>'send_notification' %></div>
+            <div class="link-descr"><%= "#{t('notification')}" %></div>
+        </div>
+        <% end %>
+         <%if Transport.gps_enabled %>
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('gps_sync')}",:controller=>'transport_gps_syncs'  ,:action=>'index' %></div>
+            <div class="link-descr"><%= "#{t('sync_gps_to_tranport')}" %></div>
+        </div>
+          <%end%>
+    </div>
+
+    <div class="extender"></div>
+</div>
+</div>
+

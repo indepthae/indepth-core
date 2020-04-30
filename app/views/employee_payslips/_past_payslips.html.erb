@@ -1,0 +1,52 @@
+<table>
+  <tr class="tr-head">
+    <td class="range"><%= t('pay_period') %></td>
+    <td class="status"><%= t('payslip_status') %></td>
+    <td class="amount"><%= t('salary') + " &#x200E;(#{currency})&#x200E;" %></td>
+    <td class="actions"></td>
+  </tr>
+  <% if @payslips.present? %>
+    <% @payslips.each do |year, payslips| %>
+      <tr class="tr-head bg_light_grey">
+        <td colspan="2"><%= "#{year} - #{year.next}" %></td>
+        <td colspan="2"><%= "#{t('total_cost')}: #{precision_label(payslips.map(&:net_pay).sum(&:to_f))}" %></td>
+      </tr>
+      <% payslips.each do |payslip| %>
+        <tr>
+          <td class="range"><%= payslip.date_range %></td>
+          <td class="status">
+            <span class="generated"><%= "#{t('generated')} : #{payslip.generated}" %>
+              <span class="of_text"><%= "#{t('of')} #{@payroll_group.employees.count} " %></span>
+            </span>
+            <span class="approved"><%= "#{t('approved')} : #{payslip.approved}" %></span>
+            <span class="pending"><%= "#{t('pending')} : #{payslip.pending}" %></span>
+            <% unless payslip.rejected.to_i == 0 %>
+              <span class="rejected"><%= "#{t('rejected')} : #{payslip.rejected}" %></span>
+            <% end %>
+          </td>
+          <td class="amount"><%= precision_label(payslip.net_pay) %></td>
+          <td class="actions">
+            <% if params[:finance].nil? %>
+              <% if permitted_to? :payslip_generation_list, :employee_payslips %>
+                <%= link_to t('view_payslips'), {:action => 'payslip_generation_list', :id => params[:id], :start_date => payslip.start_date, :end_date => payslip.end_date, :from => "past_payslips"} %>
+              <% end %>
+              <% if payslip.rejected.to_i > 0 and permitted_to? :rejected_payslips, :employee_payslips %>
+                <%= link_to t('rejected_payslips'), {:action => 'rejected_payslips',:id => params[:id], :start_date => payslip.start_date, :end_date => payslip.end_date} %>
+              <% end %>
+            <% else %>
+              <% if permitted_to? :payslip_generation_list, :employee_payslips %>
+                <%= link_to t('view_payslips'), {:action => 'payslip_generation_list', :id => params[:id], :start_date => payslip.start_date, :end_date => payslip.end_date, :from => "past_payslips_finance", :finance => params[:finance]} %>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end  %>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+<% if @payslips_list.present? %>
+  <%= pagination_status(@payslips_list) %>
+  <%= will_paginate @payslips_list,:renderer => 'RemoteLinkRenderer', :params => {:id => params[:id], :finance => params[:finance]}%>
+<% end %>

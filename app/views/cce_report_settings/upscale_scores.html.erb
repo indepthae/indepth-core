@@ -1,0 +1,82 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>Exams</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Upscale grades</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%if @batch.is_active%>
+      <% breadcrumb :cce_report_settings_upscale_scores, @batch%>
+    <%else%>
+      <% breadcrumb :cce_report_settings_previous_upscale_scores, @batch%>
+    <%end%>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="hider">
+    <% unless flash[:notice].nil? %>
+      <p id="flash-msg"class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div class="page_informer">Upscale Student Grades</div>
+  <div id="course_batches_section">
+    <%=render :partial=>'links_for_change'%>
+  </div>
+  <%if @settings.delete_if { |key, value| value.blank? }.blank? or @settings.delete_if { |key, value| value.blank? }.count < 4%>
+    <div id="batch_informer"></div>
+    <div id="no_data"></div>
+    <div id="flash-box"></div>
+    <div class="info">Upscaling criteria not defined correctly. Fill it here <%= link_to "Upscale Settings",upscale_settings_cce_report_settings_path %></div>
+    <div class="content_student_record">
+      <div id="student_list"></div>
+      <div id="student_record"></div>
+    </div>
+  <%elsif @students.count == 0%>
+    <div id="batch_informer"></div>
+    <div id="no_data"><div class='label-field-pair2' ><p class = 'flash-msg'> No students in this batch</p></div></div>
+    <div id="flash-box"></div>
+    <div class="content_student_record">
+      <div id="student_list"></div>
+      <div id="student_record"></div>
+    </div>
+  <%elsif @students.present? and @students.count == @non_eligible.count%>
+    <div id="batch_informer"></div>
+    <div id="no_data">
+      <div class='label-field-pair2' ><p class = 'flash-msg'> No students in this batch are eligible for upscaling</p></div>
+    </div>
+    <div id="flash-box"></div>
+    <div class="content_student_record">
+      <div id="student_list"></div>
+      <div id="student_record"></div>
+    </div>
+  <%elsif @subjects.blank?%>
+    <div id="batch_informer"></div>
+    <div id="no_data">
+      <div class='label-field-pair2' ><p class = 'flash-msg'> No subjects having exams in this batch</p></div>
+    </div>
+    <div id="flash-box"></div>
+    <div class="content_student_record">
+      <div id="student_list"></div>
+      <div id="student_record"></div>
+    </div>
+  <%else%>
+    <div id="holder">
+      <div id="batch_informer">
+        <%=render :partial=>'batch_info'%>
+      </div>
+      <div id="no_data"></div>
+      <div id="flash-box"></div>
+
+      <div class="content_student_record">
+        <div id="student_list">
+          <%= render  :partial=>"student_list" %>
+        </div>
+        <div id="student_record">
+          <%=render :partial=> 'individual_student_record'%>
+        </div>
+      </div>
+    </div>
+  <%end%>
+</div>
+

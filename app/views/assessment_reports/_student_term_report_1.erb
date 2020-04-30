@@ -1,0 +1,144 @@
+<% if @schol_report.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_term_report">
+      <% header = @schol_report.try(:report).try(:header)||[] %>
+      <% marks = @schol_report.try(:report).try(:marks)||[] %>
+      <% co_sch = @schol_report.try(:report).try(:activities)||[] %>
+      <% agg_marks = @schol_report.try(:report).try(:overall_marks) || [] %>
+      <% agg_grades = @schol_report.try(:report).try(:overall_grades) || [] %>
+      <% agg_percentage = @schol_report.try(:report).try(:overall_percentage) || [] %>
+      <% attendance = @schol_report.try(:report).try(:attendance)||[] %>
+      <%if  header.present? %>
+        <tr class="tr-head">
+            <td class="col-2"><%= t('scholastic_areas') %></td>
+            <td class="col-1" colspan="<%= header.length %>"><%= @term.try(:term_name_with_max_marks) || @reportable.try(:term_name_with_max_marks) || 'Term 1 (100)'%></td>
+        </tr>
+        <tr class="header-text">
+            <td><%= t('subject') %></td>
+            <% header.each do |name| %>
+              <td><%= name %></td>
+            <% end %>
+        </tr>
+        <% marks.each do |row| %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <% row.each do |cell| %>
+                <td><%= cell %></td>
+              <% end %>
+          </tr>
+        <% end %>
+        <% [agg_marks, agg_grades, agg_percentage].reject{|a| a.blank? }.each do |score| %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <td colspan="<%= score.second %>"><b><%= score.first %></b></td>
+              <% score.third.each do |cell| %>
+                <td><%= cell %></td>
+              <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+  </table>
+  <% if attendance.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_exam_report attendance_table">
+        <% if @setting["CalculationMode"] == "1" %>
+          <% if @setting["TermReport"] == "1" and @setting["TermAttendance"] == "1" %>
+            <tr class="tr-head">
+                <td class="col-2 attendance_report"></td>
+                <td class="col-1" colspan="<%= header.length %>"><%= @term.try(:term_name_with_max_marks) || @reportable.try(:term_name_with_max_marks) || 'Term 1 (100)'%></td>
+            </tr>
+            <% attendance.each do |row| %>
+              <tr>
+                  <td class="attendance_report">
+                      <%= row[0] %>    
+                  </td>
+                  <td>
+                      <%= row[1] %>    
+                  </td>
+              </tr>
+            <% end %>
+          <% elsif @setting["TermReport"] == "0" and @setting["TermAttendance"] == "1" %>
+            <% if @setting["Percentage"] == "1" or @setting["DaysPresentByDaysAbsent"] == "1" or @setting["WorkingDays"] == "1" or @setting["DaysPresent"] == "1" or @setting["DaysAbsent"] == "1" %>
+              <tr class="header-text">
+                  <td class="attendance_report"><%= t('attendance_summary') %></td>
+                  <% @exams.each do |exam| %>
+                    <td><%= exam.display_name %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+            <% if @setting["Percentage"] == "1" %>
+              <tr>
+                  <td><%= t('percentage_of_days') %></td>
+                  <% @exams.each do |exam| %>
+                    <% percentage = attendance[exam.id].first.total_days_present.to_f*100/attendance[exam.id].first.total_working_days.to_f if attendance[exam.id].present? and attendance[exam.id].first.total_days_present.present? %>
+                    <td><%= percentage.present? ? "#{percentage.round(2)}%" : "-" %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+            <% if @setting["DaysPresentByWorkingDays"] == "1" %>
+              <tr>
+                  <td><%= "#{t('days_present')}/#{t('no_of_working_days')}" %></td>
+                  <% @exams.each do |exam| %>
+                    <td><%= attendance[exam.id].present? ? (attendance[exam.id].first.total_days_present.present? ? attendance[exam.id].first.total_days_present.to_s+"/"+attendance[exam.id].first.total_working_days.to_s : "-"+"/"+attendance[exam.id].first.total_working_days.to_s) : "-" %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+            <% if @setting["WorkingDays"] == "1" %>
+              <tr>
+                  <td><%= t('num_of_working_days') %></td>
+                  <% @exams.each do |exam| %>
+                    <td><%= attendance[exam.id].present? ? attendance[exam.id].first.total_working_days : "-" %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+            <% if @setting["DaysPresent"] == "1" %>
+              <tr>
+                  <td><%= t('num_of_days_present') %></td>
+                  <% @exams.each do |exam| %>
+                    <td><%= attendance[exam.id].present? ? (attendance[exam.id].first.total_days_present.present? ? attendance[exam.id].first.total_days_present : "-") : "-" %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+            <% if @setting["DaysAbsent"] == "1" %>
+              <tr>
+                  <td><%= t('num_of_days_absent') %></td>
+                  <% @exams.each do |exam| %>
+                    <td><%= attendance[exam.id].present? ? (attendance[exam.id].first.total_days_present.present? ? attendance[exam.id].first.total_working_days-attendance[exam.id].first.total_days_present : "-") : "-" %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+          <% end %>
+        <% else %>
+          <tr class="tr-head">
+              <td class="col-2 attendance_report"></td>
+              <td class="col-1" colspan="<%= header.length %>"><%= @term.try(:term_name_with_max_marks) || @reportable.try(:term_name_with_max_marks) || 'Term 1 (100)'%></td>
+          </tr> 
+          <% attendance.each do |row| %>
+            <tr>
+                <% row.each do |cell| %>
+                  <td><%= cell %></td>
+                <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+  <% end %>
+  <% if co_sch.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table">
+        <% co_sch.each_with_index do |section, i| %>
+          <% header = true %>
+          <% if i > 0 %>
+            <tr class="empty_row">
+                <td class="2"></td>
+            </tr>
+          <% end %>
+          <% section.each do |row| %>
+            <tr class="tr-<%= cycle('even', 'odd') %> <%= header ? 'header-text' : '' %>">
+                <% header = false %>
+                <% row.each_with_index do |cell, index| %>
+                  <td class="<%= (index%2 == 0) ? 'even' : 'odd' %>"><%= cell %></td>
+                <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+  <% end %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_students_for_this_batch') %> </p>
+<% end %>

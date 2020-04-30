@@ -1,0 +1,496 @@
+<% if rtl? %>
+    <%= stylesheet_link_tag "rtl/gray_table_design" %>
+    <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+    <%= stylesheet_link_tag "rtl/finance_extensions/pay_all_fees" %>
+<% else %>
+    <%= stylesheet_link_tag "gray_table_design" %>
+    <%= stylesheet_link_tag "finance/_payment_form" %>
+    <%= stylesheet_link_tag "finance_extensions/pay_all_fees" %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_submission') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('student_fees_submission') %></div>
+  <div id="inner-tab-menu">
+
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :student_pay_all_fees, @student %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="student">
+    <%= render :partial => "finance_extensions/pay_all_form/pay_all_header" %>
+
+    <br/>
+
+    <div class="seprate_div"></div>
+    <% if @student.previous_batches.present? %>
+        <div class="each-detail">
+          <div id="hide1"><label class="common-label" class="name"><%= t('batch') %></label>
+
+
+            <div class="text-input-bg margin-set-batch">
+              <%= select :fees_submission, :batch_id, @all_batches.map { |c| [c.full_name, c.id] },
+                         {:prompt => "#{t('select_a_batch')}", :selected => @current_batch.id},
+                         {:onChange => "redirectToIndex(this.value);"} %>
+            </div>
+
+
+            <%#=link_to_function "show inactive batches","show_inactive_batches()",{:class=>'user_button'}%>
+            <div class="loader_div">
+              <%= image_tag("loader.gif",
+                            :align => "absmiddle",
+                            :border => 0,
+                            :id => "loader",
+                            :style => "display: none; ") %>
+            </div>
+          </div>
+        </div>
+    <% end %>
+    <div class="height-fixer"></div>
+    <div class="extender margin-bottom-10"></div>
+    <div id="pay_fees">
+      <%= render :partial => "pay_fees_form" %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    var precision = parseInt("<%= @precision %>");
+    j('.input_amount').focusout(function () {
+        fee_type = j(this).siblings('#max_amount').attr("class");
+        max_value = parseFloat(j(this).siblings('#max_amount').val()).toFixed(precision);
+        if (parseFloat(this.value) >= parseFloat(max_value)) {
+            entered_amount = max_value;
+            this.value = entered_amount;
+        }
+        if (parseFloat(this.value) == 0) {
+            this.value = "";
+        }
+        c_id = j(this).attr('check_box_id');
+        fee_type = j('#' + c_id).attr('fee_type');
+        if ((parseFloat(this.value) || 0) > 0) {
+            j('#' + c_id).prop('checked', true);
+        }
+        else {
+            j('#' + c_id).prop('checked', false);
+
+        }
+        check_master_fee(fee_type);
+
+    });
+
+    j('.input_amount_t').focusout(function () {
+        fee_type = j(this).siblings('#max_amount').attr("class");
+        max_value = parseFloat(j(this).siblings('#max_amount').val()).toFixed(precision);
+        if (parseFloat(this.value) >= parseFloat(max_value)) {
+            entered_amount = max_value;
+            this.value = entered_amount;
+        }
+        if (parseFloat(this.value) == 0) {
+            this.value = "";
+        }
+        c_id = j(this).attr('check_box_id');
+        fee_type = j('#' + c_id).attr('fee_type');
+        if ((parseFloat(this.value) || 0) > 0) {
+            j('#' + c_id).prop('checked', true);
+        }
+        else {
+            j('#' + c_id).prop('checked', false);
+
+        }
+        check_master_fee(fee_type);
+
+    });
+
+    function minmax(value, min, max) {
+        if (parseFloat(value) <= 0 || isNaN(value)) {
+
+
+            return "";
+        }
+        else if (parseFloat(value) > max) {
+
+            return (parseFloat(max).toFixed(precision));
+        }
+        else {
+            return value;
+        }
+    }
+
+    function total_fees() {
+        return j('.payment').val();
+    }
+    j('.payment_box').focusout(function (e) {
+        update_pay_amount();
+    });
+
+    j('.payment_box_t').focusout(function (e) {
+        update_pay_amount();
+    });
+
+    function update_pay_amount() {
+      var total_wallet_amount = <%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>
+      var wallet_amount_t = 0.00
+      if (j('#wallet_amount').exist){
+        if (j('#wallet_amount').val() > 0) {
+          wallet_amount_t = parseFloat(j('#wallet_amount').val())
+        }
+      }
+      j('.payment').val(payment_sum());
+      j('.payment_t').val((parseFloat(j('.payment').val()) - parseFloat(wallet_amount_t)).toFixed(precision))
+      var total_balance = '<%= precision_label(@total_amount_to_pay) %>' - payment_sum();
+      j('.total-pay').text(total_balance < 0 ? 0 : total_balance.toFixed(precision));
+  }
+
+  function payment_sum() {
+      var precision = parseInt("<%= @precision %>");
+      var sum = 0;
+      j('.payment_box_t').each(function () {
+          if (!j(this).hasClass('particular_disabled')) {
+              sum += parseFloat(this.value) || 0;
+          }
+      });
+      if (sum <= 0) {
+          sum = 0;
+      }
+      return sum.toFixed(precision);
+  }
+
+  j(function () {
+      update_pay_amount();
+
+  });
+
+  j('#submit_button').click(function (e) {
+      var wallet_amount_applied = parseFloat(j('.wallet-amount-applied').val())
+      var wallet_amount_used = 0.00
+      j('#progressbar').show();
+      j('.flash-msg').hide();
+      j('.collection-wallet-amount').each(function(i, obj){
+        if (j(obj).val().length != 0){
+            wallet_amount_used = parseFloat(wallet_amount_used)+parseFloat(j(obj).val())
+        }
+      })
+      if (parseFloat(wallet_amount_used) < wallet_amount_applied){
+          if_lower()
+      } else if ((parseFloat(wallet_amount_used).toFixed(precision) > parseFloat(wallet_amount_applied).toFixed(precision))){
+          if_greater();
+      }
+      var input1 = '<input type="hidden" name="multi_fees_transaction[amount]" value= ' + payment_sum() + '>';
+      j('#fees_form').append(input1);
+      var array = j('.payment_box');
+      var status = true;
+      j.each(array, function (index, value) {
+          if (value.value.length == 0) {
+              j(value).parent().children().attr('disabled', 'disabled');
+          }
+          else {
+              var balance = parseFloat(j(value).parent().parent().children('.amount_to_pay').text());
+              var payment = parseFloat(value.value);
+              status = status && (balance >= payment);
+          }
+      });
+      if (status == false) {
+          alert('<%=t('cant_pay_more')%>');
+          return activate_payment_boxes();
+          j('#progressbar').hide();
+      }
+
+      if (j('.payment').val() == 0.0) {
+          j('#progressbar').hide()
+          alert('<%=t('enter_amount')%>');
+          return activate_payment_boxes();
+      }
+      else {
+          j('html, body').animate({scrollTop: 0}, 100);
+      }
+      //      j(j('.payment_box')[1]).parent().children().attr('disabled','disabled')
+      //        var input1 = '<input type="hidden" name="multi_fees_transaction[amount]" value= ' + payment_sum() + '>'
+
+  });
+  j('#fees_form').submit(function () {
+      j('#submit_button').attr('disabled', 'disabled')
+      j('#submit_button').val('<%=t('please_wait') %>');
+  });
+  function activate_payment_boxes() {
+      var array = j('.payment_box')
+      j.each(array, function (index, value) {
+          if (value.value.length == 0) {
+              j(value).parent().children().removeAttr('disabled');
+          }
+      });
+      j('#fees_form').unbind("submit");
+      return false;
+
+  }
+  
+  function redirectToIndex(val) {
+      window.location = '<%="#{Fedena.hostname}/student_fees/#{@student.id}/all_fees" %>?batch_id=' + val;
+  }
+  
+  function amount_field_updation(e, i) {
+      max_value = parseFloat(j('.amount' + i).siblings('#max_amount').val()).toFixed(precision);
+      if (e.checked) {
+          j('.amount' + i).val(max_value);
+          j('.amount_t' + i).val(max_value);
+      }
+      else {
+          j('.amount' + i).val('');
+          j('.amount_t' + i).val('');
+      }
+      fee_type = j(e).prop('class');
+      check_master_fee(fee_type);
+
+      update_pay_amount();
+  }
+  function check_master_fee(fee_type) {
+      if (j('.' + fee_type + ':checkbox:checked').length != j('.' + fee_type + ':checkbox').length) {
+          j('#' + fee_type).prop('checked', false);
+      }
+      else {
+          j('#' + fee_type).prop('checked', true);
+      }
+  }
+  function amount_field_updation_by_fee_type(e, fee_type) {
+      all_collections = j('.' + fee_type);
+      all_collections.prop('checked', e.checked);
+
+      j.each(all_collections, function (ind, val) {
+
+          amount_field_updation(val, val.id);
+      });
+
+  }
+
+  // advance fees payment
+  j(".wallet-amount-applied").keypress(function(event) {
+      if (!event.charCode) return true;
+      ch = String.fromCharCode(event.charCode);
+      return (/[\d]/.test(ch));
+  });
+
+  show_wallet_amount_fields = function(){
+    j('.input_amount_t').each(function(i, obj){
+      var id = j(this).attr('data-index')
+      if (parseFloat(j(obj).val()) > 0){
+        j('#transactions_'+id+'_wallet_amount').show();
+      }
+    })
+  }
+
+  j('.payment_box_t').focusout(function () {
+    /* body... */
+    var id = j(this).attr('data-index')
+    j('#transactions_'+id+'_amount').val(parseFloat(j(this).val()).toFixed(precision))
+
+  })
+
+  update_wallet_amount_status = function () {
+    if (parseFloat(j("#wallet_amount").val()) > 0){
+      j('#wallet_amount_applied').val(true)
+    }else {
+      j('#wallet_amount_applied').val(false)
+    }
+  }
+
+  update_particular_wallet_ratio = function(){
+    if (parseFloat(j('.wallet-amount-applied').val()) > 0){
+      var total_amount_to_pay = payment_sum()
+      j('.input_amount_t').each(function (i, obj) {
+        var id = j(obj).attr('data-index')
+        if (j(obj).val() > 0){
+            ratio_amount = (parseFloat(j(obj).val()))/total_amount_to_pay*parseFloat(j('.wallet-amount-applied').val())
+            j('#transactions_'+id+'_wallet_amount').val(ratio_amount.toFixed(precision))
+            j('#transactions_'+id+'_amountt').val((parseFloat(j(this).val()) - parseFloat(j('#transactions_'+id+'_wallet_amount').val())).toFixed(precision))
+            if (parseFloat(j('#transactions_'+id+'_wallet_amount').val()) > 0 ){
+              j('#transactions_'+id+'_wallet_amount_applied').val(true)
+            } else {
+              j('#transactions_'+id+'_wallet_amount_applied').val(false)
+            }
+        }
+      })
+    } else {
+      j('.input_amount_t').each(function (i, obj) {
+        var id = j(obj).attr('data-index')
+        j('#transactions_'+id+'_wallet_amount').val((0).toFixed(precision))
+        j('#transactions_'+id+'_wallet_amount_applied').val(false)
+      });
+    }
+    j('.payment_box_t').each(function (i, obj) {
+      /* body... */
+      if (!(j(obj).val().empty())){
+        var id = j(obj).attr('data-index')
+        j('#transactions_'+id+'_amount').val((parseFloat(j(obj).val()) + parseFloat(j('#transactions_'+id+'_wallet_amount').val())).toFixed(precision))
+      }
+    })
+
+  }
+
+  j('.wallet-link').click(function() {
+    j('.wallet-link').css('pointer-events', 'none')
+    j('.payment_box').css( 'pointer-events', 'none');
+    j('.payment_box_t').css( 'pointer-events', 'none');
+    j('.wallet-amount-applied').css( 'pointer-events', 'none');
+    j('input[type=checkbox]').css('pointer-events', 'none')
+    var total_wallet_amount = ('<%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>')
+    if (payment_sum() < parseFloat(total_wallet_amount)){
+      j('#wallet_amount').val(payment_sum())
+      j('#student_wallet_amount_').val((parseFloat(total_wallet_amount) - payment_sum()).toFixed(precision))
+      j('#fees_paid_t').val((0).toFixed(precision))
+      j('#multi_fees_transaction_fees_paid').val((parseFloat(j('#fees_paid_t').val()) + parseFloat(j('#wallet_amount').val())).toFixed(precision))
+    } else {
+      j('#wallet_amount').val(parseFloat(total_wallet_amount).toFixed(precision))
+      j('.wallet-amount-field').val((0).toFixed(precision))
+      j('#fees_paid_t').val((payment_sum() - parseFloat(j('#wallet_amount').val())).toFixed(precision))
+      j('#multi_fees_transaction_fees_paid').val((parseFloat(j('#fees_paid_t').val()) + parseFloat(j('#wallet_amount').val())).toFixed(precision))
+    }
+    update_wallet_amount_status();
+    show_wallet_amount_fields();
+    update_particular_wallet_ratio();
+    update_payment_mode()
+  });
+  
+  j('.wallet-amount-applied').change(function() {
+    j('.payment_box').css( 'pointer-events', 'none');
+    j(this).css( 'pointer-events', 'none');
+    j('.payment_box_t').css( 'pointer-events', 'none');
+    j('input[type=checkbox]').css('pointer-events', 'none')
+     var wallet_amount_applied = parseFloat(j('.wallet-amount-applied').val())
+     var total_wallet_amount = <%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>
+     var amount_to_pay = <%= precision_label(@total_amount_to_pay) %>
+     var wallet_amount_ratio = wallet_amount_applied / <%= @finance_fees_count %>
+     if (j('.wallet-amount-applied').val() > total_wallet_amount){
+        j('.wallet-amount-field').val((0).toFixed(precision))
+        j('.wallet-amount-applied').val(parseFloat(total_wallet_amount).toFixed(precision))
+        j('.payment_t').val(payment_sum())
+        j('.payment').val(payment_sum())
+      } else {
+        if (j('.wallet-amount-applied').val().length == 0 || parseFloat(j('.wallet-amount-applied').val()) == 0) {
+          j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+          j('.payment_t').val(payment_sum())
+          j('.payment').val(payment_sum())
+        } else {
+          if (parseFloat(j('.wallet-amount-applied').val()) >= payment_sum()){
+            j('.wallet-amount-applied').val(payment_sum())
+            j('.wallet-amount-field').val(parseFloat(total_wallet_amount - payment_sum()).toFixed(precision))
+            j('.payment_t').val(parseFloat(0.00).toFixed(precision))
+            j('.payment').val(payment_sum())
+          } else {
+            j('.wallet-amount-field').val(parseFloat(total_wallet_amount - j('.wallet-amount-applied').val()).toFixed(precision))
+            j('.payment_t').val(parseFloat(j('.payment').val() - j('.wallet-amount-applied').val()).toFixed(precision))
+            j('.payment').val((parseFloat(j('.payment_t').val()) + parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+          }
+        }
+      }
+      update_wallet_amount_status();
+      update_particular_wallet_ratio();
+      show_wallet_amount_fields();
+      update_payment_mode();
+  });
+
+
+  j('.collection-wallet-amount').change(function(event){
+    var id = 0
+    var wallet_amount_used = 0.00
+    var total_wallet_amount = ('<%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>')
+    if (fetch_wallet_amount() > parseFloat(j('#wallet_amount').val())){
+      id = j(this).attr('data-index')
+      j(this).val((0).toFixed(precision))
+      j('#transactions_'+id+'_amountt').val(parseFloat(j('.max_amount_'+id).val()).toFixed(precision))
+      j('#transactions_'+id+'_wallet_amount_applied').val(false)
+      j('.wallet-amount-applied').val(wallet_amount_check())
+      j('.wallet-amount-field').val((parseFloat(total_wallet_amount) - parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+    } else {
+      id = j(this).attr('data-index')
+      if (parseFloat(j(this).val()) > parseFloat(j('#transactions_'+id+'_amountt').val())) {
+        if (parseFloat(j('.wallet-amount-applied').val() - fetch_wallet_amount(this)) > parseFloat(j('#transactions_'+id+'_amount').val())){
+          j(this).val((0).toFixed(precision))
+          j('#transactions_'+id+'_amountt').val(parseFloat(j('.max_amount_'+id).val()).toFixed(precision))
+        } else {
+          j(this).val(parseFloat(j('.wallet-amount-applied').val() - fetch_wallet_amount(this)).toFixed(precision))
+          j('#transactions_'+id+'_amountt').val(parseFloat(j('.max_amount_'+id).val()).toFixed(precision))
+        }
+      } else {
+        j('#transactions_'+id+'_amountt').val((parseFloat(j('#transactions_'+id+'_amount').val()) - parseFloat(j('#transactions_'+id+'_wallet_amount').val())).toFixed(precision))
+        if (j(this).val() <= 0 ){
+          j(this).val(0.00)
+          j('#transactions_'+id+'_amountt').val(parseFloat(j('.max_amount_'+id).val()).toFixed(precision))
+          j('#transactions_'+id+'_wallet_amount_applied').val(false)
+        } else {
+          j('.collection-wallet-amount').each(function(i, obj){
+            if (j(obj).val().length != 0){
+                wallet_amount_used = parseFloat(wallet_amount_used)+parseFloat(j(obj).val())
+            }
+          })
+          if (parseFloat(wallet_amount_used) > parseFloat(j('.wallet-amount-applied').val())){
+            j(this).val(0.00)
+          }
+        }
+      }
+      update_wallet_amount_status();
+    }
+  });
+
+  if_lower = function () {
+    var diff = parseFloat(j('.wallet-amount-applied').val()).toFixed(precision) - parseFloat(wallet_amount_check())
+    j('.wallet-amount-applied').val((parseFloat(j('.wallet-amount-applied').val()) - parseFloat(diff)).toFixed(precision))
+    j('.wallet-amount-field').val((parseFloat(j('.wallet-amount-field').val()) + parseFloat(diff)).toFixed(precision))
+  }
+
+  if_greater = function () {
+      var diff = parseFloat(wallet_amount_check()) - parseFloat(j('.wallet-amount-applied').val()).toFixed(precision)
+      var id = j('.advance-fee-field').last().attr('data-index')
+      j('#transactions_'+id+'_wallet_amount').val((parseFloat(j('#transactions_'+id+'_wallet_amount').val()).toFixed(precision) - parseFloat(diff)).toFixed(precision))
+      j('#transactions_'+id+'_amountt').val(((parseFloat(j('#transactions_'+id+'_amountt').val()) + parseFloat(diff))).toFixed(precision))
+      j('#transactions_'+id+'_amount').val((parseFloat(j('#transactions_'+id+'_wallet_amount').val()) + parseFloat(j('#transactions_'+id+'_amountt').val())).toFixed(precision))
+  }
+
+  update_payment_mode = function () {
+    if (parseFloat(j('.payment_t').val()) > 0){
+      // j('#multi_fees_transaction_payment_mode').val("Cash").change();
+      j('#fees_payment_mode').css('pointer-events', 'auto')
+    } else if ((parseFloat(j('.payment_t').val()) <= 0) && (parseFloat(j('.wallet-amount-applied').val()) > 0 )){
+      j('#multi_fees_transaction_payment_mode').val("Advance Fees").change();
+      j('#fees_payment_mode').css('pointer-events', 'none')
+    }
+  }
+
+  fetch_wallet_amount = function (field) {
+      var wallet_amount_used = 0.00
+      j('.collection-wallet-amount').each(function(i, obj){
+        if (j(obj).val().length != 0 && j(obj)[0] != j(field)[0]){
+            wallet_amount_used = parseFloat(wallet_amount_used)+parseFloat(j(obj).val())
+        }
+      })
+      return wallet_amount_used
+    }
+  j('#submit_button').click(function(event){
+      if (parseFloat(j('#fees_paid_t').val()) < 1){
+          event.preventDefault();
+          j.ajax({
+              url: '/advance_payment_fees/check_amount_to_pay',
+              data: {
+                  
+              },
+              success: function () {
+              }
+          });
+      }
+  })
+
+  wallet_amount_check = function () {
+    var amount = 0.00
+    j('.advance-fee-field').each(function (i, obj) {
+        amount += parseFloat(j(obj).val())
+    })
+    return parseFloat(amount).toFixed(precision)
+  }
+</script>

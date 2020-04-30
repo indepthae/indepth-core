@@ -1,0 +1,88 @@
+<% if  @attendance_label.present? %>
+  <% @attendance_label_id = @attendance_label.id %>
+<% else %> 
+  <% @attendance_label_id = nil %>
+<% end %>
+<% if @course.present? %>
+  <% @students_count = @course_students%>
+  <% @absent_count = @absent_students  %>
+  <% @late_count = @late_students  %>
+<% end %>
+<div class="day_wise_report_table">
+    <% unless @batches.empty? %>
+      <div >
+          <table id="custom_attendance_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+              <tr class="tr-head">
+                  <td class="serial_no_late"><%= t('s_no') %></td>
+                  <td class="courses_batch"><%= t('courses_batch') %></td>
+                  <td class="total_absentee"><%=t('total')%></td>
+                  <td colspan = "2" class="late"><%=t('late')%></td>
+              </tr>
+
+              <% @grouped_batches.each do |course,batches| %>
+                <tr class="course_name"> 
+                    <td><%= @active_courses.present? ? @active_courses.index(course) + 1 : 1 %></td>      
+                    <td colspan = "6" class="blank_column1"><%= course %></td>
+
+                </tr>
+                <tr class="tr-odd">
+                    <td rowspan = "<%= batches.count if batches.present?%>" class="col-4" ></td>
+                    <% in_cycle = nil %>
+                    <% batches.each do |batch| %>
+                      <% in_cycle = cycle('odd', 'even')%>
+                      <td class="col-1" ><%= link_to batch.name,{:controller => 'attendance_reports', :action => 'daily_report_batch_wise',:batch_id => batch.id,:date => @date},:class => "batch_link" %> </td>
+                      <% @working_day = working_days(batch,@date).include?(@date.to_date) %>
+                      <% if @working_day %>
+                        <% if @attendance_lock %>
+                          <% saved = daily_academic_day(batch, @date) %>
+                          <% if saved %>
+                            <td class="col-2-<%= in_cycle %>"><%= batch.students.present? ? batch.students.count : '-'%></td>
+                          <% else %>
+                            <% @students_count -= batch.students.present? ? batch.students.count : 0%>
+                            <td class="absent_total countcol-2-<%= in_cycle %>"><%= t('not_marked') %></td>
+                          <% end %>
+                        <% else %>
+                          <td class="absent_total countcol-2-<%= in_cycle %>"><%= batch.students.present? ? batch.students.count : '-'%></td>
+                        <% end %>
+                      <% else %>
+                        <td class="absent_total countcol-2-<%= in_cycle %>"><%= t('holiday') %></td>
+                      <% end %>
+                      <td class="late_count col-3-<%= in_cycle %>"><%= @late[batch.id].present? ? @late[batch.id].count : '-'   %></td>
+                      <td class="  col-2">
+                          <% if @late[batch.id].present? %>
+                            <%if @roll_number  %>
+                              <%=  @late[batch.id].map{|s| s.student_name + '(' + "#{s.roll_no.present? ? s.roll_no : '-'}" + ')'}.join(', ') %>
+                            <% else %>
+                              <%= @late[batch.id].collect(&:student_name).join(", ") %>
+                            <% end %>
+                          <% end %>
+                      </td>
+                  </tr>
+                <%end%>
+              <% end %>
+          </table>
+      </div>
+      <% if @course.nil? %>
+        <%= will_paginate @batches,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "attendance_reports",:action => "day_wise_report",:date => @date} %>
+      <% else %>
+        <%= will_paginate @batches,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "attendance_reports",:action => "day_wise_report_filter_by_course",:date => @date, :course_id => @course.id} %>
+      <% end %>
+  </div>
+  <% if @working_day  %>
+    <div class="summary_section">
+        <div class="summary"><%= t('summary') %>:</div>
+        <div class="total_students"><%= t('total') %> -<%= "&#x200E; #{@students_count}&#x200E;"  %></div>
+        <div class="present_students"><%= t('present') %>: <%=  @students_count - (@absent_count + @late_count ) %></div>
+        <div class="absent_students"><%= t('late') %>: <%= @late_count %></div>
+    </div>
+  <% end %>
+  <div id = "button">
+      <% if @course.nil? %>
+        <%= link_to "►#{t('csv_report')}", {:controller => 'csv_export', :action => 'generate_csv', :csv_report_type => 'day_wise_report',:report_format_type => "csv", :date => @date, :attendance_label_id => @attendance_label_id},:class => 'user_button'%>
+      <% else %>
+        <%= link_to "►#{t('csv_report')}", {:controller => 'csv_export', :action => 'generate_csv', :csv_report_type => 'day_wise_report',:report_format_type => "csv", :date => @date, :course_id => @course.id, :attendance_label_id => @attendance_label_id},:class => 'user_button'%>
+      <% end %>
+  </div>
+<% else %>
+  <p class="flash-msg"> <%= t('no_active_batches_present_for_the_selected_range') %> </p>
+<% end %>

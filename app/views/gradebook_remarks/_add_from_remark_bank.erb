@@ -1,0 +1,47 @@
+<div id="remark-bank-app">
+    <div class="left-pane">
+        <div class="label-select-conatiner">
+            <div class="select-label">
+                <%= t('choose_bank') %>
+            </div>
+            <div class="select-box">
+                <%= select '', :remark_bank, @remark_banks.collect{|rb| [rb.name, rb.id]}, :prompt => t('select_bank')  %>
+            </div>
+        </div>
+        <div id="remark-templates">
+
+        </div>
+    </div>
+    <div class="right-pane">
+        <div id="app">
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  const hide_popup_footer = () => {
+    j("#popup_footer").text('');
+  };
+  j('#_remark_bank').change(function () {
+      const remark_bank_id = j('#_remark_bank').val();
+      const student_id = '<%= @student_id %>';
+      j.ajax({
+          url: "update_remark_templates",
+          type: 'POST',
+          data: {
+              student_id: student_id,
+              remark_bank_id: remark_bank_id,
+          },
+          beforeSend: function()
+          {
+            hide_popup_footer();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+</script>

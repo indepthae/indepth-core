@@ -1,0 +1,3 @@
+<%  if permitted_to? :update_priority,:record_groups and  @course.record_assignments.count > 1%>
+  <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('prioritize_rg')}", :url => { :action => 'edit_priority',:id=>@course.id } %></li>
+<% end %>

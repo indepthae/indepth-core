@@ -1,0 +1,66 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('assignment_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('answer')}"%> </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :assignment_answers_show, @assignment_answer %>
+    <%= render_breadcrumbs  %>
+  </div>
+</div>
+<% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+<div id="answer-container">
+  <h4><%= "#{t('assignment_text')}"%></h4>
+  <% if @assignment_answer.assignment.present? %>
+    <div class="assignment-question"><%= link_to @assignment_answer.assignment.title.to_s , @assignment %></div>
+  <% else %><div class="assignment-question"><%= t('this_answer_is_not_for_the_assignment') %></div>
+
+  <% end %>
+  <h4><%= "#{t('answer')}"%></h4>
+  <div class="assignment-answer">
+    <div class="assignment-answer-title"><%= @assignment_answer.title.to_s   %></div>
+    <div class="assignment-answer-content"><%= @assignment_answer.content.to_s %></div>
+    <% unless @assignment_answer.attachment_file_name.nil? %> <div id="attachment"><%= link_to @assignment_answer.attachment_file_name.to_s, @assignment_answer.attachment.url(:default,false) %></div><%  end %>
+  </div>
+
+  <div class="answer-details">
+    <div class="label-div-pair"><label for="student-name"><%= "#{t('submitted_by')}"%></label><div id="student-name" class="themed_text"> <%= @assignment_answer.student_details.present? ? @assignment_answer.student_details.full_name : t('no_students') %></div></div>
+    <div class="label-div-pair"><label for="submitted-date"><%= "#{t('submitted_on')}"%> </label><div id="submitted-date" class="themed_text"><%= format_date(FedenaTimeSet.current_time_to_local_time(@assignment_answer.created_at),:format=>:long)%></div></div>
+    <% if @current_user.student?%>
+      <% if @current_user.student_record.id == @assignment_answer.student_id %>
+        <div class="label-div-pair"><label for="answer-status"><%= "#{t('status')}"%></label>
+          <div id="answer-status" class="themed_text">
+            <% if @assignment_answer.status == "0"  %>
+              <%= "#{t('this_answer_yet_to_be_evaluated')}"%>
+            <% else %>
+              <%= "#{t('the_assignment_is')}"%>  <%= @assignment_answer.status.capitalize   %> <%=  link_to  "(#{t('resubmit_answer')})" ,  edit_assignment_assignment_answer_path(@assignment,@assignment_answer)  unless @assignment_answer.status=="ACCEPTED"%>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <%elsif @current_user.parent?%>
+      <%student = @current_user.guardian_entry.current_ward%>
+      <%if student.id == @assignment_answer.student_id %>
+        <div class="label-div-pair"><label for="answer-status"><%= "#{t('status')}"%></label>
+          <div id="answer-status" class="themed_text">
+            <% if @assignment_answer.status == "0"  %>
+              <%= "#{t('this_answer_yet_to_be_evaluated')}"%>
+            <% else %>
+              <%= "#{t('the_assignment_is')}"%>  <%= @assignment_answer.status.capitalize %>
+            <% end %>
+          </div>
+        </div>
+      <%end%>
+    <% end %>
+  </div>
+  <div id="evaluate-answer">
+    <% if @current_user.employee? %>
+      <% if @assignment_answer.assignment.accessible_for_employee(@current_user.employee_record) %>
+        <% unless @assignment_answer.status=="ACCEPTED" %>  <%= link_to "#{t('accept_answer')}",  {:action => "evaluate_assignment" ,:id=>@assignment_answer.id,:status=>"ACCEPTED"},:class=>"submit-button" %><% end %>
+        <% unless @assignment_answer.status=="REJECTED" %>  <%= link_to "#{t('reject_answer')}",  { :action => "evaluate_assignment" ,:id=>@assignment_answer.id,:status=>"REJECTED" },:class=>"submit-button" %><% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit_vehicle_details') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :vehicles_edit, @vehicle %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <%= render :partial => 'vehicle_form' %>
+</div>
+
+
+
+<script type="text/javascript">
+    
+    
+    function get_gps_number()
+    {
+    if (document.getElementById("vehicle_gps_enabled").checked)
+    {
+    j('#hide_div').show();
+    }
+    else
+    {
+    j('#hide_div').hide();
+    document.getElementById('vehicle_gps_number').value='';    
+    }  
+    }
+    
+    window.onload = function() {
+     get_gps_number();
+   };
+</script>

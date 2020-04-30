@@ -1,0 +1,195 @@
+
+<div id="fine_detail">
+<% @total_fine=0 %>
+<% unless @fine.nil? %>
+  <% if @total_fine==0 %>    
+    <tr class="row-a">
+        <td class="sl-col col-1"></td>
+        <td class="set_border_right bold_font" colspan="3">
+            <span><%= t('fine') %></span>
+        </td>
+    </tr>    
+  <% end %>
+  <tr class="row-b">
+      <td class="sl-col col-1"><%= i+=1 %></td>
+      <td class="set_border_right particular-col">
+          <span>
+              <%= t('fine_on') %>
+              <%= format_date(payment_date) %>
+          </span>
+      </td>
+      <td class="set_border_right amount-col normal_font align_right">
+          <%= precision_label(@fine.to_f) %>
+          <% @total_fine=@total_fine+@fine.to_f %>
+      </td>
+      <td class="cancel-disc cancel-color">
+          <div class="fine-deletion <%= @defaulter_fine ? 'defaulter-fine-deletion' : ''%>" 
+               style="cursor: pointer" student="<%=@student.id%>" batch_id="<%=@batch.id%>" 
+               date="<%=@date.id  %>">
+                   <%= "&times" %>
+          </div>
+      </td>
+  </tr>
+  <% unless @financefee.is_paid? == true %>
+    <% total_fees += @fine.to_f %>
+  <% else %>
+    <% total_fees = @fine %>
+  <% end %>
+<% end %>
+<% total_fees1=total_fees %>
+<% if @paid_fees %>
+  <% unless @paid_fees.blank? %>
+    <% @paid_fees.each do |trans| %>
+      <% if trans.fine_included %>
+        <% if @total_fine==0 %>          
+          <tr class="row-a" cellpadding="1" cellspacing="1">
+              <td class="sl-col col-1"></td>
+              <td class="set_border_right col-1 bold_font" colspan="3">
+                  <span><%= t('fine') %></span>
+              </td>
+          </tr>          
+        <% end %>
+        <tr class="row-b">
+            <td class="sl-col col-1"><%= i+=1 %></td>
+            <td class="set_border_right particular-col">
+                <span><%= t('fine_on') %>
+                    <%= format_date(trans.transaction_date) %></span>
+            </td>
+            <td class="set_border_right amount-col normal_font align_right">
+                <%= precision_label(trans.fine_amount) %>
+                <% @total_fine=@total_fine+trans.fine_amount %>
+            </td>
+            <td class="cancel-disc cancel-color"></td>
+        </tr>
+        <% total_fees += trans.fine_amount.to_f %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% unless @financefee.is_paid_with_fine? %>
+  <% if @fine_rule  && !@fine_balance %>
+    <% if @total_fine==0 %>      
+      <tr class="row-a tr-head" cellpadding="1" cellspacing="1">
+          <td class="sl-col col-1"></td>
+          <td class="set_border_right bold_font" colspan="3">
+              <span><%= t('fine') %></span>
+          </td>
+      </tr>      
+    <% end %>
+    <tr class="row-b">
+        <td class="sl-col col-1"><%= i+=1 %></td>
+        <td class="set_border_right particular-col">
+            <span><%= t('fine_on') %>
+                <%= format_date(@date.due_date.to_date+@fine_rule.fine_days.days) %>
+                <%= discount_text = @fine_rule.is_amount ? "" : " (#{@fine_rule.fine_amount}&#x200E;%)" %>
+            </span>
+        </td>
+        <td class="set_border_right amount-col normal_font align_right">
+            <%= precision_label(@fine_amount) %>
+            <% @total_fine=@total_fine+@fine_amount %>
+        </td>
+        <td class="cancel-disc cancel-color">
+          <%if @current_user.admin? or @current_user.privileges.map(&:name).include? "FeeSubmission" or @current_user.privileges.map(&:name).include? "RevertTransaction"%>
+            <div class="auto_fine_deletion link-icon" 
+              style="cursor: pointer" student="<%=@student.id%>" batch_id="<%=@batch.id%>" 
+                date="<%=@date.id  %>">
+            </div>
+          <%end%>
+        </td>
+        
+    </tr>
+  <% elsif @fine_amount.to_f > 0 %>
+      <% if @total_fine==0 %>
+        <tr class="row-a">
+          <td class="sl-col"></td>
+          <td class="bold_font" colspan="3">
+            <span><%= t('fine') %></span>
+          </td>
+        </tr>
+      <%end%>
+      <tr class="row-b">
+        <td class="sl-col"><%= i+=1 %></td>
+        <td class="set_border_right particular-col">
+            <span>
+                <%= t('fine_on') %>
+                <%= format_date(FedenaTimeSet.current_time_to_local_time(Time.now).to_date) %>
+            </span>
+        </td>
+        <td class="set_border_right amount-col normal_font align_right">
+            <%= precision_label(@fine_amount) %>
+            <% @total_fine = @total_fine + @fine_amount %>
+        </td>
+        <td class="cancel-disc cancel-color">
+          <%if @current_user.admin? or @current_user.privileges.map(&:name).include? "FeeSubmission" or @current_user.privileges.map(&:name).include? "RevertTransaction"%>
+            <div class="auto_fine_deletion link-icon" 
+              style="cursor: pointer" student="<%=@student.id%>" batch_id="<%=@batch.id%>" 
+                date="<%=@date.id  %>">
+            </div>
+          <%end%>
+        </td>
+    </tr>
+  <% end %>
+<% end %>
+</div>
+<script>
+
+  j(document).undelegate(".fine-deletion", "click");
+
+  j(document).delegate('.fine-deletion', 'click', function (e) {
+      student = j(this).attr('student');
+      batch_id = j(this).attr('batch_id');
+      date = j(this).attr('date');
+      payment_note = j("#fees_reference_no").val();
+      payment_mode = j("#fees_payment_mode").val();
+      transaction_date = j("#transaction_date").val();
+      reference_no = j("#fees_payment_note").val();
+      proceed = confirm('<%=t('delete_confirm_msg') %>');
+      j('#fine_amount').val(0);
+      if (proceed) {
+          j.ajax({
+              method: "post",
+              url: '/finance/' + (j(this).hasClass('defaulter_fine') ? 'update_fine_ajax' : 'update_defaulters_fine_ajax'),
+              data: {
+                  "fine[student]": student,
+                  "fine[batch_id]": batch_id,
+                  "fine[date]": date,
+                  "fine[payment_date]": transaction_date,
+                  "payment_note": payment_note,
+                  "payment_mode": payment_mode,
+                  "reference_no": reference_no
+              }
+          });
+      }
+  });
+  
+  j(document).undelegate(".auto_fine_deletion", "click");
+  j(document).delegate('.auto_fine_deletion', 'click', function (e) {
+      student = j(this).attr('student');
+      batch_id = j(this).attr('batch_id');
+      date = j(this).attr('date');
+      payment_note = j("#fees_reference_no").val();
+      payment_mode = j("#fees_payment_mode").val();
+      transaction_date = j("#transaction_date").val();
+      reference_no = j("#fees_payment_note").val();
+      proceed = confirm('<%=t('delete_confirm_msg') %>');
+      j('#fine_amount').val(0);
+      if (proceed) {
+        j.ajax({
+              method: "post",
+              url: '/finance/pay_fees_defaulters',
+              data: {
+                  "student": student,
+                  "batch_id": batch_id,
+                  "date": date,
+                  "fees[payment_date]": transaction_date,
+                  "is_fine_waiver": "true",
+                  "fees[payment_note]": payment_note,
+                  "fees[payment_mode]": payment_mode,
+                  "cancel_auto_fine": "true",
+                  "fees[reference_no]": reference_no
+              }
+          });
+      }
+  });
+</script>

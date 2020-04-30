@@ -1,0 +1,56 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('custom_reports') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('custom_reports') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :generate, :custom_reports %>
+        <li class='themed_bg themed-dark-hover-background'>
+          <%=link_to "#{t('new_student_report')}" ,:controller=>:custom_reports,:action=>:generate,:id=>'student'%>
+        </li>
+      <% end %>
+      <% if permitted_to? :generate, :custom_reports %>
+        <li class='themed_bg themed-dark-hover-background'>
+          <%=link_to "#{t('new_employee_report')}" ,:controller=>:custom_reports,:action=>:generate,:id=>'employee'%>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<ul id="category-list">
+  <% unless @reports.nil? %>
+    <% @reports.each_with_index do |report, i| %>
+      <% unless params[:page].blank? %>
+        <% if params[:page].to_i >= 1 %>
+          <% i = (i + 1) + (params[:page].to_i - 1) * 20 %>
+        <% end %>
+      <%else %>
+        <% i = i+1 %>
+      <% end %>
+      <li class="list<%=cycle('odd', 'even')%>">
+        <div class="numbering"><%= i %></div>
+        <span class="report-link"><%= link_to report.name, :action=>'show', :id=>report.id %></span>
+        <span class="report-actions"><%= link_to "#{t('show_report')}", :action=>'show', :id=>report.id %> &nbsp;
+          <%= link_to "#{t('delete')}", {:action=>'delete', :id=>report.id},:confirm=>"#{t('delete')} Report ?" if permitted_to? :delete, :custom_reports%></span>
+      </li>
+    <% end %>
+  <% else %>
+    <li class="list<%=cycle('odd', 'even')%>">
+      <%= t('no_report') %> <%= link_to "#{t('new_report')}", :action=>'generate', :id=>'student' %>
+    </li>
+  <% end %>
+</ul>
+<div class="paginate">
+  <%= will_paginate @reports %>
+</div>
+</div>

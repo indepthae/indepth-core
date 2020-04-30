@@ -1,0 +1,80 @@
+<div id="fees_list">
+  <div class="top-div">
+    <div class="question-text">
+      <input type="checkbox" class='select_all' onclick="$$('input.collection_box').each(function(checkbox) { checkbox.checked = $$('.select_all').first().checked });;">
+      <%= t('fee_collections') %></div>
+  </div>
+  <div id="right-panel-loader" style="display:none"><label>Loading ...</label></div>
+  <div id="right-panel-bottom">
+
+    <% remote_form_for :fees_list, :url => {:controller => 'hostel_fee', :action => 'allocate_or_deallocate_fee_collection'},
+                       :html => {:method => :post, :id => 'allocation_form'} do |form1| %>
+        <%= form1.hidden_field :financial_year_id, :value => @current_financial_year[:id] %>
+        <%= form1.hidden_field :receiver_id, :value => @student.id %>
+        <%= form1.hidden_field :batch_id, :value => @batch.id %>
+        <%= form1.hidden_field :user_id, :value => @student.user_id %>
+
+        <% @fee_collection_dates.each do |date| %>
+            <div class="option-main">
+              <div class="option-div">
+                <label class="collection_check"><%= check_box_tag 'fees_list[collection_ids][]', date.id, date.assigned=="0" ? false : true, {:class => 'collection_box'} %>
+                  <div class="att_list_names"> <%= date.name %>
+                  </div>
+                </label>
+              </div>
+            </div>
+        <% end %>
+        <%#= form1.submit "#{t('assign_fees')}", :class => "submit_button" %>
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+    j('.submit_button').click(function () {
+
+
+        j('.submit_button').text('<%="► #{t("please_wait")}"%>')
+        j('.submit_button').attr('disabled', true)
+
+        j.ajax({
+
+            success: function (data, status, xhr) {
+                j('.submit_button').text('<%="#{t("update")}"%>')
+                j('.submit_button').attr('disabled', false)
+                j('html, body').animate({scrollTop: 0}, 100);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Status: " + textStatus);
+                alert("Error: " + errorThrown);
+            }
+        });
+    });
+    j(document).ready(function () {
+        if (j('.collection').length >= 1) {
+            j('.sel-list').show();
+        }
+        check_box_selection()
+    })
+    j(document).delegate('.collection_box','click',function(){
+
+        check_box_selection()
+    })
+
+    function check_box_selection(){
+        check_main_box=true
+        j.map(j('.collection_box') , function( val, i ) { check_main_box=check_main_box&&val.checked})
+        if (check_main_box)
+        {
+            j('.select_all').prop("checked",true)
+        }
+        else{
+            j('.select_all').prop("checked",false)
+        }
+    }
+
+
+    <%#*MathJax.Hub.Queue(["Typeset",MathJax.Hub,"right-panel"]);%>
+    j("#right-panel").find('iframe').attr("width", "340px");
+    j("#right-panel").find('iframe').attr("height", "191px");
+</script>

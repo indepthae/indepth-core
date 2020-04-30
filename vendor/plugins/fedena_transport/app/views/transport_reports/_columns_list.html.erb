@@ -1,0 +1,49 @@
+<% remote_form_for :columns, :url => fetch_report_transport_reports_path(:type => @type, :search => @search_params), 
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="report_column_form">
+      <% headers_list = ["student_details", "employee_details", "route_details", "additional_details", "transport_details"] %>
+      <% default_headers = TransportReport.default_headers %>
+      <% headers_list.each do |header| %>
+        <% if @report_columns.has_key? header %>
+          <% columns = @report_columns[header] %>
+          <div class="sections">
+              <div class="section_header"><%= t(header).titleize %></div>
+              <% if columns.is_a? Array %>
+                <% columns.each do |column| %>
+                  <% default = default_headers.include? column.to_sym %>
+                  <div class="fields">
+                      <%= check_box_tag "columns[#{header}][]", column, (((@selected_columns||{})[header]||[]).include? column.to_s), 
+                        :id => column.to_s + "_col", :text => t(column), :class => "rep_col", :checked => default, :readonly => default %>
+                      <label for="<%= column.to_s + "_col" %>">
+                          <% if @type == "transport_allocation_report" and column.to_sym == :pickup_route and @common_route %>
+                            <%= t('route_text') %>
+                          <% else %>
+                            <%= t(column) %>
+                          <% end %>
+                      </label>
+                  </div>
+                <% end %>
+              <% else columns.is_a? Hash %>
+                <% columns.each do |column, name| %>
+                  <div class="fields">
+                      <%= check_box_tag "columns[#{header}][]", column, (((@selected_columns||{})[header]||{}).keys.flatten.include? column.to_s),
+                        :id => column.to_s + "_col", :text => t(column), :class => "rep_col" %>
+                      <label for="<%= column.to_s + "_col" %>"><%= name %></label>
+                  </div>
+                <% end %>
+              <% end %>
+          </div>
+        <% end %>
+      <% end %>
+  </div>
+  <div id="popup_footer">
+      <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

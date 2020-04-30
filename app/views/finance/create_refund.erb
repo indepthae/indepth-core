@@ -1,0 +1,83 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_refund') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_fees_refund') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('view')} #{t('refund_rules')}", :action => 'view_refund_rules' %></li>
+    </ul>
+  </div>
+
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "financial_year_info" %>
+    </div>
+  </div>
+
+  <div id="flash_box"></div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% form_for @refund_rule, :url => {:action => 'create_refund'}, :html => {} do |form| %>
+
+      <div id="form-errors"><%= error_messages_for 'refund_rule' %></div>
+      <div id="left-side-inputs">
+        <div class="label-field-pair">
+          <label for="reason"> <%= t('fee_collection') %><span class="necessary-field">*</span>:</label>
+
+          <div class="text-input-bg">
+            <%= form.select(:finance_fee_collection_id, @collections.map { |item| ["#{item.name}: #{format_date(item.start_date)} #{t('to')} #{format_date(item.due_date)}", item.id] }.sort_by { |x, y| x.downcase }.uniq,
+                            {:selected => @refund_rule.finance_fee_collection.present? ? @refund_rule.finance_fee_collection.id : nil, :prompt => "#{ t('select_fee_collection')}"}) %>
+          </div>
+          <div class="loader_div">
+            <%= image_tag("loader.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "loader",
+                          :style => "display: none; position : absolute; ") %>
+          </div>
+        </div>
+        <div class="label-field-pair">
+          <label for="reason">  <%= t('refund_name') %><span class="necessary-field">*</span>:</label>
+
+          <div class="text-input-bg"><%= form.text_field :name %></div>
+        </div>
+        <div class="label-field-pair">
+          <label for="reason">  <%= t('refund_validity') %><span class="necessary-field">*</span>:</label>
+
+          <div class="text-input-bg"><%= calendar_date_select_tag 'refund_rule[refund_validity]', I18n.l(@refund_rule.refund_validity || FedenaTimeSet.current_time_to_local_time(Time.now).to_date, :format => :default), :popup => "force", :class => 'due_date' %></div>
+        </div>
+        <div class="label_field_pair">
+          <label class="label_for_student_gender" for="is_amount"><%= t('type') %></label>
+
+          <div class="student_gender_value">
+            <label class="label_for_gender" for="is_amount_false"> <%= t('percentage') %></label>
+            <%= form.radio_button :is_amount, false, :checked => "checked" %>
+            <label class="label_for_gender" for="is_amount_true"><%= t('amount') %></label>
+            <%= form.radio_button :is_amount, true %>
+          </div>
+        </div>
+        <div class="label-field-pair">
+          <label for="reason">  <%= t('value') %><span class="necessary-field">*</span>:</label>
+
+          <div class="text-input-bg"><%= form.text_field :amount, :value => precision_label(@refund_rule.amount), :class => 'precision_text' %></div>
+        </div>
+
+      </div>
+      <%= hidden_field_tag :session_fingerprint, session_fingerprint %>
+      <div class="extender"></div>
+      <div id="submit-button">
+        <%= submit_tag "► #{t('create_text')}", :class => 'submit_button', :disable_with => "► #{t('please_wait')}" %>
+      </div>
+  <% end %>
+</div>

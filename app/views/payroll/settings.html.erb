@@ -1,0 +1,151 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('employee_management_text')}" %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('payroll_settings') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h4><%= t('payroll_settings').titleize %></h4>
+    <div class="description"><%= t('payroll_setting_description') %></div>
+    <div id="settings_enable">
+        <% form_for @payroll_settings, :url => {:action => 'settings'} ,:method => 'post', :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |c| %>
+
+          <div class="label-radio-pair" id="lop_enabled">
+              <%= c.radio_button "config_value", "true", :onchange => 'show_examples()' %>
+              <label for="configuration_config_value_true"><%= t('gross_based_payroll') %></label>
+              <div class="label_description"><%= t('gross_based_payroll_description') %></div>
+              <div class="label_description"><%= t('gross_based_payroll_detailed_description') %><div class="examples" onclick="more_examples('gross_mode')"><%= t('view_example') %></div></div>
+          </div>
+
+          <div class="label-radio-pair" id="lop_enabled">
+              <%= c.radio_button "config_value", "false", :onchange => 'show_examples()' %>
+              <label for="configuration_config_value_false"><%= t('custom_mode') %></label>
+              <div class="label_description"><%= t('custom_mode_description') %></div>
+              <div class="label_description"><%= t('custom_mode_detailed_description') %><div class="examples" onclick="more_examples('custom_mode')"><%= t('view_example') %></div></div>
+          </div>
+          <div id='round_off_value'>
+              <div class="label-field-pair">
+                  <h5><%= t('round_off_setting').titleize %></h5>
+                  <div class="label_description_for_round_off"><%= t('round_off_desc') %></div>
+                  <div>
+                  <label id="enable_button"><%= t('round_off_net_pay') %></label>
+                  <%= check_box "", :to_round_up, :checked => @enable_round_off == "1" , :onChange=>"to_show_select()"%>
+                  </div>
+              </div>
+              <div class="label-field-pair" id="selection_for_check_box">
+                 <label><%= t('rounding_type') %></label>
+                  <div class="text-input-bg">
+                      <%=select :payroll_setting_rounding_up , :config_value , @rounds.map{|v| [t(v[1]), v[0]]},{:selected => @payroll_settings_rounding_up,:include_blank => t('select_rounding_type')}%>
+                  </div>
+              </div>
+          </div>   
+          <%=  submit_tag "#{t('save_settings')}",:class=>'submit-button', :id => 'submit_button', :onclick=>"return validate_round_off()" %>
+        <% end %>
+    </div>
+    <div id="gross_example_img">
+        <%=image_tag('payroll_settings/gross_pay.png')%>
+    </div>
+    <div id="custom_example_img">
+        <%=image_tag('payroll_settings/custom_mode.png')%>
+    </div>
+    <div id="gross_mode_example">
+        <div class="info">In the gross mode, value of Gross Pay is entered first and based on it the values of all other dependent categories are calculated.</div>
+        <div class="info">Use this mode if you institution follows a single value like gross salary and all other payroll categories depend on it directly or indirectly.</div>
+        <div class="info">Example : </div>
+        <div class="info"><b><%= "Gross - 25000#{@currency} " %></b>(Constant)</div>
+        <div class="info">Based on gross salary other payroll categories using gross in their formula will be computed.</div>
+        <table align="left" width="70%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name">Payroll Category</td>
+                <td class="code">Code</td>
+                <td class="formula">Formula</td>
+                <td class="value">Auto Computed Value</td>
+            </tr>
+            <tr> <td>Basic</td> <td>B</td> <td>40%GROSS</td> <td>10000</td> </tr>
+            <tr> <td>Dearness Allowance</td> <td>DA</td> <td>50%B</td> <td>5000</td> </tr>
+            <tr> <td>Human Resource Allowance</td> <td>HRA</td> <td>40%B</td> <td>4000</td> </tr>
+            <tr> <td>Conveyance Allowance</td> <td>CA</td> <td>Fixed</td> <td>2000</td> </tr>
+            <tr> <td>Medical Allowance</td> <td>MA</td> <td>Fixed</td> <td>2400</td> </tr>
+            <tr> <td>Food Allowance</td> <td>FA</td> <td>Fixed</td> <td>1600</td> </tr>
+        </table>
+        <div class="info">If your institution has no single value like Gross and has more than one payroll category as parent categories, then please choose Custom mode for payroll calculation. </div>
+    </div>
+    <div id="custom_mode_example">
+        <div class="info">In the custom mode, values of payroll categories having fixed numeric values are entered first and based on these values other dependent categories are calculated.</div>
+        <div class="info">Use this mode if your institution has no single value like gross salary on which all other payroll categories depend, instead has one or two like Basic Salary based on which all other categories are calculated.</div>
+        <div class="info">Example : </div>
+        <div class="info"><b><%= "Basic - 16218#{@currency} " %></b>(Constant)</div>
+        <div class="info"><b><%= "Grade pay - 5000#{@currency} " %></b>(Constant)</div>
+        <div class="info">Based on gross salary other payroll categories using gross in their formula will be computed.</div>
+        <table align="left" width="70%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name">Payroll Category</td>
+                <td class="code">Code</td>
+                <td class="formula">Formula</td>
+                <td class="value">Auto Computed Value</td>
+            </tr>
+            <tr> <td>Basic</td> <td>B</td> <td>Fixed</td> <td>16218</td> </tr>
+            <tr> <td>Grade Pay</td> <td>GP</td> <td>Fixed</td> <td>5000</td> </tr>
+            <tr> <td>Dearness Allowance</td> <td>DA</td> <td>86%(B+GP)</td> <td>18247</td> </tr>
+            <tr> <td>Human Resource Allowance</td> <td>HRA</td> <td>20%(B+GP)</td> <td>4244</td> </tr>
+            <tr> <td>Performance Bonus</td> <td>PB</td> <td>Fixed</td> <td>1273</td> </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+  var gross_mode_text = 'Gross Based Payroll Calculation';
+  var custom_mode_text = 'Custom Mode Payroll Calculation';
+    j("#selection_for_check_box").hide();
+    function to_show_select(){
+      if(j('#_to_round_up').is(":checked"))
+        j("#selection_for_check_box").show();
+      else{
+        j("#selection_for_check_box").hide();
+        j("#payroll_setting_rounding_up_config_value").val(0);
+      }
+    }
+
+  more_examples = function(type){
+      build_modal_box({title: eval(type + '_text')});
+      var content = j('#' + type + '_example').clone();
+      j('#popup_content').append(content);
+      j('#popup_footer').remove();
+    if(j('html').attr('dir') == 'ltr')
+      j('#popup_window').css({left : (j('body').width() - j('#popup_window').width())/2});
+      else
+      j('#popup_window').css({right : (j('body').width() - j('#popup_window').width())/2});
+      j('#popup_box_overlay').click(remove_popup_box);
+      j('#popup_window').attr('dir', 'ltr');
+  }
+  show_examples = function(){
+    if(j('#configuration_config_value_true').is(':checked')){
+          j('#gross_example_img').show();
+          j('#custom_example_img').hide();
+    }
+    else{
+          j('#gross_example_img').hide();
+          j('#custom_example_img').show();
+      }
+  }
+  function validate_round_off(){
+    if((j('#_to_round_up').is(":checked")) && (j("#payroll_setting_rounding_up_config_value").val()=="")){
+      alert("Rounding off is enabled.Please select an option for round up");
+      return false;
+  }
+    else
+      return true;
+  }
+  j(document).ready(function(){
+      show_examples();
+     if(j('#_to_round_up').is(":checked"))
+        j("#selection_for_check_box").show(); 
+  });
+</script>

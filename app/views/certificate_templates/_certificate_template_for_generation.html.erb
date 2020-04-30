@@ -1,0 +1,94 @@
+
+<div class="css_container">
+   <link rel="stylesheet" type="text/css" href="/stylesheets/pdf_normalize.css">
+  <%= @base_template_data %>
+</div>
+
+<script>
+template_app = new Vue({
+ el: '#preview',
+ data: {
+   <%@keys.each_with_index do |key,index|%>
+    <%if BaseTemplate.is_key_profile_photo(key.first) %>
+      <%=key.first%>: "/images/id_user.png"<%=',' if index != (@keys.count-1) %>
+    <%else%>
+      <%=key.first%>: ''<%=',' if index != (@keys.count-1) %>
+    <%end%>  
+   <%end%>
+ }
+});
+
+//reset all inline css
+j('#preview').removeAttr('style');
+
+<%if @certificate_template.manual_serial_no ==  false%>
+  //serial_no for certificate
+  template_app.serial_no = '<%= "#{@prefix}#{@get_next_serial_no}" %>';
+  generation_serial_no = <%= @get_next_serial_no %>;
+<%end%>
+
+function set_size(width,height){
+  j("#preview").css("width",width+"mm");
+  <% if @certificate_template.template_resolution[:height] < @certificate_template.template_resolution[:width] %>
+    j("#preview").css("height",height-1+"mm");
+  <% else %>
+    j("#preview").css("height",height+"mm");
+  <% end %>
+
+}
+
+function set_padding(top_padding,left_padding,right_padding,bottom_padding){
+  j("#preview").css('padding-top', top_padding+"px");
+  j("#preview").css('padding-left', left_padding+"px");
+  j("#preview").css('padding-right', right_padding+"px");
+  j("#preview").css('padding-bottom', bottom_padding+"px");
+}
+
+function set_background_image(url){
+  j("#preview").css("background-image", "url('"+url+"')");
+}
+
+<% if @certificate_template.background_image.present? %>
+  set_background_image("<%= @certificate_template.background_image.url(:original,false) %>");
+<%end%>
+set_size(<%=@template_resolution[:width]%>,<%=@template_resolution[:height]%>);
+set_padding(<%=@certificate_template.top_padding.to_i%>,<%=@certificate_template.left_padding.to_i%>,<%=@certificate_template.right_padding.to_i%>,<%=@certificate_template.bottom_padding.to_i%>);
+
+var base_template_id = <%=@base_template.id%>;
+var certificate_template_id = <%=@certificate_template.id%>;
+
+load_template_key_form();
+load_certificate_key_form();
+
+function load_template_key_form()
+{
+  j.ajax({
+    url: "/templates/load_template_key_form",
+    type: 'POST',
+    data:  {base_template_id: base_template_id},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+function load_certificate_key_form(){
+  j.ajax({
+    url: "load_certificate_key_form",
+    type: 'POST',
+    data:  {certificate_template_id: certificate_template_id},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+
+
+</script>

@@ -1,0 +1,28 @@
+<div id="collection_receipients_data">
+
+
+      <div class="extender"></div>
+
+      <ul class="tabrow">
+        <li class="selected" type="Batch"><%=link_to_function "#{t('batch')}-#{t('wise')}","select_tab(this);" %></li>
+        <li type="Student"><%=link_to_function "#{t('student_text')}-#{t('wise')}","select_tab(this);" %></li>
+        <li type="StudentCategory"><%=link_to_function "#{t('student_category')}-#{t('wise')}","select_tab(this);" %></li>
+        <li id="particular-wise-discount" type="FinanceFeeParticular"><%=link_to_function "#{t('particular')}-#{t('wise')}","select_tab(this);" %></li>
+
+
+      </ul>
+      <div id="questions-main">
+
+
+        <div id="right-panel">
+
+          <%= render :partial => @partial %>
+        </div>
+
+
+      </div>
+
+</div>
+
+
+

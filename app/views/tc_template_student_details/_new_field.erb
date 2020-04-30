@@ -1,0 +1,133 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="page-yield">
+    <div class="box">
+        <% form_remote_for :tc_template_field_student_details,:url=>{:controller=>"tc_template_student_details",:action=>'create_new_field'},:before=>"$('submit_button').disable()", :html => { :method => :post }, :complete=>"setTimeout(function(){$('submit_button').enable();},1000)" do |f| %>
+          <%=  session_fingerprint_field %>  
+          <div id="form-errors"></div>
+          <%= error_messages_for :tc_template_field_student_details %>
+          <div class="label-field-pair field_name">
+              <label for="category_name"><%= "#{t('field_name')}" %></label>
+              <div class="text-input-bg"><%= f.text_field :field_name %></div>
+          </div>
+          <div class="radio">              
+              <div class="radio_one"><%= radio_button_tag("tc_template_field_student_details[field_info][type]","system", true)%>  <label for="tc_template_field_student_details_field_info_type_system"> <%="#{t('map_to_system_details')}"%> </label></div>
+              <div class="radio_two"><%= radio_button_tag("tc_template_field_student_details[field_info][type]","custom")%>  <label for="tc_template_field_student_details_field_info_type_custom"><%="#{t('custom_field')}"%> </label></div>
+          </div>
+          <div class="check_box">
+              <div class="label-field-pair">
+                  <div class="input-container">  <%= f.check_box "[field_info][is_mandatory]" %></div>
+                  <div class="label-container check"><%= f.label :is_mandatory, t('is_mandatory') %></div>
+              </div>
+          </div>
+          <div class="system_fields">
+              <%= select_tag "tc_template_field_student_details[field_info][system_field_type_name]", grouped_options_for_select([[t('student_details'),TcTemplateVersion::SYSTEM_FIELDS.sort.map {|k,v| [t(v[:name]),k]}],[t('additional_details'), @student_additional_fields.collect {|v| [ v.name, "#{v.name}.#{v.id}" ] }]])  %>
+              <div class="date">
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words]" ) %> <label for="tc_template_field_student_details_field_info_in_words"><%=  "#{t('in_words')}"%> </label></div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures]","1",true)%> <label for="tc_template_field_student_details_field_info_in_figures"><%= "#{t('in_figures')}" %> </label></div>  
+              </div>
+          </div>
+          <div class="custom_fields">
+              <%= "#{t('value_type')}" %>
+
+              <%= select_tag "tc_template_field_student_details[field_info][custom_field_type_name]", options_for_select(TcTemplateVersion::CUSTOM_FIELDS.sort.map {|k,v| [v[:name],k]}),:class=>"input-type-select" %>
+              <div class="date_for_custom">
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words_custom]" ) %> <label for="tc_template_field_student_details_field_info_in_words_custom"><%=  "#{t('in_words')}"%> </label></div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures_custom]","1",true)%> <label for="tc_template_field_student_details_field_info_in_figures_custom"><%= "#{t('in_figures')}" %> </label></div>  
+              </div>
+          </div>
+          <div class="select_box" style="display:none"></div>
+          <div class="add-button" style="display:none"><a class="add-field" onclick="create_row()"><%= "#{t('add')}" %></a></div>
+          <%= hidden_field_tag 'flash', 'new_field_added' %>
+          <div class="submit_button new">
+              <%= f.submit "", :value => " Create", :class => "submit-button", :id => 'submit_button' %>
+          </div>
+        <% end %>
+        <div class="extender"></div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+  if (j("input[name='tc_template_field_student_details[field_info][type]']:checked").val() === "system") {
+      j(".system_fields").show();
+      j(".custom_fields").hide();
+      j(".date").hide();
+      j(".date_for_custom").hide();
+  } else {
+      j(".system_fields").hide();
+      j(".custom_fields").show();
+      j(".date").hide();
+      j(".date_for_custom").hide();
+  }
+
+  j(document).on('change', "input[name='tc_template_field_student_details[field_info][type]']:radio", function () {
+      if (j("input[name='tc_template_field_student_details[field_info][type]']:checked").val() === "system") {
+          j('.select_box').hide();
+          j('.add-button').hide();
+          j(".system_fields").show();
+          j(".custom_fields").hide();
+          var system_text = j("#tc_template_field_student_details_field_info_system_field_type_name :selected").val();
+          if (system_text == 2 | system_text == 14) {
+              j(".date").show();
+          } else
+          {
+              j(".date").hide();
+          }
+
+      } else
+      {
+          var text = j("#tc_template_field_student_details_field_info_custom_field_type_name :selected").val();
+          if (text == 4) {
+              j('.select_box').show();
+              j('.add-button').show();
+          }
+          if (text == 5) {
+              j(".date_for_custom").show();
+          } else {
+              j(".date_for_custom").hide();
+          }
+          j(".system_fields").hide();
+          j(".custom_fields").show();
+          j(".date").hide();
+      }
+  });
+
+
+  j(document).on("change", "#tc_template_field_student_details_field_info_system_field_type_name", function () {
+      var system_text = j("#tc_template_field_student_details_field_info_system_field_type_name :selected").val();
+      if (system_text == 2 | system_text == 14) {
+          j(".date").show();
+      } else
+      {
+          j(".date").hide();
+      }
+
+  });
+
+  j(document).on("change", "#tc_template_field_student_details_field_info_custom_field_type_name", function () {
+      var text = j("#tc_template_field_student_details_field_info_custom_field_type_name :selected").val();
+      if (text == 4) {
+          j('.select_box').empty();
+          j('.select_box').show();
+          j('.add-button').show();
+          j(".date_for_custom").hide();
+      } else if (text == 5) {
+          j(".date_for_custom").show();
+          j('.select_box').hide();
+          j('.add-button').hide();
+      } else {
+          j('.select_box').hide();
+          j('.add-button').hide();
+          j(".date_for_custom").hide();
+      }
+
+  });
+
+
+</script>

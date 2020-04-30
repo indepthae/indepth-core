@@ -1,0 +1,29 @@
+
+<% if (@current_user.has_required_custom_remarks_privileges? or @current_user.employee_record.batch_ids.include?(@student.batch_id)) and @remark.submitted_by == @current_user.id %>
+  <%=link_to_remote "",:url  => {:controller=>"remarks",:action=>"destroy_custom_remarks",:object_id=>@remark.id,:student_id=>@student.id, :method => :delete},:html => { :class  => "cross_button" }, :confirm =>"#{t('delete_confirm_msg')}"%>
+  <%=link_to "","javascript:void(0);",:class=>"themed_text add_link edit_button",:student_id=>@student.id,:object_id=>@remark.id,:onclick=>"edit_custom_remark(this)"%>
+<%end%>
+<div id="remarked_by_section"><%= @remark.remarked_by.present? ? @remark.remarked_by : '-' %></div>
+<div id="remark_subject_section"><%=@remark.remark_subject.present? ? @remark.remark_subject : '-'%></div>
+<div id="remark_body_section"><%=@remark.remark_body.present? ? @remark.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div><div id="submitted_by_section"><%=@remark.user.present? ?  @remark.user.first_name : t('deleted_user')%> on <%=format_date(@remark.updated_at,:format=>:long_date)%></div>
+<script type="text/javascript">
+  function edit_custom_remark(elm){
+
+    j(elm).removeAttr('onclick')
+<%= "var student_id = '#{@student.id}'" %>
+<%="var object_id = j(elm).attr('object_id')"%>
+    var parametrs={student_id:student_id,object_id:object_id}
+    new Ajax.Request('/remarks/edit_custom_remarks',{
+      parameters:j(this).serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j(elm).parent().hide();
+        j(elm).parents('#custom_remarks_section').append(resp.responseText);
+      }
+    });
+  }
+
+</script>
+

@@ -1,0 +1,101 @@
+<%= javascript_include_tag "view_all_payslips" %>
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_all_payslips') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% case params[:from]
+    when 'past_payslips'
+      breadcrumb :employee_payslips_view_all_employee_payslip_past, [@payroll_group, [@start_date, @end_date]]
+    when 'past_payslips_finance'
+      breadcrumb :employee_payslips_view_all_employee_payslip_past_finance, [@payroll_group, [@start_date, @end_date]]
+    when 'approve_payslips'
+      breadcrumb :employee_payslips_view_all_employee_payslip_approve_payslips, [@payroll_group, [@start_date, @end_date]]
+    else
+      breadcrumb :employee_payslips_view_all_employee_payslip, [@payroll_group, [@start_date, @end_date]]
+    end %>
+
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h3><%= "#{t('payroll_group')} - #{@payroll_group.name}" %></h3>
+  <% if @outdated_payroll > 0 %>
+    <p class="flash-msg"><span class="info-icon symbol"></span><%= t('view_outdated_payslips_message',{:count => @outdated_payroll}) %>
+      <%= link_to t('view_these_outdated_payslips',{:count => @outdated_payroll}), {:start_date =>@start_date, :id => @payroll_group.id, :controller => "employee_payslips", :end_date => @end_date, :action => "payslip_generation_list", :employee_status => "outdated_structure_payslips", :finance => params[:finance], :from => params[:from]} %>
+    </p>
+  <% end %>
+  <div class="fields-details field-info">
+    <div class="field-label"><%= t('pay_period') %></div>
+    <div class="fields-val"><%= @payslips_date_range.date_range %></div>
+  </div>
+  <div class="fields-details field-info">
+    <div class="field-label"><%= t('payment_frequency') %></div>
+    <div class="fields-val"><%= "#{@payroll_group.salary_type_value} - #{@payroll_group.payment_period_value}" %></div>
+  </div>
+  <div class="fields-details field-info status-info">
+    <div class="field-label"><%= t('payslips_generated') %></div>
+    <div class="fields-val">
+      <div><%= "#{@payslips.length} #{t('of')} #{@payroll_group.employees.count} #{t('employees')}" %></div>
+      <div class="field-label" id="status">
+        <% status = "#{t('approved')} : #{@approved} | #{t('pending')} : #{@pending}  " %>
+        <% status+= "| #{t('rejected')} : #{@rejected}" unless @rejected.to_i.zero? %>
+        <%= status %>
+      </div>
+    </div>
+  </div>
+  <hr/>
+  <label for="filter"><%= t('filters_text') %></label>
+  <div id="loader_div">
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  </div>
+  <div class="label-field-pair payslip_field">
+    <label for="payslip_status"><%= t('employees') %></label>
+    <div class="text-input-bg">
+      <%= select_tag "payslip[employees]", options_for_select([["#{t('all')}","all"],[t('with_lop'), "with_lop"], [t('without_lop'), "without_lop"]], "All"),{:onchange => "filter_payslips()"} %>
+    </div>
+  </div>
+  <div class="label-field-pair payslip_field">
+    <label for="payslip_status"><%= t('payslip_status') %></label>
+    <% pending_count = @pending_payslips.length %>
+    <% approved_count = @approved_payslips.length %>
+    <div class="text-input-bg">
+      <% if approved_count > 0 and pending_count > 0 %>
+        <%= select_tag "payslip[status]", options_for_select([["#{t('all')}","approved_and_pending"],[t('approved'), "approved"], [t('pending'), "pending"]], "approved_and_pending"),{:onchange => "filter_payslips()"} %>
+      <% elsif pending_count > 0 %>
+        <%= select_tag "payslip[status]", options_for_select([[t('pending'), "pending"]], "pending"),{:onchange => "filter_payslips()"} %>
+      <% elsif approved_count > 0 %>
+        <%= select_tag "payslip[status]", options_for_select([[t('approved'), "approved"]], "approved"),{:onchange => "filter_payslips()"} %>
+      <% end %>
+    </div>
+  </div>
+  <% if params[:finance].nil? %>
+    <div class="submit-button" id="revert_all" style="display : <%= "#{approved_count > 0 ? 'none' : 'block'}" %>;" onclick="revert_all()"><%= t('delete_all_payslips') %></div>
+  <% else %>
+    <div class="submit-button" id="approve_all" style="display : <%= "#{approved_count > 0 ? 'none' : 'block'}" %>;" onclick="approve_all()"><%= t('approve_all_payslips') %></div>
+    <div class="submit-button" id="revert_t_all" style="display : <%= "#{pending_count > 0 ? 'none' : 'block'}" %>;" onclick="revert_transaction_all()"><%= t('revert_all_payslips') %></div>
+  <% end %>
+  <div class="fields-details" id="total_cost">
+    <div class="field-label"><%= t('total_net_pay') %></div>
+    <% total_cost = @payslips.select{|p| !p.is_rejected}.map{|p| p.net_pay.to_f}.sum %>
+    <div class="fields-val"><%= "#{currency}#{precision_label(total_cost)}" %></div>
+  </div>
+  <div id="payslip_table">
+    <%= render :partial => "list_all_employee_payslips" %>
+  </div>
+  <div id="MB_overlay" style="display:none;"></div>
+  <div id="MB_window" style="display:none;">
+  </div>
+</div>

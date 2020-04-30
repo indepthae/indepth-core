@@ -1,0 +1,37 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('edit_question_text') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_edit_question, @exam_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= error_messages_for 'question',:header_message=>nil %>
+    <%form_for :question, :url=>{:action=>"edit_question",:group_id=>@exam_group.id} do |f| %>
+
+      <div class="question_label_field">
+        <p><%= t('question') %></p>
+        <div class="label-field-pair1">
+          <label ><%= t('mark') %></label>
+          <div class="text-input-bg"><%= f.text_field :assigned_mark %></div>
+        </div>
+        <div id="question_text_field_bg">
+          <%#= f.tinymce :question %>
+          <%= f.redactor :question,:latex=>true%>
+        </div>
+      </div>
+      <div id="submit-button">
+        <%=f.submit("► #{t('update')}") %>
+      </div>
+    <% end %>
+      <%= load_redactor_script %>
+  </div>
+</div>

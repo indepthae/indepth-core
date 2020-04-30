@@ -1,0 +1,55 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form_responses') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :preview, :forms %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('forms.preview')}", preview_form_path(@form)%></li>
+      <% end %>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :form_submissions_show %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% if @filters or (@form_submissions.present? and !@form.is_feedback) %>
+    <% if FedenaSetting.elasticsearch_enabled? %>
+      <% remote_form_for :filter,:url => filter_form_submission_path(@form.id),:loading => "$('loader').show();", :loaded => "$('loader').hide();" do |f|%>
+        <div class="filters">
+          <label>Fields</label>
+          <%= select_tag 'fields_list',options_for_select([[t('select_field'),0]]+@fields.map{ |item| [item.label,item.id] unless item.field_type == 'hr'}) %>
+          
+          <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader2",
+              :style =>"display: none;position:relative;top:8px" ) %>
+          <div class="filter_clear themed_text">
+            <span>
+              <%= t('clear_all_filter') %>
+            </span>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style =>"display: none;" ) %>
+          </div>
+          <div class="filter_list"></div>
+          <div class="apply_filter submit-button">
+            <%= f.submit t('apply') %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div id="reports">
+    <%= render :partial => "response_list" %>
+  </div>
+</div>

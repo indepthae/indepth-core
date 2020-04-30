@@ -1,0 +1,3 @@
+page << "build_modal_box({'title' : '#{(@receipt_set.new_record? ? t('create_receipt_set') : t('update_receipt_set'))}', 
+                                           'popup_class' : 'receipt_set_form'})" unless params[:receipt_number_set].present?
+page.replace_html 'popup_content', :partial => 'receipt_set_form'

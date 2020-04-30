@@ -1,0 +1,11 @@
+class <%= migration_class_name.underscore.camelize %> < ActiveRecord::Migration
+  def self.up
+    add_column :<%= table_name %>, :school_id, :integer
+    add_index :<%= table_name %>, :school_id
+  end
+
+  def self.down
+    remove_index :<%= table_name %>, :school_id 
+    remove_column :<%= table_name %>, :school_id
+  end
+end

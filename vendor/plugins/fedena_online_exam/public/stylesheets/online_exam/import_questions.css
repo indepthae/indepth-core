@@ -1,0 +1,340 @@
+.select_exam_type {
+    float: left;
+    padding-top: 5px;
+    width: 300px;
+}
+.label-field-pair .label_for_exam_type {
+    display:inline;
+    font-size:13px;
+    font-weight:normal;
+    margin: 0;
+    padding-left: 0px;
+    padding-right: 10px;
+    padding-top: 5px;
+    width:auto;
+}
+.label-field-pair .select_exam_type input {
+    float:left;
+    margin-right:5px;
+    margin-left:10px;
+    width:auto;
+}
+.label-field-pair label {
+    width:auto;
+}
+.exam-label {
+    min-width:100px;
+    width:auto;
+    font-size:13px !important;
+    font-weight:normal !important;
+}
+#questions-main {
+    width:978px;
+    border: 1px solid #999999;
+    height:550px;
+    margin-top:20px;
+    float:left;
+}
+#left-panel {
+    float:left;
+    width:390px;
+    border-right:1px solid #cccccc;
+    height:550px;
+}
+#right-panel {
+    float:right;
+    width:555px;
+    height:550px;
+    font-size:13px;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+#left-top-panel {
+    width:390px;
+    float:left;
+    height:50px;
+    border-bottom:1px solid #cccccc;
+    background-color:#ededed;
+}
+#left-top-panel select {
+    background-color: #fdfdfd;
+    border: 1px solid #cccccc;
+    margin: 10px 0 0 10px;
+    width: 120px;
+    height: 31px;
+    padding: 5px 6px;
+    font-size:13px;
+}
+#left-bottom-panel {
+    width:390px;
+    float:left;
+    background-color:#ededed;
+    height:499px;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+.each-question {
+    width:360px;
+    float:left;
+    padding-left:10px;
+    padding-right:20px;
+    padding-top:10px;
+    padding-bottom:10px;
+    border-bottom: 1px solid #cccccc;
+    color:#000000;
+    cursor:pointer;
+}
+.each-question input {
+    float:left;
+    margin:0;
+}
+.question-box {
+    float:left;
+    width:360px;
+    font-size: 13px;
+}
+.assigned{
+    background-color:#ffffcc;
+}
+.question-box p{
+    margin: 0 !important;
+}
+.selected {
+    background-color:#ffffff;
+    color:#000000;
+}
+/*.question-box iframe{
+    width:340px !important;
+    height:190px !important;
+    margin-top:5px !important;
+}*/
+.top-div {
+    float:left;
+    width:555px;
+    margin-top:20px;
+}
+.question-text {
+    float:left;
+    width:auto;
+    margin-top:5px;
+    font-weight:bold;
+    color:#000000;
+}
+.format-text{
+    float:right;
+    width:auto;
+    margin-right:30px;
+    margin-top:5px;
+    color:#666666;
+    font-weight:normal;
+}
+.marks-div{
+    float:right;
+    width:auto;
+    margin-right:30px;
+    margin-top:5px;
+    color:#000000;
+    font-weight:normal;
+}
+.input-marks{
+    margin-top:0 !important;
+}
+.marks-div label{
+    float:left;
+    margin-top:5px;
+    margin-right:5px;
+}
+.marks-div input{
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    height: 13px;
+    margin: 0 !important;
+    padding: 5px;
+    text-align: left;
+    width: 35px;
+    font-size:13px;
+}
+.question-div {
+    float:left;
+    margin-top:15px;
+    width:525px;
+    color:#000000;
+}
+.question-div p{
+    margin-top:0 !important;
+    margin-bottom:10px !important;
+}
+.answer-text {
+    float:left;
+    width:525px;
+    margin-top:5px;
+    font-weight:bold;
+}
+.option-main {
+    float:left;
+    width:525px;
+    margin-top:20px;
+}
+.option-div {
+    float:left;
+    width:445px;
+    background-color: #ededed;
+}
+.option-div p{
+    margin:10px !important;
+}
+.correct-text {
+    float:left;
+    margin-top:10px;
+    margin-left:10px;
+    height:20px;
+    width:20px;
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    background-position:0px -360px;
+}
+.no-questions {
+    width:390px;
+    float:left;
+    text-align:center;
+    font-size:13px;
+    color:#666666;
+    margin-top:220px;
+}
+#submit-button input{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+    margin-left:0px;
+    margin-top:30px;
+    margin-bottom:30px;
+    padding:7px 10px;
+    border:none;
+    cursor:pointer;
+}
+#submit-button a{
+    background: none repeat scroll 0 0 #27292B;
+    border: medium none;
+    border-radius: 10px 10px 10px 10px;
+    color: #FFFFFF !important;
+    cursor: pointer;
+    display: block;
+    font-family: arial;
+    font-size: 15px;
+    font-weight: bold;
+    margin-left:0px;
+    margin-top:30px;
+    margin-bottom:30px;
+    padding: 7px 10px;
+    text-align: center;
+    text-decoration: none;
+    width: auto;
+    float:left;
+}
+#page-yield a.remove_button:hover{
+    color:#FFFFFF !important;
+}
+.errorExplanation {
+    background: url("/images/_global/error.png") no-repeat scroll 10px 14px #FFDEDF;
+    height: auto;
+    margin-left: 55px;
+    margin-top: 20px;
+    padding: 1px 0 20px 20px;
+    width: 400px;
+}
+.fieldWithErrors{
+    float:left !important;
+}
+.pagination{
+    display:none;
+}
+.question-list{
+    float:left;
+    height:auto;
+    width:auto;
+}
+#loaders-div{
+    float:left;
+    width:390px;
+    background-color:#ededed;
+    padding-top:10px;
+    padding-bottom:10px;
+    display:none;
+}
+.loading-text{
+    color:#666666;
+    font-size:13px;
+    font-weight:bold;
+    tex-align:center;
+}
+.label-field-pair{
+    width:430px;
+    float:left;
+}
+.text-input-bg select{
+    font-size:13px;
+}
+.input-boundary{
+    float:left;
+    width:980px;
+}
+#course-selection{
+    float:left;
+    width:980px;
+}
+.user_button {
+    background: none repeat scroll 0 0 #27292B;
+    border: medium none;
+    border-radius: 10px 10px 10px 10px;
+    color: #FFFFFF !important;
+    cursor: pointer;
+    display: block;
+    font-family: arial;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0 !important;
+    padding: 7px 10px;
+    text-align: center;
+    text-decoration: none;
+    width: auto;
+}
+#exam-stats {
+    float:left;
+    width:650px;
+    font-size:13px !important;
+    color:#666666;
+    margin-top:20px;
+}
+#exam-stats p{
+    width:650px;
+    float:left;
+    margin-bottom: 0 !important;
+    margin-top: 10px !important;
+}
+#finish{
+    float:right;
+    margin-top:35px;
+}
+#finish a{
+    float:right;
+}
+#right-panel-loader{
+    float:right;
+    width:570px;
+    height:550px;
+    font-size:13px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#666666;
+}
+#right-panel-loader label{
+    margin-top:250px;
+    float:left;
+    margin-top:265px;
+    margin-left:230px;
+}

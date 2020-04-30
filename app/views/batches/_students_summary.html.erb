@@ -1,0 +1,36 @@
+<div id="highlight">
+  <span id="student_count"><%=@student_count%></span><span id="student_text"><%=@student_count <= 1 ? t('single_student') : t('multiple_student')%></span>
+</div>
+<div id="other_details">
+  <div id="student_items">
+    <%if @students.present?%>
+      <table id="student_details_table">
+        <tr>
+          <th id="sl_no"><%=t('sl_no')%></th>
+          <th id="st_name"><%=t('student_name')%></th>
+          <th id="admn_no"><%=t('admission_number')%></th>
+          <% if roll_number_enabled? %>
+            <th id="roll_no"><%=t('roll_no')%></th>
+          <%end%>
+        </tr>
+        <%@students.each_with_index do |s,i|%>
+          <% if params[:page].present? %>
+            <% if params[:page].to_i >= 1 %>
+              <% i = i  + (params[:page].to_i - 1) * 20 %>
+            <% end %> <%else %> <% i = i %> <% end %>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=i+1%></td>
+            <td><%=link_to s.full_name,:controller=>'student',:action=>'profile',:id=>s.id%></td>
+            <td><%=s.admission_no%></td>
+            <% if roll_number_enabled? %>
+              <td class="col-1"><%= s.roll_number.present? ? s.roll_number : "-" %></td>
+            <% end %>
+          </tr>
+        <%end%>
+      </table>
+      <%=will_paginate @students,:renderer => 'RemoteLinkRenderer',:remote=>{:update=>'display_area'},:params=> {:request_id=>1,:controller => "batches", :action => "batch_summary",:batch_id=>@batch.id}%>
+    <%else%>
+      <div class="no_entries"><%=t('no_students_found')%></div>
+    <%end%>
+  </div>
+</div>

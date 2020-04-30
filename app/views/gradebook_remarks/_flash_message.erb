@@ -1,0 +1,9 @@
+<% if @remark_type.present? %>
+  <% if @remark_type == "RemarkSet" %>
+    <p class="flash-msg"> <%= t('no_remark_set') %><%= link_to t('here_down'), :controller=>'assessment_reports', :action=>'settings', :assessment_plan_id => @plan_id%> </p>
+  <% else %>
+    <p class="flash-msg"> <%= "No subjects for this batch." %> </p>
+  <% end %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_students_in_batch') %> </p>
+<% end %>

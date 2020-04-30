@@ -1,0 +1,90 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('stores') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation">
+      <span><%= flash[:warn_notice] %></span>
+    </div>
+  <% end %>
+
+
+
+
+  <% form_for(@store) do |f| %>
+
+    <%= f.error_messages %>
+    <div id="form-content">
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('name')}" %><span class="necessary-field">*</span></div>
+        <div class="input-container"><%= f.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('code')}" %><span class="necessary-field">*</span></div>
+        <div class="input-container"><%= f.text_field :code %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('store_type')}" %><span class="necessary-field">*</span></div>
+        <div class="text-input-bg"><%= f.select :store_type_id,@store_types.map{|st| [st.full_name,st.id]},:prompt => "#{t('select_store_type')}" %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('store_category')}" %><span class="necessary-field">*</span></div>
+        <div class="text-input-bg"><%= f.select :store_category_id,@store_categories.map{|sc| [sc.full_name,sc.id]},:prompt => "#{t('select_store_category')}" %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('invoice_prefix')}" %></div>
+        <div class="input-container"><%= f.text_field :invoice_prefix %></div>
+      </div>
+      <div id="submit-button">
+        <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+      </div>
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+
+
+
+
+  <div class="box">
+
+
+    <ul id="category-list">
+      <% unless @stores.empty? %>
+        <li class="listheading"><div class="category-name"><%= "#{t('store')}" %></div></li>
+        <% @stores.each do |store| %>
+          <li class="list<%=cycle('odd', 'even')%>">
+            <div class="category-name"><%= store.name %></div>
+            <div class="category-code"><%=  store.code %></div>
+            <div class="category-edit"><%=  link_to t('edit_text'),  edit_store_path(store) if permitted_to? :edit, :stores %></div>
+            <div class="category-delete"><%= link_to(t('delete_text'), store_path(store), :method => 'delete', :confirm => "#{t('delete_confirm_msg')}") if permitted_to? :destroy, :stores %></div>
+          </li>
+        <% end %>
+        <div id = "button">
+          <%= link_to "Pdf report", {:controller => "stores", :action => "stores_pdf", :report_format_type => "pdf",:page_height => 760} , :target => '_blank', :class => "user_button" %>
+          <%= link_to "CSV Export", {:controller => "csv_export", :action => "generate_csv", :csv_report_type => "store", :report_format_type => "csv" }, :class => "user_button" %>
+        </div>
+      <% end %>
+    </ul>
+    <div class="extender"></div>
+  </div>
+</div>
+

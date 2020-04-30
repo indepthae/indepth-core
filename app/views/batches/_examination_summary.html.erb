@@ -1,0 +1,31 @@
+<div id="highlight">
+  <div class="examination_highlights"><div class="bold_new_exam_text margin_left_45"><%=t('multiple_new_exam')%></div><div class="large_present_text"><%=@new_exams_count%></div></div>
+  <div class="examination_highlights"><div class="bold_new_exam_text margin_left_45"><%=t('multiple_published_exam')%></div><div class="large_present_text"><%=@published_exams_count%></div></div>
+  <div id="vertical_line"></div>
+  <div class="examination_highlights"><div class="normal_absentees_text margin_left_45"><%=t('multiple_ongoing_exam')%></div><div class="absentees_count"><%=@ongoing_exams_count%></div></div>
+  <div class="examination_highlights"><div class="normal_absentees_text margin_left_45"><%=t('multiple_finished_exam')%></div><div class="absentees_count"><%=@finished_exams_count%></div></div>
+  <div class="examination_highlights"><div class="normal_absentees_text margin_left_45"><%=t('multiple_result_published_exam')%></div><div class="absentees_count"><%=@results_published_exams_count%></div></div>
+</div>
+<div id="other_details">
+  <div id="exam_items">
+    <%if @exam_groups.present?%>
+      <table id="exam_details_table">
+        <tr>
+          <th><%=t('exam_group')%></th>
+          <th><%=t('status')%></th>
+        </tr>
+        <%@exam_groups.each do |eg|%>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=eg.name%></td>
+            <td>
+              <%=eg.current_status%>
+            </td>
+          </tr>
+        <%end%>
+      </table>
+      <%=will_paginate @exam_groups,:renderer => 'RemoteLinkRenderer',:remote=>{:update=>'display_area'},:params=> {:request_id=>5,:controller => "batches", :action => "batch_summary",:batch_id=>@batch.id}%>
+    <%else%>
+      <div class="no_entries"><%=t('no_examgroups_present')%></div>
+    <%end%>
+  </div>
+</div>

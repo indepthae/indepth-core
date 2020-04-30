@@ -1,0 +1,18 @@
+<h5 class="field_head"><%= t('select_group') %></h5>
+<%= select '', :group , @user_groups.map{|g| [g.name, g.id]}, {:include_blank=>t('select_group')}, :class=>"drop_select group_selector", :id=>"group" %>
+
+<script>
+  j("#group").change(function(){
+    j.ajax({
+      url: "load_group_sms_send",
+      type: 'POST',
+      data: {group_id: j(this).val()},
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  });
+</script>

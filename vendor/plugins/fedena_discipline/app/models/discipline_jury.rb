@@ -1,0 +1,2 @@
+class DisciplineJury < DisciplineParticipation
+	end

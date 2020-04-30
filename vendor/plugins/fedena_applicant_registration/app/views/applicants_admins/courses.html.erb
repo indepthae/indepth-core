@@ -1,0 +1,24 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('applicant_regi_label') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('settings') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to t('settings'), {:action => "show"} %></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% @enabled_courses.each do |c| %>
+    <%= c.course.course_name %> |
+    <%= c.course.code %> |
+    <%= c.minimum_score %>
+  <% end %>
+</div>

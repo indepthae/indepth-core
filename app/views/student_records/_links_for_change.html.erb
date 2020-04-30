@@ -1,0 +1,12 @@
+<div class="course_batch_selection_advanced">
+  <span id="course_batch_name_label"><%="#{t('course_text')} - #{t('batch')}"%></span><div id="course_batch_name"><%=@batch.full_name%></div>
+  <%if @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name('ManageStudentRecord'))%>
+    <div id="link_for_change">
+      <%if params[:rg_id].present?%>
+        <%=link_to_remote "#{t('change_batch')}",:url=>{:controller=>'student_records',:action=>'get_course_batch_selector',:rg_id=>params[:rg_id],:id=>@batch.id},:html=>{:class=>"change_date"}%>
+      <%else%>
+        <%=link_to_remote "#{t('change_batch')}",:url=>{:controller=>'student_records',:action=>'get_course_batch_selector',:id=>@batch.id},:html=>{:class=>"change_date"}%>
+      <%end%>
+    </div>
+  <%end%>
+</div>

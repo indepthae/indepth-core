@@ -1,0 +1,54 @@
+<%if @books.present?%>
+  <div id="class_form">
+    <% remote_form_for :book, :url => {:action => 'update_barcode'}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000);window.scrollTo(0,0);" do -%>
+      <% if @book_errors and !@book_errors.empty? %>
+        <div id="errorExplanation" class='errorExplanation'><p><%=t('barcode_already_taken')%></p></div>
+      <% end %>
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td><%= "#{t('book_number')}"%></td>
+          <td> <%= "#{t('title')}"%></td>
+          <td><%= "#{t('author')}"%></td>
+          <td><%= "#{t('barcode')}"%></td>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <% @books.each do |book| %>
+          <% fields_for "book[]", book do |book_fields| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="col-2"><%=  h book.book_number %></td>
+              <td class="col-7"><%= h book.title %></td>
+              <td class="col-4"><%= h book.author %></td>
+              <td class="col-2">
+                <div class="label-field-pair" id="barcode_text">
+
+                  <% if @book_errors and @book_errors.include?(book.id.to_s) %>
+                    <div class="text-input-bg">
+                      <div class="fieldWithErrors">
+                        <%= book_fields.text_field :barcode,:value=>@book_current_value[book.id]%>
+                      </div>
+                    </div>
+                  <%else%>
+                    <div class="text-input-bg">
+                      <%= book_fields.text_field :barcode%>
+                    </div>
+                  <%end%>
+
+                </div>
+                <% if @book_errors and @book_errors.include?(book.id.to_s) %>
+                  <div class="error-icon"></div>
+                <% end %>
+              </td>
+
+            </tr>
+          <% end %>
+        <% end %>
+      </table>
+      <%= hidden_field_tag :book_ids, @books.collect(&:id).join(",") %>
+
+      <%=submit_tag("► #{t('finish')}", :id => 'submit_button',:class=>"submit_button float_right")%>
+
+    <% end %>
+  </div>
+<%else%>
+  <p class="flash-msg"> <%= "#{t('no_books_found_try_again')}"%></p>
+<%end%>

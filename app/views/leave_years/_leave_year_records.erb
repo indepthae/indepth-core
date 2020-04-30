@@ -1,0 +1,44 @@
+<% if @logs.present? %>
+  <% if @departments.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="leave_process_record">
+        <tr class="tr-head">
+            <td class="name"><%= t('department') %></td>
+            <td class="no_emp"><%= t('no_emp') %></td>
+            <td class="status"><%= t('status') %> </td>
+        </tr>
+        <% @departments.each do |department| %>
+          <% emp_counts = emp_count(department) %>
+          <% if emp_counts > 0 %>
+            <tr>
+                <td><% if @status != 1 %>
+                      <%= link_to "#{department.name}", :controller => "leave_years", :action => "end_year_process_detail", :id => department.id , :logs => @logs, :department_id => department.id %>
+                    <% else %>
+                      <%= department.name   %>
+                    <% end %>
+                </td>
+                <td><%= emp_counts %></td>
+                <% if @failed_emp.present? and @failed_emp[department.id].present? and @status != 1 %>
+                  <% if @failed_emp[department.id][:failed].to_i > 0 %>
+                    <td> <%=  @failed_emp[department.id][:failed] %> <%= 'Failed' %> </td>
+                  <% else %>
+                    <td class="success">  <%= 'Successful' %>  </td>
+                  <%end%>
+                <% else %>
+                  <td>  <%= 'Proccessing...' %></td>
+                <%end%>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+    <% if @departments.present? %>
+      <%= pagination_status(@departments) %>
+    <% end %>
+    <%= will_paginate @departments %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_department_present') %> </p>
+  <% end %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_record_present') %> </p>
+<% end %>
+
+

@@ -1,0 +1,89 @@
+<script type="text/javascript">
+  j(document).ready(function() {
+    j(".pagination").find("a").click(function(e){
+      return confirm('<%=t('are_you_sure?')%>');
+    })
+  })
+</script>
+
+<%= load_latex_preview %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('evaluate_answers') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_evaluate_answers, [@exam,@student]  %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <% @page = params[:page].present? ? params[:page].to_i : 1 %>
+    <% form_for @exam_attendance, :url=>{:action=>'evaluate_answers', :id=>@exam.id, :student_id=>@student.id, :page=>@page} do |f| %>
+      <% unless @descriptive_questions.nil? or @descriptive_questions.empty? %>
+        <%= error_messages_for 'exam_attendance',:header_message=>nil %>
+        <div class="student-name"><%= "#{@student.full_name} (#{@student.admission_no})" %></div>
+        <div class="exam-name">
+          <div class="name-left"><%= @exam.name %></div>
+          <div class="name-right"><%= t('total_score_text') %> : <b><%= @exam_attendance.total_score.to_f %></b> / <%= @max_marks %></div>
+        </div>
+        <div class="exam-name">
+          <div class="name-left"><%= @student.batch.full_name %></div>
+          <div class="name-right">
+            <%= t('status') %> :
+            <b><% if @exam_attendance.is_passed %>
+                <%= t('passed') %>
+              <% else %>
+                <%= t('failed') %>
+              <% end %></b>
+          </div>
+        </div>
+        <% @descriptive_questions.each do |question_row| %>
+          <% unless @answers[question_row.online_exam_question_id].nil? %>
+            <div class="outer-qa-div">
+              <div class="qn"><%= t('question') %></div>
+              <div class="question-main">
+                <div class="question-div">
+                  <%= question_row.online_exam_question.question %>
+                </div>
+                <div class="marks-div">
+                  <%= question_row.mark %> <%= t('marks') %>
+                </div>
+              </div>
+              <div class="answer-main">
+                <div class="an"><%= t('answer') %></div>
+
+                <div class="answer-div">
+                  <%= @answers[question_row.online_exam_question_id].first.answer %>
+                </div>
+                <% f.fields_for :online_exam_score_details ,@answers[question_row.online_exam_question_id] do |exam_form| %>
+                  <% if @scores.present? %>
+                    <% @scores.each do|s| %>
+                      <% if exam_form.object.id.to_i == s[:id].to_i %>
+                        <% exam_form.object.marks_obtained = s[:marks_obtained] %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                  <div class="mark-div">
+                    <label class="themed_text"><%= t("marks") %> : </label>
+                    <div class="text-input-bg"><%= exam_form.text_field :marks_obtained %></div>
+                    <label class="total"> / <%= question_row.mark %></label>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
+      <% else %>
+        <p class="flash-msg"> <%= t('no_descriptive_questions') %> </p>
+      <% end %>
+      <%= f.submit " ► #{t('save')}", :class=>"submit_button"%>
+    <% end %>
+    <%= will_paginate @descriptive_questions, :params=>{:action=>'evaluate_answers', :id=>@exam.id, :student_id=>@student.id, :page=>@page} %>
+  </div>
+</div>

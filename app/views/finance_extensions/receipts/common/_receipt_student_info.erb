@@ -1,0 +1,38 @@
+<div id="basic_info_section" class="width800 margin-set-left-right">
+
+    <div class="left-box fleft">
+        <div class="label_part fleft width150"><%= t('student_name') %></div>
+        <div class="value_part fleft width150auto"><%= payee.full_name %></div>
+        <div class="label_part fleft width150 clearboth"><%= t('admission_no') %></div>
+        <div class="value_part fleft width150auto"><%= payee.admission_no %></div>
+        <% if default_configs.enable_roll_number.to_i == 1 %>
+          <div class="label_part fleft width150 clearboth"><%= t('roll_no') %></div>
+          <div class="value_part fleft width150auto"><%= payee.roll_no %></div>
+        <% end %>
+    </div>
+    <div class="width90"></div>
+    <div class="right-box  fright">
+        <div class="label_part fleft width150">
+            <%= t('course_text') %>
+        </div>
+        <div class="value_part fleft width150auto">
+            <%= payee.course_full_name %>
+        </div>
+        <div class="label_part fleft width150 clearboth">
+            <%= t('batch') %>
+        </div>
+        <div class="value_part fleft width150auto">
+            <%= payee.batch_full_name %>
+        </div>
+        <% if payee.guardian_name.present? %>
+          <div class="label_part fleft width150 clearboth" style="height:auto">
+              <%= t('parent') %>
+          </div>
+          <div class="value_part fleft width150auto">
+              <%= payee.guardian_name %>
+          </div>
+        <% end %>
+    </div>
+
+
+</div>

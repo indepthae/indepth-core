@@ -1,0 +1,6 @@
+if @error
+  page.replace_html 'fee_submission', :partial => "flash_notice"
+else
+  page.replace_html 'fee_submission', :partial => @linking_required ? "finance/fees_payment/notice_link_particulars" :
+      'finance_extensions/particular_wise_payment/particular_fees_submission_form'
+end

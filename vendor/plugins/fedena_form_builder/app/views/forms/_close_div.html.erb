@@ -1,0 +1,5 @@
+<% if @form.is_closed %>
+  <%= link_to_remote "#{t('reopen')}", :url => close_form_path(:id=>@form.id), :confirm => t('confirm_reopen'), :html =>{:class => "themed_text"} %>
+<% else %>
+  <%= link_to_remote "#{t('close')}", :url => close_form_path(:id=>@form.id), :confirm => t('confirm_close'), :html =>{:class => "themed_text"} %>
+<% end %>

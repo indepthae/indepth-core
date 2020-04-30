@@ -1,0 +1,57 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('buildings') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_building') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_rooms')}", new_building_classroom_path(params[:id]) %></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :buildings_show, @building%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"><%= flash[:notice] %> </p>
+  <% end %>
+  <div class="building_name">
+    <%= t("building_name") %>
+    <div class="description">:&nbsp;&nbsp;&nbsp;<%= @building.name %></div>
+  </div>
+  <%  unless @classrooms.empty? %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= t('sl_no') %> </td>
+        <td><%= "#{t('classroom_name')}" %> </td>
+        <td><%= t('capacity') %></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <%  count = ((params[:page] || 1).to_i - 1) * 10 %>
+      <%@classrooms.each_with_index do |cr,i|%>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1"><%= count + i + 1 %></td>
+          <td class="col-2"><%= link_to cr.name, building_classroom_path(@building.id,cr.id) %> </td>
+          <td class="col-2"><%= cr.capacity %>
+            <div class="links">
+              <div id="edit"><%= link_to "#{t('edit')}",edit_building_classroom_path(@building.id,cr.id),:html => {:class => 'themed_text'}%> </div>
+              <div id ="delete"> <%=  link_to "#{t('delete')}", building_classroom_path(@building.id,cr.id), :method => :delete, :class => "delete", :confirm => "Are you sure ?"%></div>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1"><%= "#{t('no_classrooms')}" %></td>
+      </tr>
+    </table>
+  <% end %>
+  <%= will_paginate @classrooms %>
+</div>
+
+

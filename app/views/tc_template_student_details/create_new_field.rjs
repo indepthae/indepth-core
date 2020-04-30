@@ -1,0 +1,11 @@
+if @errors.nil?
+	page.replace_html 'form-errors', :text => ''
+  page.replace_html 'other_details',:partial=>'reorder', :object => @student_details
+  page.replace_html 'flash-msg',:text=>"<p class='flash-msg'> #{t("#{@flash}")}</p>"
+  page << "Modalbox.hide();"
+else
+  page << "j('#session_fingerprint').val('#{session_fingerprint}');"
+	page.replace_html 'form-errors', :partial => 'errors', :object => @result
+  page.visual_effect(:highlight, 'form-errors')
+ 
+end

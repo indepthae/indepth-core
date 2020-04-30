@@ -1,0 +1,33 @@
+<label class="head_label"><%= t('edit_instant_category_for_fees') %><span></span></label>
+
+<div id="grading-levels-form">
+
+  <% form_remote_for @instant_category, :url => {:action => 'update_category', :id => @instant_category.id} do |f| %>
+
+      <div id="form-errors"></div>
+
+      <div class="label-field-pair">
+        <div class="label-container">
+          <%= f.label "#{t('financial_year_name')}" %>
+        </div>
+        <div class="input-container">
+          <span>
+            <%= @financial_year %>
+          </span>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><%= f.label "#{t('name')}" %></div>
+        <div class="input-container"><%= f.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><%= f.label "#{t('description')}" %></div>
+        <div class="input-container"><%= f.text_field :description %></div>
+      </div>
+
+      <%= submit_tag "► #{t('save')}", :class => 'submit_button' %>
+
+  <% end %>
+</div>

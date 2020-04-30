@@ -1,0 +1,118 @@
+<% unless @applicants.blank? %>
+  <% form_for :search,:html=>{:method=>:get} do %>
+    <% hidden_field :search,:registration_course_id,:value=>params[:id] %>
+    <div class="filter">
+      <div class="col">
+        <div class="col-label"><%= t('status') %>:</div>
+        <div class="text-input-bg">
+          <%=  select :search,:status,[[t('all'),""],[t('pending'),"pending"],
+            [t('eligible'),"eligible"],[t('noteligible'),"noteligible"],[t('alloted'),"alloted"],
+            [t('discarded'),"discarded"]],\
+            :selected=>(params[:search] and params[:search][:status] ? params[:search][:status] : "")%>
+        </div>
+      </div>
+      <div class="col2">
+        <div class="col-label"><%= t('from') %>: </div>
+        <div class="text-input-bg2">  <%= calendar_date_select_tag 'search[created_at_gte]',
+            (params[:search].blank? ? I18n.l((DateTime.now-30.days).to_date,:format=>:default) : params[:search][:created_at_gte]),:readonly=>true, :popup=>:force %>
+        </div>
+      </div>
+      <div class="col2">
+        <div class="col-label"><%= t('to') %>: </div>
+        <div class="text-input-bg2">
+          <%= calendar_date_select_tag 'search[created_at_lte]',
+            (params[:search].blank? ? I18n.l((DateTime.now).to_date,:format=>:default) : params[:search][:created_at_lte]),:readonly=>true, :popup=>:force %>
+        </div>
+      </div>
+      <%= submit_tag t('filter'),:class=>"submit_1" %>
+    </div>
+  <% end %>
+
+  <% form_for :allotment,:url=>{:action=>:allot} do |f| %>
+    <table id="listing_applicant" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= check_box_tag :chkall,"",false,:onclick=>"$$('.right').each(function(checkbox) { checkbox.checked = !checkbox.checked; });" %></td>
+        <td class="name">
+          <% if @sort_order=="reg_no-ascend" %>
+            <%= link_to  "#{t('reg_no')}&nbsp;▲", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"reg_no-descend"} %>
+          <% elsif @sort_order=="reg_no-descend" %>
+            <%= link_to  "#{t('reg_no')}&nbsp;▼", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"reg_no-ascend"} %>
+          <% else %>
+            <%= link_to  "#{t('reg_no')}", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"reg_no-ascend"} %>
+          <% end %>
+        </td>
+        <td class="name">
+          <% if @sort_order=="name-ascend" %>
+            <%= link_to  "#{t('name')}&nbsp;▲", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"name-descend"} %>
+          <% elsif @sort_order=="name-descend" %>
+            <%= link_to  "#{t('name')}&nbsp;▼", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"name-ascend"} %>
+          <% else %>
+            <%= link_to  "#{t('name')}", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"name-ascend"} %>
+          <% end %>
+        </td>
+        <td class="date">
+          <% if @sort_order=="da_te-ascend" %>
+            <%= link_to  "#{t('da_te')}&nbsp;▲", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"da_te-descend"} %>
+          <% elsif @sort_order=="da_te-descend" %>
+            <%= link_to  "#{t('da_te')}&nbsp;▼", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"da_te-ascend"} %>
+          <% else %>
+            <%= link_to  "#{t('da_te')}", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"da_te-ascend"} %>
+          <% end %>
+        </td>
+        <td class="applicant_status">
+          <% if @sort_order=="status-ascend" %>
+            <%= link_to  "#{t('status')}&nbsp;▲", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"status-descend"} %>
+          <% elsif @sort_order=="status-descend" %>
+            <%= link_to  "#{t('status')}&nbsp;▼", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"status-ascend"} %>
+          <% else %>
+            <%= link_to  "#{t('status')}", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"status-ascend"} %>
+          <% end %>
+        </td>
+        <td class="telephone_interview">
+          <% if @sort_order=="paid-ascend" %>
+            <%= link_to  "#{t('paid')}&nbsp;▲", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"paid-descend"} %>
+          <% elsif @sort_order=="paid-descend" %>
+            <%= link_to  "#{t('paid')}&nbsp;▼", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"paid-ascend"} %>
+          <% else %>
+            <%= link_to  "#{t('paid')}", {:action=>"applicants",:page=>params[:page],:search=>params[:search],:sort_order=>"paid-ascend"} %>
+          <% end %>
+        </td>
+      </tr>
+      <% @applicants.each do |applicant| %>
+        <tr class="tr-<%=cycle('even', 'odd')%>">
+          <td class="chk"><%= check_box_tag "regid[]",applicant.id,false,:class=>"right" %></td>
+          <td class="batch"><%= link_to applicant.reg_no, :action=>:view_applicant,:id=>applicant.id %></td>
+          <td class="name"><%= link_to applicant.full_name, :action=>:view_applicant,:id=>applicant.id%></td>
+          <td><%= format_date(applicant.created_at.to_date) unless applicant.created_at.nil? %></td>
+          <td class="status">
+            <span class="<%=applicant.status%>"><%= t("#{applicant.status}") %></span>
+          </td>
+          <td><%= applicant.has_paid? ? t('y_es') : t('n_o') %></td>
+        </tr>
+      <% end %>
+    </table>
+    <%= will_paginate @applicants,:params=>{:action => "applicants"} %>
+    <% if @applicants.count >=1 and params[:view] != "alloted" %>
+      <div class="row">
+        <div class="label"><%= t('allot_selected_to') %>:</div>
+        <% active_batches=[] %>
+        <% if @registration_course.present? and @registration_course.course.present? %>
+          <% active_batches=@registration_course.course.batches.active %>
+        <% end %>
+        <div class="text-input-bg"> <%= f.select :batch, active_batches.map{|b| [b.full_name,b.id]} %> </div>
+        <% view = params[:search] and  params[:search][:status] ? params[:search][:status] : ""   %>
+        <%= f.hidden_field :view,:value=>view %>
+        <%= f.submit t('allot') ,:class=>"sbutton"%>
+        <%= hidden_field_tag "id",params[:id] %>
+        <%= t('o_r') %>
+        <%= f.submit t('discard') ,:class=>"sbutton"%>
+      </div>
+    <% end %>
+  <% end %>
+  <div id = "button">
+  <%= link_to "PDF Report", {:controller=>"applicants_admins", :action => "applicants_pdf", :report_format_type => "pdf",:sort_order => @sort_order, :id => params[:id],:search => params[:search],:applicants => @applicants, :page_height => 760}, :target => '_blank',:class => "user_button" %></li>
+  <%= link_to "CSV Export", {:controller=>"csv_export", :action => "generate_csv", :csv_report_type => "applicant_registration", :report_format_type => "csv", :sort_order => @sort_order, :id => params[:id],:search => params[:search],:applicants => @applicants}, :class => "user_button" %></li>
+  </div>
+<% else %>
+  <p class="flash-msg"> <%= t('no_applicants_for_course') %> </p>
+<% end %>

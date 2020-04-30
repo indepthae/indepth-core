@@ -1,0 +1,68 @@
+<%if @target.table_name.present?%>
+  <div  id="add_remark_link_for_<%=@object_id%>" class="remarks_widget">
+    <% if @current_user.employee? and (@load_model.find(@load_object_id).has_employee_privilege) and @stud.present?%>
+      <%=link_to "","javascript:void(0);",:class=>"themed_text add_link cross_button",:student_id=>@student_id,:object_id=>@object_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id => @load_object_id, :onclick=>"delete_normal_remark(this)"%>
+      <%=link_to "","javascript:void(0);",:class=>"themed_text add_link edit_button disabled_link",:student_id=>@student_id,:object_id=>@object_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id => @load_object_id,:onclick=>"edit_normal_remark(this)"%>
+    <% end %>
+    <p id="remarks_show_exam_scores"><%=@new_remark||@updated_remark||@remark%></p>
+  </div>
+<%else%>
+  <div  id="add_remark_link_for_<%=@object_id%>" class="remarks_widget">
+    <% if @current_user.employee? and @load_model.find(@load_object_id).has_employee_privilege and @remark.submitted_by == @current_user.id and (@stud.present? ? @load_model=='Subject'.constantize ? ((@stud.batch_id==Subject.find(@load_object_id).batch_id)) : @stud.batch_id==@load_object_id.to_i : false)%>
+      <%=link_to "","javascript:void(0);",:class=>"themed_text add_link cross_button",:student_id=>@student_id,:object_id=>@object_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id => @load_object_id,:onclick=>"delete_normal_remark(this)"%>
+      <%=link_to "","javascript:void(0);",:class=>"themed_text add_link edit_button disabled_link",:student_id=>@student_id,:object_id=>@object_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id => @load_object_id,:onclick=>"edit_normal_remark(this)"%>
+    <% end %>
+    <p id="remarks_show_exam_scores"><%=@new_remark||@updated_remark||@remark.remark_body%></p>
+  </div>
+<%end%>
+<script type="text/javascript">
+  function edit_normal_remark(elm){
+    j(elm).removeAttr('onclick');
+<%= "var target_name = '#{@target_name}'" %>
+<%= "var student_id = '#{@student_id}'" %>
+<%="var object_id = j(elm).attr('object_id')"%>
+<%="var params_hash = '#{@params_hash.to_json}'"%>
+<%="var load_object_id = j(elm).attr('load_object_id')"%>
+    var parametrs={student_id:student_id,object_id:object_id,target_name:target_name,params_hash:params_hash,load_object_id:load_object_id}
+    
+    new Ajax.Request('/remarks/edit_remarks',{
+      parameters:j(this).serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j(elm).parent().children().hide();
+        j(elm).parents('#add_remark_link_for_'+object_id).append(resp.responseText);
+      }
+    });
+  }
+
+  function delete_normal_remark(elm){
+    
+    var res=confirm("<%=t('delete_confirm_msg')%>");
+    if (res==true){
+
+      j(elm).removeAttr('onclick');
+<%= "var target_name = '#{@target_name}'" %>
+<%= "var student_id = '#{@student_id}'" %>
+<%="var object_id = j(elm).attr('object_id')"%>
+<%="var params_hash = '#{@params_hash.to_json}'"%>
+<%="var load_object_id = j(elm).attr('load_object_id')"%>
+      var parametrs={student_id:student_id,object_id:object_id,target_name:target_name,params_hash:params_hash,load_object_id:load_object_id}
+      new Ajax.Request('/remarks/destroy',{
+        parameters:j(this).serialize()+'&'+j.param(parametrs),
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(resp){
+          j('#add_remark_link_for_'+object_id).replaceWith(resp.responseText);
+        }
+      });
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+</script>

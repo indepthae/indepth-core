@@ -1,0 +1,19 @@
+<%if @record_groups.present?%>
+  <table id="student_details_table">
+    <tr>
+      <th id="name"><%=t('record_group')%></th>
+      <th id="no_of_batches"><%=t('assigned_batches_snakecase')%></th>
+      <th id="action"></th>
+    </tr>
+
+    <%@record_groups.each do |rg|%>
+      <tr class="list_<%=cycle('odd', 'even')%>">
+        <td><%=rg.name%></td>
+        <td><%=rg.count%></td>
+        <td><%=link_to t('view_courses'),{:controller=>'student_records',:action=>'handle_record_groups',:id=>rg.id}%></td>
+      </tr>
+    <%end%>
+  </table>
+<%else%>
+  <div class="no_entries"><%=t('no_records')%></div>
+<%end%>

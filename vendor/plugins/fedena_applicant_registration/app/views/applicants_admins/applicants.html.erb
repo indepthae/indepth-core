@@ -1,0 +1,453 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_regi_label') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('applicant_s') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('archived_applications'), {:action => "archived_applicants",:id=>@registration_course.id} %></li>
+        </ul>
+    </div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :applicants_admins_applicants ,@registration_course%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id='flash-box'>
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+    </div>
+
+    <div id="main-section">
+        <%= render :partial=>"main_section" %>
+    </div>
+
+    <%= hidden_field_tag "registration_course_id", @registration_course.id %>
+    <div id="modal-box" style="display:none;"></div>
+</div>
+
+<script>
+
+  function filter_applicants() {
+      var registration_course_id = j("#registration_course_id").val();
+      var name_search_param = j("#search_params").val();
+      var start_date = j("#start_date_params").val();
+      var end_date = j("#end_date_params").val();
+      var selected_status = j("#selected_status").val();
+      j.ajax({
+          type: 'GET',
+          url: "/applicants_admins/filter_applicants",
+          data: {
+              registration_course_id: registration_course_id,
+              name_search_param: name_search_param,
+              start_date: start_date,
+              end_date: end_date,
+              selected_status: selected_status
+          }
+      })
+  }
+
+  function search_by_name() {
+      j("#search_params").val(j("#search").val());
+      filter_applicants();
+  }
+
+  function clear_name_search() {
+      j("#search_params").val("");
+      filter_applicants();
+  }
+
+  function clear_date_search() {
+      j("#start_date_params").val("");
+      j("#end_date_params").val("");
+      filter_applicants();
+  }
+
+  function show_date_filter() {
+      j("#date_box").slideDown();
+      j("#date-show-box").hide();
+  }
+
+  function show_todays_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function show_ten_days_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now - 10.days).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function show_thirty_days_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now - 30.days).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function filter_by_date() {
+      j("#start_date_params").val(j('[name="start_date"]').prop("value"));
+      j("#end_date_params").val(j('[name="end_date"]').prop("value"));
+      filter_applicants();
+  }
+
+  function hide_date_filter() {
+      j("#date_box").slideUp();
+      j("#date-show-box").show();
+  }
+
+  function show_applicants_list(th_is) {
+      if (j(th_is).parent().find(".status-id-field").length === 0) {
+          j("#selected_status").val("");
+      }
+      else {
+          j("#selected_status").val(j(th_is).parent().find(".status-id-field").val());
+      }
+      filter_applicants();
+  }
+
+  function show_status_form() {
+      j("#buttons-div").hide();
+      j("#update-status-div").show();
+  }
+
+  function hide_status_form() {
+      j("#update-status-div").hide();
+      j("#buttons-div").show();
+  }
+
+  function show_allocation_form() {
+      j("#buttons-div").hide();
+      j("#allocation-div").show();
+  }
+
+  function hide_allocation_form() {
+      j("#allocation-div").hide();
+      j("#buttons-div").show();
+  }
+
+  function check_select_all_value(th_is) {
+      if (j(th_is).is(':checked')) {
+          var unchecked_box = j(th_is).parent().parent().parent().find(".show_field_checkbox:checkbox:not(:checked)").length;
+          if (unchecked_box === 0) {
+              j(th_is).parent().parent().parent().find(".select_all").prop('checked', 'checked');
+          }
+          else {
+              j(th_is).parent().parent().parent().find(".select_all").prop('checked', false);
+          }
+      }
+      else {
+          j(th_is).parent().parent().parent().find(".select_all").prop('checked', false);
+      }
+  }
+
+  function toggle_all_checkboxes(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().parent().find(".show_field_checkbox").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().parent().find(".show_field_checkbox").prop('checked', false);
+      }
+  }
+
+  function update_status() {
+      if (j(".show_field_checkbox:checkbox:checked").length === 0) {
+          alert("<%= t('no_applicant_selected') %>")
+      }
+      else {
+          if ((j("#application_status").val() === "") && (j("#has_paid").is(':checked') === false)) {
+              alert("<%= t('no_status_selected') %>")
+          }
+          else {
+              var applicant_ids = []
+              j(".show_field_checkbox:checkbox:checked").each(function () {
+                  applicant_ids.push(j(this).val())
+              })
+              var target_status = j("#application_status").val();
+              var registration_course_id = j("#registration_course_id").val();
+              var name_search_param = j("#search_params").val();
+              var start_date = j("#start_date_params").val();
+              var end_date = j("#end_date_params").val();
+              var selected_status = j("#selected_status").val();
+              var mark_paid = 0;
+              if (j("#has_paid").is(':checked') === true) {
+                  mark_paid = 1;
+              }
+              j.ajax({
+                  type: 'POST',
+                  url: "/applicants_admins/update_status",
+                  data: {
+                      registration_course_id: registration_course_id,
+                      name_search_param: name_search_param,
+                      start_date: start_date,
+                      end_date: end_date,
+                      selected_status: selected_status,
+                      applicant_ids: applicant_ids,
+                      target_status: target_status,
+                      mark_paid: mark_paid
+                  },
+                  beforeSend : function() {
+                    j("#update-status-button").html("<%= t('please_wait_text') %>");
+                    j("#update-status-button").attr('onclick','return false;');
+                  }
+              })
+          }
+      }
+  }
+
+  function allocate_applicants() {
+      if (j(".show_field_checkbox:checkbox:checked").length === 0) {
+          alert("<%= t('no_applicant_selected') %>")
+      }
+      else {
+          if (j("#batch_id").val() === "") {
+              alert("<%= t('no_allocation_batch_selected') %>")
+          }
+          else {
+              var applicant_ids = []
+              j(".show_field_checkbox:checkbox:checked").each(function () {
+                  applicant_ids.push(j(this).val())
+              })
+              var fee_collection_ids = []
+              j("#collection_ids_:checked").each(function () {
+                  fee_collection_ids.push(j(this).val())
+              })
+              var batch_id = j("#batch_id").val();
+              var registration_course_id = j("#registration_course_id").val();
+              var name_search_param = j("#search_params").val();
+              var start_date = j("#start_date_params").val();
+              var end_date = j("#end_date_params").val();
+              var selected_status = j("#selected_status").val();
+              j.ajax({
+                  type: 'POST',
+                  url: "/applicants_admins/allot_applicants",
+                  data: {
+                      registration_course_id: registration_course_id,
+                      name_search_param: name_search_param,
+                      start_date: start_date,
+                      end_date: end_date,
+                      selected_status: selected_status,
+                      applicant_ids: applicant_ids,
+                      fee_collection_ids: fee_collection_ids,
+                      batch_id: batch_id
+                  },
+                  beforeSend : function() {
+                    j("#allocate-button").html("<%= t('please_wait_text') %>");
+                    j("#allocate-button").attr('onclick','return false');
+                  }
+              })
+          }
+      }
+  }
+
+  function discard_applicants() {
+      if (j(".show_field_checkbox:checkbox:checked").length === 0) {
+          alert("<%= t('no_applicant_selected') %>")
+      }
+      else {
+          if (confirm("<%= t('are_you_sure_to_discard') %>")) {
+              var applicant_ids = []
+              j(".show_field_checkbox:checkbox:checked").each(function () {
+                  applicant_ids.push(j(this).val())
+              })
+              var registration_course_id = j("#registration_course_id").val();
+              var name_search_param = j("#search_params").val();
+              var start_date = j("#start_date_params").val();
+              var end_date = j("#end_date_params").val();
+              var selected_status = j("#selected_status").val();
+              j.ajax({
+                  type: 'POST',
+                  url: "/applicants_admins/discard_applicants",
+                  data: {
+                      registration_course_id: registration_course_id,
+                      name_search_param: name_search_param,
+                      start_date: start_date,
+                      end_date: end_date,
+                      selected_status: selected_status,
+                      applicant_ids: applicant_ids
+                  }
+              })
+          }
+
+      }
+  }
+  
+  function select_all_fields(th_is) {
+    if (j(th_is).is(':checked')) {
+      j(th_is).parent().parent().find(".active_batch_list").prop('checked', 'checked');
+    }
+    else {
+      j(th_is).parent().parent().find(".active_batch_list").prop('checked', false);
+    }
+  }
+
+  function toggle_field_selector(th_is) {
+    var unchecked_box = j(th_is).parent().parent().find(".active_batch_list:checkbox:not(:checked)").length;
+    if (unchecked_box === 0) {
+      j(th_is).parent().parent().find(".select_all_check").prop('checked', 'checked');
+    }
+    else {
+      j(th_is).parent().parent().find(".select_all_check").prop('checked', false);
+    }
+  }
+  
+  function onloadModal() {
+    var len = j(".show_field_checkbox:checked").length;
+    var selected_txt = String(len)+" selected";
+    j('#selected-applicants').html(selected_txt);
+    if(j( "#message_applicants_mode_email" ).prop("checked") == true){
+      j("#message_applicants_email_subject").prop("disabled",false);
+      j("#message_applicants_email_content").prop("disabled",false);
+    }
+    else{
+      j("#message_applicants_email_subject").prop("disabled",true);
+      j("#message_applicants_email_content").prop("disabled",true);
+    }
+    if(j( "#message_applicants_mode_sms" ).prop("checked") == true){
+      j("#message_applicants_sms_content").prop("disabled",false);
+    }
+    else{
+      j("#message_applicants_sms_content").prop("disabled",true);
+    }
+  }
+  
+  function message_applicants() {
+      if (j(".show_field_checkbox:checkbox:checked").length === 0) {
+          alert("<%= t('no_applicant_selected') %>")
+      }
+      else if(j("#message_applicants_send_to_applicant").prop("checked") == true || j("#message_applicants_send_to_parent").prop("checked") == true){
+        if(j("#message_applicants_mode_sms").prop("checked") == true || j("#message_applicants_mode_email").prop("checked") == true){
+          var applicant_ids = [];
+          var mode_sms = "";
+          var mode_email = "";
+          var send_to_applicant = "";
+          var send_to_parent = "";
+          var email_content = j("#message_applicants_email_content").val();
+          var email_subject = j("#message_applicants_email_subject").val();
+          var sms_content = j("#message_applicants_sms_content").val();
+          var target_status = j("#application_status").val();
+          var name_search_param = j("#search_params").val();
+          var start_date = j("#start_date_params").val();
+          var end_date = j("#end_date_params").val();
+          var selected_status = j("#selected_status").val();
+          j(".show_field_checkbox:checkbox:checked").each(function () {
+            applicant_ids.push(j(this).val());
+          })
+          if (j("#message_applicants_mode_sms").prop("checked") == true){
+            mode_sms = "1";
+          }else{
+            mode_sms = "0";
+          }
+          if (j("#message_applicants_mode_email").prop("checked") == true){
+            mode_email = "1";
+          }else{
+            mode_email = "0";
+          }
+          if (j("#message_applicants_send_to_applicant").prop("checked") == true){
+            send_to_applicant = "1";
+          }else{
+            send_to_applicant = "0";
+          }
+          if (j("#message_applicants_send_to_parent").prop("checked") == true){
+            send_to_parent = "1";
+          }else{
+            send_to_parent = "0";
+          }
+          var registration_course_id = j("#registration_course_id").val();
+            j.ajax({
+            type: 'POST',
+            url: "/applicants_admins/message_applicants",
+            data: {
+            
+              name_search_param: name_search_param,
+              start_date: start_date,
+              end_date: end_date,
+              selected_status: selected_status,
+              target_status: target_status,
+              registration_course_id: registration_course_id,
+              applicant_ids: applicant_ids,
+              mode_sms: mode_sms,
+              mode_email: mode_email,
+              email_content: email_content,
+              email_subject: email_subject,
+              sms_content: sms_content,
+              sent_to_applicant: send_to_applicant,
+              sent_to_parent: send_to_parent
+            
+            },
+            beforeSend : function() {
+              j("#message_applicants-btn").html("<%= t('please_wait_text') %>");
+              j("#message_applicants-btn").unbind('click');
+              j("#message_applicants-btn").bind('click', false);
+            }
+          })
+        }
+        else{
+          alert("<%= t('select_a_mode') %>");
+        }
+      }
+      else{
+        alert("<%= t('select_recipient') %>");
+      }
+  }
+  
+  function email_checkbox(){
+    if(j( "#message_applicants_mode_email" ).prop("checked") == true){
+      if(j("#message_applicants_send_to_applicant").prop("checked") == false && j("#message_applicants_send_to_parent").prop("checked") == false)
+      {
+        j( "#message_applicants_mode_email" ).prop("checked",false);
+        alert("<%= t('select_recipient') %>");
+      }
+      else{
+        j("#message_applicants_email_subject").prop("disabled",false);
+        j("#message_applicants_email_content").prop("disabled",false);
+      }
+    }
+    else{
+      j("#message_applicants_email_subject").prop("disabled",true);
+      j("#message_applicants_email_content").prop("disabled",true);
+    }
+  }
+  
+  function sms_checkbox(){
+    if(j( "#message_applicants_mode_sms" ).prop("checked") == true){
+      if(j("#message_applicants_send_to_applicant").prop("checked") == false && j("#message_applicants_send_to_parent").prop("checked") == false)
+      {
+        j( "#message_applicants_mode_sms" ).prop("checked",false);
+        alert("<%= t('select_recipient') %>");
+      }
+      else
+      {
+        j("#message_applicants_sms_content").prop("disabled",false);
+      }
+    }
+    else{
+      j("#message_applicants_sms_content").prop("disabled",true);
+    }
+  }
+  
+  function onErrorPresent(){
+    document.getElementById('form-errors').scrollIntoView({
+    block: "start",
+    behavior: "smooth"});
+  }
+  function validate_signature(elm)
+  {
+    text = j(elm).val();
+    count = text.length;
+    j('#s_count').text(count);
+  }
+</script>
+

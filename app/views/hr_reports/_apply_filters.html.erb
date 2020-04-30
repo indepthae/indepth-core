@@ -1,0 +1,10 @@
+<% if @base_template.filters.present? and @report_result.present? and (@report_result.values.present? or @report_values.present?) %>
+  <div  id="<%= @base_template.name %>_filters" class="apply_filter_div">
+    <div class ="filter_section apply_filters_sec">
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;") %>
+      <div class="div_link" onClick="request_filters_form();"><%= t('apply_filters') %></div>
+    </div>
+  </div>
+<% else %>
+  <div class ="filter_section" id="<%= @base_template.name %>_filters"></div>
+<% end %>

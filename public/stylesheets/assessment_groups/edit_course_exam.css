@@ -1,0 +1,358 @@
+#header{
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 40px;
+    color: #444;
+}
+#description{
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+}
+.label-radio-pair{
+    height: 40px;
+    width: 600px;
+    padding-top: 3px;
+}
+.label-radio-pair, .label-field-pair{
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+    height:  auto;
+}
+.label-radio-pair label, .label-field-pair label{
+    width: 100%;
+    float: left;
+    font-size: 13px;
+    color: #444;
+}
+.label-radio-pair .radio-buttons, .label-field-pair .text-input-bg{
+    float: left;
+    height: auto;
+}
+.text-input-bg input{
+    margin-left: 0px;
+    -webkit-border-radius: 0;
+    width: 400px;
+}
+.group_name{
+    width: 440px !important;
+}
+.group_code{
+    width: 140px;
+}
+.group_code input{
+    width: 100px
+}
+.radio-buttons{
+    margin-top: 10px
+}
+.radio-buttons input{
+    float: left;
+    margin-left: 0px;
+    margin-right: 10px
+}
+@-moz-document url-prefix() { 
+  .radio-buttons input {
+     margin-top: -2px;
+  }
+}
+.radio-buttons label{
+    float: left;
+    width: 265px;
+    font-weight:bold;
+}
+.radio-buttons .section{
+    float: left;
+    width: 300px;
+    margin-right: 20px;
+}
+.radio-buttons .section #description{
+    margin-left: 23px;
+}
+#description span{
+    float: left;
+    margin-top: 5px;
+    color: red;
+}
+.select-list{
+    float: left;
+    padding: 20px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    width: 570px;
+    margin-bottom: 30px;
+}
+.select-list label{
+    min-width: 100px;
+    max-width: 200px;
+    width: auto
+}
+.select-list #description{
+    float: left;
+    margin: 20px 0 0 0;
+    width: 100%;
+}
+.select-list .label-field-pair{
+    margin-bottom: 0px;
+}
+.select-list #description a{
+    color: #444;
+}
+table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 30px;
+    float: left;
+}
+#page-yield table .tr-head {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+}
+tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+td {
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+td.col1{ width: 60%}
+td.col2{ width: 20%}
+td.col3{ width: 40%}
+#score_type .section{ width: 150px;}
+#score_type .section label{ width: 120px;}
+.max_marks input, .min_marks input{
+    width: 100px;
+    margin-left:  10px;
+    margin-right: 5px;
+    -webkit-border-radius: 10px;
+}
+.min_marks .text-input-bg{
+    width: 130px;
+}
+#min_text{
+    font-size: 13px;
+    color:#444;
+    float: left;
+    margin-top: 12px;
+}
+#score_type{
+    margin-top: 20px;
+}
+#submit_area{
+    float: left;
+    width: 100%;
+    margin-top: 20px;
+}
+#submit_area .submit-button{
+    margin-left: 0px;
+    font-size: 13px;
+}
+#assessment_group_code, #assessment_group_display_name{
+    text-transform: uppercase;
+}
+.select_course{
+    width: 440px !important;    
+}
+.select_course select{   
+    margin-left: 0px;
+}
+#group_form{
+    float: left;
+}
+#batches_list{
+    float: left;
+    width: 250px;
+}
+div.div_link {
+    float: left;
+    font-size: 13px;
+    text-decoration: underline;
+    margin: 0 0 0 25px;
+    cursor: pointer;
+}
+#course-text, #count-text{
+    float: left;
+    font-size: 13px;
+    font-weight: bold;
+}
+.batch_details .text-input-bg{
+    margin-top: 10px
+}
+#batch_form_content{
+    display: none;
+}
+#batch_form .wrapper{
+    display: none;
+    margin: 5px 0;
+}
+#popup_content #batch_form_content{
+    display: block;
+}
+#popup_window
+{
+    width: 690px;
+    top: 40px;
+    float: left;
+}
+#popup_frame .part {
+    width: 610px;
+}
+#popup_content{
+    padding-left: 0px !important ;
+    padding-right: 0px !important;
+}
+#popup_footer{
+    padding-left: 40px;
+    padding-right: 40px;
+    border-top: 1px solid #c6c6c6;
+    float: left;
+    width: 610px;
+    padding-top: 20px;
+}
+#batch_form{
+    float: left;
+    padding: 0 40px 40px;
+    width: 88%;
+}
+#popup_content{width: 690px !important;}
+.field-label {
+    float: left;
+    min-width: 200px;
+    color: #8C8C8C;
+    max-width: 200px;
+    min-width: 0px;
+    width: auto;
+}
+.fields-val {
+    float: left;
+    margin-left: 20px;
+}
+.fields-details {
+    float: left;
+    font-weight: normal;
+    font-size: 13px;
+    color: #444;
+    margin: 3px 0;
+    width: auto;
+    margin-bottom: 10px;
+}
+#add_batches {
+    float: right;
+}
+#popup_content table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    overflow: auto;
+    max-height: 386px;
+    display: block;
+}
+#popup_content table td.check_all{width: 5%}
+#selected-batches {
+    width: 230px !important;
+}
+#popup_content .submit-button{
+    border-radius: 5px
+}
+#popup_content ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+    border: 0px;
+}
+#popup_content ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+}
+#popup_content ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#popup_content ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#popup_content ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#popup_content ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#popup_content ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+#popup_content .tr-odd {
+    background-color: #f0f0f0;
+}
+#popup_content tr{
+    border-bottom: 0px
+}
+#loader{
+    margin-top: 10px;
+}
+#course-text{
+    margin-top: 10px
+}
+hr {
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    width: 980px;
+    float: left;
+}
+#info-symbol {
+    height: 17px;
+    width: 20px;
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    margin-left: 5px;
+    float: left;
+    background-position: -60px -62px;
+}
+#info-symbol:hover{
+    background-position: -60px -83px;
+}
+.group_code label span{ float: left;}
+.tooltip_info{ font-weight: normal;}
+#header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 40px;
+    color: #444;
+}
+#description {
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+    float: left;
+}
+#academic_year_details{
+    font-size: 13px;
+    float: right;
+    margin-top: 0;
+    width: 200px;
+}
+#academic_year_details span{
+    margin-top: 10px;
+    float: left;
+    font-weight: bold;
+}
+.attribute_profile_marks_show{
+    float: left;
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+}
+.attribute_profile_marks_show .left{
+    float: left;
+}
+.attribute_profile_marks_show .left:first-child{
+    margin-right: 30px;
+}
+.attribute_profile_marks_show .left .value{
+    margin-top: 10px;
+    font-weight: bold;
+}

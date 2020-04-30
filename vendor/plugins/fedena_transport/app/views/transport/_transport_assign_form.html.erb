@@ -1,0 +1,24 @@
+<%- fields_for "#{@receiver_type}[transport_attributes]", transport do |t| %>
+  <div class="label-field-pair">
+      <label for="transport_mode"><%= t('transport.transport_mode') %></label>
+      <div class="text-input-bg">
+          <%= t.hidden_field :academic_year_id %>
+          <%= t.hidden_field :admission_form, :value => true %>
+          <%= t.select :mode, Transport::TRANSPORT_MODE.map{|k, v| [t(v), k]}, {:include_blank => t('select_mode'), :selected => @transport.try(:mode)}, 
+            {:id => "trans_mode", :onchange => "#{remote_function(:url => {:controller => "transport", :action => "show_transport_mode"},
+            :with => "'mode='+value+'&receiver_id='+'#{transport.try(:receiver_id)}'+'&receiver_type='+'#{transport.try(:receiver_type)}'",
+            :before => "Element.show('loader3');j('#bus_fare').val('')",
+            :success => "Element.hide('loader3')")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader3",
+            :style =>"display: none;" ) %>
+      </div>
+  </div>
+  <div id="transport_details">
+      <% if @enable_transport and @transport.present? and @transport.mode.present? %>
+        <%= render :partial => "transport/transport_details", :locals => {:transport => @transport} %>
+      <% end %>
+  </div>
+<% end %>

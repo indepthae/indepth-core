@@ -1,0 +1,10 @@
+if @error.nil?
+	page.replace_html 'form-errors', :text => ''
+  page.replace_html 'categories', :partial => 'icse_weightages', :object => @icse_weightages
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page << "Modalbox.hide();"
+  flash[:notice]=nil
+else
+	page.replace_html 'form-errors', :partial => 'errors', :object => @icse_weightage
+  page.visual_effect(:highlight, 'form-errors')
+end

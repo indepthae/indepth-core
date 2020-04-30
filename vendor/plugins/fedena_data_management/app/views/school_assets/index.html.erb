@@ -1,0 +1,48 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('data_management')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('categories')}"%></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :new, :school_assets %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new')}", new_school_asset_path %></li>
+      <% end %>
+      <% unless @school_assets.empty? %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('print')}",{:controller=>:asset_entries,:action=>:school_assets_pdf},:target=>'_blank' %></li>
+      <% end %>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @school_assets.empty? %>
+    <ul id="category-list">
+      <% @school_assets.each do |asset| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="category-name">
+            <%=link_to asset.asset_name,school_asset_asset_entries_path(:school_asset_id=>asset.id)%>
+          </div>
+          <% if permitted_to? :new, :school_assets %>
+            <div class="category-edit">
+              <%=link_to "#{t('edit')}",edit_school_asset_path(asset)%>
+            </div>
+            <div class="category-delete">
+              <%= link_to "#{t('delete')}" ,asset,:method=>:delete,:confirm=>"#{t('delete_confirmation')}"%>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_categories_present') %> </p>
+  <% end %>
+</div>

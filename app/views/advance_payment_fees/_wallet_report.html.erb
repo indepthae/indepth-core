@@ -1,0 +1,58 @@
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<% i = 0 %>
+<% if @student.present? %>
+<div class="main_head_label"style="margin-top: 13%">
+  <div class="left">
+    <div class="label_field_a">
+      <label><%= t('student_name') %></label>
+      <span>:</span>
+      <label class="head_label_value"><%= @student.full_name %></label>
+    </div></br>
+    <div class="label_field_b">
+      <label><%= t('admission_no') %></label>
+      <span>:</span>
+      <label class="head_label_value"><%= @student.admission_no %></label>
+    </div>
+  </div>
+  <div class="right">
+    <div class="label_field_d">
+      <label><%= t('category_name') %></label>
+      <span>:</span>
+      <label class="head_label_value"><%= @advance_fee_category.name %></label>
+    </div>
+  </div>
+</div>
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+      <td style="width: 10%"><%= t('sl_no') %></td>
+      <td class="set_border_right"><%= t('receipt_no') %></td>
+      <td class="set_border_right"><%= t('transaction_date') %></td>
+      <td class="set_border_right"><%= t('payment_mode') %></td>
+      <td class="set_border_right" style="width: 20%"><%= t('amount') %> (<%= currency %>)</td>
+    </tr>
+    <% @advance_fee_collections.each do |collection| %>
+      <tr class="row-b">
+        <td style="width: 10%"><%= i += 1 %></td>
+        <td class="set_border_right"><%= fetch_receipt_no(collection.advance_fee_collection.id) %></td>
+        <td class="set_border_right"><%= format_date(collection.advance_fee_collection.date_of_advance_fee_payment) %></td>
+        <td class="set_border_right"><%= collection.advance_fee_collection.payment_mode %></td>
+        <td class="set_border_right"><%= collection["fees_paid"] %></td>
+      </tr>
+    <% end %>
+  </table>
+  <div class="seprater_div_bottom">
+    <div id="inner-tab-menu">
+      <ul style="margin-top: 27px;">
+        <li class='themed_bg themed-dark-hover-background'>
+          <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                                             :csv_report_type => "advance_fees", :report_format_type => "csv",
+                                             :id => @student.id, :category_id => @advance_fee_category.id} %>
+        </li>
+      </ul>
+    </div>
+  </div>
+<% end %>

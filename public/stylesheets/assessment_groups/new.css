@@ -1,0 +1,449 @@
+#header{
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 40px;
+    color: #444;
+}
+#description1{
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 0px 0px;
+}
+#description{
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+}
+.label-radio-pair{
+    height: 40px;
+    width: 600px;
+    padding-top: 3px;
+}
+.label-radio-pair, .label-field-pair{
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+    height:  auto;
+}
+.label-radio-pair label, .label-field-pair label{
+    width: 100%;
+    float: left;
+    font-size: 13px;
+    color: #444;
+}
+.label-radio-pair .radio-buttons, .label-field-pair .text-input-bg{
+    float: left;
+    height: auto;
+}
+.text-input-bg input{
+    margin-left: 0px;
+    -webkit-border-radius: 0;
+    width: 400px;
+}
+.group_name{
+    width: 440px !important;
+}
+.group_code{
+    width: 140px;
+}
+.group_code input{
+    width: 100px
+}
+.radio-buttons{
+    margin-top: 10px
+}
+.radio-buttons input{
+    float: left;
+    margin-left: 0px;
+    margin-right: 10px;
+}
+@-moz-document url-prefix() { 
+  .radio-buttons input {
+     margin-top: -2px;
+  }
+}
+.radio-buttons label{
+    float: left;
+    width: 265px;
+    font-weight:bold;
+}
+.radio-buttons .section{
+    float: left;
+    width: 300px;
+    margin-right: 20px;
+}
+.radio-buttons .section #description{
+    margin-left: 23px;
+}
+#description span{
+    float: left;
+    margin-top: 5px;
+    color: red;
+}
+.select-list{
+    float: left;
+    padding: 20px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    width: 570px;
+    margin-bottom: 30px;
+}
+.select-list label{
+    min-width: 100px;
+    max-width: 200px;
+    width: auto
+}
+.select-list #description{
+    float: left;
+    margin: 20px 0 0 0;
+    width: 100%;
+}
+.select-list .label-field-pair{
+    margin-bottom: 0px;
+}
+.select-list #description a{
+    color: #444;
+}
+table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 30px;
+    float: left;
+}
+#page-yield table .tr-head {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+}
+tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+td {
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+td.col1{ width: 60%}
+td.col2{ width: 20%}
+td.col3{ width: 40%}
+#score_type .section{ width: 150px;}
+#score_type .section label{ width: 120px;}
+.max_marks input, .min_marks input{
+    width: 100px;
+    margin-left:  10px;
+    margin-right: 5px;
+    -webkit-border-radius: 10px;
+}
+.min_marks .text-input-bg{
+    width: 130px;
+}
+#min_text{
+    font-size: 13px;
+    color:#444;
+    float: left;
+    margin-top: 12px;
+}
+#score_type{
+    margin-top: 20px;
+}
+#submit_area{
+    float: left;
+    width: 100%;
+    margin-top: 20px;
+}
+#submit_area .submit-button{
+    margin-left: 0px;
+    font-size: 13px;
+    border-radius: 5px;
+}
+#assessment_group_code, #assessment_group_display_name{
+    text-transform: uppercase;
+}
+hr {
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    width: 980px;
+    float: left;
+}
+#info-symbol {
+    height: 17px;
+    width: 20px;
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    margin-left: 5px;
+    float: left;
+    background-position: -60px -62px;
+    display:none;
+}
+#info-symbol:hover{
+    background-position: -60px -83px;
+}
+.group_code label span{ float: left;}
+.tooltip_info{ font-weight: normal;}
+
+.derived__sections{
+    float: left;
+    /*margin-top: 40px;*/
+    font-size: 14px;
+}
+.formula__head {
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+.derived__formula{
+    width: 100%;
+    float: left;
+}
+.formula__box{
+    /*background: #efefef;*/
+    width: 50%;
+    padding: 30px;
+    border: 1px solid #ccc;
+    /*margin-top: 25px;*/
+    float: left;
+    box-sizing: border-box;
+}
+.formula__select__pair label {
+    font-weight: bold;
+}
+.desc__for__formula{
+    margin-left: 25px;
+    margin-top: 7px;
+    margin-bottom: 30px;
+    width: 90%;
+    font-size: 13px;
+}
+.formula__select__pair:last-child .desc__for__formula{
+    margin-bottom: 0px;
+}
+.formula__select__pair input{
+    float: left;
+    margin-top: 2px;
+    margin-right: 8px;
+}
+.formula__show__box{
+    float: left;
+    border: 1px solid #ccc;
+    padding: 15px 20px;
+    margin-top: 25px;
+    margin-left: 50px;
+    background: #fbfbfb;
+    border-radius: 5px;
+    max-width: 375px;
+}
+.box__head{
+    font-weight: bold;
+    padding-left: 10px;
+}
+.formula__show__box td,.formula__show__box tr, .formula__show__box table {
+    border: none;
+}
+.formula__show__box td.value{
+    font-weight: bold;
+}
+.formula__show__box table{
+    margin-top: 10px;
+}
+hr.derived_hr{
+    margin: 30px 0px;
+}
+#weightage input{
+    width: 50px;
+    padding: 5px;
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    height: 17px;
+}
+
+td.percentage_label{
+    display: none;
+}
+table#weightage{
+    border: 1px solid #c6c6c6;
+    margin-bottom: 10px;
+}
+.formula__desc{
+    margin-bottom: 30px;
+    font-weight: lighter;
+    font-size: 13px;
+}
+.derived_report_setting_field{
+    float: left;
+    margin-right: 30px;
+}
+.attribute_profile_marks_show{
+    float: left;
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+}
+.attribute_profile_marks_show .left{
+    float: left;
+}
+.attribute_profile_marks_show .left:first-child{
+    margin-right: 30px;
+}
+.attribute_profile_marks_show .left .value{
+    margin-top: 10px;
+    font-weight: bold;
+}
+.advance_settings{
+    width: 100%;
+    display: grid;
+}
+.empty_subject_list{
+    background: #f3f3f3;
+    display: inline-flex;
+    align-items: center;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+}
+.empty_subject_list div{
+    float: left;
+}
+.select_subject_link{
+    padding: 5px 10px;
+    border: 1px solid #b2b1b1;
+    margin-left: 10px;
+    border-radius: 2px;
+    user-select: none;
+}
+.header, .toggle_settings_link{
+    font-weight: bold;
+    font-size: 13px;
+    color: #444;
+}
+.subject_list_popup .header{
+    margin-top: 20px;
+    float: left;
+}
+.subject_list_popup table{
+    margin-top: 15px;
+}
+.subject_list_popup #subjects_scroll{
+    overflow: auto;
+    max-height: 500px;
+    padding-right: 40px;
+}
+.subject_list_popup .col5 {
+    width: 85px;
+}
+.subject_list_popup .col1{
+    width:20px;
+}
+.subject_list_popup .part{
+    width: 91.5% !important;
+    padding-right: 0px !important;
+}
+.subject_list_popup .submit-button{
+    margin-left: 0px;
+    font-size: 13px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.left_actions .submit-button:last-child{
+    margin-left: 20px;
+}
+.right_actions{
+    float: right;
+    margin-right: 40px;
+    margin-top: 8px;
+}
+#subject_count{
+    font-weight: bold;
+}
+.subject_list_popup .actions{
+    float: left;
+    width: 99.5%;
+    padding-top: 25px;
+    border-top: 1px solid #ccc;
+    margin-top: 17px;
+    margin-left: -39px;
+    /* box-sizing: border-box; */
+    overflow: hidden;
+    padding-left: 39px;
+}
+#subjects_scroll td{
+    padding: 5px;
+    color: #000;
+}
+#subject_show_list{
+    width:70%;
+    margin-top: 30px;
+}
+#subject_show_list tr td:last-child{
+    width:85px;
+}
+#subject_show_list tr td:last-child input{
+    width:70px;
+}
+.select_subject_link a{
+    color: black;
+    text-decoration: none;
+}
+.override_exam.container, .subject_list_popup{
+    font-size: 13px;
+}
+#page-yield .select_subject_link a:hover{
+    color: #000 !important;
+}
+#page-yield a.submit-button:hover{
+    color: #fff !important;
+}
+#subject_show_list input{
+    width: 70px;
+    margin-right: 5px;
+    -webkit-border-radius: 5px;
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    height: 17px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    padding: 5px;
+}
+.ag_count{
+    width: 34px;
+    text-align: center;
+    padding: 3px;
+    box-sizing: border-box;
+}
+.elective{
+    color: #757171 !important;
+}
+.consider_skills input{
+    width: auto !important;
+    float: left;
+}
+.consider_skills label{
+    width: auto !important;
+    float: left;
+}
+.consider_skills .text-input-bg{
+    clear: both;
+}
+.consider_skills #description{
+    float: left;
+    margin-left: 30px;
+    margin-top: 5px;
+}
+.consider_skills .text-input-bg label{
+    margin-left: 10px;
+    margin-top: -4px;
+}
+.consider_skills .status{
+    font-weight: normal;
+}
+.hide_marks input[type="checkbox"] {
+    float: left;
+    width: auto;
+    margin: 8px 7px 5px 0;
+}
+.hide_marks label{
+    float: left;
+    font-size: 13px;
+    color: #444;
+    font-weight: bold;
+    margin-top:10px;
+}

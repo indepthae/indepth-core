@@ -1,0 +1,47 @@
+<% if precision_label(@total_amount_to_pay).to_f > 0 %>
+  <% add_params = {:transaction_date => @transaction_date, :student_id => @student.id,
+    :batch_id => params[:batch_id]} %>
+  <tr class="row-a tr-list_head">
+      <td class="sl-col"></td>
+      <td colspan="<%= fee_head_col_span + 1 %>">
+          <% discounted_fee_types = ["FinanceFee"] %>
+          <% discounted_fee_types << "TransportFee" if FedenaPlugin.can_access_plugin?("fedena_transport") %>
+          
+          <% if can_access_request? :new_instant_discount, :finance_extensions %>
+            <% if (@finance_fees.map(&:fee_type).uniq & ['FinanceFee', 'TransportFee']).present? %>
+              <%= link_to_remote "+ #{t('add_discount')}", {:url => add_params.merge(
+                  {:action => "new_instant_pay_all_discount", :manual_fines => @temporary_manual_fines})}, 
+                {:class => "add_link"}  %>
+            <% end %>
+
+          <% end %>
+          <% if @temporary_manual_fines.present? %>
+            <% k = @temporary_manual_fines.values.inject(&:merge).try(:keys).try(:length).to_i %>            
+            <% allow_fines = @unpaid_collections > k ? true : false %>
+          <% else %>
+            <% allow_fines = @unpaid_collections > 0 ? true : false %>
+          <% end %>          
+
+          <%= link_to_remote "+ #{t('add_fine')}",  {:url => add_params.merge(
+              {:action => "add_pay_all_manual_fine", :manual_fines => @temporary_manual_fines}), 
+            :method => :get},  {:class => "add_link"} if allow_fines %>
+          
+          <%if @current_user.admin? or @current_user.privileges.map(&:name).include? "FeeSubmission" or @current_user.privileges.map(&:name).include? "RevertTransaction"%>          
+            <%if (@finance_fees.map(&:fee_type).uniq & ['FinanceFee', 'TransportFee']).present?%>
+              <%= link_to_remote "#{t('remove_fine')}", {:url => add_params.merge(
+                  {:action => "remove_pay_all_auto_fine", :manual_fines => @temporary_manual_fines, :is_fine_waiver => "true"}), 
+                :method => :get},  {:class => "add_link", :id=> "remove_fine_link"}%>
+            <%end%>
+          <%end%>
+          <!--        
+          < % link_to_remote '+ Add Fine', :url => {
+                                  :controller => "finance",
+                                  :action => "update_fine_ajax", "fine[student]" => @student.id,"fine[batch_id]"=>@batch.id,"fine[date]"=> @date.id,
+                                  :current_action => @target_action,
+                                  :current_controller=>@target_controller,
+                                  :payment_date=>@payment_date
+                                  },
+                                  :method=>:get %> -->
+      </td>
+  </tr>
+<% end %>

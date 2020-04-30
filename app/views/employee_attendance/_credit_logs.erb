@@ -1,0 +1,60 @@
+<table>
+    <tr class="tr-head">
+        <% if @sort_order=="credited_date DESC"%>
+          <td class="reset_date">
+              <%= link_to_remote  "#{t('credit_date')} &#8595;", :url=>{:action=>"credit_logs",:sort_order=>"credited_date ASC"} %>
+          </td>
+        <% elsif @sort_order=="credited_date ASC" %>
+          <td class="reset_date">
+              <%= link_to_remote  "#{ t('credit_date')} &#8593;", :url=>{:action=>"credit_logs",:sort_order=>"credited_date DESC"} %>
+          </td>
+        <% elsif @sort_order=="created_at DESC" %>
+          <td class="reset_date">
+              <%= link_to_remote  "#{ t('credit_date')} &#8593;", :url=>{:action=>"credit_logs",:sort_order=>"credited_date ASC"} %>
+          </td>
+        <% else %>
+          <% if @logs.present?%>
+            <td class="reset_date">
+                <%= link_to_remote  "#{ t('credit_date')}", :url=>{:action=>"credit_logs",:sort_order=>"created_at DESC"} %>
+            </td>
+          <% else %>
+            <td class="reset_date"><%= "#{ t('credit_date')}" %></td>
+          <% end %>
+        <% end %>
+        <td class="employees"><%= t('employee_text') %></td>
+        <td class="remarks"><%= t('remarks') %></td>
+        <td class="resetted_by"><%= t('credit_by') %></td>
+    </tr>
+    <% if @logs.present? %>
+      <% @logs.each do |log| %>
+        <tr>
+            <td class="reset_date">
+                <div class="date">
+                    <%if log.status != 1%>
+                      <%= link_to "#{format_date(log.credited_date.to_date, :short)}", :controller => "employee_attendance", :action => "employee_credit_logs", :id => log.id %>
+                    <%else%>
+                      <%= "#{format_date(log.credited_date.to_date, :short)}" %>
+                    <% end %>
+                </div>
+                <% if log.status == 3 %>
+                  <div class="status"><%= "#{log.leave_credit_logs.collect{|l| l.status == 3}.count(true)} #{LeaveCredit::CREDIT_STATUS[log.status].titleize}" %></div>
+                <% elsif log.status == 1 %>
+                  <div class="status"><%= "#{LeaveCredit::CREDIT_STATUS[log.status].titleize}.." %></div>
+                <% end %>
+            </td>
+            <td class="employees"><%= log.credit_msg %></td>
+            <td class="remarks"><%= log.remarks %></td>
+            <td class="resetted_by"><% if log.credited_by == nil %>
+                <%= t('auto_credit') %>
+                <% else %>
+                  <%= log.credited_user %>
+                <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="4"><%= t('no_credit_logs_present') %></td></tr>
+    <% end %>
+</table>
+
+<%= will_paginate @logs %>

@@ -1,0 +1,21 @@
+<% active = assessment_activated?(batch,@assessment_group,@type) %>
+<% marks_entered = marks_entered?(batch, @assessment_group,@type) %>
+<div class="batch_box">
+    <div class="header">
+        <div class="col flex">
+            <%= "#{t('batch')} : #{@course.full_name.rstrip} - <b>#{batch.name}</b> #{batch.is_active? ? "" : "&#x200E;(#{t('inactive')})&#x200E;"}" %>
+        </div>
+        <div class="col flex right">
+            <%= render :partial=> 'batch_assessment_table_actions', :locals=>{:batch=>batch, :active=> active, :marks_entered => marks_entered}%>
+        </div>
+    </div>
+    <div class="assessment_list">
+        <% if active %>
+          <%= list_assessments(@type,@assessments[batch.id],batch, @assessment_group, @inactive_subjects[batch.id]) %>
+        <% else %>
+          <% content_tag :div, :class => 'empty-msg' do -%>
+            <%= "You have not activated the #{@assessment_group.exam_mode.downcase} for this batch." %>
+          <% end %>
+        <% end %>
+    </div>
+</div>

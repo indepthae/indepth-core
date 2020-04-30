@@ -1,0 +1,85 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('manage_attendance') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('employee_leave_management').titleize %></div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="box">
+        <% if permitted_to? :index, :employee_attendances %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('attendance_register').titleize}", :controller=>"employee_attendances", :action=>"index"%></div>
+              <div class="link-descr"><%= t('register_attendance') %></div>
+          </div>
+        <% end %>
+        <% if permitted_to? :report, :employee_attendance %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('attendance_report').titleize}", :controller=>"employee_attendance", :action=>"report" %></div>
+              <div class="link-descr"><%= t('attendance_report_desc') %></div>
+          </div>
+        <% end %>
+
+        <% if permitted_to? :reset_logs, :employee_attendance %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('leave_reset')}", :controller=>"employee_attendance", :action=>"reset_logs" %></div>
+              <div class="link-descr"><%= t('reset_employee_leaves') %></div>
+          </div>
+        <% end %>
+        <% if permitted_to? :leave_applications, :employee_attendance %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('leave_applications').titleize}", :controller=>"employee_attendance", :action=>"leave_applications" %></div>
+              <div class="link-descr"><%= t('view_all_employee_leave_applications') %></div>
+          </div>
+        <% end %>
+
+        <% if permitted_to? :leave_balance_report, :employee_attendance %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('leave_balance_report').titleize}", :controller=>"employee_attendance", :action=>"leave_balance_report" %></div>
+              <div class="link-descr"><%= t('leave_balance_report_desc') %></div>
+          </div>
+        <% end %>
+
+        <% config = leave_reset_configuration %>
+        <% if  config == "1" %>
+          <% if permitted_to? :credit_logs, :employee_attendance %>
+            <div class="link-box">
+                <div class="link-heading"><%= link_to "#{t('leave_credit').titleize}", :controller=>"employee_attendance", :action=>"credit_logs" %></div>
+                <div class="link-descr"><%= t('leave_credit_desc') %></div>
+            </div>
+          <% end %>
+
+        <% end %>
+    </div>
+
+
+</div>

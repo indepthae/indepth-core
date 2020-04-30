@@ -1,0 +1,93 @@
+<% @total_fees = (@total_payable.to_f - @total_discount.to_f + total_fine) %>
+<% @total_fees += @total_tax.to_f if @financefee.tax_enabled %>
+<% unless (@current_user.admin? or @current_user.employee?) %>
+  <tr class="row-a">
+      <td colspan="4">
+          <% if @student.advance_fee_wallet.present? and (balance+@fine_amount.to_f) > 0 %>
+            <div class="wallet-section">
+                  <div class="wallet-amount-block">
+                      <label><%= t('advance_applied') %> </label>
+                      <div class="text-input-bg4">
+                          <%= text_field_tag :wallet_amount,' ', {:value => 0.00, :class => "wallet-amount-applied"} %>
+                      </div>
+                  </div>
+                  <div class="wallet-info-block">
+                    <label class="wallet-info-text"><%= t('advance_fees_collected')%></label>
+                    <div class="text-input-bg4">
+                        <%= text_field :student_wallet_amount,'', {:value => precision_label(@student.advance_fee_wallet.amount),
+                          :class => "wallet-amount-field", :readonly => true} %>
+                    </div>
+                    <%= label_tag '', t('apply_advance'), {:class => "wallet-link user_button1"} %>
+                    <div class="" style="display: none;">
+                      <%= hidden_field_tag :wallet_amount_applied , '', {:value => false} %>
+                    </div>
+
+
+                  </div>
+            </div>
+          <% end %>
+          <% unless @financefee.is_paid %>
+            <% unless @particular_wise_paid %>
+              <div class="payment_details">
+                  <div class="amount_to_pay_block">
+                      <label><%= t('amount') %></label>
+                      <div class="text-input-bg4">
+                          <%= hidden_field_tag :fees_paid, "",  :value => precision_label(balance + @fine_amount.to_f), 
+                            :class => 'precision_text payment', :disabled => @particular_wise_paid, 
+                            :readonly => !PaymentConfiguration.is_partial_payment_enabled? %>
+                          <%= text_field_tag :fees_paid_t, "",  :value => precision_label(balance + @fine_amount.to_f), 
+                            :class => 'precision_text payment_t', :disabled => @particular_wise_paid, 
+                            :readonly => !PaymentConfiguration.is_partial_payment_enabled? %>
+                          <%= hidden_field_tag :total_fees, precision_label(balance + @fine_amount.to_f) %>
+                      </div>
+                  </div>
+              </div>
+              <div id="gateway_error"></div>
+            <% end %>
+          <% end %>
+          <div class="pay_fees">
+              <% if @financefee.is_paid %>
+                <div class="pay_fees_buttons">
+                    <h4><%= t('fees_paid') %></h4>
+                    <%= link_to "► #{t('print_summary')}", {:controller => "finance",
+                      :action => "student_fee_receipt_pdf", :id => @student.id, :id2 => @date.id, 
+                      :batch_id => @batch.id}, :target => '_blank', :class => 'user_button' %>
+                </div>
+              <% else %>
+                <% unless @particular_wise_paid %>
+                  <div class="pay_fees_buttons">     
+                      <% unless @particular_wise_paid %>
+                        <!-- 
+                        < %= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'submit_button', 
+                          :onClick => "return validate_payment_mode()" %> -->
+                        <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and 
+                              PaymentConfiguration.config_value("enabled_fees").present? and 
+                              PaymentConfiguration.is_student_fee_enabled?) and @active_gateway.present? %>
+                          <%= custom_gateway_intermediate_button(precision_label(balance + @fine_amount.to_f), 
+                            'false', 0.00, params[:id], params[:id2], @fee_collection.name, @current_user.id) %>
+                        <% end %>
+                      <% end %>
+
+                      <%= link_to "► #{t('print_summary')}",
+                        {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, 
+                        :id2 => @fee_collection.id}, :target => '_blank', :class => 'user_button' unless @trans.nil? %>
+
+                      <%= link_to "► #{t('print_summary')}",
+                        {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, 
+                        :id2 => @fee_collection.id}, :target => '_blank', :class => 'user_button' %>
+                  </div>
+                <% end %>
+
+              <% end %>
+          </div>
+      </td>
+  </tr>
+<% end %>    
+<style>
+    .pay_fees_buttons {        
+        min-width: 230px !important;
+    }
+    .pay_fees_buttons a{
+        margin-top: 1px !important;
+    }
+</style>

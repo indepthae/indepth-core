@@ -1,0 +1,17 @@
+<%= rtl? ? (stylesheet_link_tag 'rtl/form_submissions/jquery-ui') : (stylesheet_link_tag 'form_submissions/jquery-ui') %>
+<div class="overlay"></div>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('description_consolidated_report') %></div>
+
+</div>
+<div id="page-yield">
+  <%= javascript_include_tag "form_submissions/jquery.dataTables" %>
+  <div class="bread_crumb">
+    <% breadcrumb :form_submissions_consolidated_report, @form %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%= render :partial => "consolidated" %>
+</div>

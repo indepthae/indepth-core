@@ -1,0 +1,30 @@
+<div class="bookmarks">
+  <h4 class="bookmark-head">Bookmarks</h4>
+  <div class="hor_line"></div>
+  <div class="bookmark-box">
+    <% if @bookmarks.present?  %>
+      <% @bookmarks.each do |bookmark| %>
+        <div class="bookmark-pair">
+          <div class="bookmark-details">
+            <div class="bookmark-time">
+              <%= "#{bookmark.created_at.strftime('%d %B %Y   %I:%M %P')}" %>
+            </div>
+            <div class="bookmark-name">
+              <%= bookmark.name %>
+            </div>
+            <div class="bookmark-url">
+              <%=link_to "#{shorten_string(bookmark.url,150)}",bookmark.url,:target=>'_blank' %>
+            </div>
+          </div>
+          <div class="bookmark-delete">
+            <%=link_to "x",bookmark_destroy_school_stat_path(:id=>bookmark.id),:confirm=>"Are you sure?"%>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="hor_line"></div>
+    <%= will_paginate @bookmarks,:renderer => 'RemoteLinkRenderer',:params=>{:action => "bookmark_paginate"},:class=>"pagination stats-pagination"%>
+  <% else %>
+    <div class="bookmark-nil">No bookmarks yet.</div>
+  <% end %>
+</div>

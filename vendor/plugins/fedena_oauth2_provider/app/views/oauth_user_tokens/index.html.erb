@@ -1,0 +1,53 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag "#{@direction}single_access_tokens/index"  %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('apps') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('revoke_authorizations') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% if @tokens.present? %>
+    <div class="box">
+      <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td class="client_name"><%= t('app_name') %></td>
+          <td class="options"></td>
+        </tr>
+        <tr class="tr-blank">
+
+        </tr>
+        <% @tokens.each do |token| -%>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="client_name col-2">
+              <%= h(token.oauth_client.name) %>
+            </td>
+            <td class="options col-3">
+              <%= link_to t('delete'),{:action => :revoke, :token_id => token.id, :controller => 'oauth_user_tokens'}, :confirm => t('confirm_text'), :method => :delete %>
+            </td>
+
+          </tr>
+
+        <% end %>
+      </table>
+
+      <div class="extender"></div>
+    </div>
+  <% else %>
+    <div id="flash-box">
+      <p class="flash-msg"><%= t('no_access_token_text') %></p>
+    </div>
+  <% end %>
+</div>
+

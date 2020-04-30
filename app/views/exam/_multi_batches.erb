@@ -1,0 +1,55 @@
+
+<div id="exam-form">
+  <% form_for @course_exam_group do |f|%>
+   <%= error_messages_for :exam_group %>
+   <%= f.hidden_field :course_id,:value=>"#{@course.id}"%>
+    <div class="label-field-pair">
+      <label for="student_batch"><%= t('select_batch') %>:</label>
+      <div class="text-input-bg" style="margin-bottom: 113px;">
+        <div class="categories">
+          <div class="sel-list">
+            <%= t('select') %>: <%= link_to_function t('all'), "$$('input.check_batch').each(function(checkbox) { checkbox.checked = true; });" %>,
+            <%= link_to_function t('none'), "$$('input.check_batch').each(function(checkbox) { checkbox.checked = false; });" %>
+          </div>
+          <% @batches.each do |batch| %>
+            <div class="each_category">
+              <%=  check_box_tag "course_exam_group[new_batch_ids][]",batch.id, false,:class=>'check_batch'%>
+                <label><%= "#{batch.full_name}" %></label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <div class="label-field-pair">
+            <label for="exam_name"><%= t('exam_name') %></label>
+            <div class="text-input-bg"><%= f.text_field :name%></div>
+    </div>
+    <% if @course.gpa_enabled? or @course.cwa_enabled? %>
+      <div class="label-field-pair">
+        <label for="exam_type"><%= t('exam_type') %></label>
+        <div class="text-input-bg"><%= f.select :exam_type,[[t('marks_and_grades'),"MarksAndGrades"]] %></div>
+      </div>
+    <% elsif @course.cce_enabled? %>
+      <div class="label-field-pair">
+        <label for="cce_exam_category_id"><%= t('cce_exam_category') %></label>
+        <div class="text-input-bg"><%= f.select :cce_exam_category_id,@cce_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>t("select") %></div>
+      </div>
+      <%= f.hidden_field :exam_type, :value=>"MarksAndGrades"  %>
+    <% elsif @course.icse_enabled? %>
+      <div class="label-field-pair">
+        <label for="cce_exam_category_id">ICSE Exam Category</label>
+        <div class="text-input-bg"><%= f.select :icse_exam_category_id,@icse_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>"Select Exam Category" %></div>
+      </div>
+      <%= f.hidden_field :exam_type, :value=>"MarksAndGrades"  %>
+    <% else %>
+      <div class="label-field-pair">
+        <label for="exam_type"><%= t('exam_type') %></label>
+        <div class="text-input-bg"><%= f.select :exam_type,options_for_select([[t('marks'),"Marks"],[t('grades'), "Grades"],[t('marks_and_grades'),"MarksAndGrades"]]) %></div>
+      </div>
+    <%end%>
+    <div class="extender"></div>
+    <div class="text-input-bg">
+            <%= f.submit "", :value => "► #{t('save')}",:name=>nil, :class => "submit_button", :id => 'submit_button' %>
+    </div>
+  <%end%>
+</div>

@@ -1,0 +1,65 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('attribute_profiles') %></div>
+    <% unless @profile.dependencies_present? %>
+      <div id="inner-tab-menu">
+          <% if @profile.assessment_attributes.present? %>
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_attributes')}", {:controller => "assessment_attributes", :action => "add_attributes", :id=> @profile.id} %></li>
+            </ul>
+          <% end %>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to t('delete_profile'), '#' , :onclick => "make_popup_box(this, 'confirm', '#{t('delete_profile_confirmation')}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_attribute_profile')}', 'popup_class' : 'delete_confirmation'}); return load_plan_delete_method();" %>
+              </li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_attribute_profiles_show,@profile %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="ativity_box">
+        <div class="header"><%=t('attribute_profile')%></div>
+        <%= render :partial=>'profile_details' %>
+        <hr>
+        <% if @profile.assessment_attributes.present? %>
+          <div id="attributes">
+            <%= render :partial=> 'attributes', :locals => {:attributes=> @attributes }%>
+          </div>
+        <%else%>
+          <div class="add_activity_blank">
+              <div class="add_activity_helper"><%=t('blank_attribute_helper')%></div>
+              <div class="add_activity_button"><%= link_to t('add_attributes'), {:controller=>'assessment_attributes', :action => 'add_attributes', :id=>@profile.id}, :class=>'submit-button' %></div>
+          </div>
+        <% end %>
+        <% if @profile.dependencies_present? %>
+          <div id="warning"><span id="info-symbol"></span><span id="info-text"><%= t('this_profile_has_dependencies') %></span></div>
+        <% end %>
+    </div>
+
+
+
+
+</div>
+<script type="text/javascript">
+      load_plan_delete_method = function () {
+      j('.submit-button#yes').on('click', function () {
+        profile_id = <%=@profile.id%>
+          j.ajax({
+              type: 'DELETE',
+              url: '/assessment_attributes/'+profile_id
+          });
+      })
+  }
+</script>

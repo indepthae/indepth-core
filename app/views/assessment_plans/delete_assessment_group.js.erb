@@ -1,0 +1,5 @@
+<% if @result %>
+  window.location.href='/assessment_plans/<%=@plan.id%>'
+<% else %>
+  show_warning_popup('<%=@assessment_group.id%>')
+<% end %>

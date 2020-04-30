@@ -1,0 +1,17 @@
+<% remote_form_for :manage_masters, :url => {:action => "manage_masters"},
+                   :html => {:class => 'manage_masters_form'} do |f| %>
+    <%= session_fingerprint_field %>
+    <div id="manage_masters_form">
+      <div id="masters_data"></div>
+      <div class="label-field-pair">
+        <label for=""><%= t('master_fees.fees_type') %></label>
+
+        <div class="text-input-bg">
+          <%= f.select :fee_type, fees_type_options, {:include_blank => t('select')}, {:onchange => "load_fee_categories(this)"}%>
+        </div>
+      </div>
+      <div id="fee_categories"></div>
+    </div>
+    <%= f.submit t('submit'), :class => "submit-button", :id => "submit_button" %>
+
+<% end %>

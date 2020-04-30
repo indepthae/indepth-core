@@ -1,0 +1,22 @@
+<%form_remote_for :child_comment, :url=>{:controller=>"discipline_complaints", :action=>"create_comment"},
+                  :before=>"$('reply_button').disable()",:complete=>"setTimeout(function(){$('reply_button').enable();},5000)",
+                  :loading => "$('loading#{@child_comment.id}').show();", :loaded => "$('loading#{@child_comment.id}').hide();" do |c| %>
+<%= hidden_field_tag :child_id,@child_comment.id %>
+<div class="add_replay" id="txtar">
+  <div id="txt">
+      <div class="label-field-pair-text-area">
+          <div class="comment-reply" ><%= c.text_area:body,:cols =>47, :rows => 5 ,:value=>"",:id=>"child_comment_body_#{@child_comment.id}"%></div>
+      </div>
+  </div>
+  <div class="loadr_img">
+  <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id =>"loading#{@child_comment.id}",
+                  :style =>"display: none;" ) %>
+  </div>
+ <div id="reply-btn">
+        <%=submit_tag "► #{t('post')}",{:id => 'reply_button', :class => "submit_button" , :onClick => "return validate('#{@child_comment.id}')"}%>
+ </div>
+<%end%>
+</div>

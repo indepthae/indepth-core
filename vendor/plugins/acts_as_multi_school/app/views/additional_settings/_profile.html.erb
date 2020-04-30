@@ -1,0 +1,89 @@
+<% i = 0 %>
+<% if @additional_setting and !@additional_setting.new_record? %>
+  <% setting_fields = @additional_setting.class::SETTING_FIELDS %>
+  <% if setting_fields.is_a? Array %>
+    <% setting_fields.each do|s| %>
+      <% unless s.to_s=="password" %>
+        <fieldset>
+          <label><%= s.to_s.titleize %></label>
+          <label class="value">
+            <%=h @additional_setting.settings["#{s}"] %>
+          </label>
+          <% if i == 0 %>
+            <% if permitted_to? :edit, @additional_setting, :context=>:additional_settings %>
+              <%= link_to 'Edit', edit_additional_setting_path(@owner_type,@owner.id,child_class), :class=>"button-grey-small float-right-with-margin" %>
+            <% end %>
+            <% if @additional_setting.class.name=="SmtpSetting" %>
+              <% if permitted_to? :check_smtp_settings, @additional_setting, :context=>:additional_settings %>
+                <%= link_to 'Verify Settings', check_smtp_settings_additional_setting_path(@owner_type,@owner.id,child_class), :class=>"button-grey-small float-right-with-margin" %> <br/>
+              <% end %>
+            <% end %>
+            <% i=1 %>
+          <% end %>
+        </fieldset>
+      <% end %>
+    <% end %>
+  <% elsif setting_fields.is_a? Hash %>
+    <% setting_fields.each do|k,val| %>
+      <% if val.count > 0 %>
+        <% unless k.to_s=="text" or k.to_s=="select" or k.to_s === "drop_down" %>
+          <fieldset>
+            <label><%= k.to_s.titleize %></label>
+          </fieldset>
+        <% end %>
+        <% val.each do|v| %>
+          <% unless v.to_s=="password" %>
+            <fieldset>
+              <label><%= v.to_s.titleize %></label>
+              <label class="value">
+                <% if k.to_s=="select" %>
+                  <%=h @additional_setting.send("get_#{v.to_s}") %>
+                <% elsif k.to_s == "drop_down" %>
+                  <% value = @additional_setting.send("get_#{v.to_s}_value") %>
+                  <% if v.to_s == "font" or value == 'Default' or value.nil? %>
+                    <%=h value %>
+                  <% else %>
+                    <div style="background-color: <%= value %>;width: 20px;height: 20px;padding-top: 0px;margin-top: 5px;"></div>
+                  <% end %>
+                <% else %>
+                  <%=h (@additional_setting.settings["#{k}"]).try("[]",v) %>
+                <% end %>
+              </label>
+              <% if i == 0 %>
+                <% if permitted_to? :edit, @additional_setting, :context=>:additional_settings %>
+                  <%= link_to 'Edit', edit_additional_setting_path(@owner_type,@owner.id,child_class), :class=>"button-grey-small float-right-with-margin" %>
+                <% end %>
+                <% if @additional_setting.class.name=="SmsCredential" and @owner.class.name=="School" %>
+                  <% if permitted_to? :show_sms_messages, @owner, :context=>:schools %>
+                    <%= link_to "SMS Log",{:controller=>"schools",:action=>"show_sms_messages", :id=>@owner.id}, :class=>"button-grey-small float-right-with-margin"  %> <br/>
+                  <% end %>
+                <% end %>
+                <% i=1 %>
+              <% end %>
+            </fieldset>
+          <% end %>
+        <% end %>
+      <% else %>
+        <fieldset>
+          <label><%= k.to_s.titleize %></label>
+          <label class="value">
+            <%=h @additional_setting.settings["#{k}"] %>
+          </label>
+          <% if i == 0 %>
+            <% if permitted_to? :edit, @additional_setting, :context=>:additional_settings %>
+              <%= link_to 'Edit', edit_additional_setting_path(@owner_type,@owner.id,child_class), :class=>"button-grey-small float-right-with-margin" %> <br/>
+            <% end %>
+            <% i=1 %>
+          <% end %>
+        </fieldset>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <fieldset>
+    <label>No settings found.</label>
+    <% if permitted_to? :new, @additional_setting, :context=>:additional_settings %>
+      <%= link_to 'Add', new_additional_setting_path(@owner_type,@owner.id,child_class), :class=>"button-grey-small float-right-with-margin" %> <br/>
+    <% end %>
+  </fieldset>
+<% end %>

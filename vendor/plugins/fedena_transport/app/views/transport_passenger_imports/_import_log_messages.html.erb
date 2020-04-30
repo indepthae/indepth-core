@@ -1,0 +1,26 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="import_listing">
+    <tr class="tr-head">
+        <td class="sl_no"><%= t('sl_no') %></td>
+        <td class="row_no"><%= t('row_number') %></td>
+        <td class="rows"><%= t('last_error') %></td>
+    </tr>
+    <% unless @message.empty? %>
+      <% @message.each_with_index do |m, i|  %>
+        <tr>
+            <td><%= i+1 %></td>
+            <td><%= m.first %></td>
+            <td>
+                <% if m.last.is_a? Array %>
+                  <%= m.last.try(:join, ", ")||"-" %>
+                <% else %>
+                  <%= m.last||"-" %>
+                <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% end %>
+</table>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

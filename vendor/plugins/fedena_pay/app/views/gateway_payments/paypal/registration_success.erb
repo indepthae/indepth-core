@@ -1,0 +1,13 @@
+<center>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <p style="font-weight: bold;margin-left:-70px;margin-bottom:-10px">Total Payable Amount : <span class="themed_text"><%= @currency %>. <%= @applicant.amount %></span></p>
+
+  <% form_for :token_check,:url => {:action => "print_application"} do |f| %>
+    <%= f.hidden_field :print_token,:value => @applicant.print_token %>
+    <%= f.submit 'Print Application',:class => "submit_button submit-button_print" %>
+  <% end %>
+  
+<% end %>
+</center>

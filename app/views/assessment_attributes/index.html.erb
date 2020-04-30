@@ -1,0 +1,55 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('attribute_profiles') %></div>
+    <% if permitted_to? :new , :assessment_attributes %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('create_attribute_profile')}", :url => {:controller => "assessment_attributes", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_attributes_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('attribute_profiles') %></div>
+    <div id ="description"><%= t('attribute_profiles_description') %></div>
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('profile_text') %></td>
+                <td class="attribute_count"><%= t('no_of_attributes') %></td>
+                <td class="attribute_count"><%= t('formula') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @profiles.present? %>
+              <% @profiles.each do |ap|  %>
+                <tr class="tr-<%= cycle('even', 'odd') %>">
+                    <td><%= link_to ap.name, assessment_attribute_path(ap) %></td>
+                    <td class="float"><%= ap.attributes_count %></td>
+                    <td><%= ap.formula_text %></td>
+                    <td><%= link_to t('view_profile'), assessment_attribute_path(ap) %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="4"><%= t('create_an_attribute_profile') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @profiles.present? %>
+          <%= pagination_status(@profiles) %>
+        <% end %>
+        <%= will_paginate @profiles %>
+    </div>
+</div>

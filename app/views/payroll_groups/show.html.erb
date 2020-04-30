@@ -1,0 +1,142 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_payroll_group').titleize %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if params[:finance].nil? and permitted_to? :edit, :payroll_groups%>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit')}", edit_payroll_group_path(@payroll_group.id) %></li>
+      <% end %>
+      <% if params[:finance].nil? and permitted_to? :lop_settings, :payroll_groups %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('lop_settings')}", {:action => 'lop_settings', :controller => 'payroll_groups', :id => @payroll_group.id} %></li>
+      <% end %>
+      <% if permitted_to? :assigned_employees, :payroll %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('employees')}", {:action => 'assigned_employees', :controller => 'payroll', :id => @payroll_group.id, :finance => params[:finance]} %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <% breadcrumb :payroll_groups_show, @payroll_group%>
+    <% else %>
+      <% breadcrumb :payroll_groups_show_finance, @payroll_group%>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+    
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+    
+  <h3><%= "#{t('payroll_group_details').titleize}" %></h3>
+  <div class="fields-details">
+    <div class="field-label"><%= t('payroll_group_name') %> : </div>
+    <div class="fields-val"><%= "#{@payroll_group.name}" %></div>
+  </div>
+  <hr/>
+  <div class="fields-details">
+    <div class="field-label field-head"><%= t('salary_preferences').titleize %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('employee_salary_type') %> : </div>
+    <div class="fields-val"><%= @payroll_group.salary_type_value %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('payment_period') %> : </div>
+    <div class="fields-val"><%= @payroll_group.payment_period_value %></div>
+  </div>
+  <% unless @payroll_group.payment_period == 1%>
+    <div class="fields-details">
+      <div class="field-label"><%= t('payslip_generation_date') %> : </div>
+      <div class="fields-val"><%= @payroll_group.payslip_generation_day %></div>
+    </div>
+  <% end %>
+  <hr/>
+  <% if @payroll_group.employee_overtime.present? %>
+    <div class="fields-details">
+      <div class="field-label field-head"><%= t('overtime_settings') %></div>
+    </div>
+    <div class="fields-details">
+      <div class="field-label"><%= t('overtime_calculation') %> : </div>
+      <div class="fields-val"><%= @payroll_group.employee_overtime.hr_formula.formula_display %></div>
+    </div>
+    <hr/>
+  <% end %>
+  <div class="fields-details">
+    <div class="field-label field-head"><%= t('payroll_categories').titleize %></div>
+  </div>
+  <% if @earnings.present? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('earnings') %></div>
+    </div>
+
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="name"><%= "#{t('payroll_category_name')} &#x200E;(#{t('code')})&#x200E;" %></td>
+        <td class="value"><%= t('value') %></td>
+      </tr>
+      <% @earnings.each do |pc|  %>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+          <td><%= "#{pc.name} &#x200E;(#{pc.code})&#x200E;" %></td>
+          <td><%= pc.hr_formula.try(:formula_html_display) %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+
+  <% if @deductions.present? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('deductions') %></div>
+    </div>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="deductions_list">
+      <tr class="tr-head">
+        <td class="name"><%= "#{t('payroll_category_name')} &#x200E;(#{t('code')})&#x200E;" %></td>
+        <td class="value"><%= t('value') %></td>
+      </tr>
+      <% @deductions.each do |pc|  %>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+          <td><%= "#{pc.name} &#x200E;(#{pc.code})&#x200E;" %></td>
+          <td><%= pc.hr_formula.try(:formula_html_display) %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+  <% if @payroll_group.employee_lop.present? %>
+    <hr/>
+    <% employee_lop = @payroll_group.employee_lop %>
+    <div class="fields-details">
+      <div class="field-label field-head"><%= t('loss_of_pay_criteria') %></div>
+    </div>
+    <div class="fields-details">
+      <div class="field-label"><%= t('loss_of_pay_formula') %> : </div>
+      <div class="fields-val"><%= employee_lop.hr_formula.formula_html_display %></div>
+    </div>
+    <div class="fields-details">
+      <div class="field-label"><%= t('lop_calculation_method') %> : </div>
+      <div class="fields-val"><%= employee_lop.lop_as_deduction ? t('as_a_deduction', :code => "LOPA") : t('deduct_lopa_from_payroll_categories', :code => "LOPA") %></div>
+    </div>
+    <% if !employee_lop.lop_as_deduction and @lop_prorated_formulas.present? %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td class="name"><%= "#{t('payroll_category_name')} &#x200E;(#{t('code')})&#x200E;" %></td>
+          <td class="value"><%= t('value') %></td>
+        </tr>
+        <% @lop_prorated_formulas.each do |lpf|  %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+            <td><%= "#{lpf.payroll_category.name} &#x200E;(#{lpf.payroll_category.code})&#x200E;" %></td>
+            <td><%= lpf.actual_value ? '-' : lpf.hr_formula.default_value %></td>
+          </tr>
+        <% end %>
+      </table>
+    <% end %>
+  <% end %>
+ </div>

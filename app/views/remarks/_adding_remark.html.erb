@@ -1,0 +1,6 @@
+
+<div id="add_remark_link_for_<%=@object_id%>" class="add_remark_link_exam_score">
+  <% if ((@current_user.employee? and @load_model.find(@load_object_id).has_employee_privilege)) and (@stud.present? ? @load_model=='Subject'.constantize ? ((@stud.batch_id==Subject.find(@load_object_id).batch_id)) :@stud.batch_id==@load_object_id.to_i : false)%>
+    <%=link_to t('add_remarks_text'),"javascript:void(0);",:class=>"themed_text adding_link disabled_link",:id=>"a_#{@object_id}",:student_id=>@student_id,:target_name=>@target_name,:object_id=>@object_id,:load_object_id => @load_object_id,:params_hash=>@params_hash.to_json,:onclick=>'completeReq(this)'%>
+  <%end%>
+</div>

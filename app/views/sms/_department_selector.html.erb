@@ -1,0 +1,7 @@
+<h5 class="field_head"><%= t('select_date') %></h5>
+<div class="text-input-bg start_date">
+    <%= calendar_date_select_tag 'date' ," ",  :onchange => "load_employees();", :id => "date", :class => "calender-select-width",:format=>:default  %>
+</div>
+
+
+

@@ -1,0 +1,78 @@
+attendance:
+    primary_keys:
+      student_id:
+      month_date:
+    overrides: 
+      student_id: "Student Admission Number"
+      batch_id: "Batch Name"
+      forenoon: "Forenoon Attendance"
+      afternoon: "Afternoon Attendance"
+      reason: "Reason"
+      attendance_label_id: "Attendance Status Code"
+      attendance_save: "Attendance Save"
+#      attendance_submit: "Attendance Submit"
+    booleans:
+     - :forenoon
+     - :afternoon
+    associations:
+     - :student
+     - :batch
+     - :attendance_label
+    associated_columns:
+      student: "admission_no"
+      attendance_label: "code"
+    map_combination:
+      batch: "full_name"
+    filters:
+     - :period_table_entry_id
+     - :school_id
+     - :weightage
+     - :notification_sent
+    mandatory_columns:
+     - :month_date
+     - :batch_id
+     - :student_id
+     - :attendance_label_id
+    attr_accessor_list:
+     - :attendance_save
+#     - :attendance_submit
+    instructions:
+        Student Admission Number:
+            Type: "Alphanumeric, underscore, hyphen and back slash(/)."
+            Input Instruction and example: "AYS/2018/S001"
+        Forenoon Attendance:
+            Type: "Enter 'y' for marking forenoon attendance as absent and Enter '0' for unmarking forenoon attendance as absent."
+            Input Instruction and example: ""
+        Afternoon Attendance:
+            Type: "Enter 'y' for marking afternoon attendance as absent and Enter '0' for unmarking forenoon attendance as absent."
+            Input Instruction and example: ""
+        Reason:
+            Type: "Alphanumeric."
+            Input Instruction and example: "Reason for the absence."
+        Month date:
+            Type: "mm/dd/yyyy or dd-mm-yyyy"
+            Input Instruction and example: "03/13/2016 or 13-03-2016."  
+        Batch Name:
+            Type: "Course code - Batch name"
+            Input Instruction and example: "For a course ‘Grade 1’ having course code ‘G1' and a batch named '2018 A’ batch name is G1 - 2018 A."
+        Attendance Status Code:
+            Type: "Enter attendance status code."
+            Input Instruction and example: ""
+        Attendance Save:
+            Type: "Y or leave blank"
+            Input Instruction and example: "Enter ‘Y’ to save, leave blank otherwise. The attendance will be saved."
+#        Attendance Submit:
+#            Type: "Y or leave blank"
+#            Input Instruction and example: "Enter ‘Y’ to lock attendance, leave blank otherwise. This column cannot be modified during bulk import"
+# Please refer to employee.yml for basic concept.
+
+# Forenoon and afternoon are boolean fields.It will only be having true and false values.Whenever such
+# columns comes,place all those inside booleans array.If any value is present in the csv for those
+# it will enter an entry as true,if left blank,will be entered as false
+
+# Batch will be entered as full name only.But cannot be searched as search.Bacause no such column called
+# full_name is there in the database.But full name can be fetched by method.
+# Value will be a combination of course code and batch name.Such kind of case,where a method is to be used
+# to search an associated value,to be placed inside map_combination hash.
+
+    

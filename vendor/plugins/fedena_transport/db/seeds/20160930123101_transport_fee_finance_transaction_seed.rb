@@ -1,0 +1,3 @@
+TransportFee.find(:all, :select => "transport_fees.id as id,transport_fees.transaction_id as transaction_id,transport_fees.school_id as current_school_id,ft.amount as transaction_amount", :joins => "inner join finance_transactions ft on ft.id=transport_fees.transaction_id", :skip_multischool => true).each do |tf|
+  ActiveRecord::Base.connection.execute("INSERT INTO `transport_fee_finance_transactions` (`transaction_amount`, `transaction_balance`, `parent_id`, `finance_transaction_id`, `school_id`, `transport_fee_id`) VALUES(#{tf.transaction_amount}, 0.0, NULL, #{tf.finance_transaction_id}, #{tf.current_school_id}, #{tf.id})")
+end

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.student_details{
+  @students.each do |student|
+    @student = student
+    @xml.student do
+      @xml.student_name(@student.full_name)
+      @xml.batch_name(@student.batch.name)
+      @xml.admission_date(@student.admission_date)
+      @xml.admission_no(@student.admission_no)
+      @xml.gender(@student.gender)
+      @xml.guardian_name(@student.immediate_contact.try(:full_name))
+      @xml.immediate_contact_no(@student.immediate_contact.try(:mobile_phone))
+    end
+  end
+}%>
+
+

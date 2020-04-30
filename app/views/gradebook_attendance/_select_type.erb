@@ -1,0 +1,12 @@
+<div class="label-field-pair">
+    <div class="label">
+        <label for="batch_id" class="label-batch"><%= t('type') %></label>
+    </div>
+    <span class="batch_selector">
+        <%= select :gradebook_attendance,:report_type, @types,
+          {:include_blank=>t('select_type')},
+          {:onChange => "#{remote_function(:url => {:action => "load_subtypes"},
+          :with => "'type='+ value +'&batch_id=#{@batch.id}'+'&assessment_plan_id=#{plan_id}'"
+          )}"}%>
+    </span>
+</div>

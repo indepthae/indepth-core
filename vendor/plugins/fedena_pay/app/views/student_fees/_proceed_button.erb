@@ -1,0 +1,6 @@
+<% form_for :custom_gateway_online_pay ,:url => {:controller=>'student_fees', :action=>'initialize_all_fees_payment'},:method => :post,:html=>{:class=>'payment-form'} do |f| %>
+  <%= hidden_field_tag :payment_id, @payment_id %>
+  <%= hidden_field_tag :gateway_id, @active_gateway %>
+  <%= hidden_field_tag :id, @student.id %>
+  <%= f.submit t('proceed'),:class => "submit_button",:style => @button_style %>
+<% end %>

@@ -1,0 +1,250 @@
+<% scholastic = @report.scholastic %>
+<div id="student_record_data_holder">
+  <div id="top">
+    <%=hidden_field_tag :current_student ,@student.id%>
+    <div id="top_section_full">
+      <div class="<%=roll_number_enabled? ? "heading_sec_33" : "heading_sec_50"%>">
+        <div class="header_name"><%=t('single_student')%></div>
+        <div class="header_value bold_text"><%=@student.full_name%></div>
+      </div>
+      <% if roll_number_enabled? %>
+        <div class="heading_sec_33">
+          <div class="header_name"><%=t('roll_nos')%></div>
+          <div class="header_value bold_text"><%=@student.roll_number_in_context%></div>
+        </div>
+      <%end%>
+      <div class="<%=roll_number_enabled? ? "heading_sec_33" : "heading_sec_50_right"%>">
+        <div class="header_name"><%=t('admission_no')%></div>
+        <div class="header_value bold_text"><%=@student.admission_no%></div>
+      </div>
+    </div>
+  </div>
+  <div id="main_section_full">
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader_1", :style =>"display: none" ) %>
+    <% remote_form_for(:upscale_scores, :url => {:action=> 'save_upscale_scores',:count=>@count}) do |f| %>
+      <%=hidden_field_tag 'batch_id',@batch.id%>
+      <%=hidden_field_tag 'student_id',@student.id%>
+      <table id="student_details_table" cellspacing="0">
+        <tr>
+          <th id="name" class="no_right_border no_bottom_border">Subject</th>
+          <th id="grade" class="no_right_border no_bottom_border">Grade</th>
+          <th id="no_of_batches" class="no_right_border no_bottom_border">Upscaling Eligibility/Status</th>
+          <th id="action" class="no_bottom_border"></th>
+        </tr>
+        <% @subjects.each_with_index do |s,i| %>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td class="no_right_border no_bottom_border"><%= s.name %></td>
+            <% sub=scholastic.find{|c| c.subject_id==s.id} %>
+            <%status = sub.present? ? CceReportSetting.get_grade_status(@student,@batch,sub) : ""%>
+            <%case status
+            when "Upscaled"%>
+              <td id="before_grade" class="no_right_border no_bottom_border"><%= sub.overall if sub %></td>
+              <%obtained_reverted_grade = CceReportSetting.get_reverted_grade(@student,@batch,sub)%>
+              <td id="after_grade" class="no_show no_right_border no_bottom_border"><%= obtained_reverted_grade if sub %></td>
+              <%=hidden_field_tag "upscale_score[#{i}][upscaled_grade]",sub.present? ? sub.overall : "",:class=>'ug' if sub%>
+              <%=hidden_field_tag "upscale_score[#{i}][previous_grade]",sub.present? ? obtained_reverted_grade : "",:class=>'non_ug'%>
+              <%=hidden_field_tag "upscale_score[#{i}][_delete]",0,:class=>'delete_entry'%>
+              <td id="before_status" class="text_status no_right_border no_bottom_border"><%= status %></td>
+              <td id="after_status" class="no_show text_status no_right_border no_bottom_border"><%= "Eligible"%></td>
+              <td id="revert_link_<%=sub.subject_id%>" class="revert_links no_bottom_border"><div class="reverts_1">Revert</div></td>
+              <td id="up_link_<%=sub.subject_id%>" class="upscale_links no_show no_bottom_border"><div class="uplinks_1">Upscale Grade</div></td>
+              <td id="uplink_dull_<%=sub.subject_id%>" class="upscale_dull_links no_show no_bottom_border"><div class="dull_msg">Upscale Grade</div></td>
+            <%when "Eligible"%>
+              <td id="before_grade" class="no_right_border no_bottom_border"><%= sub.overall if sub %></td>
+              <%obtained_upscaled_grade = CceReportSetting.get_upscaled_grade(@student,@batch,sub)%>
+              <td id="after_grade" class="no_show no_right_border no_bottom_border"><%= sub.present? ? obtained_upscaled_grade : ""%></td>
+              <%=hidden_field_tag "upscale_score[#{i}][upscaled_grade]",sub.present? ? sub.overall : "",:class=>'ug'%>
+              <%=hidden_field_tag "upscale_score[#{i}][previous_grade]",sub.present? ? obtained_upscaled_grade : "",:class=>'non_ug'%>
+              <%=hidden_field_tag "upscale_score[#{i}][_delete]",1,:class=>'delete_entry'%>
+              <td id="before_status" class="text_status no_right_border no_bottom_border"><%= status %></td>
+              <td id="after_status" class="no_show text_status no_right_border no_bottom_border"><%= "Upscaled"%></td>
+              <td id="up_link_<%=sub.subject_id%>" class="upscale_links no_bottom_border"><div class="uplinks_2">Upscale Grade</div></td>
+              <td id="revert_link_<%=sub.subject_id%>" class="revert_links no_show no_bottom_border"><div class="reverts_2">Revert</div></td>
+              <td id="uplink_dull_<%=sub.subject_id%>" class="upscale_dull_links no_show no_bottom_border"><div class="dull_msg">Upscale Grade</div></td>
+            <%else%>
+              <td class="no_right_border no_bottom_border"><%= sub.overall if sub %></td>
+              <td class="dull_status text_status no_right_border no_bottom_border"><%= status %></td>
+              <td class="no_bottom_border"></td>
+            <%end%>
+            <%=hidden_field_tag "upscale_score[#{i}][subject_id]", sub.subject_id if sub%>
+            <%=hidden_field_tag "upscale_score[#{i}][batch_id]", @batch.id%>
+
+          </tr>
+        <%end%>
+      </table>
+      <%= submit_tag "► #{t('save')}",:class=>'submit_button no_show' %>
+    <%end%>
+  </div>
+</div>
+<script type="text/javascript">
+  j(document).ready(function(){
+    j('#main_section_full').height(j('#listing').height() - 63)
+
+    if((j('td:contains("Upscaled"):visible').length) >= 1)
+    {
+      ORDER = "reverse"
+    }
+    else{
+      ORDER = "forward"
+    }
+    j('tr.st_entry').removeClass('coloured_background');
+    j('tr#'+"<%=@student.id%>").addClass('coloured_background');
+    var count = parseInt("<%=@count%>");
+    if(count == (j('td:contains("Upscaled"):visible').length)){
+      j('td:contains("Upscale Grade"):visible').addClass('no_show');
+      j('#student_details_table').find('tr.list_odd').each(function(){
+        if((j(this).find('td:visible').length) <= 3){
+          j(this).find('td.upscale_dull_links').removeClass('no_show');
+        }
+      });
+      j('#student_details_table').find('tr.list_even').each(function(){
+        if((j(this).find('td:visible').length) <= 3){
+          j(this).find('td.upscale_dull_links').removeClass('no_show');
+        }
+      });
+    }
+  });
+  j('.uplinks_1').each(function(e){
+    j(this).click(function(){
+      j(this).parent('td').addClass('no_show');
+      j(this).parents('tr').find('td#before_grade').removeClass('no_show');
+      j(this).parents('tr').find('td#after_grade').addClass('no_show');
+      j(this).parents('tr').find('.ug').attr('value',j(this).parents('tr').find('td#before_grade').html());
+      j(this).parents('tr').find('.non_ug').attr('value',j(this).parents('tr').find('td#after_grade').html());
+      j(this).parents('tr').find('.delete_entry').attr('value',0);
+      j(this).parents('tr').find('td#before_status').removeClass('no_show');
+      j(this).parents('tr').find('td#after_status').addClass('no_show');
+      j(this).parents('tr').find('td.revert_links').removeClass('no_show');
+      var count = parseInt("<%=@count%>");
+      if(count == (j('td:contains("Upscaled"):visible').length)){
+        j('td:contains("Upscale Grade"):visible').addClass('no_show');
+        j('#student_details_table').find('tr.list_odd').each(function(){
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_dull_links').removeClass('no_show');
+          }
+        });
+        j('#student_details_table').find('tr.list_even').each(function(){
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_dull_links').removeClass('no_show');
+          }
+        });
+      }
+      else{
+        j('#student_details_table').find('tr.list_odd').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+
+        });
+        j('#student_details_table').find('tr.list_even').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+
+        });
+      }
+      if((j('td:contains("Upscaled"):visible').length) == 1)
+      {
+        j('.submit_button').removeClass('no_show');
+      }
+    });
+  });
+  j('.reverts_1').each(function(e){
+    j(this).click(function(){
+      j(this).parent('td').addClass('no_show');
+      j(this).parents('tr').find('td#after_grade').removeClass('no_show');
+      j(this).parents('tr').find('td#before_grade').addClass('no_show');
+      j(this).parents('tr').find('.ug').attr('value',j(this).parents('tr').find('td#after_grade').html());
+      j(this).parents('tr').find('.non_ug').attr('value',j(this).parents('tr').find('td#before_grade').html());
+      j(this).parents('tr').find('.delete_entry').attr('value',1);
+      j(this).parents('tr').find('td#after_status').removeClass('no_show');
+      j(this).parents('tr').find('td#before_status').addClass('no_show');
+      j(this).parents('tr').find('td.upscale_links').removeClass('no_show');
+      var count = parseInt("<%=@count%>");
+      if(count != (j('td:contains("Upscaled"):visible').length)){
+        j('#student_details_table').find('tr.list_odd').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_links:contains("Upscale Grade")').removeClass('no_show');
+          }
+        });
+        j('#student_details_table').find('tr.list_even').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_links:contains("Upscale Grade")').removeClass('no_show');
+          }
+        });
+      }
+      if((j('td:contains("Upscaled"):visible').length) < 1 && ORDER=='forward')
+      {
+        j('.submit_button').addClass('no_show');
+      }
+      else if((j('td:contains("Upscaled"):visible').length) == 0 && ORDER == 'reverse' && count == 1){
+        j('.submit_button').removeClass('no_show');
+      }
+      else if((j('td:contains("Upscaled"):visible').length) <= 1 && ORDER == 'reverse' && count == 2){
+        j('.submit_button').removeClass('no_show');
+      }
+    });
+  });
+  j('.uplinks_2').each(function(e){
+    j(this).click(function(){
+      j(this).parent('td').addClass('no_show');
+      j(this).parents('tr').find('td#before_grade').addClass('no_show');
+      j(this).parents('tr').find('td#after_grade').removeClass('no_show');
+      j(this).parents('tr').find('.ug').attr('value',j(this).parents('tr').find('td#after_grade').html());
+      j(this).parents('tr').find('.non_ug').attr('value',j(this).parents('tr').find('td#before_grade').html());
+      j(this).parents('tr').find('.delete_entry').attr('value',0);
+      j(this).parents('tr').find('td#before_status').addClass('no_show');
+      j(this).parents('tr').find('td#after_status').removeClass('no_show');
+      j(this).parents('tr').find('td.revert_links').removeClass('no_show');
+      var count = parseInt("<%=@count%>");
+      if(count == (j('td:contains("Upscaled"):visible').length)){
+        j('td:contains("Upscale Grade"):visible').addClass('no_show');
+        j('#student_details_table').find('tr.list_odd').each(function(){
+          if((j(this).find('td:visible').length) <=3){
+            j('td:contains("Upscale grade")').addClass('no_show');
+            j(this).find('td.upscale_dull_links').removeClass('no_show');
+          }
+        });
+        j('#student_details_table').find('tr.list_even').each(function(){
+          if((j(this).find('td:visible').length) <=3){
+            j('td:contains("Upscale grade")').addClass('no_show');
+            j(this).find('td.upscale_dull_links').removeClass('no_show');
+          }
+        });
+      }
+      if((j('td:contains("Upscaled"):visible').length) >= 1)
+      {
+        j('.submit_button').removeClass('no_show');
+      }
+    });
+  });
+  j('.reverts_2').each(function(e){
+    j(this).click(function(){
+      j(this).parent('td').addClass('no_show');
+      j(this).parents('tr').find('td#after_grade').addClass('no_show');
+      j(this).parents('tr').find('td#before_grade').removeClass('no_show');
+      j(this).parents('tr').find('.ug').attr('value',j(this).parents('tr').find('td#before_grade').html());
+      j(this).parents('tr').find('.non_ug').attr('value',j(this).parents('tr').find('td#after_grade').html());
+      j(this).parents('tr').find('.delete_entry').attr('value',1);
+      j(this).parents('tr').find('td#after_status').addClass('no_show');
+      j(this).parents('tr').find('td#before_status').removeClass('no_show');
+      j(this).parents('tr').find('td.upscale_links').removeClass('no_show');
+      var count = parseInt("<%=@count%>");
+      if(count != (j('td:contains("Upscaled"):visible').length)){
+        j('#student_details_table').find('tr.list_odd').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_links:contains("Upscale Grade")').removeClass('no_show');
+          }
+        });
+        j('#student_details_table').find('tr.list_even').each(function(){
+          j(this).find('td.upscale_dull_links').addClass('no_show');
+          if((j(this).find('td:visible').length) <=3){
+            j(this).find('td.upscale_links:contains("Upscale Grade")').removeClass('no_show');
+          }
+        });
+      }
+      if((j('td:contains("Upscaled"):visible').length) == 0 && ORDER == 'forward'){
+        j('.submit_button').addClass('no_show');
+      }
+    });
+  });
+</script>

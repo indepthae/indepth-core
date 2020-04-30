@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.finance_transaction_detail{
+  @finance_transactions.each do |finance_transaction|
+    @finance_transaction = finance_transaction
+    @xml.finance_transaction do
+      @xml.title(@finance_transaction.title)
+      @xml.description(@finance_transaction.description)
+      @xml.amount(FedenaPrecision.set_and_modify_precision(@finance_transaction.amount).to_f)
+      @xml.transaction_date(@finance_transaction.transaction_date)
+      @xml.tax_included(@finance_transaction.tax_included)
+      @xml.tax_amount(FedenaPrecision.set_and_modify_precision(@finance_transaction.tax_amount).try(:to_f))      
+      @xml.fine_included(@finance_transaction.fine_included)
+      @xml.fine_amount(FedenaPrecision.set_and_modify_precision(@finance_transaction.fine_amount).try(:to_f))
+      @xml.master_transaction(@finance_transaction.master_transaction.try(:title))
+      @xml.finance(@finance_transaction.finance_type)
+      payee = @finance_transaction.fetch_payee
+      payee_no =
+        case payee.class.name
+        when "Student", "ArchivedStudent"
+          payee.admission_no
+        when "Employee", "ArchivedEmployee"
+          payee.employee_number
+        when "Applicant"
+          payee.reg_no
+        when "User"
+          payee.username
+        else
+          "NA"
+        end
+      @xml.payee("#{payee.try(:full_name)}(#{payee.nil? ? 'NA' : payee_no})")
+      invoice_no = (@finance_transaction.finance.invoice_no rescue nil)
+      @xml.invoice_no("#{invoice_no}")
+      @xml.receipt_no(@finance_transaction.receipt_number)
+      @xml.voucher_no(@finance_transaction.voucher_no) 
+    end
+  end
+}%>
+

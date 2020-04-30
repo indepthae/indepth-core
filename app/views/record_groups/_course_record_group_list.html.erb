@@ -1,0 +1,45 @@
+<%if @courses_list_paginator.group_by(&:occurrence).present?%>
+  <table id="student_details_table">
+    <tr>
+      <th id="name"><%=t('course_name')%></th>
+      <th id="grade"><%=t('grading_system')%></th>
+      <th id="no_of_batches"><%=t('assigned_batches_snakecase')%></th>
+      <th id="action"></th>
+    </tr>
+    <%if @courses_list_paginator.group_by(&:occurrence).keys.count > 1%>
+      <%@courses_list_paginator.group_by(&:occurrence).each do |k,v|%>
+        <tr><td colspan="4" class="highlighter"><%=k != "0" ? "#{t('courses_with_rg')}" : "#{t('courses_without_rg')}"%></td></tr>
+        <%v.each do |c|%>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=c["cname"]%></td>
+            <td><%=Batch::GRADINGTYPES[c['grading_type']].nil? ? t('normal') : Batch::GRADINGTYPES[c['grading_type']]%></td>
+            <td><%=c["bcount"]%></td>
+            <%if k == "0"%>
+              <td><%=link_to_remote t('assign_record_group'),:url=>{:controller=>'record_groups',:action=>'add_record_groups_to_course',:id=>c['id']}%></td>
+            <%else%>
+              <td><%=link_to t('record_groups_small'),:controller=>'record_groups',:action=>'manage_record_groups_for_course',:id=>c['id']%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      <%end%>
+    <%else%>
+      <%@courses_list_paginator.group_by(&:occurrence).each do |k,v|%>
+        <%v.each do |c|%>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=c["cname"]%></td>
+            <td><%=Batch::GRADINGTYPES[c['grading_type']].nil? ? t('normal') : Batch::GRADINGTYPES[c['grading_type']]%></td>
+            <td><%=c["bcount"]%></td>
+            <%if k == "0"%>
+              <td><%=link_to_remote t('assign_record_group'),:url=>{:controller=>'record_groups',:action=>'add_record_groups_to_course',:id=>c['id']}%></td>
+            <%else%>
+              <td><%=link_to t('record_groups_small'),:controller=>'record_groups',:action=>'manage_record_groups_for_course',:id=>c['id']%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      <%end%>
+    <%end%>
+  </table>
+  <%=will_paginate @courses_list_paginator,:params=>{:controller=>"record_groups",:action=>"manage_record_groups"}%>
+<%else%>
+  <div class="no_entries"><%=t('no_courses_assigned')%></div>
+<%end%>

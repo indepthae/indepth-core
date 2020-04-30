@@ -1,0 +1,337 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<script>
+
+  function add_member(member) {
+    var member_list = new Array();
+    if($('members_students').value != '')
+      member_list = $('members_students').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      member_list.push(member);
+    }
+    $('members_students').value = member_list.join();
+    members = $('members_students').value;
+    if(!member_exists)
+      <%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members_students='+members" ) %>
+  }
+
+  function add_member1(member) {
+    var member_list = new Array();
+    if($('members_employees').value != '')
+      member_list = $('members_employees').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      member_list.push(member);
+    }
+    $('members_employees').value = member_list.join();
+    members = $('members_employees').value;
+    if(!member_exists)
+      <%= remote_function(:url => {:action => 'update_member_list1'}, :with => "'members_employees='+members" ) %>
+  }
+
+  function add_member2(member) {
+    var member_list = new Array();
+    if($('members_parents').value != '')
+      member_list = $('members_parents').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      member_list.push(member);
+    }
+    $('members_parents').value = member_list.join();
+    members = $('members_parents').value;
+    if(!member_exists)
+      <%= remote_function(:url => {:action => 'update_member_list2'}, :with => "'members_parents='+members" ) %>
+  }
+
+  function add_all_member(member) {
+    insert_all_students(member)
+    members = $('members_students').value;
+    <%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members_students='+members" ) %>
+  }
+
+  function insert_all_students(member){
+    var member_list = new Array();
+    if($('members_students').value != '')
+      member_list = $('members_students').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(var j=0; j<member_list.length; j++)
+        if(member_list[j] == new_list[i])
+          member_exists = true;
+      if(!member_exists) member_list.push(new_list[i]);
+    }
+
+    $('members_students').value = member_list.join();
+  }
+
+  function add_all_member1(member) {
+    insert_all_employees(member)
+    members = $('members_employees').value;
+    <%= remote_function(:url => {:action => 'update_member_list1'}, :with => "'members_employees='+members" ) %>
+  }
+
+  function insert_all_employees(member) {
+    var member_list = new Array();
+    if($('members_employees').value != '')
+      member_list = $('members_employees').value.split(',');
+    else
+    member_list = [];
+    var new_list = member.split(',');
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(var j=0; j<member_list.length; j++)
+        if(member_list[j] == new_list[i])
+          member_exists = true;
+      if(!member_exists) member_list.push(new_list[i]);
+    }
+    $('members_employees').value = member_list.join();
+  }
+
+  function add_all_member2(member) {
+    insert_all_parents(member)
+    members = $('members_parents').value;
+    <%= remote_function(:url => {:action => 'update_member_list2'}, :with => "'members_parents='+members" ) %>
+  }
+
+  function insert_all_parents(member){
+    var member_list = new Array();
+    if($('members_parents').value != '')
+      member_list = $('members_parents').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(var j=0; j<member_list.length; j++)
+        if(member_list[j] == new_list[i])
+          member_exists = true;
+      if(!member_exists) member_list.push(new_list[i]);
+    }
+
+    $('members_parents').value = member_list.join();
+  }
+
+  function remove_member(member) {
+    members = $('members_students').value;
+    var member_list = new Array();
+    member_list = $('members_students').value.split(',');
+
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member)
+    {
+      member_list.splice(i,1);
+      break;
+    }
+    set_students_count();
+    $('members_students').value = member_list.join();
+    members = $('members_students').value;
+    <%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members_students='+members" ) %>
+  }
+
+  function remove_member1(member) {
+    members = $('members_employees').value;
+    var member_list = new Array();
+    member_list = $('members_employees').value.split(',');
+
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member)
+    {
+      member_list.splice(i,1);
+      break;
+    }
+
+    $('members_employees').value = member_list.join();
+    members = $('members_employees').value;
+    set_employee_count();
+    <%= remote_function(:url => {:action => 'update_member_list1'}, :with => "'members_employees='+members" ) %>
+  }
+
+  function remove_member2(member) {
+    members = $('members_parents').value;
+    var member_list = new Array();
+    member_list = $('members_parents').value.split(',');
+
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member)
+    {
+      member_list.splice(i,1);
+      break;
+    }
+
+    $('members_parents').value = member_list.join();
+    members = $('members_parents').value;
+    set_parents_count();
+    <%= remote_function(:url => {:action => 'update_member_list2'}, :with => "'members_parents='+members" ) %>
+  }
+
+  function remove_all_students(obj)
+  {
+    j("#member-list").empty();
+    j("#members_students").val("");
+  }
+
+  function remove_all_employees(obj)
+  {
+    j("#member-list1").empty();
+    j("#members_employees").val("");
+  }
+
+  function remove_all_parents(obj)
+  {
+    j("#member-list2").empty();
+    j("#members_parents").val("");
+  }
+
+  function number_of_selected_students() {
+    return j("#member-list").find(".scroll-inside").first().find(".hover").length;
+  }
+
+  function number_of_selected_employees() {
+    return j("#member-list1").find(".scroll-inside").first().find(".hover").length;
+  }
+
+  function number_of_selected_parents() {
+    return j("#member-list2").find(".scroll-inside").first().find(".hover").length;
+  }
+
+  function set_employee_count(){
+    employees_count=number_of_selected_employees();
+    if (employees_count>0) {
+      j("#selected_employees_count").html(employees_count);
+    }else {
+      remove_all_employees(this);
+    }
+  }
+
+  function set_parents_count(){
+    parents_count=number_of_selected_parents();
+    if (parents_count>0) {
+      j("#selected_parents_count").html(parents_count);
+    } else {
+      remove_all_parents(this);
+    }
+  }
+  function set_students_count(){
+    students_count=number_of_selected_students();
+    if( students_count >0) {
+      j("#selected_students_count").html(students_count);
+    } else {
+        remove_all_students(this);
+    }
+  }
+  function check_for_all_student(string){
+    if($('members_students').value != "all")
+    {
+      add_all_member(string);
+    }
+  }
+  function check_for_all_student1(t){
+    if($('members_students').value != "all")
+    {
+      add_member(t);
+    }
+  }
+  
+  function check_for_all_employee(string){
+    if($('members_employees').value != "all")
+    {
+      add_all_member1(string);
+    }
+  }
+  function check_for_all_employee1(t){
+    if($('members_employees').value != "all")
+    {
+      add_member1(t);
+    }
+  }
+  
+  function check_for_all_parents(string){
+    if($('members_parents').value != "all")
+    {
+      add_all_member2(string);
+    }
+  }
+  function check_for_all_parents1(t){
+    if($('members_parents').value != "all")
+    {
+      add_member2(t);
+    }
+  }
+
+</script>
+
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('user_groups') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('new_group') %></div>
+
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :user_groups_create %>
+    <%= render_breadcrumbs %>
+  </div>
+  <% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="error_box">
+  </div>
+  <%= render 'create_group_form.html.erb' %>
+  <div class="extender"></div>
+
+</div>

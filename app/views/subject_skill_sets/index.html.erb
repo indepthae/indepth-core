@@ -1,0 +1,55 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('subject_skill_set') %></div>
+    <% if permitted_to? :new , :subject_skill_sets %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('create_skill_set')}", :url => {:controller => "subject_skill_sets", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :subject_skill_sets_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('subject_skill_sets') %></div>
+    <div id ="description"><%= t('subject_skill_set_desc') %></div>
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('skill_set') %></td>
+                <td class="attribute_count"><%= t('no_of_skills') %></td>
+                <td class="attribute_count"><%= t('formula') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @sets.present? %>
+              <% @sets.each do |sks|  %>
+                <tr class="tr-<%= cycle('even', 'odd') %>">
+                    <td><%= link_to sks.name, subject_skill_set_path(sks) %></td>
+                    <td class="float"><%= sks.skill_count %></td>
+                    <td><%= sks.formula_text %></td>
+                    <td><%= link_to t('view_text'), subject_skill_set_path(sks) %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="4"><%= t('create_a_skill_set') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @sets.present? %>
+          <%= pagination_status(@sets) %>
+        <% end %>
+        <%= will_paginate @sets %>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('id_cards') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+
+    <% if permitted_to? :id_card_templates %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('id_card_templates')}", id_card_templates_id_card_templates_path %></div>
+        <div class="link-descr"><%= t('id_card_templates_link_desc') %></div>
+      </div>
+    <% end %>
+
+    <% if permitted_to? :generate_id_card  %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('generate_individual_id_card')}", generate_id_card_id_card_templates_path %></div>
+        <div class="link-descr"><%= t('generate_individual_id_card_link_desc') %></div>
+      </div>
+    <% end %>
+    
+    <% if permitted_to? :bulk_export  %>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('bulk_generate_id_cards')}", bulk_export_id_card_templates_path %></div>
+      <div class="link-descr"><%= t('bulk_generate_id_cards_link_desc') %></div>
+    </div>
+    <% end %>
+    
+    <% if permitted_to? :generated_id_cards  %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('generated_id_cards')}", generated_id_cards_id_card_templates_path %></div>
+        <div class="link-descr"><%= t('generated_id_cards_link_desc') %></div>
+      </div>
+    <% end %>
+    
+
+  </div>
+</div>

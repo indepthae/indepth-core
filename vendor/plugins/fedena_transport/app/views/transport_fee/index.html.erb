@@ -1,0 +1,27 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('transport_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('transport_fee_text') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash"></div>
+  <div class="box">
+    <div id ="message"></div>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('fee_collections')}",:action => "transport_fee_collections" %></div>
+      <div class="link-descr"><%= t('create_and_view_fee_collection') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('pay_fees')}", :action => "pay_transport_fees" %></div>
+      <div class="link-descr"><%= t('transport_fee_payments') %></div>
+    </div>
+
+    <div id="modal-box" style="display:none;"></div>
+  </div>
+</div>

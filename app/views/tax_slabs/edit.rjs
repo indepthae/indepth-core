@@ -1,0 +1,2 @@
+page << "build_modal_box({'title' : '#{t('update_tax_slab')}'})" unless params[:tax_slab].present?
+page.replace_html 'popup_content', :partial => 'slab_form'

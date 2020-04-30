@@ -1,0 +1,38 @@
+<fieldset>
+  <label>Full name</label>
+  <label class="value">
+    <%=h @admin_user.full_name %>
+  </label>
+  <% if permitted_to? :destroy, @admin_user, :context=>:admin_users %>
+    <%= link_to 'Delete', admin_user_path(@admin_user),:method=>:delete, :class=>"button-grey-small float-right-with-margin" %>
+  <% end %>
+  <% if permitted_to? :edit, @admin_user, :context=>:admin_users %>
+    <%= link_to 'Edit', edit_admin_user_path(@admin_user), :class=>"button-grey-small float-right-with-margin" %>
+  <% end %>
+</fieldset>
+
+<fieldset>
+  <label>Username</label>
+  <label class="value">
+    <%=h @admin_user.username %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Email</label>
+  <label class="value">
+    <%=h @admin_user.email %>
+  </label>
+</fieldset>
+<fieldset>
+  <label>Contact number</label>
+  <label class="value">
+    <%=h @admin_user.contact_no %>
+  </label>
+</fieldset>
+<fieldset>
+  <label>Description</label>
+  <label class="value">
+    <%=h @admin_user.description %>
+  </label>
+</fieldset>

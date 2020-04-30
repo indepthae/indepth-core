@@ -1,0 +1,148 @@
+<% unless @all_absentees.blank? %>
+  <div class="extender"></div>
+  <% sms_setting = SmsSetting.new() %>
+  <% show_sms_options = false %>
+  <% batch_tutor = false %>
+  <% subject_teacher = false %>
+  <% if sms_setting.application_sms_active %>
+    <% settings = SmsSetting.get_settings_for("AttendanceEnabled") %>
+    <% if settings["Student"] == true or settings["Guardian"] == true %>
+      <% if @current_user.admin or @current_user.privileges.include?(Privilege.find_by_name("StudentAttendanceRegister")) %>
+        <% show_sms_options = true %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if @config.config_value == 'Daily' and @current_user.employee? and !show_sms_options %>
+    <% batch = Batch.find_by_id(@all_batches)%>
+    <% if batch.is_tutor_in_this_batch %>
+      <% batch_tutor = true  %>
+    <%end%>
+  <% elsif @config.config_value == 'SubjectWise' and @current_user.employee? and !show_sms_options  %>
+    <% subject = Subject.find_by_id(@all_subjects) %>
+    <% if subject.is_subject_teacher_for_this_subject %>
+      <% subject_teacher = true %>
+    <% end %>
+  <% end %>
+  <% if show_sms_options or batch_tutor or subject_teacher %>
+    <div class="hor_line"></div> 
+    <div class="information">
+        <div class="label"><%="Send Notification" %></div>
+    </div>
+    <div id="info">
+        <div class="field_pair">
+            <div class="label1">
+                <b><span id="selected_students">0 </span></b>
+                <%=" #{t('selected_students',:total=>@all_absentees.count)}" %>
+            </div>
+        </div>
+    </div>
+  <% end %>
+
+  <% remote_form_for :send_sms, :url=>{:action=>'send_sms_for_absentees',:batch_ids => @all_batches, :date => @date.to_date, :subject_ids => @all_subjects},:confirm=>t('are_you_sure_want_to_send') do |f| %>
+    <div class="submit-button_div">
+        <% if show_sms_options or batch_tutor or subject_teacher %>
+          <div id="send_all_button">
+              <%= render :partial => 'attendance_sms_button',:locals => {:batch_ids => @all_batches, :date => @date.to_date, :subject_ids => @all_subjects}%>
+          </div>
+          <div id="submit-btn-div" style="display:none">
+              <%= f.submit "#{t('send_sms')}", :class=>"send-sms-to-all-btn",:batch_ids => @all_batches, :date => @date.to_date, :subject_ids => @all_subjects%>
+          </div>
+        <% end %>
+    </div> 
+    <% if @all_subjects.present? %>
+      <% @all_subjects.each do |subject_id| %>
+        <%= f.hidden_field "subject_ids", :multiple => true, :value => subject_id  %>
+      <% end %>
+    <% end %>
+    <div id="page-yield">
+        <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1" class="primary">
+            <tr>
+                <th><%= t('no_text') %></th>
+                <th><%= t('admission_no') %></th>
+                <th><%= t('name') %></th>
+                <th><%= t('batch') %></th>
+                <% if @enable_status == "1" %>
+                  <th><%= t('status') %></th>
+                <% end %>
+                <% if @config.config_value == 'Daily' %>
+                  <th><%= t('leave_session') %></th>
+                <% else %>
+                  <th><%= t('subject') %></th>
+                <% end %>
+                <th><%= t('notification_status') %></th>
+                <% if show_sms_options or batch_tutor or subject_teacher %>
+                  <th><%= check_box :select_student, :all , :class=>'check_box select_all_sms', :onclick => "select_all_to_sms(this)" %></th>
+                <% end %>  
+            </tr>
+            <% page_count=0 %>
+            <% @all_absentees.each_with_index do |s, @i| %>
+              <% if params[:page].present? %>
+                <% if params[:page].to_i >= 1 %>
+                  <% @i = @i  + (params[:page].to_i - 1) * @all_absentees.per_page.to_i %>
+                <% end %> <%else %> <% @i = @i %>
+              <% end %>
+              <% page_count+=1 %>
+              <tr>
+                  <td><%= @i+1 %></td>
+                  <td><%= s.admission_no %></td>
+                  <td><%= s.full_name %></td>
+                  <% if @config.config_value == 'Daily' %>
+                    <td><%= s.batch.full_name %></td>
+                    <% if @enable_status == "1" %>
+                      <% if s.status_name.present? %>
+                        <td><%= s.status_name %></td>
+                      <% else %>
+                        <td><%= 'Absent' %></td>
+                      <% end %>
+                    <% end %>
+                    <% if @enable_status == "1" and s.attendance_type == "Late"%>
+                      <%   leave = "-"%>
+                    <% else %>
+                      <% if s.mhalf == s.ehalf%>
+                        <% leave = "Full day" %>
+                      <% elsif  s.mhalf == '1' %>
+                        <% leave = "Forenoon" %>
+                      <% elsif s.ehalf == '1'%>
+                        <% leave = "Afternoon" %>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <td><%= @student_batch %></td>
+                    <% leave = Subject.find_by_id(s.subject).name %>
+                    <% if @enable_status == "1" %>
+                      <% if s.status_name.present? %>
+                        <td><%= s.status_name %></td>
+                      <% else %>
+                        <td><%= 'Absent' %></td>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+
+                  <td><%= leave %></td>
+                  <% if s.notification == "1" %>
+                    <% notify = "Sent" %>
+                  <% else %>
+                    <% notify = "Not sent" %>
+                  <% end %>
+                  <td><%= notify %></td>
+                  <%  if show_sms_options or batch_tutor or subject_teacher %>
+                    <td style="text-align: center;"><%= check_box_tag "send_sms[student_ids][]" , s.id,false, :class=>'check_box student_check', :onclick=>'count_selected_students(this)' %></td>
+                  <% end %>
+              </tr>
+            <% end %>
+    <%#= hidden_field_tag 'batch_id',:batch_ids =>@all_batch %>
+    <%#= hidden_field_tag 'date',:date =>@date %>
+        </table>
+      <%end%>
+      <div class="status">
+          <%= pagination_status(@all_absentees) %>
+          <% if @config.config_value == 'Daily' %>
+            <%= will_paginate @all_absentees, :renderer => 'RemoteLinkRenderer',:params => {:batch_ids => params[:batch_ids],:subject_ids => params[:subject_ids],:date => @date.to_date} %>
+          <% else %>
+            <%= will_paginate @all_absentees, :renderer => 'RemoteLinkRenderer',:params => {:subject_ids => params[:subject_ids],:batch=>{:id => params[:batch][:id]},:date => @date.to_date} %>
+          <% end %>
+      </div>
+    <% else %>
+      <p class="flash-msg"> <%= t('no_students_found') %></p>
+  </div>
+<% end  %>

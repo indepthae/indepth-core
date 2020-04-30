@@ -1,0 +1,50 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('doc_manager_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('create')}"%></div>
+
+
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'> <%= link_to "#{t('doc_manager_text')}", doc_managers_path %>  </li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="box">
+      <% if permitted_to? :new, :documents %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('create_document')}", new_document_path %> </div>
+          <div class="link-descr"><%= "#{t('description_create_document')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :new, :folders %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('create_folder')}", new_shareable_folder_path(:folder_type => "shareable") %> </div>
+          <div class="link-descr"><%= "#{t('description_create_folder')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :new_privileged, :folders %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('create_privileged_folder')}", new_privileged_folder_path(:folder_type => "privileged") %> </div>
+          <div class="link-descr"><%= "#{t('description_create_privileged_folder')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :new_userspecific, :folders %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('create_userspecific_folder')}", new_userspecific_folder_path(:folder_type => "userspecific") %> </div>
+          <div class="link-descr"><%= "#{t('description_create_userspecific_folder')}"%></div>
+        </div>
+      <% end %>     
+    </div>
+</div>

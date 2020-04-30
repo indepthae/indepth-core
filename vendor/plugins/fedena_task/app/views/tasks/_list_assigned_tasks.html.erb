@@ -1,0 +1,16 @@
+ <ul id="category-list">
+      <li class="list<%=cycle('odd', 'even')%>"><%= t('tasks_assigned_to_me') %></li>
+      <% @assigned_tasks.each do |task| %>
+          <li class="list<%=cycle('odd', 'even')%>">
+            <div class="category-name"><%= link_to task.title, task_path(:id=>task) %></div>
+            <div class="category-edit"><%= task.user.present? ? task.user_first_name : "#{t('deleted_user')}" %></div>
+            <div class="category-edit"><%=h format_date(task.due_date,:format=>:long)%></div>
+            <% if task.status == "Assigned" %>
+            <div class="category-delete"><%=h  t("#{task.status.downcase}") %></div>
+             <% elsif task.status == "Completed" %>
+            <div class="category-delete1"><%=h  t("#{task.status.downcase}") %></div>
+            <% end %>          
+</li>
+      <% end %>
+      <li class="list<%=cycle('odd', 'even')%>"><%= will_paginate @assigned_tasks, :renderer => 'RemoteLinkRenderer' ,:params=>{:action=>"list_assigned_tasks"}, :param_name => :assigned_page,:remote => {:with => "'filter_assigned_tasks='+$('filter_assigned_tasks').value"} %></li>
+    </ul>

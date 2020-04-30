@@ -1,0 +1,60 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('placement_events') %></div>
+<div id="inner-tab-menu">
+  <ul>
+    <% if @placementevent.is_active %>
+    <% if permitted_to? :invite,:placementevents %><li class='themed_bg themed-dark-hover-background'>  <%= link_to "#{t('invite_students')}", :controller => "placementevents", :action => "invite", :id => @placementevent.id %></li><% end %>
+    <% if permitted_to? :index,:placement_registrations and !@current_user.student %><li class='themed_bg themed-dark-hover-background'>  <%= link_to "#{t('registrations')}" , placementevent_placement_registrations_path(@placementevent) %></li><% end %>
+    <% end %>
+  </ul>
+</div>
+</div>
+<div id="page-yield">
+ <%if @placementevent.is_active==true%>
+  <div class="bread_crumb">
+    <%  breadcrumb :placementevents_show,@placementevent%>
+    <%=render_breadcrumbs%>
+  </div>
+ <%else%>
+  <div class="bread_crumb">
+    <%  breadcrumb :placementevents_archive_show,@placementevent%>
+    <%=render_breadcrumbs%>
+  </div>
+ <%end%>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="placement-title"><%= @placementevent.title.to_s %></div>
+  <div id="placement-time" class="themed_text"> <%= format_date(@placementevent.date,:format=>:long_date) %></div>
+  <div id="placement-description">
+    <p><%= @placementevent.description.to_s %></p>
+  </div>
+  <div id="action-buttons">
+    <% if @placementevent.is_active %>
+      <% if @placementevent.date>=Date.today %>
+        <%   if permitted_to? :edit,:placementevents  %><div >  <%= link_to " ► #{t('edit_text')}" , edit_placementevent_path,:class=>"user_button" %> </div><% end %>
+      <% end %>
+      <%   if permitted_to? :deactivate,:placementevents  %><div >  <%= link_to " ► #{t('archive_this_event')}", {:controller => "placementevents", :action => "deactivate", :id => @placementevent.id } , :confirm=>"#{t('are_you_sure_to_archive')}",:class=>"user_button"  %> </div><% end %>
+      <%  unless @placement_registration.nil? %><div>      <%= link_to "► #{t('view_invitation')}",    [@placementevent,@placement_registration],:class=>"user_button" %></div><% end %>
+    <% end %>
+  </div>
+
+
+  <% if permitted_to? :report,:placementevents %>
+    <% form_for :report,:html=>{:method=>"get"},:url=>{:action=>:report} do|f|%>
+      <div id="report-form">
+        <div class="label-field-pair">
+          <label><%= t('generate_report') %></label>
+          <div class="text-input-bg">   <%= f.select :type, [["#{t('invited')}","Invited"],["#{t('applied')}","Applied"],["#{t('approved')}","Approved"],["#{t('attended')}","Attended"],["#{t('placed')}","Placed"]],:prompt=>"#{t('select_type')}"%></div>
+        </div>
+        <div id="report-submit"> <%= f.submit "#{t('go')}" ,:class=>"submit-button" %> </div>
+      </div>
+    <% end %>
+  <% end %>
+
+
+
+</div>

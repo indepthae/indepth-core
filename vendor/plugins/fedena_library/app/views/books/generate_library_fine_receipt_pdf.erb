@@ -1,0 +1,50 @@
+
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag "rtl/books/generate_library_fine_receipt_pdf.css" ,:media=>"all"%>
+  <%else %>
+    <%= stylesheet_link_tag "books/generate_library_fine_receipt_pdf" ,:media=>"all"%>
+  <% end %>
+<% end %>
+<div id="page-yield">
+    <%=render :partial=>'library_fine_receipt_header'%>
+    <div class="subsection">
+        <hr class="light_hor_line"/>
+        <div id="sub_text_left"><%=t('particular')%></div>
+        <div id="sub_text_right" class=""><%=t('amount')%> (<%= @currency %>)</div>
+        <hr class="light_hor_line"/>
+        <div class="extender"></div>
+    </div>
+    <% i = 1 %>
+    <div class="particulars_list">
+        <div class="slno"><%= i %>.</div>
+        <div class="particalar_name">&#x200E;<%="#{t('books.library_fine')} (#{@book_name_and_no})"%>&#x200E;</div>
+        <div class="particalar_amount"><%= precision_label @library_fine_amount %></div>
+    </div>
+    <div class="payment_info_section">
+        <div class="label_collection_part">
+            <div class="label_part">
+                <div class="label_name"><%="#{t('payment_mode')} "%></div>
+                <div class="value_span" style="font-weight:bold;">: <%= @online_transaction_id.present? ? t('online') : t('offline') %></div>
+            </div>   
+        </div>
+    </div>
+    <div class="receipt-footer-bottom words_bottom" style="border: 1px solid #999999;">
+        <div class="left_info amount_margin" style="display:<%= (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") ? 'block' : 'none' %>;"><span style="font-weight: bold;" class="float-left"><%= "#{ t('amount_in_words')}: "%>&nbsp;&nbsp;</span><span class="float-left"><%= NumberToWord.convert(precision_label(@library_fine_amount), @config[:pdf_receipt_nsystem], @default_currency) %></span></div>    
+        <div class="right_total amount_paid">
+            <b>
+                <div class="right_total_label"><%= "#{t('total_amount_paid')} : " %></div>
+                <div class="right_total_amount"><%= precision_label(@library_fine_amount) %></div>
+            </b>
+        </div>
+    </div>
+    <div id="pdf-footer-second">
+        <div class="note_part"><%= @config[:pdf_receipt_custom_footer] %></div>    
+        <div class="signature_part">
+            <% if @config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1" %>
+              <%= @config[:pdf_receipt_signature_name].blank? ? t('signature') :  @config[:pdf_receipt_signature_name] %>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="page-break"></div>

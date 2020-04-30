@@ -1,0 +1,57 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('fedena_custom_export_label') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('new_text') %></div>
+<div id="inner-tab-menu">
+</div>
+
+</div>
+<div id="page-yield">
+
+   <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <% form_for @data_export do |f| %>
+      <%= f.error_messages %>
+
+      <div class="grades">
+        <div class="label-field-pair">
+          <label for="model_names"><%= t('exports') %></label>
+        </div>
+        <div class="fee_category_scroll">
+          <div class="sel-list">
+            <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+            <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+          </div>
+          <% @export_structures.each do |export_structure| %>
+            <div class="each_batch">
+              <%= check_box :model_ids, export_structure.id , :checked => (@models.nil? ? false : (@models.include? export_structure.id.to_s)),:class=>'batches_box' %> <label for="configuration_<%= export_structure.model_name.humanize %>"><%= export_structure.model_name.humanize %></label>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="alert_box">
+          <b><%= t('please_note') %></b> <span><%= t('export_warning') %></span>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="format"><%= t('format') %></label>
+        <div class="text-input-bg">
+          <%= f.select :file_format,[["CSV","csv"]],:selected => @file_format.to_s %>
+        </div>
+      </div>
+      <%= f.submit "#{t('export')}", :class => "submit_button" %>
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+</div>
+
+

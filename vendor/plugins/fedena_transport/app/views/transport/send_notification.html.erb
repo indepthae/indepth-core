@@ -1,0 +1,93 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('notification') %></div>
+    <% if @tempalte_edit_setting == true %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('transport.create_transport_template')}", new_message_template_message_templates_path("template_type"=>"TRANSPORT") %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <%if rtl?%>
+      <link href="/plugins/select_framework/stylesheets/select-invert.css" media="screen" rel="stylesheet" type="text/css" />
+    <%else%>
+      <link href="/plugins/select_framework/stylesheets/select.css" media="screen" rel="stylesheet" type="text/css" />
+    <%end%>
+    <script src="/plugins/select_framework/javascripts/select.js" type="text/javascript"></script>
+
+    <div class="">
+        <div class="radio_values">
+            <div class="radio_head">
+                <%= t('transport.select_stop_type') %>
+            </div>
+            <label class="check_label"  >
+                <%= radio_button_tag :stop_type, "pickup",true, {:class=>"check", :checked=>"checked"} %>
+                <%= t('pickup') %>
+            </label>
+            &nbsp;&nbsp;&nbsp;
+            <label class="check_label" >
+                <%= radio_button_tag :stop_type, "drop",false, {:class=>"check"}%>
+                <%= t('drop') %>
+            </label>
+            &nbsp;&nbsp;&nbsp;
+        </div>
+
+        <div class="field_set">
+            <label class="head_label"><%= t('transport.select_route') %></label>
+            <%= select "", :template , @routes.map{|r| [r.name,r.id] }, {:include_blank=>t('transport.select_route')}, :class=>"drop_select", :id=>"route_selector" %>
+        </div>
+
+        <div id="stop_selector" class="field_set">
+        </div>
+
+
+    </div>
+    <div id="user_listing" class="user_listing">
+    </div>
+
+    <div id="send_portion" class="send_portion">
+    </div>
+
+</div>
+
+<script>
+  j("input[name='stop_type']").change(function () {
+      j("#send_portion").html("");
+      j("#stop_selector").html("");
+      j("#route_selector").val("");
+  });
+
+  var user_selector = new FedenaSelector.select();
+  j("#route_selector").change(function () {
+      j.ajax({
+          url: "load_stops_selector",
+          type: 'POST',
+          data: {route_id: j(this).val()},
+          success: function (data, textStatus, jqXHR)
+          {
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+ 
+   function fetch_sms_length(elm){
+    text = j(elm).val();
+    count = text.length;
+    j('#sms_word_count').text(count);
+  }
+</script>

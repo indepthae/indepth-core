@@ -1,0 +1,111 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div id="student_main_container">
+    <div id="search_box_bg">
+        <form id="search" name="search_form" action="" style="display:inline;">
+            <div id="search_textbox">
+                <%= text_field_tag("query", params['query'], :autocomplete => 'off',:placeholder => "#{t('student_name')}/#{t('admission_no') }", :onkeyup=> "return search_logic()",:onblur=> "return search_logic()") %>
+                <br/>
+            </div>
+            <%=hidden_field_tag 'batch_id',@batch.id%>
+            <%=hidden_field_tag 'observation_group_id',@observation_group.id%>
+        </form>
+    </div>
+    <div id="student_label"><%=t('students_in_batch')%></div>
+    <div id="student_listing_main">
+        <label for="user_name">
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style => "display: none;") %>
+        </label>
+        <table id="student_listing" width="100%" cellpadding="1" cellspacing="1">
+            <% @students.each do |s| %>
+              <tr class="st_entry" id="<%=s.id%>">
+                  <td class="student_entry">
+                      <div class="student_entry_div">
+                          <%= s.name_with_suffix %>
+                      </div>
+                  </td>
+                  <td class="completion_indication">
+                      <% if s.has_completed_assessment(@observation_group,@batch)%>
+                        <span class="completed"></span>
+                      <% end %>
+                  </td>
+              </tr>
+            <%end%>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+  j("#<%=@student.id%>").addClass('coloured_background');
+  j('#student_listing tr.st_entry').each(function () {
+      j(this).click(function () {
+          j(".coloured_background").removeClass('coloured_background');
+          j(this).addClass('coloured_background');
+          j.ajax({
+              type: 'POST',
+              url: "/assessment_scores/observation_scores",
+              data: {
+                  student: j(this).attr('id'),
+                  batch_id: <%=@batch.id%>,
+                  observation_group_id: <%=@observation_group.id%>
+              },
+              beforeSend: function () {
+                  j('.observation_sections_main').hide();
+                  j('#loader_1').show();
+              },
+              success: function () {
+                  j('#loader_1').hide();
+                  j('.observation_sections_main').show();
+              }
+          });
+      });
+  });
+  (function ($) {
+      $.fn.hasScrollBar = function () {
+          return this.get(0).scrollHeight > this.height();
+      }
+  })(jQuery);
+  if (j('tbody').hasScrollBar() == true)
+  {
+      j('.td_val').css('width', '67px');
+  }
+  else {
+      j('.td_val').css('width', '82px');
+  }
+
+
+  function search_logic() {
+      if ($('query').value.include("%"))
+          return;
+<%="#{remote_function(:url => {:action => "search_batch_students"},
+:with => "j('form#search').serialize()",
+:before => "Element.show('loader');Element.hide('student_listing')",
+:success => "Element.hide('loader');Element.show('student_listing')",
+:update=>"student_listing_main"
+)}"%>
+  }
+//j(document).ready(function () {
+//    new Form.Element.Observer('query', 1, search_logic);
+//});
+
+
+</script>

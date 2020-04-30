@@ -1,0 +1,15 @@
+
+<div class="text-input-bg">
+  <label for="student_course"><%= "#{t('show')}" %> :
+  </label>
+  <%=  select_tag :batch_type, options_for_select([["Active Batches",'1'],["Inactive Batches","2"]]), :onchange =>"#{remote_function(:url => {:action=>"batches_ajax"},:method=>:get,
+  :with => "'course_id='+#{@course.id}+ '&type=2'+ '&status='+value",
+  :before => "Element.show('loader1')",
+  :success => "Element.hide('loader1')",
+  :update => "cmb_block"
+  )}"%>
+  <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader1", :style =>"display: none;" ) %>
+</div>
+<div class="combine_block" id="cmb_block">
+  <%=render :partial=>'sub_form'%>
+</div>

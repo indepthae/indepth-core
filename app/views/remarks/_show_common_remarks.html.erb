@@ -1,0 +1,58 @@
+<%if @ret_val.present?%>
+  <%@ret_val.each do |val|%>
+    <div id="common_remarks_section_<%=val.id%>" class="common_remarks_section">
+      <div id="add_remark_link_for_<%=val.id%>">
+        <% check_for_gradebook =  ['AssessmentTerm', 'AssessmentGroup', 'AssessmentPlan'].include? @load_model.class_name %>
+        <% if (@current_user.admin? or (@current_user.employee? and @load_model.find(@load_object_id).has_employee_privilege)) and (@stud.present? ? @load_model=='Subject'.constantize ? ((@stud.batch_id==Subject.find(@load_object_id).batch_id)) : (check_for_gradebook ? true : @stud.batch_id==@load_object_id.to_i): false) and val.submitted_by == @current_user.id%>
+          <%=link_to_remote "",:url  => {:controller=>"remarks",:action=>"destroy_common_remarks",:object_id=>val.id,:student_id=>@student_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id => @load_object_id, :method => :delete},:html => { :class  => "cross_button" }, :confirm =>"#{t('delete_confirm_msg')}"%>
+          <%=link_to "","javascript:void(0);",:class=>"themed_text add_link edit_button edit_common_remark",:student_id=>@student_id,:target_name=>@target_name,:object_id=>val.id,:load_object_id => @load_object_id,:params_hash=>@params_hash%>
+          <script type="text/javascript">
+            j('#close_<%=val.id%>').click(function(){
+              j('#add_remark_link_for_<%=val.id%>').children().eq(1).attr('onclick','edit_common_remark(this)')
+              j('#close_<%=val.id%>').parents('#common_remarks_section').children().first().show();
+              j('#close_<%=val.id%>').parent().remove();
+              j('#close_<%=val.id%>').remove();
+              j('hr').remove();
+            });
+          </script>
+        <% end %>
+        <div id="remarked_by_section"><%= val.remarked_by.present? ? val.remarked_by : '-' %></div>
+        <div id="remark_body_section"><%=val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div>
+        <div id="submitted_by_section"><%=val.user.present? ?  val.user.first_name : t('deleted_user')%> on <%=format_date(val.updated_at,:format=>:long_date)%></div>
+      </div>
+    </div>
+  <%end%>
+  <div id="paginate" class="<%=@ret_val.total_entries > @ret_val.per_page ? "remarks_pagination" : ""%>">
+    <%= will_paginate @ret_val, :renderer => 'RemoteLinkRenderer',  :params => {:controller=>"remarks",:action => "show_common_remarks",:student_id=>@student_id,:target_name=>@target_name,:params_hash=>@params_hash,:load_object_id=>@load_object_id}%>
+  </div>
+  <script type="text/javascript">
+    j('.edit_common_remark').click(function(){
+      var onclick_attr=j(this).attr('onclick');
+      var jthis=j(this);
+      j(this).attr('onclick','ss'+onclick_attr);
+  <%= "var target_name = '#{@target_name}'" %>
+  <%= "var student_id = '#{@student_id}'" %>
+  <%="var object_id = j(this).attr('object_id')"%>
+  <%="var load_object_id = j(this).attr('load_object_id')"%>
+  <%="var page = '#{@page}'"%>
+  <%="var params_hash = '#{@params_hash.to_json}'"%>
+
+
+      var parametrs={student_id:student_id,object_id:object_id,load_object_id:load_object_id,page:page,target_name:target_name,params_hash:params_hash}
+      new Ajax.Request('/remarks/edit_common_remarks',{
+        parameters:j(this).serialize()+'&'+j.param(parametrs),
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(resp){
+          j(jthis).parent().hide();
+          j(jthis).parents('#common_remarks_section_'+object_id).append(resp.responseText);
+
+        }
+      });
+    });
+
+  </script>
+<%else%>
+  <p id="no_common_remarks">No remarks added yet</p>
+<%end%>

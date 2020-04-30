@@ -1,0 +1,147 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<%css_path = (rtl?) ? 'rtl/indepth_finance/single_statement_header_settings' : 'indepth_finance/single_statement_header_settings'%>
+<%= stylesheet_link_tag css_path -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('single_statement_header_settings') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('header') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :finance_settings_index_single_statement_header_settings%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+    <% end %>
+
+<%#=  @field.errors.full_messages %>
+
+    <div class="box">
+        <div class="page_header_box">
+            <div class="page_header"><%= t('tc_header_settings')%> </div>
+            <div class="page_header_desc"><%= t('statement_header_settings_desc')%> </div>
+        </div>
+        <%- form_for (:single_statement_header ,:html=> {:multipart=>true}) do |f| -%>
+          <div id="form-content">
+              <div class="label-radio-pair">
+                  <div class="radio-select-options">
+                      <div class="radio-select">
+                          <%= f.radio_button 'is_empty', "true", :checked => @checked_val %>
+                          <label for="single_statement_header_enabled_true"><%= t('use_header_template_for_statement')%></label>
+                          <p><%= t('enable_statement_header_description') %> </p>
+                      </div>
+                      <div class="radio-select">
+                          <%= f.radio_button 'is_empty', "false", :checked => !@checked_val %>
+                          <label for="single_statement_header_enabled_false"><%= t('do_not_generate_header_leave_blank_space')%> </label>
+                          <p><%= t('disable_statement_header_description') %> </p>
+                          <div class="reveal-if-active">
+                              <hr>
+                              <%#= render :partial => "institution_settings", :locals=>{:f=>f} %>
+                              <%#= render :partial => "logo_settings", :locals=> {:f=>f} %>
+                              <div class="institution_details_box">
+                                <div class="template_settings_sub_head"><%= t('statement_details')%></div>
+                                <div class = "institution_details_form">
+                                    <div class ="institution_details_row">
+                                    <div class = "institution_details_label">
+                                        <label for="single_statement_header_institution_name[is_enabled]" class="cb_value"><%= t('statement_title') %></label>
+                                    </div>
+                                        <div class = "institution_details_field">
+                                            <%= f.text_field "title", :value => @title, :placeholder=>"Enter Title"%>
+                                        </div>
+                                    </div>
+                                    <div class ="institution_details_row">
+                                      <div class="label-field-pair">
+                                        <label for="configuration_currency_type"><%= t('upload_logo') %> (<%= t('max_size') %>, <%= t('height_width') %>)</label>
+                                        <div class="text-input-bg">
+                                            <%#= paperclip_file_field_tag 'single_statement_header','logo', :size=>12, :direct => false, :object=>@logo %>
+                                             <div class="text-input-bg"><%= f.paperclip_file_field :logo, :size=>12, :direct => false %></div>
+                                        </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>  
+
+                          </div>
+                          <div class="reveal-if-inactive">
+                              <hr>
+                              <%#= render :partial => "header_disabled_settings", :locals=>{:f=>f} %>
+                              <div class = "disabled_header">
+                                <div class="disabled_header_note"><%= t('disable_header_note')%> </div>
+                                <div class="disabled_header_field">
+                                    <div class="disabled_header_label"><%= t('blank_from_top')%><span class="necessary-field">*</span> </div>  
+                                    <%= f.text_field "space_height", :value =>@space_height%>
+                                    <div class="disabled_header_measure"><%= t('millimeters')%></div>
+                                    <div class="disabled_header_label_hint"><%= t('optimum_size') %></div>
+                                </div>
+                            </div>
+                              <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+                          </div>
+                      </div>
+                      <%#= render :partial => "certificate_headline_settings", :locals=> {:f=>f} %>
+                      <div class="submit_form">
+                          <div id="submit-button">
+                              <%=submit_tag " #{t('save_header_preferences')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+                          </div>
+                      </div>
+                      <hr class="faded">
+                      <div class="header_preview_box">
+                        <div class="template_settings_sub_head"><%= t('preview')%></div>
+                        <div class="header_preview">
+                          <% if @single_statement_header.is_empty %>
+                            <div class ="header_head">
+                              <img src="/<%=@single_statement_header.logo.url%>">
+                            </div>
+                          <% else %>
+                            <div class ="header_head">
+                              <div class="not_enabled_message"><%= t('no_header_enabled')%></div>
+                            </div>
+                          <%  end %>
+                      </div>
+                      </div>
+
+                  </div>
+              </div>
+          </div>  
+        <%- end -%>
+    </div>
+</div>
+<script type="text/javascript">
+  if (j('.logo_to_left').length == 1) {
+      j('.institution_details_to_center').css('float', 'left');
+  } else {
+      j('.institution_details_to_center').css('float', 'left');
+  }
+  if ("<%= @checked_val%>" == "true") {
+      j(".reveal-if-active").show();
+      j(".reveal-if-inactive").hide();
+  } else {
+      j(".reveal-if-active").hide();
+      j(".reveal-if-inactive").show();
+  }
+  if(j('.institution_contact_preview').children().length == 0){
+    j('.institution_contact_preview').css('display', 'none');
+  }
+  else{
+    j('.institution_contact_preview').css('display', 'inline-block');
+  }
+  j("input[name='single_statement_header[is_empty]']:radio").change(function () {
+      if (this.value == "true") {
+          j(".reveal-if-active").show();
+          j(".reveal-if-inactive").hide();
+      }
+      if (this.value == "false") {
+          j(".reveal-if-active").hide();
+          j(".reveal-if-inactive").show();
+      }
+  });
+</script>

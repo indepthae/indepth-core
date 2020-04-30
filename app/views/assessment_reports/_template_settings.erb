@@ -1,0 +1,71 @@
+<div class="label_field_pair block">
+    <label class="core_label"><%=t('header_name')%></label>
+    <div class="com_block">
+        <p class="msg_desc main-msg"><%= "#{t('header_settings_auto_generation_message')} #{link_to t('general_settings'),{:controller=>"configuration",:action=>"settings"},:target=>'_blank' if permitted_to? :settings, :configuration}"%></p>
+    </div>
+    <div class="msg_desc main-msg"><%= t('header_settings_skip_message')  %> </div>
+    <div class="ind_block">
+        <%= radio_button  :assessment_report_setting, :report_header,"0",:checked=>@setting[:report_header]=="0",:class=>'report_head'%>
+        <label class="general_label" for="cce_report_setting_report_header_0"><%=t('auto_generate_header_section')%></label>
+        <%= radio_button  :assessment_report_setting,:report_header, "1",:checked=>@setting[:report_header]=="1",:class=>'report_head' %>
+        <label class="general_label" for="cce_report_setting_report_header_1"><%=t('skip_header_section')%></label>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+    <div id="report_desc">
+        <%if @setting[:report_header]=="0"%>
+          <%=render :partial => "report_with_normal_header"%>
+        <%else%>
+          <%=render :partial => "report_without_normal_header"%>
+        <%end%>
+    </div>
+</div>
+<div class="label_field_pair block">
+    <label class="core_label"><%= t('student_details').titleize %></label>
+    <div class="msg_desc"><%= t('student_details_desc_text') %></div>
+    <div class="grey_back">
+        <%3.times do |i|%>
+          <%options=["<option selected ='selected'>#{t(@student_fields[i][0])}</option>"]%>
+          <div class="label-field-pair with_border">
+              <span><%=i+1%></span>
+              <div class="text-input-bg">
+                  <%= select_tag "assessment_report_setting_student_detail#{i+1}",options,:disabled=>true%>
+                  <%=hidden_field_tag "assessment_report_setting[student_detail#{i+1}]",@student_fields[i][1]%>
+              </div>
+          </div>
+        <%end%>
+        <%7.times do |i|%>
+          <div class="label-field-pair with_border">
+              <span><%=i+4%></span>
+              <div class="text-input-bg">
+                  <%=  select :assessment_report_setting, :"student_detail#{i+4}", grouped_options_for_select([[t('student_details'),@student_fields.map{|arr| [t(arr[0]),arr[1]]}],
+                      [t('additional_details'), @student_additional_fields.collect {|v| [ v.name, "ad.#{v.name}.#{v.id}" ] }]
+                      ],@setting[:"student_detail#{i+4}"],t('select_a_student_detail'))%>
+              </div>
+          </div>
+        <%end%>
+    </div>
+    <div class="msg_desc"><%= t('student_details_select_text') %></div>
+</div>
+
+
+<div class="label_field_pair block">
+    <label class="core_label" for="student_gender"><%= t('signature') %></label>
+    <div class="com_block">
+        <p class="msg_desc"><%= t('signature_show_hide_message') %></p>
+    </div>
+    <div class="ind_block">
+        <%= radio_button  :assessment_report_setting, :signature,"0",:checked=>@setting[:signature]=="0",:class=>'signature'%>
+        <label class="general_label" for="cce_report_setting_signature_0"><%= t('auto_generate_signature') %></label>
+        <%= radio_button  :assessment_report_setting,:signature, "1",:checked=>@setting[:signature]=="1",:class=>'signature' %>
+        <label class="general_label" for="cce_report_setting_signature_1"><%= t('skip_signature') %></label>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+    </div>
+    <div id="report_sign">
+        <%if @setting[:signature]=="0"%>
+          <%=render :partial => "report_with_signature"%>
+        <%end%>
+    </div>
+</div>
+<div id="submit_button">
+    <%= submit_tag t('save_settings').titleize ,:id=>'submit-button'%>
+</div>

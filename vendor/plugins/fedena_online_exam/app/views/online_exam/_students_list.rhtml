@@ -1,0 +1,51 @@
+
+<% unless @exam_group.online_exam_attendances.blank? %>
+
+  <div class="label-field-pair"><label> <%= t('select_student') %>: </label></div>
+  <div id="list_content">
+    <div id="list">
+      <div class="sel-list">
+        <%= t('select') %>: <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+        <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+      </div>
+      <% form_for :attendance,:url=>{:action=>'update_reset_exam'} do |form| %>
+        <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+            <td>
+              <%= t('student_name') %>
+            </td>
+            <% if roll_number_enabled? %>
+              <td>
+                <%= t('roll_no') %>
+              </td>
+            <% end %>
+            <td>
+              <%= t('admission_no') %>
+            </td>
+          </tr>
+
+          <tr class="tr-blank"></tr>
+          <% @attendance.each do |b| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="col-2">
+                <label> <%= check_box_tag "att_id[]", b.id,false,:class=>'batches_box' %> <div class="att_list_names"><%= b.student_full_name %></div></label>
+              </td>
+              <% if roll_number_enabled? %>
+                <td class="col-3"><%= b.student.roll_number%></td>
+              <% end %>
+              <td class="col-3"><%= b.student_admission_no%></td>
+            </tr>
+          <% end %>
+        </table>
+
+        <div class="user_submit_button1">
+          <%= submit_tag "", :name => "commit", :value => "► #{t('reset')}", :onClick => "return empty_check()" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+
+  <p class="flash-msg"><%= t('no_students_has_atended_the_selcted_exam_group') %>  </p>
+<% end %>
+

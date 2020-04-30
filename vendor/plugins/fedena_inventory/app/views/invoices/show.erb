@@ -1,0 +1,176 @@
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('view') %></div>
+    <%  if permitted_to? :invoice_pdf,:invoices %>
+
+<div id="inner-tab-menu">
+  <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('print')}", {:action => "invoice_pdf", :id => @invoice.id },:target => '_blank' %>
+      </li>
+  </ul>
+</div>
+<% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :invoice_show, [@start_date,@end_date,@invoice,@item] %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <div class="box">
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('store')}" %></div>
+    <div class="label-output">:  <%=h @invoice.store.name  unless @invoice.store.nil? %></div>
+  </div>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('name')}" %></div>
+    <%  user_details = @invoice.sales_user_details.first %>
+    <div class="label-output">:  <%=user_details.username %>
+    <%if user_details.present?%>
+         <%if user_details.kind_of? Student or user_details.kind_of? ArchivedStudent %>
+          <%= "(#{user_details.admission_no})"%>
+        <%elsif user_details.kind_of? Employee %>
+          <%= "(#{user_details.employee_number})"%>
+        <%end%>
+    <%end%>
+    </div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('address')}" %></div>
+    <div class="label-output">:  <%=h @invoice.sales_user_details.first.address %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('invoice_no')}" %>:</div>
+    <div class="label-output">:  <%=h @invoice.invoice_no %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('invoice_date')}" %></div>
+    <div class="label-output">:  <%=h format_date(@invoice.date) %></div>
+  </div>
+
+
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1" class="items">
+      <tr class="tr-head">
+        <td>
+          <%= t('sl_no') %></td>
+        <td>
+          <%= "#{t('item_description')}" %></td>
+        <td>
+          <%= "#{t('rate')}" %>
+        </td>
+        <td>  <%= "#{t('quantity')}" %></td>
+        <td>
+          <%= "#{t('amount')} (#{@currency})" %>
+        </td>
+        
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% subtotal = 0 %>
+      <% @invoice.sold_items.each_with_index do |i, p| %>
+
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1"><%= p+1 %></td>
+          <td class="col-2"> <%=h  i.store_item.item_name  unless i.store_item.nil? %></td>
+          <td class="col-3"> <%=h  i.store_item.unit_price unless i.store_item.nil? %></td>
+          <td class="col-3"> <%=h  i.quantity unless i.store_item.nil? %></td>
+          <% subtotal += (i.store_item.unit_price * i.quantity) unless i.store_item.nil? %>
+          <td class="col-3"> <%=h  i.store_item.unit_price * i.quantity unless i.store_item.nil? %></td>
+        </tr>
+      <% end %>
+
+    
+  </table>
+  <div class ="subtotal_fields">
+  <div class="label-field-show1">
+    <div class="label-container1"><%= "#{t('subtotal')}" %></div>
+    <div class="label-output1">:  <%= "#{@currency} " + "#{precision_label(subtotal)}" %></div>
+  </div>
+  </div>
+    <% unless @invoice.tax.nil? %>
+ <div class="subtotal_fields">
+
+  <div class="label-field-show1">
+    <div class="label-container1"><%= "#{t('tax')} (%)" %></div>
+    <div class="label-output1">:  <%=h precision_label(@invoice.tax) %></div>
+  </div>
+</div>
+    <% end %>
+        <% add_charges = 0 %>
+<% unless @invoice.additional_charges.empty? %>
+  <h4 class="heading"> Additional Charges </h4>
+  <table id="listing" align="center" width="70%" cellpadding="1" cellspacing="1" class="charges">
+      <tr class="tr-head">
+        <td>
+          <%= t('sl_no') %></td>
+        <td>
+          <%= "#{t('name')}" %></td>
+        
+        <td>
+          <%= "#{t('amount')} (#{@currency})"%>
+        </td>
+
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @invoice.additional_charges.each_with_index do |i, p| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1"><%= p+1 %></td>
+          <td class="col-2"> <%=h  i.name  %></td>
+          <% add_charges += i.amount.to_f %>
+          <td class="col-3"> <%=h  precision_label(i.amount)  %></td>
+        </tr>
+      <% end %>
+
+
+  </table>
+  <% end %>
+        <% discounts = 0 %>
+
+  <% unless @invoice.discounts.empty? %>
+  <h4 class="heading">Discounts</h4>
+  <table id="listing" align="center" width="70%" cellpadding="1" cellspacing="1" class="charges">
+      <tr class="tr-head">
+        <td>
+          <%= t('sl_no') %></td>
+        <td>
+          <%= "#{t('name')}" %></td>
+
+        <td>
+          <%= "#{t('amount')} (#{@currency})" %>
+        </td>
+
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @invoice.discounts.each_with_index do |i, p| %>
+
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1"><%= p+1 %></td>
+          <td class="col-2"> <%=h  i.name  %></td>
+          <% discounts += i.amount.to_f %>
+          <td class="col-3"> <%=h  precision_label(i.amount)  %></td>
+        </tr>
+      <% end %>
+
+
+  </table>
+  <%end%>
+  <div class="subtotal_fields">
+  <div class="label-field-show1">
+    <div class="label-container1"><%= "#{t('grandtotal')}" %></div>
+    <div class="label-output1">:  <%= "#{@currency} " + "#{precision_label(@invoice.payable_amount)}" %></div>
+  </div>
+</div></div>
+</div>
+
+
+

@@ -1,0 +1,134 @@
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('online_payment') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('settings') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "Transaction", transactions_online_payments_path %></li>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "Custom Gateways", custom_gateways_path %></li>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% unless @gateways.present? %>
+      <p class="flash-msg"> <%= "#{t('payment_gateway')} #{t('not')} #{t('found')}, #{link_to t('add_new'), new_custom_gateway_path}"%> </p>
+    <% end %>
+
+    <% if @gateways.present? %>
+      <% form_for :payment_settings,:url => {:action => :settings} do |f| %>
+        <div class="label-field-pair-gateway">
+            <label for="configuration_fee"><%= t('online_payment_of_fees_text') %></label>
+            <div class="check_box_group" id="online_payment_settings">
+                <div class="value">
+                    <% if @gateways.present? %>
+                      <%= radio_button("payment_settings","enabled_online_payment","true",{:checked => (@enable_online_payment == "true")}) %>
+                    <% else %>
+                      <%= radio_button("payment_settings","enabled_online_payment","true",{:checked => (@enable_online_payment == "true"), :disabled=>true}) %>
+                    <% end %>
+                    <label for="payment_settings_enabled_online_payment_true"><%= t('enable_for_institution') %></label>
+                </div>
+                <div class="value">
+                    <%= radio_button("payment_settings","enabled_online_payment","false",{:checked => (@enable_online_payment.nil? || @enable_online_payment == "false")}) %>
+                    <label for="payment_settings_enabled_online_payment_false"><%= t('disable_text') %></label>
+                </div>
+                <span tooltip="<%=t('online_payment_disable_helper')%>" class="info_icon_img"></span>
+            </div>
+        </div>
+        <div id="form-container">
+            <div class="label-field-pair-gateway">
+                <label for="configuration_fee"><%= t('partial_payments') %></label>
+                <div class="check_box_group">
+                    <div class="value">
+                        <%= radio_button("payment_settings","enabled_partial_payment","true",{:checked => (@enable_partial_payment == "true")}) %>
+                        <label for="payment_settings_enabled_partial_payment_true"><%= t('allow_partial_payments') %></label>
+                    </div>
+                    <div class="value">
+                        <%= radio_button("payment_settings","enabled_partial_payment","false",{:checked => (@enable_partial_payment.nil? ||@enable_partial_payment == "false")}) %>
+                        <label for="payment_settings_enabled_partial_payment_false"><%= t('pay_in_full') %></label>
+                    </div>
+                    <span tooltip="<%=t('partial_payment_enable_helper')%>" class="info_icon_img"></span>
+                </div>
+            </div>
+            <div class="label-field-pair-gateway">
+                <label for="configuration_fee"><%= t('pay_all_fees') %></label>
+                <div class="check_box_group">
+                    <div class="value">
+                        <%= radio_button("payment_settings","enabled_pay_all","true",{:checked => (@enable_all_fee == "true")}) %>
+                        <label for="payment_settings_enabled_pay_all_true"><%= t('enable') %></label>
+                    </div>
+                    <div class="value">
+                        <%= radio_button("payment_settings","enabled_pay_all","false",{:checked => (@enable_all_fee == "false")}) %>
+                        <label for="payment_settings_enabled_pay_all_false"><%= t('disable') %></label>
+                    </div>
+                    <span tooltip="<%=t('pay_all_fee_enable_helper')%>" class="info_icon_img"></span>
+                </div>
+            </div>
+            <div class="label-field-pair-gateway">
+                <label for="configuration_fee"><%= t('applicable_for_modules') %></label>
+                <% allowed_module = ["Student Fee"]
+                if FedenaPlugin.accessible_plugins.include? "fedena_applicant_registration"
+                  allowed_module = allowed_module.push("Application Registration")
+                  end
+                if FedenaPlugin.accessible_plugins.include? "fedena_hostel"
+                  allowed_module = allowed_module.push("Hostel Fee")
+                  end
+                if FedenaPlugin.accessible_plugins.include? "fedena_transport"
+                  allowed_module = allowed_module.push("Transport Fee")
+                  end
+              %>
+                <div class="check_box_group">
+                    <% allowed_module.each do |fee| %>
+                      <div class="value payment_modules">
+                          <%= check_box_tag "payment_settings[enabled_fees][]",fee, (@enabled_fees.include? fee),:id => "checkbox_#{fee}" %>
+                          <label for="configuration_<%= fee.underscore %>"><%= fee %></label>
+                      </div>
+                    <% end %>
+                </div>
+            </div>
+            <%= render :partial => "custom_gateways" %>
+        </div>
+        <%= submit_tag t('save'),:class => "submit-button" %>
+      <% end %>
+    <% else %>
+      <div class="label-field-pair-gateway">
+          <label for="configuration_fee"><%= t('online_payment_of_fees_text') %></label>
+          <div class="check_box_group" id="online_payment_settings">
+              <div class="value">
+                  <%= radio_button("payment_settings","enabled_online_payment","true",{:checked => false, :disabled=>true}) %>
+                  <label for="payment_settings_enabled_online_payment_true"><%= t('enable_for_institution') %></label>
+              </div>
+              <div class="value">
+                  <%= radio_button("payment_settings","enabled_online_payment","false",{:checked => true, :disabled=>true}) %>
+                  <label for="payment_settings_enabled_online_payment_false"><%= t('disable_text') %></label>
+              </div>
+              <span tooltip="<%=t('online_payment_disable_helper')%>" class="info_icon_img"></span>
+          </div>
+      </div>
+    <% end %>
+</div>
+<script type="text/javascript">
+    j('#online_payment_settings input:radio').change(function () {
+    if (j(this).val() == 'true') {
+    j('#form-container').show();
+    } else {
+    j('#form-container').hide();
+    }
+    })
+    op_enabled = "<%=@enable_online_payment%>"
+    if (op_enabled == "true") {
+    j('#form-container').css("display", "block");
+    } else {
+    j('#form-container').css('display', 'none');
+    }
+</script>

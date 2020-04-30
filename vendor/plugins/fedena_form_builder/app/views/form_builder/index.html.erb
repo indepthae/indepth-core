@@ -1,0 +1,54 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('form_builder_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('create_form')}"%></div>
+
+
+
+<div id="inner-tab-menu">
+  
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="box">
+      <% if permitted_to? :new, :form_templates %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('create_form_template_text')}", new_form_template_path %> </div>
+          <div class="link-descr"><%= "#{t('description_create_form_template')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :index, :form_templates %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('form_template_index_text')}", form_templates_path %> </div>
+          <div class="link-descr"><%= "#{t('description_form_template')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :manage, :forms %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('form_manage_index_text')}", manage_forms_path %> </div>
+          <div class="link-descr"><%= "#{t('description_manage_forms')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :index, :forms %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('form_index_text')}", forms_path %> </div>
+          <div class="link-descr"><%= "#{t('description_view_forms')}"%></div>
+        </div>
+      <% end %>
+      <% if permitted_to? :feedback_forms, :forms %>
+        <div class="link-box">
+          <div class="link-heading">  <%= link_to "#{t('feedback_form_index_text')}", feedback_forms_forms_url %> </div>
+          <div class="link-descr"><%= "#{t('description_view_feedback_forms')}"%></div>
+        </div>
+      <% end %>
+    </div>
+</div>

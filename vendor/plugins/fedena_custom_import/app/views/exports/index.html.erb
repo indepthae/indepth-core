@@ -1,0 +1,72 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fedena_custom_import_label') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('all_exports') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", new_export_path %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('view_scheduled_jobs'), scheduled_task_path(:job_object=>"Import",:job_type=>"1") %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% if @outdated.present? %>
+    <p class="flash-msg info-msg"><span class="info-icon symbol"></span> <%= t('custom_import_export_structure_is_outdated') %> </p>
+  <% end %>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% unless @exports.empty? %>
+    <div class="box">
+      <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-header">
+          <td class="sl_no"><%= t('serial_no') %></td>
+          <td class="name"><%= t("name") %></td>
+          <td class="model"><%= t("model") %></td>
+          <td class="options"><span class="substitute"></span><%= t("options") %></td>
+        </tr>
+        <% @exports.each_with_index do |export,index| %>
+          <tr class="tr-body">
+            <td class="sl_no"><%= ((@exports.current_page - 1) * @exports.per_page) + index + 1 %></td>
+            <td class="name">
+              <%= export.name %>
+            </td>
+            <td class="model"><%= export.get_model_name %></td>
+            <td class="options">
+              <% outdated_flag = export.is_outdated? %>
+              <% unless outdated_flag %>
+                <span class="substitute"></span>
+                <%= link_to t('export_csv'),export_csv_exports_path(:id => export.id) %>
+                | <%= link_to t('import_data'),new_import_path(:id => export.id) %>
+                | <%= link_to t('bulk_edit'),edit_import_path(:id => export.id) %>
+              <% else %>
+                <span class="error-icon" tooltip="<%= t('no_longer_supported') %>"></span>
+                <div class="div_link" id="export_link" tooltip="<%= t('no_longer_supported') %>"><%= t('export_csv') %></div>
+                <div class="div_link" tooltip="<%= t('no_longer_supported') %>"><span class="pipe"> | </span><%= t('import_data') %></div>
+                <div class="div_link" tooltip="<%= t('no_longer_supported') %>"><span class="pipe"> | </span><%= t('bulk_edit') %></div>
+              <% end %>
+              | <%= link_to t('delete'),export, :confirm => t('sure'), :method => :delete %>
+              | <%= link_to "#{t('imports_text')}", imports_path(:export_id => export.id) %>
+            </td>
+
+          </tr>
+        <% end %>
+      </table>
+      <%= will_paginate @exports %>
+    </div>
+  <% else %>
+    <div id="flash-box">
+      <p class="flash-msg">No Exports present</p>
+    </div>
+  <% end %>
+
+</div>

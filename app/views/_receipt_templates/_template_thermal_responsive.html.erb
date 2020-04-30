@@ -1,0 +1,602 @@
+<!-- Template for  template thermal responsive -->
+<%  if v["finance_type"] == 'BookMovement'%>
+
+  <div class="receipt-container">
+      <div id="receipt">
+          <div class="receipt-header">
+              <div class="institution_logo">
+              </div>
+              <div class="institution_header">
+                  <p class="institution_name"><%= current_school_name %></p>
+                  <p class="institution_address"><%= Configuration.find_by_config_key("InstitutionAddress").config_value  %></p>
+              </div>
+          </div>
+          <div class="receipt_title">
+              <%= t('library_fine_receipt') %>
+          </div>
+          <div class="receipt-content">
+              <table class="receipt-details">
+                  <tr class="">
+                      <td class="left-label">
+                          <%= t('receipt_no') %>:
+                      </td>
+                      <td class="bold">
+                          <%= v["receipt_no"] %>
+                      </td>
+                  </tr>
+                  <tr class="">
+                      <td class="left-label">
+                          <%= t('date_text') %>:
+                      </td>
+                      <td class="">
+                          <%= format_date(v["transaction_date"],:format=>:short_date) %>
+                      </td>
+                  </tr>
+              </table>
+              <hr>
+              <table class="student-details">
+                  <% if v['payee']['type'] =='Student' %>
+                    <tr>
+                        <td class="left-label">
+                            <%= t('student_text') %>:
+                        </td>
+                        <td class="bold rtl_bracket_fix">
+                            <%=v["payee"]["full_name"]%> (<%=v["payee"]["admission_no"]%>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <%if v['payee']['guardian_name'].present?%>
+                          <td class="left-label">
+                              <%= t('parent') %>:
+                          </td>
+                          <td >
+                              <%= v["payee"]["guardian_name"] %>
+                          </td>
+                        <%end%>
+                    </tr>
+                    <tr>
+                        <td class="left-label">
+                            <%= t('course_text') %>:
+                        </td>
+                        <td>
+                            <%= v["payee"]["full_course_name"] %>
+                        </td>
+                    </tr>
+                    <% if roll_number_enabled? and v["payee"]["roll_number"].present? %>
+                      <tr>
+                          <td class="left-label">
+                              <%= t('roll_number') %>:
+                          </td>
+                          <td>
+                              <%=v["payee"]["roll_number"]%>
+                          </td>
+                      </tr>
+                    <%end %>
+                  <% end %>
+              </table>
+              <section class="particulars-header">
+                  <div class="particulars-header-left"><%= t('particular') %></div>
+                  <div class="particulars-header-right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+              </section>
+              <%i=0%>
+              <section class="particulars">
+                  <div class="receipt-details_item">
+                      <div class="left"><%=i+=1%>. <%="#{t('books.library_fine')}"%> (<%=v["book_name_and_number"] %>)&#x200E;</div>
+                      <div class="right"><%= precision_label(v["amount"]) %></div>
+                  </div>
+              </section>
+              <section class="payment_status">
+                  <table class="payment_status-details">
+                        <tr class="">
+                            <td class="right-label">
+                                <%= t('total_amount') %>:
+                            </td>
+                            <td class="bold">
+                                <%= precision_label_with_currency(clean_output(v["amount"].to_f)) %>
+                            </td>
+                        </tr>
+                  </table>
+              </section>
+              <section class="bottom_fields">
+                  <table>
+                      <tr class="receipt-details_item">
+                          <td class="left">
+                              <%= t('payment_mode') %>:
+                          </td>
+                          <td class="">
+                              <%= @online_transaction_id.present? ? t('online') : t('offline') %>
+                          </td>
+                      </tr>
+                      <%if v["reference_no"].present?%>
+                        <tr class="receipt-details_item">
+                            <td class="left"><%= reference_no_label(v) %>:</td>
+                            <td class=""><%= v["reference_no"] %></td>
+                            </div>
+                        </tr>                      
+                      <% end %>
+                      <% if v["payment_note"].present? %>
+                        <tr class="receipt-details_item">
+                            <td class="left">
+                                <%= t('notes') %>:
+                            </td>
+                            <td class="">
+                                <%= v["payment_note"] %>
+                            </td>
+                        </tr>
+                      <% end %>
+                  </table>
+              </section>
+          </div>        
+          <% show_amount_in_words = (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") %>
+          <section class="bottom_fields">
+              <% if show_amount_in_words %>
+                <div class="receipt-details_item"> 
+                    <span class="amount_in_word"><%= t('amount_paid_in_words') %>:</span>
+                    <span class="amount_in_words">
+                        <%= NumberToWord.convert(precision_label(v["amount"].to_f), @config[:pdf_receipt_nsystem], @default_currency) %>
+                    </span>
+                </div>
+              <% end %>
+          </section>
+          <section class="bottom_fields">
+              <div class="receipt-details_item addtional_notes"> 
+                  <%= @config[:pdf_receipt_custom_footer] %>
+              </div>
+          </section>
+          <div class="receipt-footer">
+  <%#= v["payment_note"] %>
+          </div>
+      </div>
+  </div>
+  <%#= debug v %>
+
+<% else %>
+<div class="receipt-container">
+    <div id="receipt">
+        <div class="receipt-header">
+            <div class="institution_logo">
+            </div>
+            <div class="institution_header">
+                <p class="institution_name"><%= current_school_name %></p>
+                <p class="institution_address"><%= Configuration.find_by_config_key("InstitutionAddress").config_value  %></p>
+            </div>
+        </div>
+        <div class="receipt_title">
+            <%= t('fee_receipt') %>
+        </div>
+        <div class="receipt-content">
+            <table class="receipt-details">
+                <tr class="">
+                    <td class="left-label">
+                        <%= t('receipt_no') %>:
+                    </td>
+                    <td class="bold">
+                        <%= v["receipt_no"] %>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td class="left-label">
+                        <%= t('date_text') %>:
+                    </td>
+                    <td class="">
+                        <%= format_date(v["transaction_date"],:format=>:short_date) %>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <table class="student-details">
+                <% if v['payee']['type'] =='Student' %>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('student_text') %>:
+                      </td>
+                      <td class="bold rtl_bracket_fix">
+                          <%=v["payee"]["full_name"]%> (<%=v["payee"]["admission_no"]%>)
+                  </tr>
+                  </td>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('parent') %>:
+                      </td>
+                      <td >
+                          <%= v["payee"]["guardian_name"] %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('course_text') %>:
+                      </td>
+                      <td>
+                          <%= v["payee"]["full_course_name"] %>
+                      </td>
+                  </tr>
+                  <% if has_roll_number?(v) %>
+                    <tr>
+                        <td class="left-label">
+                            <%= t('roll_number') %>:
+                        </td>
+                        <td>
+                            <%=v["payee"]["roll_number"]%>
+                        </td>
+                    </tr>
+                  <%end %>
+                <% elsif v['payee']['type'] =='Employee' %>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('employee_text') %>:
+                      </td>
+                      <td class="bold">
+                          <%= v["payee"]["full_name"] %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('employee_number') %>:
+                      </td>
+                      <td>
+                          <%= v["payee"]["employee_number"] %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('department') %>:
+                      </td>
+                      <td>
+                          <%= v["payee"]["employee_department_name"] %>
+                      </td>
+                  </tr>
+                <%else%>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('guest_text') %>:
+                      </td>
+                      <td class="bold">
+                          <%= v["payee"]["full_name"] %>
+                      </td>
+                  </tr>
+                <% end %>
+                <% if v["finance_type"] == 'InstantFee'%>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('instant_fee_category') %>:
+                      </td>
+                      <td>
+                          <%=v["collection"].category_name %>
+                      </td>
+                  </tr>
+                <%else%>
+                  <tr>
+                      <td class="left-label">
+                          <%= t('fee_collection') %>:
+                      </td>
+                      <td>
+                          <%=v["collection"].name %>
+                      </td>
+                  </tr>
+                <%end%>
+                <%unless v["finance_type"] == 'InstantFee'%>
+                  <tr>
+                      <% if has_due_date?(v) %>
+                        <td class="left-label">
+                            <%= t('due_date') %>:
+                        </td>
+                        <td>
+                            <%=format_date(v["due_date"],:format=>:short_date)%>
+                        </td>
+                      <% end %>
+                  </tr>
+                <%end%>
+            </table>
+            <section class="particulars-header">
+                <div class="particulars-header-left"><%= t('particular') %></div>
+                <div class="particulars-header-right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+            </section>
+            <% if v[:is_particular_wise] != true%>
+              <%i=0%>
+              <section class="particulars">
+                  <%v["categorized_particulars"].each do |particular_type|%>
+                    <%particular_type.last.each do |fp|%>
+                      <div class="receipt-details_item">
+                          <div class="left"><%=i+=1%>. <%=fp.name%></div>
+                          <div class="right"><%= precision_label fp.amount %></div>
+                      </div>
+                    <%end%>
+                  <%end%>
+              </section>
+            <% else %>
+              <div class="particulars">
+                  <% v[:particulars_list].each_with_index do |particular,index| %>
+                    <section class="particular_wise_item">
+                        <div class="particular_name">
+                            <%= "#{index+1}. #{particular.name}" %>
+                        </div>
+                        <div class="particular_wise_item_details">
+                            <div class="left">
+                                <%=  t('amount') %>
+                            </div>
+                            <div class="right">
+                                <%= precision_label(particular.amount) %>
+                            </div>
+                        </div>
+                        <% if particular_has_previous_payments(particular) and  v["finance_type"] != 'InstantFee'%>
+                          <div class="particular_wise_item_details">
+                              <div class="left">
+                                  <%= t('remaining_balance') %>
+                              </div>
+                              <div class="right">
+                                  <%= precision_label(particular.remaining_balance) %>
+                              </div>
+                          </div>
+                        <% end %>
+                        <% if particular_has_discount(particular) %>
+                          <div class="particular_wise_item_details">
+                              <div class="left">
+                                  <%= t('discount') %>
+                              </div>
+                              <div class="right">
+                                  - <%= precision_label(particular.discount) %>
+                              </div>
+                          </div>
+                        <% end %>
+                        <% if v['finance_type'] == 'InstantFee' and v['tax_enabled'] %>
+                          <div class="particular_wise_item_details">
+                              <div class="left">
+                                  <%=t('tax_text')%>
+                              </div>
+                              <div class="right">
+                                  <%= precision_label(particular.tax_amount) %>
+                              </div>
+                          </div>
+                        <% end %>
+                        <div class="particular_wise_item_details">
+                            <div class="left">
+                                <%= t('amount_paid') %>
+                            </div>
+                            <div class="right">
+                                <%= precision_label(particular.amount_paid) %>
+                            </div>
+                        </div>
+                        <% unless v["finance_type"] == 'InstantFee' %>
+                          <div class="particular_wise_item_details">
+                              <div class="left">
+                                  <%= t('balance') %>
+                              </div>
+                              <div class="right">
+                                  <%= precision_label(particular.balance) %>
+                              </div>
+                          </div>
+                        <%end%>
+                    </section>
+                  <% end %>
+              </div>
+            <% end %>
+            <section class="discount">
+                <% if v[:discounts_list].present? %>
+                  <p class="subtitle">
+                      <%= t('discount') %>
+                  </p>
+                <% end %>
+                <%v[:discounts_list].each_with_index do |d,i|%>
+                  <div class="receipt-details_item">
+                      <div class="left"><%=i+=1%>.<%= d.name %></div>
+                      <div class="right">- <%= precision_label(d.amount) %></div>
+                  </div>
+                <%end%>
+            </section>
+
+            <% if has_tax?(v) %>
+              <section class="tax">
+                  <p class="subtitle">
+                      <%= t('tax_text') %>
+                  </p>
+                  <% i = 0 %>
+                  <% unless v["finance_type"] == 'TransportFee' %>
+                    <% v['tax_slab_collections'].each_pair do |slab, tax_collections| %>
+                      <div class="receipt-details_item">
+                          <div class="left"><%= i+=1 %>.<%= "#{slab.name} - #{precision_label(slab.rate)}%" %></div>
+                          <div class="right"><%= precision_label(tax_collections.map(&:tax_amount).sum.to_f) %></div>
+                      </div>
+                    <% end %>
+                  <% else %>
+                    <div class="receipt-details_item">
+                        <div class="left"><%= i+=1 %>.<%= "#{v['tax_slab_collections'].name} - #{precision_label(v['tax_slab_collections'].rate)}%" %></div>
+                        <div class="right"><%= precision_label(v['total_tax'].to_f) %></div>
+                    </div>
+                  <% end %>
+              </section>
+            <% end %>
+
+            <section class="fine">
+                <% if v[:fine_list].present? %>
+                  <p class="subtitle">
+                      <%= t('fine') %>
+                  </p>
+                <% end %>
+                <%v[:fine_list].each_with_index do |fine,i|%>
+                  <div class="receipt-details_item">
+                      <div class="left "><%=i+=1%>.<%= fine.name %></div>
+                      <div class="right"><%= precision_label(fine.amount) %></div>
+                  </div>
+                <%end%>
+            </section>
+            <section class="summary">
+                <p class="subtitle">
+                    <%= t('summary') %>
+                </p>
+                <div class="receipt-details_item">
+                    <div class="left">
+                        <%= t('total_fees') %>
+                    </div>
+                    <div class="right">
+                        <%= precision_label(v["total_payable"]) %>
+                    </div>
+                </div>
+                <% if has_discount?(v) %>
+                  <div class="receipt-details_item">
+                      <div class="left">
+                          <%= t('discount') %>
+                      </div>
+                      <div class="right">
+                          - <%= precision_label(v["total_discount"]) %>
+                      </div>
+                  </div>
+                <% end %>
+                <% if has_tax?(v) %>
+                  <div class="receipt-details_item">
+                      <div class="left">
+                          <%= t('tax_text') %>
+                      </div>
+                      <div class="right">
+                          <%= precision_label(v["total_tax"]) %>
+                      </div>
+                  </div>                
+                <% end %>
+                <% if has_fine?(v) %>
+                  <div class="receipt-details_item">
+                      <div class="left">
+                          <%= t('fine') %>
+                      </div>
+                      <div class="right">
+                          <%= precision_label(v["total_fine_amount"]) %>
+                      </div>
+                  </div>
+                <% end %>
+            </section>
+            <section class="payment_status">
+                <table class="payment_status-details">
+                    <% unless v["finance_type"] == 'InstantFee' %>
+                      <tr class="">
+                          <td class="right-label">
+                              <%= t('total_amount_to_pay') %>:
+                          </td>
+                          <td class="bold">
+                              <%= precision_label_with_currency(v["total_amount_to_pay"]) %>
+                          </td>
+                      </tr>
+                    <%end%>
+                    <% if has_previously_paid_fees?(v) %>
+                      <tr class="">
+                          <td class="right-label">
+                              <%= t('previous_payments') %>:
+                          </td>
+                          <td class="bold">
+                              <%= precision_label_with_currency(v["previously_paid_amount"]) %>
+                          </td>
+                      </tr>
+                    <% end %>
+                    <tr class="">
+                        <td class="right-label">
+                            <%= t('amount_paid') %>:
+                        </td>
+                        <td class="bold">
+                            <%= precision_label_with_currency(v["amount"].to_f) %>
+                        </td>
+                    </tr>
+                    <% if has_previously_paid_fees?(v) %>
+                      <tr class="">
+                          <td class="right-label">
+                              <%= t('total_amount_paid') %>:
+                          </td>
+                          <td class="bold">
+                              <%= precision_label_with_currency(v["total_amount_paid"].to_f) %>
+                          </td>
+                      </tr>
+                    <% end %>
+                    <% unless v["finance_type"] == 'InstantFee' %>
+                      <tr class="">
+                          <td class="right-label">
+                              <%= t('total_due_amount') %>:
+                          </td>
+                          <td class="bold">
+                              <%= precision_label_with_currency(clean_output(v["total_due_amount"].to_f)) %>
+                          </td>
+                      </tr>
+                    <%end%>
+                </table>
+            </section>
+            <section class="bottom_fields">
+                <table>
+                    <tr class="receipt-details_item">
+                        <td class="left">
+                            <%= t('payment_mode') %>:
+                        </td>
+                        <td class="">
+                            <%= v["payment_mode"] %>
+                        </td>
+                    </tr>
+
+                    <% if v["reference_no"].present? %>
+                      <tr class="receipt-details_item">
+                          <td class="left"><%= reference_no_label(v) %>:</td>
+                          <td class=""><%= v["reference_no"] %></td>
+                          </div>
+                      </tr>                      
+                    <% end %>
+
+                    <% if v["reference_no"].present? %>
+                      <tr class="receipt-details_item">
+                          <td class="left"><%= t('cheque_date') %>:</td>
+                          <td class=""><%= v['cheque_date'].present? ? v['cheque_date'] : '-' %></td>
+                      </tr>                      
+                      <tr class="receipt-details_item">
+                          <td class="left"><%= t('bank_name') %>:</td>
+                          <td class=""><%= v['bank_name'].present? ? v['bank_name'] : '-'%></td>
+                      </tr>                      
+                    <% end %>
+
+                    <% if has_tax?(v) %>
+                      <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+                        <tr class="receipt-details_item">
+                            <td class="left">
+                                <%= @tax_config[:finance_tax_identification_label] %>:
+                            </td>
+                            <td class="">
+                                <%= @tax_config[:finance_tax_identification_number] %>
+                            </td>
+                        </tr>
+                      <% end %>
+                    <% end %>
+                    <% if v["payment_note"].present? %>
+                      <tr class="receipt-details_item">
+                          <td class="left">
+                              <%= t('notes') %>:
+                          </td>
+                          <td class="">
+                              <%= v["payment_note"] %>
+                          </td>
+                      </tr>
+                    <% end %>
+                </table>
+            </section>
+        </div>        
+        <% show_amount_in_words = (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") %>
+        <section class="bottom_fields">
+            <% if show_amount_in_words %>
+              <div class="receipt-details_item"> 
+                  <span class="amount_in_word"><%= t('amount_paid_in_words') %>:</span>
+                  <span class="amount_in_words">
+                      <%= NumberToWord.convert(precision_label(v["amount"].to_f), @config[:pdf_receipt_nsystem], @default_currency) %>
+                  </span>
+              </div>
+            <% end %>
+            <% unless v["finance_type"] == 'InstantFee' %>
+              <% if @invoice_enabled and v["collection"].invoice_enabled %>
+                <div class="receipt-details_item"> 
+                    <span class="amount_in_word"><%=t('payment_for_invoice')%></span> : 
+                    <span class="amount_in_word"><%= v["invoice_no"] %></span>
+                </div>
+              <% end %>
+            <% end %>
+        </section>
+        <section class="bottom_fields">
+            <div class="receipt-details_item addtional_notes"> 
+                <%= @config[:pdf_receipt_custom_footer] %>
+            </div>
+        </section>
+        <div class="receipt-footer">
+<%#= v["payment_note"] %>
+        </div>
+    </div>
+</div>
+<%#= debug v %>
+<% end %>

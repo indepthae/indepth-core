@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.document{
+    @xml.category{
+      @xml.id(@category.category_id)
+      @xml.name(@category.attachment_category_name)
+    }
+    @xml.id(@document.id)
+    @xml.added_on(format_date(@document.created_at,:format=>:short_date))
+    @xml.name(@document.attachment_name)
+    @xml.batch_id(@document.batch_id)
+    @xml.student_id(@document.student_id)
+    @xml.admission_no(@admission_no) if @admission_no.present?
+    @xml.uploader_id(@document.uploader_id)
+  }
+%>

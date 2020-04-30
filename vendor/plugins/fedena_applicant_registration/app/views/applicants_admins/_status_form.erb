@@ -1,0 +1,34 @@
+<div id="page-yield">
+    <div class="m_box">
+        <% form_remote_for @application_status,:url=>@application_status.new_record? ? new_status_applicants_admins_path : edit_status_applicants_admin_path(@application_status),:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+          <div class="mbox-form">
+              <div id="form-errors"></div>
+
+              <div class="label-field-pair mb_input_row">
+                  <label><%= "#{t('name')}" %></label>
+                  <div class="text-input-bg">
+                      <% if @application_status.is_default == true %>
+                        <label class="status-name-label"><%= t(@application_status.name) %></label>
+                      <% else %>
+                        <%= f.text_field :name %>
+                      <% end %>
+                  </div>
+              </div>
+              <div class="label-field-pair mb_input_row text-area">
+                  <label><%= t('description') %></label>
+                  <div class="text-input-bg text-area-input"><%= f.text_area :description,:cols => 27, :rows => 5,:class => 'status-textarea' %></div>
+              </div>
+              <div class="checkbox-text-pair">
+                  <%= f.check_box :is_active,:disabled=>(@application_status.is_default==true) %>
+                  <label><%= t('active') %></label>
+              </div>
+              <div class="checkbox-text-pair">
+                  <%= f.check_box :notification_enabled %>
+                  <label><%= t('enable_notifications') %></label>
+              </div>
+          </div>
+          <div class="hor-line"></div>
+          <%= f.submit "", :value => @application_status.new_record? ? "#{t('create_status')}" : "#{t('edit_status')}", :class => "submit_button", :id => 'submit_button' %>
+        <%end%>
+    </div>
+</div>

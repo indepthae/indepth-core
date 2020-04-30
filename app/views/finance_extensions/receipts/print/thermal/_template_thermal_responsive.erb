@@ -1,0 +1,33 @@
+<div class="receipt-container">
+  <%= render :partial => "finance_extensions/receipts/common/receipt_header",
+             :locals => {:template_id => transaction_hash.template_id,
+                         :default_configs => transaction_hash.default_configs, :printer => true} %>
+  <!--
+  < %= render :partial => "finance_extensions/receipts/print/a4/header",
+    :locals => {:template_id => transaction_hash.template_id,
+    :default_configs => transaction_hash.default_configs} %> -->
+
+  <div class="receipt_title">
+    <%= t('fee_receipt') %>
+  </div>
+
+  <div class="receipt-content">
+
+    <%= render :partial => "finance_extensions/receipts/print/thermal/basic_info",
+               :locals => {:transaction_hash => transaction_hash} %>
+
+    <%= render :partial => "finance_extensions/receipts/print/thermal/receipt_data",
+               :locals => {:transaction_hash => transaction_hash} %>
+
+  </div>
+  
+  <%= render :partial => "finance_extensions/receipts/common/receipt_footer",
+             :locals => {:template_id => transaction_hash.template_id,
+                         :default_configs => transaction_hash.default_configs, 
+                         :transaction_status => transaction_hash.transaction_status} %>
+
+</div>
+
+<script type="text/javascript">
+    // set_width_in_firefox("135mm");
+</script>

@@ -1,0 +1,49 @@
+<%= javascript_include_tag 'jquery.multiple.select' %>
+<%= stylesheet_link_tag 'multiple-select' %>
+<%= stylesheet_link_tag "#{rtl? ? 'rtl/' : ''}finance_reports/filters" %>
+<%= stylesheet_link_tag "#{rtl? ? 'rtl/' : ''}finance_reports/report" %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('particular_wise_daily_transaction_report') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :finance_reports_particular_wise_daily %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <div id="report_selectors">
+    <% form_for :transaction_report, :url => particular_wise_daily_finance_reports_path,
+                :html => {:id => 'search-form'} do |form| %>
+        <%= session_fingerprint_field %>
+
+        <% #filters or selectors   %>
+        <div id="report_filters">
+          <%= render :partial => "finance_reports/filters/fee_account" %>
+          <%= render :partial => "finance_reports/filters/financial_year", :locals => {:form => form} %>
+          <div id="date_range_section">
+            <%= render :partial => "finance_reports/filters/date_range", :locals => {:form => form} %>
+          </div>
+          <%= render :partial => "finance_reports/filters/multi_select_course" %>
+        </div>
+        <div id="flash_msg"></div>
+        <div id="fetch_report">
+          <%= form.submit t('view_report') %>
+        </div>
+    <% end %>
+  </div>
+
+  <div id="report_results"></div>
+
+  <div id="loading" class="substitute">
+    <%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+    <span><%= "#{t('loading')}.." %></span>
+  </div>
+</div>
+
+<%= render :partial => "finance_reports/filters/form_js" %>

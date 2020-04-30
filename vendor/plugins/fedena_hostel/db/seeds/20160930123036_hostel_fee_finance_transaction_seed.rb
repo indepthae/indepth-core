@@ -1,0 +1,3 @@
+HostelFee.find(:all,:select=>"hostel_fees.id as id,hostel_fees.finance_transaction_id as finance_transaction_id,hostel_fees.school_id as current_school_id,ft.amount as transaction_amount", :joins => "inner join finance_transactions ft on ft.id=hostel_fees.finance_transaction_id", :skip_multischool => true).each do |hf|
+  ActiveRecord::Base.connection.execute("INSERT INTO `hostel_fee_finance_transactions` (`transaction_amount`, `transaction_balance`, `parent_id`, `finance_transaction_id`, `school_id`, `hostel_fee_id`) VALUES(#{hf.transaction_amount}, 0.0, NULL, #{hf.finance_transaction_id}, #{hf.current_school_id}, #{hf.id})")
+end

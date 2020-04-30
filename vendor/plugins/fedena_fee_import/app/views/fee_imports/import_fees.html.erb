@@ -1,0 +1,47 @@
+<div id="content-header">
+  <div class='header-icon student-icon'></div>
+  <h1><%= t('admission') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('import_fees') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :fee_imports_import_fees, @student %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "finance/financial_year_info" %>
+    </div>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="fee_collections">
+    <div id="list">
+      <div class="sel-list">
+        <%= t('layouts_default_select') %>:
+        <a href="#" onclick="$$('input.collection_box').each(function(checkbox) { checkbox.checked = true; });; return false;"><%= t('layouts_default_all') %></a>,
+        <a href="#" onclick="$$('input.collection_box').each(function(checkbox) { checkbox.checked = false; });; return false;"><%= t('layouts_default_none') %></a>
+      </div>
+      <% form_for :fees, :url => {:action => 'import_fees', :id => @student.id} do |form| %>
+          <% @fee_collection_dates.each do |date| %>
+              <div class="name_list<%= cycle('odd', 'even') %>">
+                <li>
+                  <label><%= check_box_tag 'fees[collection_ids][]', date.id, false, :class => 'collection_box' %>
+                    <div class="att_list_names"> <%= date.name %> </div>
+                  </label>
+                </li>
+              </div>
+          <% end %>
+          <%= form.submit "► #{t('assign_fees')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+          <div id="skip">
+            <%= link_to "► #{t('click_here_to_skip')}", {:controller => "student", :action => "admission4", :id => @student.id}, :class => "user_button" %>
+          </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

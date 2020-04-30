@@ -1,0 +1,87 @@
+<%= javascript_include_tag("receipt_printer") %>
+<%= javascript_include_tag("fine_updations_for_hostel") %>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+  <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+  <%= stylesheet_link_tag "rtl/finance/_collection_layouts" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+  <%= stylesheet_link_tag "finance/_payment_form" %>
+  <%= stylesheet_link_tag "finance/_collection_layouts" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('hostel_fee.hostel_fees_submission')}" %></h1>
+
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= @student.full_name %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :hostel_fee_student_hostel_fee, @student %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% if @hostel_fee_collection.nil? %>
+      <div id="batchs1">
+          <div class="details">              
+              <div class="each-detail" id="hide1">
+                  <label class="name"><%= "#{t('hostel_fee.select_fee_collection_date')}" %></label>
+                  <div class="val">
+                      <div class="text-input-bg val-align">
+                          <%= select :fees_submission, :dates_id, @dates.map { |e| [e.name, e.id] },
+                            {:prompt => "#{t('hostel_fee.select_collection_dates')}"},
+                            {:onChange => "#{remote_function(:url =>
+                            {
+                            :action => "fees_submission_student"},
+                            :with => "'date='+value+'&student='+#{@student.id}",
+                            :before => "Element.show('loader')",
+                            :success => "Element.hide('loader')")}"
+                            } %>
+                      </div>
+                  </div>
+
+                  <div class="loader_div"><%= image_tag("loader.gif",
+                        :align => "absmiddle",
+                        :border => 0,
+                        :id => "loader",
+                        :style => "display: none;") %>
+                  </div>
+              </div>
+          </div>
+      </div>
+    <% else %>
+
+      <script type="text/javascript">
+
+  <%=  remote_function(:url => { :action => 'fees_submission_student' }, 
+    :with => "'date='+#{@hostel_fee_collection.id}+'&student='+#{@student.id}+'&payer_type='+'#{@payer_type}'") %>
+
+      </script>
+
+    <% end %>
+      
+    <div id="flash"></div>
+    <div id="hostel_fee_collection_details"></div>
+</div>
+
+<div id="modal-box" style="display:none;"></div>
+
+<script type="text/javascript">
+
+  function validate_payment_mode() {
+      if ($('fees_payment_mode') != null) {
+          if ($('fees_payment_mode').select('input')[0].value == "") {
+              alert('<%= "#{t('select_one_payment_mode')}"%>');
+              return false;
+          }
+          else {
+              return true;
+          }
+      } else {
+          return true;
+      }
+  }
+
+</script>

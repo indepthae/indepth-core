@@ -1,0 +1,1 @@
+RemarkSetting.find_or_create_by_target(:target=>'icse_student_wise_general',:parameters=>["batch_id","student_id"],:remark_type=>"multiple",:general => true,:load_model=>"batch")

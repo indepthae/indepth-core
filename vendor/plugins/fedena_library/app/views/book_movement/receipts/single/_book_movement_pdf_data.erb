@@ -1,0 +1,40 @@
+<% i = 1 %>
+<% if transaction_hash.fee_particulars.present? %>
+    <% transaction_hash.fee_particulars.each_with_index do |particular, j| %>
+        <div class="particulars_list">
+          <div class="slno"><%= i = i + j %>.</div>
+          <div class="particalar_name"><%= particular.name %></div>
+          <div class="particalar_amount"><%= particular.amount %></div>
+        </div>
+    <% end %>
+<% end %>
+
+<div class="payment_info_section">
+  <div class="label_collection_part">
+    <div class="label_part">
+      <div class="label_name"><%= "#{t('payment_mode')} " %></div>
+      <div class="value_span" style="font-weight:bold;">: <%= transaction_hash.payment_mode %></div>
+    </div>
+  </div>
+</div>
+
+<div class="receipt-footer-bottom words_bottom" style="border: 1px solid #999999;">
+  <% show_amount_in_words = (transaction_hash.default_configs.pdf_receipt_atow.to_i == 1) %>
+  <% if show_amount_in_words %>
+      <div class="left_info amount_margin">
+        <span style="font-weight: bold;" class="float-left"><%= "#{ t('amount_in_words')}: " %>&nbsp;&nbsp;</span>
+          <span class="float-left">
+               <%= NumberToWord.convert(transaction_hash.amount.to_f,
+                                        transaction_hash.default_configs.pdf_receipt_nsystem,
+                                        transaction_hash.default_configs.default_currency) %>
+          </span>
+      </div>
+  <% end %>
+
+  <div class="right_total amount_paid">
+    <b>
+      <div class="right_total_label"><%= "#{t('total_amount_paid')} : " %></div>
+      <div class="right_total_amount"><%= transaction_hash.amount %></div>
+    </b>
+  </div>
+</div>

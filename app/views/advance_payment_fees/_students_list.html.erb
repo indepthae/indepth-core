@@ -1,0 +1,23 @@
+<div class="label-field-pair"><label><%= t('select_student') %>:</label>
+
+  <div class="text-input-bg">
+    <div id="fees_collection_dates">
+
+
+      <%= select :student, :students_id, @students.present? ? @students.map { |e| [e.full_name, e.id] } : [],
+                 {:prompt => "#{t('select_student')}"},
+                 {:onChange => "#{remote_function(:url => {:controller => "advance_payment_fees",
+                                                           :action => "fee_head_by_student" },
+                                                  :with => "'student_id='+value",
+                                                  :before => "Element.show('loader_collection')",
+                                                  :success => "Element.hide('loader_collection')"
+                 )}"}
+      %>
+      <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader_collection",
+                    :style => "display: none;") %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<% show_percentage = settings[:other_settings][:show_percentage] if local_assigns[:settings] and settings[:other_settings].present? %>
+<div id="derived_scoring_type">
+    <div class="label-radio-pair" id="score_type">
+        <div class="formula__head"><%=t('scoring')%></div>
+        <div class="radio-buttons">
+            <% AssessmentGroup::SCORE.each do |i, name| %>
+              <% next if i == 2 %>
+              <div class="section" id="<%= "r_#{name}" %>">
+                  <%=  radio_button :derived_assessment_group_settings, :scoring_type, i, :id => "derived_#{name}", :checked => (obj.scoring_type.to_i == i), :onchange => "fetch_derived_score_type();",:class => 'core_field' %>
+                  <label for="derived_<%= name %>"><%= t(name) %></label>
+              </div>
+            <% end %>
+        </div>
+    </div>
+    <div id="select_grade" class="select-list">
+        <div class="label-field-pair max_marks" style="display: <%= (([1, 3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+            <label for="max_marks"><%= t('maximum_marks') %></label>
+            <div class="text-input-bg">
+              <%= text_field :derived_assessment_group_settings, :maximum_marks, :value => obj.maximum_marks ,:class => 'core_field'%>
+              <%= g.hidden_field :max_marks if obj.derived_assessment? %>
+            </div>
+        </div>
+        <div class="label-field-pair min_marks" style="display: <%= (([1].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+            <label for="max_marks"><%= t('pass_criteria') %></label>
+            <div class="text-input-bg">
+              <%= text_field :derived_assessment_group_settings, :minimum_marks ,:value => obj.minimum_marks , :class => 'core_field'%>
+              <%= g.hidden_field :min_marks if obj.derived_assessment?%>
+            </div>
+            <span id="min_text"><%= t('and_above') %></span>
+        </div>
+        <% if local_assigns[:is_final] %>
+          <div class="label-field-pair show_perc" style="display: <%= (([1].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+              <label for="max_marks"><%= t('show_percentage') %></label>
+              <div class="text-input-bg">
+                  <%= check_box_tag "derived_assessment_group_settings[other_settings][show_percentage]", true , (show_percentage.present? ? (show_percentage) : false)  ,:class=>'core_field' %>
+              </div>
+          </div>
+        <% end %>
+        <div class="label-field-pair grade_set" id="direct_grades" style="display: <%= (([2].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+            <label for="grading_profile"><%= t('grading_profile') %></label>
+            <div class="text-input-bg">
+                <%= select :derived_assessment_group_settings,:grade_set_id, @direct_grades.map{|p| [p.name, p.id]}, 
+                  {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field'} %>
+            </div>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style =>"display: none;" ) %>
+
+        </div>
+        <div id="profile_details"></div>
+        <div class="label-field-pair grade_set" id="marks_grades" style="display: <%= (([3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+            <label for="grading_profile"><%= t('grading_profile') %></label>
+            <div class="text-input-bg">
+                <%= select :derived_assessment_group_settings, :grade_set_id, options_for_select(@mark_grades.map{|p| [p.name, p.id]}, obj.grade_set_id ),
+                  {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field'} %>
+            </div>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style =>"display: none;" ) %>
+
+        </div>
+        <div id="profile_details">
+            <% if @grade_sets.present? %>
+              <%= render :partial => 'grade_sets' %>
+            <% end %>
+        </div>
+        <div class="text-input-bg hide_marks" id="hide_marks" style="display: <%= (([3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+            <label for="hide_marks"><%= t('hide_marks') %></label>
+            <div class="hide_marks_cb">
+              <%= g.check_box :hide_marks %>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  fetch_derived_score_type = function () {
+      j('#derived_scoring_type #select_grade .label-field-pair').hide();
+      j('#derived_scoring_type #select_grade input, #select_grade select').attr('disabled', true);
+      j('#derived_scoring_type #select_grade input, #select_grade select').val("");
+      j('#derived_scoring_type #select_grade #profile_details').html('');
+      j('#derived_scoring_type #select_grade .wrapper').hide();
+      j('#derived_scoring_type #select_grade input').css('border', '1px solid #c6c6c6');
+      if (j('#derived_marks').is(':checked')) {
+          j('#derived_scoring_type .max_marks').show();
+          j('#derived_scoring_type .max_marks input').attr('disabled', false);
+          j('#derived_scoring_type .min_marks').show();
+          j('#derived_scoring_type .min_marks input').attr('disabled', false);
+          j('#derived_scoring_type .show_perc').show();
+          j('#derived_scoring_type .show_perc input').attr('disabled', false);
+          j('#hide_marks').hide();
+      }
+      if (j('#derived_grades').is(':checked')) {
+          j('#derived_scoring_type .grade_set#direct_grades').show();
+          j('#derived_scoring_type .grade_set#direct_grades select').attr('disabled', false);
+      }
+      if (j('#derived_marks_and_grades').is(':checked')) {
+          j('#derived_scoring_type .max_marks').show();
+          j('#derived_scoring_type .max_marks input').attr('disabled', false);
+          j('#derived_scoring_type .grade_set#marks_grades').show();
+          j('#derived_scoring_type .grade_set#marks_grades select').attr('disabled', false);
+          j('#assessment_group_hide_marks').attr('disabled', false);
+          j('#hide_marks').show();
+      }
+  }
+</script>

@@ -1,0 +1,9 @@
+if @initial.present?  or @errors.present?
+  page.replace_html 'modal-box', :partial =>'confirm_destroy'
+  page.replace_html 'form-errors', :partial => 'errors', :object => @category if @category.errors.present?
+  page << "Modalbox.show($('modal-box'), {title: '#{t('delete_document_category')}', width: 600});"
+elsif @deleted.present?
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page.replace_html "student_document_categories", :partial => "categories", :object => @categories
+  page << "Modalbox.hide();"
+end

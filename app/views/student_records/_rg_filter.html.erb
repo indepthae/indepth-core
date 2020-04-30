@@ -1,0 +1,5 @@
+<div class="text-input-bg"><%= select :leave_management_all, :department_id, @record_groups.map { |s| [s.name, s.id] },
+    {:prompt => "#{t('any_record_group')}"},
+    {:onChange => "#{remote_function(:url => {:action => "manage_student_records_for_course"},:method => "post",
+    :with => "'rg_id='+value+ '&id=#{@course.id}'",:before=>"$('loader1').show();",:success=>"$('loader1').hide();")}"} %>
+</div>

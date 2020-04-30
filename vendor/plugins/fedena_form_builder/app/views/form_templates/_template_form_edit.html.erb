@@ -1,0 +1,36 @@
+<%= template.hidden_field :id %>
+<div class="template_heading">
+  <div class="field-label">
+    <%= template.label :form_name %>
+    <%= template.text_field :name, :placeholder => 'Add your form title here' %>
+  </div>
+</div>
+<div class="template_form_contents">
+  <div id="errors_pane">    
+  </div>
+  <div class="template_blank_form fields_exist">
+    <h2>This is a blank form</h2>
+    <h5>Add fields by clicking or dragging the fields from the left sidebar</h5>
+  </div>
+  <div id="template_fields">
+    <% @fields.each do |field|%>
+      <div id="fields" class="field_set">
+        <%= render_field_for_edit(field, @fields_count[field.field_type]) %>
+      </div>
+      <% @fields_count[field.field_type] = @fields_count[field.field_type].next  %>
+    <% end %>
+  </div>
+  <div id="template_drag_area">
+
+  </div>
+</div>
+
+<div class="field-label">
+  <div class="submit publish">
+    <%= template.submit t('use'),:id => "submit_publish", :data=>'edit', :option=>"publish", :class => 'submit publish button' %>
+  </div>
+  <div class="submit">
+    <%= template.submit t('save_template'), :data=>'edit', :class => 'submit button' %>
+  </div>
+</div>
+

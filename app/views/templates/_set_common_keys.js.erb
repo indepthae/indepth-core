@@ -1,0 +1,44 @@
+<%  @config = Configuration.all(:conditions=>["config_key in (?)", ['InstitutionName', 'InstitutionAddress', 'InstitutionPhoneNo', 'InstitutionEmail','InstitutionWebsite']]).inject({}){ |r,c| r.merge c.config_key=>c.config_value }%>
+
+<%if @keys[:date].present?%>
+  template_app.date = <%=  (format_date(Date.today)).to_s.to_json %>;
+<%end%>
+
+<%if @keys[:institution_name].present?%>
+  template_app.institution_name = <%=  @config["InstitutionName"].to_json %>;
+<%end%>
+
+<%if @keys[:institution_address].present?%>
+  template_app.institution_address = <%=  @config["InstitutionAddress"].to_json %>;
+<%end%>
+
+<%if @keys[:institution_phone_no].present?%>
+  template_app.institution_phone_no = <%=  @config["InstitutionPhoneNo"].to_json %>;
+<%end%>
+
+<%if @keys[:institution_email].present?%>
+  template_app.institution_email = <%=  @config["InstitutionEmail"].to_json  %>;
+<%end%>
+
+<%if @keys[:institution_website].present?%>
+  template_app.institution_website = <%= @config["InstitutionWebsite"].to_json %>;
+<%end%>
+
+<% # for bulk generation -- barcode%>
+<% @container = ".preview" if !@container.present? %>
+<%if @keys[:barcode].present?%>
+  template_app.barcode = {
+    format: "CODE128",
+    orientaion: "landscape",
+    barcode_value: "barcode",
+    barcode_width: 1,
+    compute_barcode : function (){
+      j('<%=@container%>').find('#barcode').JsBarcode(this.barcode_value, {
+        format: "CODE128",
+        height: 60,
+        barcode_width: 1
+      });
+    }
+};
+template_app.barcode.compute_barcode();
+<%end%>

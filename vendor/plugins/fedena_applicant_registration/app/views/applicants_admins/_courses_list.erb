@@ -1,0 +1,45 @@
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+        <td style="width:40%"><%= t('course_s') %></td>
+        <td class="set_border_right" style="width:15%"><%= t('applications_text') %></td>
+        <td class="set_border_right" style="width:25%"><%= t('application_fee') %> (<%= currency %>)</td>
+        <td class="set_border_right" style="width:20%"></td>
+    </tr>
+    <tr class="tr-list_head">
+        <td colspan="3"><%= t('active_course_applications') %> &#x200E;(<%= enabled_courses.count %>)&#x200E;</td>
+        <td><%= link_to_remote t('inactivate'),:url=>show_inactivating_form_applicants_admins_path, :method=>:get if enabled_courses.present?%></td>
+    </tr>
+    <% if enabled_courses.present? %>
+      <% enabled_courses.each do |c| %>
+        <tr class="row-b">
+            <td class="set_border_right"><%= c.display_name.present? ? "#{c.display_name} &#x200E;(#{c.course.course_name})&#x200E;" : "#{c.course.course_name} &#x200E;(#{c.course.code})&#x200E;" %> </td>
+            <td class="set_border_right"><%= c.applicants.select{|a| (a.is_deleted==false and a.submitted == true)}.count %></td>
+            <td class="set_border_right"><%= precision_label(c.amount.to_f) %></td>
+            <td class="set_border_right"><%= link_to t('applicant_s'), {:action=>"applicants",:id=>c.id}  %>
+                <%= link_to t('settings'), registration_settings_registration_course_path(c) %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="row-b">
+          <td colspan="4">
+              <%= t('no_courses_found') %>
+          </td>
+      </tr>
+    <% end %>
+    <% if disabled_courses.present? %>
+      <tr class="tr-list_head">
+          <td colspan="3"><%= t('inactive_course_applications') %> &#x200E;(<%= disabled_courses.count %>)&#x200E;</td>
+          <td><%= link_to_remote t('activate'),:url=>show_activating_form_applicants_admins_path, :method=>:get %></td>
+      </tr>
+      <% disabled_courses.each do |c| %>
+        <tr class="row-b">
+            <td class="set_border_right"><%= c.display_name.present? ? "#{c.display_name} &#x200E;(#{c.course.course_name})&#x200E;" : "#{c.course.course_name} &#x200E;(#{c.course.code})&#x200E;" %> </td>
+            <td class="set_border_right"><%= c.applicants.select{|a| (a.is_deleted==false and a.submitted==true)}.count %></td>
+            <td class="set_border_right"><%= precision_label(c.amount.to_f) %></td>
+            <td class="set_border_right"><%= link_to t('applicant_s'), {:action=>"applicants",:id=>c.id}  %> 
+                <%= link_to t('settings'), registration_settings_registration_course_path(c) %></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+</table>

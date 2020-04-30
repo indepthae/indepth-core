@@ -1,0 +1,35 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('doc_manager_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('edit_userspecific_folder')}"%></div>
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'> <%= link_to "#{t('doc_manager_text')}", :controller => "doc_managers", :action=>"index" %>  </li>
+  </ul>
+</div>
+</div>
+<div id="page-yield" >
+   <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% form_for(@folder, :url=>update_userspecific_folder_path(:folder_type => params[:folder_type], :page=>params[:page]), :html=> {:multipart=>true}) do |s| %>
+    <%= error_messages_for 'folder', :header_message => nil %>
+    <%= hidden_field_tag :action_text,@action.present? ? @action : '' %>
+    <%= hidden_field_tag :query,@query.present? ? @query : '' %>
+    <%= hidden_field_tag :members,@members.present? ? @members : '' %>
+    <div id="create_folder_form">
+      <%= render "assignable_folder", :s => s %>
+    </div>
+  <% end %>
+  <div id="userspecific-list">
+    <%= render 'userspecific_folders' %>
+  </div>
+</div>
+
+
+

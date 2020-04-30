@@ -1,0 +1,188 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% if params[:debug].present? %>
+  <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+  <%= stylesheets_link_tag 'finance_extensions/student_fees_structure_pdf' %>
+<% end %>
+
+<%#= javascript_include_tag 'jquery/jquery-ui.min.js' %>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+
+<div id="page-yield">    
+
+    <div class="hor_line"></div>
+    <h2><%= t('fee_structure') %></h2>
+    <div class="hor_line"></div>
+    <div class="extender"></div>
+    <!--div class="hor_line"></div-->
+
+    <div class="report">
+        <div id ="main_info">
+            <div class="info">
+                <div class="info-left">            
+                    <div class="info1">
+                        <label class="field-label"><%= t('student_name') %> : </label>                        
+                        <label class="infolbl"><%= @student.full_name %></label>
+                    </div>    
+                    <div class="info1">
+                        <label class="field-label"><%= t('adm_no') %> : </label>                        
+                        <label class="infolbl"><%= @student.admission_no %></label>
+                    </div>
+                </div>
+                <div class="info-right">
+                    <div class="info1">
+                        <label class="field-label"><%= t('course_and_batch') %> : </label>                        
+                        <label class="infolbl">
+                            <%= @student.batch.course_name %> - <%= @student.batch.name  %>  
+                        </label>
+                    </div>
+                    <% if roll_number_enabled? %>
+                      <div class="info1">
+                          <label class="field-label"><%= t('roll_no') %> : </label>                          
+                          <label class="infolbl">
+                              <%= (@student.roll_number.present? ? @student.roll_number : "-")  %> 
+                          </label>
+                      </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+        <div id="pdf-info">
+            <table id="pdf-table" width="100%" cellspacing="0">
+                <tr class="table-header">                
+                    <td class="col-pdf"><%= t("s_no") %></td>
+                    <td class="col-pdf2"><%= t('fees_name') %></td>
+                    <td class="col-pdf5"><%= t('date_text') %></td>                    
+                    <td class="col-pdf4 balance-col"><%= t('balance') %><%= "(#{currency})" %></td>
+                    <td class="col-pdf4"><%= t('amount') %><%= "(#{currency})" %></td>
+                </tr>                
+                <% c= 'even' %>
+                <% g_balance = 0%>
+                <% g_total = 0%>
+                <% @student_fees.each_pair do |fee_type,fees| %>
+                  <% if fees.present? %>
+                    <tr class="table-header table_subtitle">
+                        <td colspan="5" class="col-pdf fee-name-col" >
+                            <%= t("#{fee_type == 'finance_fees' ? 'general_fees' : fee_type}") %>
+                        </td>
+                    </tr>
+                  <% end %>
+                  <% fee_type_name = fee_type.singularize %>
+                  <% fees.each_with_index do |fee,i| %>
+                    <% collection = fee.send("#{fee_type_name}_collection") %>
+                    <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+                        <td class="col-pdf"><%= (i+1) %></td>
+                        <td class="col-pdf2">
+                            <%= fee.name %>
+                        </td>
+                        <% if fee_type == 'finance_fees' %>
+                          <% paid = (fee.is_paid? || ((precision_label(fee.balance.to_f + 
+                                    fee.finance_fee_collection.fine_to_pay(@student).to_f))==precision_label(0))) %>
+                        <% elsif fee_type == 'transport_fees' %>
+                          <% paid = fee.is_paid %>
+                        <% else %>
+                          <% paid = ((precision_label(fee.balance.to_f))==precision_label(0)) %>                      
+                        <% end %>
+                        <% if paid %>                    
+                          <% transaction_date = fee.try(:last_transaction_date).try(:to_date) %>
+                          <% if transaction_date.present? %>
+                            <td class="col-pdf5">
+                                <%= t('paid_on') %>
+                                <%= format_date(transaction_date, :format => :short) %>
+                            </td>
+                          <% else %>
+                            <td class="col-pdf5">
+                                <%= "-" %>
+                            </td>
+                          <% end %>
+                          <td class="col-pdf4 balance-col">
+                              <%= precision_label(0) %>
+                          </td>
+                          <td class="col-pdf4">
+                              <% g_total += precision_label(fee.try(:paid_amount)).to_f %>
+                              <%= precision_label(fee.try(:paid_amount)) %>
+                          </td>
+                        <% else %>
+                          <td class="col-pdf5">
+                              <%= t('due_on') %>
+                              <%= format_date(collection.due_date.to_date, :format => :short) %>
+                          </td>
+                          <% patially_paid_amount = fee.try(:paid_amount).to_f %>
+                          <% if fee_type == "finance_fees" %>
+                            <% amount_to_pay = fee.balance.to_f + collection.fine_to_pay(@student).to_f %>                      
+                          <% elsif fee_type == "transport_fees" %>
+                            <% discount = precision_label(fee.total_discount_amount).to_f %>
+                            <% amount_to_pay = fee.balance.to_f + fee.auto_fine_amount(collection,discount,fee).to_f %>
+                          <% else %>
+                            <% amount_to_pay = fee.balance.to_f %>                                            
+                          <% end %>
+                          <% #amount_to_pay=fee.balance.to_f+0.to_f %>
+                          <% total_amount = patially_paid_amount + amount_to_pay %>                    
+                          <td class="col-pdf4 balance-col">
+                              <% g_balance += precision_label(amount_to_pay).to_f %>
+                              <%= precision_label(amount_to_pay) %>
+                          </td>
+                          <td class="col-pdf4">
+                              <% g_total += precision_label(total_amount).to_f %>
+                              <%= precision_label(total_amount) %>
+                          </td>
+                        <% end %>
+                    </tr>
+                  <% end %>
+                <% end %>
+                <% if @student_fees %>
+                  <tr class="table-header grand-total table_subtitle">                      
+                      <td colspan="3" class="col-pdf grand-total-col" >
+                          <%= t('grand_total') %>
+                      </td>                      
+                      <td class="col-pdf balance-col" >
+                          <%= precision_label(g_balance) %>
+                      </td>
+                      <td class="col-pdf" >
+                          <%= precision_label(g_total) %>
+                      </td>
+                  </tr>
+                  <% if @config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1" %>
+                    <tr class="table-header">
+                        <% colspan = precision_label(g_balance) == precision_label(g_total) ? 4 : 5 %>
+                        <td colspan="<%= colspan %>">
+                            <div class="amount_words_lbl">
+                                <%= t('amount')%>
+                                <span><%= " &rlm;(#{t('in_words').downcase}&rlm;) " %></span> :
+                            </div>
+                            <div class="amount_words_txt">
+                                <%= NumberToWord.convert(precision_label(g_total), @config[:pdf_receipt_nsystem], 
+                                  Configuration.default_currency) %>
+                            </div>
+                        </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+            </table>
+        </div>    
+
+    </div>
+</div>
+<script>
+<% if  precision_label(g_balance) == precision_label(g_total) %>
+    $('.balance-col').hide();
+    $('.fee-name-col').attr('colspan', 4);
+<% end %>
+</script>

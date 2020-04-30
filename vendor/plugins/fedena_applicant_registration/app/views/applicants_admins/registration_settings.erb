@@ -1,0 +1,91 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('applicant_regi_label') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('settings') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('customize_form'), customize_form_applicants_admins_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div class="page-heading">
+    <%= t('applicant_registration_settings') %>
+  </div>
+  <div class="page-subheading">
+    <%= t('application_filling_instructions') %>
+  </div>
+  <div class="desc-text">
+    <%= t('instruction_desc') %>
+  </div>
+  <div id="instruction-box">
+    <%= render :partial=>"instruction_box", :locals=>{:instruction=>@instruction} %>
+  </div>
+  <div class="page-subheading">
+    <%= t('application_status') %>
+  </div>
+  <div class="desc-text">
+    <%= t('status_instructions') %>
+  </div>
+  <div class="desc-text margin-top-15">
+    <%= t('custom_status_instructions') %>
+  </div>
+  <div id="status-box">
+    <%= render :partial=>"status_box", :locals=>{:statuses=>@statuses}  %>
+  </div>
+  <div class="page-subheading">
+    <%= t('archive_applications') %>
+  </div>
+  <div class="desc-text">
+    <%= t('archive_instructions') %>
+  </div>
+  <div class="archive-link">
+    <%= link_to "#{t('archive_all_applications')}",archive_all_applicants_applicants_admins_path,:confirm => t('delete_confirm_msg') %>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+</div>
+<script>
+  function unskip_and_save(){
+    j("#application_instruction_skip_instructions").val(false);
+    j("#type_of_action").val("");
+    save_form();
+  }
+  function skip_and_save(){
+    j("#application_instruction_skip_instructions").val(true);
+    j("#type_of_action").val("hide_instructions");
+    save_form();
+    j("#instruction_desc_text_field_bg").hide();
+    j("#save_instructions").hide();
+    j("#skip_instructions").hide();
+    j("#show_instructions").show();
+  }
+  function show_and_save(){
+    j("#application_instruction_skip_instructions").val(false);
+    j("#type_of_action").val("show_instructions");
+    save_form();
+    j("#instruction_desc_text_field_bg").show();
+    j("#show_instructions").hide();
+    j("#save_instructions").show();
+    j("#skip_instructions").show();
+  }
+  function save_form(){
+    j("#in_form").submit();
+  }
+</script>

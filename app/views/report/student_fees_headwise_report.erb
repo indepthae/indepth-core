@@ -1,0 +1,118 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'jquery-ui_1.css' %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/student/student_wise_report' %>
+  <%else %>
+    <%= stylesheet_link_tag 'student/student_wise_report' %>
+  <% end %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%="#{t('student_text')} #{t('fees_head_wise_report')}" %> </div>
+  <div id="inner-tab-menu">
+    <ul>
+      <!-- <li class='themed_bg themed-dark-hover-background'><%#= link_to "#{t('csv_report')}",:controller => 'report', :action => "student_fees_headwise_report_csv",:id => @student.id %> </li> -->
+      <li class='themed_bg themed-dark-hover-background'>
+        <%= link_to "#{t('pdf_report')}", {:controller => 'report', :action => 'student_fees_headwise_report_pdf', :id => @student.id},:target=> :_blank %></li>
+      <li class='themed_bg themed-dark-hover-background'>
+        <%= link_to "#{t('csv_report')}",
+          {:controller => "csv_export", :action => "generate_csv",:csv_report_type => "student_fees_headwise_report",:session_fingerprint=>session_fingerprint,:student_id => @student.id}%></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :report_student_fees_headwise_report, @student %>
+    <%= render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="info">
+    <div class="row_head">
+      <% if roll_number_enabled? && @student.roll_number.present? %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('student_name')}" %> </div>
+          <div class="label2"><%= "#{@student.full_name}&#x200E; (#{@student.admission_no})&#x200E;" %></div>
+        </div>
+      <% else %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('student_name')}" %> </div>
+          <div class="label2"><%= "#{@student.full_name}" %></div>
+        </div>
+      <% end %>
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('batch_name')}" %> </div>
+        <div class="label2"><%= "#{@student.batch.complete_name}" %> </div>
+      </div>
+      <% if roll_number_enabled? && @student.roll_number.present? %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('roll_no')}" %> </div>
+          <div class="label2"><%= "#{@student.roll_number}" %></div>
+        </div>
+      <% else %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('admission_no')}" %> </div>
+          <div class="label2"><%= "#{@student.admission_no}" %></div>
+        </div>
+      <% end %>
+    </div>
+    <div class="row_head">
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('total_paid')}" %> </div>
+        <div class="label2" id="total_paid"><%= currency %><%= " " %></div>
+      </div>
+
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('total_balance')}" %> </div>
+        <div class="label2" id="total_balance"><%= currency %><%= " " %></div>
+      </div>
+    </div>
+  </div>
+  <div id="information">
+    <%= render :partial=> "student/student_wise_report" ,:locals=>{:batches=>@batches}%>
+  </div>
+</div>
+<script type="text/javascript">
+  function set_precision_count(number) {
+    precision_count= <%= precision_count %>
+    number=number.toFixed(precision_count);
+    return number;
+  }
+  j(function() {
+    var total_paid=0;
+    var balance_amount=0;
+    var total_partial_amount=0;
+    // TODO replace this with better logic
+    function update_fees_status_information() {
+      var collection_count=j(".item").length;
+      j(".item").each( function( index, value ){
+        amount_field=j(value).children()[2];
+        amount_value=j(amount_field).html();
+        status_field=j(value).children()[1];
+        if (j(status_field).data("status") == "unpaid") {
+          if (isNaN(Number(amount_value))) {
+            amount_value=j(status_field).data("amount-to-pay")
+          } else {
+            amount_value=Number(amount_value);
+          }
+          balance_amount+=Number(amount_value);
+        }else{
+          total_paid+=Number(amount_value);
+        }
+        partial_amount=Number(j(status_field).data("partialy-paid-amount"));
+        total_partial_amount+=(isNaN(partial_amount) ) ? 0 : partial_amount;
+      });
+      var collection_count=j(".item").length;
+      total_paid+=total_partial_amount;
+      total_paid=set_precision_count(total_paid);
+      balance_amount=set_precision_count(balance_amount);
+      j("#total_paid").append(total_paid);
+      j("#total_balance").append(balance_amount);
+      j("#collection_count").append(collection_count);
+    }
+    update_fees_status_information();
+  });
+</script>

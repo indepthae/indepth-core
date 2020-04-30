@@ -1,0 +1,91 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%= javascript_include_tag "sortable" %>
+<% if @batch.present?  %>
+  <% unless @students.empty?  %>
+    <%=hidden_field_tag :rg_id , params[:rg_id]%>
+    <table class ="sortable" id="listing" width="100%" cellpadding="1" cellspacing="1" onload="sortables_init()">
+      <thead>
+        <tr>
+          <td class="unsortable" style="display: none;"></td>
+          <th id="student_label" data-sorting-type="natural_sort"><%=t('single_student')%></th>
+          <% if roll_number_enabled? %>
+            <th data-sorting-type="natural_sort"><%=t('roll_nos')%></th>
+          <%else%>
+            <th data-sorting-type="natural_sort"><%=t('admission_no')%></th>
+          <%end%>
+        </tr>
+      </thead>
+      <% @students.each do |s| %>
+        <tr class="st_entry row_<%=cycle('odd','even')%>" id="<%=s.id%>">
+          <td style="display: none;"></td>
+          <td class="student_entry"> <%= s.full_name %></td>
+          <% if roll_number_enabled?%>
+            <td class="td_val"> <%= @batch.is_active==true ? s.roll_number.present? ? s.roll_number : "-" : s.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number.present? ? s.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number : "-" %></td>
+          <%else%>
+            <td class="td_val"> <%= s.admission_no %></td>
+          <%end%>
+        </tr>
+      <%end%>
+    </table>
+
+  <% else %>
+    <div class="list_name">
+      <%= t("no_students_in_batch")  %>
+    </div>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+  j('.st_entry').each(function(){
+    j(this).click(function(){
+      j.ajax({
+        type: 'POST' ,
+        url: "/student_records/student_records_for_batch",
+        data : {
+          student_id : j(this).attr('id'),
+          id: <%=@batch.id%><%if params[:rg_id].present?%>,
+            rg_id: <%=params[:rg_id]%>
+<%end%>
+        },
+        beforeSend : function(){
+          j('#main_section_full').children().not('img').hide();
+          j('#loader_1').show();
+        },
+        success : function() {
+          j('#loader_1').hide();
+          j('#main_section_full').children().not('img').show();
+        }
+      });
+    });
+  });
+  (function($) {
+    $.fn.hasScrollBar = function() {
+      return this.get(0).scrollHeight > this.height();
+    }
+  })(jQuery);
+  if(j('tbody').hasScrollBar() == true)
+  {
+    j('.td_val').css('width','67px');
+  }
+  else{
+    j('.td_val').css('width','82px');
+  }
+  sortables_init();
+</script>
+

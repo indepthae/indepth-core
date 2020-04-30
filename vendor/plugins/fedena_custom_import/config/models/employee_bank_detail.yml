@@ -1,0 +1,13 @@
+ employee_bank_detail:
+    overrides:
+      employee_id: "Employee Name"
+      bank_field_id: "Bank Field Name"
+      bank_info: "Bank Information"
+    associations:
+     - :employee
+     - :bank_field
+    filters:
+     - :employee_id
+
+# Please refer to employee.yml for basic concept.
+

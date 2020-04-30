@@ -1,0 +1,92 @@
+<fieldset>
+  <label>Name:</label>
+  <label class="value">
+    <%=h @group_admin.full_name %>
+  </label>
+
+  <%= link_to "Assign Schools",assign_schools_multi_school_group_path(@multi_school_group), :class=>"button-grey-small float-right-with-margin" if permitted_to? :assign_schools, @multi_school_group, :context=>:multi_school_groups %>
+  <%= link_to "Edit",edit_multi_school_group_path(@multi_school_group), :class=>"button-grey-small float-right-with-margin" if permitted_to? :edit, @multi_school_group, :context=>:multi_school_groups %>
+  <%= link_to "Edit",edit_profile_multi_school_group_path(@multi_school_group), :class=>"button-grey-small float-right-with-margin" if permitted_to? :edit_profile, @multi_school_group, :context=>:multi_school_groups %>
+</fieldset>
+
+
+
+<fieldset>
+  <label>Organization:</label>
+  <label class="value">
+    <%=h @multi_school_group.name %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Contact number:</label>
+  <label class="value">
+    <%=h @group_admin.contact_no %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Email:</label>
+  <label class="value">
+    <%=h @group_admin.email %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Username:</label>
+  <label class="value">
+    <%=h @group_admin.username %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Description:</label>
+  <label class="value">
+    <%=h @group_admin.description %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>No. of Licenses:</label>
+  <label class="value">
+    <%=h @multi_school_group.license_count %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Licenses used:</label>
+  <% license_used = @multi_school_group.schools.active.count %>
+  <label class="value">
+    <%=h license_used %>
+  </label>
+</fieldset>
+<fieldset>
+  <label>GPS Enabled:</label>
+  <% gps_enabled = @multi_school_group.gps_enabled %>
+  <label class="value">
+    <%=h gps_enabled %>
+  </label>
+</fieldset>
+<%# if @multi_school_group.parent_group %>
+  <%#*<fieldset>%>
+    <%#*<label>Whitelabel enabled:</label>%>
+    <%#*<label class="value">%>
+      <%#=h @multi_school_group.whitelabel_enabled %>
+    <%#*</label>%>
+  <%#*</fieldset>%>
+
+  <%#*<fieldset>%>
+    <%#*<label>Inherit email settings:</label>%>
+    <%#*<label class="value">%>
+      <%#=h @multi_school_group.inherit_smtp_settings %>
+    <%#*</label>%>
+  <%#*</fieldset>%>
+  <%# if admin_user_session.school_stats_accessable? %>
+    <%#*<fieldset>%>
+      <%#*<label>School statistics enabled:</label>%>
+      <%#*<label class="value">%>
+        <%#=h @multi_school_group.school_stats_enabled %>
+      <%#*</label>%>
+    <%#*</fieldset>%>
+  <%# end %>
+<%# end %>

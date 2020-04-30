@@ -1,0 +1,15 @@
+<div class="label-field-pair">
+  <label for="subject_id">Select Subject</label>
+  <div  class="text-input-bg" id="exam-group-select">
+    <%= select :subject_report, :subject_id, @subjects.map{|a| [a.name,a.id]},{:prompt=> "Select Subject"},{:onChange => "#{remote_function(:url => {:action => "list_exam_groups"},
+      :method=>"GET",
+      :with => "'subject_id='+ value",
+      :before => "Element.show('loader2')",
+      :success => "Element.hide('loader2')"
+      )}"} %><%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader2",
+      :style =>"margin-left:8px;display: none;" ) %>
+  </div>
+</div>

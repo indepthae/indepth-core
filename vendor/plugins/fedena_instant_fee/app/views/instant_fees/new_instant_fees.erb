@@ -1,0 +1,42 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('instant_fees_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_instant_fee') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+        <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation">
+        <ul>
+          <li><%= flash[:warn_notice] %> </li>
+        </ul>
+      </div>
+  <% end %>
+  <%= error_messages_for 'new_instant_fee', :header_message => nil %>
+  <div id="main_content">
+    <%= render :partial => "form_new_instant_fee" %>
+  </div>
+</div>
+<script>
+    enable_fee_payment = function (status) {
+        status ? j('#pay_button').hide() : j('#pay_button').show();
+    }
+    validate_transaction_date = function () {
+        val = j('#transaction_date').val();
+        j.ajax({
+            url: '/instant_fees/validate_transaction_date',
+            data: {transaction_date: val},
+            before: enable_fee_payment(false)
+        })
+    }
+</script>

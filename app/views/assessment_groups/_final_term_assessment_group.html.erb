@@ -1,0 +1,101 @@
+<% form_for :assessment_group, @assessment_group, :url => fetch_final_term_path(@assessment_group), :html => { :method => fetch_method(@assessment_group), :id=>'assessment_group_form'} do |g| %>
+  <% obj = g.object %>
+  <%= g.hidden_field :type %>
+  <%= g.hidden_field :parent_id %>
+  <%= g.hidden_field :parent_type %>
+  <%= g.hidden_field :assessment_plan_id %>
+  <%= g.hidden_field :academic_year_id %>
+  <%= g.hidden_field :is_final_term, :value => true %>
+  <% settings = obj.settings_as_hash %>
+
+  <%if @subject_exams_with_marks.present? %>  
+    <div class="no_exam_check">
+        <div class="label-radio-pair">
+            <div class="radio-buttons">
+                <div class="section">
+                    <%= g.radio_button :no_exam, false ,:class => 'core_field', :onchange => 'toggle_no_exam(this)' %>
+                    <label for="assessment_group_no_exam_false"><%= t('calculate_final_result') %></label>
+                    <div id="description"><%= t('add_final_term_description') %></div>
+                </div>
+                <div class="section">
+                    <%= g.radio_button  :no_exam, true, :class => 'core_field', :onchange => 'toggle_no_exam(this)'  %>
+                    <label for="assessment_group_no_exam_true"><%= t('dont_calculate_final_result') %></label>
+                    <div id="description"><%= t('dont_add_final_term_description') %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+  <%else%>
+    <%=g.hidden_field :no_exam, :value=> true %>
+  <%end%>
+
+  <div class="label-field-pair group_name">
+      <label for="name"><%= t('exam_name').titleize %></label>
+      <div class="text-input-bg"><%= g.text_field :name, :onchange => "show_display_name(this);" %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name"><%= t('code') %></label>
+      <div class="text-input-bg"><%= g.text_field :code %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name">
+          <span><%= t('display_name') %></span>
+        <!--  <span id="info-symbol" tooltip="<%#= t('display_name') %>"></span>-->
+      </label>
+      <div class="text-input-bg"><%= g.text_field :display_name %></div>
+  </div>
+          <div id="derived_based">
+      <hr class="derived_hr"/>
+      <div class="assessment_group_details" id="ag_group_list">
+          <%= render :partial => 'subject_assessment_groups', :locals=>{:g => g, :assessments => @subject_assessments, :derived_assessments => @derived_assessments, :obj => obj} %>
+      </div>
+      
+       <div class="warning danger"><%= t('activity_exam_will_be_present_in_report_by_default') %></div>
+       
+     <%if @subject_exams_with_marks.present? %>
+      <hr class='derived_hr' id="formula-hr"/>
+      <div class="derived__sections" id="formula">
+          <%= render :partial => 'formula_select', :locals => {:g => g, :obj => obj, :assessments => @subject_assessments, :derived_assessments => @derived_assessments, :settings => settings, :exam_type => t('term_text').downcase} %>
+      </div>
+      <hr class="derived_hr" id="scoring_type-hr"/>
+      <div class="derived__sections" id="scoring-type">
+          <%= render :partial => 'scoring_type_select', :locals => {:g => g, :obj => obj, :is_final => true, :settings => settings} %>
+      </div>
+      <%end%>
+      <%if @subject_exams_with_marks.present? %>
+          <hr class="derived_hr"/>
+          <div class="derived__sections">
+              <%= render :partial => 'subject_advance_settings', :locals => {:g=>g} %>
+          </div>
+        <%end%>
+  </div>
+  <div id='submit_area'>
+      <%= g.submit "#{@assessment_group.new_record? ? t('create_exam') : t('update_exam') }" , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  get_profile_details = function (elm, type) {
+      j(elm).parent().next('.wrapper').hide();
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_groups/fetch_profiles', {
+              parameters: {'profile_id': elm.value, 'profile_type': type},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j(elm).closest('.label-field-pair').next('#profile_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j(elm).closest('.label-field-pair').next('#profile_details').html('');
+  }
+
+  if (j('#assessment_group_no_exam_true').is(':checked')) {
+      j('#formula, #scoring-type, #scoring_type-hr, #formula-hr').hide();
+  }
+</script>

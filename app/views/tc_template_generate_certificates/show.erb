@@ -1,0 +1,69 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<% content_for :head do  %>
+  <%= javascript_include_tag("tc_printer") %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('view_certificate') %></div>
+    <div id="inner-tab-menu">
+        <% if params[:new_record].present? %>
+          <%= render :partial => 'download_link'  %>
+        <% else %>
+          <%= render :partial => 'download_and_delete'  %>
+        <% end %>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_record_show, @tc_data.student%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="error_msg"></div>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%= t('transfer_certificate') %></label>
+        </div>
+    </div>
+    <%= render :partial=>'student_profile_head'  %>
+    <div class="middile_section" id="middle_section">
+        <div class="preview_box">
+            <%=render :partial=>'transfer_certificate'%>
+        </div>
+    </div>
+</div>
+<iframe class="" style="display: none" id="tc_printer_template_container"></iframe>
+
+<script type="text/javascript">
+if(j('.logo_to_left').length == 1){
+  j('.institution_details_to_center').css('float', 'left');
+}
+else{
+  j('.institution_details_to_center').css('float', 'right');
+}
+  if(j('.institution_contact_preview').children().length == 0){
+    j('.institution_contact_preview').css('display', 'none');
+  }
+  else{
+    j('.institution_contact_preview').css('display', 'inline-block');
+  }
+  
+  if(j('span.words').length > 0)
+  {
+    j('span.words').parent().css('white-space','normal');
+  }
+  if(j('span.in_figures').length > 0)
+  {
+    j('span.in_figures').parent().css('white-space','normal');
+  }
+</script>

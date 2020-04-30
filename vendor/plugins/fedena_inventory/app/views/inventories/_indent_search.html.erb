@@ -1,0 +1,50 @@
+
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <% unless @indents.blank? %>
+    <tr class="tr-head">
+      <td>
+        <%= t('sl_no') %></td>
+      <td>
+        <%= t('indent_no') %>
+      </td>
+      <td>  <%= t('raised') %></td>
+      <td>
+        <%= t('expected_date') %>
+      </td>
+      <td>   <%= t('status') %></td>
+      <td>   <%= t('manager') %></td>
+      <td colspan="4">  </td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @indents.each_with_index do |s,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1"><%= (@indents.current_page - 1) * @indents.per_page + (i + 1) %></td>
+        <td class="col-3"><%= link_to s.indent_no , s %></td>
+        <td class="col-2"><%=  s.user.first_name unless s.user.nil?  %></td>
+        <td class="col-1"><%= format_date(s.expected_date,:format=>:long_date) %></td>
+        <td class="col-3"><%= s.status %></td>
+        <td class="col-3"><%=  s.manager.first_name unless s.manager.nil?   %></td>
+        <td class="col-2 edit-delete-links" colspan="4">
+          <div class="edit-delete-box">
+            <% if s.can_accept_edit_or_delete(@current_user) %>
+              <div><small><%=  link_to 'Edit', edit_indent_path(s) unless s.status == "Issued"%></small></div>
+              <div><small><%=  link_to 'Delete', s, :confirm => 'Are you sure?', :method => :delete if s.status != "Issued" and s.can_be_deleted? == true %> </small></div>
+              <% if s.can_accept(@current_user) %>
+                <div><small><%= link_to 'Accept', acceptance_indent_path(:id => s.id) unless s.status == "Issued" %></small></div>
+              <% end %>
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-2"><%= t('no_indents') %></td>
+    </tr> 
+  <% end %>
+</table>
+
+<% unless @indents.blank? %>
+  <%= will_paginate @indents,:renderer => 'RemoteLinkRenderer',:params => {:controller => "inventories",:action => "search_ajax",:search_inventory => "Indent",:paginate => true} %>
+<% end %>
+

@@ -1,0 +1,43 @@
+<% total_paid_fine = 0 %>
+<% ft_fine_amount = 0 %>
+
+<% head_row = 0 %>
+<% if @hostel_fee.finance_transactions_with_fine.present? %>
+  <% head_row = 1 %>
+  <tr class="row-a">
+      <td class="sl-col col-1"></td> 
+      <td class="bold_font" colspan="3">
+          <span><%= t('fine') %></span>
+      </td>
+  </tr>
+<% end %>
+
+<% @hostel_fee.finance_transactions_with_fine.each do |ft|%>
+  <% ft_fine_amount += ft.fine_amount %>
+  <tr class="row-b fine-row">
+      <td class="sl-col"><%= i+=1 %></td>
+      <td class="set_border_right particular-col">
+          <%= "#{t('fine_on')} #{format_date(ft.transaction_date)}" %>
+      </td>
+      <td class="set_border_right amount-col normal_font align_right">
+          <%= precision_label ft.fine_amount %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+<% end %>
+
+<% unless ft_fine_amount == 0 %>
+  <% @total_paid_fine += (precision_label ft_fine_amount).to_f %>
+<% end %>
+
+<% if head_row == 0 %>
+  <tr class="row-a" id="head-show-fine">
+      <td class="sl-col col-1"></td> 
+      <td class="bold_font" colspan="3">
+          <span><%= t('fine') %></span>
+      </td>
+  </tr>  
+<% end %>
+
+
+

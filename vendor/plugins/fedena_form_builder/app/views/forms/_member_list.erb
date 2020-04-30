@@ -1,0 +1,32 @@
+
+<% unless @members.empty? %>
+  <div class="member-list">
+    <div class="label_text">
+      <%= t('selected_recipients') %>
+    </div>
+    <% disabled_members = @disabled_members.present? ? @disabled_members.split(',') : [] %>
+    <div class="label-field-pair-document-small">
+      <div class ="scrolable" >
+        <% x = '<span> x </span>' %>
+        <div class="scroll-inside">
+          <% @members.each do |m|  %>
+            <%user_name = "<span>(#{m.username})&#x200E;</span>"%>
+            <div class="hover">
+              <% if disabled_members.include? m.id.to_s %>
+              <div class="individual_disabled">
+                <%= shorten_string(m.full_name,15)+user_name %>
+              </div>
+              <% else %>
+                <%user_name = user_name+x%>
+                <%= link_to shorten_string(m.full_name,15) + user_name, "#", :onClick => "remove_member(#{m.id})", :id=> "member_#{m.id}",:class=> 'individual',
+                  :before => "Element.show('loader')",
+                  :success => "Element.hide('loader')" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="extender"></div>
+<% end %>

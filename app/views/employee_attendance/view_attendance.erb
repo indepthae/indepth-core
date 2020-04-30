@@ -1,0 +1,48 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('leave_application') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('approve_deny') %></div>
+
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :employee_attendance_view_attendance, [@attendance,@employee,params[:from]] %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div id="leave-info">
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('name') %>:</div><%= @attendance.employee.first_name %>
+      </li>
+    </ul>
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('manager_name') %>:</div>
+        <%= @reporting_manager %>
+      </li>
+    </ul>
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('leave_type') %>:</div><%= @attendance.employee_leave_type.name %>
+      </li>
+    </ul>
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('date_text') %>:</div><%= format_date(@attendance.attendance_date, :short) + (@attendance.is_half_day ? "&nbsp;(#{t('half_day')})" : "") %>
+      </li>
+    </ul>
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('no_of_days') %>:</div><%= @attendance.is_half_day ? 0.5 : 1.0 %>
+      </li>
+    </ul>
+    <ul id="category-list">
+      <li class="list<%= cycle('odd','even') %>">
+        <div class="category-name"><%= t('reason') %>:</div><div class="category-val"><%= @attendance.reason %></div>
+      </li>
+    </ul>
+  </div>
+</div>

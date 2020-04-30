@@ -1,0 +1,3 @@
+class DisciplineAccusation < DisciplineParticipation
+
+end

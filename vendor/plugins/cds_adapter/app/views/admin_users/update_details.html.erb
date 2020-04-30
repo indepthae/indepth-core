@@ -1,0 +1,18 @@
+<div id="notice"></div>
+<fieldset class="bg-light grey-border shadow">
+
+  <div class="release_version"><%= "Version #{@release_msg}" %></div>
+  <%= link_to_remote "Update",:update=>"message-div",
+    :before => "Element.show('loader');$('update_btn').hide();",
+    :success => "Element.hide('loader')",
+    :url=>{:controller=>:admin_users,:action=>:install_updates},:html=>{:id=>"update_btn",:class  => 'button-red float-right',:style=>"margin-top: 36px;margin-right: 30px;"},:confirm=>"Are you sure ?" %>
+  <div class="extender"></div>
+  <%= image_tag("loader2.gif",
+    :align => "absmiddle",
+    :border => 0,
+    :id => "loader",
+    :class=>"loader_img",
+    :style =>"display: none;" ) %>
+  <div class="extender"></div>
+  <div class="release_note"><%= @release_note %></div>
+</fieldset>

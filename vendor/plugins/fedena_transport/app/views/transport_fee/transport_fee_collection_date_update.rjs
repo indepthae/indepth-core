@@ -1,0 +1,19 @@
+if @error.nil?
+  if @user_type=='employee'
+    @transport_fee_collection = TransportFeeCollection.find(:all, :conditions=>'batch_id IS NULL')
+    @user_type = 'employee'
+    page.replace_html 'fee_collection_list', :partial=>'fee_collection_list'
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{t('flash1')}</p>" unless flash[:notice].nil?
+    page.replace_html 'batch_list', :text=>''
+  elsif @user_type=='student'
+    @transport_fee_collection = TransportFeeCollection.find_all_by_batch_id(params[:batch_id])
+    @user_type = 'student'
+    @batches = Batch.active
+    page.replace_html 'batch_list', :partial=>'students_batch_list'
+    page.replace_html 'fee_collection_list', :partial=>'fee_collection_list'
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{t('flash1')}</p>" unless flash[:notice].nil?
+  else
+    page.replace_html 'batch_list', :text=>''
+    page.replace_html 'fee_collection_list', :text=>''
+end
+end

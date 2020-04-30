@@ -1,0 +1,421 @@
+.planner_container{
+    font-size: 14px;
+}
+.exam_planner_head{
+    width: 100%;
+    border-bottom: 1px solid #999;
+    padding-bottom: 30px;
+    overflow: auto;
+    margin-bottom: 30px;
+}
+.exam_planner_head .left{
+    width: 40%;
+    float: left;
+}
+.exam_planner_head .right{
+    width: 60%;
+    float: left;
+    display: flex;
+}
+.right .clm{
+    margin-right: 30px;
+    flex: 1;
+}
+.clm:last-child{
+    margin-right: 0px !important;
+}
+.clm .value{
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 10px;
+}
+.detail_badges{
+    display: flex;
+    margin-bottom: 50px;
+}
+.detail_badges .clm{
+    flex: 1;
+    min-height: 180px;
+    background: #f3f3f3;
+    border: 1px solid #e8e8e8;
+    margin-right: 15px;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 13px;
+}
+.detail_badges .clm .head{
+    border-bottom: 1px solid #ccc;
+    overflow: auto;
+    padding: 10px;
+}
+.detail_badges .head .left{
+    width:60%;
+    float:left;
+}
+.detail_badges .head .right{
+    float: right;
+}
+.desc table{
+    width:100%;
+    height: 100%;
+}
+.detail_badges .clm .desc{
+    height: 80%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.detail_badges .desc td{
+    color: #808080;
+}
+.detail_badges .desc td.desc_val{
+    color: black;
+}
+.empty_msg{
+    font-style: italic;
+    color: #666;
+    font-size: 13px;
+}
+.term_box{
+    margin-bottom: 50px;
+    border: 1px solid #ccc;
+    position: relative;
+}
+.term_box .head{
+    background: #e6e6e6;
+    overflow: auto;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+}
+.term_box .desc{
+    min-height: 200px;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.term_box .head .left{
+    float: left;
+    width: 40%;
+}
+.term_box .head .right{
+    float: left;
+    display: flex; 
+    width: 60%;
+    align-items: center;
+}
+.term_box .head .right div{
+    float: left;
+    width:70%;
+}
+.term_box .head .right .actions{
+    float: right;
+    width:20%;
+}
+.term_box .actions .label-field-pair, .term_box .actions .text-input-bg{
+    width:97% !important;
+}
+#term_action{
+    width: 100% !important;
+    border-radius: 0px !important;
+    background-color: #fff !important;
+    margin: 0px !important;
+    height: 34px !important;
+}
+.empty_terms{
+    text-align: center;
+    width: 100%;
+    margin-top: 60px;
+}
+.add_link .submit-button{
+    font-size: 13px !important;
+    margin-left: 0px;
+    float: none;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: normal !important;
+}
+.add_link{
+    margin-top: 20px;
+}
+#page-yield .submit-button:hover {
+    color: white !important;
+}
+.term_box table, .eg_table{
+    /*border: 1px solid #bfbfbf;*/
+    border-collapse: collapse;
+    font-size: 13px;
+    /*margin: 30px 0;*/
+}
+.term_box td, .eg_table td{
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+#page-yield .term_box table .tr-head, #page-yield .eg_table .tr-head{
+    font-weight: bold;
+    background-color: #ececec;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important
+}
+.term_box tr{
+    border: 1px solid #bfbfbf;
+    background: #fff;
+    height: 45px;
+}
+.eg_table tr{
+    border: 1px solid #bfbfbf;
+    background: #fff;
+}
+.term_box table a, #page-yield .term_box table a:hover, .eg_table a, .eg_table a:hover{
+    color: black !important;
+    /*text-decoration: none;*/
+    margin-right: 20px;
+    float:left;
+}
+.term_box td.col-2, .eg_table td.col-2{
+    width:30%;
+}
+.term_box td.col-1, .eg_table td.col-1{
+    width:20%;
+}
+.term_box .desc{
+    padding: 40px 10px;
+}
+.term_box .head .add_link{
+    margin-top: 0px;
+    width: 24% !important;
+}
+.term_box .head .duration{
+    text-align: right;
+    margin-right: 20px;
+    font-size: 13px;
+}
+.desc.with_eg{
+    align-items: flex-start;
+}
+.term_box table a:hover{
+    text-decoration: underline !important;
+}
+.right a, .right a:hover, #page-yield .right a:hover {
+    color: black !important;
+    cursor: pointer;
+}
+.add_link a, #page-yield .right .add_link a:hover{
+    color: #fff !important;
+}
+.tr-head td.actions{
+    width:15%;
+}
+.action_td select{
+    width: 58px;
+    background: #fff;
+    border-color: #fff;
+    text-decoration: underline;
+} 
+.deletion_warning #popup_content{
+    font-size: 13px;
+    color: red;
+}
+.submit-button{
+    border-radius: 5px !important;
+}
+.show {display:block !important;}
+#page-yield .right a.dropbtn, #page-yield .right a.dropbtn:hover{
+    color: white !important;
+    text-decoration: none !important;
+    font-weight: normal;
+}
+.dropbtn {
+    color: black !important;
+    border: none;
+    cursor: pointer;
+    margin: 0 !important;
+    border-radius: 1px;
+    background: white;
+    border: 1px solid #ccc;
+    font-weight: normal;
+    font-size: 13px;
+}
+.morebtn {
+    border:none !important;
+}
+#page-yield .dropbtn:hover{
+    color: black !important;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    top: 43px;
+    width: auto !important;
+    border: 1px solid #ccc;
+}
+
+.options-dropdown{
+    top: 33px;
+    left: -1px;
+}
+
+.dropdown-content a {
+    /*padding: 12px 16px;*/
+    text-decoration: none;
+    display: block;
+    padding: 5px 8px;
+}
+
+.dropdown a:hover {background-color: #f1f1f1}
+#status_filter{
+    height: auto !important;
+    padding-top: 0px;
+}
+.final_term_table{
+    margin-top: 50px;
+}
+.final_term_table td.col-2{
+    width: 33%;
+}
+.final_term_table td.col-1{
+
+}
+tr.empty_row{
+    border: none;
+    background: #f3f3f3;
+}
+tr.empty_row td{
+    border: none;
+    height: 40px;
+}
+tr.final_term{
+    font-weight: bold;
+}
+tr.final_term .action_td{
+    font-weight: normal;
+}
+.dropbtn.submit-button{
+    font-weight: normal;
+    width: auto !important;
+}
+.text-right{
+    text-align: right;
+}
+p.flash-msg{
+    margin-bottom: 50px;
+}
+.text-input-bg {
+    height: 30px !important;
+    width: auto !important;
+}    
+input[type="text"]{
+    width: 150px;
+    margin-right: 5px;
+    border-radius: 5px;
+    height: 20px;
+    padding: 3px 5px;
+    border: 1px solid #c6c6c6;
+    font-size:13px;
+}
+.editor_cancel{
+    margin-left: 5px;
+    color: #000;
+    font-weight: normal;
+    text-transform: capitalize;
+}
+#page-yield a.editor_cancel:hover{
+    color: #000 !important;   
+}
+.editor_ok_button{
+    font-size: 13px !important;
+    margin-left: 0px;
+    float: none;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: normal !important;
+    color: #fff !important;
+    background: #27292B;
+    border: none;
+    padding: 6px 9px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.action_td {
+    position: relative;
+}
+.term_details_banner{
+    width: 100%;
+    /* margin-right: 38px; */
+    background: #f0f0f0;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    display: flex;
+}
+.banner_col{
+    flex: 1;
+}
+.banner_col .label{
+    margin-right: 10px;
+}
+.banner_col .value{
+    font-weight: bold;
+}
+.term_popup #popup_frame .part{
+    padding: 20px 0px;
+    width: 500px;
+}
+.term_details_banner .banner_col:last-child{
+    text-align: right;
+}
+.term_popup #popup_header_part{
+    padding-left: 20px !important;
+}
+.term_popup #popup_content{
+    width: 520px !important;
+}
+.term_popup #MB_close{
+    right: -20px !important;
+}
+.term_popup .form_container{
+    width:100%;
+    padding: 20px;
+    float: left;
+    box-sizing: border-box;
+}
+.term_popup label{
+    font-weight: bold !important;
+}
+.term_popup .actions{
+    float: left;
+    width: 100%;
+    clear: both;
+    padding-top: 20px;
+}
+.term_popup .submit-button{
+    margin-left: 0px;
+}
+.term_popup input[type="text"]{
+    width: 200px;
+    /*margin-bottom: 20px;*/
+}
+.term_popup .wrapper {
+    min-width: 200px !important;
+    margin-left: 107px !important;
+    float: none !important;
+    margin-top: 10px;
+}
+.term_popup .label-field-pair{
+    margin-bottom: 10px;
+    float: left;
+}
+.green{
+    border: 2px solid #a4a7a4;
+}

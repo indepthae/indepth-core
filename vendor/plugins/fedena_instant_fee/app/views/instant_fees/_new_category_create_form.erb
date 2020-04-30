@@ -1,0 +1,42 @@
+<label class="head_label"><%= t('create_instant_category_for_fee') %><span></span></label>
+
+<div id="grading-levels-form">
+
+  <% form_remote_for @new_instant_category, :url => {:action => 'create_category'},
+                     :before => "$('submit_button').disable()",
+                     :complete => "setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+      <% unless @current_financial_year.present? %>
+          <p class="flash-msg">
+            <%= t('financial_years.no_financial_year_chosen_or_exists') %>
+          </p>
+      <% end %>
+      <div id="form-errors"></div>
+
+      <div class="label-field-pair">
+        <div class="label-container">
+          <%= f.label "#{t('financial_year_name')}" %>
+        </div>
+        <div class="input-container">
+          <% if @current_financial_year.present? %>
+              <span>
+                <%= @current_financial_year[:name] %>
+              </span>
+              <%= f.hidden_field :financial_year_id, :value => @current_financial_year[:id] %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><%= f.label "#{t('name')}" %></div>
+        <div class="input-container"><%= f.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><%= f.label "#{t('description')}" %></div>
+        <div class="input-container"><%= f.text_field :description %></div>
+      </div>
+
+      <%= submit_tag "► #{t('save')}", :class => 'submit_button', :id => 'submit_button' %>
+
+  <% end %>
+</div>

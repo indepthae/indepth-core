@@ -1,0 +1,17 @@
+
+<div class="wrapper" id="live-val">
+    <div class="error-icon"></div>
+    <div class="error-msg">
+        <% if @error_msg.present? %>
+          <%= @error_msg %>
+        <% else %>
+          <%= t('end_date_lower') %>
+        <% end %>
+    </div>
+</div>
+
+<script>
+
+  j(".end_date input[type='text']").css("border", "1px solid red");
+
+</script>

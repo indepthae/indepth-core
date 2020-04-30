@@ -1,0 +1,239 @@
+<% unless @form.is_feedback %>
+  <script>
+    var trigger_ajax_reload = false;
+    var filters_exist = false;
+    function check_filter_apply(){
+      form_id = j('#form_id').val();
+      show_loader2 = false;
+      if(j('.filter_list').html()!='' && j('.filter_list  .filter').length!=0){
+        j(".apply_filter").css('display','');
+        j('.filter_clear').css('display','block');
+      }else{
+        j("#fields_list").val(0);
+        j('.filter_clear').css('display','');
+        show_loader2 = true
+        j(".apply_filter").css('display','none');
+        //j('.reports_table').css('display','');
+        console.log('nono');
+        if(trigger_ajax_reload){
+          j.ajax({
+            url: '/form_submissions/'+form_id,
+            beforeSend: function(){
+              show_loader2 == true ? Element.show('loader2') : Element.show('loader');
+            },
+            success: function(){
+              console.log('hiding loader');
+              show_loader2 == true ? Element.hide('loader2') : Element.hide('loader');
+              trigger_ajax_reload = false;
+            }
+          });
+        }
+      }
+    }
+    function add_filter(this_opt,this_ele_val,options){
+      options = options || null;
+      console.log('i am adding');
+      id = 'filter_'+this_ele_val+'_criteria_text';
+      name= 'filter['+this_ele_val+'][criteria_text]';
+      criteria_id = 'filter_'+this_ele_val+'_criteria';
+      criteria_name= 'filter['+this_ele_val+'][criteria]';
+      filter_list = j('.filter_list');
+    
+      if(j('.filter_list .filter').length==0 && j('.filter_list table').length==0){
+        filter_list.append(j('<table cellspan=0 cellpadding=0>'));
+      }
+      if(filter_list.find('#'+id).length==0){
+        var new_filter = j('<tr class="filter">');
+        console.log('this_opt');
+        console.log(this_opt);
+        var filter_label = j('<td class="field_label">').html(this_opt.text());
+        var criteria_select = j('<select>').attr('name',criteria_name).attr('id',criteria_id);
+        var clear_filter = j('<td class="clear_filter">');
+        criteria_select.append(j('<option value="1">').text('<%= t("match_phrase")%>'))
+        .append(j('<option value="2">').text('<%= t("match_terms")%>'));
+        /*
+        .append(j('<option value="2">').text('<%#= t("start_with")%>'))
+        .append(j('<option value="3">').text('<%#= t("end_with")%>'))
+        .append(j('<option value="4">').text('<%#= t("anywhere")%>'));
+        */
+        var criteria = j('<td class="criteria">').html(criteria_select);
+        var criteria_field = j('<input type="text">').attr('name',name).attr('id',id);
+        if(options != null){
+          criteria_select.val(options['criteria']);
+          criteria_field.val(options['criteria_text']);
+        }
+        var filter_field = j('<td class="criteria_text">').html(criteria_field);
+        new_filter.append(filter_label).append(criteria).append(filter_field).append(clear_filter);
+        filter_list.find('table').append(new_filter);
+      }
+      j('.filter_clear').css('display','block');
+      check_filter_apply();
+    }
+  </script>
+<% end %>
+
+<%= hidden_field_tag 'form_id',@form.id %>
+<% if @form_submissions.present? or @filters.present? %>
+
+  
+  <div class="extender"></div>
+  <% if @form_submissions.present? %>
+    <div class="submit-button">
+      <%= link_to "#{t('export_as_csv')}" ,{:action=>'form_submissions_csv',:id=>@form.id,'filter'=>@filters},:target=>'_blank' %>
+    </div>
+    <% if @form.is_feedback %>
+      <div class="submit-button">
+        <%= link_to "#{t('analysis')}" ,{:action=>'analysis',:id=>@form.id},:target=>'_blank' %>
+      </div>
+    <% end %>
+
+    <% if @form.is_feedback and @form.is_targeted %>
+      <div class="submit-button">
+        <%= link_to "#{t('consolidated_report')}" ,{:action=>'consolidated_report',:id=>@form.id} %>
+      </div>
+    <% end %>
+  <% end %>
+  <div class="extender"></div>
+  <div class="reports_table">
+    <% if @form_submissions.present? %>
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head sub-heading">
+          <th><%= t('no_text') %></th>
+          <% cnt = @fields.count %>
+          <% (@fields).each do |field| %>
+            <% unless field.field_type == 'hr' %>
+              <th class='width-<%= field.field_type%>'>
+                <%= field.label %>
+              </th>
+            <% end %>
+          <% end %>
+        </tr>
+        <% page_count=0 %>
+        <% @form_submissions.each_with_index do |form_submission,@index| %>
+          <% form_submission = form_submission.search_data unless FedenaSetting.elasticsearch_enabled?  %>
+          <% if params[:page].present? %>
+            <% if params[:page].to_i >= 1 %>
+              <% @index = @index  + (params[:page].to_i - 1) * @form_submissions.per_page.to_i %>
+            <% end %> <%else %> <% @index = @index %>
+          <% end %>
+          <% page_count+=1 %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td>
+              <%= @index+1 %>
+              <% m = 0 %>
+            </td>
+            <% @fields.each do |field| %>
+              <% unless field.field_type == 'hr' %>
+                <td>
+                  <% if(field.field_type == 'checkbox')  %>
+                    <% if(form_submission["#{field.id}"].present?) %>
+                      <% form_submission["#{field.id}"].each do |b| %>
+                        <li>
+                          <%= b %>
+                        </li>
+                      <% end %>
+                    <% end %>
+                  <% elsif field.field_type == 'file' %>
+                    <% if form_submission["#{field['id']}"].present? and form_submission["#{field['id']}"].length == 2 %>
+                      <%= link_to form_submission["#{field['id']}"].first,form_submission["#{field['id']}"].second, :class => 'themed_text', :target => "_blank" %>
+                    <% end %>
+                  <% elsif field.field_type == 'radio' %>
+                    <%= form_submission["#{field.id}"] %>
+                  <% else %>
+                    <%= form_submission["#{field.id}"] %>
+                  <% end %>
+                </td>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    <% else %>
+      <% unless @form.is_feedback %>
+        <div class="message_notifier">
+          <p class="flash-msg">
+            <%= t('filters_empty_result') %>
+          </p>
+        </div>
+
+      <% end %>
+    <% end %>
+  </div>
+  <% unless @form_submissions.per_page.to_i > @form_submissions.total_entries.to_i %>
+    <div class="pagination_list">
+      <div class="pagination_text">
+        <%= "#{t('showing')} #{@index+1-(page_count-1)}-#{@index+1} #{t('of')} #{@form_submissions.total_entries}" %>
+      </div>
+      <% custom_params = {} %>
+      <% custom_params[:action] = :show %>
+      <% custom_params[:filter] = @filters if @filters.present? %>
+      <%= will_paginate @form_submissions,:renderer => 'RemoteLinkRenderer' ,:page_links=>false,:params=> custom_params %>
+    </div>
+  <% end %>
+
+<% else %>
+  <div class="message_notifier">
+    <p class="flash-msg">
+      <%= t('no_submissions') %>
+    </p>
+  </div>
+
+<% end %>
+
+<% unless @form.is_feedback %>
+  <% if FedenaSetting.elasticsearch_enabled? %>
+    <% if @filters.present? %>
+      <%= hidden_field_tag 'retained_filters',@filters%>
+      <script>
+        //retain_filters();
+        filters_exist = true;
+      </script>
+    <% else %>
+      <script>
+        check_filter_apply()
+      </script>
+    <% end %>
+  <% end %>
+<% end %>
+<% unless @form.is_feedback %>
+  <script>
+    j(document).ready(function(){
+      j('.reports_table').css('display','block');
+    })
+    j('#fields_list').on('change',function(){
+      this_ele = j(this);
+      this_opt = this_ele.find('option:selected');
+      if(this_ele.val()!=0){
+        add_filter(this_opt,this_opt.val());
+      }
+    });
+    j(document).delegate('.filter_clear','click',function(){ // all filter
+      filters_exist = j('.filter_list').find('tr').length > 0 ? true : false;
+      trigger_ajax_reload = filters_exist;
+      j('.filter_list').html('');
+      console.log('flt_exit::'+filters_exist);
+      check_filter_apply();
+    })
+    j(document).delegate('.clear_filter','click',function(){ // one filter
+      filters_exist = j('.filter_list').find('tr').length > 0 ? true : false;
+      trigger_ajax_reload = filters_exist;
+      j(this).parent().remove();
+      //trigger_ajax_reload = filters_exist;
+      check_filter_apply();
+    })
+    j("form").bind("ajax:beforeSend", function(evt, data, status, xhr){
+      j("#loader").show();
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function(){
+      j('.reports_table').css('display','block');
+    })
+  </script>
+<% end %>
+<style>
+  .submit-button a:hover{
+    color:#fff !important;
+  }
+</style>

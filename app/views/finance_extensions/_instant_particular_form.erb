@@ -1,0 +1,56 @@
+<label class="head_label"><%= "#{t('create_text')} #{t('particular')}" %><span></span></label>
+
+<div id="grading-levels-form">
+
+  <% form_remote_for :finance_fee_particular,
+                     :url => {:action => 'create_instant_particular',
+                              :id => @financefee.id, :target_action => @target_action,
+                              :target_controller => @target_controller} do |form| %>
+      <%= form.hidden_field :receiver_type, :value => 'Student' %>
+      <%= form.hidden_field :receiver_id, :value => @financefee.student_id %>
+      <%= form.hidden_field :batch_id, :value => @financefee.batch_id %>
+      <%= form.hidden_field :finance_fee_category_id, :value => @finance_fee_category.id %>
+      <%= form.hidden_field :is_deleted, :value => true %>
+      <%= form.hidden_field :is_instant, :value => true %>
+
+      <div id="form-errors"></div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('name')}" %><span class="necessary-field">*</span></label></div>
+        <div class="input-container">
+          <%= form.select :master_fee_particular_id,
+                          options_for_select(@master_particulars.map { |x| [x.name, x.id] },
+                                             @fee_particular.master_fee_particular_id),
+                          :include_blank => t('select_a_particular') %>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('amount')}" %><span class="necessary-field">*</span></label></div>
+        <div class="input-container"><%= form.text_field :amount, :class => 'precision_text' %></div>
+      </div>
+
+      <% if @financefee.tax_enabled %>
+          <div class="label-field-pair">
+            <div class="label-container"><label><%= "#{t('tax_slab_text')}" %></label></div>
+            <div class="input-container">
+              <%= form.select :tax_slab_id, @tax_slabs.map { |slab|
+                                            ["#{slab.name} - (#{precision_label(slab.rate)})", slab.id] },
+                              :include_blank => t('select_a_tax_slab') %>
+            </div>
+          </div>
+      <% end %>
+
+      <div class="extender"></div>
+      <%= hidden_field_tag :session_fingerprint, session_fingerprint %>
+      <div id="submit-button">
+        <%= submit_tag "► #{t('update')}", :class => 'modal-box-submit_button', :disable_with => "► #{t('create_text')}" %>
+      </div>
+  <% end %>
+</div>
+<script type="text/javascript">
+    j(document).delegate('.modal-box-submit_button', 'click', function () {
+        j(this).attr('disabled', true)
+        j('.modal-box-submit_button').val('<%=t('please_wait') %>')
+    })
+</script>

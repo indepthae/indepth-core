@@ -1,0 +1,108 @@
+<div id="content-header">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_remarks') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :gradebook_remarks_manage, [@course,@academic_year]%>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="head">
+        <%=t('exam_planners')%>
+    </div>
+
+    <div class="select-box-container">
+        <%= render :partial => 'select_boxes' %>
+    </div>
+    
+    <div id="flash-container" class="flash-container">
+    </div>
+      
+    <div id="remark_sets_or_subjects" class="textfield-date">
+    </div>
+
+    <div id="student_list" class="table-container">
+    </div>
+
+</div>
+
+<script type="text/javascript">
+  let template_app;
+  let add_to_remark_bank_element;
+  get_batch_id = function () {
+      return j('#_batch_id').val();
+  };
+  get_report_type = function () {
+      return j('#_report_type').val();
+  };
+  get_reportable_id = function () {
+      return j('#_reportable_id').val();
+  }
+  get_assessment_plan_id = function () {
+      return j('#_assessment_plan_id').val();
+  }
+  get_remark_type = function () {
+      return j('#_remark_type').val();
+  }
+  get_remarkable_id = function () {
+      return j('#_remarkable_id').val();
+  }
+
+  j('#_batch_id').change(function () {
+      j.ajax({
+          url: "update_remark_type",
+          type: 'POST',
+          data: {
+              batch_id: get_batch_id(),
+              assessment_plan_id: get_assessment_plan_id(),
+          },
+          beforeSend: function()
+          {
+              j('#loader1').show();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j('#loader1').hide();
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+
+  add_from_remark_bank = function (th_is) {
+      add_to_remark_bank_element = th_is;
+      const student_id = j(th_is).parent().parent().find('#gradebook_remark_student_id').val();
+      const batch_id = j('#_batch_id').val();
+      const report_type = j('#_report_type').val();
+      const assessment_plan_id = j('#_assessment_plan_id').val();
+      const remark_type = j('#_remark_type').val();
+      j.ajax({
+          url: "add_from_remark_bank",
+          type: 'POST',
+          data: {
+              student_id: student_id,
+              batch_id: batch_id,
+              assessment_plan_id: assessment_plan_id,
+              report_type: report_type,
+              remark_type: remark_type,
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j(window).scrollTop(0, 0);
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  };
+
+</script> 

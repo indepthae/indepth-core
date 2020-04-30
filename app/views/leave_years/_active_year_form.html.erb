@@ -1,0 +1,45 @@
+<% form_tag update_active_leave_years_path, :method => :post, :onsubmit => "return validate();"  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="year_form">
+      <% if @last_reset_date == "0" %>
+        <div class="reset_date_side">
+            <div class="label-field-pair date_field1" >
+                <label for="department"><%= t('select_last_reset_date') %><div class="tooltip_info2" tooltip ="<%= t('last_reset_text') %>"></div></label>
+                <div class="text-input-bg">
+                    <%= calendar_date_select_tag 'leave_year[last_reset_date]', I18n.l(@last_reset,:format=>:default),
+                      :year_range => 15.years.ago..5.years.from_now, :id => 'start_date' %>
+                </div>
+            </div>
+        </div>
+      <% end %>
+      <div class="leave_year_side">
+          <div class="label-field-pair">
+              <label for="department"><%= t('active_leave_year') %></label>
+              <div class="text-input-bg"><%= select_tag "leave_year[year_id]", 
+                    options_for_select([["#{t('select_leave_year')}",'']] + @leave_years.map{|pg| [pg.name,pg.id]}, @active_year.try(:id)||'') ,
+                    :onchange => "fetch_year_details(this);" %>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader",
+                    :style =>"display: none;" ) %>
+                  <div class="wrapper" id="active_year_msg" style="display: none;"><div class="error-icon"></div><div class="error-msg"><%= " #{t('cant_be_blank')}" %></div></div>
+              </div>
+          </div>
+      </div>
+       <%= hidden_field_tag :type, @type %>
+      <div id="active_year_details">
+          <% if @active_year.present? %>
+            <%= render :partial => 'year_details' %>
+          <% end %>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "#{t('save_active_year')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

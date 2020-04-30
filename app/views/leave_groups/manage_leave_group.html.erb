@@ -1,0 +1,94 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_management') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'> <%= t('leave_groups') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_groups_manage_leave_group, @employee %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <h4><%= "#{t('add_leave_group')}" %></h4>
+
+    <div class="employee_name">
+        <div class="label">
+            <%= t('employee_name')  %>
+        </div>
+        <div class="text"><%= @employee.full_name + "&nbsp;(#{@employee.employee_number})&#x200E;" %></div>
+    </div>
+
+    <div class="reset_date">
+        <div class="label">
+            <%= t('recent_leave_reset') %>
+        </div>
+        <div class="text"><%= format_date(@employee.last_reset_date, :format => :short_date) %></div>
+    </div>
+
+    <div class="dpt_name">
+        <div class="label">
+            <%= t('employee_department')  %>
+        </div>
+        <div class="text"><%= @employee.employee_department.name %></div>
+    </div>
+
+    <hr></hr>
+    <% form_for @leave_group_employee, :url => {:action => "manage_leave_group", :id => @employee.id} do |lge| %>
+      <%= lge.hidden_field :employee_id, :value => @employee.id %>
+      <%= lge.hidden_field :employee_type, :value => 'Employee' %>
+      <div class="label-field-pair">
+          <label for="name"><%= t('leave_group') %></label>
+          <div class="text-input-bg">
+              <%= lge.select :leave_group_id, @leave_groups.map {|p| [p.name, p.id]}, {:include_blank => t('select_leave_group')},:onchange => "change_leave_group(this)" %>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader",
+                :style =>"display: none;" ) %>
+              <div class="wrapper" id="live-val" style="display:none;">
+                  <div class="error-icon"></div>
+                  <div class="error-msg"><%=  t('select_a_leave_group')%></div>
+              </div>
+          </div>
+      </div>
+      <div id="leave_group_details"></div>
+      <%= submit_tag "#{t('add_leave_group')}", :class => "submit-button", :id => "submit_button", :style => "display:none", :onclick => "return check_leave_group('submit');" %>
+      <%= link_to t('skip_and_finish'), {:controller => "employee", :action => "profile", :id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  function check_leave_group(type) {
+      value = j('#leave_group_employee_leave_group_id').val();
+      if (value == "") {
+          if (type == 'submit')
+              j('#live-val').show();
+          j('#submit_button').hide();
+          j('#leave_group_details').html('');
+          return false;
+      } else {
+          j('#live-val').hide();
+          return true;
+      }
+  }
+  function change_leave_group() {
+      value = j('#leave_group_employee_leave_group_id').val();
+      if (check_leave_group('select')) {
+          new Ajax.Request('/leave_groups/leave_group_details', {
+              parameters: {'id': value},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j('#loader').show();
+              },
+              onComplete: function (resp) {
+                  result = resp.responseText;
+                  j('#leave_group_details').html(result);
+                  j('#submit_button').show();
+                  j('#loader').hide();
+              }
+          });
+      }
+  }
+</script>

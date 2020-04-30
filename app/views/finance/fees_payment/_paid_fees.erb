@@ -1,0 +1,114 @@
+<%= javascript_include_tag("receipt_printer") %>
+<% unless @paid_fees.empty? %>
+  <div id="payments_details">
+      <div class="label-field-pair3">
+          <label><%= t('payment_history') %> </label>
+      </div>
+      
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main-head tr-list_head">
+              <td><%= t('receipt_no') %></td>
+              <td class="set_border_right"><%= t('payment_date') %></td>
+              <td class="set_border_right"><%= t('payment_mode') %></td>
+              <td class="set_border_right"><%= t('payment_notes') %></td>
+              <% unless @current_user.student? %>
+                <td class="set_border_right"><%= t('cashier') %></td>
+              <% end %>
+              <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+              <%unless @payer_type.present? and @payer_type=="Archived Student"%>
+                <td class="set_border_right col-3" ></td>
+              <%end%>
+          </tr>
+      
+          <% @paid_fees.each_with_index do |f, i| %>
+            <tr class="row-b">
+                <td class="col-3"><%= f.receipt_number %></td>
+                <td class="set_border_right col-3">
+                    <%= format_date(f.transaction_date) %>
+                </td>                
+                <td class="set_border_right col-3">
+                    <%= "#{f.payment_mode} #{ f.reference_no.present? ? '- ' + f.reference_no : ''}" %>
+                </td>
+                <td class="set_border_right col-2"><%= f.payment_note %></td>
+
+                <% unless @current_user.student? %>
+                  <td class="set_border_right col-3">
+                      <%= f.payment_mode=='Online Payment' ? f.get_cashier_name : f.cashier_name %>
+                  </td>
+                <% end %>
+
+                <td class="set_border_right col-3 align_right">
+                    <%= precision_label(f.amount.to_f) %>
+                </td>
+
+                <% unless @payer_type.present? and @payer_type == "Archived Student" %>
+                  <td class="set_border_right col-3 receipt-actions">
+                      <%= receipt_buttons(f.id) %>
+                      <% if defined?(delete_action) and (can_access_request? delete_action, :finance) and !@hide_print_options.present? %>
+                        <% if @financefee.fee_refund.present? %>                          
+                          <a class="inactive">
+                              <%= ("<span class='revert_icon_img' tooltip='Fees Refunded. You can t revert the transaction!'></span>") %>
+                          </a>
+                          <div id="hover-message"></div>
+                        <% else %>
+                          <% if f.transaction_ledger.is_waiver == true %>
+                            <% if f.transaction_ledger.transaction_type == "SINGLE" %>
+                              <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                              :onclick => "return MakeBox(#{f.id});",:class=>"themed_text", :tooltip=>t('revert_transaction') %>
+                            <% else %>
+                              <span class="waiver_info" tooltip="<%= t("waiver_revert_block_collection") %>"></span>
+                            <% end %>
+                          <% else %>
+                            <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                              :onclick => "return MakeBox(#{f.id});",:class=>"themed_text", :tooltip=>t('revert_transaction') %>
+                          <% end %>
+                        <% end %>
+                      <% end %>
+                  </td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+  </div>
+
+  <div id="revert-pop-up">
+      <%= t('fees_refund_exists_cant_revert_transaction') %>
+      <br/>
+      <div class="revert_arrow_down"></div>
+  </div>
+
+<% end %>
+
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>
+
+<script type="text/javascript">
+<% if defined?(delete_action) %>
+    MakeBox = function (f) {
+        remove_popup_box();
+        options = {'submit': '<%=t('revert_transaction')%>', 'cancel': '<%=t('cancel')%>', 'field_name': 'reason',
+            'input_type': 'text_area', 'title': '<%=t('revert_transaction')%>'};
+        build_modal_box(options);
+        build_prompt_popup_box('<%=t('reason')%>', options)
+        j('#popup_window #popup_footer > #yes').click(function () {
+            if(j(this).attr('disabled') == undefined) {
+                j(this).attr('disabled','disabled');
+                j.ajax({
+                    url: '/finance/<%= delete_action %>',
+                    method: 'post',
+                    data: {
+                        'id': <%=@student.id%>,
+                        'date': <%=@date.id%>,
+                        'transaction_id': f,
+                        'batch_id': <%=batch_id%>,
+                        'reason': j('#popup_content #prompt_value').val(),
+                        'session_fingerprint': '<%= session_fingerprint %>'
+                    },
+                    success: function () {
+                        remove_popup_box();
+                    }
+                });
+            }
+        });
+    };
+<% end %>
+</script>

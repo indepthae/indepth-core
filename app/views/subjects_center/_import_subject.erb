@@ -1,0 +1,18 @@
+<% level1 = (klass == 'level-1') %>
+<% if tbody_required -%><tbody class="<%= level1 ? 'disable_sort' : '' %>"><%end-%>
+  <tr class="<%= klass %> <%= tbody_required ? 'disable_sort' : ''%>">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <% if enable_selection and !@imported_components[:course_subjects].include? subject.id%>
+              <div class="pull-left inner_select">
+                <%= check_box_tag "import_subjects[#{subject.class.name.underscore}_ids][]", subject.id, false, 
+                              :class => "select_subject" %>
+              </div>
+          <% end %>
+          <div class="pull-left bold"><%= subject.name_with_code %></div>
+          <div class="component_link component_type">
+              <%= t('subject') %>
+          </div>
+      </td>
+  </tr>
+<% if level1 -%></tbody><% end -%>

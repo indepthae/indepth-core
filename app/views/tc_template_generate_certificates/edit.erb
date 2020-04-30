@@ -1,0 +1,44 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<% content_for :head do  %>
+  <%= javascript_include_tag("tc_printer") %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tc_template_generate_certificate') %></div>
+    <div id="inner-tab-menu">
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_generate_report, @student%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="error_msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="error_msg"></div>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%= t('generate_transfer_certificate')%> </label>
+        </div>
+    </div>
+    <%= render :partial=>'student_profile_head'  %>
+    <div class="middile_section" id="middle_section">
+        <div class="text" id="text">
+        </div>
+        <div id="tc_display">
+            <div id="necessary-field-notification"> <%= t('legend1') %> <span class="necessary-field">*</span> <%= t('legend2') %></div>
+            <div class="student_details_view">
+                <%=render :partial=>'student_details'%>
+            </div>
+
+        </div>
+    </div>
+</div>

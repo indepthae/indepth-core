@@ -1,0 +1,16 @@
+<% if precision_label(@total_fine).to_f > 0 %>
+  <% total_fees =0 %>
+  <% i = 0 %>
+  <div id="particulars-list">
+      <tr class="tr-blank"></tr>
+      <tr class="tr-<%= cycle("odd", "even") %>" >
+          <td class="col-1 normal_font"><%= i+=1 %></td>
+          <td class="col-2 normal_font"><%= t('fine') %></td>
+          <td class="col-6 normal_font">
+              <%= precision_label(@total_fine.to_f) %>
+          </td>
+      </tr>
+  </div>
+<% end %>
+
+

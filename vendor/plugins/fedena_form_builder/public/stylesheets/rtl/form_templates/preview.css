@@ -1,0 +1,85 @@
+.form_name label {
+    font-size: 15px;
+    font-weight: bold;
+}
+.field_block {
+    min-width: 640px;
+    width: 100%;
+    height: auto;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    display: inline-block;
+}
+/** input field **/
+.label_text_field {
+    width: auto;
+    margin-bottom: 5px;
+    min-height: 20px;
+}
+.label_text_field label {
+    color: #5a5a5a;
+    font-size: 15px;
+}
+.label_text_field .description_label{
+    color: #5a5a5a;
+    font-size: 13px;
+    margin-top: 5px;
+    white-space: pre-wrap;
+    width: 100%;
+}
+.input_text_field {
+    width: 230px;
+    min-height: 30px;
+}
+.field_block .input_text_field {
+    width: 100%;
+}
+.field_block .input_text_field label {
+    width: calc(100% - 40px);
+}
+.input_text_field input, .input_text_field select{
+    width: 100%;
+    height: 28px;
+    border: 1px solid #e2e2e2;
+    padding-right: 10px;
+    padding-left: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    background: #eee;
+}
+.input_text_field input[type='checkbox'],.input_text_field input[type='radio']{
+    height: 15px !important;
+    width: 15px !important;
+    float: right;
+    top: 5px;
+    position: relative;
+}
+.input_text_field label{
+    color: #5a5a5a;
+    font-size: 15px;
+    float: right;
+    margin-right: 10px;
+    line-height: 30px;
+    width: 190px;
+}
+.input_text_field textarea{
+    width: 500px;
+    height: 72px;
+    border: 1px solid #e2e2e2;
+    background: #eee;
+    border-radius: 4px;
+    padding: 10px;
+    /*resize: none;*/
+    max-width: 958px;
+}
+.input_text_field input{
+    width: 220px;
+}
+.input_text_field select{
+    width: 242px;
+}
+.mandatory:after{
+    color: #FF0000;
+    font-size: 15px;
+    content: "*";
+}

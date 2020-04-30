@@ -1,0 +1,45 @@
+<% if @multi_fee_discounts.present? %>
+  <tr class="row-a">
+      <td class="sl-col col-1"></td>                  
+      <td colspan="<%= fee_head_col_span + 1%>" class="instant_heading">
+          <%= t('discounts') %>
+      </td>
+  </tr>
+  <% @multi_fee_discounts.each_with_index do |m_discount, di| %>
+    <tr class="row-b">
+        <td class="sl-col col-1">
+            <%= di + 1 %>
+        </td>
+        <td class="set_border_right padding_right_0" colspan="<%= @is_tax_present ? 4 : 3%>">
+            <%= m_discount.name %>
+            <%= " - #{m_discount.discount} % " unless m_discount.is_amount%>
+            <% if m_discount.fee_type.present? %>
+              <span class="discount-collection-details">
+                  <% if m_discount.fee_type == "FinanceFee" %>
+                    <% collection_name = m_discount.fee.finance_fee_collection.name %>
+                    <% collection_name += " - #{m_discount.master_receiver.name}" if m_discount.master_receiver_type == "FinanceFeeParticular"  %>
+                    <%= "&#x200E;(#{collection_name})&#x200E;"  %>
+                  <% elsif m_discount.fee_type == "TransportFee" %>
+                    <%= "&rlm;(#{m_discount.fee.transport_fee_collection.name}&rlm;)" %>
+                  <% end %>
+              </span>
+            <% end %>
+        </td>
+        <td class="set_border_right align_right">
+            <% param = {:student_id => @student.id, :batch_id => params[:batch_id]} %>
+            <% param.merge!({:manual_fines => @temporary_manual_fines}) if @temporary_manual_fines.present? %>
+            <% if precision_label(@total_amount_to_pay).to_f != 0.to_f and m_discount.can_delete?(params[:batch_id]) %>
+              <% if can_access_request? :delete_student_discount, :finance_extensions %>
+              <% unless m_discount.transaction_ledger_id.present? %>
+              <%= link_to_remote "#{t('remove')}", {:url => {:action => "delete_instant_pay_all_discount",
+                  :id => m_discount }.merge(param), :confirm => "#{t('delete_confirm_msg')}"}, {:class => "option_link" } %>
+              <% end %>
+            <% end %>
+            <% end %>
+        </td>
+        <td class="set_border_right">
+            <%= precision_label(m_discount.is_amount ? m_discount.discount.to_f : m_discount.total_discount.to_f) %>
+        </td>
+    </tr>
+  <% end %>
+<% end %>

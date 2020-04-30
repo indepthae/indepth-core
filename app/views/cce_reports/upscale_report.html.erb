@@ -1,0 +1,54 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>CCE Reports</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Upscale Report</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="rg_text">Upscale Report</div>
+  <div id="record_group">
+    <div id="other_details">
+      <div id="student_items">
+        <%if @entries.present?%>
+          <table id="student_details_table">
+            <tr>
+              <th id="name">Class</th>
+              <th id="action">Eligible Students</th>
+              <th id="action">Upscaled Students</th>
+              <th id="action"></th>
+            </tr>
+            <%@entries.each do |course_name,batches|%>
+              <tr>
+                <td colspan="4" class="highlighter sep_border"><%=course_name%></td>
+              </tr>
+              <%batches.each do |batch|%>
+                <tr class="list_<%=cycle('odd', 'even')%>">
+                  <td>
+                    <%=batch.full_name%>
+                  </td>
+                  <td>
+                    <%="#{batch.get_eligible_students_count}/#{batch.students.count}"%>
+                  </td>
+                  <td>
+                    <%="#{batch.upscaled_students_count}/#{batch.get_eligible_students_count}"%>
+                  </td>
+                  <td>
+                    <%if can_access_request? :upscale_scores,batch,:context=>:cce_report_settings%>
+                      <%= link_to "Upscale student grades", upscale_scores_cce_report_settings_path(:batch_id=>batch.id) %>
+                    <% end %>
+                  </td>
+                </tr>
+              <%end%>
+            <%end%>
+          </table>
+        <%else%>
+          <div class="no_entries">No batches with upscaling</div>
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>

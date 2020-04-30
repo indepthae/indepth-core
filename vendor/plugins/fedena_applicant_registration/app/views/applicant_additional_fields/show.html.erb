@@ -1,0 +1,54 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('additional_fields') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @addl_field_grp.name %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('data_management')}", :action=>"index"%></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :applicant_additional_fields_show, @addl_field_grp %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <ul id="category-list">
+    <% @addl_field_grp.applicant_addl_fields.each_with_index do |f,i| %>
+      <li class="list<%=cycle('odd', 'even')%>">
+        <div class="category-name">
+          <%= f.field_name%>
+        </div>
+        <div class="category-type">
+          <%=f.get_field_type%>
+        </div>
+        <div class="field-value">
+          <% unless f.field_type =="text"  %>
+            Values: <%= f.applicant_addl_field_values.map{|a| a.option}.join(",") %>
+          <% else %>
+            -
+          <% end %>
+        </div>
+        <div class="category-status">
+          <%= f.is_active ? t('active') : t('inactive') %>
+        </div>
+        <div class="pos">
+          <span class="category-up-down <%= "inactive" if i==0 %>"><%= link_to_remote "▲",:url=>{:action=>"change_order",:order=>"up",:id=>f.id,:c=>"field"} %></span>
+          <span class="category-up-down <%= "inactive" if i+1==@addl_field_grp.applicant_addl_fields.count%>"><%= link_to_remote "▼",:url=>{:action=>"change_order",:order=>"down",:id=>f.id,:c=>"field"} %></span>
+        </div>
+        <div class="category-toggle">
+          <%= link_to (f.is_active ? t('make_inactive') : t('make_active')) ,:action=>:toggle_field,:id=>f.id,:group_id=>params[:id] %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+  <hr/>
+
+
+</div>

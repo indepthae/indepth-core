@@ -1,0 +1,16 @@
+<% if @report_template.present? %>
+  <div class="template-name-container">
+      <label class="template-name"><%= @report_template.display_name %></label>
+      <%= hidden_field :assessment_report_setting, :custom_template, :value =>  @report_template.name %>
+  </div>
+  <div class="left-pane">
+      <div class="image-container">
+        <%= image_tag("/assessment_reports/preview_img/?name=#{@report_template.name}") %>
+      </div>
+  </div>
+  <div class="right-pane">
+      <% settings_fields_for @report_template %>
+      <div id="view-templates" onclick="view_templates(this);"><%= t('change_template') %></div>
+  </div>
+
+<% end %>

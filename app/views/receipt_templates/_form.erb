@@ -1,0 +1,64 @@
+<% content_for :head do %>
+    <% @direction = rtl? ? 'rtl/' : '' %>
+    <%= stylesheet_link_tag "#{@direction}receipt_templates/_form" %>
+<% end %>
+
+<% if @receipt_template.errors.present? %>
+    <div id="error-box">
+      <ul>
+        <% @receipt_template.errors.full_messages.each do |msg| %>
+            <li> <%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>
+
+<% form_for @receipt_template, @receipt_template.new_record? ?
+                                     {:url => receipt_templates_path, :method => :post} :
+                                     {:url => receipt_template_path, :method => :put} do |f| %>
+    <%= session_fingerprint_field %>
+    <%= f.hidden_field :preview, :value => 0 %>
+    <div class="label-field-pair">
+      <%= f.label :name, t('name') %>
+      <div class="text-input-bg">
+        <%= f.text_field :name %>
+      </div>
+    </div>
+
+    <div class="label-field-pair margin-bottom-5">
+      <%= f.label :header_content, t('header'), :class => "margin-bottom-5" %>
+    </div>
+    <div class="description margin-top-0 margin-bottom-20">
+      <%= t('default_header_template_desc') %>
+    </div>
+    <div id="header_content" class="header_contents">
+      <%# TODO :: load redactor with default receipt header %>
+      <%= f.redactor :header_content, {:plugin => [:fontsize, :fontfamily], :exclude => [:video, :file, :link]} %>
+    </div>
+
+    <div class="label-field-pair">
+      <%= f.label :footer_content, t('footer') %>
+      <div class="text-input-bg">
+        <%= f.text_area :footer_content %>
+      </div>
+    </div>
+
+    <%= render :partial => "additional_templates", :locals => {:f => f} %>
+
+    <%= f.submit t('save_template'), :class => "submit-button" %>
+    <%= f.submit t('save_and_preview_template'), :onclick => "set_preview()", :class => "submit-button save-and-preview" %>
+
+<% end %>
+
+<script>
+
+    set_preview = function () {
+        j("input[name*='preview']").val(1);
+    };
+
+    j('#additional_templates').on('change', function () {
+        console.log('hi');
+        j('div[id^=header_content-]').hide();
+        j('#header_content-' + j(this).val()).show();
+    });
+</script>

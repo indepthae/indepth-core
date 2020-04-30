@@ -1,0 +1,27 @@
+<div class="head">
+    <%=t('exam_planners')%>
+</div>
+<div id="plan_listing">
+    <% if @plans.present? %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="col-2"><%= t('plan_name') %></td>
+              <td class="col-1"><%= t('courses_linked_count') %></td>
+              <td class="col-1"><%= t('terms') %></td>
+              <td class="col-1"><%= t('exams_text') %></td>
+              <td class="col-1"></td>
+          </tr>
+          <% @plans.each do |plan|  %>
+            <tr class="tr-<%= cycle('even', 'odd') %>">
+                <td><%= plan.name %></td>
+                <td class="float"><%= plan.courses.count %></td>
+                <td class="float"><%= plan.terms_count %></td>
+                <td class="float"><%= plan.assessment_groups_count %></td>
+                <td><%= link_to t('show_details'), {:action=> 'show', :id=>plan.id} %></td>
+            </tr>
+          <% end %>
+      </table>
+    <% else %>
+      <p class="flash-msg"> No Plans Created </p>
+    <% end %>
+</div>

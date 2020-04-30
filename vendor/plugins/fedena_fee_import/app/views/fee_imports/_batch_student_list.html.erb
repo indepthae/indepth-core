@@ -1,0 +1,15 @@
+<% if @students.present? %>
+  <div id="student_list">
+    <%= render  :partial=>"student_list" %>
+  </div>
+
+  <div id="fees_list">
+    <%= render :partial=>'fees_list'%>
+  </div>
+<% else %>
+  <p class="flash-msg"> <%= t("no_students_in_batch")  %> </p>
+<% end %>
+<script type="text/javascript">
+  $$('.student-link').invoke('observe','click',draw_report);
+  $$('.student-link').invoke('observe','click',set_active);
+</script>

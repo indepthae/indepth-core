@@ -1,0 +1,85 @@
+
+
+<div id="page-yield">
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+
+
+    <% form_for(@store_item) do |f| %>
+
+      <%= f.error_messages %>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('store')}" %><span class="necessary-field">*</span></div>
+        <div class="text-input-bg"><%= f.select :store_id, @stores.map{|st| [st.full_name,st.id]} %></div>
+      </div>
+
+     
+    
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('item_name')}" %><span class="necessary-field">*</span></div>
+        <div class="input-container"><%= f.text_field :item_name %></div>
+      </div>
+
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('code')}" %></span></div>
+        <div class="input-container"><%= f.text_field :code %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('quantity')}" %><span class="necessary-field">*</span></div>
+        <div class="text-input-bg"><%= f.text_field :quantity %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('unit_price')}" %><span class="necessary-field">*</span></div>
+        <% @store_item.unit_price = precision_label(@store_item.unit_price) if @store_item.unit_price %>
+        <div class="text-input-bg"><%= f.text_field :unit_price,:class=>'precision_text' %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('tax')}" + " (%)" %><span class="necessary-field">*</span></div>
+        <% @store_item.tax = precision_label(@store_item.tax) if @store_item.tax %>
+        <div class="input-container"><%= f.text_field :tax,:class=>'precision_text' %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('batch_no')}" %></div>
+        <div class="input-container"><%= f.text_field :batch_number %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('sellable')}" %></div>
+        <div class="input-container"><%= f.check_box :sellable %></div>
+      </div>
+    <div id="item_category" style="display:none;">
+       <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('item_category')}" %><span class="necessary-field">*</span></div>
+        <div class="text-input-bg"><%= f.select :item_category_id, @item_categories.map{|st| [st.name,st.id]}, :prompt => "select category"%></div>
+      </div>
+    </div>
+
+      <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+j('#store_item_sellable').change(function(){
+j('#item_category').toggle()
+})
+
+if (j('input#store_item_sellable').is(':checked')){
+  j('#item_category').show();
+}
+</script>

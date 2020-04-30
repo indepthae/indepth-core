@@ -1,0 +1,54 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="att_detail">
+    <%= @config.config_value == 'Daily' ? t('total_working_days'): t('total_working_hours') %>
+    <%= @academic_days_count %>
+    | <%= t('no_of_applicable_days') %>:<%= @student_academic_days %>
+    |<%= t('total_present') %> : <%= @attendance %> |
+    <%= t('percentage') %>: <%= "%.2f" %(@percent.to_f) %>
+</div>
+<% if @student_leaves.present? %>
+  <table id="listing" align="center" width="80%">
+      <tr class="tr-head">
+          <td>
+              <%= t('date_text') %>
+          </td>
+          <td>
+              <%= t('status') %>
+          </td>
+          <td>
+              <%= t('reason') %>
+          </td>
+      </tr>
+      <tr class="blank"></tr>
+      
+      <% @student_leaves.each do |t| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-2"><%= format_date(t.month_date.to_date) %></td>
+            <td class="col-3">
+                <%  if @config.config_value == 'Daily' %>
+                  <% if t.forenoon and t.afternoon %>
+                    <%= t('full_day') %>
+                  <% elsif t.afternoon %>
+                    <%= t('afternoon') %>
+                  <% elsif t.forenoon %>
+                    <%= t('forenoon') %>
+                  <% end %>
+                <% else %>
+                  <%= t('absent') %>
+                <% end %>
+            </td>
+            <td class="col-2">
+                <%= t.reason %></td>
+          <% end %>
+      </tr>
+  </table>
+<% else %>
+  <div class="label-field-pair2" >
+      <p class = "flash-msg"><%= t('no_report_for_given_period') %></p>
+  </div>
+<% end %>

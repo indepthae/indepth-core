@@ -1,0 +1,42 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_student_records') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :student_records_handle_record_groups,@record_group,@current_user%>
+    <%= render_breadcrumbs %>
+  </div>
+  <% if params[:flash].present? %>
+    <p class='flash-msg'><%= params[:flash] %></p>
+  <% end %>
+  <div id="rg_text"><%=@record_group.name%></div>
+  <div id="rg_desc"><%=t('record_assignment_desc_course')%></div>
+  <div id="other_details">
+    <div id="student_items">
+      <%if @courses_list.present?%>
+        <table id="student_details_table">
+          <tr>
+            <th id="name"><%=t('course_text')%></th>
+            <th id="grade"><%=t('grading_system')%></th>
+            <th id="no_of_batches"><%=t('assigned_batches_snakecase')%></th>
+            <th id="action"></th>
+          </tr>
+
+          <%@courses_list.each do |c|%>
+            <tr class="list_<%=cycle('odd', 'even')%>">
+              <td><%=c["cname"]%></td>
+              <td><%=Batch::GRADINGTYPES[c['grading_type']].nil? ? 'Normal' : Batch::GRADINGTYPES[c['grading_type']]%></td>
+              <td><%=c["bcount"]%></td>
+              <td><%=link_to t('view_batches'),{:controller=>'student_records',:action=>'manage_student_records_for_course',:id=>c['id'],:rg_id=>@record_group.id}%></td>
+            </tr>
+          <%end%>
+        </table>
+      <%else%>
+        <div class="no_entries"><%=t('no_records')%></div>
+      <%end%>
+    </div>
+  </div>
+</div>

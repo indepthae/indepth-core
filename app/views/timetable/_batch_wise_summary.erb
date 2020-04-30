@@ -1,0 +1,31 @@
+<div class="batch_summary_selector">
+  <div class="batch_wise_heading">
+    <%= t('batch_wise_summary') %>
+  </div>
+  <div class="batch_data">
+    <div class="batch_list">
+      <div class="label-field-pair">
+        <label>
+          <%= t('batch') %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+        </label>
+        <div class="text-input-bg">
+          <%= select :batch, :id,
+            @batches.map {|b| [b.full_name, b.id] },
+            {:prompt => t('select_a_batch') },
+            {:onchange => "#{remote_function(
+            :url => { :action => 'load_batch_wise_summary' },
+            :with => "'id='+value+'&timetable_id='+#{@timetable.id}",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"  )}"} %>
+        </div>
+      </div>
+    </div>
+    <div class="batch_tutor_list" id="batch_tutor_list">
+
+    </div>
+  </div>
+</div>
+<div id="batch_summary">
+  <%= render :partial => "summary_data" if @batch.present? %>
+</div>

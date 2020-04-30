@@ -1,0 +1,73 @@
+<% if @transport_fee.finance_transactions.present? %>
+  <div id="payments_details">
+      <div class="label-field-pair3">
+          <label><%= t('payment_history') %> </label>
+      </div>  
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+
+          <tr class="main-head tr-list_head">
+              <td><%= t('receipt_no') %></td>
+              <td class="set_border_right"><%= t('payment_date') %></td>
+              <td class="set_border_right"><%= t('payment_mode') %></td>
+              <td class="set_border_right"><%= t('payment_notes') %></td>
+              <% unless @current_user.student? %>
+                <td class="set_border_right"><%= t('cashier') %></td>
+              <% end %>
+              <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+              <% unless @payer_type.present? and @payer_type=="Archived Student" %>
+                <td class="set_border_right col-3" ></td>
+              <% end %>
+          </tr>
+
+          <% @transport_fee.finance_transactions.each do |transaction| %>
+            <tr class="row-b">
+                <td class="col-3">
+                    <%= transaction.receipt_number %>
+                </td>
+                <td class="set_border_right col-3">
+                    <%= format_date(transaction.transaction_date) %>
+                </td>
+
+                <td class="set_border_right col-3">
+                    <%= "#{transaction.payment_mode} #{ transaction.reference_no.present? ? '- ' + transaction.reference_no : ''}" %>
+                </td>
+
+                <td class="set_border_right col-2"><%= transaction.payment_note %></td>
+
+                <% unless @current_user.student? %>
+                  <td class="set_border_right col-3">
+                      <%= transaction.payment_mode == 'Online Payment' ? transaction.get_cashier_name : transaction.cashier_name %>
+                  </td>
+                <% end %>
+
+                <td class="set_border_right col-3">
+                    <%= precision_label(transaction.amount.to_f) %>
+                </td>
+
+                <% unless @payer_type.present? and @payer_type == "Archived Student" %>
+                  <td class="set_border_right col-3 receipt-actions">
+                      <%= receipt_buttons(transaction.id) %>
+                      <% if (can_access_request? :delete_transport_transaction, :transport_fee) and !@hide_print_options.present? %>
+                        <% if transaction.transaction_ledger.is_waiver == true %>
+                          <% if transaction.transaction_ledger.transaction_type == "SINGLE" %>
+                            <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                            :onclick => "return MakeBox(#{transaction.id});", :class=>"themed_text", 
+                            :tooltip=>t('revert_transaction') %>
+                          <% else %>
+                            <span class="waiver_info" tooltip="<%= t("waiver_revert_block_collection") %>"></span>
+                          <% end %>
+                        <% else %>
+                          <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                            :onclick => "return MakeBox(#{transaction.id});", :class=>"themed_text", 
+                            :tooltip=>t('revert_transaction') %>
+                        <% end %>
+                      <% end %>
+                  </td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+
+  </div>
+<% end %>

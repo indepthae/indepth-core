@@ -1,0 +1,736 @@
+<script type="text/javascript">
+    function setOption(optn) {
+        if (optn == 'guest') {
+            $('payee_select').hide();
+            $('search_textbox').hide();
+        }
+        else {
+            $('payee_select').show();
+            $('search_textbox').show();
+        }
+        document.getElementById("option").value = optn;
+    }
+</script>
+<div id="partial-content">
+  <div id="search_box_bg">
+    <form name="search_form" action="" style="display:inline;">
+      <%= hidden_field_tag("option", params['option'], :value => "student") %>
+      <label for="user_name" id="payee_select"><%= "#{t('select_payee')}" %>
+      </label>
+
+      <div id="search_textbox">
+
+        <%= text_field_tag("query", params['query'], :autocomplete => 'off') %>
+
+      </div>
+      <div class="radio_button">
+        <div class="radio-label">
+          <input type="radio" name="setopt" id="search_present_students_radio" checked="checked"
+                 onclick="setOption('student')"/><%= t('student_text') %>
+          <input type="radio" name="setopt" id="search_former_students_radio" onclick="setOption('employee')"/>
+          <%= t('employee_text') %>
+          <input type="radio" name="setopt" id="search_former_students_radio" onclick="setOption('guest')"/><%= t('guest') %>
+        </div>
+        <div class="img_loading">
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style => "display: none;") %>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div id="view_all"></div>
+
+  <%= observe_fields ['query', 'option'], :frequency => 0.5, :update => 'information',
+                     :before => "Element.show('loader')", :success => "Element.hide('loader')",
+                     :url => {:action => 'tsearch_logic'} %>
+
+  <div id="information"></div>
+  <div id="select-category-type"></div>
+  <div id="enter_custom_category"></div>
+  <div id="fee_window"></div>
+</div>
+
+
+<script>
+
+    <% if @tax_enabled %>
+    var tax_slabs = JSON.parse('<%= raw(@tax_slab_hash.to_json) %>');
+    <% end %>
+    var tax_enabled = <%= @tax_enabled %>;
+
+    i = 0;
+
+    function update_row_status(row_ele, status){
+        j(row_ele).find('select').attr('disabled', status);
+        j(row_ele).find('input').attr('disabled', status);
+        j(row_ele).find("input[name^=amount]").val("<%= precision_label(0) %>");
+    }
+
+    function clone_particulars(id_suffix){
+        masters = j('#master_particulars > select').clone();
+        j(masters).attr('disabled', false);
+        j(masters).attr('id', j(masters).attr('id') + id_suffix);
+        existing_master_ids = j("[name^=master_fee_particular_id]:enabled").map(function() {
+            return this.value;
+        }).get();
+        j(masters).attr('disabled', false).find('option:enabled').each(function(a,b){
+            j(b).attr('disabled', existing_master_ids.includes(j(b).val()) ? true : false);
+        });
+        j(j(masters).find('option:enabled')[0]).attr('selected', true);
+        masters_available = j(masters).find('option:enabled').length;
+        return masters_available > 0 ? masters : false;
+    }
+
+    function clone_discounts(id_suffix){
+        masters = j('#master_discounts > select').clone();
+        j(masters).attr('disabled', false);
+        j(masters).attr('id', j(masters).attr('id') + id_suffix);
+        return masters;
+    }
+
+    function update_row_sl(){
+        ci = 0;
+        j('tr[class*="tr-data-rows"] td.col-1').each(function(a,b){
+            j(b).text(++ci);
+        });
+    }
+
+    function insRow(){
+        // set row counter
+        i = (i == 0 ? j('.tr-data-rows').length + 1 : i);
+        // row count
+        row_value = j('.tr-data-rows').length + j('.tr-data-rows-custom').length + 1;
+        row_number = i;
+        // row stamp
+        row_t = Date.now();
+        var master_particulars = clone_particulars(row_t);
+        // check if master particulars exists else return
+        if(!master_particulars){
+            alert("<%= t('instant_fees.no_unique_master_particulars') %>");
+            return false;
+        }
+
+        var master_discounts = clone_discounts(row_t);
+        var add_before_node = j('#addrow').parents('tr');
+        var row = j('<tr>', {class: 'tr-odd tr-data-rows-custom'});
+        // make columns for row
+        // sl_no column
+        var cell_1 = j('<td>', {class: 'col-1', text: row_value});
+        // particular column
+        var cell_2 = j('<td>', {class: tax_enabled ? 'col-2-2' : 'col-2'});
+        // particular amount column
+        var cell_3 = j('<td>', {class: 'col-3'});
+        // discount column
+        var cell_4 = j('<td>', {class: tax_enabled ? 'col-4-3' : 'col-2'});
+        // tax column
+        if(tax_enabled){
+            var cell_5 = j('<td>', {class: 'col-4-2'});
+        }
+        // net amount column
+        var cell_6 = j('<td>', {class: 'col-5'});
+        // options column
+        var cell_7 = j('<td>', {class: 'col-select'});
+        // Build columns
+        // (2) build particular column
+        cell_2.append(j('<div>', {class: 'text-input-bg'}).append(master_particulars));
+        // (3) build particular amount column
+        cell_3.append(j('<div>', {class: 'text-input-bg1'}).append(
+                j('<input>', {
+                    id: 'amount_' + row_t, class: 'amount precision_text', type: 'text', name: 'amount[]',
+                    onchange: "update_total_by_amount(this)", value: "<%= precision_label(0) %>"
+                })
+        ));
+        // (4) build discount column
+        col_div = j('<div>', {class: 'text-input-bg1'});
+        col_div.append(master_discounts);
+        cell_4.append(col_div.append(
+                j('<input>', {
+                    id: 'discount_' + row_t, class: 'precision_text', type: 'text', name: 'discount[]',
+                    readonly: "readonly", onchange: "update_total_by_discount(this)", value: "<%= precision_label(0) %>"
+                })
+        ));
+        // (5) build tax column
+        if(tax_enabled){
+            col_div = j('<div>', {class: 'text-input-bg1'});
+            tax_select = j('<select>', {
+                id: 'tax_slab_' + row_t,
+                name: 'tax_slab[]',
+                onchange: 'update_total_by_tax_slab(this)'
+            });
+            // default option
+            tax_select.append(j('<option>', {
+                text: '<%= t("select_a_tax_slab")  %>'
+            }));
+            // append slabs
+            for (var slab in tax_slabs) {
+                slab_name = j.parseHTML(tax_slabs[slab]['name'] + ' - &rlm;(' + roundVal(tax_slabs[slab]['rate']) + ')&rlm;%')[0].data;
+                tax_select.append(j('<option>', {
+                    value: slab,
+                    text: slab_name
+                }));
+            }
+            i_tax_rate = j('<input>', {
+                id: 'tax_rate_' + row_t, type: 'hidden', name: 'tax_rate[]', value: "<%= precision_label(0) %>"
+            });
+            i_tax_amount = j('<input>', {
+                id: 'tax_amount_' + row_t, type: 'hidden', name: 'tax_amount[]', value: "<%= precision_label(0) %>"
+            });
+            cell_5.append(col_div.append(tax_select).append(i_tax_rate).append(i_tax_amount));
+        }
+        // (6) build net amount column
+        cell_6.append(j('<div>', {class: 'text-input-bg1'}).append(
+                j('<input>', {
+                    id: 'total_check_' + row_t, class: 'particular_total', type: 'text', name: 'total[]',
+                    readonly: 'readonly', value: "<%= precision_label(0) %>"
+                })
+        ));
+        // (7) build row option column
+        anchor = j('<a>', {
+            href: '#', id: 'delete_row_' + row_t, class: 'themed_text delete_row',
+            onclick: 'delRow(j(this).parents("tr"))', text: 'x'
+        });
+        cell_7.append(anchor);
+
+        // append columns to row
+        row.append(cell_1);
+        row.append(cell_2);
+        row.append(cell_3);
+        row.append(cell_4);
+        if(tax_enabled) {
+            row.append(cell_5);
+        }
+        row.append(cell_6);
+        row.append(cell_7);
+
+        // attach new row to form
+        add_before_node.before(row);
+        i++;
+    }
+
+    j(document).on("click", "a.delete_row" , function(e) {
+        e.preventDefault()
+    });
+
+    function delRow(row) {
+        j(row).remove();
+//        document.getElementById('listing').deleteRow(i);
+        col5total();
+        // update sl number of rows
+        update_row_sl();
+    }
+
+    function roundVal(val) {
+        var dec = parseInt("<%= @precision%>");
+        var result = Math.round(val * Math.pow(10, dec)) / Math.pow(10, dec);
+        return result;
+    }
+
+    function precisionVal(val){
+        var dec = parseInt("<%= @precision%>");
+        return parseFloat(val).toFixed(dec);
+    }
+
+    var total_global;
+    function assign_amt(che) {
+        var master_particular = che.id.replace('check', 'master_fee_particular_id');
+        var master_discount = che.id.replace('check', 'master_fee_discount_id');
+        var discount = che.id.replace('check', "discount");
+        var amount = che.id.replace('check', "amount");
+        if (tax_enabled) {
+            var tax_rate = che.id.replace('check', 'tax_rate');
+            var tax_slab = che.id.replace('check', 'tax_slab');
+            var tax_amount = che.id.replace('check', 'tax_amount');
+        }
+        var total = che.id.replace('check', "total_check");
+        var amount_text = document.getElementById(amount).value;
+        var discount_text = document.getElementById(discount).value;
+        var tax_rate_text = tax_enabled ? document.getElementById(tax_rate).value : 0;
+        var tax_amount_text = tax_enabled ? document.getElementById(tax_amount).value : 0;
+        if (isNaN(discount_text) == false && isNaN(amount_text) == false) {
+            if (che.checked) {
+                document.getElementById(master_particular).removeAttribute('disabled');
+                document.getElementById(master_discount).removeAttribute('disabled');
+                document.getElementById(amount).removeAttribute('disabled');
+                document.getElementById(discount).removeAttribute('disabled');
+                document.getElementById(total).removeAttribute('disabled');
+                if (tax_enabled) {
+                    document.getElementById(tax_slab).removeAttribute('disabled');
+                    document.getElementById(tax_rate).removeAttribute('disabled');
+                    document.getElementById(tax_amount).removeAttribute('disabled');
+                }
+                if (amount_text == 0 || "") {
+                    document.getElementById(total).value = precisionVal(0.0);
+                    amount_text = document.getElementById(amount).value = precisionVal(0.0)
+                }
+                else {
+                    if (amount_text < 0) {
+                        alert("Amount can not be negative.")
+                        document.getElementById(amount).value = precisionVal(0.0)
+                        col5total();
+                        return false;
+                    }
+                    if (discount_text == 0 || "") {
+                        document.getElementById(total).value = precisionVal(amount_text.value)
+                    }
+                    if (discount_text <= 100) {
+                        if (discount_text < 0) {
+                            alert("Discount cannot be negative.")
+                            document.getElementById(discount).value = precisionVal(0.0);
+                            col5total();
+                            return false;
+                        }
+                        else {
+                            taxable_amount = parseFloat(amount_text - (amount_text * discount_text / 100));
+                            tax_amount_calc = tax_enabled ? parseFloat(taxable_amount * tax_rate_text * 0.01) : 0;
+                            taxed_amount_calc = parseFloat(taxable_amount + tax_amount_calc);
+                            if (tax_enabled)
+                                document.getElementById(tax_amount).value = precisionVal(roundVal(tax_amount_calc));
+                            document.getElementById(total).value = precisionVal(roundVal(taxed_amount_calc));
+                        }
+                    }
+                }
+
+            }
+            else {
+                j("#check_all").prop("checked", false);
+                document.getElementById(master_particular).setAttribute('disabled', 'true');
+                document.getElementById(master_discount).setAttribute('disabled', 'true');
+                document.getElementById(total).value = precisionVal(0.0);
+                document.getElementById(amount).setAttribute('disabled', 'true');
+                document.getElementById(discount).setAttribute('disabled', 'true');
+                document.getElementById(total).setAttribute('disabled', 'true');
+                if (tax_enabled) {
+                    document.getElementById(tax_slab).setAttribute('disabled', 'true');
+                    document.getElementById(tax_rate).setAttribute('disabled', 'true');
+                    document.getElementById(tax_amount).setAttribute('disabled', 'true');
+                }
+            }
+            col5total();
+        }
+        else
+            alert('Please enter numeric value for amount and discount');
+        col5total();
+    }
+
+    function update_total_by_tax_slab(select_box) {
+        var amount = select_box.id.replace('tax_slab', "amount");
+        var discount = select_box.id.replace('tax_slab', "discount");
+        var tax_rate = select_box.id.replace('tax_slab', 'tax_rate');
+        var tax_amount = select_box.id.replace('tax_slab', 'tax_amount');
+        var total = select_box.id.replace('tax_slab', "total_check");
+
+        var amount_text = document.getElementById(amount).value;
+        var discount_text = document.getElementById(discount).value;
+        var tax_slab_id = parseInt(select_box.value);
+        // TO DO: check if logic to handle when tax slabs is empty is working fine
+        //var tax_amount_text = document.getElementById(tax_amount).value;
+
+        if (!isNaN(tax_slab_id) && tax_slab_id > 0) {
+            var tax_rate_text = document.getElementById(tax_rate).value = precisionVal(tax_slabs[tax_slab_id]['rate']);
+
+            taxable_amount = parseFloat(amount_text - (amount_text * discount_text * 0.01));
+            tax_amount_calc = parseFloat(taxable_amount * tax_rate_text * 0.01);
+            taxed_amount_calc = parseFloat(taxable_amount + tax_amount_calc);
+            document.getElementById(tax_amount).value = precisionVal(roundVal(tax_amount_calc));
+            document.getElementById(total).value = precisionVal(roundVal(taxed_amount_calc));
+        } else { // remove tax slab on particular values
+            document.getElementById(tax_rate).value = precisionVal(0);
+
+            discounted_amount = parseFloat(amount_text - (amount_text * discount_text * 0.01));
+            document.getElementById(tax_amount).value = precisionVal(0);
+            document.getElementById(total).value = precisionVal(roundVal(discounted_amount));
+        }
+        col5total();
+    }
+
+    function update_total_by_amount(text_box) {
+        if(parseFloat(text_box.value) > 0){
+            text_box.removeClassName('error');
+        }else{
+            text_box.addClassName('error');
+        }
+        var discount = text_box.id.replace('amount', "discount");
+        var tax_rate = text_box.id.replace('amount', 'tax_rate');
+        var tax_amount = text_box.id.replace('amount', 'tax_amount');
+        var total = text_box.id.replace('amount', "total_check");
+        var discount_text = document.getElementById(discount).value;
+        var tax_rate_text = tax_enabled ? document.getElementById(tax_rate).value : 0;
+        var tax_amount_text = tax_enabled ? document.getElementById(tax_amount).value : 0;
+
+        /*
+         var discount = che.id.replace('check', "discount");
+         var amount = che.id.replace('check', "amount");
+         var total = che.id.replace('check', "total_check");
+         var amount_text = document.getElementById(amount).value;
+         var discount_text = document.getElementById(discount).value;
+         */
+
+
+        if (isNaN(discount_text) == false && isNaN(text_box.value) == false) {
+            if (text_box.value < 0) {
+                alert("Amount can not be negative.");
+                text_box.value = 0.0;
+                document.getElementById(total).value = precisionVal(0.0);
+                col5total();
+                return false;
+            }
+            if (text_box.value == "") {
+                text_box.value = 0.0;
+                document.getElementById(total).value = precisionVal(0.0);
+                col5total();
+                return false;
+            }
+            if (discount_text == 0 || "") {
+                document.getElementById(total).value = precisionVal(text_box.value);
+                document.getElementById(discount).value = precisionVal(0.0);
+            }
+            if (discount_text <= 100) {
+                if (discount_text < 0) {
+                    alert("Discount can not be negative.")
+                    document.getElementById(discount).value = precisionVal(0.0);
+                    col5total();
+                    return false;
+                }
+                else {
+                    parseFloat(text_box.value - (text_box.value * discount_text / 100));
+
+                    taxable_amount = parseFloat(text_box.value - (text_box.value * discount_text / 100));
+                    tax_amount_calc = tax_enabled ? parseFloat(taxable_amount * tax_rate_text * 0.01) : 0;
+                    taxed_amount_calc = parseFloat(taxable_amount + tax_amount_calc);
+                    if (tax_enabled)
+                        document.getElementById(tax_amount).value = precisionVal(roundVal(tax_amount_calc));
+                    document.getElementById(total).value = precisionVal(roundVal(taxed_amount_calc));
+                }
+            }
+            else
+                alert('Discount cannot be greater than 100% ');
+            col5total();
+        }
+        else {
+            text_box.value = 0.0
+            document.getElementById(total).value = precisionVal(0.0);
+            alert('Please enter numeric value for amount and discount')
+            col5total();
+        }
+    }
+
+    function reset_row(){
+
+    }
+
+    function reset_discount(obj){
+        val = j(obj).val();
+        if(val === undefined || val == ""){
+            obj.siblings('input')[0].value = precisionVal(0);
+            obj.siblings('input')[0].readOnly = true;
+            update_total_by_discount(obj.siblings('input')[0]);
+        }else{
+            obj.siblings('input')[0].readOnly = false;
+        }
+    }
+
+    function update_total_by_discount(text_box) {
+        var amount = text_box.id.replace('discount', "amount");
+        var total = text_box.id.replace('discount', "total_check");
+        var tax_rate = text_box.id.replace('discount', 'tax_rate');
+        var tax_amount = text_box.id.replace('discount', 'tax_amount');
+        var amount_text = document.getElementById(amount).value;
+        var tax_rate_text = tax_enabled ? document.getElementById(tax_rate).value : 0;
+        var tax_amount_text = tax_enabled ? document.getElementById(tax_amount).value : 0;
+
+        /*
+         var discount = text_box.id.replace('amount', "discount");
+         var total = text_box.id.replace('amount', "total_check");
+         var discount_text = document.getElementById(discount).value;
+         */
+
+        if (isNaN(amount_text) == false && isNaN(text_box.value) == false) {
+            if (text_box.value == "") {
+                text_box.value = precisionVal(0.0);
+                document.getElementById(total).value = precisionVal(amount_text);
+                col5total();
+                return false;
+            }
+            if (amount_text == 0) {
+                document.getElementById(total).value = precisionVal(0.0);
+            }
+            if (amount_text < 0) {
+                alert("Amount can not be negative.");
+                document.getElementById(amount).value = precisionVal(0.0);
+                col5total();
+                return false;
+            }
+            else {
+                if (text_box.value <= 100) {
+                    if (text_box.value < 0) {
+                        alert("discount can not be negative.");
+                        text_box.value = precisionVal(0.0);
+                        document.getElementById(total).value = precisionVal(amount_text);
+                        col5total();
+                        return false;
+                    }
+                    else {
+                        discount_amount = roundVal(parseFloat(amount_text * text_box.value * 0.01));
+                        taxable_amount = parseFloat(amount_text - discount_amount);
+                        tax_amount_calc = tax_enabled ? parseFloat(taxable_amount * tax_rate_text * 0.01) : 0;
+                        taxed_amount_calc = parseFloat(taxable_amount + tax_amount_calc);
+                        if (tax_enabled)
+                            document.getElementById(tax_amount).value = precisionVal(roundVal(tax_amount_calc));
+                        document.getElementById(total).value = precisionVal(roundVal(taxed_amount_calc));
+                    }
+                }
+                else {
+                    text_box.value = precisionVal(0.0);
+                    alert('Discount cannot be greater than 100% ');
+                }
+                col5total();
+            }
+        }
+        else {
+            text_box.value = 0.0
+            document.getElementById(total).value = precisionVal(amount_text);
+            alert('Please enter numeric value for amount and discount');
+            col5total();
+        }
+    }
+
+    function attacher() {
+        $$('.par_check').invoke('observe', 'change', assign_amt);
+        col5total();
+    }
+
+    function col5total() {
+        var total = 0;
+        var total_fees = 0;
+        var total_discount = 0;
+        var total_tax = 0;
+        $$('.particular_total').each(function (el) {
+            if (!el.disabled) {
+                amount = parseFloat(document.getElementById(el.id.replace('total_check', "amount")).value);
+                total_fees += isNaN(amount) == false ? amount : 0;
+                discount = parseFloat(document.getElementById(el.id.replace('total_check', "discount")).value);
+                if (isNaN(discount) == false) {
+                    discount_amount = amount * discount * 0.01;
+                    total_discount += discount_amount;
+                }
+                taxable_amount = parseFloat(amount - discount_amount);
+                if (tax_enabled) {
+                    tax_rate = parseFloat(document.getElementById(el.id.replace('total_check', "tax_rate")).value);
+                    tax_amount_calc = parseFloat(taxable_amount * tax_rate * 0.01);
+                    tax = roundVal(tax_amount_calc);
+                    document.getElementById(el.id.replace('total_check', "tax_amount")).value = tax;
+                    total_tax += isNaN(tax) == false ? tax : 0;
+                } else {
+                    tax_amount_calc = 0;
+                }
+                if (isNaN(el.value) == false || el.value != "") {
+                    taxed_amount_calc = parseFloat(taxable_amount + tax_amount_calc);
+                    document.getElementById(el.id).value = roundVal(taxed_amount_calc);
+                    total = roundVal(total + parseFloat(taxed_amount_calc));
+                }
+                else {
+                    el.value = precisionVal(0.0);
+                    alert('please enter a numeric value for total');
+                }
+            }
+        });
+        $("gross_fees").innerHTML = precisionVal(roundVal(total_fees));
+        $("total_discount").innerHTML = precisionVal(roundVal(total_discount));
+        if (tax_enabled) {
+            $("total_tax").innerHTML = precisionVal(roundVal(total_tax));
+        }
+        $("total").innerHTML = precisionVal(roundVal(total));
+        $('total_fees').value = precisionVal(roundVal(total));
+    }
+
+    function validate_particulars(){
+        no_particulars = j('input[name^=master_fee_particular_id].particular-name:enabled').parents('tr').
+                find('.par_check:checked').length + j('select[name^=master_fee_particular_id]:enabled').length;
+        if(no_particulars > 0){
+            return true;
+        }else{
+            alert("<%= t('instant_fees.flash5') %>");
+            return false;
+        }
+    }
+
+    function return_or_proceed(status){
+        if(!status)
+        return false;
+    }
+
+    function validate_make_fee() {
+
+        // validate guest name
+        if(!validate_guest())
+            return false;
+        // validate custom category
+        if(!validate_category())
+            return false;
+        // validate particular selection
+        if(!validate_particulars())
+            return false;
+        // validate payment mode selection
+        if(!validate_payment_mode())
+            return false;
+        // validate form
+        if(!validate_form())
+            return false;
+
+        return true;
+//        if (j('[name^=master_fee_particular_id]:enabled').length > 0){ //$$('.particular_name').length > 0) {
+//            return validate_particulars();
+//        }else {
+//            if (validate_particular_select())
+//                return true;
+//            else {
+//                alert("Please enter at least one particular detail");
+//                return false;
+//            }
+//        }
+    }
+
+    function validate_payment_mode() {
+        if (j('#fees_payment_mode').val() == null || j('#fees_payment_mode').val().trim() == "") {
+            alert('<%= "#{t('select_one_payment_mode')}"%>');
+            return false;
+        }
+        return true;
+    }
+
+    function validate_form(){
+        ecount = 0;
+        j('tr[class*="tr-data-rows"] input[id^="amount"]').each(function (a, b) {
+            if (parseFloat(j(b).val()) <= 0) {
+                j(b).addClass('error');
+                ecount++;
+            }
+        });
+        if(ecount > 0){
+            alert("<%= t('instant_fees.flash7') %>");
+            return false;
+        }else{
+            j('#pay_button').val("<%= "► #{t('please_wait')}" %>");
+            return true;
+        }
+    }
+
+    function validate_guest() {
+        if(j('#guest_payee').length > 0 && j('#guest_payee').val().trim() == "") {
+            err_text = "<%= t('instant_fees.flash6') %>";
+            alert(err_text);
+            return false;
+        }
+        return true;
+    }
+
+    function validate_category() {
+        if (j('#custom_category_name').length == 0)
+            return true;
+        if (j('#custom_category_name').length > 0 && j('#custom_category_name').val().trim() != "") {
+            return true;
+        } else {
+            err_text = "<%= t('instant_fees.flash4') %>";
+            alert(err_text);
+            return false;
+        }
+    }
+
+//    function validate_particular_name() {
+//        var flag = 0;
+//        var flags = 0;
+//        $$('.particular_name').each(function (el) {
+//
+//            if (el.value.trim() == "")
+//                flag = 1;
+//        });
+//        $$('.amount').each(function (el) {
+//
+//            if (el.value.trim() == "0.0" || el.value.trim() == "0" || el.value.trim() == "-0")
+//                flags = 1;
+//        });
+//        if (flag == 1) {
+//            alert("Particular name missing");
+//            return false;
+//        }
+//        else if (flags == 1) {
+//            alert("Particular amount should be positive");
+//            return false;
+//        }
+//        else
+//            return true;
+//    }
+
+//    function validate_particular_select() {
+//        var flag = 0;
+//        $$('.par_check').each(function (el) {
+//
+//            if (el.checked == true) {
+//                flag = 1;
+//            }
+//        });
+//        if (flag == 0) {
+//            alert("Please select at least one particular");
+//            return false;
+//        }
+//        else
+//            return true;
+//    }
+
+//    function validate_make_fee_from_custom_category() {
+//        if (validate_category()) {
+//            if ($$('.particular_name').length > 0) {
+//                if (validate_particular_name()) {
+//                    return validate_payment_mode();
+//                }
+//                else {
+//                    return false;
+//                }
+//            }
+//            else {
+//                alert("Please enter at least one particular detail");
+//                return false;
+//            }
+//        }
+//        else {
+//            return false;
+//        }
+//    }
+//
+//    function validate_make_fee_for_guest() {
+//        if (validate_guest()) {
+//            return validate_particular_name();
+//        }
+//        else
+//            return true;
+//    }
+//
+//    function validate_make_fee_for_guest_from_custom_category() {
+//        if (validate_guest()) {
+//            if ($$('.particular_name').length > 0) {
+//                if (validate_particular_name()) {
+//                    if ($('custom_category_name')) {
+//                        return (validate_category())
+//                    }
+//                    else {
+//                        return validate_payment_mode();
+//                    }
+//                }
+//                else {
+//                    return false
+//                }
+//            }
+//            else {
+//                if (validate_particular_select())
+//                    return validate_payment_mode();
+//                else {
+//                    return false;
+//                }
+//            }
+//        }
+//        else
+//            return false;
+//    }
+
+</script>

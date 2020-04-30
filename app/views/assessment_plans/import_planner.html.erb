@@ -1,0 +1,79 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('import_planner') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('import_planner_logs')}", {:controller => "assessment_plans", :action => "import_logs"} %></li>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_import_planner %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div class='page_head'><%= t('import_planner') %></div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="planner_box">
+        <% form_for :import_planner,@import, :url => {:action => :import_planner }, :method => :post do |form| %>
+          <div class="label-field-pair">
+              <label for="employee_total-experience"><%= t('import_to_ay') %></label>
+              <div class="text-input-bg">
+                  <%= select :import_planner, :import_to, options_for_select(@academic_years_to.map{|a| [a.name, a.id]}, @import.try(:import_to).try(:to_i)),
+                    {:include_blank => t('select_an_academic_year')}, {:onchange => "#{remote_function(:url => {:action => "refresh_from_academic_year"},:with => "'academic_year_id='+value",
+                    :before => "Element.show('loader1')",:success => "Element.hide('loader1')")}"} %>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader1",
+                    :style =>"display: none;" ) 
+                  %>
+              </div>
+          </div>
+
+          <div class="label-field-pair" id='import_from'>
+              <%= render :partial => 'import_from_academic_year' %>
+          </div>
+
+          <div class='import_form' id='import_form'>
+              <% if @import.errors.present? %>
+                <%= render :partial => 'planner_import_form' %>
+              <% end %>
+          </div>
+          
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+function select_all(obj){
+    if(j(obj).prop('checked')){
+      j('.select_planner').each(function(){
+        if(!j(this).prop('disabled'))
+          j(this).prop('checked',true)
+      })  
+    }
+    else{
+      j('.select_planner').each(function(){
+        if(!j(this).prop('disabled'))
+          j(this).prop('checked',false)
+      })  
+    }
+  }
+ function check_and_select(obj){
+    j('.select_all').prop('checked', (j('.select_planner').length - j('.select_planner:disabled').length) == (j('.select_planner:checked').length - j('.select_planner:checked:disabled').length));
+ }
+  if(j('.select_planner').length == j('.select_planner:checked').length){
+    j('.select_all').prop('checked','true');
+    j('.select_all').prop('disabled','true');
+  }
+  if(j('.select_planner').length == j('.select_planner:disabled').length){
+    j('.select_all').prop('disabled','true');
+  }
+</script>

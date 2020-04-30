@@ -1,0 +1,35 @@
+<div id="page-yield">
+  <div class="m_box">
+    <% form_for :message_applicants do |f| %>
+    <div class="mbox-form modal-body">
+    <div id="form-errors"></div>
+      <div class="label-field-pair mb_input_row">
+        <label><%= t('applicant_s') %></label>
+        <div id="selected-applicants" class="selected-label"></div>
+      </div>
+      <div class="label-field-pair mb_input_row">
+        <label ><%= t('send_to') %></label>
+        <div class="text-input-bg checkbox-pair-width"><%= f.check_box :send_to_applicant, :class => "margin_right" %><label for="message_applicants_send_to_applicant" class="checkbox-width checkbox_label_padding label_font_style"><%= t('applicants.applicant') %></label> <%= f.check_box :send_to_parent, :class => "margin_right" %><label for="message_applicants_send_to_parent" class="checkbox-width checkbox_label_padding label_font_style"><%= t('guardian') %></label></div>
+      </div>
+      <div class="label-field-pair mb_input_row">
+        <label ><%= t('message_mode') %></label>
+        <div class="text-input-bg checkbox-pair-width"><%= f.check_box :mode_email, :class => "margin_right", :onclick => "email_checkbox();" %><label for="message_applicants_mode_email" class="checkbox-width checkbox_label_padding label_font_style"><%= t('email') %></label> <%= f.check_box :mode_sms, :class => "margin_right", :onclick => "sms_checkbox();" %><label for="message_applicants_mode_sms" class="checkbox-width checkbox_label_padding label_font_style"><%= t('sms-txt') %></label></div>
+      </div>
+      <div class="label-field-pair mb_input_row" style="height: 200px;">
+        <label style="width:450px;"><%= t('email_content') %></label>
+        <div class="text-input-bg text-area-margin-top text-area-margin" style="width:450px;">
+          <%= f.text_field :email_subject, :placeholder => t('subject'), :class => "email_subject_input" %>
+          <%= f.text_area :email_content, :rows => 5, :cols => 27, :placeholder => t('body'), :class => "text_area_style" %>
+        </div>
+      </div>
+      <div class="label-field-pair mb_input_row" style="height: 173px;">
+        <label class="text-area-margin" style="width:450px; margin-top: 10px;"><%= t('sms_content') %></label>
+        <div class="text-input-bg text-area-margin-top text-area-margin" style="width:450px; height: 100px;"><%= f.text_area :sms_content, :rows => 5, :cols => 27, :onkeyup => "validate_signature(this);", :class => "text_area_style" %></div>
+        <div id="sms_count"><div id="s_count">0</div><%= t('characters') %></div>
+      </div>
+    </div>
+      <div class="hor_line_modal"></div>
+      <%=  link_to_function t('send'),"message_applicants(); return false;",{:class=>'user_button submit_button', :id => 'message_applicants_btn'} %>
+    <%end%>
+  </div>
+</div>

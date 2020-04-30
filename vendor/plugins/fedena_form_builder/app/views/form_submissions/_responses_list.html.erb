@@ -1,0 +1,124 @@
+<div id="responses">
+  <% if @form_submissions.present? %>
+    <div class="response_label">
+      <label>
+        <%= t('responses') %> : <%= @form.name %>
+      </label>
+    </div>
+    <% page_count=0 %>
+    <div id="responses_list">
+      <table id="responses_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head sub-heading">
+          <th class="width-sno"><%= t('no_text') %></th>
+          <th class="width-submited">
+            <%= t('submitted_at') %>
+          </th>
+          <% if @form.is_editable %>
+            <th class="width-action">
+              <%= t('actions') %>
+            </th>
+          <% end %>
+          <% cnt = @fields.count %>
+          <% (@fields).each do |field| %>
+            <% unless field.field_type == 'hr' %>
+              <th class='width-<%= field.field_type%>'>
+                <%= field.label %>
+              </th>
+            <% end %>
+          <% end %>
+        </tr>
+        <% @form_submissions.each_with_index do |submission,@index| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <% page_count = page_count.next %>
+            <% if params[:page].present? %>
+              <% if params[:page].to_i >= 1 %>
+                <% @index = @index  + (params[:page].to_i - 1) * @form_submissions.per_page.to_i %>
+              <% end %>
+            <% end %>
+            <td>
+              <%= @index+1 %>
+            </td>
+            <td>
+              <%= format_date((submission['updated_at'] + Time.now.utc_offset),:format=>:long) %>
+            </td>
+            <% if @form.is_editable %>
+              <td>
+                <%= link_to t('edit_response'), edit_response_form_path(submission['id']), :class => "themed_text"  %>
+              </td>
+            <% end %>
+            <% @fields.each do |field| %>
+              <% unless field.field_type == 'hr' %>
+                <td>
+                  <% if field.field_type == 'checkbox'%>
+                    <ul>
+                      <% if submission['response']["#{field.id}"].present? %>
+                        <% submission['response']["#{field.id}"].each do |k,v| %>
+                          <li>
+                            <%= v %>
+                          </li>
+                        <% end %>
+                      <% end %>
+                    </ul>
+                  <% elsif field.field_type == 'file' %>
+                    <% if submission['response']["#{field.id}"].present? %>
+                      <%= link_to "#{submission['response']["#{field.id}"].first}","#{submission['response']["#{field.id}"].second}", :class => 'themed_text' %>
+                    <% end %>
+                  <% else %>
+                    <%= submission['response']["#{field.id}"] %>
+                  <% end %>
+
+                </td>
+              <% end %>
+            <% end %>
+
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
+
+    <% unless @form_submissions.per_page.to_i > @form_submissions.total_entries.to_i %>
+      <div class="pagination_list">
+        <div class="pagination_text">
+          <%= "#{t('showing')} #{@index+1-(page_count-1)}-#{@index+1} #{t('of')} #{@form_submissions.total_entries}" %>
+        </div>
+        <% custom_params = {} %>
+        <% custom_params[:action] = :responses %>
+        <%= will_paginate @form_submissions,:renderer => 'RemoteLinkRenderer' ,:page_links=>false,:params=> custom_params %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="message_notifier">
+      <p class="flash-msg">
+        <%= t('no_submissions') %>
+      </p>
+    </div>
+
+  <% end %>
+</div>
+<script>
+  j('.submission').each(function(a,b){
+    ele = j(this).find('.submission_scrip');
+    questions = ele.find('.question');
+    count = 0;
+    questions.each(function(a,b){
+      current_height = ele.get(0).scrollHeight;
+      if(current_height <= 200){
+        j(b).attr('style','display:block');
+      }else{
+        return false;
+      }
+    });
+    count = a+1;
+    if(questions.length > count){
+      ele.parent().find('.show_more').attr('style','display:block;');
+    }
+  })
+  j(document).delegate('.show_more','click',function(){
+    ele = j(this);
+    ele2 = ele.parent().find('.submission_scrip');
+    ele.parent().find('.question').attr('style','display:block');
+    ele.parent().find('.submission_scrip').attr('style','max-height: 100%;');
+    ele.attr('style','');
+  });
+</script>

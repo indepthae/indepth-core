@@ -1,0 +1,127 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('discussion') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= @group.group_name %></div>
+
+<%if (@current_user.id==@group.user_id or @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name("GroupCreate"))) or @group.group_members.find_all_by_is_admin(true).collect(&:user_id).include?(@current_user.id) %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_text')}", edit_group_path(:id=>@group.id) %></li>
+      <li class='themed_bg themed-dark-hover-background'> <%= link_to "#{t('delete_text')}", group_path(:id=>@group), :confirm => "#{t('confirm_group')}", :method=>:delete, :action=>"destroy" %></li>
+    </ul>
+  </div>
+<% end %>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :groups_show,@group%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="leftside">
+    <div id="share">
+      <div class="red_heading themed_text" id="share_heading"><%= t('share') %></div>
+      <%  form_for(@new_post,:url=>{:controller=>"group_posts",:action=>"create",:group_id=> @group.id},:html => { :multipart => true } ) do |f| %>
+        <%= error_messages_for :new_post, :header_message=> nil %>
+        <div id="title_label">
+          <div class="textField2"><%= "#{t('title')}<span class='necessary-field'>*</span>"%> </div>
+          <div class="textField1"><%= f.text_field :post_title %></div>
+        </div>
+        <div id="description_label">
+          <div class="text_description"><%= "#{t('description')}<span class='necessary-field'>*</span>"%></div>
+          <div class="textField"><%= f.text_area :post_body , :rows=>9 , :cols =>90 %></div>
+        </div>
+        <div class="textField" id="upload">
+          <div class="file_name"><%= t('image_docu') %> </div>
+          <% f.fields_for :group_files do |ff|%>
+            <%= ff.paperclip_file_field :doc, :size=>20, :direct => false %>
+          <% end %>
+          <div id="go">
+            <div id="sub">
+              <%= f.submit "#{t('post')}", :id=>@group.id, :disable_with => "#{t('please_wait')}" %>
+            </div>
+          </div>
+
+        <% end %>
+      </div>
+
+
+      <div id="all_posts">
+        <div class="red_heading themed_text" id="all_posts_heading"><%= t('all_discussion') %></div>
+        <% unless @group_posts.count==0 %>
+          <div class="posts">
+            <% for post in @group_posts %>
+              <div class="each_post">
+                <div class="post_title_black"><%=link_to "#{post.post_title}", group_group_post_path(:group_id=>post.group,:id=>post.id),:anchor=>"#comments" %></div>
+                <div class="post_details">
+                  <% if post.user.present? %>
+
+                    <div class="posted_by"><%= t('posted_by') %> <b><%="#{post.user.first_name}"%></b></div>
+                  <% else %>
+                    <div class="posted_by"><%= t('posted_by') %> <b> <%= t('deleted_user') %></b></div>
+                  <% end %>
+                  &nbsp;<%= t('on_text') %> <%= format_date(post.created_at,:format=>:long) %>
+
+                  <div class="comments"><%=link_to "#{post.group_post_comments.count} #{t('comments')}", group_group_post_path(:group_id=>post.group,:id=>post.id),:class=>"themed_text" %></div>
+                </div>
+
+                <div id="horizantal_bar"></div>
+              </div>
+            <%end%>
+            <div class="paginate">
+              <%= will_paginate @group_posts ,:previous_label=>"<", :next_label=>">"%>
+
+              <div id="horizantal_bar_paginate"></div>
+
+            </div>
+          </div>
+        <% else %>
+
+          <%= t('no_discussion') %>
+        <% end %>
+      </div></div>
+  </div>
+  <div id="rightside">
+    <div id="right_content">
+      <div id="members">
+        <div class="red_heading themed_text"><%= t('member') %></div>
+
+
+        <%  @group.group_members[0..9].each do |member| %>
+          <% if member.user.present? %>
+            <% if member.user.admin? or member.user.employee? %>
+              <% employee_record=member.user.employee_record %>
+              <div class="td-name themed_hover_text" ><%=  "#{member.user.first_name}"%>
+                <% if employee_record.present? %>
+                  <div class="date"><span><%="#{employee_record.employee_number}<br />#{employee_record.employee_department.name}"%></span></div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="td-name themed_hover_text" ><%=  "#{member.user.first_name}"%><div class="date"><span><%= "#{member.user.student_record.admission_no}<br />#{member.user.student_record.batch.full_name}"%></span></div></div>
+            <% end %>
+          <% else %>
+            <div class="td-name themed_hover_text" ><%= t('deleted_user') %><div class="date"><span><%= t('data_not_found')%></span></div></div>
+          <% end %>
+
+        <%end%>
+
+        <div id="see_all_members"> <%= link_to "#{t('see_all_members')}", members_group_path(:id=>@group) ,:class=>"themed_text"%>     </div>
+
+        <div id="my_groups">
+          <div class="red_heading themed_text"><%= t('my_group') %></div>
+          <div class="group_names">
+            <%  @current_user.member_groups.each do |gr| %>
+              <div class="firstName"><%= link_to "#{gr.group_name}", group_path(:id=>gr)  %></div>
+            <%end%>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>

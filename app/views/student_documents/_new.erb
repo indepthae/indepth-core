@@ -1,0 +1,9 @@
+<% form_remote_for(@document, :url => student_documents_path(:id => @student, :category_id => @category), :html=> {:multipart=>true}) do |form| %>
+  <%= render :partial => "document_form", :locals => {:form => form} %>
+  <div class="submit_field">
+      <% category_id = @category.new_record? ? (@category.registered ? 'registered' : 'nil') : @category.id %>
+      <%= form.submit  "", :value => "#{t('upload_document')}", :class => "submit_button", :id => "submit_button", :onclick => "build_and_send_form_data('#{category_id}');return false;" %>  
+      <div class="cancel_link" id='cancel_upload_<%= @category.id %>'><%= t('cancel') %></div>
+  </div>
+<% end %>
+

@@ -1,0 +1,137 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_payroll_category') %></div>
+  <div id="inner-tab-menu">
+    <% dep_cats = @category.dependent_categories_list %>
+    <% payroll_groups = @category.payroll_groups %>
+    <% check_flag = (dep_cats.present? or payroll_groups.present?) %>
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('edit'), edit_payroll_category_path(@category), :id => "edit" ,:flag => check_flag %></li>
+      <% unless check_flag %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to t('delete'), payroll_category_url(@category), :method => :delete, :confirm => t('delete_confirm_msg') %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :payroll_categories_show, @category %>
+    <%= render_breadcrumbs  %>
+  </div>
+    <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <h3><%= "#{t('payroll_category_details').titleize}" %></h3>
+  <div class="fields-details">
+    <div class="field-label"><%= t('payroll_category_name') %> : </div>
+    <div class="fields-val"><%= @category.name %></div>
+  </div>
+
+  <div class="fields-details">
+    <div class="field-label"><%= t('category_code') %> : </div>
+    <div class="fields-val"><%= @category.code %></div>
+  </div>
+
+  <div class="fields-details">
+    <div class="field-label"><%= t('category_type') %> : </div>
+    <div class="fields-val"><%= @category.is_deduction ? t('deductions') : t('earnings') %></div>
+  </div>
+  
+  <div class="fields-details">
+    <div class="field-label"><%= t('round_off') %> : </div>
+    <div class="fields-val"><%= @category.round_off_value.present? ? t(PayrollCategory::ROUND_OFF[@category.round_off_value]) : t(PayrollCategory::ROUND_OFF[1]) %></div>
+  </div>
+  <hr/>
+  <div class="fields-details">
+    <div class="field-label"><%= t('value_type') %> : </div>
+    <div class="fields-val"><%= @category.hr_formula.value_type_text %></div>
+  </div>
+  <% case @category.hr_formula.value_type
+  when 1 %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('default_value') %> : </div>
+      <div class="fields-val"><%= precision_label(@category.hr_formula.default_value) %></div>
+    </div>
+  <%  when 2 %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('default_value') %> : </div>
+      <div class="fields-val formula"><%= @category.hr_formula.default_value %></div>
+    </div>
+  <% when 3 %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('default_value') %> : </div>
+      <div class="fields-val formula"><%= @category.hr_formula.default_value %></div>
+    </div>
+    <% @category.hr_formula.formula_and_conditions.each_with_index do |f, i| %>
+      <div class="fields-details">
+        <div class="field-label"><%= "#{t('condition')} #{i+1}" %> : </div>
+        <div class="fields-val formula"><%= f.condition_text %></div>
+      </div>
+    <% end %>
+  <% end %>
+  <% if dep_cats.present? %>
+    <hr/>
+    <div class="fields-details">
+      <div class="field-label field-head"><%= t('dependent_payroll_categories').titleize %></div>
+    </div>
+    <div class="description"><%= t('dependent_payroll_categories_desc') %></div>
+    <table cellpadding="1" cellspacing="1">
+      <% dep_cats.each do |pc| %>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+          <td class="col1"><%= pc.name %></td>
+          <td class="col2"><%= pc.code %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+  <% if payroll_groups.present? %>
+    <%= "<hr/>" unless dep_cats.present?  %>
+    <div class="fields-details">
+      <div class="field-label field-head"><%= t('associated_payroll_groups').titleize %></div>
+    </div>
+    <div class="description"><%= t('associated_payroll_groups_desc') %></div>
+    <table cellpadding="1" cellspacing="1">
+      <% payroll_groups.each do |pg|  %>
+        <tr>
+          <td class="col1"><%= pg.name %></td>
+          <td class="col2"><%= "#{pg.salary_type_value} - #{pg.payment_period_value}" %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+
+</div>
+<% if check_flag %>
+  <div id="MB_overlay" style="display:none;"></div>
+  <div id="MB_window" style="display:none;">
+    <%= render :partial => "edit_warning" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#edit').click(function(e){
+    if(j(this).attr('flag') == 'true')
+    {
+      e.preventDefault();
+      showModalBox();
+      if(j('html').attr('dir') == 'ltr')
+        j('#MB_window').css({left : (j('body').width() - j('#MB_window').width())/2});
+      else
+        j('#MB_window').css({right : (j('body').width() - j('#MB_window').width())/2});
+    }
+  });
+  function showModalBox()
+  {
+    j('#MB_overlay').show();
+    j('#MB_overlay').css('opacity',0.75);
+    j('#MB_window').show();
+  }
+  function hideModalBox()
+  {
+    j('#MB_overlay').hide();
+    j('#MB_window').hide();
+  }
+</script>

@@ -1,0 +1,27 @@
+<div class="assessment_course_details">
+  <div class="left">
+      <div class="clm">
+          <div class="label"><%="#{t('course_text')}"%></div>
+          <div class="value"><%=@course.full_name%></div>
+      </div>
+      <div class="clm">
+          <div class="label"><%=t('academic_year')%></div>
+          <div class="value"><%=@academic_year.name%></div>
+      </div>
+  </div>
+  <div class="right">
+      
+      <div class="clm">
+          <div class="label"><%=t('batches_text')%></div>
+          <div class="value"><%=@course.batches_in_academic_year(@academic_year.id).count%></div>
+      </div>
+      <!--<div class="clm">
+          <div class="label"><%#=t('courses_linked_count')%></div>
+          <div class="value"><%#= @plan.present? ? @plan.courses.count : '-' %></div>
+      </div> -->
+      <div class="clm">
+          <div class="label"><%=t('multiple_student')%></div>
+          <div class="value"><%= @course.active_students_in_academic_year(@academic_year.id).count %></div>
+      </div>
+  </div>
+</div>

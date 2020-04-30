@@ -1,0 +1,36 @@
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="fee-collections-list">
+<table id="listing">
+  <tr class="tr-head">
+    <td><%= t('username') %></td>
+    <td><%= t('bus_fare') %></td>
+    <td><%= t('start_date') %></td>
+    <td><%= t('end_date') %></td>
+    <td><%= t('due_date') %></td>
+    <td></td>
+  </tr>
+ 
+  <% @transport_defaulters.each do |t| %>
+
+    <tr class="tr-<%= cycle('odd', 'even')%> ">
+      <td class="col-1"><%= t.user.full_name %></td>
+      <td class="col-2"><%= precision_label t.bus_fare %></td>
+      <td class="col-3"><%= format_date(t.start_date) %></td>
+      <td class="col-4"><%= format_date(t.end_date) %></td>
+      <td class="col-5"><%= format_date(t.due_date) %></td>
+      <td class="col-6">
+        <p>
+
+        <%if t.transaction_id.nil? %>
+         <%= link_to_remote "► #{t('pay_fees')}",:class=>'submit_button' ,:url=>{:action=>'transport_defaulters_fee_pay', :id => t.id} %>
+        <% else %>
+      <h4><%= t('fees_paid') %></h4>
+          <%end%>
+      </p>
+       </td>
+   </tr>
+  <% end %>
+</table>
+</div>

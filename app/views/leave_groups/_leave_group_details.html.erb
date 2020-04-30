@@ -1,0 +1,22 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+        <td class="type_name"><%= t('leave_types') %></td>
+        <td class="type_count"><%= t('leave_count').titleize %></td>
+    </tr>
+    <% config = leave_reset_configuration %>
+    <% if @leave_group.leave_group_leave_types.present? %>
+      <% @leave_group.leave_group_leave_types.each do |type| %>
+        <% if type.employee_leave_type.present? and type.employee_leave_type.is_active %>
+          <tr>
+              <td class="type_name"><%= type.employee_leave_type.name_with_code %></td>
+              <td class="type_count"> <% leave_credit_type = leave_credit_type(type.employee_leave_type_id) %>
+              <% if config == "1" and leave_credit_type == "Slab" %><div class="tooltip_info2" tooltip ="<%= t('slab_leave_count') %>"></div><% end %><%= text_field :leave_type, "#{type.employee_leave_type.id}".to_sym, :value=> type.display_leave_count, :class => "count-text-field"%></td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="2"><%= t('no_leave_types_present') %></td>
+      </tr>
+    <% end %>
+</table>

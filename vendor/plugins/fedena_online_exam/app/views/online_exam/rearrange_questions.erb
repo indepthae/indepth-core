@@ -1,0 +1,110 @@
+<%= javascript_include_tag 'pagination.js' %>
+<script type="text/javascript">
+  j(function() {
+    j("#sortable").sortable({
+      update: function( event, ui ) {
+        qn = ui.item;
+        qn_id = qn.find("#question-id").val();
+        next_qn = qn.next();
+        next_qn_id = 0;
+        if(next_qn.length !== 0){
+          next_qn_id = next_qn.find("#question-id").val();
+        }
+        exam_id = j("#randomize_question").val();
+        j.ajax({
+          type: 'POST' ,
+          url: "/online_exam/update_question_positions",
+          data : {
+            exam_group : {
+              question_id : qn_id,
+              next_question_id : next_qn_id,
+              exam_group_id : exam_id
+            }
+          }
+        })
+      }
+    });
+    j("#sortable").disableSelection();
+  });
+
+  j(document).ready(function() {
+    r_chkbx = j("#randomize_question")
+    if(r_chkbx.is(":checked")){
+      div_height = j('#sorting-div').height();
+      j('#overlay-div').height(div_height);
+      j('#overlay-div').css("display","block");
+      j( "#sortable" ).sortable( "disable" );
+    }
+    else{
+      j('#overlay-div').css("display","none");
+      j( "#sortable" ).sortable( "enable" );
+    }
+  })
+
+  function randomize_order(th_is){
+    randomizer = j(th_is);
+    exam_group_id = randomizer.val();
+    randomized = 0
+    if(randomizer.is(":checked")){
+      randomized = 1
+    }
+    j.ajax({
+      type: 'POST' ,
+      url: "/online_exam/randomize_question_order",
+      data : {
+        exam_group : {
+          group_id : exam_group_id,
+          randomized : randomized
+        }
+      },
+      success : function(data) {
+        if(randomized==1){
+          div_height = j('#sorting-div').height();
+          j('#overlay-div').height(div_height);
+          j('#overlay-div').css("display","block");
+          j( "#sortable" ).sortable( "disable" );
+        }
+        else{
+          j('#overlay-div').css("display","none");
+          j( "#sortable" ).sortable( "enable" );
+        }
+      }
+    })
+  }
+</script>
+
+<%= load_latex_preview %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('rearrange_questions') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_rearrange_questions, @exam_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless @question_positions.blank? %>
+    <div class="top-div">
+      <div id="randomize-div">
+        <%= check_box_tag "randomize_question",@exam_group.id,@exam_group.randomize_questions,:onChange=>"randomize_order(this); return false;" %>
+        <label><%= t('randomize') %></label>
+        <div class="randomize_explanation"><%= t('randomize_explanation') %></div>
+      </div>
+    </div>
+    <div class="middle-div">
+      <div class="rearrange"><%= t('rearrange_questions') %></div>
+      <div class="rearrange-explanation"><%= t('rearrange_explanation') %></div>
+    </div>
+    <div id="sorting-div">
+      <div id="overlay-div" style="display:none;"></div>
+      <ul id="sortable">
+          <%= render :partial=>"sortable_questions",:locals=>{:question_positions=>@question_positions,:exam_group=>@exam_group} %>
+      </ul>
+    </div>
+    <div id="infinite-scrolling">
+      <%= will_paginate @question_positions %>
+    </div>
+  <% end %>
+</div>

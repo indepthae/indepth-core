@@ -1,0 +1,17 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('archived_placements') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%= render :partial=>"placementevents_list" %>
+</div>

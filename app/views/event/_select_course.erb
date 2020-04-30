@@ -1,0 +1,69 @@
+
+<% unless @events.batch_events.empty? %>
+  <ul id="category-list">
+      <li class="listheading">
+          <div class="heading-name">
+              <div class="category-edit">
+                  <%= check_box_tag "full_batches_list", "",false%>
+              </div>
+              <%= t("batches_text") %></div>
+          <div class="heading-edit">
+          </div>
+      </li>
+      <div class="scroll">
+          <% f.fields_for :batch_events, @events.batch_events.sort_by{|o| o.batch.full_name } do |b| %>
+            <% b_obj = b.object %>
+            <li class="list<%=cycle('odd', 'even')%>">
+                <label>
+                    <div class="category-edit">
+
+                        <%= b.check_box :selected, :id => b_obj.batch_id, :class => "category_select", :onclick => "check_all_batches();" %>
+                        <%= b.hidden_field :batch_id %>
+                    </div>
+                    <div class="category-name">
+                        <%= "#{b_obj.batch_name}" %>
+                    </div>
+                </label>
+            </li>
+
+          <% end %>
+      </div>
+  </ul>
+<% else %>
+  <ul id="category-list">
+      <li class="listheading">
+          <div class="heading-name">No batches present</div>
+          <div class="heading-edit">
+          </div>
+      </li>
+  </ul>
+<% end %>
+
+
+<script type="text/javascript">
+   if(j('input.category_select').length == j('input.category_select:checked').length)
+    {
+      j("#full_batches_list").prop("checked", true);
+    }
+
+    j('#full_batches_list').bind('change',function(){
+    if(j(this).is(':checked')){
+    $$('input.category_select').each(function(checkbox) { checkbox.checked = true; });
+    } else {
+    $$('input.category_select').each(function(checkbox) { checkbox.checked = false; });
+    }
+    });
+    
+    
+    function check_all_batches()
+    {
+      if(j('input.category_select').length == j('input.category_select:checked').length)
+      {
+        j("#full_batches_list").prop("checked", true);
+      }
+      else
+      {
+        j("#full_batches_list").prop("checked", false);
+      }
+    }
+</script>

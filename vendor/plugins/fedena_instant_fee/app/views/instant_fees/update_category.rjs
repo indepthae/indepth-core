@@ -1,0 +1,9 @@
+if @error.nil?
+	page.replace_html 'form-errors', :text => ''
+	page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('instant_fee_category_updated_successfully')}</p>"
+  page << "Modalbox.hide();"
+  page.replace_html :list_categories,:partial=>"list_categories",:locals=>{:instant_fee_categories=>@instant_fee_categories}
+else
+	page.replace_html 'form-errors', :partial => 'errors', :object => @instant_category
+  page.visual_effect(:highlight, 'form-errors')
+end

@@ -1,0 +1,204 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_attendance') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('reportees_leaves').titleize %></div>
+  <% if (can_access_request? :reportees_leave_applications,:employee_attendance) && @reportees.present?%>
+    <div id="inner-tab-menu">
+      <ul>
+        <% if params[:action] == "reportees_leaves" && (can_access_request? :pending_leave_applications,@employee.user,:context => :employee_attendance) && @total_leave_count > 0%>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pending_leave_applications')} (#{@total_leave_count})", :controller=>"employee_attendance", :action=>"pending_leave_applications", :id=> @employee.id, :status => "pending",:from => "manager" %></li>
+        <% end %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('all_leave_applications')}", :controller=>"employee_attendance", :action=>"reportees_leave_applications", :id => @employee.id, :from => :manager %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :employee_attendance_reportees_leaves, @current_employee %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <h4><%= t('reportees_leaves').titleize %></h4>
+  <div id="description"><%= t('reportees_leaves_description') %></div>
+  <div id ="filters" style="display:none;">
+      <hr>
+    <label><%= t('filter_by_date')%></label>
+    <div class="label-field-pair">
+      <label for="leave_type"><%= t('from') %></label>
+      <div class="text-input-bg start_date">
+        <%= calendar_date_select_tag 'date[start_date]' ,"",:popup=>:force, :id => "start_date"  %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="end_date"><%= t('to') %></label>
+      <div class="text-input-bg end_date"><%= calendar_date_select_tag 'date[end_date]' ,"",:popup=>:force, :id => "end_date"   %></div>
+    </div>
+    <%= submit_tag "", :value => "#{t('view')}", :class => "submit_button" , :id => 'submit_button' %>
+    <div id="cancel"><%= t('cancel') %></div>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none; margin-top: 5px;" ) %>
+    <div class="error-msg" style="display:none;"><div class="error-icon"></div><%= t('select_valid_date')%></div>
+  </div>
+
+  <div id="date_range"  style="display:none;">
+    <div class="label-field-pair">
+      <label for="leave_type"><%= t('date_text') %></label>
+      <div class="text-input-bg start_date_text"></div>
+    </div>
+    <div class="label-field-pair">
+      <label for="end_date"><%= t('to') %></label>
+      <div class="text-input-bg end_date_text"></div>
+    </div>
+    <div id="change_date"><%= t('change_date') %></div>
+    <div id="reset"><%= t('reset') %></div>
+  </div>
+  <div id ="advance_search"><%= t('filter_with_dates') %></div>
+  <div id="attendance_report"> <%= render :partial => 'attendance_report'%> </div>
+</div>
+
+
+<script type="text/javascript">
+  j("#advance_search").click(function(){
+    j("#filters").show();
+    j(this).hide();
+  })
+
+  j("#cancel").click(function(){
+    if (j("#start_date").val() == "" || j("#end_date").val() == "" || j(".error-msg").length > 0){
+      j("#filters").hide();
+      j("#advance_search").show();
+    }
+    else
+    {
+      j("#date_range").show();
+      j("#filters").hide();
+    }
+  })
+
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+
+  j("#submit_button").click(function(){
+    if (validate_dates()){
+      var start_date = j("#start_date").val();
+      var end_date = j("#end_date").val();
+      var dpt_id= j("#department_id").val();
+      var leave_criteria = j("#leave_criteria").val();
+      j("#loader").show();
+      new Ajax.Request('/employee_attendance/reportees_leaves',{
+        parameters: {
+          start_date: start_date,
+          end_date: end_date,
+          department_id: dpt_id||"All Departments",
+          leave_criteria: leave_criteria,
+          from: "reportees_leaves",
+          id: <%= params[:id] %>
+        },
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(resp){
+          j("#loader").hide();
+          j("#advance_search").hide();
+          j("#date_range").show();
+          j(".start_date_text").text(formattedDate(j("#start_date").val()));
+          j(".end_date_text").text(formattedDate(j("#end_date").val()));
+          j("#filters").hide();
+        }
+      });
+
+    }else
+      j(".error-msg").show();
+    return false;
+  })
+
+  j("#department_id").change(function(){
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    j("#loader1").show();
+    new Ajax.Request('/employee_attendance/reportees_leaves',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id,
+        leave_criteria: leave_criteria,
+        from: "reportees_leaves",
+        id: <%= params[:id] %>
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader1").hide();
+      }
+    });
+  })
+
+  j("#leave_criteria").change(function(){
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    j("#loader").show();
+    new Ajax.Request('/employee_attendance/reportees_leaves',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id,
+        leave_criteria: leave_criteria,
+        from: "reportees_leaves",
+        id: <%= params[:id] %>
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader").hide();
+      }
+    });
+  })
+
+  j("#change_date").click(function(){
+    j("#filters").show();
+    j("#date_range").hide();
+  })
+
+  j("#reset").click(function(){
+    location.reload();
+  })
+
+  function validate_dates(){
+    valid = true;
+    if (j("#start_date").val() == "") valid = false;
+    if (j("#end_date").val() == "") valid = false;
+    if (j("#end_date").val() < j("#start_date").val() ) valid = false;
+    return valid
+  }
+
+  function formattedDate(date) {
+    var d = new Date(date || Date.now()),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+    if (month.length < 2) {month = '0' + month};
+    if (day.length < 2) {day = '0' + day};
+    date_format = <%= @format %>;
+
+    if(date_format == 1){
+      return [day, month, year].join('<%= @seperator.to_s %>');
+    }
+
+    if(date_format == 2){
+      return [month, day, year].join('<%= @seperator.to_s %>');
+    }
+
+    if(date_format == 3){
+      return [year, month, day].join('<%= @seperator.to_s %>');
+    }
+  }
+</script>

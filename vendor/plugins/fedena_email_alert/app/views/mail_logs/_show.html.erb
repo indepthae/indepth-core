@@ -1,0 +1,59 @@
+<div class="container_head logs_head">
+</div>
+<div class="content_box">
+    <div class="message_details">
+        <%= mail_content %>
+    </div>
+    <div class="recipients_box">
+        <table class="recipient_details" id="recipient_logs" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th><%= t('recipient_details') %></th>
+                <th></th>
+            </tr>
+            <% @recipient_logs.each do |log| %>
+              <%= mail_log_recipient_details(log) %>
+            <% end %>
+        </table>
+    </div>
+    <div class="logs_loader">
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+    </div>
+</div>
+
+<script>
+  var recipient_log_page_no = 1;
+  var scroll_left = 0;
+  j('.logs .content_box').on('scroll', function() {
+
+      if(j(this).scrollLeft() != scroll_left){
+          scroll_left = j(this).scrollLeft();
+          return;
+      }
+
+      if(j(this).scrollTop() + j(this).innerHeight() == j(this)[0].scrollHeight) {
+          recipient_log_page_no++ ;
+
+          j('.logs #loader').show();
+          j.ajax({
+              url: "mail_logs/<%= @mail_log.id %>",
+              type: 'GET',
+              data: {
+                  page: recipient_log_page_no,
+                  start_date: j('#start_date').val(),
+                  end_date: j('#end_date').val(),
+                  paginate: "yes"
+              },
+              success: function (data, textStatus, jqXHR)
+              {
+                j('.logs #loader').hide();
+              },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+                  recipient_log_page_no = recipient_log_page_no - 1;
+                  j('.logs #loader').hide();
+              }
+          });
+      }
+  });
+
+</script>

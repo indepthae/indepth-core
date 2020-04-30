@@ -1,0 +1,28 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('discussion') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= @group.group_name %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :groups_members,@group%>
+    <%=render_breadcrumbs%>
+  </div>
+  <div id="group_mem" class="themed_text"><%= t('group_members') %></div>
+  <div>
+    <% form_tag request.path, :method => 'get' do %>
+      <div class="label-field-pair">
+        <label for="filter"><%= t('filter_by') %></label>
+        <div class="text-input-bg">
+          <%= select_tag "filter_group_members", options_for_select([ ["#{t('all')}", "All"],[ "#{t('employee_text')}","Employee"], ["#{t('student_text')}","Student"]], params[:filter_group_members]), {:onChange => 'this.form.submit()'}  %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div id="grp_members">
+    <%=  render :partial=> "group_members" %>
+  </div>
+</div>
+

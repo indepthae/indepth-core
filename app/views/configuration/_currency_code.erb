@@ -1,0 +1,12 @@
+<% selected_value = @config[:currency_code].present? ? @config[:currency_code] : nil %>
+<select id="configuration_currency_code" name="configuration[currency_code]">
+  <option value><%= t('select_currency_code') %></option>
+  <% @currency_codes.each do |currency_hash| %>
+      <option value="<%= currency_hash[:currency_code] %>" data-subunit="<%= currency_hash[:subunit] %>"
+              data-symbol="<%= currency_hash[:symbol] %>"
+              data-name="<%= currency_hash[:name] %>"
+              <%= selected_value == currency_hash[:currency_code] ? 'selected' : '' %> >
+        <%= "#{currency_hash[:currency_code].upcase} (#{currency_hash[:name]})" %>
+      </option>
+  <% end %>
+</select>

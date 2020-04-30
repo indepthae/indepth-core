@@ -1,0 +1,30 @@
+<% remote_form_for @component, :url => {:action => @component.new_record? ? 'create_component' : 'update_component' , :type => 'course_elective_group', :course_id => @course.id, :id => @component.id}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |ceg| %>
+  <%= session_fingerprint_field %> 
+  <%= ceg.hidden_field :parent_id %>
+  <%= ceg.hidden_field :parent_type %>
+  <%= ceg.hidden_field :course_id, :value => @course.id %>
+  <div id="subject_group_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('course_elective_group_name') %></label>
+          <div class="text-input-bg"><%= ceg.text_field :name  %></div>
+      </div>
+      <% if @course.enable_student_elective_selection %>
+        <div class="label-field-pair">
+            <label for="name"><%= t('end_date_of_selection') %></label>
+            <div class="text-input-bg">
+              <% obj = ceg.object %>
+              <%= calendar_date_select_tag 'course_elective_group[end_date]', (obj.end_date.present? ? I18n.l(obj.end_date,:format=>:default) : nil),
+              :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" , :id=>"exam_date"%>
+            </div>
+        </div>
+      <% end %>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{head}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlay').click(remove_popup_box);
+</script>

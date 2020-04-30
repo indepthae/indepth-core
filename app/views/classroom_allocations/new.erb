@@ -1,0 +1,64 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "classroom_allocations" %>
+  <%= javascript_include_tag :defaults, :cache => true %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('building') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('allocate') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="choose_allocation">
+    <div class="title"> <%= t("allocation_type") + " :" %></div>
+    <div class="form">
+      <% form_for :classroom_allocation do |f| %>
+        <div class="label_field_pair">
+         <%= f.radio_button  :allocation_type, "weekly",:onChange => "render_partial(this);j('#flash').hide();" %>
+         <label class="label_for_weekly" for="classroom_allocation_allocation_type_weekly"><%= t('weekly') %></label>
+         <%= f.radio_button  :allocation_type, "date_specific",:onChange => "render_partial(this);j('#flash').hide();" %>
+         <label class="label_for_date_specific" for="classroom_allocation_allocation_type_date_specific"><%= t('date_specific') %></label>
+        </div>
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+
+    </div>
+    <div id="render_partial"></div>
+   
+    <%end%>
+  </div>
+  <div class="allocations" id ="flash"></div>
+  
+
+</div>
+
+
+<script type="text/javascript">
+  dir="<%= (rtl?) ? 'rtl' : 'ltr' %>"
+  var no_teacher= "<%= t('no_teacher') %>"
+  var month_names = ["<%= t('jan') %>" , "<%= t('feb') %>", "<%= t('mar') %>", "<%= t('apr') %>", "<%= t('may') %>", "<%= t('jun') %>", "<%= t('jul') %>", "<%= t('aug') %>", "<%= t('sep') %>", "<%= t('oct') %>", "<%= t('nov') %>", "<%= t('dec') %>"];
+  var delete_allocation = "<%= t('del_allocation') %>"
+  var search_batch = "<%= t('search_batch') %>";
+  var continue_text = "<%= t('continue') %>";
+  var cancel_text = "<%= t('cancel') %>"
+  function render_partial(button){
+    j('#loader1').show();
+    new Ajax.Request('/classroom_allocations/view',
+    {
+        parameters:'allocation_type='+button.value,
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(){
+           j('#loader1').hide();
+        }
+    }
+    )
+}   
+</script>

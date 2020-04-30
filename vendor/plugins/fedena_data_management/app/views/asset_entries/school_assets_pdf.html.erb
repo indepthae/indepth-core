@@ -1,0 +1,45 @@
+<%= stylesheet_link_tag (rtl?) ? 'rtl/asset_entries/school_assets_pdf.css' : 'asset_entries/school_assets_pdf.css' %>
+<%#= stylesheet_link_tag 'asset_entries/school_assets_pdf.css' %>
+</div>
+<%#*<div id="page-yield">%>
+</div>
+<div id="page-yield">
+<div class="hor_line"></div>
+<h2><%= t('data_management') %></h2>
+<div class="hor_line"></div>
+<% count=0 %>
+<% @school_assets.each do |school_asset| %>
+  <%# count+=1 %>
+  <%  @asset_field=school_asset.asset_field_names.keys.first %>
+  <%  asset_entries=school_asset.asset_entries %>
+  <% asset_entries.each do |asset_entry| %>
+    <ul id="categorylist">
+      <li class="heading">
+        <%= "Sl No.: #{count+=1} #{asset_entry.school_asset.asset_name}"%>
+      </li>
+      <% asset_entry.asset_field_names.each do |key,val|  %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="category-name">
+            <%=  "#{val["field_name"]}".upcase %>
+          </div>
+          <% if val["field_type"]=="has_many" %>
+            <div class="category-delete">
+              <% rec=asset_entry[val["related"]] %>
+              <%= rec.map{ |d| d.default_field }.join(", ") %>
+            </div>
+          <% elsif val["field_type"]=="belongs_to" %>
+            <div class="category-delete">
+              <% rec=asset_entry[val["related"]] %>
+              <%= rec.default_field unless rec.nil? %>
+            </div>
+          <% else %>
+            <div class="category-delete">
+              <%= asset_entry.send key %>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+</div>

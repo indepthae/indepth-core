@@ -1,0 +1,17 @@
+<tr class="row-b">
+    <td class="sl-col col-1 particular_index normal_font"><%= i += 1 %></td>
+    <td class="set_border_right">
+        <% if @student_type == 'Student'%>
+        <%= @hostel_fee.student.full_name %>
+        <% else %>
+        <%= @hostel_fee.hostel_fee_collection.name %>
+        <% end %>
+    </td>
+
+    <td class="set_border_right amount-col normal_font align_right">
+        <%= precision_label(@hostel_fee.rent) %>
+    </td>
+    <td class="cancel-disc cancel-color"></td>
+</tr>
+
+<% @total_fees = @hostel_fee.rent %>

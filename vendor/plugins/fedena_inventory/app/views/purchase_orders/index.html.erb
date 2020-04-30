@@ -1,0 +1,95 @@
+
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('purchase_order') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <%  if permitted_to? :index, :indents %><li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('indent_text')}", indents_path %> </li><% end %>
+      <%  if permitted_to? :index, :grns %><li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('grn_text')}", grns_path %> </li><% end %>
+      <%  if permitted_to? :index, :purchase_orders %> <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", new_purchase_order_path %> </li><% end %>
+
+
+
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <% form_tag purchase_orders_path, :method => 'get' do %>
+    <div id="search_textbox">
+      <label><%= t('search') %>:</label>
+      <div class="text-input-bg" id="search_dropdown">
+        <%= select '',:po_status_like, [["Pending","Pending"],["Issued","Issued"],["Rejected","Rejected"]],:selected => params[:po_status_like]  %>
+      </div>
+      <%= text_field_tag :po_no_or_store_like, params[:po_no_or_store_like] %>
+    </div>
+    <%= submit_tag "Search", :value => "► #{t('submit')}",:name => nil , :class => "submit_button" %>
+  <% end %>
+
+
+  <div id="page-yield">
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+    <% end %>
+
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <% unless @purchase_orders.blank? %>
+        <tr class="tr-head">
+          <td>
+            <%= t('sl_no') %></td>
+          <td colspan="1">
+            <%= t('purchase_order_no') %>
+          </td>
+          <td>  <%= t('store_name') %></td>
+          <td>  <%= t('po_status') %></td>
+          <% unless params[:po_status_like] == "Issued" %>
+            <td>  </td>
+          <% end %>
+
+        </tr>
+        <tr class="tr-blank"></tr>
+        <%  @purchase_orders.each_with_index do |p, i| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-1"><%=(@purchase_orders.current_page - 1) * @purchase_orders.per_page + (i + 1) %></td>
+            <td class="col-2"><%= link_to p.po_no, p  %></td>
+            <td class="col-2"><%= p.store.name unless p.store.nil? %></td>
+            <td class="col-2"><%= p.po_status unless p.po_status.nil? %></td>
+            <% unless params[:po_status_like] == "Issued" %>
+              <td class="col-2"><div class="edit-delete-box">
+                  <div><small><%=  link_to 'Edit', edit_purchase_order_path(p) unless p.po_status == "Issued"%></small></div>
+                  <div><small><%=  link_to 'Delete', p, :confirm => 'Are you sure?', :method => :delete if p.can_be_deleted?%></small></div>
+                  <div><small><%= link_to p.po_status == "Issued" ? "Reject" : "Issue",  acceptance_purchase_order_path(:id => p.id) if p.can_be_rejected? %></small></div></div>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% else %>
+
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%= t('no_porchase_order') %></td>
+        </tr>
+      <% end %>
+    </table>
+
+  </div>
+  <% unless @purchase_orders.blank? %>
+    <%= will_paginate  @purchase_orders %>
+  <% end %>
+
+</div>

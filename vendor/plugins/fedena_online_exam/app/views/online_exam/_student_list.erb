@@ -1,0 +1,59 @@
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <tr class="tr-head">
+    <td class="col-1"><%= t('serial_no') %></td>
+    <td><%= t('student_name') %></td>
+    <td><%= t('admission_no') %></td>
+    <td><%= t('marks') %></td>
+    <td><%= t('status') %></td>
+    <td></td>
+  </tr>
+  <tr class="tr-blank"></tr>
+  <% @students.each_with_index do |e,i| %>
+    <% attended = @exam.has_attendance_for(e) %>
+    <tr  class="tr-<%= cycle('odd', 'even') %>" id="tr-<%=e.id%>">
+      <td class="col-1"><%= i+1 %></td>
+      <td class="col-6"><%= e.full_name %></td>
+      <td class="col-2"><%= e.admission_no %></td>
+      <td class="col-2">
+        <% unless attended == false %>
+          <%= attended.total_score %>/<%= @max_marks %>
+        <% else %>
+          <%= " - " %>
+        <% end %>
+      </td>
+      <% unless attended == false %>
+        <% if attended.answers_evaluated == true %>
+          <% if attended.is_passed %>
+            <td class="col-2" ><%= t('passed') %></td>
+          <% else %>
+            <td class="col-2" ><%= t('failed') %></td>
+          <% end %>
+        <% else %>
+          <td class="col-2" ><%= t('not_evaluated') %></td>
+        <% end %>
+      <% else %>
+        <td class="col-2"><%= " - " %></td>
+      <% end %>
+      <td class="col-3">
+        <% unless attended == false %>
+          <% if attended.answers_evaluated == true %>
+            <div class="edit" id="publish">
+              <label><%= t('evaluated') %></label>
+            </div>
+            <div class="edit">
+              <%= link_to "#{t('recheck')}",{:action => 'evaluate_answers', :id => @exam.id, :student_id=>e.id}, :class=>"themed_text" %>
+            </div>
+          <% else %>
+            <div class="edit">
+              <%= link_to "#{t('evaluate_text')}",{:action => 'evaluate_answers', :id => @exam.id, :student_id=>e.id}, :class=>"themed_text" %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="edit" id="publish">
+            <label><%= t('did_not_appear') %></label>
+          </div>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

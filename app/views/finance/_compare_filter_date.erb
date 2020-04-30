@@ -1,0 +1,73 @@
+<div class="date_box">
+  <div class="float-box width50p">
+    <div class="fields-label">
+      <%= t('select_a_date_range') %>
+    </div>
+    <div class="fields">
+      <div class="date">
+        <%= calendar_date_select_tag 'start_date', I18n.l(Date.today, :format => :default), :popup => :force %>
+      </div>
+
+      <div class="date">
+        <label><%= t('to') %></label>
+        <%= calendar_date_select_tag 'end_date', I18n.l(Date.today, :format => :default), :popup => :force %>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-box width50p">
+    <div class="fields-label">
+      <%= t('compare_date_range') %>
+    </div>
+    <div class="fields">
+      <div class="date">
+        <%= calendar_date_select_tag 'start_date2', I18n.l(Date.today, :format => :default), :popup => :force %>
+      </div>
+
+      <div class="date">
+        <label><%= t('to') %></label>
+        <%= calendar_date_select_tag 'end_date2', I18n.l(Date.today, :format => :default), :popup => :force %>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-box width50p margin-top20">
+    <div class="fields-label">
+      <% if @accounts_enabled %>
+          <%= t('fee_account_text') %>
+      <% end %>
+    </div>
+    <div class="fields">
+      <% if @accounts_enabled %>
+          <div class="text-input-bg accounts_list">
+            <% selected = @account_id == "0" ? 0 : @account_id %>
+            <%= select_tag :fee_account_id, options_for_select(@accounts.map { |a| [a.name, a.id] }.
+                                                                       unshift([t("default_account"), 0]).unshift([t("all_accounts"), nil]), :selected => selected) %>
+          </div>
+      <% end %>
+
+      <div class="view_report">
+        <%= submit_tag "#{t('view_report')}", {:id => "submit_form", :class => 'user_button1'} %>
+        <% if @target_action.present? %>
+            <span class="themed_hover_text" id="hide_date_filter"><%= t('cancel') %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    j(document).delegate('#submit_form', 'click', function () {
+        url = "/finance/report_compare?start_date=" + j('#start_date')[0].value + "&end_date=" +
+                j('#end_date')[0].value + "&start_date2=" + j('#start_date2')[0].value + "&end_date2=" +
+                j('#end_date2')[0].value;
+        window.location.href = url;
+    })
+
+    j("#hide_date_filter").click(function () {
+        j(".date_box").hide();
+        j("#show_date").show();
+    });
+
+</script>

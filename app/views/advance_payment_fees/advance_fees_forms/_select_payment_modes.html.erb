@@ -1,0 +1,25 @@
+<% form_obj = params[:form_obj].present? ? params[:form_obj] : "advance_fees_collection" %>
+  <% if @payment_mode == 'Others' %>
+    <div class="payment_mode_block">
+        <label>&nbsp;</label>
+        <% mode=mode||"" %>
+        <div class="text-input-bg3" id="payment">
+            <%= text_field_tag "#{form_obj}[payment_mode]" , mode, {:class => "others_payment_mode"}%>
+        </div>
+    </div>
+  <% elsif @payment_mode == 'Cheque' %>
+    <div class="payment_mode_block">
+        <label><%= t('bank_name') %></label>
+        <div class="text-input-bg3" id="payment">
+            <%= text_field_tag "#{form_obj}[bank_name]" %>
+        </div>
+    </div>
+
+    <div class="label-field-pair3 special_case payment_mode_block cheque_due_date">
+        <label><%= t('cheque_date') %></label>
+        <div class="date-input-bg date-input-bg-c">
+            <%= calendar_date_select_tag "#{form_obj}[cheque_date]", I18n.l(Date.today, :format => :default),
+              {:popup => 'force'} %>
+        </div>
+    </div>
+  <% end %>

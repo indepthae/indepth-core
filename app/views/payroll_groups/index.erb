@@ -1,0 +1,78 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payroll_groups') %></div>
+  <% if params[:finance].nil? and permitted_to? :new, :payroll_groups %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to t('create_payroll_group'), :controller=>"payroll_groups", :action=>"new" %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% breadcrumb :payroll_groups_index_finance %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id ="header"><%= t('payroll_groups').titleize %></div>
+  <% unless params[:finance].present? %>
+    <div id ="description"><%= t('payroll_group_description') %></div>
+  <% else %>
+    <div id ="description"><%= t('payroll_group_finance_description') %></div>
+  <% end %>
+  <div id ="payroll_group_list">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="name"><%= t('payroll_group_name') %></td>
+        <td class="emp_count"><%= t('assigned_employees') %></td>
+        <td class="categories"><%= t('payroll_categories') %></td>
+        <td class="salary_preference"><%= t('salary_preferences') %></td>
+        <td class="actions"></td>
+      </tr>
+      <% if @payroll_groups.present? %>
+        <% @payroll_groups.each do |pg|  %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+            <td><%= link_to pg.name, {:action => 'show', :controller => 'payroll_groups', :id => pg.id, :finance => params[:finance]} %></td>
+            <td><%= pg.employees_count %></td>
+            <td><%= pg.category_codes %></td>
+            <td><%= pg.salary_preference %></td>
+            <td>
+              <div id="edit">
+                <%= link_to t('view'), {:action => 'show', :controller => 'payroll_groups', :id => pg.id, :finance => params[:finance]} %>
+              </div>
+              <div id="employees">
+                <% if permitted_to? :assigned_employees, :payroll %>
+                  <%= link_to t('employees'), {:action => 'assigned_employees', :controller => 'payroll', :id => pg.id, :finance => params[:finance]} %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr class="tr-even" >
+          <td colspan="5"><%= t('create_a_payroll_group') %></td>
+        </tr>
+      <% end %>
+    </table>
+    <% if @payroll_groups.present? %>
+      <%= pagination_status(@payroll_groups) %>
+    <% end %>
+    <%= will_paginate @payroll_groups %>
+  </div>
+</div>

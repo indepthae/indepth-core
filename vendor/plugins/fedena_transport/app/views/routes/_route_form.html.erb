@@ -1,0 +1,185 @@
+<%= javascript_include_tag "jquery.timepicker" %>
+<%= stylesheet_link_tag ("jquery.timepicker") %>
+<% if @route.updating_fare %>
+  <p class="flash-msg"> <%= t('fare_updation_in_progress') %> </p>
+<% end %>
+<div id="route_form">
+    <% form_for(@route) do |r| %>
+      <%= session_fingerprint_field %>
+      <h5><%= t('route_details') %></h5>
+      <div class="label-field-pair">
+          <label for="name"><%= t('academic_year') %></label>
+          <%= r.hidden_field :academic_year_id %>
+          <div class="text-input-bg"><span><%= @academic_year.try(:name) %></span></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="name"><%= t('name') %></label>
+          <div class="text-input-bg"><%= r.text_field :name %></div>
+      </div>
+      <% if @flat_based_fee %>
+        <div class="label-field-pair">
+            <label for="fare"><%= t('routes.flat_route_fare') %></label>
+            <div class="text-input-bg"><%= r.text_field :fare, :class=>'precision_text', :value => (precision_label(@route.fare) if @route.fare.present?), 
+                  :onchange => ('update_stop_fare(this)' if @flat_based_fee) %><span class="currency-type"><%= @currency %></span></div>
+            <%#*<div id="leave_status_text" style=""></div>%>
+        </div>
+      <% end %>
+
+      <div class="label-field-pair">
+          <label for="vehicle"><%= t('vehicle') %></label>
+          <div class="text-input-bg"><%= r.select :vehicle_id, (@vehicles+@route.vehicle.to_a).uniq.map{|v| [v.vehicle_no, v.id]}, {:include_blank => "#{t('select_an_option')}"} %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="driver"><%= t('transport_employees.driver') %></label>
+          <div class="text-input-bg"><%= r.select :driver_id, @drivers.map{|d| [d.name, d.id]}, {:include_blank => "#{t('select_an_option')}"} %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="attendant"><%= t('transport_employees.attendant') %></label>
+          <div class="text-input-bg"><%= r.select :attendant_id, @attendants.map{|a| [a.name, a.id]}, {:include_blank => "#{t('select_an_option')}"} %></div>
+      </div>
+
+      <% i=0 %>
+      <% r.fields_for :transport_additional_details, @route_additional_details do |ff| %>
+        <%= ff.hidden_field :transport_additional_field_id %>
+        <% additional = @additional_fields.detect{|a| a.id == ff.object.transport_additional_field_id}  %>
+        <% if additional.input_type=="belongs_to" %>
+          <div class="label-field-pair">
+              <label><%= additional.name %></label>
+              <div class="text-input-bg"><%= ff.select :additional_info,additional.route_additional_field_options.map{|b| [b.field_option,b.field_option]},{:include_blank=>"#{t('select_an_option')}"}%></div>
+          </div>
+        <% elsif additional.input_type=="has_many" %>
+          <div class="label-field-pair select-list">
+              <label><%= additional.name %></label>
+          </div>
+          <div class="fee_category_scroll">
+              <div class="sel-list">
+                  <%= t('select') %>: <%= link_to_function t('all'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = true; });" %>,
+                  <%= link_to_function t('none'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = false; });" %>
+              </div>
+              <% values = (ff.object.additional_info.present? ? ff.object.additional_info : "")  %>
+              <% values = values.split(',') if values.is_a? String %>
+              <% additional.route_additional_field_options.each do |k| %>
+                <div class="each_batch">
+                    <%= ff.check_box :additional_info, {:class=>"batches_box check#{i}", :multiple => true, 
+                      :checked => values.include?(k.field_option)}, k.field_option, nil %>
+                    <label class="check_box_value"><%=k.field_option%></label>
+                </div>
+              <% end %>
+          </div>
+          <div id="addl_values">
+              <%= ff.hidden_field :additional_values %>
+          </div>
+        <% else %>
+          <div class="label-field-pair">
+              <label><%= additional.name %></label>
+              <div class="text-input-bg"><%= ff.text_field :additional_info%></div>
+          </div>
+        <% end %>
+        <% i+=1 %>
+
+        <div class="extender"></div>
+
+      <%end%>
+      <hr/>
+      <% stops = @route.route_stops.collect(&:vehicle_stop_id) %>
+      <h5><%= t('assign_stops') %></h5>
+      <%= r.hidden_field :stops_length %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="stops_listing">
+          <tr class="row-head">
+              <td class="col-1"><%= t('stop') %></td>  
+              <td class="col-2"><%= t('pickup_time') %></td>  
+              <td class="col-3"><%= t('drop_time') %></td>  
+              <td class="col-4"><%= t('distance') %></td>
+              <td class="col-5"><%= "#{t('fare')} &#x200E;(#{@currency})&#x200E;" %></td>
+              <td class="col-6"></td>
+          </tr>
+          <% i = 1 %>
+          <% r.fields_for :route_stops do |builder| %>
+            <%= render "route_stop_fields" ,:c => builder, :index => i, :stops => stops %>
+            <% i += 1 %>
+          <% end %>
+          <tr>
+              <td colspan='6'>
+                  <%= link_to_add_stops "<span>#{t('add')}</span>", r, :route_stops, i, stops %>
+              </td>
+          </tr>
+      </table>
+      <%= submit_tag "", :value => "#{t('save')}", :class => "submit-button", :disable_with => "#{t('please_wait')}", :disabled => @route.updating_fare %>
+      <%= link_to t('cancel'), routes_path, :class => "submit-button", :id => "cancel-link" %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  var previous;
+  j('.pickup_time, .drop_time').timepicker({'timeFormat': 'h:i A', 'step': 5});
+  check_stop_options();
+  function add_fields(link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).up().up().insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+      j(link).closest('tr').prev().find('.pickup_time, .drop_time').timepicker({'timeFormat': 'h:i A', 'step': 5});
+      values = j(".stop-list:visible").map(function () {
+          if (this.value != "")
+              return this.value;
+      });
+      j(link).closest('tr').prev().find('.stop-list option').attr('disabled', false);
+      j(link).closest('tr').prev().find('.stop-list option').each(function () {
+          if (j.inArray(this.value, values) >= 0)
+              j(this).attr('disabled', true);
+      })
+      j(link).closest('tr').prev().find(".stop-list").focus(focus_action).change(change_action);
+      update_stop_fare($('route_fare'));
+  }
+
+  function check_stop_options() {
+      values = j(".stop-list:not(:visible)").map(function () {
+          if (this.value != "")
+              return this.value;
+      });
+      j('tr').each(function () {
+          j(this).find('.stop-list option').each(function () {
+              if (j.inArray(this.value, values) >= 0)
+                  j(this).attr('disabled', false);
+          });
+      });
+  }
+
+
+  function remove_fields(link) {
+      $(link).previous("input[type=hidden]").value = '1';
+      j(link).closest('tr').hide();
+      previous = j(link).closest('tr').find('.stop-list').val();
+      if (previous != "") {
+          j(".stop-list option[value='" + previous + "']").attr('disabled', false);
+      }
+  }
+
+  function update_stop_fare(elm) {
+      if (j('#route_fare').length > 0)
+          j('.stop_fare').val(j(elm).val());
+  }
+
+  focus_action = function () {
+      // Store the current value on focus, before it changes
+      previous = this.value;
+  }
+  change_action = function () {
+      // Do something with the previous value after the change
+
+      if (previous != "") {
+          j(".stop-list option[value='" + previous + "']").attr('disabled', false);
+      }
+      if (this.value != "") {
+          j(".stop-list[name!='" + this.name + "'] option[value='" + this.value + "']").attr('disabled', true);
+      }
+      previous = this.value;
+  }
+  j(".stop-list").focus(focus_action).change(change_action);
+</script>

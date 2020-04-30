@@ -1,0 +1,68 @@
+<div id="MB_frame">
+  <div class="part" id="MB_header_part">
+    <a class="remove-icon" href="#" onclick="hideModalBox(this)" id="close"></a>
+    <h4><%= t('payslips_of_employee_department_advanvced_search') %></h4>
+  </div>
+  <% form_for :payslip, :url => {:controller => "finance", :action => "view_monthly_payslip", :hr => params[:hr]} ,:html => {:id => "advnc_form"} do |f| %>
+    <div class="part" id="date_ranges">
+      <label><%= t('payslip_date_range') %></label>
+      <div class="label-field-pair payslip_dates">
+        <label for="from"><%= t('from') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'payslip[start_date]', I18n.l(Date.today.beginning_of_month,:format=>:default),
+            :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair payslip_dates">
+        <label for="to"><%= t('to') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'payslip[end_date]', I18n.l(Date.today.end_of_month,:format=>:default),
+            :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+        </div>
+      </div>
+    </div>
+    <div class="part" id="search_fields">
+      <label><%= t('payslip_period') %></label>
+      <div class="label-field-pair">
+        <div class="text-input-bg">
+          <%= f.select :payslip_period, [["#{t('all')}","All"]] + @pay_period.map{|k,v| [t(v), k]}, {:selected=> "All"} %>
+        </div>
+      </div>
+    </div>
+    <div class="part"  id="search_fields">
+      <label><%= t('payslip_status') %></label>
+      <div class="label-field-pair">
+        <div class="text-input-bg">
+          <%= select_tag "payslip[payslip_status]", options_for_select([["#{t('all')}","All"]] + @payslip_status.map{|k,v| [t(v), k]}, @payslip_query[:payslip_status]),{:onchange => "filter_payslips()"} %>
+        </div>
+      </div>
+    </div>
+    <div class="part" id="search_fields">
+      <label><%= t('department') %></label>
+      <div class="label-field-pair">
+        <div class="text-input-bg">
+          <%= f.select :department_id, [["#{t('all_departments')}","All"]] + @departments.map { |c| [c.name, c.id] }, {:selected=>"All"} %>
+        </div>
+      </div>
+    </div>
+    <div class="part" id="employee_details">
+      <label><%= t('employee_details') %></label>
+      <div class="label-field-pair" id="emp_name">
+        <label for="emp_name"><%= t('employee_name') %></label>
+        <div class="text-input-bg">
+          <%= f.text_field :employee_name %>
+        </div>
+      </div>
+      <div class="label-field-pair" id="emp_no">
+        <label for="emp_no"><%= t('employee_number') %></label>
+        <div class="text-input-bg">
+          <%= f.text_field :employee_no %>
+        </div>
+      </div>
+    </div>
+    <div class="part" id="MB_footer">
+      <%= submit_tag "#{t('search_text')}", :class => 'submit_button', :id => 'submit_button', :disable_with => "#{t('please_wait')}"  %>
+      <input class="submit_button" value="<%= "#{t('cancel')}" %>" type="button" onclick="hideModalBox();" id="close"/>
+    </div>
+  <% end %>
+</div>

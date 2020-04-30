@@ -1,0 +1,59 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<% total_fees =0 %>
+<% form_for :fees, :url => {:action => 'pay_fees_defaulters', :student => @student.id, 
+          :date => @date.id, :fine => @fine, :special_fine => @fine_amount, :batch_id => @batch.id}, 
+          :html => {:id => "fees_form", :onSubmit => "return validate_payment_mode();"} do |form| %>
+
+          <input type="hidden" id="fine_amount" value="0">
+
+          <% locals = {:form => form} %>
+          <% unless @fee_particulars.nil? %>
+
+            <table class="gray_table_list" cellpadding="0" cellspacing="0">
+                <tr class="main_head tr-list_head">
+                    <td class="sl-col"><%= t('sl_no') %></td>
+                    <td class="set_border_right"><%= t('particulars') %></td>
+                    <td class="set_border_right" colspan="2">
+                        <%= t('amount') %>
+                        (<%= currency %>)
+                    </td>
+                </tr>
+
+                <% i = 0 %>
+
+                <%= render :partial => 'finance/fees_payment/particular_list', :locals => {:i => i} %>          
+
+                <% @total_fine = 0 %>
+                <% total_fees1 = 0 %>
+
+                <%= render :partial => 'finance/fees_payment/discount_list',  :locals => {:i => i, 
+                  :total_fees => total_fees} %>
+
+                <% if @financefee.tax_enabled? and @financefee.tax_collections.present? %>
+                  <%= render :partial => 'finance/fees_payment/tax_list', :locals => {:i => i, 
+                    :total_tax => total_fees } %>          
+                <% end %>
+                <% @defaulter_fine = true %>
+                <%= render :partial => 'finance/fees_payment/fine_list', :locals => {:i => i, 
+                  :total_fees => total_fees, :payment_date => @payment_date} %>
+
+                <% balance = @financefee.balance.to_f + @fine.to_f %>
+
+                <%= render :partial => 'finance/fees_payment/summary', :locals => {:i => i, 
+                  :total_fine => @total_fine.to_f} %>
+
+                <%= render :partial => "finance/fees_payment/payment_block", :locals => locals.merge({:i => i, 
+                    :balance => balance, :total_fees1 => total_fees1, :payer_type => @payer_type,
+                    :onchange => "change_transaction_date()"}) %>
+
+              <% end %>
+          </table>
+
+        <% end %>
+
+        <%= render :partial => 'finance/fees_payment/paid_fees', :locals => {:batch_id => @batch.id, 
+          :delete_action => 'delete_transaction_fees_defaulters'} %>

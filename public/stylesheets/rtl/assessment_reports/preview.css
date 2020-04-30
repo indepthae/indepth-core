@@ -1,0 +1,481 @@
+
+@page {
+    margin-bottom: 25mm;
+    margin-top: 0px;
+}
+html {
+    margin-top: 0px;
+    /*background-color: red;*/
+}
+#page-yield {
+    width:-moz-max-content;
+    margin: 0 auto;
+    float: right;
+    overflow: hidden;
+    width: 852px;
+    margin-top:0px !important;
+}
+
+#pdf-info{
+    padding-top: 50px;
+}
+
+
+.hor_line{
+    width:-moz-max-content;
+    background: #333333;
+    height: 1px;
+}
+
+h2{
+    text-align: center;
+    margin:5px;
+    font-size: 13px;
+}
+h3{
+    font-size: 13px;
+}
+body {
+    font-family: arial;
+    margin-top: 0px;
+    padding-top: 0px;
+    float: right;
+
+}
+#main_info h4{
+    color: #555555;
+    margin-top: 18px;
+    font-weight: normal;
+}
+
+#main_info h2{
+    margin-bottom: 2px;
+    font-weight: normal;
+
+}
+
+
+.odd{
+    height:auto;
+    background: #F4F4F4;
+
+}
+
+.even{
+
+    height:auto;
+    background: #fff;
+
+
+}
+tr.even{
+    border: 1px solid #ADACAB;
+}
+
+tr.odd{
+    border: 1px solid #ADACAB;
+}
+
+td{
+    padding: 6px;
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 25px;
+    text-align: center;
+    font-size: 12px;
+}
+
+td.col-pdf-bold{
+    font-weight: bold !important;
+}
+
+.table-header td{
+    padding: 5px !important;
+    color: #000;
+    background: #EEEEEE;
+    font-weight: bold;
+    font-size: 12px;
+}
+.table-footer td{
+    padding: 12px 15px 12px 12px;
+    border: 1px solid #ADACAB;
+    color: #97080e;
+    background: #EEEEEE;
+}
+
+table#pdf-table{
+    border-top: 1px solid #ADACAB;
+    border-collapse:collapse
+}
+
+
+#page-extender{
+    width:100%;
+    height :300px;
+
+}
+#page-extender1{
+    width:100%;
+    height :500px;
+
+}
+table{
+    border-left: 1px solid #ADACAB;
+    /*font-size: 11px;*/
+    font-size: 14px;
+    /*    border-collapse: collapse;*/
+
+}
+.report{
+    min-height: 1000px;
+    margin: 0 auto;
+}
+
+#signature{
+    text-align: left;
+    width: 700px;
+    margin: 0 auto;
+    color: #999999;
+    font-size: 18px;
+}
+
+
+#page-yield h2{
+    text-align: center;
+}
+
+
+.page-break td{
+    height: 450px;
+    border: 1px solid #fff;
+    border-bottom: 1px solid #ADACAB;
+}
+.subject{
+    text-align: right;
+    width: 100px;
+}
+.sl_no{
+    width: 10px;
+}
+.grade{
+    max-width: 10px;
+}
+.info1{
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #444444;
+    float: right;
+    width: 100%;
+}
+.infolbl{
+    color:#000;
+    font-weight: bold;
+    float: right;
+    width: 70%;
+    word-break: break-word;
+}
+.field-label{
+    width: 97px;
+    float: right;
+    word-break: break-word;
+}
+.info-left{
+    float:right;
+    width: 50%;
+}
+.info-right{
+    float: left;
+    width: 50%;
+}
+.info{
+    width:100%;
+    float:right;
+    margin-bottom: 15px;
+}
+.high{
+    color:#b00;
+}
+.common_remarks_section{
+    float:right;
+    width:800px;
+    margin-bottom:10px;
+    border-top:1px solid #e5e5e5;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*margin-top:20px;*/
+}
+.section2{
+    margin-bottom: 5px;
+    float: right;
+    width: 100%;
+}
+
+
+#remarked_by_section{
+    float:right;
+    width:120px;
+    margin-left: 30px;
+    font-size: 13px;
+    word-break: break-all;
+}
+
+#remark_subject_section{
+    float:right;
+    width:136px;
+    margin-left: 30px;
+    font-size: 13px;
+}
+
+#remark_body_section{
+    float:right;
+    width:426px;
+    margin-left: 30px;
+    font-size: 13px;
+    word-break: break-all;
+}
+
+#submitted_by_section{
+    float:left;
+    font-size: 13px;
+    width: 180px;
+    color:#666666;
+    word-break: break-all;
+}
+#remarks_bold_label{
+    font-weight: bold;
+    float:right;
+    margin-top:15px;
+    margin-bottom: 5px;
+}
+#remarks_list{
+    float:right;
+    border-top:1px solid #cccccc;
+}
+#all-remarks
+{
+    width: 800px;
+    float: right;
+    margin-top: 20px;
+}
+
+
+
+
+.page-blank{
+    width: 100%;
+    float: left;
+}
+.page_break{
+    margin-top: 60px;
+}
+
+.page-break1{
+    height: 20px;
+    border: 1px solid #fff;
+    width:800px;
+    float: left;
+}
+.section1{
+    page-break-before:always;
+    /*    text-align: center;*/
+}
+.section {
+    page-break-inside: avoid;
+    float: right;
+    width: 100%;
+}
+.section{
+    margin-top:0px !important;
+}
+.row{
+    float: left;
+    width: 100%;
+    /*    text-align: center;*/
+}
+.page1 {
+    width:800px;
+    height: auto;
+    page-break-after: always;
+    page-break-inside: avoid;
+    clear: both;
+}
+
+#no_common_remarks{
+    float: right;
+    width: 800px;
+    margin-bottom: 10px;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    font-size: 15px;
+    font-weight:bold;
+    color: #666666;
+    margin-top:0px;
+}
+.custom_header{
+    float: right;
+    width: 100%;
+}
+.custom_header h3 {
+    /*padding-top: 20px;*/
+    clear: both;
+    margin-top:10px;
+    margin-bottom:5px;
+}
+
+td.remarks_value{
+    width: 20%;
+    text-align: right;
+}
+.remarks_data{
+    text-align:right;
+}
+.page-yield {
+    margin-top: -30px;
+    float: right;
+    background-color: yellow;
+}
+/* pdf header styles copy */
+.header {
+    width: 100%;
+    float: right;
+    margin-bottom:5px;
+    display: table;
+    /*background-color: red;*/
+}
+.school_logo {
+    float: right;
+    width: 30%;
+}
+.icse-header-content {
+    float: right;
+    width: 70%;
+    color: #97080e;
+    font-family: arial;
+    font-weight: bold;
+}
+.icse-header-content p{
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+}
+.icse-header-content p.institution_address{
+    font-weight: normal !important;
+    color: #000 !important;
+    margin-top: 15px !important;
+    line-height: 25px;
+}
+.footer {
+    float: right;
+    width: 100%;
+    page-break-before: avoid;
+    page-break-inside: avoid;
+}
+.wrapper {
+    page-break-inside: avoid;
+    float: right;
+    width: 100%;
+}
+.logo{
+    width: 70px;
+    height: 70px;
+    float: right;
+    border: 1px solid #e5e5e5;
+    padding: 3px;
+}
+.logo img{
+    width:100%;
+    vertical-align: middle;
+    display: table-cell;
+}
+#school-name{
+    float: right;
+    font-weight: bold;
+    font-size: 16px;
+    margin-right: 10px;
+    width: 95%;
+    margin-bottom: px;
+    margin-top: 3px;
+    color:#000 !important;
+}
+.header-content p.institution_address{
+    float: right;
+    margin-right: 10px;
+    font-size: 14px;
+    color: #666 !important;
+    margin-top:0px !important;
+    width:95%;
+}
+.header-content{
+    margin-right:0px; 
+    height:80px;
+    width: 90%;
+    padding:3px;
+    float: none;
+}
+.left_bold{
+    text-align: right;
+    font-weight: bold;
+}
+.right_bold{
+    text-align: left;
+    font-weight: bold;
+}
+span.header_parts{
+    vertical-align: middle;
+    display: table-cell;
+    text-align:center;
+}
+span.colon{
+    float:right;
+    margin-left:5px;
+    margin-right:5px;
+}
+.image_enclosure{
+    float:right;
+    width:100%;
+}
+.image_enclosure img{
+    width:100%;
+}
+#pdf-footer {
+    float:right;
+    color: black;
+    width: 100% !important;
+    padding: 50px 0px !important;
+}
+.signature {
+    width: 32%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    word-break: break-all;
+}
+.push_left{
+    text-align: right;
+    margin-left: 10px;
+}
+.push_right{
+    text-align: left;
+    margin-right: 10px;
+}
+
+.border_less{
+    border: none !important
+}
+.logo.border_less{
+    width:62px;
+    height: 62px;
+    padding-bottom: 10px;
+}
+.sign_img{
+    margin-bottom: 10px;
+}
+.sign_img:first-child{
+    margin-right: 10px;
+}
+.sign_img:last-child{
+    margin-left: 10px;
+}

@@ -1,0 +1,158 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div id="page-yield" class="available_sections">
+  <div class="section" >
+    <center>
+      <div class="hor_line"></div>
+      <h2><%= "#{t('department_wise_payslip')}" %></h2>
+      <div class="hor_line"></div>
+    </center>
+  </div>
+
+  <div class="section" >
+    <div id ="info">
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:department_name].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('department') %></label><span>: </span>
+            <label class="infolbl"><%= @data_hash[:department_name] %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:start_date].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('start_date') %></label><span>: </span>
+            <label class="infolbl"><%= format_date(@data_hash[:search_parameters][:start_date], :short) %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:end_date].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('end_date') %></label><span>: </span>
+            <label class="infolbl"><%= format_date(@data_hash[:search_parameters][:end_date], :short) %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:payslip_period].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('payslip_period') %></label><span>: </span>
+            <label class="infolbl"><%= @data_hash[:search_parameters][:payslip_period] == "All" ? t('all') : t(PayrollGroup::PAYMENT_PERIOD[@data_hash[:search_parameters][:payslip_period].to_i]) %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:payslip_status].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('payslip_status') %></label><span>: </span>
+            <label class="infolbl"><%=  @data_hash[:search_parameters][:payslip_status] == "All" ? t('all') : t(EmployeePayslip::PAYSLIP_STATUS[@data_hash[:search_parameters][:payslip_status].to_i]) %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:employee_name].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('employee_name') %></label><span>: </span>
+            <label class="infolbl"><%=  @data_hash[:search_parameters][:employee_name] %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="<%= cycle('info-left', 'info-right') %>">
+        <% if @data_hash[:search_parameters][:employee_no].present? %>
+          <div class="info1">
+            <label class="field-label"><%= t('employee_number') %></label><span>: </span>
+            <label class="infolbl"><%=  @data_hash[:search_parameters][:employee_no] %></label>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="section row" id="table-headers" >
+    <center>
+      <table id="pdf-table" width="100%">
+        <tr class="table-header">
+          <td class = "e_text"><%="#{t('employee_text')}"%></td>
+          <% if @data_hash[:search_parameters][:department_id] == "All" %>
+            <td class = "frequency"><%= "#{t('payment_frequency')}" %></td>
+          <% end %>
+          <td class = "period"><%= "#{t('payslip_period')}" %></td>
+          <td class = "amount"><%= "#{t('amount')} (#{@data_hash[:currency_type]})" %></td>
+          <td class = "status"><%=  "#{t('payslip_status')}" %></td>
+        </tr>
+        <% total_salary = 0; total_approved_salary = 0; total_employees = []; i=0 %>
+        <% unless @data_hash[:payslips].blank? %>
+          <% @data_hash[:payslips].each do |group_name,payslips| %>
+            <tr class="even">
+              <td colspan = "6" class="sub-head">
+                <% if @data_hash[:search_parameters][:department_id] == "All" %>
+                  <%= group_name %>
+                <% else %>
+                  <%= PayrollGroup.payment_period_translation(group_name) %>
+                <% end %>
+              </td>
+            </tr>
+            <% payslips.each do |p| %>
+              <tr class="even">
+                <td class="e_text">
+                  <%= "#{i+=1}. #{p.full_name} &#x200E;(#{p.employee_number})&#x200E;" %>
+                  <% if p.emp_type == 'ArchivedEmployee' %>
+                    <span class ="archived"><%= "&#x200E;(#{t('archived')})&#x200E;" %></span>
+                  <% end %>
+                </td>
+                <% if @data_hash[:search_parameters][:department_id] == "All" %>
+                  <td class = "frequency"><%= PayrollGroup.payment_period_translation(p.payment_period) %></td>
+                <% end %>
+                <td class = "period"><%= p.date_range %></td>
+                <td class = "amount"><%= precision_label(p.net_pay) %></td>
+                <td class = "status"><%= p.is_rejected == true ? t('rejected') : p.is_approved == true ? t('approved') : t('pending') %></td>
+              </tr>
+              <% total_salary += p.net_pay.to_f %>
+              <% total_approved_salary += p.net_pay.to_f if p.is_approved %>
+              <% total_employees << p.employee_id %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </table>
+    </center>
+  </div>
+  <div class="section row no-break" >
+    <div class= "tot-emp">
+      <div class = "tot-emp-text"><%= "#{t('total_payslips')}" %></div><span>: </span>
+      <span class = "tot-emp-val"><%= total_employees.length %></span>
+    </div>
+
+    <div class= "tot-emp">
+      <div class = "tot-emp-text"><%= "#{t('total_employees')}" %></div><span>: </span>
+      <span class = "tot-emp-val"><%= total_employees.uniq.length %></span>
+    </div>
+
+    <div class= "tot-emp">
+      <div class = "tot-emp-text"><%= "#{t('total_salary_text')}"%></div><span>: </span>
+      <span class = "tot-emp-val"><%= precision_label(total_salary) %></span>
+    </div>
+    <div class= "tot-emp">
+      <div class= "tot-emp-text"><%= "#{t('approved_salary')}" %></div><span>: </span>
+      <span class = "tot-emp-val"><%= precision_label(total_approved_salary) %></span>
+    </div>
+  </div> 
+</div>
+

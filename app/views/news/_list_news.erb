@@ -1,0 +1,53 @@
+
+
+
+<% if @news.present? %>
+  <% @news.each do |r| %>
+    <div class="news_box" data-id="<%= r.id %>">
+        <span class="title">
+            <%= r.title %>
+        </span>
+        <div class="content-div">
+            <div class="content">
+                <%= shorten_string(strip_tags(r.content),400) %>
+            </div>
+            
+        </div>
+        <div class="news_box_sub">
+            <!--span class="date">< % = r.created_at.strftime("%d %b %Y") %></span-->
+            <span class="date"><%= format_date(r.created_at, :format=>:long_date) %></span>
+            <span class="comment"><%=  t('comments') %> : <%= r.comments.size %></span>
+        </div>
+    </div>
+    
+  <% end %>
+  <div>
+      <div class="pages">
+          <% @page_num = 1 unless @page_num.present? %>
+          <% start_page= ((@page_num.to_i - 1)*10) + 1 %>
+          <% end_page=  (((@page_num.to_i - 1)*10) + @news.count) %>
+          <% if start_page == end_page %>
+              <%= t('showing_sentance',:start_page=>start_page,:total=>@news_count) %>
+          <%  else %>
+              <%= t('showing_sentance1',:start_page=>start_page,:end_page=>end_page,:total=>@news_count) %>
+          <%  end %>
+          
+          
+      </div>
+      <div class="pagination-div">
+          <%= will_paginate @news,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "news",:action => "load_news",:query=>params[:query],:search_since=>params[:search_since]} %>
+      </div> 
+  </div>
+<% else %>
+  <p class="flash-msg" style="margin-top: 100px;"> <%= t('no_news') %></p>
+<% end %>
+
+  
+<script>
+  window.scrollTo(0, 0);
+  j(".news_box").on("click",function(){
+    data_id = j(this).attr('data-id');
+    window.location.href = "/news/"+data_id;
+    
+  })
+</script>

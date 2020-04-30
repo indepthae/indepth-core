@@ -1,0 +1,10 @@
+<% if @student.present? %>
+  <div class="pdf">
+      <%# if @schol_report.individual_report_pdf.present? %>
+        <%#= link_to "#{t('download_pdf')}", @schol_report.individual_report_pdf.attachment.url(:original,false), { :href => "#{@schol_report.individual_report_pdf.attachment.url(:original, false)}", :class=> 'user_button'}%>
+      <%# else %>
+        <%= link_to "#{t('download_pdf')}",
+          { :action => "student_#{@exam_type}_pdf", :student_id => @student.s_id, :reportable_id => @reportable.id, :batch_id => @batch.id},:target => '_blank', :class=> 'user_button' %>
+      <%# end %>
+  </div>
+<% end %>

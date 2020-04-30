@@ -1,0 +1,10 @@
+<label for="batch_id">Assessment Group</label>
+<div  class="text-input-bg" id="exam-group-select">
+    <%if @assessment_groups_cat_1.present?%>
+      <%=  select :assessment, :assessment_group, grouped_options_for_select([['Individual',@assessment_groups_cat_1.collect {|v| [ v, v ] }],
+          ['Grouped', @assessment_groups_cat_2.collect {|v| [ v, v ] }],
+          ['Term',@assessment_groups_cat_3.collect {|v| [ v, v ] }],['ASL',[['SA1','ASL1'],['SA2','ASL2'],['SA1+SA2','ASLO']]]],{},"Select an assessment group")%>
+    <% else %>
+      <%= select :assessment, :assessment_group, [],{:prompt=>"Select an assessment_group"} %>
+    <% end %>
+</div>

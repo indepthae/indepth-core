@@ -1,0 +1,34 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>Exam Categories</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>ICSE Exam Categories</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :icse_settings_edit_ia_group,@ia_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% form_for(@ia_group, :url => {:action=> 'update_ia_group',:id=>@ia_group.id}, :html=> {:multipart=>true}) do |ia| %>
+    <%= error_messages_for 'ia_group', :header_message => nil %>
+    <%= render :partial=>"ia_form",:locals=>{:ia=>ia} %>
+    <div id="submit-button">
+      <%=  submit_tag "► #{t('update')}",:class=>'submit_button',:disable_with => "► Please Wait.." %>
+    </div>
+  <%end%>
+</div>
+
+<script type="text/javascript">
+  j(document).ready(function () {
+    j("#indicator").find("input:hidden").each(function(e){
+      if (this.value=="true"){
+        this.parentNode.parentNode.hide();
+      }
+    });
+  });
+</script>

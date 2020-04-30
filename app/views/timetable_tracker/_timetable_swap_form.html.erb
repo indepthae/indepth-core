@@ -1,0 +1,63 @@
+<% form_remote_for :timetable, :url => {:action => 'timetable_swap',:timetable_entry_id=>params[:timetable_entry_id],
+  :date=>params[:date],:timetable_swap_id=>params[:timetable_swap_id],:batch_id=>params[:batch_id] ,:type => params[:type], :employee_wise_id => @emp_wise_id} ,
+  :loaded=>"reset_timetable_period_options(#{params[:timetable_entry_id]}); $('link_#{params[:timetable_entry_id]}').hide();" do |form| %>
+  <%= params[:employee_id]  %>
+  <div class="image_loading">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader_#{params[:timetable_entry_id]}",
+        :style =>"display: none;" ) %>
+  </div>  
+
+<div class="swap_form">
+      <div class="label-field-pair1">
+          <%= t('department_select_form') %><br>
+          <div class="text-input-bg1">
+              <%= select :timetable, :department_id,
+                @departments.map {|d| [d.name, d.id]},
+                {:prompt => "#{t('select_department')}"},
+                {:onChange => "#{remote_function(:url => {:action => "list_employees"},
+                :with=>"'department_id='+value+'&date=#{params[:date]}'+'&timetable_entry_id='+#{params[:timetable_entry_id]}+'&employee_id='+#{@employees}",
+                :before => "Element.show('loader_#{params[:timetable_entry_id]}');update_submit(j('#link_#{params[:timetable_entry_id]}').find('#timetable_employee_id'))",
+                :success => "Element.hide('loader_#{params[:timetable_entry_id]}')"
+                )}"} %>
+          </div>
+      </div>
+      <%= t('form_emp') %><br>
+      <div class="label-field-pair1" id=<%= "employee_list_#{params[:timetable_entry_id]}" %>>
+          <% @employees=[] %>
+          <div class="text-input-bg1"><%= select :timetable, :employee_id,
+                @employees.map {|d| [d.name, d.id]},
+                {:prompt => "#{t('select_employee')}"}%>
+          </div>
+      </div>
+      <div class="sub label-field-pair1">
+          <%= t('class_subject') %><br>
+          <div class="text-input-bg1"><%= select :timetable, :subject_id,
+                @subjects.map {|s| [s.name, s.id]},
+                {:prompt => "#{t('select_subject')}"}%>
+          </div>      
+      </div>
+     
+  </div>
+  <div class="swap_submit_section">
+      <div id='employee_swap_overlap_validation_<%="#{params[:timetable_entry_id]}"%>' class='employee_swap_overlap_validation'></div>
+      <div id="status_record_<%="#{params[:timetable_entry_id]}"%>" class="teacher_status_title"></div>
+      <div class='submit_buttons'>
+          <div class="cancel_link">
+              <%= button_to_function "#{t('cancel')}",:onclick=>"reset_timetable_period_options(#{params[:timetable_entry_id]});",:class=>"swap_themed_text_form"%>
+          </div>
+          <div class="submit">
+              <%= submit_tag "#{t('swap_class')}",:class=>'swap submit_button', :disabled => 'disabled', :onclick => "disable_this_form(#{params[:timetable_entry_id]})"  %>
+          </div>
+      </div>
+      <div id='swap_notify_<%="#{params[:timetable_entry_id]}"%>' class='#'>
+          <div class="label-field-pair_notify">
+              <div class="text-input-bg1_notify">
+                  <label><%= form.check_box :notify %><%= t('notify_swap') %></label>
+              </div>      
+          </div>
+      </div>
+  </div>
+<% end %>

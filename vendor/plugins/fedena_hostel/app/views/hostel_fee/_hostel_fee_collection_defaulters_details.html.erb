@@ -1,0 +1,34 @@
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="fee-collections-list">
+  <table id="listing">
+    <% unless @hostel_fee.blank?  %>
+      <tr class="tr-head">
+        <td><%= "#{t('student_name')}"%></td>
+        <td><%= "#{t('hostel_fee_text')}"%></td>
+        <td></td>
+      </tr>
+      <% @hostel_fee.each do |h| %>
+
+        <tr class="tr-<%= cycle('odd', 'even')%> ">
+          <td class="col-2"><%= h.student.full_name %></td>
+          <td class="col-3"><%#= h.rent %><%= precision_label h.rent %></td>
+
+          <td class="col-3">
+
+
+            <%if h.finance_transaction_id.nil? %>
+              <%= link_to_remote "► #{t('pay_fees')}",:class=>'submit_button' ,:url=>{:action=>'pay_defaulters_fees', :id => h.id} %>
+            <% else %>
+              <h4><%= "#{t('fees_paid')}"%></h4>
+            <%end%>
+
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="no-defaulters"><td><%= "#{t('no_defaulters')}"%></td></tr>
+    <% end %>
+  </table>
+</div>

@@ -1,0 +1,10 @@
+<div class="text-input-bg1"><%= select :timetable, :employee_id,
+      @employees.reject{|e| e.id == params[:employee_id].to_i}.map {|e| [ "#{e.full_name}(#{e.employee_number})", e.id]},
+      {:prompt => "#{t('select_employee')}"},
+      {:onChange => "#{remote_function(:url => {:action => "validate_swap_employees"}, 
+      :with=>"'employee_id='+value+'&date=#{params[:date]}'+'&timetable_entry_id='+#{params[:timetable_entry_id]}+'&department_id=#{params[:department_id]}'",
+      :before => "Element.show('loader_#{params[:timetable_entry_id]}');
+      j('#link_'+#{params[:timetable_entry_id]}).find('#timetable_employee_id').removeClass('overlap_validated')",
+      :success => "Element.hide('loader_#{params[:timetable_entry_id]}')"
+      )}"}%>
+</div>

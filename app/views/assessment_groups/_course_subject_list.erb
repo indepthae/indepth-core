@@ -1,0 +1,115 @@
+<div id='subjects_scroll'>
+  <div class="description"><%= t('list_of_unique_subjects') %></div>
+  <% if @course_subjects.present? %>
+    <% @course_subjects.each_pair do |id, css| %>
+      <% course_name = css.first.course_name %>
+      <div class="header"><%= course_name %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="col1"></td>
+              <td class="col4"><%= t('subject_name').titleize %></td>
+              <td class="col5"><%= t('subject_code') %></td>
+          </tr>
+          <% css.each do |cs| %>
+            <tr>
+                <% data_id = "subject_#{cs.subject_code}_#{id}".gsub(/[^\w]/, '_') %>
+                <% selected = @selected_subjects.present? ? (@selected_subjects.include? data_id) : false %>
+                <td><%= check_box_tag "course_subject[]",cs.subject_code, selected ,{ :class=>'select_subject', :data_id => data_id,:onclick =>"selectSubj(this);",
+                      :subject_code => cs.subject_code, :course_id => id, :subject_name => cs.subject_name, :course_name => course_name} %></td>
+                <% if cs.subject_elective_id.present? %>
+                    <td class="elective"><%= cs.subject_name%></td>
+                    <td class="elective"><%= cs.subject_code %></td>
+                <% else %>
+                    <td><%= cs.subject_name%></td>
+                    <td><%= cs.subject_code %></td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+    <% end %>  
+  <% end %>
+</div>
+<div class="actions">
+    <div class="left_actions">
+      <%= link_to  t('select_subject').titleize, '#', :onclick => "return insertSubjects();", :class => 'submit-button' %>
+      <%= link_to  t('cancel').titleize, '#', :onclick => "remove_popup_box();", :class => 'submit-button' %>
+    </div>
+    <div class='right_actions'>
+        <%= "#{t('generate_payslip_bulk.selected')} "%> 
+        <span id='subject_count'><%= @selected_subjects.present? ? @selected_subjects.count : 0 %></span> 
+        <%= "#{t('subjects_text')}" %>
+    </div>
+</div>
+<script type="script/javascript">
+    selectSubj = function(e){
+      var checked = j(e).prop('checked')
+      if(checked){
+        j('#subject_count').html(parseInt(j('#subject_count').html()) + 1);
+      }else{
+        j('#subject_count').html(parseInt(j('#subject_count').html()) - 1);
+      }
+    }
+    
+    remove_destroy_flag = function(class_name){
+      if(j('.'+class_name+'#'+class_name).length > 0){
+        j('.'+class_name+'#'+class_name).remove();
+      }
+    }
+    
+    add_destroy_flag = function(class_name,new_id){
+      remove_destroy_flag(class_name)
+      if(j('.'+class_name).length > 0){
+        el_id = j('input.'+class_name+'[type=text]')[0].up().className
+        j('<input>').attr({type: 'hidden', value: true , class: class_name, id: class_name,  name: 'assessment_group[override_assessment_marks_attributes]'+ el_id +'[_destroy]'}).appendTo('#assessment_group_form');
+      }
+      if(j('input.'+class_name+'[type=text]:visible').length > 0){
+        j('input.'+class_name+'[type=text]').each(function(){
+          j(this).parent().parent().hide();
+        })
+      }
+    }
+    
+    insertSubjects = function(){
+      $subject_list = []
+      j('.select_subject').each(function(){
+        course_id = j(this).attr('course_id')
+        course_name = j(this).attr('course_name')
+        subject_code = j(this).attr('subject_code')
+        subject_name = j(this).attr('subject_name')
+        id = j(this).attr('data_id')
+        var new_id = new Date().getTime();
+        if(j(this).prop('checked')){
+          $subject_list.push(id)
+          remove_destroy_flag(id);
+          if(j('input.'+id+'[type=text]').length == 0){
+            j('<input>').attr({type: 'hidden', value: subject_code , class: id , name: 'assessment_group[override_assessment_marks_attributes]'+ new_id +'[subject_code]'}).appendTo('#assessment_group_form');
+            j('<input>').attr({type: 'hidden', value: course_id , class: id , name: 'assessment_group[override_assessment_marks_attributes]'+ new_id +'[course_id]'}).appendTo('#assessment_group_form');
+            j('<input>').attr({type: 'hidden', value: subject_name , class: id , name: 'assessment_group[override_assessment_marks_attributes]'+ new_id +'[subject_name]'}).appendTo('#assessment_group_form');
+            drawSubjectsTable(new_id, subject_name, course_id , course_name, subject_code, id)
+          }
+        }else{
+          add_destroy_flag(id,new_id);
+        }
+      })
+      
+      
+      remove_popup_box();
+      
+          }
+    
+    drawSubjectsTable = function(new_id, subject_name, course_id, course_name, subject_code, id){
+      var table = document.getElementById("subject_show_list");
+      var row = table.insertRow();
+      var cell0 = row.insertCell(0)
+      var cell1 = row.insertCell(1)
+      var cell2 = row.insertCell(2)
+      var cell3 = row.insertCell(3)
+      j(cell0).html(subject_name)
+      j(cell1).html(subject_code)
+      j(cell2).html(course_name)
+      j(cell3).html(j('<input>').attr({type: 'text', class: id , name: 'assessment_group[override_assessment_marks_attributes]'+ new_id +'[maximum_marks]'}));
+      cell3.classList.add(new_id)
+      j('#subject_show_list').css('display','table')
+    }
+    
+</script>

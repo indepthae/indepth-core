@@ -1,0 +1,21 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('store_types') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('new_text') %></div>
+  <div class="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= link_to "#{t('store_types')}", store_types_path %>
+    <div class = "bread-crumb-separator"> > </div>
+    <%= t('new_text') %>
+  </div>
+
+
+
+
+  <%= render :partial => 'form' %>
+
+</div>

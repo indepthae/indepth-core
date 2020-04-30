@@ -1,0 +1,34 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+    <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Schools</h1>
+  <%= link_to '+ New school', new_school_path, :class  => 'button-red float-right' if permitted_to? :new, :schools%>
+</fieldset>
+<div class="content-div container-width">
+  <div class='content-list'>
+    <% unless @schools.empty? %>
+      <% @schools.each do |school| %>
+        <fieldset class="bg-light grey-border shadow">
+          <h4><%=link_to school.name, school_path(school) %></h4>
+          <% if permitted_to? :edit, school, :context=>:schools %>
+            <label class="clear-width"><%= link_to 'Edit', edit_school_path(school) %></label>
+          <% end %>
+          <% school_domain = school.school_domains.try(:first) %>
+          <% if permitted_to?(:admin_login, school, :context=>:schools) && school_domain.present? %>
+              <p class="seperator">|</p>
+              <label class="clear-width"><%= link_to 'Login', admin_login_school_path(:id=>school.id,:domain_id=>school_domain.id), :target=>'_blank', :title => 'login to this school here' %></label>
+          <% end %>
+        </fieldset>
+      <% end %>
+      <%= will_paginate @schools %>
+    <% else %>
+      <fieldset class="bg-light grey-border shadow">
+        <label>No schools found.</label>
+      </fieldset>
+    <% end %>
+  </div>
+</div>
+

@@ -1,0 +1,23 @@
+<% if @stats_hash.present? %>
+  <% if @stats_hash[@entity.to_sym].data_entity.type.to_s=="attendance" %>
+    <h4 class="dashboard-heading margin-top-20 attendance-head"><%= read_live_entity(@entity.to_s) %><span class="date"><%= text_field_tag "start_date", value="#{@end_date.to_date}", options={:id => "attendance_date-#{@entity}", :class => "datepicker date_search_attendance",:autocomplete=>:off,:readonly=>true} %></span></h4>
+    <%= render :partial=>"stat_attendance" %>
+  <% else %>
+    <h4 class="dashboard-heading margin-top-20"><%= read_live_entity(@entity.to_s) %></h4>
+    <% @stats_hash[@entity.to_sym].data_entity.fields.keys.each do |field| %>
+      <div class="label-box">
+        <h5 class="label-heading"><%= read_live_entity(field.to_s) %></h5>
+        <div class="big-text margin-bottom-20 label-big-text"><%=  "#{@stats_hash[@entity.to_sym].read(field)}" %></div>
+      </div>
+    <% end %>
+    <%= link_to_function "More..","#",:class=>"float-right margin-right-20 small-text-link school-stats-small-link"  %>
+  <% end %>
+<% end %>
+
+<script>
+  var q = jQuery.noConflict();
+  q('.school-stats-small-link').click(function(e){
+    window.location = "/schools/statistics/live/"+j(this).parent().children().find(".child-entity")[0].id+"?start_date='<%=@start_date%>'&end_date='<%=@end_date%>'"
+    e.stopPropagation();
+  });
+</script>

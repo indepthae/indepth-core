@@ -1,0 +1,5 @@
+if @error_text.nil?
+  #page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  #page.replace_html 'weekly_class_cnt', :text=> @wk_cnt
+end
+page.redirect_to :action => 'index', :batch_id => @subject.batch_id

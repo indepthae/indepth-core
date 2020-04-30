@@ -1,0 +1,62 @@
+<% form_for @assessment_plan, {:url => add_courses_assessment_plan_path(@assessment_plan), :method => :put} do |ap| %>
+  <%= session_fingerprint_field %>
+  <div id="course_form">
+      <table align="center" width="75%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="check_all">
+                  <%= check_box :selected,:all, :class => "select_all" ,:onclick => "select_all(this)" %>
+              </td>
+              <td class="course_name"><%= t('course_text') %></td>
+              <td class="batch_count"><%= t('batches_text') %></td>
+              <td class="planner"><%= t('exam_planner_linked') %></td>
+          </tr>
+          <% ap.fields_for :assessment_plans_courses, @assessment_plan.assessment_plans_courses do |course| %>
+            <% c_obj = course.object %>
+            <tr>
+                <td class="check_all">
+                    <%= course.check_box :selected, :class => "select_leave", :onclick=>"select(this)", :disabled => c_obj.disable %>
+                    <%= course.hidden_field :course_id %>
+                    <%= course.hidden_field :assessment_plan_id %>
+                </td>
+                <td class="course_name"><%= c_obj.name %></td>
+                <td class="batch_count"><%= c_obj.batches_count %></td>
+                <td class="planner"><%= c_obj.planner_name %></td>
+            </tr>
+          <% end %>
+      </table>
+  </div>
+  <div id="popup_footer">
+      <div id="count"></div>
+      <%=submit_tag "#{t('link_courses')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <%= link_to "#{t('manage_courses')}", manage_courses_assessment_plan_path(@assessment_plan), :class => "submit-button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+function select_all(obj){
+    if(j(obj).prop('checked')){
+      var i;
+      for(i=0;i<j('.select_leave').length;i++){
+        if (!j('#assessment_plan_assessment_plans_courses_attributes_'+i+'_selected').prop('disabled'))
+          j('#assessment_plan_assessment_plans_courses_attributes_'+i+'_selected').prop('checked',true);
+      }  
+    }
+    else{
+      var i;
+      for(i=0;i<j('.select_leave').length;i++){
+        if (!j('#assessment_plan_assessment_plans_courses_attributes_'+i+'_selected').prop('disabled'))
+          j('#assessment_plan_assessment_plans_courses_attributes_'+i+'_selected').prop('checked',false);
+      }
+    }
+  }
+ 
+  j('.select_leave').on('click',function(){
+    j('.select_all').prop('checked', (j('.select_leave').length - j('.select_leave:disabled').length) == (j('.select_leave:checked').length - j('.select_leave:checked:disabled').length));
+  })
+  if(j('.select_leave').length == j('.select_leave:checked').length){
+    j('.select_all').prop('checked','true');
+    j('.select_all').prop('disabled','true');
+  }
+  if(j('.select_leave').length == j('.select_leave:disabled').length){
+    j('.select_all').prop('disabled','true');
+  }
+</script>

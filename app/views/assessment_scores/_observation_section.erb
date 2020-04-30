@@ -1,0 +1,97 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<div class="observation_section">
+    <% indicators= ob.descriptive_indicators %>
+    <% if indicators.present? %>
+      <div class="sub_head">
+          <%= "#{ind + 1}. #{ob.name}" %>
+      </div>
+      <table id="observation_listing" width="100%" cellpadding="1" cellspacing="1">
+          <% indicators.each_with_index do |di,i| %>
+            <tr class="st_entry list-<%= cycle('odd', 'even') %>">
+                <td class="observation_label">
+                    <div class="observation_label_div">
+                        <%= di.name %>
+                    </div>
+                </td>
+                <td class="observation_field">
+                    <div class="label-field-pair">
+                        <div class="text-input-bg field_<%=ob.id%>"><%= text_field_tag "grade[#{di.id}]", (@scores[@student.id][di.id].present? ? @scores[@student.id][di.id].first.grade_points : "") ,:class=>"precision_text",:onkeyup=> "return validate_mark(this)",:onblur=> "return validate_mark(this)",:autocomplete=>"off"%></div>
+                    </div>
+                </td>
+            </tr>
+          <%end%>
+      </table>
+      <% if CceReportSetting.get_setting_value('ObservationRemarkMode') == "0" %>
+        <div class="grade_and_remark">
+            <div class="grade-section">
+                <span class="grade_label"><%= t("grade_text")%> </span>
+                <span class="grade_field" id="grade_field_<%=ob.id%>"><%=ob.get_grade(@student.id,@batch.id)%></span>
+            </div>
+            <div class="remark-section">
+                <span class="remark_label"><%= t('remark')%> </span>
+                <div class="label-field-pair">
+                    <div class="text-input-bg"><%= text_area_tag "remarks[#{ob.id}]",(@remarks[@student.id][ob.id].present? ? @remarks[@student.id][ob.id].first.remark : "")%></div>
+                </div>
+                <div class="remark-select-button <%- unless ob.observation_remarks.count > 0 %>disabled<%- end%>" id="remark_select_<%=ob.id%>">
+                    <li class="remark_drop <%- unless ob.observation_remarks.count > 0 %>disabled<%- end%> " id="drop_remark_link_<%=ob.id%>">▼</li>
+                    <ul class="remarks_list" id="remark_list_<%=ob.id%>">
+                        <% ob.observation_remarks.each_with_index do |rem, i|  %>
+                          <li class="remarks" id="remarks_<%=ob.id%>"><%= i+1 %>. <span><%= rem.remark%></span></li>
+                            <% end %>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+      <% end %>
+
+    <% end %>
+</div>
+<script>
+  j('.disabled').unbind('click');
+  j("#drop_remark_link_<%=ob.id%>").on('click', function () { // drop down on remark select
+      if (j("#remark_list_<%=ob.id%>").css("display") == 'none') {
+          j("#drop_remark_link_<%=ob.id%>").html('▲');
+          j("#drop_remark_link_<%=ob.id%>").addClass('opened_box');
+          j('.remarks_list').css('display', 'none');
+          link_off = j("#remark_select_<%=ob.id%>").offset();
+          link_width = j("#remark_select_<%=ob.id%>").width();
+          link_height = j("#remark_select_<%=ob.id%>").height();
+          box_width = j("#remark_list_<%=ob.id%>").width();
+          j("#remark_list_<%=ob.id%>").css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+          j("#remark_list_<%=ob.id%>").css("display", "block");
+      } else {
+          j("#remark_list_<%=ob.id%>").css("display", "none");
+          j("#drop_remark_link_<%=ob.id%>").html('▼');
+          j("#drop_remark_link_<%=ob.id%>").removeClass('opened_box');
+      }
+  });
+
+  j(".remarks").on('click', function () {
+      var id = j(this).attr("id").match(/\d+/);
+      id = parseInt(id);
+      var new_html = j(this).find("span").html();
+      j('#remarks_' + id).val(new_html);
+      j("#remark_list_<%=ob.id%>").css("display", "none");
+      j('.remark_drop').html('▼');
+      j('.remark_drop').removeClass('opened_box');
+  });
+  //*********Auto reszing TextBox************ //
+  function form_autosize(this_element){
+    this_scroll = j(window).scrollTop();
+    j(this_element).css('height', '');
+    j(this_element).css('overflow', 'scroll');
+    j(this_element).height(j(this_element).prop('scrollHeight'));
+    j(this_element).css('overflow', 'hidden');
+    j(window).scrollTop(this_scroll);
+  };
+  
+  j('textarea').on('keyup change paste', function() {
+    form_autosize(this); });
+  //*********Auto reszing TextBox************ //
+
+</script>

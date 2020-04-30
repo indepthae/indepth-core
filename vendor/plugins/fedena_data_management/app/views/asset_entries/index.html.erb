@@ -1,0 +1,33 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('data_management') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @school_asset.asset_name %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :new, :school_assets %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_entry')}", new_school_asset_asset_entry_path(:school_asset_id=>@school_asset.id) %></li>
+      <% end %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('data_management')}", school_assets_path %></li>
+      <% unless @asset_entries.empty? %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('print')}", {:action=>:assets_pdf,:school_asset_id=>@school_asset.id},:target=>'_blank' %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%  breadcrumb :asset_entries_index,@school_asset %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @asset_entries.empty? %>
+    <% @asset_entries.each_with_index do |asset,count| %>
+      <%= render :partial=>"asset_entries",:locals=>{:asset_entry=>asset,:count=>count} %>
+    <% end %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_data_present') %> </p>
+  <% end %>
+</div>

@@ -1,0 +1,98 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('elective') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :student_assigned_elective_subjects,@batch%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless @elective_groups.blank? %>
+  <div id="search_box_bg">
+    <form name="search_form" action="" style="display:inline;">
+      <%= hidden_field_tag("option", params['option'], :value => "active") %>
+      <label for="user_name"><%= t('search_text') %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+      </label>
+      <div id="search_textbox">
+        <%= text_field_tag("query", params['query'], :autocomplete => 'off') %>
+      </div>
+      <div class="extender"></div>
+    </form>
+  </div>
+  <div id ="students">
+    <% unless @students.blank? %>
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td><%= "Student" %></td>
+          <td><%= "Group" %></td>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+          <%@students.each do |s|%>
+            <% elective_subjects = s.subjects %>
+              <tr class="tr-<%= cycle('odd', 'even') %>">
+                <td class="col-1" rowspan="<%= @elective_group_count %>"><%= s.full_name %></td>
+              <% @elective_groups.each do |eg| %>
+                <% electives = elective_subjects.select {|x| x.elective_group_id == eg.id} %>
+                  <div id="elective-name">
+                    <td class="col-2-<%= cycle('odd', 'even') %>"><%=eg.name%>
+                  </div>
+                  <div id="elective-subjects">
+                    <% if electives.empty? %>
+                      <div id="no-electives"><%= t('no_electives_selected') %></div>
+                    <% else %>
+                      <div id="electives">
+                        <p><%= "#{t('elective_subjects')}" %>: <% names = "" %>
+                           <%electives.each do |e|%>
+                             <% names += e.name + ", " %>
+                           <%end%>
+                           <%= names.chomp(", ") %>
+                        </p>
+                      </div>
+                    <%end%>
+                  </div>
+                </td>
+              </tr>
+            <%end%>
+          <%end%>
+        </tr>
+      </table>
+      <%= will_paginate @students %>
+    <% end %>
+  </div>
+  <%else%>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%= t('no_elective_groups')%></td>
+        </tr>
+    </table>
+  <% end %>
+</div>
+<script type="text/javascript">
+    function search_students(){
+      if ($('query').value.include("%")) return;
+<%="#{remote_function(:url => {:action => "search_students", :id => @batch.id},
+:with =>"j('form').serialize()",
+:before => "Element.show('loader')",
+:success => "Element.hide('loader')",
+:update=>"information"
+)}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('query', 1, search_students);
+    new Form.Element.Observer('option', 0.5, search_students);
+  });
+</script>

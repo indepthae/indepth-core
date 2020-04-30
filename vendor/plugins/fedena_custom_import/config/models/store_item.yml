@@ -1,0 +1,50 @@
+ store_item:
+    primary_keys:
+      item_name: "Item name"
+    overrides:
+      store_id: "Store Code"
+      item_category_id: "Item Category Code"
+      
+    associations:
+     - :store 
+     - :item_category
+    associated_columns:
+      store: "code_as"
+      item_category: "code"
+    filters:
+     - :school_id
+     - :is_deleted
+    mandatory_columns:
+     - :item_name
+     - :quantity
+     - :unit_price
+     - :batch_number
+     - :store_id
+    instructions:
+      Item name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Quantity:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Unit price:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Tax:
+          Type: "Numeric."
+          Input Instruction and example: "Enter the tax percentage"
+      Batch number:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Store Code:
+          Type: "An active Store Code."
+          Input Instruction and example: ""
+      Code:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Sellable:
+          Type: "Y,Blank."
+          Input Instruction and example: "Enter Y to make the item sellable, keep it blank to make it unchecked.."
+      Item Category Code:
+          Type: "An active Item Category Code."
+          Input Instruction and example: "Mandatory if item is sellable."

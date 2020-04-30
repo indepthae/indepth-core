@@ -1,0 +1,59 @@
+<%= stylesheet_link_tag (rtl?) ? 'rtl/asset_entries/new.css' : 'asset_entries/new.css' %>
+<%=  %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= @school_asset.asset_name %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @school_asset.asset_description %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('data_management')}", school_assets_path(:school_asset_id=>@school_asset.id) %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% unless @asset_entry.id.nil? %>
+      <%  breadcrumb :asset_entries_edit,[@school_asset,@asset_entry] %>
+    <% else %>
+      <%  breadcrumb :asset_entries_new,[@school_asset,@asset_entry] %>
+    <%end%>
+
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% form_for [@school_asset,@asset_entry]  do |f| %>
+    <%= error_messages_for :asset_entry %>
+    <fieldset>
+      <% @asset_entry.asset_field_names.each do |key,val|  %>
+        <% if val["field_type"]=="belongs_to" %>
+          <div class="label-field-pair">
+            <div class="label-container"> <%= f.label key, "#{val["field_name"]}".capitalize %></div>
+            <div class="text-input-bg"> <%= f.select key, val["related_options"],:prompt=>"#{t('select_option')}"%></div>
+          </div>
+        <% elsif val["field_type"]=="has_many" %>
+          <div class="label-field-pair with_container">
+            <div class="label-container"> <%= f.label key, "#{val["field_name"]}".capitalize %></div>
+            <div class="check_box_container">
+              <% val["related_options"].each do |opt| %>
+                <div class="label-field-pair">
+                  <%= check_box_tag "asset_entry[#{key}][]",opt[1],(((@asset_entry.send key)||[]).include? opt[1]),:id=>"asset_entry_#{key}_#{opt[1]}" %>
+                  <%= f.label "#{key}_#{opt[1]}","#{opt[0]}" %>
+                </div>
+
+              <% end  %>
+            </div>
+          </div>
+        <% else %>
+          <div class="label-field-pair">
+            <div class="label-container"> <%= f.label key, "#{val["field_name"]}".capitalize   %></div>
+            <div class="text-input-bg"><%= f.text_field key%></div>
+          </div>
+        <% end %>
+      <% end %>
+    </fieldset>
+    <%= f.submit "#{t('save')}",:class=>"submit_button", :disable_with => "#{t('please_wait')}"%>
+  <% end %>
+</div>

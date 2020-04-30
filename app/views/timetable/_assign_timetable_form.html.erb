@@ -1,0 +1,147 @@
+<div class="assigned_batches_section">
+  <div class="select_all_section">
+    <label><%= t('assigned_batches') %></label>
+  </div>
+  <div id="assigned_batches">
+    <% disabled_batches = @assigned_batches.select {|x| x.timetable_entries.select{|tte| tte.timetable_id==@timetable.id}.present? } %>
+    <% enabled_batches = @assigned_batches.present? ? (@assigned_batches - disabled_batches) : []  %>
+
+    <% if enabled_batches.present? %>
+      <div class="assigned_batch assigned_batch_head">
+        <%= check_box_tag "check_all_assigned", "",false,{:onclick => "check_all_assigned(this)",:class=> "assigned_batches_check assigned_batches_check_all"} %>
+        <label for='check_all_assigned'><%= t('batches_without_timetable_entries') %></label>
+      </div>
+      <% enabled_batches.each do |batch| %>
+        <%timetable_entries=batch.timetable_entries.select{|tte| tte.timetable_id==@timetable.id} %>
+        <div class="assigned_batch">
+          <% if timetable_entries.present? %>
+            <%= check_box_tag "batch#{batch.id}", batch.id,false,{:onclick => "add_check_class(this)",:class=> "assigned_batches_check",:disabled=>true} %>
+          <% else %>
+            <%= check_box_tag "batch#{batch.id}", batch.id,false,{:onclick => "add_check_class(this)",:class=> "assigned_batches_check"} %>
+          <% end %>
+          <label for='<%="batch#{batch.id}"%>'><%= batch.full_name %></label>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if disabled_batches.present? %>
+      <div class="assigned_batch assigned_batch_head assigned_batch_disabled">
+        <label>
+          <%= t('batches_with_timetable_entries') %>
+        </label>
+      </div>
+      <% disabled_batches.each do |batch| %>
+        <%timetable_entries=batch.timetable_entries.select{|tte| tte.timetable_id==@timetable.id} %>
+        <div class="assigned_batch assigned_batch_disabled">
+          <label for='<%="batch#{batch.id}"%>'><%= batch.full_name %></label>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+<div class="buttons">
+  <div class="right">
+    <%= link_to_function "", "remove_batch_from_timetable(#{@timetable.id})" %>
+  </div>
+  <div class="loader1">
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none" ) %>
+  </div>
+  <div class="left">
+    <%= link_to_function "","add_batch_to_timetable(#{@timetable.id})" %>
+  </div>
+</div>
+<div class="all_batches_section">
+  <div class="select_all_section">
+    <label><%= t('available_batches') %></label>
+  </div>
+  <div id="all_batches">
+    <% if @available_batches.present? %>
+      <div class="all_batch all_batch_head">
+        <%= check_box_tag "check_all_batch", "",false,{:onclick => "check_all_batch(this)",:class=> "all_batches_check all_batches_check_all"} %>
+        <label for='check_all_batch'>
+          <%= t('batches_without_timetable_entries') %>
+        </label>
+      </div>
+      <% @available_batches.each do |batch| %>
+        <div class="all_batch">
+          <%= check_box_tag "batch#{batch.id}", batch.id,false,{:onclick => "add_check_class(this)",:class=> "all_batches_check"} %>
+          <label for='<%="batch#{batch.id}"%>'><%= batch.full_name %></label>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  function add_batch_to_timetable(timetable_id){
+    var batch_ids=j(".all_batches_check:checked").map(function(){return this.value}).get();
+    if(batch_ids==""){
+      alert('<%=t('select_one_batch')%>');
+    }
+    else{
+      j.ajax({
+        type: 'POST' ,
+        url: "/timetable/add_batch_timetable",
+        data : {
+          id : timetable_id,
+          batch_id : batch_ids
+        },
+        beforeSend : function() {
+          j("#loader1").show();
+        },
+        success : function(){
+          j("#loader1").hide();
+        }
+      })
+    }
+  }
+
+  function check_all_batch(obj){
+    var check_all_status = j(obj).is(':checked');
+    var check_boxes = j('.all_batches_check');
+    j(check_boxes).each(function(a,b){
+      j(b).prop('checked',check_all_status);
+    });
+  }
+
+  function check_all_assigned(obj){
+    var check_all_status = j(obj).is(':checked');
+    var check_boxes = j('.assigned_batches_check');
+    j(check_boxes).each(function(a,b){
+      j(b).prop('checked',check_all_status);
+    });
+  }
+
+  function remove_batch_from_timetable(timetable_id){
+    var batch_ids=j(".assigned_batches_check:checked").map(function(){return this.value}).get();
+    if(batch_ids==""){
+      alert('<%=t('select_one_batch')%>');
+    }
+    else{
+      j.ajax({
+        type: 'POST' ,
+        url: "/timetable/remove_batch_timetable",
+        data : {
+          id : timetable_id,
+          batch_id : batch_ids
+        },
+        beforeSend : function() {
+          j("#loader1").show();
+        },
+        success : function(){
+          j("#loader1").hide();
+        }
+      })
+    }
+  }
+  function add_check_class(val){
+    /*
+    if (val.checked==false){
+      j(val).parent().removeClass("checked_class")
+    }
+    else{
+      j(val).parent().addClass("checked_class")
+    }
+     */
+  }
+</script>

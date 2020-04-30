@@ -1,0 +1,58 @@
+<div class="text-input-bg spl_position"><%= select :student, :id, @students.map { |s| [s.full_name, s.id] } %>
+  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+</div>
+<script type="text/javascript">
+  j('#student_id').change(function(){
+<%if params[:rg_id].present?%>
+      j.ajax({
+        type: 'POST' ,
+        url: "/student_records/new",
+        data : {
+          id : j(this).val(),
+          batch_id: <%=@batch.id%>,
+          rg_id: <%=params[:rg_id]%>
+        },
+        beforeSend : function(){
+          j('#loader').show();
+        },
+        success : function() {
+          j('#loader').hide();
+        }
+      });
+<%else%>
+      if (j('#record_group_id').val() != ""){
+        j.ajax({
+          type: 'POST' ,
+          url: "/student_records/new",
+          data : {
+            id : j(this).val(),
+            batch_id: <%=@batch.id%>,
+            rg_id: j('#record_group_id').val()
+          },
+          beforeSend : function(){
+            j('#loader').show();
+          },
+          success : function() {
+            j('#loader').hide();
+          }
+        });
+      }
+      else{
+        j.ajax({
+          type: 'POST' ,
+          url: "/student_records/new",
+          data : {
+            id : j(this).val(),
+            batch_id: <%=@batch.id%>
+          },
+          beforeSend : function(){
+            j('#loader').show();
+          },
+          success : function() {
+            j('#loader').hide();
+          }
+        });
+      }
+<%end%>
+  });
+</script>

@@ -1,0 +1,141 @@
+<% unless flash[:warn_notice].nil? %>
+  <div id="errorExplanation" class="errorExplanation">
+      <%= flash[:warn_notice] %> 
+  </div>
+<% end %>
+
+<div class="extender"></div>
+
+<div class="each-detail" id="hide1">
+    <label class="name"><%= t('student_text') %></label>
+    <div class="val">
+        <div class="text-input-bg val-align"> 
+            <%= select :fees_submission, :batch_id, @students.map { |c| [c.full_name, c.id] },
+              {:prompt => "#{t('switch_student')}", :selected => @student.id},
+
+              {:onChange => "#{remote_function(:url => {:action => "hostel_fee_collection_details"},
+              :with => "'student='+value+'&batch_id='+#{@batch.id}+'&date='+#{@date.id}",
+              :before => "Element.show('hostel_loader')",
+              :success => "Element.hide('hostel_loader')")}"
+              } %>
+        </div>
+    </div>
+    <div class="loader_div">
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "hostel_loader",
+          :style =>"display: none; " ) %>
+    </div>
+
+</div>
+
+<div class="each-detail">
+    <div class="name">
+        <%= "#{t('student_text')} #{t('admission_no')}" %>
+    </div>
+    <div class="val">
+
+
+        <div class="val-align"><%= @student.admission_no %></div>
+    </div>
+</div>
+<% if roll_number_enabled? %>
+  <div class="each-detail width-210">
+      <div class="name">
+          <%= "#{t('student_text')} #{t('roll_no')}" %>
+      </div>
+      <div class="val">
+
+
+          <div class="val-align"><%= @student.roll_number %></div>
+      </div>
+  </div>
+<% end %>
+
+<div class="each-detail">
+    <% unless @student.student_category.nil? %>
+      <div class="name">
+          <%= t('student_category') %>
+      </div>
+      <div class="val">
+          <div class="val-align">
+              <%= @student.student_category.name %>
+          </div>
+      </div>
+    <% end %>
+</div>
+
+<div class="height-fixer"></div>
+<div class="extender"></div>
+
+<div id="flash"></div>
+
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"><%= flash[:notice] %></p>
+<% end %>
+
+<div class="extender"></div>
+
+<div id="register">
+    <div class="header">
+        <div class="prev stu" next_or_prev_name="<%= @prev_student.full_name %>" 
+             student_name="<%= @student.full_name %>" side="left">
+                 <%= link_to_remote '◄', :url => {:action => 'hostel_fee_collection_details', 
+                   :batch_id => @batch.id, :student => @prev_student.id, :date => @date.id} %>
+        </div>
+        <div class="month">
+            <%= @student.full_name %>
+            <%= "(#{t('transfered_to_batch')}:#{@student.batch.full_name})" unless @batch==@student.batch %>
+        </div>
+
+        <div class="next stu" next_or_prev_name="<%= @next_student.full_name %>" 
+             student_name="<%= @student.full_name %>" side="right">
+                 <%= link_to_remote '►', :url => {:action => 'hostel_fee_collection_details', 
+                   :batch_id => @batch.id, :student => @next_student.id, :date => @date.id} %>
+        </div>
+        <div class="hover-text">
+            <label class="next_or_previous"></label>
+            <div class="hover_student_name"></div>
+            <div class="hover_arrow_down"></div>
+        </div>
+        <div class="extender"></div>
+    </div>
+</div>
+
+<%= render :partial => "hostel_fee/fees_payment/fees_details" %>
+
+<script>
+
+  j(function () {
+      j('.stu').hover(function (e) {
+          var left_or_right = "<%= (rtl?) ? 'right' : 'left'  %>";
+          j('.hover_student_name').text(j(this).attr('next_or_prev_name'));
+          if (j(this).attr('side') == 'left') {
+              j('.hover-text').css('margin-' + left_or_right, '0px');
+              j('.next_or_previous').text('<%="#{t('previous')} #{t('student_text')}" %>');
+          } else {
+              j('.hover-text').css('margin-' + left_or_right, '445px');
+              j('.next_or_previous').text('<%="#{t('next')} #{t('student_text')}" %>');
+          }
+          j('.hover-text').show();
+      }, function () {
+          j('.hover-text').hide();
+      });
+  });
+
+  function change_transaction_date() {
+      j.ajax({
+          method: 'POST',
+          url: '/hostel_fees/hostel_fee_collection_details',
+          data: {student: <%= @student.id %>, batch_id: <%= @batch.id %>, date: <%= @date.id %>}
+      });
+
+
+//      window.location = "/hostel_fees/hostel_fee_collection_details/<%= @student.id %>?batch_id=<%= @batch.id %>" +
+//              "<%= '&fine=' + @fine.to_s if @fine %>&date=<%= @date.id%>&transaction_date=" +
+//              j('#transaction_date').val() + "&reference_no=" + reference_no + "&payment_mode=" +
+//              payment_mode + "&payment_note=" + payment_note + "&others_payment_mode=" + others_payment_mode;
+  }
+
+</script>

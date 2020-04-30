@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.employee_leave_type_detail{
+  @employee_leave_types.each do |employee_leave_type|
+    @employee_leave_type = employee_leave_type
+    @xml.employee_leave_type do
+      @xml.name(@employee_leave_type.name)
+      @xml.code(@employee_leave_type.code)
+      @xml.is_active(@employee_leave_type.is_active)
+      @xml.max_leave_count(@employee_leave_type.max_leave_count)
+      @xml.carry_forward(@employee_leave_type.carry_forward)
+      @xml.lop_enabled(@employee_leave_type.lop_enabled)
+      @xml.max_carry_forward_leaves(@employee_leave_type.max_carry_forward_leaves)
+      @xml.carry_forward_type(@employee_leave_type.carry_forward_type)
+      @xml.reset_date(@employee_leave_type.reset_date)
+      @xml.creation_status(@employee_leave_type.creation_status)
+    end
+  end
+}%>
+
+

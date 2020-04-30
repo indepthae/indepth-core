@@ -1,0 +1,37 @@
+<div class="employee_utilization_header">
+  <div class="label_pair">
+    <div class="label">
+      <%= t('timetable_text') %>
+    </div>
+    <div class="title">
+      <%= @timetable.range %>
+    </div>
+  </div>
+  <div class="header_description">
+    <%= t("#{@utilization == "0" ? 'not_allocated' : (@utilization == "1" ? 'partially_allocated' : (@utilization == "2" ? 'completely_allocated' : 'not_eligible') )}_batch_list_description") %>
+  </div>
+</div>
+<div class="employee_list_table">
+  <div class="employee_list_table_header">
+    <div class="label_pair">
+      <div class="label"> <%= t("#{@utilization == "0" ? 'batches_not_allocated' : (@utilization == "1" ? 'batches_partially_allocated' : (@utilization == "2" ? 'batches_completely_allocated' : 'batches_not_eligible') )}") %> </div>
+      <div class="data">
+        <%= "(#{@batches.length} #{t('of')} #{@batches_total})" %>
+      </div>
+    </div>
+  </div>
+  <div class="employee_list_rows">
+    <% @batches.each do |batch| %>
+      <div class="employee_row">
+        <%= "#{batch.full_name} (#{batch.code})" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<style>
+  #MB_content{
+    width: 500px;
+    margin: 0px auto;
+    padding-bottom: 30px;
+  }
+</style>

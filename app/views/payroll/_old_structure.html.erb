@@ -1,0 +1,35 @@
+<% if @old_structure.present? %>
+  <div id="old-structure">
+    <div id="heading"><%= t('previous_payroll_structure') %></div>
+    <div class="sub_heading"><%= t('earnings') %></div>
+    <% earnings = 0 %>
+    <% deductions = 0 %>
+    <% @old_structure.select{|c| !c.payroll_category.is_deduction}.each do |comp| %>
+      <div class="components">
+        <div class="name"><%= comp.payroll_category.name %></div>
+        <div class="amount"><%= "#{precision_label(comp.amount)} #{@currency_type}" %></div>
+        <% earnings += comp.amount.to_f %>
+      </div>
+    <% end %>
+    <div class="components total">
+      <div class="name"><%= t('total_earning').titleize %></div>
+      <div class="amount"><b><%= "#{precision_label(earnings)} #{@currency_type}" %></b></div>
+    </div>
+    <div class="sub_heading"><%= t('deductions') %></div>
+    <% @old_structure.select{|c| c.payroll_category.is_deduction}.each do |comp| %>
+      <div class="components">
+        <div class="name"><%= comp.payroll_category.name %></div>
+        <div class="amount"><%= "#{precision_label(comp.amount)} #{@currency_type}" %></div>
+        <% deductions += comp.amount.to_f %>
+      </div>
+    <% end %>
+    <div class="components total">
+      <div class="name"><%= t('total_deduction').titleize %></div>
+      <div class="amount"><b><%= "#{precision_label(deductions)} #{@currency_type}" %></b></div>
+    </div>
+   <div class="components">
+      <div class="name"><%= t('net_pay').titleize %></div>
+      <div class="amount"><b><%= "#{precision_label(earnings - deductions)} #{@currency_type}" %></b></div>
+    </div>
+  </div>
+<% end %>

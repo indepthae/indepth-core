@@ -1,0 +1,30 @@
+<div id="page-yield">
+  <div class="m_box">
+    <div id="delete_msg"><%=t('add_course_desc')%></div>
+    <% form_remote_for @registration_course,:url=>add_course_applicants_admins_path,:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+    <div class="mbox-form">
+    <div id="form-errors"></div>
+      <div class="label-field-pair mb_input_row">
+        <label><%= t('course') %></label>
+        <div class="text-input-bg">
+          <%= f.select :course_id,@available_courses.map{|c| [c.full_name,c.id]},{:prompt => "#{t('select_a_course')}"}  %>
+        </div>
+      </div>
+      <div class="label-field-pair mb_input_row">
+        <label><%= "#{t('display_name')}" %></label>
+        <div class="text-input-bg"><%= f.text_field :display_name %></div>
+      </div>
+      <div class="label-field-pair mb_input_row">
+        <label><%= "#{t('amount')}" %></label>
+        <div class="text-input-bg"><%= f.text_field :amount %></div>
+      </div>
+      <div class="label-field-pair mb_input_row">
+        <label><%= "#{t('activate_registration')}" %></label>
+        <div class="text-input-bg"><%= f.check_box :is_active %></div>
+      </div>
+    </div>
+      <div class="hor_line"></div>
+      <%= f.submit "", :value => "#{t('registration_courses.add_course')}", :class => "submit_button", :id => 'submit_button' %>
+    <%end%>
+  </div>
+</div>

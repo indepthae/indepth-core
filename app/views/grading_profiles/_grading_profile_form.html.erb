@@ -1,0 +1,57 @@
+<% remote_form_for @grade_set, :url => fetch_grade_profile_path(@grade_set), :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |gs| %>
+  <%= session_fingerprint_field %> 
+  <div id="grading_profile_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('grading_profile_name') %></label>
+          <div id ="description"><%= t('grading_profile_name_description') %></div>
+          <div class="text-input-bg"><%= gs.text_field :name %></div>
+      </div>
+      <% if @grade_set.new_record? or @grade_set.grades.empty? %>
+        <div class="label-field-pair">
+            <label for="name"><%= t('grade_type') %></label>
+            <div class="grade_type">
+                <%= gs.radio_button :direct_grade, 1, :onclick => "display_grade_points()", :checked => gs.object.direct_grade? %>
+                <label for="grade_set_direct_grade_1"><%= t('direct_grade') %></label>
+                <div id ="description"><%= t('direct_grade_description') %></div>
+            </div>
+            <div class="grade_type">
+                <%= gs.radio_button :direct_grade, 0, :onclick => "display_grade_points()", :checked => !gs.object.direct_grade? %>
+                <label for="grade_set_direct_grade_0"><%= t('marks_based_grades') %></label>
+                <div id ="description"><%= t('marks_based_grades_description') %></div>
+            </div>
+        </div>
+        <div class="label-field-pair" id="credit_points">
+            <label for="description"><b><%= t('credit_points') %></b><%= " &#x200E;(#{t('applicable_for_courses_with_gpa')})&#x200E;" %></label>
+            <div id ="description"><%= t('credit_points_description') %></div>
+            <div class="text-input-bg" id="enable_credit_points">
+                <%= gs.check_box :enable_credit_points %>
+                <label for="grade_set_enable_credit_points"><%= t('enable_cfedit_points_for_grades') %></label>
+            </div>
+        </div>
+        <div class="label-field-pair" id="enable-description">
+            <label for="description"><b><%= t('description_for_grades') %></b></label>
+            <div class="text-input-bg" id="description_enabled">
+                <%= gs.check_box :description_enabled %>
+                <label for="grade_set_description_enabled"><%= t('enable_description_for_grades') %></label>
+            </div>
+        </div>
+      <% end %>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@grade_set.new_record? ? t('create_grading_profile') : t('update_grading_profile'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  display_grade_points = function () {
+      if (j('#grade_set_direct_grade_0').is(':checked'))
+          j('#credit_points').show();
+      else
+          j('#credit_points').hide();
+  }
+  j(document).ready(function () {
+      display_grade_points();
+  });
+</script>

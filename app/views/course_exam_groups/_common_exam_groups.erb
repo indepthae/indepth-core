@@ -1,0 +1,34 @@
+
+<%unless @common_exam_groups.empty?%>
+  <table id="listing" width="100%">
+    <tr class="tr-head">
+      <td class="col-2"><%= t('common_exam_groups') %></td>
+      <td class="col-1"><%= t('exam_type') %></td>
+      <td class="col-1"><%= t('assosiated_batches') %></td>
+      <td class="col-1"></td>
+    </tr>
+    <% @common_exam_groups.each do |exam_group|%>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-2"><%= exam_group.name %></td>
+        <td class="col-1"><%=t(exam_group.exam_type.underscore)%></td>
+        <td class="col-1"><%= exam_group.exam_groups.active.all.count%>  <%=t('of')%> <%=exam_group.course.batches.usable.count%></td>
+        <td class="col-1"><%= link_to t('manage_groups'), :controller=>"course_exam_groups",:action=>"show",:id=>exam_group.id %></td>
+      </tr>
+    <%end%>
+  </table>
+  <%= will_paginate @common_exam_groups,:renderer => 'RemoteLinkRenderer' ,:params=>{:action=>"common_exam_groups",:course_id=>params[:course_id]}%>
+<%else%>
+  <table id="listing" class="alert_msg_table" width="100%">
+    <tr class="tr-head">
+      <td class="col-2"><%= t('common_exam_groups') %></td>
+      <td class="col-1"><%= t('exam_type') %></td>
+      <td class="col-1"><%= t('batch_with_exams') %></td>
+      <td class="col-1"></td>
+    </tr>
+    <tr class='tr-odd'>
+      <td colspan="4">
+        <%=t('no_exam_groups_created')%>
+      </td>
+    </tr>
+  </table>
+<%end%>

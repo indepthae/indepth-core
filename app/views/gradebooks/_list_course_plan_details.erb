@@ -1,0 +1,110 @@
+<div class="plan_details_box">
+    <% if @plan.present? %>
+      <div class='header'>
+          <span class="pull_left">
+              <%="#{t('exam_planner')} : <b>#{@plan.name}</b>"%>
+          </span>
+          <% if @is_privilaged or @course.is_tutor_and_has_batch_in_this_course_academic_year(@academic_year)%>
+            <span class="pull_right hollow_btn">
+                <%= link_to t('generate_planner_report'), {:controller=>'assessment_reports', :action=> 'generate_planner_reports', :assessment_plan_id => @plan.id, :course_id => @course.id} %>
+            </span>
+          <% end %>
+          <% if (@setting[:enable_attendance] == "1" and @setting[:calculation_mode] == "1") and (@current_user.privileges.include?(Privilege.find_by_name("ManageGradebook")) or @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name("GradebookMarkEntry")) or @course.is_tutor_and_has_batch_in_this_course) %>
+            <span class="pull_right hollow_btn">
+                <%= link_to t('attendance_entry'), {:controller=>'gradebook_attendance', :action=> 'attendance_entry', :academic_year_id => @academic_year.id, :assessment_plan_id => @plan.id, :course_id => @course.id} %>
+            </span>
+          <% end %>
+          <% if @setting[:enable_attendance] == "1" and @setting[:calculation_mode] == "0" and (@setting[:exam_attendance]== "1" or (@setting[:term_report]== "0" and @setting[:term_attendance]== "1") or (@setting[:planner_report]== "0" and @setting[:planner_attendance]== "1")) and (permitted_to? :attendance_period, :gradebook_attendance)%>
+            <span class="pull_right hollow_btn">
+                <%= link_to t('attendance_period'), {:controller=>'gradebook_attendance', :action=> 'attendance_period', :academic_year_id => @academic_year.id, :assessment_plan_id => @plan.id, :course_id => @course.id} %>
+            </span>
+          <% end %>
+          <% if (@setting[:general_remarks] == "1" or @setting[:subject_wise_remarks] == "1") and (@current_user.privileges.include?(Privilege.find_by_name("ManageGradebook")) or @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name("GradebookMarkEntry")) or @course.is_tutor_and_has_batch_in_this_course or @course.is_subject_teacher_and_has_batch_in_this_course) %>
+            <span class="pull_right hollow_btn">
+                <%= link_to t('remarks'), {:controller => "gradebook_remarks", :action => "manage", :id => @course, :academic_year_id => @academic_year.id} %>
+            </span>
+          <% end %>
+      </div>
+      <div class="plan_details_banner"><%= render :partial => 'plan_details_banner' %></div>
+      <% if @plan.terms_count > 0 %>
+        <div class='term_listing'>
+            <% @plan.assessment_terms.each do |term| %>
+              <% groups = term.assessment_groups.without_final %>
+              <% report_present = term.has_report?(@course.id) %>
+              <div class="term_box">
+                  <div class="header">
+                      <div class='left'><%=  term.name%></div>
+                      <div class='right'>
+                          <% if @is_privilaged or @course.is_tutor_and_has_batch_in_this_course_academic_year(@academic_year) %>
+                            <% if report_present or groups.present? %>
+                              <div class="text-input-bg">
+                                  <div class="dropbtn submit-button" drop_id = '<%= term.id %>' onclick="showDrop(this)"><%= "#{t('actions')} &#9660;" %></div>
+                              </div>
+                              <div id="actionDropdown_<%=term.id%>" class="dropdown-content">
+                                  <% if report_present %>
+                                    <%= link_to t('student_term_reports'), students_term_reports_assessment_reports_path(:term_id => term.id, :course_id => @course.id,:from_manage_exam=>true)  %>
+                                  <% end %>
+                                  <% if groups.present? %>
+                                    <%= link_to t('generate_term_reports'), {:controller=>'assessment_reports', :action=> 'generate_term_reports', :term_id => term.id, :course_id => @course.id} %>
+                                  <% end %>
+                              </div>
+                            <% end %>
+                          <% end %>
+                      </div>
+                  </div>
+                  <div class="table">
+                      <% if groups.present? %>
+                        <%= render :partial => 'assessment_group_listing', :locals=>{:assessment_groups=> groups,:term=>term} %>
+                      <% else %>
+                        <div class="empty-flash"><%= t('no_assessment_groups_created')  %> </div>
+                      <% end %>
+                  </div>
+                  <div class="formula">
+                      <!--Todo Add Final Result Calculation -->
+                  </div>
+              </div>
+
+            <% end %>
+        </div>
+      <% else %>
+        <div class="plan_assessment_group_listing">
+            <% if @plan.assessment_groups.without_derived.present? %>
+              <%= render :partial => 'assessment_group_listing', :locals=>{:assessment_groups=>@plan.assessment_groups.without_derived } %>
+            <% else %>
+              <div class="empty-flash"><%= t('no_assessment_groups_created')  %> </div>
+            <% end %>
+        </div>
+      <%end%>
+    <%else%>
+      <p class="flash-msg"> <%= t('no_planner_linked')%> </p>
+    <% end %>
+</div>
+<script type="text/javascript">
+    function showDrop(el){
+      drop_id = j(el).attr('drop_id')
+      document.getElementById('actionDropdown_'+drop_id).classList.toggle("show");
+    }
+    
+    function hideOptions(){
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+          if (dropdowns[i].classList.contains('show')) {
+                  dropdowns[i].classList.remove('show');
+          }
+      }
+    }
+    
+    function showOptions(el){
+      hideOptions();
+      drop_id = j(el).attr('drop_id')
+      document.getElementById('optionDropdown_'+drop_id).classList.toggle("show");
+    }
+    
+    window.onclick = function(event) {  
+      if (!event.target.matches('.dropbtn')) {
+        hideOptions();   
+      }
+    }
+    
+</script>

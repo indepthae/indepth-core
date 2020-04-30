@@ -1,0 +1,103 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<% content_for :head do  %>
+  <%= javascript_include_tag("tc_printer") %>
+<% end %>
+<%= javascript_include_tag "sortable" %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tc_template_generate_certificate') %></div>
+    <div id="inner-tab-menu">
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_generate_certificate%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%= t('generate_transfer_certificate_for_students')%> </label>
+        </div>
+    </div>
+    <div id="form-errors"></div>
+    <div id="middle_section">
+        <div id="description">
+            <div id="description_text">
+                <% remote_form_for :generate_student_tc, :url=>{:action=>'list_students'}, :loading => "$('loader').show();", :loaded => "$('loader').hide();" do |x| %>
+
+                  <div class="text-input-bg">
+                      <%= select :generated_student_tc,:course_id,
+                        @courses.map {|c| [c.full_name, c.id]},
+                        {:prompt => "#{t('select_a_course')}"},
+                        {:onChange => "#{remote_function(:url => {:action =>'list_batches'},
+                        :with => "'course_id='+value",
+                        :before => "Element.show('loader')",
+                        :success => "Element.hide('loader')"
+                        )}"} %>
+                  </div>
+
+                  <div  class="text-input-bg" id="batch-select">
+                      <%= select :generated_student_tc, :batch_id, 
+                        @batches.map{|b| [b.full_name,b.id]},
+                        :prompt=> "#{t('select_a_batch')}" %>
+                  </div>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader",
+                    :style =>"display: none;" ) %>
+                  <%= submit_tag "#{t('view')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+
+                <% end %>
+            </div>
+        </div>
+        <div id="priority">
+            <div id="priority_text_1">
+                <div id="search_box_bg">
+                    <form name="search_form" action="" style="display:inline;">
+                        <label for="user_name">
+                            <%= t('search_text') %>
+                            <%= image_tag("loader.gif",
+                              :align => "absmiddle",
+                              :border => 0,
+                              :id => "loader2",
+                              :style => "display: none;") %>
+                        </label>
+                        <div id="search_textbox">
+                            <%= text_field_tag("query", params['query'], :autocomplete => 'off',:placeholder => "#{t('student_name')}/#{t('admission_no') }") %>
+                            <br/>
+                        </div>
+                    </form>
+                </div>
+            </div>              
+        </div>
+
+
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="other_details">
+    </div>
+    <script type="text/javascript">
+      function search_logic() {
+          if ($('query').value.include("%"))
+              return;
+              <%="#{remote_function(:url => {:action => "search_logic_for_archived_students"},
+              :with => "j('form').serialize()",
+              :before => "Element.show('loader2')",
+              :success => "Element.hide('loader2')",
+              :update=>"other_details"
+              )}"%>
+      }
+      document.observe("dom:loaded", function () {
+          new Form.Element.Observer('query', 1, search_logic);
+      });
+    </script>
+</div>

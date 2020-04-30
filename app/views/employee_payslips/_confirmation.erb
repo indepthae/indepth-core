@@ -1,0 +1,29 @@
+<div id="MB_frame">
+  <div id="MB_header">
+    <div id="MB_caption"></div>
+    <div id="MB_close" class="close_link"><span>x</span></div>
+  </div>
+
+  <div id="MB_content">
+    <div id="msg">
+
+    </div>
+
+  </div>
+  <div id="MB_footer">
+    <div class="submit-button" id="ok_btn"><%= t('ok') %></div>
+    <div class="submit-button" id="cancel-link"><%= t('cancel') %></div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  j(".close_link, #cancel-link").click(function(){
+    return removeConfirmation();
+  })
+
+  
+
+
+</script>

@@ -1,0 +1,9 @@
+<% @question_positions.each do|qp| %>
+  <li class="ui-state-default">
+    <% q = qp.online_exam_question %>
+    <% q.question_format = "objective" if q.question_format.nil? %>
+    <%= hidden_field_tag "question-id",q.id %>
+    <div class="q-div"><%= q.question %></div>
+    <div class="marks-div"><%= t("#{q.question_format}") %> (<%= q.marks_assigned(exam_group.id) %> <%= t('marks') %>) </div>
+  </li>
+<% end %>

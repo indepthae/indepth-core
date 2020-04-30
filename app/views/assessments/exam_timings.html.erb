@@ -1,0 +1,39 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_timetable') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessments_exam_timings, [@assessment_group,@assessment_group.academic_year,@course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="header"><%= t('exam_timetable') %></div>
+    <div id="description"><%= t('exam_timetable_description') %></div>
+
+    <div class="label-field-pair">
+        <label for="department"><%= t('course_text') %></label>
+        <div class="text-input-bg">
+            <%= select_tag :course_id, options_for_select(@courses.map { |c| [c.course_name, c.id] }, :selected => @course.id),
+              :onchange => "#{remote_function(:url => {:action => "fetch_groups"},
+            :with => "'course_id='+value",
+            :before => "Element.show('loader1')",
+            :success => "Element.hide('loader1')")};"%>
+        </div>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader1",
+          :style =>"display: none;" ) %>
+    </div>
+    <div id="groups_list">
+        <%= render :partial => 'groups_list' %>
+    </div>
+    <div id="batches_list">
+        <%= render :partial => 'batches_list' %>
+    </div>
+    <div id="exam_timetables">
+        <%= render :partial => 'exam_timetables' %>
+    </div>
+</div>

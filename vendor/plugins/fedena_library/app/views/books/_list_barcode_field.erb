@@ -1,0 +1,22 @@
+<div class="label-field-pair">
+  <label for="barode"><%= "#{t('barcode')}"%><span class="necessary-field">*</span></label>
+
+  <%if @book_barcode.present?%>
+    <div class="text-input-bg">
+      <%= text_field_tag "book[barcode]",@book_barcode%>
+    </div>
+  <%else%>
+    <div class="text-input-bg">
+      <%if params[:action]=="create"%>
+        <div class="fieldWithErrors">
+          <%= text_field_tag "book[barcode]"%>
+        </div>
+      <%else%>
+        <%= text_field_tag "book[barcode]"%> 
+      <%end%>
+
+    </div>
+  <%end%>
+  <%= hidden_field_tag "tag[count]", @count||1 %>
+
+</div>

@@ -1,0 +1,131 @@
+<script>
+  function add_student(student) {
+    var invites_list = new Array();
+    if($('invites').value != '')
+      invites_list = $('invites').value.split(',');
+    else
+      invites_list = [];
+
+    var student_exists = false;
+    for(i=0; i<invites_list.length; i++)
+      if(invites_list[i] == student)
+        student_exists = true;
+
+    if(!student_exists) {
+      invites_list.push(student);
+    }
+    $('invites').value = invites_list.join();
+    invites = $('invites').value;
+<%= remote_function(:url => {:action => 'update_invite_list'}, :with => "'students='+invites" ) %>
+  }
+
+  function add_all_students(students) {
+    var invites_list = new Array();
+    if($('invites').value != '')
+      invites_list = $('invites').value.split(',');
+    else
+      invites_list = [];
+
+    var new_list = students.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var student_exists = false;
+      for(var j=0; j<invites_list.length; j++)
+        if(invites_list[j] == new_list[i])
+          student_exists = true;
+      if(!student_exists) invites_list.push(new_list[i]);
+    }
+
+    $('invites').value = invites_list.join();
+    invites = $('invites').value;
+<%= remote_function(:url => {:action => 'update_invite_list'}, :with => "'students='+invites" ) %>
+  }
+
+
+  function remove_student(student) {
+    invites = $('invites').value;
+    var invites_list = new Array();
+    invites_list = $('invites').value.split(',');
+
+    for(i=0; i<invites_list.length; i++)
+      if (invites_list[i] == student)
+    {
+      invites_list.splice(i,1);
+      break;
+    }
+
+    $('invites').value = invites_list.join();
+    invites = $('invites').value;
+<%= remote_function(:url => {:action => 'update_invite_list'}, :with => "'students='+invites" ) %>
+
+
+
+  }
+</script>
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('invite_students') %></div>
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%  breadcrumb :placementevents_invite,@placementevent%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation">
+      <ul>
+        <li>
+          <%= flash[:warn_notice] %>
+        </li>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="label-field-pair">
+    <label for="student_course"><%= t('select_a_batch') %>:
+      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+    </label>
+    <div class="text-input-bg">
+      <%= select :placement,:batch,
+        @batches.map {|b| ["#{b.full_name} ",b.id]},
+        {:prompt => "#{t('select_a_batch')}"},
+        {:onChange => "#{remote_function(:url => {:action => "update_students_list"},
+        :with => "'batch='+ value",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')"
+        )}"} %>
+    </div></div>
+
+
+
+  <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+  <div id="list-container">
+    <div id="students-list-container" >
+      <div class="label-field-pair">
+        <label for="student_grade"><%= t('select_recipient') %></label>
+        <div class ="scrolable" >
+          <div id="students-list">      <div class="hover"><div class="individual"><%= t('no_batch_selected') %></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="invites-list-container" >
+      <div class="label-field-pair">
+        <label for="student_grade"><%= t('students_to_invite') %></label>
+        <div class ="scrolable" >
+          <div id="invite-list"><div class="hover"><div class="individual"><%= t('no_students_selected') %></div></div></div>
+        </div>
+      </div>
+      <% form_for :placement_event  do|f|%>
+        <%= hidden_field_tag :invites, '' %>
+        <%= submit_tag "#{t('invite')}" ,:class=>"submit-button", :disable_with => "#{t('please_wait')}" %>
+      <% end %>
+    </div>
+  </div>
+</div>

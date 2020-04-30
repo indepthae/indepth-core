@@ -1,0 +1,168 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div class="info">
+    <div class="info-left">
+        <div class="info1">
+            <label class="field-label">Name</label>: <label class="infolbl themed_text"> <%= @student.full_name %></label>
+        </div>
+        <div class="info1">
+            <label class="field-label"><%=t('course')%></label>: <label class="infolbl themed_text"> <%= @batch.course.full_name %></label>
+        </div>
+        <% if roll_number_enabled? %>
+          <div class="info1">
+              <label class="field-label"><%= t('roll_no') %></label>: <label class="infolbl themed_text"> <%= @student.roll_number_in_context %></label>
+          </div>
+        <% end %>
+    </div>
+    <div class="info-right">
+        <div class="info1">
+            <label class="field-label">Adm No.</label>: <label class="infolbl themed_text"> <%= @student.admission_no.present? ? @student.admission_no : "-" %></label>
+        </div>
+        <div class="info1">
+            <label class="field-label">Batch</label>: <label class="infolbl themed_text"> <%= @batch.name %></label>
+        </div>
+    </div>
+</div>
+<div id="score-table">
+    <div class="custom_header">
+        Formative Assessment (<%=@fa_group%>)
+    </div>
+    <table id="listing" width="100%">
+        <% if @subjects.empty? or @student_fa_scores_hash.empty? %>
+          <tr class="tr-head">
+              <td>No reports to show </td></tr>
+        <% else %>
+          <tr class="tr-head">
+              <td>Sl.No</td>
+              <td>Subjects</td>
+              <td colspan="2">Entered</td>
+              <td>GP</td>
+          </tr>
+          <% @subjects.each_with_index do |s,i| %>
+            <tr class="center tr-<%= cycle('odd', 'even') %>">
+                <td><%= i+1 %></td>
+                <td class="left-aligned"><%= s.name%>( <%=s.code%> )</td>
+                <% if @student_fa_scores_hash[s.name].present? %>
+                  <td><%= @student_fa_scores_hash[s.name][:obtained_mark].round(2)%>/<%=@student_fa_scores_hash[s.name][:max_mark]%></td>
+                  <td><%= @student_fa_scores_hash[s.name][:grade]%></td>
+                  <td><%= to_grade_point(@student_fa_scores_hash[s.name][:grade],@grading_levels)%></td>
+                <% else %>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+</div>
+<div id="score-table">
+    <div class="custom_header">
+        Grading Levels
+    </div>
+    <table id="listing" width="100%">
+        <% if @grading_levels.empty? %>
+          <tr class="tr-head">
+              <td>No Reports </td>
+          </tr>
+        <% else %>
+          <tr class="tr-head">
+              <td>Grade</td>
+              <td>Minimum score</td>
+              <td>Description</td>
+              <td>Grade</td>
+              <td>Minimum score</td>
+              <td>Description</td>
+          </tr>
+          <% @grading_levels.each_with_index do |gl,i| %>
+            <% if i%2==0 %>
+              <tr class="center tr-<%= cycle('odd', 'even') %>">
+                <% end %>
+                <td class="col-5"><%= gl.name %></td>
+                <td class="col-5"><%= gl.min_score %></td>
+                <td><%= gl.description%></td>
+                <%if (@grading_levels.count-1 == i) and (i%2==0)%>
+                  <td class="col-5"></td>
+                  <td class="col-5"></td>
+                  <td></td>
+                <%end%>
+                <% if i%2==1 %>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+    </table>
+</div>
+
+<div class="demo-container" id="report_graph">
+    <div id="placeholder" class="demo-placeholder"></div>
+</div>
+
+<div id = "button">
+    <%= link_to "PDF Report",{:action=>"student_fa_report_pdf",:batch_id=>@batch.id,:id=>@student.id_in_context,:fa_group=>@fa_group,:type=>@type,:report_format_type => "pdf"},:target => '_blank', :class=> 'user_button' %>
+</div>
+
+<script type="text/javascript">
+  j = jQuery;
+  j(document).ready(function () {
+      j(function () {
+          var student_marks = <%=@data.to_json%>
+          var class_avg = <%=@data2.to_json%>
+          var subjects = <%=@subjects_list.to_json%>
+          j.plot("#placeholder", [{
+                  color: "#286ca0",
+                  data: student_marks,
+                  bars: {order: 1, fill: true, fillColor: '#286ca0'},
+                  label: "Student Marks",
+                  align: "center"
+              }, {
+                  color: "#6cb9f5",
+                  data: class_avg,
+                  bars: {order: 2, fill: true, fillColor: '#6cb9f5'},
+                  label: "Class Average",
+                  align: "center"
+
+              }], {
+              series: {
+                  bars: {
+                      show: true,
+                      barWidth: 0.3,
+                      lineWidth: 2
+                  }
+              },
+              xaxis: {
+                  min: -1,
+                  max: subjects.length,
+                  tickSize: 1,
+                  tickFormatter: function (v) {
+                      if ((v === -1) || (v === subjects.length))
+                          return '';
+                      else
+                          return (subjects[v]);
+                  }
+              },
+              yaxis: {
+                  min: 0,
+                  max: 100
+              }
+          });
+      });
+  });
+</script>

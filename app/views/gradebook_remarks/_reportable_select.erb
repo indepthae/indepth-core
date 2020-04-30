@@ -1,0 +1,43 @@
+<% if @reportables.first.is_a? AssessmentPlan %>
+  <label for="_reportable_id" class="select-box-label"><%= t('select_planner') %></label>
+  <%= select '', :reportable_id, @reportables.collect{|r| [r.name, r.id]}, :prompt => t('select_planner') %>
+<% elsif @reportables.first.is_a? AssessmentTerm %>
+  <label for="_reportable_id" class="select-box-label"><%= t('select_term') %></label>
+  <%= select '', :reportable_id, @reportables.collect{|r| [r.name, r.id]}, :prompt => t('select_term') %>
+<% else %>
+  <label for="_reportable_id" class="select-box-label"><%= t('select_exam') %></label>
+  <%= select '', :reportable_id, @reportables.collect{|r| [r.name, r.id]}, :prompt => t('select_exam') %>
+<% end %>
+<%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader4",
+                :class => "loader_style",
+                :style =>"display: none;" ) %>
+
+<script type="text/javascript">
+  j('#_reportable_id').change(function () {
+      j.ajax({
+          url: "update_remarkable",
+          type: 'POST',
+          data: {
+              batch_id: get_batch_id(),
+              report_type: get_report_type(),
+              reportable_id: get_reportable_id(),
+              remark_type: get_remark_type(),
+              assessment_plan_id: get_assessment_plan_id(),
+          },
+          beforeSend: function()
+          {
+              j('#loader4').show();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j('#loader4').hide();
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+</script>

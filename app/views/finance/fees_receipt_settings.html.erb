@@ -1,0 +1,74 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('fees_receipt_settings') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="">
+    <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+    <p class="title"><%= t('fees_receipt_printer_settings')%></p>
+    <div id="fee_receipt_form_container">
+      <%= render :partial=> "fees_receipt_settings_form" %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function load_css(href) {
+    remove_template_stylesheets();
+     var cssLink = j("<link rel='stylesheet' type='text/css' href='"+href+"'>");
+     j("head").append(cssLink);
+  }
+  function remove_template_stylesheets (){
+    j('link[rel=stylesheet][href~="/stylesheets/_receipt_templates/_template_thermal_responsive.css"]').remove();
+  }
+  function print_preview() {
+    var ifrm = document.getElementById('preview_frame');
+    iframe_window=(ifrm.contentWindow || ifrm.contentDocument)
+    iframe_window.document.execCommand('print', false, null) || iframe_window.print();
+  }
+  function set_template(id) {
+    var dotcheck = document.getElementById('receipt_printer_receipt_printer_type_1').checked;
+    j("#loader_image").show();
+    reset_iframe_dimensions();
+    var iframe = document.getElementById('preview_frame');
+    // TODO make https compatiable
+    // iframe.src= "<%= @receipt_printer.preview_url %>";
+    j.get(window.location.protocol+"//"+window.location.host+"/finance/get_dotmatrix_printer_message/"+id)
+    //iframe.src=window.location.protocol+"//"+window.location.host+"/finance/fees_receipt_preview?type="+id+"&logo="+dotcheck
+    if(id==0) {
+      // j("#preview_frame").addClass("a4_preview_overrides");
+    } else {
+      j("#preview_frame").removeClass("a4_preview_overrides");
+    }
+  }
+  function initilize_iframe (obj) {
+    resizeIframe(obj);
+    j("#loader_image").hide();
+    if(current_layout()==0) {
+      // j("#preview_frame").addClass("a4_preview_overrides");
+    } else {
+      j("#preview_frame").removeClass("a4_preview_overrides");
+    }
+  }
+  function current_layout() {
+    return j("#receipt_printer_receipt_printer_template").val()
+  }
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+    obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+    obj.style.width = obj.contentDocument.documentElement.scrollWidth+'px';
+  }
+  function reset_iframe_dimensions() {
+    var iframe = document.getElementById('preview_frame');
+    iframe.style.height=0+ 'px';
+    iframe.style.width=0+ 'px';
+  }
+  j(function() {
+    reset_iframe_dimensions();
+  });
+</script>

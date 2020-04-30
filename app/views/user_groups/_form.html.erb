@@ -1,0 +1,97 @@
+  <%unless @members_employees.nil?%>
+    <%= hidden_field_tag :members_employees, @members_employees%>
+  <%else%>
+    <%= hidden_field_tag :members_employees,''%>
+  <%end%>
+  <%unless @members_students.nil?%>
+    <%= hidden_field_tag :members_students, @members_students%>
+  <%else%>
+    <%= hidden_field_tag :members_students,''%>
+  <%end%>
+  <%unless @members_parents.nil?%>
+    <%= hidden_field_tag :members_parents, @members_parents%>
+  <%else%>
+    <%= hidden_field_tag :members_parents,''%>
+  <%end%>
+
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader1",
+        :style =>"display: none;" ) %>
+      <!-- <div class="extender"></div> -->
+      <div id="select-student-course">
+          <%if @batches.present?%>
+            <%=  render :partial=> "select_student_course" %>
+          <%end%>
+      </div>
+  </div>
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" )
+    %>
+      <div id="select-employee-department">
+          <%if @departments.present?%>
+            <%=   render :partial=>"select_employee_department" %>
+          <%end%>
+      </div>
+  </div>
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader2",
+        :style =>"display: none;" ) %>
+      <!-- <div class="extender"></div> -->
+      <div id="select-parents">
+          <%if @parents_for_batch.present?%>
+            <%=  render :partial=> "select_parents" %>
+          <%end%>
+      </div>
+  </div>
+  <!-- <div class="extender"></div> -->
+  <div class="select_users">
+
+        <div class="label-field-to">
+            <div id="to_students"></div>
+        </div>
+
+
+        <div class="label-field-to">
+            <div id="to_employees">
+            </div>
+        </div>
+
+
+        <div class="label-field-to">
+            <div id="to_parents"></div>
+        </div>
+
+  </div>
+  <hr class="divider">
+  <h4><%= t('selected_members') %></h4>
+  <div class="selected_users">
+      <% if @to_all_students %>
+        <div id="member-list" class="member-list"><%=render :partial=>'member_list_all_students'%></div>
+      <%else%>
+        <div id="member-list" class="member-list"><%if @members_students.present?%><%=render :partial=>'member_list_students'%><%end%></div>
+      <%end%>
+      <% if @to_all_employees %>
+        <div id="member-list1" class="member-list"><%=render :partial=>'member_list_all_employees'%></div>
+      <% else %>
+        <%if @departments.present?%>
+          <div id="member-list1" class="member-list"><%if @members_employees.present?%><%=render :partial=>'member_list_employees'%><%end%></div>
+        <% end %>
+      <% end %>
+      <% if @to_all_parents %>
+        <div id="member-list2" class="member-list"><%=render :partial=>'member_list_all_parents'%></div>
+      <%else%>
+        <div id="member-list2" class="member-list"><%if @members_parents.present?%><%=render :partial=>'member_list_parents'%><%end%></div>
+      <%end%>
+  </div>
+
+  <div class="extender"></div>

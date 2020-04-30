@@ -1,0 +1,150 @@
+
+<%= error_messages_for 'form', :header_message => nil %>
+<% members = (@members.present? ? @members : '') %>
+<% targets = (@targets.present? ? @targets : '') %>
+<% students = (@students.present? ? @students : '') %>
+<% disabled_members = (@submitted_members.present? ? @submitted_members : '') %>
+<% disabled_targets = (@submitted_targets.present? ? @submitted_targets : '') %>
+<%= f.hidden_field :students, :value => students %>
+<%= f.hidden_field :members, :value => members %>
+<%= f.hidden_field :targets, :value => targets %>
+<%= f.hidden_field :disabled_members, :value => disabled_members %>
+<%= f.hidden_field :disabled_targets, :value => disabled_targets %>
+<% disabled = (@disabled.present? and @disabled) ? true : false  %>
+<div class="label-field-pair">
+  <label for="form_name"><%= t('form_name') %></label>
+  <div class="text-input-bg">
+    <%= f.text_field :name, :readonly => disabled %>
+  </div>
+</div>
+<div class="label-field-pair">  
+  <%= f.label :is_feedback,t('feedback_form') %>
+  <div class="text-input-bg">
+    <%= f.check_box :is_feedback, :checked=> (@form.is_feedback),:disabled => disabled %>
+  </div>
+</div>
+<div class="initial_hide label-field-pair feedback">
+  <%= f.label :is_targeted,t('targeted_form') %>
+  <div class="text-input-bg">
+    <%= f.check_box :is_targeted, :checked=> (@form.is_targeted),:disabled => disabled%>
+  </div>
+</div>
+<div id="form_target_list" class="initial_hide">
+  <div class="half">
+    <div class="heading_label">
+      <%= t('select_people') %>
+    </div>
+    <div id="select-employee-department">
+      <%= render "select_target_employee_department" %>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader2",
+        :style =>"display: none;" ) %>
+    </div>
+    <div class="label-field-to">
+      <div id="to_targets">         </div>
+
+    </div>
+    <div class="extender"></div>
+    <div id="select-student-course">
+      <%= render "select_target_student_course" %>
+    </div>
+    <div class="label-field-to">
+      <div id="to_targets2"> </div>
+    </div>
+  </div>
+  <div class="half">
+    <div id="target-list">
+      <script>
+        show_targets_if_exists();
+      </script>
+    </div>
+  </div>
+</div>
+<div class="label-field-pair large not_feedback initial_hide">
+  <label><%= t('form_visibility') %></label>
+  <div class="text_input_radio">
+    <div class="radio_box_float">
+      <%= f.radio_button :is_public, true, :checked=> (@form.is_public), :disabled => disabled%>
+      <label for="form_is_feedback">
+        <%= t('visibility_public') %>
+      </label>
+    </div>
+    <div class="radio_box_float">
+      <%= f.radio_button :is_public,false, :checked=> (!@form.is_public), :disabled => disabled%>
+      <label for="form_is_feedback">
+        <%= t('visibility_private') %>
+      </label>
+    </div>
+  </div>
+</div>
+<div id="form_reciepients" class="feedback private">
+  <div class="half">
+    <div class="heading_label">
+      <%= t('select_recipients') %>
+    </div>
+    <div id="select-employee-department">
+      <%= render "select_employee_department" %>
+    </div>
+    <div class="label-field-to">
+      <div id="to_users">         </div>
+
+    </div>
+    <div class="extender"></div>
+    <div id="select-student-course">
+      <%= render "select_student_course" %>
+    </div>
+    <div class="label-field-to">
+      <div id="to_users2"> </div>
+    </div>
+  </div>
+  <div class="half">
+    <div id="member-list">
+      <script>
+        show_members_if_exists();
+      </script>
+    </div>
+  </div>
+  <div class="initial_hide label-field-pair large student_selected">
+    <label><%= t('form_student_parent') %></label>
+    <div class="text_input_radio">
+      <div class="radio_box_float">
+        <%= f.radio_button :is_parent, 0, :checked=> (@form.is_parent == 0), :disabled => disabled%>
+        <label for="form_is_feedback">
+          <%= t('parent') %>
+        </label>
+      </div>
+      <div class="radio_box_float">
+        <%= f.radio_button :is_parent,1, :checked=> (@form.is_parent == 1), :disabled => disabled%>
+        <label for="form_is_feedback">
+          <%= t('student') %>
+        </label>
+      </div>
+      <div class="radio_box_float">
+        <%= f.radio_button :is_parent,2, :checked=> (@form.is_parent == 2), :disabled => disabled%>
+        <label for="form_is_feedback">
+          <%= t('both') %>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="label-field-pair large not_feedback initial_hide">
+  <label><%= t('user_preferences') %></label>
+  <div class="text_input_checkbox">
+    <div class="check_box_float">
+      <%= f.check_box :is_editable, :checked=> (@form.is_editable), :disabled => disabled%>
+      <label for="form_is_editable">
+        <%= t('editable') %>
+      </label>
+    </div>
+    <div class="check_box_float">
+      <%= f.check_box :is_multi_submitable, :checked=> (@form.is_multi_submitable), :disabled => disabled%>
+      <label for="form_is_multi_submitable">
+        <%= t('multiple_submit') %>
+      </label>
+    </div>
+  </div>
+</div>

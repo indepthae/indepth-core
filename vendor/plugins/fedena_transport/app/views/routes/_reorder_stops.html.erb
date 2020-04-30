@@ -1,0 +1,49 @@
+<% if @stops.present? %>
+  <% form_for :route ,@route, :url => {:action => 'save_order' } do |r|%>
+    <%= session_fingerprint_field %>
+    <div id="vehicle_stop_form">
+        <div id="description"><%= t('reorder_stops_description') %></div>
+        <table width="100%" class="sort_table">
+            <tr class="tr-head disable_sort">
+                <td class="index reorder"></td>
+                <td class="col4"><%= t('name') %></td>
+                <td class="col5"><%= t('vehicle_stops.landmark') %></td>
+            </tr>
+            <tbody>
+                <% r.fields_for :route_stops, @stops do |rs|%>
+                  <% stop = rs.object.vehicle_stop %>
+                  <tr class="list">
+                      <td class="reorder"><i></i></td>
+                      <td class="col4"><%= stop.name %></td>
+                      <td class="col5"><%= stop.landmark %></td>
+                      <%= rs.hidden_field :stop_order, :id => 'sort_order' %>
+                      <%= rs.hidden_field :reordering, :value => 1 %>
+                  </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+    <div id='popup_footer'>
+        <%= r.submit t('save_order') , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+        <%= link_to "#{t('cancel')}","#",:onclick=>'close_modal_box();',:class=>'modal-box-cancel_button submit-button' %>
+    </div>
+  <% end %>
+
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  j('.sort_table').sortable({
+      start: function (event, ui) {
+          j(this).children('tr.list').addClass('my_class');
+      },
+      stop: function (event, ui) {
+          j(this).children('tr.list').removeClass('my_class');
+          updateSortorder();
+      },
+      items: "tr:not(.disable_sort)"
+
+  }).disableSelection();
+
+
+</script> 

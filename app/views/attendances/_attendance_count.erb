@@ -1,0 +1,20 @@
+<%= @absentee.month_date %><%= ' ' %><%= @absentee.month_date.strftime("%A") %>
+<% if @config.config_value=="SubjectWise" %>
+  <div class="absent-students" id="absent-stds">
+      <%= @absent_count.present? ? @absent_count : 0 %> Absent 
+  </div>
+  <div class="late-students" id="late-students">
+      <%= @late_count.present? ?  @late_count : 0 %> Late 
+  </div>
+<% elsif @config.config_value=="Daily" %>
+  <div class="absent-students" id="absent-stds">
+      <% if @absent_count.present? %>
+        <%= @absent_count[@absentee.month_date] %> Absent 
+      <% end %>
+  </div>
+  <div class="late-students" id="late-students">
+      <% if @late_count.present? %>
+        <%= @late_count[@absentee.month_date] %> Late 
+      <% end %>
+  </div>
+<% end %>

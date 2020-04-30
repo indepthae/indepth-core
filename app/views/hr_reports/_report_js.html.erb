@@ -1,0 +1,533 @@
+<script type="text/javascript">
+  var temp_columns=JSON.parse('<%= (@template_columns||[]).to_json.gsub("'", %q(\\\')) %>');
+  var saved_columns=JSON.parse('<%= (@template_columns||[]).to_json.gsub("'", %q(\\\')) %>');
+  function build_multiselect(){
+    if(j("#payroll_category_list").next('.ms-parent').length == 0){
+      j("#payroll_category_list").multipleSelect({
+        placeholder: '<%= t('select_payroll_category') %>',
+        countSelected : '<%= t('payroll_categories') %>',
+        noMatchesFound: '<%= t('no_payroll_categories') %>'
+      });
+    }
+    j("#comparison_report_inputs #pay_period_multiple_list").multipleSelect({
+      placeholder: '<%= t('select_pay_period') %>',
+      countSelected : '<%= t('pay_period') %>',
+      noMatchesFound: '<%= t('no_pay_periods') %>'
+    });
+    j('#employee_department_filter_list, #employee_department_template_list').multipleSelect({
+      placeholder: '<%= t('select_employee_department') %>',
+      countSelected : '<%= t('employee_department_text') %>',
+      noMatchesFound: '<%= t('no_employee_department') %>'
+    });
+    j('#employee_category_filter_list, #employee_category_template_list').multipleSelect({
+      placeholder: '<%= t('select_employee_category') %>',
+      countSelected : '<%= t('employee_category_text') %>',
+      noMatchesFound: '<%= t('no_employee_category') %>'
+    });
+    j('#payroll_group_filter_list, #payroll_group_template_list').multipleSelect({
+      placeholder: '<%= t('select_payroll_group') %>',
+      countSelected : '<%= t('payroll_group') %>',
+      noMatchesFound: '<%= t('no_payroll_group') %>'
+    });
+    j('#pay_frequency_filter_list, #pay_frequency_template_list').multipleSelect({
+      placeholder: '<%= t('select_pay_frequency') %>',
+      countSelected : '<%= t('pay_frequency_text') %>',
+      noMatchesFound: '<%= t('no_pay_frequency') %>'
+    });
+    j(".filter_section select[multiple='multiple']").multipleSelect('checkAll');
+  }
+
+  function fetch_dependent_field()
+  {
+    j('[dependent_field]').each(function(){
+      elm = this
+      dependent_field = j(this).attr('dependent_field');
+      j('#'+dependent_field+'_list').change(function(){
+        dep_elm = this
+        new Ajax.Request('/hr_reports/fetch_dependent_values',{
+          parameters:{'value': j(this).val(), 'report_name' : '<%= @base_template.name %>', 'field' : j(elm).attr('field'), 'dependent_field' : dependent_field, 'child' : j(elm).attr('child')},
+          asynchronous:true,
+          evalScripts:true,
+          method:'post',
+          onLoading: function(){
+            j(dep_elm).next('#loader').show();
+          },
+          onComplete:function(resp){
+            j(dep_elm).next('#loader').hide();
+            j(elm).closest('.label-field-pair').replaceWith(resp.responseText);
+          }
+        });
+      })
+    })
+  }
+  function send_request(type)
+  {
+    j('.'+type+'_submit').attr('disabled', true);
+    if(validate_form(type)){
+      var input_values = JSON.parse(j('#inputs_temp').val());
+      var filter_values = JSON.parse(j('#filters_temp').val());
+      var column_values = JSON.parse(j('#columns_temp').val());
+      var template = <%= @custom_report.present? %>;
+      if(type == 'inputs'){
+        input_values = fetch_values('input_form');
+        j('#inputs_temp').val(Object.toJSON(input_values));
+      }
+      else if(type == 'filters'){
+        filter_values = fetch_correct_values('filter_form');
+      }
+      else if(type == 'columns'){
+        column_values = fetch_values('column_form');
+        j('#columns_temp').val(Object.toJSON(column_values));
+        temp_columns = j(".rep_col:checked:visible").map(function(a, i) {return j(i).attr('text')});
+      }
+      else if(type == 'reset_filters'){
+        filter_values = Object();
+        j('#filters_temp').val("{}")
+      }
+      var action = '<%= @custom_report.present? ? "fetch_template_reports" : "fetch_reports" %>'
+      new Ajax.Request('/hr_reports/'+action,{
+        parameters:j.param({'inputs': input_values, 'name' : '<%= @base_template.name %>', 'filters': filter_values, 'columns': column_values, 'type' : type, 'temp_id' : '<%= @custom_report.present? ? @custom_report.id : '' %>'}),
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onLoading: function(){
+          j('.report_section').hide();
+          j('#loading').show();
+          if(type=='columns')
+            hide_popup_box();
+          if(type=='inputs'){
+            j('.report_columns').remove();
+            j('#columns_list').remove();
+            j('#columns_form_footer').remove();
+            if(!template){
+              j('.report_templates').remove();
+              j('#templates_list').remove();
+              j('#templates_form_footer').remove();
+            }
+          }
+        },
+        onComplete:function(resp){
+          if(type=='inputs'){
+            j('.report_columns').remove();
+            if(!template){
+              j('.report_templates').remove();
+              j('#popup_box_overlay').remove();
+            }
+          }
+          else{
+            if(type=='reset_filters')
+              j('.templates_section').hide();
+            else
+              j('.templates_section').show();
+          }
+          j('.report_section').show();
+          j('#loading').hide();
+          j('.'+type+'_submit').attr('disabled', false);
+        }
+      });
+    }
+    j('.'+type+'_submit').attr('disabled', false);
+    return false;
+  }
+
+  function parse_values(val){
+    val = JSON.parse(val);
+    j.each(val, function(key, value) {
+      val[key] = JSON.parse(value);
+    });
+    return val;
+  }
+
+  function fetch_values(id){
+    values = {};
+    j('#'+id).serializeArray().map(function(x){
+      if(x.name in values){
+        if(!j.isArray(values[x.name]))
+          values[x.name] = j.makeArray(values[x.name])
+        values[x.name].push(x.value)
+      }
+      else
+        values[x.name] = x.value;
+    });
+    return values;
+  }
+
+  function fetch_correct_values(id){
+    values = {};
+    actual_values = {};
+    j("#" + id + " select").each(function(){
+      actual_values[j(this).attr('field')] = j(this).val();
+      if(j(this).is('[multiple]') && j("[name='"+"selectAll" + this.name+"']").is(':checked')){
+        return;
+      }
+      values[this.name] = j(this).val();
+    });
+    j('#filters_temp').val(Object.toJSON(values));
+    j('#filter_result').val(Object.toJSON(actual_values))
+    return values;
+  }
+
+  j(document).ready(function(){
+    fetch_dependent_field();
+    build_multiselect();
+  });
+
+  function build_columns_form(){
+    if(j('.report_columns').length == 0){
+      remove_popup_box();
+      build_modal_box({title : '<%= t('customize_columns').titleize %>'});
+      j('#popup_window:not(.report_templates)').attr('class','report_columns');
+      if(j('.report_columns #popup_content').is(':empty'))
+        j('.report_columns #popup_content').append(j('#columns_list'));
+      if(j('.report_columns #popup_footer').is(':empty'))
+        j('.report_columns #popup_footer').append(j('#columns_form_footer'));
+      j('.report_columns #popup_frame #MB_close').attr('onclick', 'hide_popup_box();');
+      select_all();
+    }
+    else{
+      j('#popup_box_overlay').show();
+      j('.report_columns').show();
+    }
+    j('.report_columns').offset({
+      left : (j('body').width() - j('.report_columns').width())/2,
+      top : (j(window).scrollTop()+50)
+    });
+    j('.report_columns #popup_content').height(j(window).height() - (j('.report_columns #popup_header_part').outerHeight() + j('.report_columns #popup_footer').outerHeight() + 100));
+    j('body').css('overflow','hidden');
+    return false;
+
+  }
+
+  function build_templates_form(type){
+    if(j('.report_templates').length == 0){
+      remove_popup_box();
+      build_modal_box({title : '<%= t('report_template') %>'});
+      j('#popup_window:not(.report_columns)').attr('class','report_templates');
+      if(j('.report_templates #popup_content').is(':empty'))
+        j('.report_templates #popup_content').append(j('#templates_list'));
+      if(j('.report_templates #popup_footer').is(':empty'))
+        j('.report_templates #popup_footer').append(j('#templates_form_footer'));
+      j('.report_templates #popup_frame #MB_close').attr('onclick', 'hide_popup_box();');
+    }
+    else{
+      j('#popup_box_overlay').show();
+      j('.report_templates').show();
+    }
+    set_template_values(type)
+    j('#template_values_name').closest('.label-field-pair').removeClass('error_field');
+    j('#templates_list .wrapper div').hide();
+    j('#template_values_name').val(j('#template_values_name').attr('def_val'));
+    j('.report_templates').offset({
+      left : (j('body').width() - j('.report_templates').width())/2,
+      top : (j(window).scrollTop()+50)
+    });
+    j('.report_templates #popup_content').height(j(window).height() - (j('.report_templates #popup_header_part').outerHeight() + j('.report_templates #popup_footer').outerHeight() + 100));
+    j('body').css('overflow','hidden');
+    if(type=='edit')
+      columns_list = saved_columns
+    else
+      columns_list = temp_columns
+    if(columns_list.length>0){
+      j('#template_columns').show();
+      j('#save_columns').prop('checked', true);
+      j('#template_columns ul').remove();
+      ul=j('<ul></ul>')
+      j.each(columns_list, function(i, c){
+        ul.append(j('<li>'+c+'</li>'))
+      });
+      j('#template_columns').append(ul);
+    }
+    else{
+      j('#template_columns').hide();
+      j('#save_columns').prop('checked', false);
+      j('#template_columns ul').remove();
+    }
+    if((j('#template_form hr').next().length == 0) && (j('#template_columns:visible').length == 0))
+      j('#template_form hr').remove();
+    return false;
+  }
+
+  function hide_popup_box(){
+    j('#popup_box_overlay').hide();
+    j('.report_columns').hide();
+    j('.report_templates').hide();
+    j('body').css('overflow','scroll');
+  }
+
+  function show_payslip_section()
+  {
+    if(j('#payslip_details_true').is(':checked'))
+    {
+      j("#detailed_sec").show();
+      j('#detailed_sec .columns_select').attr('disabled', false);
+      j('#detailed_sec .columns_total').each(function(){
+        if(j(this).attr('is_disabled') == "true")
+          j(this).attr('disabled', true);
+        else
+          j(this).attr('disabled', false);
+      });
+      j("#summary_sec").hide();
+      j('#summary_sec .columns_select, #summary_sec .columns_total').attr('disabled', true);
+    }
+    else
+    {
+      j("#detailed_sec").hide();
+      j('#detailed_sec .columns_select, #detailed_sec .columns_total').attr('disabled', true);
+      j("#summary_sec").show();
+      j('#summary_sec .columns_select').attr('disabled', false);
+      j('#summary_sec .columns_total').each(function(){
+        if(j(this).attr('is_disabled') == "true")
+          j(this).attr('disabled', true);
+        else
+          j(this).attr('disabled', false);
+      });
+    }
+    select_all()
+  }
+  function check_all(text)
+  {
+    if(j(text+' .select_all:visible').is(':checked'))
+    {
+      j(text+' .columns_select:visible').prop('checked', true);
+      j(text+' .columns_total:visible').attr('disabled', false);
+      j(text+' .columns_total:visible + label').removeClass('disable_label');
+    }
+    else{
+      j(text+' .columns_select:visible, .columns_total:visible').prop('checked', false);
+      j(text+' .columns_total:visible').attr('disabled', true);
+      j(text+' .columns_total:visible + label').addClass('disable_label');
+    }
+  }
+  function individual_column_select(elm)
+  {
+    select_all()
+    if(j(elm).prop('checked') == true) {
+      j(elm).closest('tr').children('.total').children('.columns_total').attr('disabled', false);
+      j(elm).closest('tr').children('.total').children('.columns_total').attr('is_disabled', false);
+      j(elm).closest('tr').children('.total').children('label').removeClass('disable_label');
+    }
+    else{
+      j(elm).closest('tr').children('.total').children('.columns_total').prop('checked', false);
+      j(elm).closest('tr').children('.total').children('.columns_total').attr('disabled', true);
+      j(elm).closest('tr').children('.total').children('.columns_total').attr('is_disabled', true);
+      j(elm).closest('tr').children('.total').children('label').addClass('disable_label');
+    }
+  }
+  function select_all(){
+    if(j('#detailed_sec .columns_select:not(:checked)').length == 0)
+      j('#detailed_sec .select_all').prop('checked',true);
+    if(j('#detailed_sec .columns_select:not(:checked)').length > 0)
+      j('#detailed_sec .select_all').prop('checked',false);
+    if(j('#summary_sec .columns_select:not(:checked').length == 0)
+      j('#summary_sec .select_all').prop('checked',true);
+    if(j('#summary_sec .columns_select:not(:checked').length > 0)
+      j('#summary_sec .select_all').prop('checked',false);
+  }
+
+  function reset_fields(elements){
+    elements = elements.split(",");
+    elements.each(function(elm){
+      j('[field='+ elm +']').val("");
+    });
+  }
+  function build_filters_form(){
+    j('.filters_form_sec').show();
+    j('.apply_filters_sec').hide();
+  }
+  function remove_filters(){
+    j('.filter_values_sec').html("");
+    j('.filter_values_sec').hide();
+    j('.apply_filters_sec').show();
+  }
+  function modify_filters(){
+    j('.filter_values_sec').hide();
+    j('.filters_form_sec').show();
+  }
+  function request_filters_form(){
+    var input_values = JSON.parse(j('#inputs_temp').val());
+    var action = '<%= @custom_report.present? ? "fetch_template_filters" : "fetch_filters" %>';
+    new Ajax.Request('/hr_reports/'+action,{
+      parameters:j.param({'inputs': input_values, 'name' : '<%= @base_template.name %>', 'temp_id' : '<%= @custom_report.present? ? @custom_report.id : '' %>'}),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j('.apply_filters_sec .div_link').attr('onclick', "")
+        j('#loader2').show();
+      },
+      onComplete:function(resp){
+        j('.apply_filters_sec .div_link').attr('onclick', "request_filters_form();");
+        j('#loader2').hide();
+      }
+    });
+    return false;
+  }
+
+  function reset_filters_form(){
+    j(".filter_section select[multiple='multiple']").multipleSelect('checkAll');
+    j(".filter_section select:not([multiple])").val("");
+  }
+
+  function show_categories(){
+    j('#inactive_categories').toggle();
+  }
+
+  function set_template_values(type){
+    var filter_values = JSON.parse(j('#filter_result').val());
+<% if @custom_report.present? and @custom_report.report_filters.present? %>
+      var report_filters = JSON.parse('<%= @custom_report.report_filters.to_json %>');
+      if(type == 'edit')
+        filter_values = report_filters
+      else
+        filter_values = j.extend(filter_values, report_filters)
+<% end %>
+    j('#template_form select').each(function(){
+      key = j(this).attr('field');
+      if(j(this).is('[multiple]')){
+        j('#'+key+'_choose_all').prop('checked', true);
+        j(this).multipleSelect("uncheckAll");
+        j(this).multipleSelect("disable");
+      }
+      else{
+        j('#'+key+'_choose_all').prop('checked', true);
+        j(this).attr('disabled', true);
+      }
+    });
+    j.each( filter_values, function( key, value ) {
+      field=j("#"+key+"_template_list");
+      if(field.is('[multiple]')){
+        if(value == null){
+          j('#'+key+'_choose_all').prop('checked', true);
+          field.multipleSelect("uncheckAll");
+          field.multipleSelect("disable");
+        }
+        else{
+          j('#'+key+'_choose_specific').prop('checked', true);
+          field.multipleSelect("setSelects", value);
+          field.multipleSelect("enable");
+        }
+      }
+      else{
+        if(value == ""){
+          j('#'+key+'_choose_all').prop('checked', true);
+          field.attr('disabled', true);
+        }
+        else
+        {
+          j('#'+key+'_choose_specific').prop('checked', true);
+          field.attr('disabled', false);
+
+        }
+        field.val(value);
+      }
+    });
+  }
+  function send_template(){
+    name = j('#template_values_name').val();
+    j('#templates_list .wrapper div').hide();
+    if((name != "") && (name != null)){
+      j('#template_values_name').closest('.label-field-pair').removeClass('error_field')
+      var filter_values = {}
+      j('#templates_form_footer #submit_button').attr('disabled', true);
+      var column_values = JSON.parse(j('#columns_temp').val());
+      j('#template_form select').each(function(){
+        field = j(this).attr('field');
+        if(!j('#template_form #'+field+'_choose_all').is(':checked')){
+          filter_values[field] = j("#"+field+'_template_list').val();
+        }
+      });
+      new Ajax.Request('/hr_reports/save_template',{
+        parameters:j.param({'report_name' : '<%= @base_template.name %>', 'name' : j('#template_values_name').val(), 'filters': filter_values, 'columns': column_values, 'temp_id' : '<%= @custom_report.present? ? @custom_report.id : '' %>', 'save_columns' : j('#save_columns').is(':checked')}),
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(resp){
+          if(resp.responseJSON.hasOwnProperty("name")){
+            j('#templates_list .wrapper div').show()
+            j('#name_error').text(resp.responseJSON.name);
+          }
+          j('#templates_form_footer #submit_button').attr('disabled', false);
+        }
+      });
+    }
+    else{
+      j('#template_values_name').closest('.label-field-pair').addClass('error_field')
+    }
+  }
+  function change_template_value(elm){
+    field = j('#'+j(elm).attr('field')+"_template_list");
+    if(j(elm).is(':checked') && j(elm).val() == 'all'){
+      if(field.is('[multiple]'))
+        field.multipleSelect("disable");
+      else
+        field.attr('disabled', true);
+    }
+    else{
+      if(field.is('[multiple]'))
+        field.multipleSelect("enable");
+      else
+        field.attr('disabled', false);
+    }
+  }
+
+  function validate_form(type){
+    valid = true;
+    j(".input_section .label-field-pair").removeClass("error_field");
+    if(type == 'inputs'){
+      elements = j(".input_section [field]:not(.calendar_label)[child='true']").map(function(){if((j(this).val() == "") || (j(this).val() == null)) return this})
+      if(elements.length == 0){
+        elements = j(".input_section [field]:not(.calendar_label):not([pair])").map(function(){if((j(this).val() == "") || (j(this).val() == null)) return this})
+        if(elements.length > 0)
+          valid = false
+        add_error_class(elements);
+        pairs = j(".input_section [field]:not(.calendar_label)[pair]")
+        pairs_name = j.unique(pairs.map(function(){return j(this).attr('pair')}))
+        fields = []
+        pairs_name.each(function(){
+          fields.push(j.unique(j("[pair='"+this+"']").map(function(){return j(this).attr('field')})))
+        });
+        fields.each(function(e){
+          field1 = e.first().get(0)
+          field2 = e.last().get(0)
+          field1_elms = j(".input_section [field='"+ field1 +"']:not(.calendar_label)[pair]")
+          field1_no_value = field1_elms.map(function(){if((j(this).val() == "") || (j(this).val() == null)) return this})
+          field2_elms = j(".input_section [field='"+ field2 +"']:not(.calendar_label)[pair]")
+          field2_no_value = field2_elms.map(function(){if((j(this).val() == "") || (j(this).val() == null)) return this})
+          if((field1_no_value.length > 0) && (field2_no_value.length > 0)){
+            if(((field1_elms.length - field1_no_value.length) == 0) && ((field2_elms.length - field2_no_value.length) == 0)){
+              add_error_class(field1_elms);
+              add_error_class(field2_elms);
+              valid = false
+            }
+            else if(field1_no_value.length > 0){
+              add_error_class(field1_no_value);
+              valid = false
+            }
+            else if(field2_no_value.length > 0){
+              add_error_class(field2_no_value);
+              valid = false
+            }
+          }
+        });
+      }
+      else{
+        valid = false
+        add_error_class(elements);
+      }
+      elements = j('.input_section .select-list:not(.calendar_label)').map(function(){if((j(this).val() == "") || (j(this).val() == null)) return this})
+    }
+    return valid;
+  }
+
+  function add_error_class(elements){
+    elements.each(function(){
+      j(this).closest('.label-field-pair').addClass("error_field")
+    });
+  }
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+
+
+</script>

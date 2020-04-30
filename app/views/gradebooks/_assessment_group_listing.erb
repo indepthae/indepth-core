@@ -1,0 +1,48 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+        <td class="col-2"><%= t('exam_groups_text') %></td>
+        <td class="col-1"><%= t('status') %></td>
+        <td class="col-1"><%= t('exam_mode') %></td>
+        <td class="col-1 actions_col"><%= t('actions')%></td>
+    </tr>
+    <% assessment_groups.each do |ag|  %>
+      <tr class="tr-<%= cycle('even', 'odd') %>">
+          <td><%= ag.name_with_code %></td>
+          <td><%= ag.active_for(@batch_ids) ? t('active') : t('inactive')%></td>
+          <td><%= ag.exam_mode %></td>
+          <td class="links">
+              <% if (ag.exam_type.subject or ag.exam_type.subject_attribute or ag.exam_type.subject_wise_attribute) or (@current_user.privileges.include?(Privilege.find_by_name("ManageGradebook")) or @current_user.admin?) or @course.is_tutor_and_has_batch_in_this_course_academic_year(@academic_year) or @current_user.privileges.include?(Privilege.find_by_name("GradebookMarkEntry")) %>
+                <span class="primary_links">
+                    <% if ag.derived_assessment? %>
+                      <%= link_to t('manage_exams'), {:controller=>'assessments', :action=> 'manage_derived_assessment', :id=>ag.id, :course_id => @course.id, :academic_year_id=>@academic_year.id} %>
+                    <% else %>
+                      <%= link_to t('manage_exams'), {:controller=>'assessments', :action=> 'show', :id=>ag.id, :course_id => @course.id, :academic_year_id=>@academic_year.id} %>
+                    <% end %>
+                </span>
+                <% if (@current_user.employee and @course.is_tutor_and_has_batch_in_this_course_academic_year(@academic_year)) or @current_user.privileges.include?(Privilege.find_by_name("ManageGradebook")) or @current_user.admin? %>
+                  <% unless ag.derived_assessment? %>
+                    <div class="text-input-bg">
+                        <div class="dropbtn submit-button options-dropbutton" drop_id = '<%= ag.id %>' onclick="showOptions(this)"><%= "#{t('more')} &#9660;" %></div>
+                    </div>
+                    <div id="optionDropdown_<%=ag.id%>" class="dropdown-content options-dropdown">
+                        <%= link_to t('generate_reports'), {:controller=>'assessment_reports', :action=> 'generate_exam_reports', :group_id => ag.id, :course_id => @course.id, :term_id=> term.id} %>
+                        <% if ag.is_course_exam? and permitted_to? :edit_course_exam , :assessment_groups %>
+                          <%= link_to t('edit_exam_group'), edit_course_exam_assessment_group_path(ag) %>
+                        <% end %>
+                        <% if ag.has_report?(@course.id) %>
+                          <%= link_to t('student_exam_reports'), student_exam_reports_assessment_reports_path(:group_id => ag.id, :course_id => @course.id, :from_manage_exam => true,:term_id=> term.id) %>
+                        <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% else %>
+                  <span class="primary_links">
+                          <div class="blank_cell">
+                        
+                      </div>
+              </span>
+              <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>

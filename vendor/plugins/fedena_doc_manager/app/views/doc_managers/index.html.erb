@@ -1,0 +1,174 @@
+<%  if (rtl?) %>
+<script type="text/javascript">
+
+  j(document).ready(function() {
+    j(".drop_header").hover(
+    function () {
+      link_off = j(this).offset();
+      link_width = j(this).width();
+      link_height = j(this).height();
+      menu_box = j(this).find(".more-menu-div");
+      box_width = menu_box.width();
+    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+      menu_box.css({top: (link_off.top + link_height),left: (link_off.left)});
+      menu_box.css("display","block");
+    },
+    function () {
+      j(this).find(".more-menu-div").css("display","none");
+    });
+  });
+
+  function update_all(id,user_id,page,action_text)
+  {
+<%= remote_function(:url => show_folder_path, :with => "'id='+id+'&user_id='+user_id+'&page='+page+'&action_text='+action_text" ) %>
+  }
+  function iframe_height(hgt)
+  {    
+    document.getElementById("uploading").height= (parseInt(hgt) + 10) +"px";
+  }
+
+</script>
+<% else %>
+<script type="text/javascript">
+
+  j(document).ready(function() {
+    j(".drop_header").hover(
+    function () {
+      link_off = j(this).offset();
+      link_width = j(this).width();
+      link_height = j(this).height();
+      menu_box = j(this).find(".more-menu-div");
+      box_width = menu_box.width();
+    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+      menu_box.css({top: (link_off.top + link_height),left: ((link_off.left + link_width) - box_width)});
+      menu_box.css("display","block");
+    },
+    function () {
+      j(this).find(".more-menu-div").css("display","none");
+    });
+  });
+
+  function update_all(id,user_id,page,action_text)
+  {
+<%= remote_function(:url => show_folder_path, :with => "'id='+id+'&user_id='+user_id+'&page='+page+'&action_text='+action_text" ) %>
+  }
+  function iframe_height(hgt)
+  {    
+    document.getElementById("uploading").height= (parseInt(hgt) + 10) +"px";
+  }
+
+</script>
+<% end %>
+<%= javascript_include_tag 'jquery.ajaxAutocomplete.ch' %>
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('doc_manager_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('document_management')}"%></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='drop_header themed_bg themed-dark-hover-background'><%= link_to "#{t('create')} &#9660;", share_docs_doc_managers_path %>
+      <ul id="box_1" class="more-menu-div" style="display:none;">
+        <% if permitted_to? :new, :documents %>
+          <li class='themed_bg themed-dark-hover-background'> <%=link_to "#{t('create_document')}", new_document_path %> </li>
+        <% end %>
+        <% if permitted_to? :new, :folders %>
+          <li class='themed_bg themed-dark-hover-background'> <%=link_to "#{t('create_shareable_folder')}", new_shareable_folder_path(:folder_type => "shareable") %> </li>
+        <%end%>
+        <% if permitted_to? :new_privileged, :folders %>
+          <li class='themed_bg themed-dark-hover-background'> <%=link_to "#{t('create_privileged_folder')}", new_privileged_folder_path(:folder_type => "privileged") %></li>
+        <% end %>
+        <% if permitted_to? :new_userspecific, :folders %>
+          <li class='themed_bg themed-dark-hover-background'> <%=link_to "#{t('create_userspecific_folder')}", new_userspecific_folder_path(:folder_type => "userspecific") %> </li>
+        <% end %>
+
+      </ul>
+    </li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+<div class="bread_crumb" id="brd_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="tab_loader">
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader3",
+      :style =>"display: none;" ) %>
+  </div>
+  <div class="extender"></div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div>
+    <div id="bread_crumb">
+      <%= render :partial => 'breadcrumbs' %>
+    </div>
+    <div id="search-area">
+      <div id="searchbox">
+        <form name="search-form" id="search-form">
+          <div class="loader_div">
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style =>"display: none;" ) %>
+          </div>
+          <%= text_field_tag "query", params[:query], :autocomplete => 'off', :placeholder => "#{t('search_placeholder')}" %>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="pane" class="center_text">
+    <% if @action.present? %>
+      <%= case @action
+      when "privileged_docs"
+        render :partial => 'privileged_docs'
+      when "my_docs"
+        render :partial => 'my_docs'
+      when "shared_docs"
+        render :partial => 'shared_docs'
+      when "recent_docs"
+        render :partial => 'recent_docs'
+      when "favorite_docs"
+        render :partial => 'favorite_docs'
+      when "user_docs"
+        render :partial => 'user_docs'
+      when "search"
+        render :partial => 'search_list'
+      end %>
+    <% else %>
+      <%= render :partial => 'my_docs'%>
+    <% end %>
+
+    <% if params[:folder_id].present? and params[:action_text]!='search' %>
+      <script type="text/javascript">
+        update_all("<%= params[:folder_id] %>","<%= params[:user_id] %>","<%= params[:page] %>","<%= @action %>")
+      </script>
+    <% end %>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  function search_docs_ajax(){
+    if ($('query').value.include("%")) return;
+<%="#{remote_function(:url => search_docs_ajax_doc_managers_path,
+:with =>  "'query='+ $('query').value",
+:before => "Element.show('loader')",
+:success => "Element.hide('loader')"
+)}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('query', 1, search_docs_ajax);
+  });
+
+</script>

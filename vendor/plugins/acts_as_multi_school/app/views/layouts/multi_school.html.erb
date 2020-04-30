@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Administrations</title>
+    <link rel="icon" href=" " type="ico" />
+    <link rel="shortcut icon" href=" " type="ico" />
+    <%= yield :head %>
+    <%= stylesheet_link_tag 'bootstrap' %>
+    <%= stylesheet_link_tag 'bootstrap_overrides.css' %>
+    <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+    <%= javascript_include_tag 'jquery/jquery-ui.min.js'%>
+<%#= javascript_include_tag 'jquery/jquery.min.js'%>
+    <%= javascript_include_tag 'prototype'%>
+    <%= javascript_include_tag 'bootstrap-dropdown'%>
+    <%= javascript_include_tag 'jquery.ajaxautocomplete'%>
+    <%= javascript_include_tag 'acts_as_multi_school.js'%>
+    
+    <script type="text/javascript">
+      j(function(){
+        var options={serviceUrl:'<%=search_schools_url %>',noCache:false, onSelect:function(value,data){document.location='/schools/'+data;}}
+        var autocom=j("#search").autocompleteAjax(options);
+        j("#search").focus(function(){
+          j('#'+autocom.mainContainerId).css({top:autocom.el.offset().top+autocom.el.height()- j(window).scrollTop()+10});
+        });
+      });
+    </script>
+  </head>
+  <body class="main-bg-color">
+    <div class="navbar navbar-fixed-top padding-bottom-10 main-bg-color">
+      <div class="navbar-inner bg-dark black-border-bottom no-shadow">
+        <div class="container container-width height-50 bg-dark">
+          <% admin_user_session.school_stats_accessable?? home_path= school_statistics_live_path : home_path= schools_path%>
+          <% if @linkable and @linkable.class.to_s == "MultiSchoolGroup" %>
+            <%= link_to @linkable.name , home_path , :class  => 'brand' %>
+          <% else %>
+            <%= link_to FedenaSetting.company_details[:company_name] , home_path , :class  => 'brand' %>
+          <% end %>
+          <ul class="nav pull-right">
+            <li class="dropdown" style="margin-top:5px;">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= admin_user_session.username %> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><%= link_to 'User Profile', admin_user_path(admin_user_session) %></li>
+                <% unless admin_user_session.class.name=="MasterAdmin" %>
+                  <li><%= link_to 'Company', multi_school_group_path(admin_user_session.school_group) %></li>
+                <% end %>
+                <li><%= link_to_function "#{MultiSchool.multischool_settings['version']}", '#' %></li>
+                <li class="divider"></li>
+                <li><%=link_to 'Logout',logout_admin_users_path %></li>
+              </ul>
+            </li>
+          </ul>
+          <%  if(CdsAdapter rescue false) && !(ClientSchoolGroup rescue false) %>
+            <% if session[:update]==true %>
+              <ul class="nav pull-right" style="background: #1192d3 !important;margin-top: 11px;">
+                <li><%=link_to 'Updates Available',{:controller=>:admin_users,:action=>:update_details} ,{:style=>"padding:5px;color:#fff;"} %></li>
+              </ul>
+            <% end %>
+          <% end %>
+        </div>
+
+      </div>
+      <div class="navbar-inner bg-red red-border-top no-shadow">
+        <div class=" container container-width height-45 bg-red">
+          <% if admin_user_session %>
+            <ul class="inline ul-nav">
+              <% if admin_user_session.school_stats_accessable? %>
+                <li><%= link_to "Statistics", school_statistics_live_path %></li>
+              <% end %>
+              <li><%= link_to "Schools", schools_path %></li>
+              <li><%= link_to "Admin Users", multi_school_group_admin_users_path(admin_user_session.school_group) %></li>
+              <% if admin_user_session.school_group.allowed_plugins.include?("fedena_pay") %>
+                <li><%= link_to "Payment Gateways", multi_school_group_payment_gateways_path(admin_user_session.school_group) %></li>
+              <% end %>
+              <% unless saas? %>
+                  <li><%= link_to "Gradebook Templates",gradebook_templates_path %></li>
+              <% end %>
+              <input type="text" name="search" placeholder="Search schools" id="search" class="nav-search-box" />
+            </ul>
+          <% end %>
+        </div>    
+      </div>
+    </div>
+
+
+    <div class="container-fluid main-bg-color">
+      <div class="container container-width container-height">
+        <% unless flash[:notice].nil? %>
+          <div class="alert alert-warning pagination-centered">
+            <%= flash[:notice] %>
+          </div>
+        <% end %>
+        <%= yield %>
+      </div>
+      <div class="container container-width footer-div">
+        <hr/>
+      </div>
+    </div>
+
+  </body>
+</html>

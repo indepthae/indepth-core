@@ -1,0 +1,199 @@
+<%#= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<script type="text/javascript">
+  function remove_fields(link) {
+      $(link).previous("input[type=hidden]").value = "1";
+      $(link).up(".fields").hide();
+  }
+  var up_by;
+  var j = jQuery.noConflict();
+  var prev_value = [];
+  function update_item(value, data, id)
+  {
+      j('#' + id).val(data);
+  }
+  function to_update_item(value, data, id, up_by) {
+      j.ajax({
+          type: 'POST',
+          url: '/indents/update_item',
+          data: {
+              'item_id': data,
+              'i': id,
+              'up_by': up_by
+          },
+          success: function (resp) {
+              console.log(resp);
+          }
+      });
+  }
+  function add_fields(link, association, content) {
+      prev_value = [];
+      $$('select.select_value').each(function (checkbox) {
+          prev_value.push(checkbox.value);
+      });
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g")
+      $(link).up().insert({
+          before: content.replace(regexp, new_id)
+      });
+      to_search();
+      prev_value_insert();
+  }
+  function StoreSelected() {
+    j('input[id^=query_]').val("");
+    j('.nested_qty').val("");
+    j('.nested_price').val("0.0000");  
+    j('.nested_batch_no').val("");   
+    to_search();
+  }
+  document.observe('dom:loaded', function () {
+      $('person_store_id').observe('change', StoreSelected);
+  });
+  function to_search(){
+    j(document).unbind();
+    j(document).delegate(".selector", "input", function () {
+          var a,id;
+          if (j(this).next().is("div")) {
+              up_by = 3;
+              id = j(this).next().children().attr('id')
+          } else {
+              up_by = 2;
+              id = j(this).next().attr('id')
+          }
+          parameter = {store_id: j('#person_store_id').val()}
+          j(this).autocompleteAjax({serviceUrl: '/indents/search_items', params: parameter,
+              onSelect: function (value, data) {
+                j('.autocomplete-w1').hide();
+                update_item(value, data, id);
+                to_update_item(value, data, id,up_by);
+              }});
+         
+      });
+  }
+  function prev_value_insert()
+  {
+      var i = 0
+      $$('select.select_value').each(function (checkbox) {
+          checkbox.value = prev_value[i];
+          i += 1;
+      });
+  }
+  var store_items = new Array();
+<% for item in @store_items -%>
+    store_items.push(new Array(<%= item.store_id %>, '<%=escape_javascript item.item_name %>', <%= item.id %>));
+<% end -%>
+</script>
+<script type="text/javascript">
+  function update_pending_value(text_box)
+  {
+      text_box_value = text_box.value;
+      if (isNaN(text_box_value) == true) {
+          alert("Please enter numeric value");
+          text_box.value = "";
+          return
+      }
+      pending_text_box_id = text_box.id.replace('required', 'pending');
+      issued_text_box_id = text_box.id.replace('required', 'issued');
+      $(pending_text_box_id).value = text_box_value;
+  }
+</script>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('indent') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('new_text') %></div>
+    <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="box">
+
+
+        <% form_for(@indent) do |f| %>
+
+          <%= f.error_messages %>
+
+          <div class="label-field-pair">
+              <div class="label-container1"><%= "#{t('indent_no')}" %></div>
+              <div class="input-container">
+                  <%=  f.text_field :indent_no, :value=> @last_indent.nil? ? nil : @last_indent.next %>
+              </div>
+          </div>
+
+          <%= f.hidden_field :user_id, :value=> @current_user.id %>
+          <%= f.hidden_field :status, :value => "Pending" %>
+          <%= f.hidden_field :manager_id, :value => @current_user.employee_record.reporting_manager.nil? ? nil : @current_user.employee_record.reporting_manager.id %>
+
+
+          <div class="label-field-pair">
+              <div class="label-container1"><%= "#{t('store')}" %></div>
+              <div class="text-input-bg"  >
+                  <%= f.select :store_id, @stores.map{|st| [st.name,st.id]}, {:prompt=>t('select_store')},
+                    {:id=>"person_store_id"} %>
+              </div>
+          </div>
+
+          <div class="indent_date label-field-pair">
+              <div class="label-container1"><%= "#{t('expected_date')}" %></div>
+              <div class="text-input-bg-indent">
+                  <%= calendar_date_select_tag 'indent[expected_date]',
+                    (@indent.expected_date.blank? ?  I18n.l(Date.today,:format=>:default): @indent.expected_date),
+                    :year_range => 30.years.ago..5.years.from_now ,:popup=>"force" %>
+              </div>
+          </div>
+          <div class="label-field-pair">
+              <div class="label-container1"><%= "#{t('description')}" %></div>
+              <div class="text-input-bg-indent"><%= f.text_area :description, :rows => 3 %></div>
+          </div>
+
+          <div class="indent-items"><%= "#{t('indent_items')}" %>
+          </div>
+
+          <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+
+              <tr class="tr-head">
+                  <td class="lable-text">
+                      <%= t('store_item_id') %>
+                      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader",
+                        :style =>"display: none;margin-top: -5px;" ) %>
+                  </td>
+                  <td class="lable-text">   <%= t('required_quantity') %></td>
+                  <td class="lable-text">   <%= t('pending') %></td>
+                  <td class="lable-text">   <%= t('quantity') %></td>
+                  <td class="lable-text">
+                      <%= t('issued_quantity') %>
+                  </td>
+                  <td class="lable-text">  <%= t('issued_type') %></td>
+
+                  <td class="lable-text">   <%= t('price') %></td>
+                  <td class="lable-text">
+                      <%= t('batch_no') %>
+                  </td>
+                  <td> </td>
+              </tr>
+          </table>
+
+          <% f.fields_for :indent_items,@indent_item do |i| %>
+            <%=  render 'indent_item_fields', :f => i %>
+          <% end %>
+          <div class="fields">
+              <div id="add_item">
+                  <%= link_to_add_fields  "#{image_tag("/images/buttons/icon-add.png",:border => 0)} #{t('add_item')}", f ,
+                    :indent_items %>
+              </div>
+          </div>
+          <br />
+          <hr class="label-underline"></hr>
+          <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+        <%  end %>
+
+        <div class="extender"></div>
+    </div>
+</div>

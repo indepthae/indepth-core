@@ -1,0 +1,197 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<div class="front_preview exclude_font keep-together">
+  <%=@generated_id_card.get_front_preview_html%>
+</div>
+
+<%if @generated_id_card.get_back_preview_html.present? %>
+<div class="back_preview exclude_font keep-together">
+  <%=@generated_id_card.get_back_preview_html%>
+</div>
+<%end%>
+
+
+<%if @generated_id_card.id_card_template.front_background_image.present? %>
+<% front_img_url = FedenaSetting.s3_enabled? ? @generated_id_card.id_card_template.front_background_image.url(:original,false) : File.join(RAILS_ROOT,@generated_id_card.id_card_template.front_background_image.path) %>
+<style type="text/css">
+#front_preview{
+  background-image: url('<%=front_img_url%>') !important;
+}
+
+
+</style>
+<%end%>
+
+<%if @generated_id_card.get_back_preview_html.present? %>
+  <%if @generated_id_card.id_card_template.back_background_image.present? %>
+    <% back_img_url = FedenaSetting.s3_enabled? ? @generated_id_card.id_card_template.back_background_image.url(:original,false) : File.join(RAILS_ROOT,@generated_id_card.id_card_template.back_background_image.path) %>
+    <style type="text/css">
+    #back_preview{
+      background-image: url('<%=back_img_url%>') !important;
+    }
+    </style>
+  <%end%>
+<%end%>
+
+<style type="text/css">
+<%if @single_page_enabled %>
+ <%if rtl?%>
+ .new-page {
+   page-break-before: always;
+ }
+
+ .keep-together {
+     page-break-inside: avoid;
+ }
+
+ .break-after {
+     page-break-after: always;
+ }
+ div.preview{
+   box-sizing: border-box;
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+   font-size: 6pt;
+   line-height: 1.2;
+   display: inline-block;
+   vertical-align: top;
+   text-align: left;
+   -webkit-transform: scale(2.341);
+   -webkit-transform-origin: 100% 0%;
+
+ }
+
+ div.front_preview, div.back_preview{
+   box-sizing: border-box;
+   page-break-before: always;
+   page-break-inside: avoid;
+   page-break-after: always;
+
+ }
+ <%else%>
+ .new-page {
+   page-break-before: always;
+ }
+
+ .keep-together {
+     page-break-inside: avoid;
+ }
+
+ .break-after {
+     page-break-after: always;
+ }
+ div.preview{
+   box-sizing: border-box;
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+   font-size: 6pt;
+   line-height: 1.2;
+   display: inline-block;
+   vertical-align: top;
+   text-align: left;
+   -webkit-transform: scale(2.341);
+   -webkit-transform-origin: 0% 0%;
+
+ }
+
+ div.front_preview, div.back_preview{
+   box-sizing: border-box;
+   page-break-before: always;
+   page-break-inside: avoid;
+   page-break-after: always;
+
+ }
+ <%end%>
+
+
+<%else%>
+
+  <%if rtl?%>
+
+  html{
+    text-align: center;
+  }
+
+  .new-page {
+    page-break-before: always;
+  }
+
+  .keep-together {
+      page-break-inside: avoid;
+  }
+
+  .break-after {
+      page-break-after: always;
+  }
+
+  div.preview{
+    text-align: right;
+    box-sizing: border-box;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: 6pt;
+    line-height: 1.2;
+    margin: 4mm;
+    display: inline-block;
+    border-style: solid;
+    border-color: #777;
+    border-width: 1px;
+    vertical-align: top;
+    text-align: right;
+  }
+
+  div.front_preview{
+    display: inline-block;
+  }
+
+  div.back_preview{
+    display: inline-block;
+  }
+  <%else%>
+  html{
+    text-align: center;
+  }
+
+  .new-page {
+    page-break-before: always;
+  }
+
+  .keep-together {
+      page-break-inside: avoid;
+  }
+
+  .break-after {
+      page-break-after: always;
+  }
+
+  div.preview{
+    text-align: left;
+    box-sizing: border-box;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: 6pt;
+    line-height: 1.2;
+    margin: 4mm;
+    display: inline-block;
+    border-style: solid;
+    border-color: #777;
+    border-width: 1px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  div.front_preview{
+    display: inline-block;
+  }
+
+  div.back_preview{
+    display: inline-block;
+  }
+  <%end%>
+
+
+<%end%>
+</style>

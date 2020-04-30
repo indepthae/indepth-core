@@ -1,0 +1,12 @@
+
+<% if @remarkable.class.name.to_s == "RemarkSet" %>
+  <div class="label-field-container">
+      <label for="_remark_set_name"><%= t('remark_set_display_name') %></label>
+      <label id="_subject_name" class="subject-label"><%= @remarkable.name %></label>
+  </div>
+<% else %>
+  <div class="label-field-container">
+      <label for="_subject_name"><%= t('subject') %></label>
+      <label id="_subject_name" class="subject-label"><%= @remarkable.name %></label>
+  </div>
+<% end %>

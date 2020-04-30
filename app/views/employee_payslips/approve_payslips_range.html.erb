@@ -1,0 +1,51 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(true) %>
+  <h1><%= "#{t('employee_payslip_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('approve_payslips')} - #{t('pay_period')}" %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :employee_payslips_approve_payslips_range, [@start_date, @end_date] %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= t('approve_payslips') %></h3>
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('pay_period') %>:</label>
+    <div class="text-input-bg" id="label_value"> <%= @payslips_date_range.date_range %> </div>
+  </div>
+
+  <div id="approve_list">
+    <table>
+      <tr class="tr-head">
+        <td class="pg_name"><%= t('payroll_group') %></td>
+        <td class="frequency"><%= t('payment_frequency') %></td>
+        <td class="status"><%= t('payslips_generated') %></td>
+        <td class="actions"></td>
+      </tr>
+      <% @payroll_groups.each do |group| %>
+        <tr>
+          <td><%= group.name %></td>
+          <td><%= "#{group.salary_type_value} - #{group.payment_period_value}" %></td>
+          <td>
+            <span class="generated"><%= "#{t('generated')} : #{group.generated}" %>
+              <span class="of_text"><%= "#{t('of')} #{group.employees.count} " %></span>
+            </span>
+            <span class="approved"><%= "#{t('approved')} : #{group.approved}" %></span>
+            <span class="pending"><%= "#{t('pending')} : #{group.pending}" %></span>
+            <% unless group.rejected.to_i == 0 %>
+              <span class="rejected"><%= "#{t('rejected')} : #{group.rejected}" %></span>
+            <% end %>
+          </td>
+          <td><%= link_to t('view_payslips'), {:action => 'payslip_generation_list', :id => group.id, :start_date => @start_date, :end_date => @end_date, :finance => 1, :from => 'approve_payslips'} %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <%= pagination_status(@payroll_groups) %>
+  <%= will_paginate @payroll_groups %>
+</div>

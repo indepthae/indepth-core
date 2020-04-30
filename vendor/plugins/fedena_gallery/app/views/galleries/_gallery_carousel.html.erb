@@ -1,0 +1,24 @@
+<div class="inner_box">
+  <div class="image_box">
+    <div class="upper_panel">
+      <div class="full_description">
+      </div>
+      <div class="close_photo" onclick="close_image()"></div>
+
+    </div>
+    <div class="full_image">
+      <img class="full_image" src='<%=  image.photo.url(:original, false)%>'/>
+    </div>
+    <div class="controls">
+      <div class="previous">
+        <button class="control">Previous</button>
+      </div>
+      <div class="current_image">
+        Showing
+      </div>
+      <div class="next">
+        <button class="control">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

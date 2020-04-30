@@ -1,0 +1,52 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_import_text') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('transport_import_logs')}", {:controller => "transport_imports", :action => "show"} %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('transport_impoprt_description') %></div>
+    <div class="planner_box">
+        <% form_for :import_transport, @transport_import, :url => {:action => :create }, :method => :post do |form| %>
+          <%= session_fingerprint_field %> 
+          <div class="label-field-pair">
+              <label for="employee_total-experience"><%= t('import_from_ay') %></label>
+              <div class="text-input-bg">
+                  <%= select :import_transport, :import_from_id, options_for_select(@academic_years_to.map{|a| [a.name, a.id]}, @transport_import.try(:import_to_id).try(:to_i)),
+                    {:include_blank => t('select_an_academic_year')}, {:onchange => "#{remote_function(:url => {:action => "fetch_academic_years"},:with => "'academic_year_id='+value",
+                    :before => "Element.show('loader1')",:success => "Element.hide('loader1')")}"} %>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader1",
+                    :style =>"display: none;" ) 
+                %>
+              </div>
+          </div>
+
+          <div class="label-field-pair" id='import_from'>
+              <%= render :partial => 'import_to_academic_year' %>
+          </div>
+
+          <div class='import_form' id='import_form'>
+              <% if @transport_import.errors.present? %>
+                <%= render :partial => 'transport_import_form' %>
+              <% end %>
+          </div>
+
+        <% end %>
+    </div>
+</div>

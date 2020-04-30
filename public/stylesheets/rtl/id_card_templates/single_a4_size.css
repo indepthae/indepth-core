@@ -1,0 +1,47 @@
+
+  .new-page {
+    page-break-before: always;
+  }
+
+  .keep-together {
+      page-break-inside: avoid;
+  }
+
+  .break-after {
+      page-break-after: always;
+  }
+
+  div.preview{
+    position: relative;
+    text-align: right;
+    box-sizing: border-box;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: 6pt;
+    line-height: 1.2;
+    margin: 4mm;
+    display: inline-block;
+    border-style: solid;
+    border-color: #777;
+    border-width: 1px;
+    vertical-align: top;
+    text-align: right;
+  }
+
+  div.front_preview{
+    display: inline-block;
+  }
+
+  div.back_preview{
+    display: inline-block;
+  }
+  
+  html{
+    text-align: center;
+    margin: 0px;
+  }
+
+  body{
+    margin: 0px;
+  }

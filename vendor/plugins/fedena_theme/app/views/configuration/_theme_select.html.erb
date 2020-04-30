@@ -1,0 +1,216 @@
+<% content_for :head do  %>
+  <% unless rtl? %>
+    <%= stylesheet_link_tag("select_list.css") %>
+  <% else %>
+    <%= stylesheet_link_tag("rtl/select_list.css") %>
+  <% end %>
+<% end %>
+<div class="label-field-pair">
+  <label for="configuration_currency_type"><%= t('select_theme') %></label>
+  <div class="text-input-bg">
+    <div id="color-field" class="jsDropDown">
+      <% color = FedenaTheme.selected_color_value %>
+      <div id="fill-color" style="background-color: <%= color %> "></div>
+      <i id="icon1"></i></div>
+    <div id="c-list" style="display: none;">
+      <ul id="color-list" class="drop_down_list" >
+        <% FedenaTheme::COLORS.sort_by{|k,v| k}[0..14].each do |key,color_set| %>
+          <% if key%5 == 0 and key > 10 %>
+            <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='row_end column_end'></li>" %>
+          <% elsif key%5 == 0 %>
+            <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='row_end'></li>" %>
+          <% elsif key > 10 %>
+            <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='column_end'></li>" %>
+          <% else %>
+            <%= "<li style='background-color:#{color_set[:color]}'color='#{color_set[:color]}' key='#{key}'></li>" %>
+          <% end %>
+        <% end %>
+      </ul>
+      <div id="more-option">
+        <%= link_to t('more_colors'),"#" ,:class => "themed_text", :id => "color-box"%>
+      </div>
+    </div>
+    <input name="configuration[color]" type="hidden" id ="sel-theme"value=<%= FedenaTheme.selected_theme %>>
+  </div>
+</div>
+<div class="label-field-pair">
+  <label for="configuration_currency_type"><%= t('select_font')%> </label>
+  <div class="text-input-bg">
+    <% font = FedenaTheme.selected_font_value %>
+    <div id ="font-field" class="jsDropDown" style="font-family:<%= font %>"><span id="f_value"><%= font %></span><i id="icon"></i></div>
+    <ul id ="font-list" class="drop_down_list" style="display: none;">
+      <%  FedenaTheme::FONTS.sort_by{|k,v| v[:text]}.each do |k,v| %>
+        <%= "<li style='font-family: #{v[:value]} !important' class='#{v[:text] == font ? 'selected' : ''}' value=#{k}>#{v[:text]}</li>" %>
+      <% end %>
+    </ul>
+    <input name="configuration[font]" type="hidden" id ="sel-font"value=<%= FedenaTheme.selected_font %>>
+  </div>
+</div>
+<div id="MB_overlay" style="display:none;"></div>
+<div id="MB_window" style="display:none;">
+
+</div>
+<script type="text/javascript">
+<% @color_hsh = FedenaTheme::COLORS.sort_by{|k,v| v[:sort_order]} %>
+  var hsh = <%= @color_hsh.to_json %>
+<%= "var b_value= '#{t('choose_color')}'" %>
+<%= "var select_color= '#{t('no_color_selected')}'" %>
+<%= "var cancel_text= '#{t('cancel')}'" %>
+  j('.jsDropDown').click(function(){
+    this.next().toggle();
+    if(j(this).prop('id')=='color-field')
+    {
+      j('ul#color-list li').each(function(){
+        j(this).removeClass('c-selected');
+      });
+      j("ul#color-list li[key="+j('#sel-theme').val()+"]").addClass('c-selected');
+    }
+  });
+  j('ul#color-list li').mouseover(function(){
+    j('ul#color-list li').each(function(){
+      j(this).removeClass('c-selected');
+    });
+    j(this).addClass('c-selected');
+  });
+  j('ul#font-list li').mouseover(function(){
+    j('ul#font-list li').each(function(){
+      j(this).removeClass('selected');
+    });
+    j(this).addClass('selected');
+  });
+  j('ul#color-list li').click(function(){
+    j('#sel-theme').val(j(this).attr('key'));
+    j('#fill-color').css('background-color',j(this).attr('color'));
+    j('link[rel=stylesheet][href*="theme_css.css"]').remove();
+    if(j('html').attr('dir') =="ltr")
+    {
+      var link_href = '<link href="/stylesheets/themes/'+j(this).attr('key')+'/theme_css.css" media="screen" rel="stylesheet" type="text/css">'
+      j('head').append(link_href);
+
+    }
+    else
+    {
+      var link_href = '<link href="/stylesheets/rtl/themes/'+j(this).attr('key')+'/theme_css.css" media="screen" rel="stylesheet" type="text/css">'
+      j('head').append(link_href);
+    }
+    j('#c-list').hide();
+  });
+  j('ul#font-list li').click(function(){
+    j('#font-field span').text(j(this).text());
+    j('#sel-font').val(j(this).attr('value'));
+    j('#font-field').css('font-family',j(this).css('font-family'));
+    j('link[rel=stylesheet][href*="font.css"]').remove();
+    var link_href = '<link href="/stylesheets/fonts/'+j(this).attr('value')+'/font.css" media="screen" rel="stylesheet" type="text/css">'
+    j('head').append(link_href);
+    j('#font-list').hide();
+  });
+  j('#color-box').click(function(){
+    j('#MB_overlay').show();
+    j('#MB_overlay').css('opacity',0.75);
+    create_modal();
+    j('#MB_window').show();
+  });
+  j(document).click(function(event){
+    if(j.inArray(j(event.target).prop("id"),["font-field","f_value","icon"]) == -1)
+    {
+      j('#font-list').hide();
+    }
+    if(j.inArray(j(event.target).prop("id"),["color-field","fill-color","icon1"]) == -1)
+    {
+      j('#c-list').hide();
+    }
+  });
+
+  function create_modal()
+  {
+    var MB_window=document.getElementById('MB_window');
+    var frame=document.createElement('div');
+    frame.id='MB_frame';
+    var content=document.createElement('ul');
+    content.id='MB_content';
+    var sel_theme=document.getElementById('sel-theme').value;
+    for(i=1;i<=hsh.length;i++)
+    {
+      var content_li=document.createElement('li');
+      content_li.style.setProperty('background-color', hsh[i-1][1]['color']);
+      content_li.setAttribute('key', hsh[i-1][0]);
+      content_li.setAttribute('color', hsh[i-1][1]['color']);
+      if (i%7 == 0 && i > 42)
+      {
+        content_li.className='row_end column_end';
+      }
+      else if(i%7 == 0)
+      {
+        content_li.className='row_end';
+      }
+      else if(i > 42)
+      {
+        content_li.className='column_end';
+      }
+      else
+      {}
+      content_li.setAttribute('onclick','active_box(this)');
+      content.appendChild(content_li);
+      if(content_li.getAttribute('key') == sel_theme)
+      {
+        content_li.addClassName('co-selected');
+      }
+    }
+    frame.appendChild(content);
+    var footer=document.createElement('div');
+    footer.id='MB_footer';
+    var footer_button=document.createElement('input');
+    footer_button.type='button';
+    footer_button.id='f_button';
+    footer_button.value=b_value;
+    footer_button.setAttribute('onclick','set_color()');
+    footer.appendChild(footer_button);
+    var cancel=document.createElement('a');
+    cancel.className='themed_text';
+    cancel.href="#";
+    cancel.setAttribute('onclick', 'close_modal()');
+    cancel.innerHTML=cancel_text;
+    footer.appendChild(cancel);
+    frame.appendChild(footer);
+    MB_window.appendChild(frame);
+  }
+  function active_box(elm)
+  {
+    j('ul#MB_content li').each(function(){
+      j(this).removeClass('co-selected');
+    });
+    j(elm).addClass('co-selected');
+  }
+  function set_color()
+  {
+    var selectd=j('.co-selected');
+    if (selectd.length == 0)
+    {
+      alert(select_color);
+    }
+    else
+    {
+      j('#fill-color').css('background-color',selectd.attr('color'));
+      j('#sel-theme').val(selectd.attr('key'));
+      j('link[rel=stylesheet][href*="theme_css.css"]').remove();
+      if(j('html').attr('dir') =="ltr")
+      {
+        var link_href = '<link href="/stylesheets/themes/'+selectd.attr('key')+'/theme_css.css" media="screen" rel="stylesheet" type="text/css">'
+        j('head').append(link_href);
+
+      }
+      else
+      {
+        var link_href = '<link href="/stylesheets/rtl/themes/'+selectd.attr('key')+'/theme_css.css" media="screen" rel="stylesheet" type="text/css">'
+        j('head').append(link_href);
+      }
+      j('#MB_frame').remove();
+      j('#MB_overlay').hide();
+    }
+  }
+  function close_modal()
+  {
+    j('#MB_frame').remove();
+    j('#MB_overlay').hide();
+  }
+</script>

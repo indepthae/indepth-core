@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.errors{
+  if @delete_error.present?
+      @xml.error(t('student_documents.not_found'))    
+  elsif @edit_error.present?
+    if @document.present?
+      unless @category.present?        
+        @xml.error(t('student_document_categories.not_found'))
+      else
+        @document.errors.full_messages.each do |msg|
+          @xml.error(msg)
+        end
+      end
+    else
+      @xml.error(t('student_documents.not_found'))
+    end
+  elsif @student.present?
+    if @document.present?
+      unless @category.present?        
+        @xml.error(t('student_document_categories.not_found'))
+      else
+        @document.errors.full_messages.each do |msg|
+          @xml.error(msg)
+        end
+      end
+    else
+      @xml.error(t('student_documents.not_found'))
+    end
+  else
+    @xml.error(t('student_documents.student_not_found'))
+  end
+  }
+%>

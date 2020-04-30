@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.route_detail{
+  @routes.each do |route|
+    @route = route
+    @xml.route do
+      @xml.destination(@route.destination)
+      @xml.main_route(@route.main_route.try(:destination))
+      @xml.cost(@route.cost)
+      @xml.vehicles(@route.main_route.vehicles.map(&:vehicle_no).flatten.join(', '))
+    end
+  end
+}%>
+
+

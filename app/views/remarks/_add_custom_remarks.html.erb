@@ -1,0 +1,61 @@
+<div class="edit-form">
+  <% form_for :remark, @remark, :url=>"" ,:html => {:id=>"add_custom_remarks"} do |f| %>
+    <div class="label-field-pair" id="subject-field">
+      <%=label_tag 'remark_subject', nil%>
+      <div class="text-input-bg" id="remark_subject_text_box">
+        <%= text_field_tag("remark[remark_subject]",nil) %>
+      </div>
+    </div>
+    <div class="label-field-pair" id="remark-by-field">
+      <%=label_tag 'remarked_by', nil%>
+      <div class="text-input-bg" id="remarked_by_text_box">
+        <%= text_field_tag("remark[remarked_by]",nil) %>
+      </div>
+    </div>
+    <div class="remark-text-area">
+      <%= f.text_area :remark_body %>
+    </div>
+    <%=f.hidden_field :target_id,:value=>@target.id%>
+    <%=f.hidden_field :student_id,:value=>@student.id%>
+    <%=f.hidden_field :batch_id,:value=>@student.batch_id%>
+    <%=f.hidden_field :submitted_by,:value=>@current_user.id%>
+    <%= f.submit "#{t('submit')}",:class=>"crs"%>
+    <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link custom_remark_cancel",:student_id=>@student.id,:target_id=>@target.id,:onclick=>'cancelreq(this)'%>
+  <% end %>
+  <div class="extender"></div>
+
+</div>
+
+<script type="text/javascript">
+  j('form#add_custom_remarks').submit(function(e){
+
+    j('.crs').attr('disabled','disabled')
+<%= "var target_id = '#{@target.id}'" %>
+<%= "var student_id = '#{@student.id}'" %>
+    var parametrs={target_id:target_id,student_id:student_id}
+    e.preventDefault();
+    var fo=this
+    new Ajax.Request('/remarks/create_custom_remarks',{
+      parameters:this.serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j('#add_remark_link #add_remark_link_for_ a').attr('onclick','completeReq(this)')
+        j(fo).parents('#add_remark_link_for_').children().first().show();
+        j('#remarks_list').html(resp.responseText);
+        j(fo).parent().remove();
+        j('hr').remove();
+      }
+    });
+  });
+
+  function cancelreq(ele)
+  {
+    j(ele).parents('#add_remark_link_for_').children().first().attr('onclick','completeReq(this)')
+    j(ele).parents('#add_remark_link_for_').children().first().show();
+    j(ele).parents('.edit-form').remove();
+    j('hr').remove();
+    
+  }
+</script>

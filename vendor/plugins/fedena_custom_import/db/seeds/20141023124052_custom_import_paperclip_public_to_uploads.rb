@@ -1,0 +1,1 @@
+Rake::Task["fedena_custom_import:public_to_uploads"].execute

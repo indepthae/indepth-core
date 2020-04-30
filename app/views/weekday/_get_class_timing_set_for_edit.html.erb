@@ -1,0 +1,4 @@
+<span>
+  <%=select_tag "batch[batch_class_timing_sets_attributes][#{@key_id}][class_timing_set_id]", options_for_select(@class_timing_sets.collect{ |u| [u.name, u.id] },@weekday_id.to_i),:class=>'cts_select_tag'%>
+</span>
+<div class="cancel_link" id="cancel_<%=@key_id%>" val="<%=@key_id%>" onclick="cancel_this(this)"><%=t('cancel_text')%></div>

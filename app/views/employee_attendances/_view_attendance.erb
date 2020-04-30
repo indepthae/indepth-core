@@ -1,0 +1,43 @@
+<div id="show">
+  <div class="label-field-pair">
+    <label for="leave_type"><%= t('employee_name') %></label>
+    <div class="text-input-bg"><b><%= @employee.first_name %></b>
+    </div>
+  </div>
+  <div class="label-field-pair">
+    <label for="leave_type"><%= t('leave_type') %></label>
+    <div class="text-input-bg"><%= @attendance.employee_leave_type.name %></div>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="leave_type"><%= t('date_text') %></label>
+    <div class="text-input-bg"><%= format_date(@attendance.attendance_date,:short) + (@attendance.is_half_day ? "&nbsp;(#{t('half_day')})" : "") %></div>
+  </div>
+  <% if @is_additional.present? %>
+    <div class="additional_leave_notification"><div class="error-icon"></div>
+      <div class="error-msg"><%= t('additional_leave_notification') %></div>
+      <% if @lop_status && @deducted%>
+        <div class="info"><%= t('lop_is_deducted') %></div>
+      <% end %>
+    </div>
+  <% end %>
+  <% if @attendance.apply_leave_id.nil? %>
+    <div id="reason">
+      <div class="label-field-pair">
+        <label for="leave_type"> <%= t('reason') %></label>
+        <div class="text-area-bg"><%= @attendance.reason %></div>
+      </div>
+    </div>
+  <% else %>
+    <div class="label-field-pair">
+      <label for="leave_type"> <%= t('approved_by') %></label>
+      <div class="text-input-bg"><%= @approved_by.present? ? @approved_by.full_name : "-" %></div>
+    </div>
+    <div class="label-field-pair">
+      <label for="leave_type"> <%= t('remarks') %></label>
+      <div class="text-input-bg"><%= @approver_remarks.present? ? @approver_remarks : "-" %></div>
+    </div>
+  <% end %>
+  <div class="extender"></div>
+
+</div>

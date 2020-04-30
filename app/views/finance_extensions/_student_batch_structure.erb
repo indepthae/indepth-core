@@ -1,0 +1,217 @@
+<!--<div class="list_table_div">-->
+<div id="fees_list">
+
+    <div class="fees_list_item">
+        <table class="fees_table">          
+            <!--<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">-->
+
+            <thead>
+            <th><%= t("s_no") %></th>
+            <th class="class44"><%= t('fees_name') %></th>
+            <th class="class13"><%= t('amount') %><%= "(#{currency})" %></th>
+            <th class="class20"><%= t('date_text') %></th>
+            <th class="class13"></th>
+            </thead>            
+            <% @student_fees.each_pair do |fee_type,fees| %>
+              <% if fees.present? %>
+                <tr class="table_subtitle">
+                    <td colspan="5" >
+                        <%= t("#{fee_type == 'finance_fees' ? 'general_fees' : fee_type}") %>
+                    </td>
+                </tr>
+              <% end %>
+              <% fee_type_name = fee_type.singularize %>
+              <% fees.each_with_index do |fee,i| %>
+                <% collection = fee.send("#{fee_type_name}_collection") %>
+                <tr class="item">
+                    <td><%= (i+1) %></td>
+                    <td>
+                        <%= link_to "#{fee.name}", {:action => :fees_structure_for_student,
+                          :id => @student.id, :fee_type => fee_type,
+                          :id2 => collection.id,
+                          }, :class => "themed_hover_text" %>
+                    </td>
+                    <% if fee_type == 'finance_fees' %>
+                      <% paid = (fee.is_paid? || ((precision_label(fee.balance.to_f + 
+                                fee.finance_fee_collection.fine_to_pay(@student).to_f))==precision_label(0))) %>
+                    <% elsif fee_type == 'transport_fees' %>
+                      <% paid = fee.is_paid %>
+                    <% else %>
+                      <% paid = ((precision_label(fee.balance.to_f))==precision_label(0)) %>                      
+                    <% end %>
+                    <% if paid %>                    
+                      <td>
+                          <%= precision_label(fee.try(:paid_amount)) %>
+                      </td>
+                      <td>
+                          <% transaction_date = fee.try(:last_transaction_date).try(:to_date) %>
+                          <% if transaction_date.present? %>
+                            <%= t('paid_on') %>
+                            <%= format_date(transaction_date, :format => :short) %>
+                          <% end %>
+                      </td>
+                    <% else %>
+                      <% patially_paid_amount = fee.try(:paid_amount).to_f %>
+                      <% if fee_type == "finance_fees" %>
+                        <% amount_to_pay = fee.balance.to_f + collection.fine_to_pay(@student).to_f %>
+                      <% elsif fee_type == "transport_fees" %>
+                        <% discount = precision_label(fee.total_discount_amount).to_f %>
+                        <% amount_to_pay = fee.balance.to_f + fee.auto_fine_amount(collection,discount,fee).to_f %>
+                      <% else %>
+                        <% amount_to_pay = fee.balance.to_f %>                                            
+                      <% end %>
+                      <% #amount_to_pay=fee.balance.to_f+0.to_f %>
+                      <% total_amount = patially_paid_amount + amount_to_pay %>                    
+                      <td>
+                          <%= precision_label(amount_to_pay)+ "  /  " + precision_label(total_amount) %>
+                      </td>
+                      <td>
+                          <%= t('due_on') %>
+                          <%= format_date(collection.due_date.to_date, :format => :short) %>
+                      </td>
+                    <% end %>
+                    <td>
+                        <%= link_to t("#{@invoice_enabled ? 'view_invoice' : 'view_pdf'}"), 
+                          {:action => :fee_structure_pdf, :id => @student.id, 
+                          :id2 => collection.id, :fee_type => fee_type }, 
+                          :target => '_blank' %>
+                    </td>
+                </tr>
+              <% end %>
+            <% end %>
+            <!--
+          < % FedenaPlugin.deliver_registered_hook(:student_profile_fees).each do |mod| %>
+            < %= render :partial=>mod.camelize.constantize.send("student_profile_fees_by_batch_hook"),
+              :locals=>{:student=>@student,:batch=>@batch,:page=>page} %>
+          < % end %>
+            -->
+        </table>
+    </div>    
+
+</div>
+<% unless @student_fees.blank? %>
+  <div class="seprater_div_bottom">
+      <div id="download_links">
+          <%= link_to "#{t('pdf_report')}", {:action => "student_fees_structure_pdf", :id => @student.id, 
+            :id2 => @batch.id},:target => '_blank', :class => "user_button" %>
+          <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+            :csv_report_type => "student_fees_structure", :report_format_type => "csv", 
+            :student_id => @student.id, :batch_id => @batch.id }, :class => "user_button" %>
+      </div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  /*
+   // j("#fees_list").accordion();
+   (function ($) {
+   $.fn.invisible = function () {
+   return this.each(function () {
+   $(this).css("visibility", "hidden");
+   });
+   };
+   $.fn.visible = function () {
+   return this.each(function () {
+   $(this).css("visibility", "visible");
+   });
+   };
+   }(jQuery));
+   function set_paid_count_status() {
+   j(".fees_list_title").each(function (index, value) {
+   accodian_head = j(value);
+   status_span = accodian_head.children()[2];
+   status_cells = accodian_head.next().find(".status_cell");
+   count = 0;
+   status_cells.each(function (index, value) {
+   status_cell = j(value)
+   if (status_cell.data("status") === "unpaid") {
+   count += 1;
+   }
+   });
+   if (count > 0) {
+   message = "<span class='unpaid_count'>" + count.toString() + "</span>";
+   message += " < %= t('unpaid_fees')%>";
+   j(status_span).html(message);
+   j(status_span).addClass("payment_status_active");
+   }
+   // console.log(accodian_head.next().find(".status_cell").length);
+   });
+   }
+   function disable_empty_tab() {
+   j(".fees_list_title").each(function (index, value) {
+   accodian_head = j(value);
+   status_span = accodian_head.children()[2];
+   status_cells = accodian_head.next().find(".status_cell");
+   if (status_cells.length <= 0) {
+   message = "< %= t('no_fees_to_pay') %>";
+   j(status_span).html(message);
+   accodian_head.addClass("ui-state-disabled");
+   // workaround to remove content of first ac
+   accodian_head.removeClass("ui-accordion-header-active");
+   accodian_head.next().hide();
+   // hide others tab if contents are nil
+   if (accodian_head.hasClass("other_fees")) {
+   accodian_head.hide();
+   }
+   // hide down button for inactive tabs
+   icon_span = accodian_head.children()[0];
+   j(icon_span).invisible();
+   }
+   // console.log(accodian_head.next().find(".status_cell").length);
+   });
+   }
+   function set_red_color_for_unpaid_fees() {
+   j(".status_cell").each(function (index, value) {
+   if (j(value).data("status") == "unpaid") {
+   j(value).css("color", "red");
+   }
+   });
+   }
+   j(function () {
+   var icons = {
+   header: "down-arrow-img",
+   activeHeader: "up-arrow-img"
+   };
+   j("#fees_list").accordion({
+   icons: icons,
+   heightStyle: "content",
+   collapsible: true,
+   // workaround to allow multipple tabs open
+   beforeActivate: function (event, ui) {
+   // The accordion believes a panel is being opened
+   if (ui.newHeader[0]) {
+   var currHeader = ui.newHeader;
+   var currContent = currHeader.next('.ui-accordion-content');
+   // The accordion believes a panel is being closed
+   } else {
+   var currHeader = ui.oldHeader;
+   var currContent = currHeader.next('.ui-accordion-content');
+   }
+   // Since we've changed the default behavior, this detects the actual status
+   var isPanelSelected = currHeader.attr('aria-selected') == 'true';
+   
+   // Toggle the panel's header
+   currHeader.toggleClass('ui-corner-all',
+   isPanelSelected).toggleClass('ui-accordion-header-active ui-state-active ui-corner-top',
+   !isPanelSelected).attr('aria-selected', ((!isPanelSelected).toString()));
+   
+   // Toggle the panel's icon
+   currHeader.children('.ui-icon').toggleClass('down-arrow-img',
+   isPanelSelected).toggleClass('up-arrow-img', !isPanelSelected);
+   
+   // Toggle the panel's content
+   currContent.toggleClass('accordion-content-active', !isPanelSelected);
+   if (isPanelSelected) {
+   currContent.slideUp();
+   } else {
+   currContent.slideDown();
+   }
+   
+   return false; // Cancels the default action
+   }
+   });
+   set_paid_count_status();
+   disable_empty_tab();
+   set_red_color_for_unpaid_fees();
+   });
+   */
+</script>

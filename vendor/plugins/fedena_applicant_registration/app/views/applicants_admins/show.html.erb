@@ -1,0 +1,62 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('applicant_regi_label') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to_remote t('registration_courses.add_course'), :url=>add_course_applicants_admins_path, :method=>:get %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('settings'), registration_settings_applicants_admins_path %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('manage_pins'), pin_groups_path %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('preview'), preview_form_applicants_admins_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div class="desc-area">
+    <div class="desc-text"><%= t('applicants_admin_desc_text') %></div>
+    <div class="search-form">
+      <% form_for :search,:url => search_by_registration_applicants_admins_url,:html=>{:method=>:get,:onsubmit=>"return check_input_data();"} do |f| %>
+        <%= submit_tag t('search_text'),:class=>"user_button1" %>
+        <div class="label-field-pair">
+          <div class="text-input-bg">
+            <%= text_field_tag :search,"",:name => "search[registration_no]",:placeholder => "#{t('search_by_name_or_reg_no')}" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div id="courses_list">
+    <%= render :partial=>"courses_list",:locals=>{:enabled_courses=>@enabled_courses,:disabled_courses=>@disabled_courses} %>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+</div>
+
+<script>
+  function check_input_data(){
+    if(j("#search").val() === ""){
+      j('form').unbind('submit');
+      return false;
+    }
+    else {
+      j('form').unbind('submit');
+      return true;
+    }
+  }
+</script>

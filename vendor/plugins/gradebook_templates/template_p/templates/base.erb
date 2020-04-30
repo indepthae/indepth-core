@@ -1,0 +1,274 @@
+<% content_for :head do %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="<%= "#{Rails.root}/vendor/plugins/gradebook_templates/template_p/templates/stylesheets/template_p_style.css" %>">
+<% end %>
+
+<div class="<%= settings[:template_p_theme] %>" >
+
+    <div class="">
+
+        <div class="section">
+            <%= custom_report_header({:school_name=> report.school_details.name, :school_address=> report.school_details.address,:logo1_url=> default_school_logo,:logo2_url=> secondary_logo_url(settings[:template_p_logo]),:school_email_with_website=> report.school_details.email_with_website }) %>
+        </div>
+        <div class="extender_1"></div>        
+        <div class="section_1">
+            Academic Session: <%= report.academic_year %>           
+        </div>
+        <div class="section_2"><%= settings[:template_p_header] %></div>
+        
+        <div class="section tab">
+          <table  primary condensed margin_top_0>
+              <thead>
+                <% report.student.details.each do |details| %>
+                  <tr>
+                    <th class="no_colr"><%= details.first  %></th>
+                    <th class="no_colr">: <%= details.last %></th>
+                  </tr>
+                <% end %>
+              </thead>
+          </table>            
+        </div>
+
+        <% grouped_activity_sets = report.activity_sets.group_by{|r| r.profile_name } %>        
+        
+        <% if report.exam_sets.present? %>
+          <div class="section">
+              <%column_padding = report_column_padding(report)%>
+              <table class="<%=  column_padding %> primary condensed margin_top_0">
+                  <thead>
+                  <th><%= I18n.t('scholastic_areas') %></th>
+                  <% report.term_names.each do |term_name| %>
+                    <th colspan="<%=report.term_section_col_count(term_name) %>"><%= term_name%></th>
+                  <%end%>
+                  <% final_column = report.term_section_col_count %>
+                  <% unless final_column.zero? %>
+                    <th colspan="<%=  final_column %>"></th>
+                  <% end %>
+                  </thead>
+                  <tr class="shaded_bg">
+                      <%= sub_headers(report) %>
+                  </tr>
+
+                  <% if aggregate_enabled? %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects_included_in_total, :level => 0, :grouped_exams=>true}) %>
+                    <%= aggregate_rows %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects_excluded_from_total, :level => 0, :grouped_exams=>true}) %>
+                  <% else %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects, :level => 0, :grouped_exams=>true}) %>
+                  <% end %>
+
+              </table>
+          </div>
+        <% end %>        
+        
+        <div class="section">
+            <% if grouped_activity_sets.present? %>              
+              <% if report.term_names.count == 1 %>
+                <div class="<%= group_report? ? 'twelve' : 'six' %> columns" style="width: 100%;">
+                    <% grouped_activity_sets.each do |key, activity_sets| %>                  
+                      <table class="primary striped condensed">
+                          <thead>
+                          <th style="width:70%"><%= activity_sets.first.name %></th>                      
+                          <th>Grade</th>                      
+                          </thead>
+                          <%activity_sets.first.activities.each_with_index do |activity, index| %>
+                            <tr>
+                                <td><%= activity.name %></td>                            
+                                <% activity_sets.each do |activity_set| %>                            
+                                  <% if activity_set.term_name == display_name_for_activity_exam(activity_sets.first)  %>                            
+                                    <td><%= activity_set.scores[index].grade %></td>
+                                  <% end %>
+                                <%end%>  
+                            </tr>  
+                          <%end%>
+                      </table>
+                    <%end%>
+                </div>
+              <% end %>
+            
+              <% if report.term_names.count >= 2 %>
+                <% grouped_activity_sets.each do |key, activity_sets| %>
+                <% count = activity_sets.count %>                
+                <% if count >= 2 %>
+                  <% d = 'six' %>                  
+                <%else%>
+                  <% d = 'twelve'%>
+                <%end%>
+                <% activity_sets.each do |active| %>
+                  <% if active.term_name ==  report.term_names.last %>                    
+                    <% if count >= 2 %>
+                      <div class="<%= d %>" style="float: right;width: 49%;">
+                    <%else%>
+                      <div class="<%= d %>" style="float: right;width: 100%;">
+                    <%end%>                    
+                  <% else %>
+                    <div class="<%= d %> columns" style="margin-left: 0 !important;">
+                  <% end %>
+                        <table class="primary striped condensed">
+                          <thead>
+                            <th style="width:70%"><%= activity_sets.first.name %></th>                      
+                            <th>Grade</th>                      
+                          </thead>
+                          <%active.activities.each_with_index do |activity, index| %>
+                              <tr>
+                                  <td><%= activity.name %></td>                                  
+                                  <td><%= active.scores[index].grade %></td>                                  
+                                  <%# activity_sets.each do |activity_set| %>                                  
+                                    <%# if activity_set.term_name == display_name_for_activity_exam(activity_sets.first)  %>                            
+                                      <%#*<td><%= activity_set.scores[index].grade %>
+                                    <%# end %>                                    
+                                  <%#end%>  
+                              </tr>  
+                          <%end%>                          
+                        </table>                        
+                  </div>
+                <% end %>
+                 <%end%>                
+              <% end %>
+            <%end%>
+            
+            <div class="six col attend"> 
+              <% if report.attendance_reports.present? %>
+                <table class="primary striped condensed">
+                    <%= attedance_report(:type => 'term_and_consolidated') %> 
+                </table>    
+              <% end %>
+            </div>            
+                        
+            
+            <div class="section remark_div">
+                <div class="padded_space">
+                    <%= report_remarks(report.remarks)  %>
+                </div>            
+            </div>
+
+            <%  if settings[:signature] == "0"%>
+              <div class="section outer_sec">              
+                <% if settings[:sign_right_img].present? or settings[:sign_left_img].present? %>
+                  <div class="margin_top_3">
+                      <div class="four columns left_text">
+                          <div class="bold">
+                              <div class="sign_img img1"></div>                              
+                          </div>
+                      </div>
+                      <div class="four columns center_text img2">
+                          <div class="bold">
+                              <div class="sign_img img3">
+                                  <% if settings[:sign_left_img].present? %>
+                                    <%= wicked_pdf_image_tag settings[:sign_left_img] ,:s3=>true,:style=>:original,:timestamp=>false %>                               
+                                  <% end %>
+                              </div>                              
+                          </div>
+                      </div>
+                      <div class="four columns right_text img4">
+                          <div class="bold">
+                              <div class="sign_img img5">
+                                  <% if settings[:sign_right_img].present? %>
+                                    <%= wicked_pdf_image_tag settings[:sign_right_img] ,:s3=>true,:style=>:original,:timestamp=>false %>                              
+                                  <% end %>
+                              </div>                              
+                          </div>
+                      </div>                      
+                  </div>
+                <% end %>                
+              </div>
+              <div class="bold sig_outer">
+                <% if settings[:template_p_place].present? && settings[:template_p_date].present? %>
+                  <div class="place_date">
+                    <% if settings[:template_p_place].present? %>
+                      <% if !settings[:template_p_date].present? %>
+                        <div class="pl_dt">Place : <%= settings[:template_p_place] %> </div>
+                      <% else %>
+                        <div>Place : <%= settings[:template_p_place] %> </div>
+                      <% end %>
+                    <% end %>
+                    <%if settings[:template_p_date].present? %>
+                      <% if !settings[:template_p_place].present? %>
+                        <div class="pl_dt">Date : <%= settings[:template_p_date] %> </div>
+                      <% else %>
+                        <div>Date : <%= settings[:template_p_date] %> </div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="place_date">
+                    <div>&nbsp;</div>                    
+                  </div>
+                <% end %>
+                  <div class="class_tech">
+                    <div><%= settings[:sign_left_text] %></div> 
+                 </div>
+                 <div class="princi_sig">
+                    <div><%= settings[:sign_right_text] %></div>
+                </div>
+              </div>
+            <% end %>
+            <div class="extender"></div>
+            <div class="instruct">
+                <span>Instructions</span>
+            </div>
+            <% report.grade_scales.each do |grade_scale| %>
+              <div class="instruct_info font_1">            
+                  <span class="bold"><%= grade_scale.name %></span>
+              </div>            
+              <div class="six col">
+                <% if grade_scale.labels.include?"Description" %>
+                  <table align="center" class="pri striped condensed">
+                      <tr>
+                        <td><%=grade_scale.labels.last%></td>
+                        <td><%=grade_scale.labels.first%></td>
+                      </tr>
+                      <% grade_scale.scale.each do |label_name| %>
+                        <tr>
+                          <td> <%= label_name.last %> </td>
+                          <td> <%= label_name.first %> </td>
+                        </tr> 
+                      <%end%>
+                  </table>
+                <% else %>
+                  <table align="center" class="pri striped condensed">                    
+                      <tr>
+                          <td><%=grade_scale.labels.last%></td>
+                          <td><%=grade_scale.labels.first%></td>
+                      </tr>                      
+                      <% grades = grade_scale.scale.sort_by{|a| a.last}.reverse %>                                            
+                      <% grades.each_with_index do |values,i| %>                      
+                        <tr>
+                            <% if i == 0 %>
+                              <td> <%= values.last.to_i %>-<%= 100 %> </td>                          
+                            <% else %>
+                              <% if values.last.to_i == 0.0 %>
+                                <td><%= (grades[-2].last.to_i)-1 %>&nbsp;& Below</td>
+                              <% else %>                                
+                                <td><%= values.last.to_i %>-<%= grades[i-1].last.to_i-1 %></td>                          
+                              <% end %>
+                            <% end %>                            
+                            <td><%= values.first %></td>
+                        </tr>
+                      <%end%>                    
+                  </table>
+                <% end %>
+              </div>
+            <%end%>
+        </div>
+
+        <% if report.student.records.present? %>
+          <div class="section">
+              <%= gradebook_records(report) %>
+          </div>
+        <% end %>
+
+        <div class="section">
+            <% if report.exam_attendance_reports.present? %>
+              <table class="primary striped condensed">
+                  <%= attedance_report(:type => 'full') %> 
+              </table> 
+            <% end %>
+        </div>           
+
+
+
+    </div>
+
+</div>

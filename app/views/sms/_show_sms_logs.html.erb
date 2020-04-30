@@ -1,0 +1,70 @@
+<div class="container_head logs_head">
+</div>
+<div class="content_box">
+    <div class="message_details">
+        <div class="message_content">
+            <%= CGI.unescape @sms_message.body %> 
+        </div>
+        <div class="sent_on_tag">
+            <span class="key_text"><%= t('sent_on') %>:</span> <%= format_date(change_time_to_local_time(@sms_message.created_at), :format=>:long) %>
+        </div>
+        <div class="group_tag">
+            <%if @sms_message.group.present? %>
+              <span class="key_text"><%= @sms_message.group_tag %>: <%= @sms_message.group_value %></span> 
+            <%end%>
+        </div>
+    </div>
+    <div class="recipients_box">
+        <table class="recipient_details" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th><%= t('recipient_details') %></th>
+                <th><%= t('status') %></th>
+                <th></th>
+            </tr>
+
+            <% @sms_logs.each do |log| %>
+              <tbody class="group">
+                  <tr>
+                      <td>
+                          <%= log.user_name if log.user_name.present? %>
+                          <%= log.user.full_name if !log.user_name.present? and log.user.present? %>
+
+                          <span class="recipient_no <%= "remove_user_spacing" if !log.user.present?%>"><%= log.mobile %></span>
+                      </td>
+                      <td><%= log.gateway_response %></td>
+                      <td class="right_text">
+                          <%if log.message.present? %>
+                            <span class="action_link" data-value="<%=log.id%>" ><%= t('show_message') %></span>
+                          <%end%>
+                      </td>
+                  </tr>
+                  <%if log.message.present? %>
+                    <tr id="m_<%= log.id %>" class="recipient_message">
+                        <td colspan="3">
+                            <%= log.message%>
+                        </td>
+                    </tr>
+                  <%end%>
+              </tbody>
+            <%end%>
+        </table>
+    </div>
+</div>
+
+<script>
+  j(".action_link").click(function(){
+    var message_id = "m_"+j(this).data("value");
+    if(j(this).data("state")=="visible")
+      {
+      j("#"+message_id).css("display","none")
+      j(this).data("state","hidden");
+          j(this).html("<%= t('show_message') %>");
+      }
+    else{
+      j("#"+message_id).css("display","table-row")
+      j(this).data("state","visible");
+          j(this).html("<%= t('hide_message') %>");
+      }
+
+  });
+</script>

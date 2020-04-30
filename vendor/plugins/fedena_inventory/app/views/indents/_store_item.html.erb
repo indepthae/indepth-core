@@ -1,0 +1,9 @@
+<%= select '', :store_item_id,
+        @store_items.map {|b| [b.item_name , b.id]},
+        {:prompt => "#{t('select_item')}"},
+        {:onChange => "#{remote_function(:url => {:action => "update_item" },
+        :with => "'item_id='+value+ '&i='+this.id",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')"
+
+        )}"} %>

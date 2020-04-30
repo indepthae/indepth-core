@@ -1,0 +1,22 @@
+<% transport = p.transports.detect{|t| t.academic_year_id == @academic_year_id} %>
+<tr passenger_id="<%= p.id %>" passenger_type="<%= p.class.to_s %>" id="<%= "#{p.class.to_s.underscore}_#{p.id}" %>">
+    <td class="name"><%= "#{p.full_name} - <span>#{(@type == "student" ? p.admission_no : p.employee_number)}</span>" %></td>
+    <td class="status">
+        <% if transport.present? and transport.mode.present? %>
+          <% if transport.mode == 1 or transport.mode == 2 %>
+            <b>Pickup</b> <%= transport.pickup_route.try(:name)||'-' %>: <%= transport.pickup_stop.try(:name)||'-' %><br/>
+          <% end %>
+          <% if transport.mode == 1 or transport.mode == 3 %>
+            <b>Drop</b> <%= transport.drop_route.try(:name)||'-' %>: <%= transport.drop_stop.try(:name)||'-' %>
+          <% end %>
+        <% else %>
+          <i><%= t('not_assigned') %></i>
+        <% end %>
+    </td>
+    <td class="fare"><%= ((transport.present? and transport.mode.present?) ? precision_label(transport.bus_fare) : '-') %></td>
+    <td class="action">
+        <% if transport.present? %>
+          <%= link_to "#{t('remove')}", "#", :class => "remove_link", :passenger_id => transport.id %>
+        <% end %>
+    </td>
+</tr>

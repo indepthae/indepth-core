@@ -1,0 +1,38 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <%= javascript_include_tag :defaults, :cache => 'cache/javascripts/all' %>
+    <%= stylesheet_link_tag 'advance_payment_fees/initialize_advance_payment.css' %>
+    <% if rtl? %>
+      <%= stylesheet_link_tag 'rtl/payment_settings/payment_initialize.css'%>
+    <%else %>
+      <%= stylesheet_link_tag 'payment_settings/payment_initialize.css' %>
+    <% end %>
+</head>
+<body>
+    <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and @enable_online_payment == "true") and @active_gateways.present? %>
+      <div class="pay">
+          <div class="name_info">
+              <table style="width:100%;font-size: 14px;">
+                  <tr><td class="label_name"><%= t('name')%></td><td class="label_sep">:</td><td class="label_info"><%= "#{@student.full_name} - #{@student.admission_no}"%></td></tr>
+                  <tr><td class="label_name"><%= t('amount')%></td><td class="label_sep">:</td><td class="label_info"><b><%= "#{@amount_total}"%></b></td></tr>
+                  <tr><td class="label_name"><%= t('fee_name')%></td><td class="label_sep">:</td><td class="label_info"><%= "Advance Fees"%></td></tr>
+              </table>
+
+          </div>
+
+          <div class="main">
+              <h4 class="select_payment"><%= t('select_payment_gateway')%></h4>
+              <ul class="list_payment">
+                  <% @active_gateways.each_with_index do |g_id, i| %>
+                    <li><% status = (i == 0) ? true : false %>
+                        <%= radio_button :payment,:gateway, g_id, :checked => status,
+                          :onchange => "#{remote_function(:url => {:action => "change_gateway_options"},:with => "'g_id='+value+'&payment_id='+#{@payment_id}+'&id='+#{@student.id}")}", :class=>'select_payment_radio' %>
+                        <label class="select_payment_label"><%= PaymentConfiguration.gateway_name(g_id) %></label></li>
+                  <% end %>
+              </ul>
+          </div>
+          <div id="proceed_button"><%= render "proceed_button" %></div>
+          <%= button_to_function t('cancel'), "history.back()", :class => "user_button cancel_payment_button" %>
+      </div>
+    <% end %>
+</body>

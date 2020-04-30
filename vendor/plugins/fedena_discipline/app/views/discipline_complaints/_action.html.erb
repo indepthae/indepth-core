@@ -1,0 +1,29 @@
+<div id="act<%=action.id%>" >
+  <div class="comment_details">
+    <div class="themed_text commenter">
+      <%=action.user.nil? ? t('deleted user'):action.user.full_name%>
+    </div>
+    <%unless @discipline_complaint.action_taken==true%>
+      <div class="delete-comment">
+        <%=link_to_remote "#{t('delete_text')}",:url=>{:controller=>"discipline_complaints",:action=>"decision_remove",:act_id=>action.id},:confirm => "#{t('delete_confirm_msg')}"%>
+      </div>
+    <%end%>
+    <div class="verdict">
+      <%=action.remarks%>
+    </div>
+    <div class="date">
+      <%= format_date(action.updated_at,:format => :long)%>
+    </div>
+    <div class="action_body">
+      <%=action.body%>
+    </div>
+    <div class="convict_list">
+      <%=t('the_convicts_are')%> :
+      <%action.discipline_student_actions.each do |f|%>
+        <li>  <%=f.discipline_participation.user.full_name+'-'+f.discipline_participation.user.username %></li>
+      <%end%>
+    </div>
+  </div>
+</div>
+
+

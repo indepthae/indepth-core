@@ -1,0 +1,75 @@
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :discipline_complaints_decision, @discipline_complaint %>
+    <%= render_breadcrumbs  %>
+  </div>
+</div>
+
+<%unless (@discipline_complaint.action_taken==true)  %>
+  <%if ((@discipline_complaint.discipline_juries.collect(&:user_id).include?(@current_user.id))||@current_user.admin?)|| (DisciplineComplaint.is_privileged_user(@current_user.id)) %>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%remote_form_for :verdict, :url=>{:controller=>"discipline_complaints", :action=>"decision"},
+      :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)",
+      :loading => "$('loading').show();", :loaded => "$('loading').hide();" do |c| %>
+      <div id="page-yield">
+        <div id="error"></div>
+        <div class="label-field-pair">
+          <label for="discipline_subject"><%= t('verdict') %><span class="necessary-field">*</span> </label>
+          <div class="text-input-bg"><%= c.text_field :remarks,:value=>"" ,:id=>"q"%>
+          </div>
+        </div>
+        <div class="label-field-pair-text-area">
+          <label for="discipline_discription"><%= t('comments') %><span class="necessary-field">*</span> </label>
+          <div class="textarea-input-bg"><%= c.text_area :body,:cols => 30, :rows => 5,:class => 'new_complaint-textarea',:value=>"" ,:id=>"p"%></div>
+        </div>
+        <div class="extender"></div>
+        <div class="convicts">
+          <div class="label-field-pair">
+            <label for="convicted"><%= t('convicted') %><span class="necessary-field">*</span> </label>
+          </div>
+          <div class="convict_scroll">
+            <div class="sel-list">
+              <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+              <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+            </div>
+            <% @convicted.each do |val| %>
+              <div class="each_convict">
+                  <%if val.user.nil?%>
+                    <%= check_box_tag "message_ids[]", val.id ,false,:class=>'batches_box',:id=>"#{t('deleted_user')}"%> <label for="#{'deleted_user'}"><%="#{t('deleted_user')}" %></label>
+                  <%else%>
+                    <%= check_box_tag "message_ids[]", val.id ,false,:class=>'batches_box',:id=>val.user.username%> <label for="<%=val.user.username%>"><%=val.user.full_name+' - '+val.user.username %></label>
+                  <%end%>
+              </div>
+            <% end %>
+          </div>
+        </div></div>
+      <div class="extender"></div>
+
+      <div class="buttons">
+        <div id="page-yield"> <%=submit_tag "► #{t('save')}", :class => "submit_button", :id => "submit_button" %></div>
+        <div class="cancel_button">    <%= link_to"► #{t('close')}",{:controller=>"discipline_complaints",:action=>"decision_close"},:confirm => "#{t('delete_confirm_msg')}" %> </div>
+      </div>
+
+    <%end%>
+  <%end%>
+<%end%>
+<div class="extender"></div>
+<div id="comments_div">
+  <label class="c_head"for="title"><%= t('actions') %>:
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id =>"loading",
+      :style =>"display: none;" ) %>
+  </label>
+
+  <div id="actions">
+    <%= render :partial => 'discipline_complaints/action', :collection => @discipline_complaint.discipline_actions %>
+  </div>
+</div>
+<script type="text/javascript">
+  $('submit_button').disable();                                 //disable submit button after reload
+  setTimeout(function(){$('submit_button').enable();},3000);
+</script>

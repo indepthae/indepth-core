@@ -1,0 +1,20 @@
+if @error.nil?
+	page.replace_html 'form-errors', :text => ''
+  if @from_action == "manage_all"
+    page.replace_html 'student_items', :partial => 'course_record_group_list', :object => @courses_list_paginator
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  else
+    if @rg_remains > 0
+      page.replace_html 'add_button', :partial=>'add_record_group_button'
+    else
+      page.replace_html 'add_button', :text => ""
+    end
+    page.replace_html 'rg_priority', :partial => 'rg_prioritizer', :object => @course
+    page.replace_html 'student_items', :partial => 'record_groups_for_course', :object => {@courses_list,@courses_list_paginator}
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  end
+  page << "Modalbox.hide();"
+else
+	page.replace_html 'form-errors', :partial => 'errors', :object => @record_assignment
+  page.visual_effect(:highlight, 'form-errors')
+end

@@ -1,0 +1,20 @@
+<div class="fields">
+    <div class="label-field-pair2">
+      <label for="document_name"><%= t('document_name') %></label>
+      <div class="text-input-bg"><%= text_field_tag "document_attributes[#{k}][name]", value = v[:name] %></div>
+    </div>
+    <div class="label-field-pair2">
+      <label for="document_file" class="custom_width"><%= t('document_file') %></label>
+      <div class="text-input-bg">
+        <%#= paperclip_file_field_tag "document_attributes[#{Time.now.to_i}][attachment]",:attachment,
+          :size=> 12,:onchange => "update_name(this)",
+          :direct=>false,:object => @document %>
+        <%= paperclip_file_field_tag "document_attributes[#{k}]",:attachment,
+          :size=> 12, :onchange => "update_name(this)",
+          :direct=>false,:object => @document %>
+      </div>
+    </div>
+    <%= link_to_remove_additional_fields " ","document_attributes[#{k}]" %>
+    <%= hidden_field_tag "document_attributes[#{k}][user_id]",@current_user.id %>
+  <div class="extender"></div>
+</div>

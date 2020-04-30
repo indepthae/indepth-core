@@ -1,0 +1,18 @@
+<% @subject = (defined? subject) ? subject : @subject %>
+<td class="subject-col-1"> <%= @subject.name %> </td>
+<td class="subject-col-2"> <%= @subject.employees.map{|x| x.full_name.strip }.join(', ') %> </td>
+<td class="subject-col-3">
+
+  <% if @subject.employees.present? %>
+    <%= link_to_remote t('manage'),
+      :url => {:controller => "timetable", :action => 'load_manage_subject', :id => @subject, :request => 1 },
+      :html => {:class => "themed_hover_text"}, :before => "process_request(#{@subject.id},'before')",
+      :success => "process_request(#{@subject.id},'success')" %>
+  <% else %>
+    <%= link_to_remote t('assign'),
+      :url => {:controller => "timetable", :action => 'load_manage_subject', :id => @subject, :request => 2 },
+      :html => {:class => "themed_hover_text"}, :before => "process_request(#{@subject.id},'before')",
+      :success => "process_request(#{@subject.id},'success')" %>
+  <% end %>
+  <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "subject-employees-#{@subject.id}", :style =>"display: none;" ) %>
+</td>

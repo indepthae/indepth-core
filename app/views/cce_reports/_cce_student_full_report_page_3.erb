@@ -1,0 +1,285 @@
+<div class="third_page_full_div">
+  <h2>Scheme of Studies</h2>
+  <div id="part_1_div">
+    <div id="part_1">
+      <p class="part_headding sub_small_head">Part-1 : Academic Performance : Scholastic Areas :</p>
+      <ol start="1">
+        <li>
+          <p><span class="bullet">(a)</span><span class="tittle">Scheme of Studies</span> -
+            A Candidate is required to study :<br/>
+            Language I : English or Hindi, <br/>
+            Language II (any language other than Language I), Mathematics, Science and Social Science.<br/>
+            <span class="tittle">Additional Subject (Optional) </span>:
+            Any Language other than language I/II, Commerce, Painting, Music, Home Science and Foundation of Information Technology.
+          </p>
+          <p><span class="bullet">(b)</span>Candidate with Learning Disabilities may offer :<br/>
+            English or Hindi and any four out of - Mathematics, Science, Social Science, other one/two language(s), Commerce, Painting, Music, Home Science and Foundation of Information Technology.
+          </p>
+          <%if @batch.asl_subject.present?%>
+            <p><span class="bullet">(c)</span>In English language, candidates are assessed in Assessment of<br/>
+              Speaking and Listening Skills(ASL) under SA1 and SA2 for 20 marks. <span class="dark_bold">Grade indicated separately against '*'.</span>
+            </p>
+            <p><span class="bullet">(d)</span>Open Text Based Assessment (OTBA) in English, Hindi,<br/>Mathematics, Science and Social Science in Summative<br/>Assessment II consists of 10 marks.</p>
+          <%end%>
+        </li>
+        <li>
+          <p style="margin-left: 0px">Each academic year has been divided into two terms :<br/>
+            First Term  : FA1(10%)+FA2(10%)+SA1(30%)=50%<br/>
+            Second Term : FA3(10%)+FA4(10%)+SA2(30%)=50%
+          </p>
+          <div class="packer">
+            <div class="left_div">
+              <label>FA-Formative Assessment<span> : </span></label>
+            </div>
+            <div class="right_div">
+              <label>School based internal assessment.</label>
+            </div>
+          </div>
+          <div class="packer">
+            <div class="left_div">
+              <label>SA-Summative Assessment<span> : </span></label>
+            </div>
+            <div class="right_div">
+              <label>Question papers and making scheme supplied by the Board and assessment carried out by the School.</label>
+            </div>
+          </div>
+          <%if @batch.asl_subject.present?%>
+            <div class="packer">
+              <div class="left_div addl_width">
+                <label>Problem Solving Assessment (PSA) score has been reflected towards FA4 in one language (English or Hindi), Mathematics, Science and Social Science.</label>
+              </div>
+            </div>
+          <%end%>
+        </li>
+        <li>
+          <%if @batch.asl_subject.present?%>
+            <p> <span class="bullet">(a)</span>It is mandatory to obtain atleast 25% marks in the Summative Assessments (both SA1 and SA2 taken together). <span class="dark_bold">Those obtaining less than 25% marks in a subject in SA1+SA2 shall not qualify that subject.</span> </p>
+            <p> <span class="bullet">(b)</span>To qualify in a subject, a candidate must obtain minimum of Grade D.</p>
+            <p> <span class="bullet">(c)</span>Those  candidates  who have  obtained Grade E1 or E2 in the subject(s) shall have to improve their performance within one month from the declaration of result to qualify in the subject(s).</p>
+          <%else%>
+            <p> <span class="bullet">(a)</span>To qualify in a subject, a candidate must obtain minimum of Grade D.</p>
+            <p> <span class="bullet">(b)</span>Those  candidates  who have  obtained Grade E1 or E2 in the subject(s) shall have to improve their performance within one month from the declaration of result to qualify in the subject(s).</p>
+          <%end%>
+        </li>
+        <li>
+          <p style="margin-left: 0px">In respect of candidates offering an additional subject, the following norms shall apply :</p>
+          <p style="margin-left: 0px">A language  offered as an additional subject may replace a language in the event of a candidate not qualifying in the same, provided, after replacement the candidate has English or Hindi as one of the languages.</p>
+        </li>
+        <li>
+          <p style="margin-left: 0px">A candidate must obtain minimum of Grade D in all the subjects excluding the additional subject as per Scheme of Studies for admission in Class X. </p>
+        </li>
+      </ol>
+    </div>
+
+    <div id="part_2">
+      <p class="part_headding sub_small_head">Part-2 : Co-Scholastic Areas :</p>
+      <ol start="2">
+        <li>
+          <%if @batch.asl_subject.present?%>
+            <p> <span class="bullet dark_bold">(A)</span><span class="tittle">Life Skills :</span><br/></p>
+            <div class="packer">
+              <div class="left_div">
+                <label>Thinking Skills<span>:</span></label>
+              </div>
+              <div class="right_div">
+                <label> Self Awareness, Problem Solving, Decision Making, Critical and Creative Thinking</label>
+              </div>
+            </div>
+            <div class="packer">
+              <div class="left_div">
+                <label>Social Skills<span> :</span></label>
+              </div>
+              <div class="right_div">
+                <label>Interpersonal Relationships, Effective Communication and Empathy </label>
+              </div>
+            </div>
+            <div class="packer">
+              <div class="left_div">
+                <label>Emotional Skills<span> :</span></label>
+              </div>
+              <div class="right_div">
+                <label>Managing Emotions and Dealing with Stress</label>
+              </div>
+            </div>
+          <%else%>
+            <p> <span class="bullet dark_bold">(A)</span><span class="tittle">Life Skills :</span><br/>Self Awareness, Problem Solving, Decision Making, Critical Thinking, Creative Thinking, Interpersonal Relationships, Effective Communication, Empathy, Managing Emotions, Dealing with Stress.</p>
+          <%end%>
+          <p> <span class="bullet dark_bold">(B)</span><span class="tittle">Work Education :</span><br/>Cookery Skills,Preparation of Stationery Items, Tying and Dyeing, Screen Printing, Recycling of Paper, Hand Embroidery, Running a Book Bank, Repair and Maintenance of Domestic Electrical Gadgets, Computer Operation and Maintenance, Photography etc.</p>
+          <p> <span class="bullet dark_bold">(C)</span><span class="tittle">Visual and Performing Arts :</span><br/>Music (Vocal, Instrumental), Dance, Drama, Painting, Craft, Sculpture, Puppetry, Folk Art Forms etc.</p>
+          <p> <span class="bullet dark_bold">(D)</span><span class="tittle">Attitude and Values towards :</span><br/>Teachers, School-mates, School Programmes and Environment and Values Systems</p>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div id="part_2_div">
+    <div id="part_3">
+      <p class="part_headding sub_small_head">Part-3 : Co-Scholastic Activities :</p>
+      <ol start="3">
+        <li>
+          <p> <span class="bullet">(A)</span><span class="tittle">Suggestive activities (Any two to be assessed)</span><br/>
+
+          <ol start="1" class="sub_ol">
+            <li><p><span class="short_title">Literary and Creative Skills :</span>
+                Debate, Declamation, Creative Writing, Recitation, Essay Writing, Poster-Making, Slogan writing etc.</p>
+            </li>
+            <li><p><span class="short_title">Scientific Skills :</span>
+                Science Club, Projects, Math Club, Science Quiz, Science Exhibition, Olympiads etc.</p>
+            </li>
+            <li><p><span class="short_title">Information and Communication :</span>
+                PowerPoint Presentation, Website and Cover Page Designing, Communication, Animation, Technology (ICT) Programming, E-Books etc.</p>
+            </li>
+            <li><p><span class="short_title">Organizational and  Leadership Skills(Clubs) :</span>
+                Eco Club, Health and Wellness Club, Disaster Management Leadership Skills Club, AEP and Other Clubs.</p>
+            </li>
+          </ol>
+          </p>
+        </li>
+      </ol>
+      <ol start="3">
+        <li>  <p> <span class="bullet">(B)</span><span class="tittle">Health and physical Activities (Any two to be assessed) :</span><br/></p>
+          <div class="packer">
+            <div class="left_div">
+              <ol start="1">
+                <li value="1"> Sports/Indigenous Sport<br/>(Kho-Kho etc.)</li>
+              </ol>
+            </div>
+            <div class="right_div">
+              <ol start="2">
+                <li> NCC/NSS<br/></li>
+              </ol>
+            </div>
+          </div>
+          <div class="packer">
+            <div class="left_div">
+              <ol start="1">
+                <li value="3"> Scouting and Guiding</li>
+              </ol>
+            </div>
+            <div class="right_div">
+              <ol start="2">
+                <li value="4"> Swimming</li>
+              </ol>
+            </div>
+          </div>
+          <div class="packer">
+            <div class="left_div">
+              <ol start="1">
+                <li value="5"> Gymnastics</li>
+              </ol>
+            </div>
+            <div class="right_div">
+              <ol start="2">
+                <li value="6"> Yoga</li>
+              </ol>
+            </div>
+          </div>
+          <div class="packer">
+            <div class="left_div">
+              <ol start="1">
+                <li value="7"> First Aid</li>
+              </ol>
+            </div>
+            <div class="right_div">
+              <ol start="2">
+                <li value="8"> Gardening / Shramdaan</li>
+              </ol>
+            </div>
+          </div>
+          <div class="packer">
+            <div class="left_div">
+              <ol start="1">
+                <li value="9">Martial Arts</li>
+              </ol>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <%unless (@settings.delete_if { |key, value| value.blank? }.count < 4) or @batch.asl_subject.nil? %>
+      <div id="part_upscale" class="seperate_div">
+        <p class="part_headding margin" >4. <span class="normal_text">Overall performance of the candidate is based on the achievements in the Scholastic Areas as well as Co-Scholastic Areas and Co-Scholastic Activities as follows :</span></p>
+        <ul>
+          <li>
+            Under Scholastic Areas, Grades have been upgraded to the next higher grade in one or two subjects as per the total Grade Points achieved under Co-Scholastic Areas 2(A), 2(B), 2(C), 2(D) and Co-Scholastic Activities 3(A), 3(B) as given below :
+            <div class="packer">
+              <div class="left_div">
+                <ul>
+                  <li><%=@settings[:two_sub_upscale_start]%> to <%=@settings[:two_sub_upscale_end]%></li>
+                </ul>
+              </div>
+              <div class="right_div">
+                Grades in two subjects of Scholastic area are upgraded.
+              </div>
+            </div>
+            <div class="packer">
+              <div class="left_div">
+                <ul>
+                  <li><%=@settings[:one_sub_upscale_start]%> to <%=@settings[:one_sub_upscale_end]%></li>
+                </ul>
+              </div>
+              <div class="right_div">
+                Grade in one subject of Scholastic area is upgraded.
+              </div>
+            </div>
+            <div class="packer">
+              <div class="left_div">
+                <ul>
+                  <li><%=@settings[:one_sub_upscale_start].to_i - 1%> and below</li>
+                </ul>
+              </div>
+              <div class="right_div">
+                No up-gradation of Grades in subjects of Scholastic areas.
+              </div>
+            </div>
+          </li>
+          <li>Up-gradation has been done from lower Grade to higher Grade. However, Grade E2 is not to be upgraded.</li>
+          <li>No Grade in the subjects of Scholastic areas has been upgraded twice.</li>
+          <li>The upgraded Grade has been shown with <span class="dark_bold">'**'</span>.</li>
+          <li>If mandatory 25% marks have <span class="dark_bold">NOT</span> been obtained in the Summative Assessments in the subject, Grade E1 or E2 <span class="dark_bold">NOT</span> to be upgraded.</li>
+        </ul>
+      </div>
+    <%end%>
+    <div id="part_4"  class="separate_div">
+      <p class="part_simple_headding sub_small_head">Grading System</p>
+      <p class="sub_small_head">Scholastic Areas (Grading on 9 point scale)</p>
+      <table class="grading_level">
+        <tr>
+          <td> Mark Range</td>
+          <td> Grade </td>
+          <td>Grade Point</td>
+        </tr>
+        <% m = nil %>
+        <%@grading_levels.each do |g|%>
+          <tr>
+            <td><%= g.min_score %> - <%= m.present? ? (m-1) : 100  %> <% m = g.min_score %></td>
+            <td><%=g.name%></td>
+            <td><%=g.credit_points%></td>
+          </tr>
+        <%end%>
+      </table>
+      <p class="sub_small_head">Co-scholastic Areas /Activities (Grading on 5 point scale)</p>
+      <%@grade_sets.each do |g_set|%>
+        <p class="grade_type_head"><%=g_set.name%></p>
+        <table class="grading_level">
+          <tr>
+            <td>Grade</td>
+            <td> Grade Point Range </td>
+            <td>Grade  Point</td>
+          </tr>
+          <%s=nil%>
+          <%g_set.cce_grades.sorted_grade_points.each do |g|%>
+            <tr>
+              <td><%=g.name%></td>
+              <%unless g.grade_point==0%>
+                <td><%=g.grade_point-0.9%>-<%= g.grade_point %></td>
+              <%else%>
+                <td>0</td>
+              <%end%>
+              <td><%= g.grade_point %></td>
+            </tr>
+          <%end%>
+        </table>
+      <%end%>
+    </div>
+  </div>
+</div>

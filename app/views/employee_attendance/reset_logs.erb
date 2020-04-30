@@ -1,0 +1,30 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_attendance') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('leave_reset_records').titleize %></div>
+  <% config = leave_reset_configuration %>
+  <% if config == "0"  %>
+  <% unless @leave_types.zero?  %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('reset_leaves')}", :controller=>"employee_attendance", :action=>"reset_leaves" %></li>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('leave_reset_settings')}", :controller=>"employee_attendance", :action=>"settings" %></li>
+      </ul>
+    </div>
+  <% end %>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h4><%= t('leave_reset_records') %></h4>
+
+  <div class="description"><%= t('leave_reset_log_description') %></div>
+
+  <div id="list"><%= render :partial => 'reset_logs'%></div>
+</div>

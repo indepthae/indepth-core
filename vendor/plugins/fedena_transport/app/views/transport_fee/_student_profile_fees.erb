@@ -1,0 +1,63 @@
+<% transport_fees_list = student.transport_fees_by_batch(batch.try(:id),order="transport_fees.is_paid ASC , tfc.due_date ASC") %>
+<% unless transport_fees_list.empty? %>
+  <tr class="table_subtitle">
+      <td colspan="4"><%= t('transport_fees') %></td>
+  </tr>
+  <% transport_fees_list.each do |fee| %>
+    <%# fee= TransportFee.find_by_transport_fee_collection_id_and_receiver_id(d.id, student.id) %>
+    <% collection= fee.transport_fee_collection %>
+    <% discount = fee.total_discount_amount %>
+    <% auto_fine_amount = fee.auto_fine_amount(collection,discount,fee) %>
+    <tr class="item">
+        <td>
+            <% if page == :report && (permitted_to? :fees_student_dates, :transport_fee) %>
+              <%= link_to "#{fee.name}", {:controller => :transport_fee, :action => :fees_student_dates, :id => @student.id, :collection_id => collection.id}, :class => "themed_hover_text", :target => :_blank %>
+            <% elsif permitted_to? :student_profile_fee_details, :transport_fee %>
+              <%= link_to collection.name, {:controller => :transport_fee, :action => :student_profile_fee_details, :id => student.id,:student_type => student.class.name, :id2 => collection.id}, :class => "themed_hover_text" %>
+            <% else %>
+              <%= collection.name %>
+            <% end %>
+        </td>
+        <% if fee.is_paid %>
+          <td class="status_cell" data-status="paid">
+              <%= t('paid') %>
+          </td>
+          <td>
+              <% paid_amount =  fee.bus_fare.to_f - discount.to_f + fee.fine_amount.to_f %>  
+              <% paid_amount +=  fee.tax_amount.to_f if fee.tax_enabled? %>  
+              <%= precision_label(paid_amount) %>
+          </td>
+          <td>
+              <%= t('paid_on') %>
+              <%= format_date(fee.finance_transactions.last.transaction_date) %>
+          </td>
+        <% else %>
+          <% partially_paid_amount = 0.0 %>
+          <% if fee.finance_transactions.present? %>
+          <%  partially_paid_amount = fee.finance_transactions.sum(:amount) %>
+          <% end %>
+          <%# partially_paid_amount = fee.bus_fare.to_f - fee.balance.to_f - discount.to_f%>
+          <% amount_to_pay = precision_label(fee.balance.to_f).to_f+ precision_label(auto_fine_amount .to_f).to_f%>
+          <% total_amount = fee.bus_fare.to_f - discount.to_f + fee.fine_amount.to_f + auto_fine_amount.to_f %>
+          <% if fee.tax_enabled? %>
+            <% total_amount +=  fee.tax_amount.to_f %>  
+          <% end %>
+          <td class="status_cell" data-status="unpaid" data-amount-to-pay="<%= amount_to_pay %>" data-partialy-paid-amount="<%= partially_paid_amount %>">
+              <%= t('unpaid') %>
+          </td>
+          <td>
+              <%= precision_label(amount_to_pay)+ "  /  " + precision_label(total_amount) %>
+          </td>
+          <td>
+              <%= t('due_on') %>
+              <%= format_date(collection.due_date) %>
+          </td>
+        <% end %>
+      <% end %>
+  </tr>
+<% end %>
+
+
+
+
+

@@ -1,0 +1,18 @@
+ActsAsMultiSchool
+=================
+
+Plugin to introduce school wise tenancy to fedena
+
+Setup
+=====
+Placing this in a configuration in an initializer would require current school to be set 
+```
+MultiSchool.setup_multi_school_for_models([Student])
+```
+
+To set school id , 
+```
+MultiSchool.current_school = School.first
+```
+
+Copyright (c) 2012 [name of plugin creator], released under the MIT license

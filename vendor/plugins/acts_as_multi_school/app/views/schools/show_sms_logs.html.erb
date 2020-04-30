@@ -1,0 +1,27 @@
+<h1><%= @school.name %></h1>
+<div class='well'>
+  <table class="table table-bordered table-striped">
+    <thead>
+    <th>SMS Message Log for - <%= CGI.unescape(@sms_message.body) %></th>
+    </thead>
+    <tr>
+      <th>Mobile</th><th>Gateway Response</th><th>Sent at</th>
+    </tr>
+    <% @sms_logs.each do |log| %>
+      <tr>
+        <td>
+          <%= log.mobile %>
+        </td>
+        <td>
+          <%= log.gateway_response %>
+        </td>
+        <td>
+          <%= log.created_at.strftime("%A, %d. %B %Y, %H:%M") %> <br/>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+
+  <%= will_paginate @sms_logs %>
+
+</div>

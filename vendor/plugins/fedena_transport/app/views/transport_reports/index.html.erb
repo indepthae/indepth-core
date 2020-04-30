@@ -1,0 +1,44 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('reports_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_report_center') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to t(:transport_allocation_report), {:action => :report, :type => 'transport_allocation_report'} %></div>
+            <div class="link-descr"><%= t(:transport_allocation_report_desc) %></div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to t(:route_wise_transport_allocation_report) , {:action => :report, :type => 'route_wise_report'} %></div>
+            <div class="link-descr"><%= t(:route_wise_transport_allocation_report_desc) %></div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to t(:route_details_report) , {:action => :report, :type => 'route_details_report'} %></div>
+            <div class="link-descr"><%= t(:route_details_report_desc) %></div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to t(:transport_fee_report) , {:action => :report, :type => 'transport_fee_report'} %></div>
+            <div class="link-descr"><%= t(:transport_fee_report_desc) %></div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to t(:transport_attendance_report) , {:action => :report, :type => 'transport_attendance_report'} %></div>
+            <div class="link-descr"><%= t(:transport_attendance_report_desc) %></div>
+        </div>
+    </div>
+
+</div>

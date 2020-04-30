@@ -1,0 +1,10 @@
+<% if @filters_text.present? %>
+  <div class ="filter_values filters filter_values_sec" id="<%= @base_template.name %>_filter_values">
+    <% @filters_text.each do |key, value| %>
+      <div class="filter_result">
+        <label><%= t("#{key.to_s}_text") %> :</label>
+        <div class="text_value"><%= value %></div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

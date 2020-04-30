@@ -1,0 +1,28 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('subject_group') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <div class="edit_field"><td><%= link_to_remote t('create_subject_group'), :url => {:action => 'new_subject_group'}, :method => :get %></div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="list_box">
+        <%= render :partial => 'subject_groups_list' %>
+    </div>
+    <div class="extender"></div>
+</div>
+

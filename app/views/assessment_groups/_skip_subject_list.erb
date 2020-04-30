@@ -1,0 +1,52 @@
+<% osm = g.object.override_assessment_marks  %>
+<div class="empty_subject_list">
+    <div class="select_subject_desc"><%= t('select_subjects_have_diff_marks') %></div>
+    <div class="select_subject_link">
+        <%= link_to  t('select_subject').titleize, '#', :onclick => "return MakeSubjectListBox();" %>
+    </div>
+</div>
+
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id='subject_show_list' style="display: <%= osm.present? ? 'table' : 'none' %>">
+    <tr class="tr-head">
+        <td class="col4"><%= t('subject_name').titleize %></td>
+        <td class="col5"><%= t('subject_code') %></td>
+        <td class="col4"><%= t('course') %></td>
+        <td class="col5"><%= t('max_exam_marks') %></td>
+    </tr>
+    <% i = 0 %>
+    <% g.fields_for :override_assessment_marks do |builder| %>
+      <tr>
+          <td><%= builder.object.subject_name %></td>
+          <td><%= builder.object.subject_code %></td>
+          <td><%= builder.object.course.course_name %></td>
+          <td class="<%=i%>">
+            <% class_name = "subject_#{builder.object.subject_code}_#{builder.object.course_id}".gsub(/[^\w]/, '_') %>
+            <%= builder.text_field :maximum_marks, :class=> class_name %>
+            <%= builder.hidden_field :subject_name, :class=> class_name %>
+            <%= builder.hidden_field :subject_code, :class=> class_name %>
+            <%= builder.hidden_field :course_id, :class=> class_name %>
+          </td>
+      </tr>
+      <% i = i + 1 %>
+    <% end %>
+</table>
+
+<script type="text/javascript">
+    var $subject_list = new Array();
+    
+    MakeSubjectListBox = function () {
+      remove_popup_box();
+      options = {'title': '<%= t('select_subjects_to_override') %>'};
+      build_modal_box(options);
+      j('#popup_window').addClass('subject_list_popup');
+      j('#popup_content').html("<%=escape_javascript(render :partial => "course_subject_list", :locals => {:g=>g, :osm => osm})%>")
+      j('.select_subject').each(function(){
+        if (j.inArray(j(this).attr('data_id'), $subject_list) !== -1){
+          j(this).prop('checked',true);
+        }
+      })
+      j('#subject_count').html(j('.select_subject:checked').length)
+      j('#popup_footer').remove();
+      j('#popup_box_overlay').click(remove_popup_box);
+    }
+</script>

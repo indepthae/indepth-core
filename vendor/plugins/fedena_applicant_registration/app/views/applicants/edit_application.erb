@@ -1,0 +1,62 @@
+<% content_for :head do %>
+  <%#= javascript_include_tag "applicant_registration" %>
+  <%= javascript_include_tag "jquery-form" %>
+  <%= stylesheet_link_tag 'jquery-ui_1.css' %>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant')%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit_application') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :applicants_admins_edit_applicant ,@applicant%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= render :partial=>"edit_form" %>
+</div>
+
+<script>
+
+  function toggle_relation_box(th_is) {
+      if (j(th_is).val() === "other") {
+          var attr_name = j(th_is).attr("name")
+          var attr_id = j(th_is).attr("id")
+          j(th_is).parent().parent().find(".parent-relation").html('<div class="text-input-bg"><input id=' + attr_id + ' type="text" value="" size="30" name=' + attr_name + '></div>');
+          j(th_is).attr("name", j(th_is).attr("name").replace("[relation]", "[relation_type]"));
+      }
+      else {
+          j(th_is).attr("name", j(th_is).attr("name").replace("[relation_type]", "[relation]"));
+          j(th_is).parent().parent().find(".parent-relation").html('');
+      }
+  }
+  function select_all_fields(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().find(".active_batch_list").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".active_batch_list").prop('checked', false);
+      }
+  }
+
+  function toggle_field_selector(th_is) {
+      var unchecked_box = j(th_is).parent().parent().find(".active_batch_list:checkbox:not(:checked)").length;
+      if (unchecked_box === 0) {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', false);
+      }
+  }
+  
+  function delete_attachment(th_is) {
+    j(th_is).parent().find(".delete-attachment-field").val(true);
+    j(th_is).parent().find(".prev-attachment").remove();
+    j(th_is).remove();
+  }
+
+</script>

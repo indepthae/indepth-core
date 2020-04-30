@@ -1,0 +1,334 @@
+@page {
+    size: A5 landscape;
+    margin-left: 12mm ;
+    margin-right: 12mm;
+    margin-top: 5mm;
+    margin-bottom: 12mm;
+    height: 145mm;
+}
+
+html {
+}
+
+body {
+    /* A5 dimensions */
+    /*width: 210mm;
+    height: 148.5mm;*/
+    min-width: 175mm;
+    font-size: 12px;
+    margin: 0px;
+    font-family: arial !important;
+    /*font-size: 13px;*/
+}
+
+.receipt-container {
+    /*border-width: 1px;*/
+    /*border-style: solid;*/
+    /* A5 dimensions */
+    /*height: 145mm;*/
+    /*width: 185mm;*/
+    /*height: 142.5mm;*/
+    /*min-height: 142.5mm;*/
+    /*height: 400px;  /* temp */
+    page-break-inside: avoid;
+    page-break-after: always;
+    width: -moz-available;
+    width: -webkit-fill-available;
+}
+
+/*.receipt-header {
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}*/
+.institution_header {
+    width: 550px;
+    margin: 10px;
+    margin-top: 0px;
+    float: right;
+}
+
+.institution_name {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 0px;
+}
+
+.institution_address {
+    font-size: 11px;
+}
+
+.top {
+    /*margin-left: 10px;*/
+    font-size: 13px;
+}
+
+.top span {
+    width: 33%;
+    float: left;
+}
+
+.top .title {
+    font-size: 13px;
+    padding-left: 4px;
+    /*font-weight: bold;*/
+}
+
+.top .receipt_no {
+    text-align: center;
+}
+
+.top .date {
+    text-align: right;
+
+}
+
+.receipt-details-list {
+    float: left;
+    /*width: 350px;*/
+    margin-left: 10px;
+}
+
+.receipt-details-list:last-child {
+    float: right;
+    margin-right: 10px;
+}
+
+.receipt-details-list-item {
+    clear: both;
+    height: 20px;
+
+}
+
+.receipt-details-list-item .left {
+    float: left;
+    width: 100px;
+
+}
+
+.receipt-details-list-item .right {
+    float: left;
+}
+
+section.particulars-header {
+    padding-left: 10px;
+    padding-right: 10px;
+    /*margin-left: 10px;
+    margin-right: 10px;*/
+    /*font-weight: bold;*/
+    font-size: 13px;
+}
+
+.particulars-header-left {
+    float: left;
+}
+
+.particulars-header-right {
+    float: right;
+}
+
+.particulars-item {
+    margin-left: 10px;
+    /*margin-right: 10px;*/
+    /*clear: both;*/
+    float: left;
+    width: 97%;
+    /*width: 712px;*/
+    /*margin-left: 5px;*/
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.particulars-item-left {
+    float: left;
+}
+
+.particulars-item-right {
+    float: right;
+    text-align: right;
+}
+
+.payment-mode {
+
+}
+
+.payment-mode div {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+.summary {
+
+}
+
+.summary .left, .summary .right {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.summary .right .row span {
+    float: right;
+    margin-left: 10px;
+}
+
+section {
+    border: 1px solid #333;
+    /*border-bottom:1px solid #333;*/
+    border-collapse: collapse;
+    clear: both;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    overflow: auto;
+    margin-top: -1px; /* workaround for border collapse*/
+    margin-bottom: -1px; /* workaround for border collapse*/
+}
+
+/*Particular wise*/
+.particular_wise_item {
+    page-break-inside: avoid;
+
+}
+
+.particular_wise_item .particular_name {
+    /*font-weight: bold;*/
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 350px;
+}
+
+.particular_wise_item .particular_wise_item_details_list {
+    float: left;
+    width: 334px;
+}
+
+.particular_wise_item .particular_wise_item_details {
+    font-weight: normal;
+    float: right;
+    width: 100%;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 14px;
+}
+
+.particular_wise_item_details .left {
+    width: 70%;
+    text-align: right;
+
+}
+
+.particular_wise_item_details .right {
+    width: 30%;
+    text-align: right;
+}
+
+.right .row {
+    /*height: 20px;*/
+}
+
+.receipt-footer {
+    margin: 5px;
+    margin-left: 10px;
+}
+
+.summary {
+    page-break-inside: avoid;
+    /*border: 0px;*/
+}
+
+.dont-break .summary {
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.payment-mode {
+    border-bottom-width: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.dont-break {
+    page-break-inside: avoid;
+}
+
+.words_bottom {
+    font-weight: bold;
+}
+
+.amount_margin {
+    margin-right: 12px;
+    font-weight: lighter;
+}
+
+.pdf-footer-second {
+    /*float: right;*/
+    border: none !important;
+}
+
+.note_part {
+    width: 70%;
+    margin: 0 auto !important;
+    font-size: 11px;
+}
+
+.signature_part {
+    width: 20%;
+    float: right;
+    margin-top: 40px;
+    font-size: 13px;
+}
+
+.dont-break {
+    border: 1px solid #333;
+}
+
+.border-fix {
+    border-right: none;
+    border-left: none;
+}
+
+.logo {
+    width: 66px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 2px;
+    padding-bottom: 5px;
+    /*display: none;*/
+}
+
+.logo img {
+    width: 100%;
+    display: block
+}
+
+.none {
+    width: 98% !important;
+    padding-right: 4px;
+    padding-left: 4px;
+}
+
+.block {
+    margin-right: 30px;
+    margin-left: 0px;
+}
+
+.amount_span {
+    margin: 0 auto;
+    font-weight: bold;
+}
+
+.no-top-border {
+    border-top: 0px;
+}
+
+.no_bold {
+    font-weight: normal !important;
+}

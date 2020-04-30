@@ -1,0 +1,52 @@
+<div class="extender"></div>
+<div id="information">
+  <% unless @instant_fee_particulars.blank? %>
+
+      <% col_2 = @tax_enabled ? 'col-2-2' : 'col-2' %>
+
+      <table class="sortable" id="listing" width="100%">
+        <tr class="tr-head">
+          <th class="col-sl"><%= t('sl_no') %></th>
+          <th class="<%= col_2 %>"><%= t('particular_name') %></th>
+          <th class="<%= col_2 %>"><%= t('master') %></td>
+          <th class="<%= col_2 %>"><%= t('description') %></th>
+          <th class="<%= col_2 %>"><%= t('amount') %></th>
+          <% if @tax_enabled %>
+              <th class="<%= col_2 %>"><%= t('tax_slab_text') %></th>
+          <% end %>
+          <th class="options"><%= t('select') %></th>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <% @instant_fee_particulars.each_with_index do |particular, index| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="col-sl"><%= index +=1 %></td>
+              <td class="<%= col_2 %>"><%= particular.name %></td>
+              <td class="<%= col_2 %>">
+                <%= particular.master_fee_particular.try(:name) || '-' %>
+              </td>
+              <td class="<%= col_2 %>"><%= particular.description %></td>
+              <td class="<%= col_2 %>">
+                <%= precision_label(particular.amount) %>
+              </td>
+              <% if @tax_enabled %>
+                  <% tax_slab = particular.tax_slabs.try(:last) %>
+                  <td class="<%= col_2 %>"><%= tax_slab.present? ? tax_slab.name : '-' %></td>
+              <% end %>
+              <td class="options">
+                <%= link_to_remote "#{t('edit_text')}", :url => {:controller => "instant_fees",
+                                                                 :action => "edit_particular", :id => particular.id} %>
+                <% if @tax_enabled %>
+                    <%= link_to_remote "#{t('change_tax_slab_text')}", :url => {:controller => "instant_fees",
+                                                                                :action => "edit_particular_slab", :id => particular.id} %>
+                <% end %>
+                <%= link_to_remote "#{t('delete_text')}", :url => {:controller => "instant_fees",
+                                                                   :action => "delete_particular", :id => particular.id},
+                                   :confirm => "#{t('are_you_want_to_delete_particular')}" %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+  <% else %>
+      <p class="flash-msg"><%= t('no_default_particular_exist') %>.</p>
+  <% end %>
+</div>

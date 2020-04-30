@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'edit_exam_group'
+page << "Modalbox.show($('modal-box'), {title: '#{t("edit_exam_group")}', width: 500});"

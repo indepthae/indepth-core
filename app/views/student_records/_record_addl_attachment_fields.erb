@@ -1,0 +1,15 @@
+<div class="fields">
+  <div class="label-field-pair-attachment">
+    <% unless f.object.present? %>
+      <div class="attachment_file"><%= f.paperclip_file_field :attachment, :direct=>false, :size=>12 %></div>
+    <% else %>
+      <% if f.object.attachment_file_name.nil? or f.object.id.nil? %>
+        <div class="attachment_file"><%= f.paperclip_file_field :attachment,:direct=>false, :size=>12 %></div>
+      <% else %>
+        <div class="attachment_files themed_text margin_left_10"><%= truncate(f.object.attachment_file_name, :length => 30,:ommision => '...') %></div>
+      <% end %>
+    <% end %>
+    <div class="remove_link"><%= link_to_remove_fields "" ,f %></div>
+  </div>
+</div>
+

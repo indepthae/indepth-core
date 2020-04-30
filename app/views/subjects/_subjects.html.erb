@@ -1,0 +1,60 @@
+<div class="notif">
+    <div class="text"> <%= t('subjects_notif') %> </div>
+    <div class="classes_count">
+        <%= t('no_of_weekly_classes') %>
+        <span class="highlight" id="weekly_class_cnt">
+            <%= @weekly_classes %>
+        </span>
+    </div>
+</div>
+
+<div class="header_links">
+    <div id="normal_sub">
+        <%= "#{t('major_subjects_text')}" %>
+        <div class="subs">
+            <div class="sub_text">
+                <%= t('subjects_sub_text') %>
+            </div>
+            <!--<div id="add_sub">
+                <%#= link_to "#{t('import_subjects')}", :action => 'import_subjects', :controller => "subjects", :id => @batch %>
+            </div>
+            <div id="add_sub">
+                <%#= link_to_remote "+ #{t('add_normal_subject')}", {:url => { :action => 'new', :id => @batch }}, :class => "" unless defined? @elective_group %>
+            </div>-->
+        </div>
+    </div>
+</div>
+
+<% unless @subjects.empty? %>
+  <div id="flash" style="display:none;"><%= render :partial => "no_subjects", :locals => {:elective_group => false} %></div>
+  <table id="listing_theme" class ="subjects" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td><%= "#{t('subject')}" %></td>
+          <td><%= "#{t('code')}" %></td>
+          <td><%= "#{t('max_weekly_classes')}" %></td>
+          <td></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @subjects.each do |subject| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>" id="subject-<%=subject.id%>">
+            <%= render :partial => "subject_row", :locals => {:subject => subject} %>
+        </tr>
+      <% end %>
+  </table>
+<% else %>
+  <div id="flash"><%= render :partial => "no_subjects", :locals => {:elective_group => false} %></div>
+<% end %>
+
+<div id ="electives">
+    <%= render :partial => "elective_groups" %>
+</div>
+
+
+<%unless @batch.nil? %>
+  <div class="add_sub1">
+      <%= link_to "#{t('assigned_elective_subjects')}", {:controller => 'student', :action => 'assigned_elective_subjects', :id => @batch.id}, :class => '' %>
+  </div>
+<%end %>
+<script>
+<%= render_generic_multi_hook %>
+</script>

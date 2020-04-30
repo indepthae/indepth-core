@@ -1,0 +1,14 @@
+<% tutors = @batch.employees %>
+<% if tutors.present? %>
+  <div class="label-field-pair">
+    <label for="timetable_entry_batch_id"><%= t('batch_tutor_text') %></label>
+  </div>
+  <div class="tutorlist">
+    <% tutors.each_with_index do |tutor,i| %>
+      <span class="tutor_row">
+        <%= tutor.full_name.strip %>
+        <%= "<span class='tutor_id'>(&rlm;#{tutor.employee_number}&rlm;)</span>#{(tutors.length > (i+1)) ? ', ':''}" %>
+      </span>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,125 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_payment') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('transactions') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "Settings", settings_online_payments_path %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% form_for :payment_transaction,:url => transactions_online_payments_url do %>
+    <div class="label-field-pair">
+      <label for="start_date"><%= t('start_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'start_date', params[:start_date].present? ? params[:start_date] : I18n.l(Date.today,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+    </div>
+    <div class="label-field-pair">
+      <label for="start_date"><%= t('end_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'end_date', params[:end_date].present? ? params[:end_date] : I18n.l(Date.today,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+    </div>
+    <%= submit_tag 'Search',:name => "search",:class => "submit-button" %>
+  <% end %>
+  <% unless @online_payments.empty? %>
+    <div class="box">
+      <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td class="sl_no"><%= t('serial_no') %></td>
+          <td class="gateway_name"><%= t("gateway_name") %></td>
+          <td class="payee_name"><%= t("payee_name") %></td>
+          <td class="fee_name"><%= t("fee_name") %></td>
+          <td class="amount"><%= t("amount") %></td>
+          <td class="gateway_status"><%= t("gateway_status") %></td>
+          <td class="online_transaction_id"><%= t("online_transaction_id") %></td>
+          <td class="transaction_date"><%= t("transaction_date") %></td>
+        </tr>
+        <% @online_payments.each_with_index do |payment,index| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="sl_no"><%= ((@online_payments.current_page - 1) * @online_payments.per_page) + index + 1 %></td>
+            <td class="gateway_name">
+              <% if payment.gateway %>
+                <% gateway = CustomGateway.find(payment.gateway) %>
+                <% gateway_name = gateway.present? ? gateway.name : "-" %>
+              <% elsif payment.gateway_response.keys.include? :x_trans_id %>
+                <% gateway_name = "Authorize.net" %>
+              <% elsif payment.gateway_response.keys.include? :transaction_id %>
+                <% gateway_name = "Paypal" %>
+              <% elsif payment.gateway_response.keys.include? :payment_reference %>
+                <% gateway_name = "Interswitch" %>
+              <% end %>
+              <%= link_to_remote gateway_name,:url => { :controller=>"payment_settings",:action => 'show_transaction_details', :id =>payment.id},:method => 'get' %>
+            </td>
+            <% payee_user = payment.payee.try(:user).try(:username) unless payment.payee.class.name == "Applicant" %>
+            <td class="payee_name"><%= "#{payment.payee_name}(#{payment.payee_user})" %></td>
+            <% fee_name = String.new
+            if payment.payment_type == "Application"
+              fee_name = "Application"
+            end
+          %>
+            <td class="fee_name"><%= fee_name.empty? ? (payment.finance_payments.empty? ? "" : (payment.type =="SingleFeePayment" ? (payment.finance_payment.try(:fee_payment_type) == "Application" ? "Application" : payment.finance_payment.try(:fee_collection).try(:name)) : t('multi_fee_payment')) ) : fee_name %></td>
+            <td class="amount"><%= payment.amount %></td>
+            <td class="gateway_status">
+              <% gateway_status = "Failed"
+              if payment.status == true
+                if payment.is_pending == true
+                  gateway_status = "Pending"
+                else
+                  gateway_status = "Completed"
+                end  
+              elsif gateway_name == "Paypal"
+                gateway_status = "Completed" if payment.gateway_response[:status] == "Completed"
+              elsif gateway_name == "Authorize.net"
+                gateway_status = "Completed" if payment.gateway_response[:x_response_reason_code] == "1"
+              elsif gateway_name == "Interswitch"
+                gateway_status = "Completed" if payment.gateway_response[:response_code] == "00"
+              end %>
+              <%= gateway_status %>
+            </td>
+            <td class="online_transaction_id">
+              <% transaction_id = nil
+              if payment.gateway
+                transaction_id = payment.gateway_response[:transaction_reference]
+              elsif gateway_name == "Paypal"
+                transaction_id = payment.gateway_response[:transaction_id]
+              elsif gateway_name == "Authorize.net"
+                transaction_id = payment.gateway_response[:x_trans_id]
+              elsif gateway_name == "Interswitch"
+                transaction_id = payment.gateway_response[:payment_reference]
+              end %>
+              <%= transaction_id %>
+            </td>
+            <td class="transaction_date">
+              <%= format_date(change_time_to_local_time(payment.created_at),:format=>:long) %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+      <%= will_paginate @online_payments,:params=>{:start_date => params[:start_date],:end_date => params[:end_date]} %>
+    </div>
+  <% else %>
+    <div id="flash-box">
+      <p class="flash-msg"  style="float: left;margin-top: 50px;width: 100%;">No Payments present</p>
+    </div>
+  <% end %>
+  <div id="modal-box" style="display:none;"></div>
+
+</div>
+
+
+<script type="text/javascript">
+  j('td.gateway_name a').click(function(){
+    document.body.style.cursor = "wait"
+  });
+</script>

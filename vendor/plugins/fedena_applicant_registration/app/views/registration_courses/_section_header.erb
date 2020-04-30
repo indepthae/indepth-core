@@ -1,0 +1,37 @@
+<div class="top-section">
+    <% unless a[:applicant_addl_field_group_id].present? %>
+      <div class="name-section">
+          <%= t("#{a[:section_name]}") %>
+      </div>
+    <% else %>
+      <div class="name-section">
+          <%= field_group.name %>
+      </div>
+      <% if field_group.can_edit_section(@registration_course.id) %>
+        <div class="section-edit-link hide-on-sort"><%= link_to "#{t('edit')}","#",{:id=>"#{field_group.id}-edit", :onClick=>"show_edit_section_form(this); return false;"} %></div>
+      <% end %>
+      <% if field_group.can_delete_section(@registration_course.id) %>
+        <div class="section-delete-link hide-on-sort"><%= link_to "#{t('delete_text')}","#",{:id=>"#{field_group.id}-delete", :onClick=>"delete_section(this); return false;"} %></div> 
+      <% end %>
+    <% end %>
+    <div class="link-section">
+        <div class="hide-on-sort">
+            <%= link_to "#{t('add_new_field')}","#",{:onClick=>"show_add_field_form(this); return false;"} unless a[:section_name] == "elective_subjects" %>
+        </div>
+        <div class="invisible-div right-float">
+            <%= link_to "#{t('cancel')}","#",{:onClick=>"hide_reorder_fields_form(this); return false;",:class=>"user_button right-float save-order-button"} %>
+            <%= link_to "#{t('save_order')}","#",{:onClick=>"save_field_order(this); return false;",:class=>"user_button save-order-button right-float"} %>
+        </div>
+    </div>
+</div>
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% if field_group.description.present? %>
+    <div class="desc-section"><%= field_group.description %></div>    
+  <% end %>
+<% else %>        
+  <% if a[:section_description].present? %>
+    <div class="desc-section">
+        <%= t("#{a[:section_description]}") %>
+    </div>
+  <% end %>
+<% end %>

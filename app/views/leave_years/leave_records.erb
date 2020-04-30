@@ -1,0 +1,39 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_year_record') %></h1>
+    <% if permitted_to? :leave_process , :leave_years %>
+      <% if @active_year.present? and (@active_year.end_date == Date.today or  @active_year.end_date < Date.today) %>
+        <div id="inner-tab-menu">
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('process_leave')}", {:action => "index"} %></li>
+            </ul>
+        </div>
+      <% end %>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_leave_records, [@log] %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% if @leave_years.present? %>
+      <div class="leave_year">
+          <div class="label-field-pair"><label> <%= t('leave_year') %></label>
+              <div class="text-input-bg">
+                  <%= select_tag :year, options_for_select([[t('select_leave_year'), ""]]+@leave_years.map{|a| [a.name, a.id]}, @leave_year.try(:id)) || '',
+                    {:onChange => "#{remote_function(:url => leave_record_filter_leave_years_path,:method=>:get,
+                    :with => "'leave_year_id='+value")}"} %>
+              </div>
+          </div>
+      </div>
+    <% end %>
+    <% if @leave_year.present? %>
+      <div id="records">
+          <%= render :partial => 'leave_year_records' %>
+      </div>
+    <% end %>
+    <div id="record_lists"></div>
+</div>

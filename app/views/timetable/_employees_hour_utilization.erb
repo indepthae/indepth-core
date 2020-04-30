@@ -1,0 +1,37 @@
+<div class="employee_utilization_header">
+  <div class="label_pair">
+    <div class="label">
+      <%= t('timetable_text') %>
+    </div>
+    <div class="title">
+      <%= @timetable.range %>
+    </div>
+  </div>
+  <div class="header_description">
+     <%= t(@utilization == "0" ? 'employees_fully_utilized_hour_description' : (@utilization == "1" ? 'employees_fully_utilized_hour_description' : 'employees_fully_utilized_hour_description')) %>
+  </div>
+</div>
+<div class="employee_list_table">
+  <div class="employee_list_table_header">
+    <div class="label_pair">
+      <div class="label"> <%= t("#{@utilization == "0" ? 'employees_fully_utilized' : (@utilization == "1" ? 'employees_over_utilized' : 'employees_under_utilized' )}") %> </div>
+      <div class="data">
+        <%= "(#{@employees.length} #{t('of')} #{@emp_total})" %>
+      </div>
+    </div>
+  </div>
+  <div class="employee_list_rows">
+    <% @employees.each do |employee| %>
+      <div class="employee_row">
+        <%= "#{employee.full_name} (#{employee.employee_number})" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<style>
+  #MB_content{
+    width: 500px;
+    margin: 0px auto;
+    padding-bottom: 30px;
+  }
+</style>

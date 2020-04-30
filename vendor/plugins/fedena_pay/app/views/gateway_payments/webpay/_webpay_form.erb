@@ -1,0 +1,14 @@
+
+<% form_for :webpay_online_pay ,:url => get_payment_url,:method => :post do |f| %>
+  <%= hidden_field_tag :txn_ref, @txn_ref %>
+  <%= hidden_field_tag :product_id, @product_id %>
+  <%= hidden_field_tag :pay_item_id,@pay_item_id %>
+  <%= hidden_field_tag :currency,  @currency %>
+  <%= hidden_field_tag :amount, @amount %>
+  <%= hidden_field_tag :site_redirect_url, @site_redirect_url %>
+  <%= hidden_field_tag :hash,  @hash %>
+  <% if @paid_fees.blank? %>
+    <%= f.submit 'Pay Fee',:class => "submit_button",:style => @button_style, :confirm => transaction_details(@txn_ref,precision_label(@original_amount)) %>
+  <% end %>
+<% end %>
+

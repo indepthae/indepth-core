@@ -1,0 +1,29 @@
+<div class="template_heading">
+  <div class="field-label">
+    <%= template.label :form_name %>
+    <%= template.text_field :name, :placeholder => 'Add your form title here' %>
+  </div>
+</div>
+<div class="template_form_contents">
+  <div id="errors_pane"></div>
+  <div class="template_blank_form">
+    <h2>This is a blank form</h2>
+    <h5>Add fields by clicking or dragging the fields from the left sidebar</h5>
+  </div>
+  <div id="inplace_drag_area" class="ui-sortable-helper"></div>
+  <div id="template_fields">
+  </div>
+  <div id="template_drag_area">
+
+  </div>
+</div>
+
+<div class="field-label">
+  <div class="submit publish">
+    <%= template.submit t('use'),:id => "submit_publish",:option=>"publish", :class => 'submit publish button' %>
+  </div>
+  <div class="submit">
+    <%= template.submit t('save_template'), :class => 'submit button' %>
+  </div>
+</div>
+

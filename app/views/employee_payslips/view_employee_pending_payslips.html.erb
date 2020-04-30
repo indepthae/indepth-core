@@ -1,0 +1,47 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payroll_and_payslips') %></div>
+
+
+</div>
+<% pg = @employee.payroll_group %>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:from] == "assigned_employees" %>
+      <% breadcrumb :removing_from_group, [@employee, @employee.payroll_group] %>
+    <% elsif params[:from] == "profile" %>
+      <% breadcrumb :employee_profile_pending_payslips, @employee %>
+    <% else %>
+      <% breadcrumb :adding_to_group, [@employee, @employee.payroll_group] %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= "#{t('pending_or_rejected_payslips')} - #{@employee.full_name}" %></h3>
+  <div class="description"><%= t('past_payslip_description') %></div>
+  <div class="fields-details" id="name">
+    <div class="field-label"><%= t('name') %></div>
+    <div class="fields-val">: <%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('department') %></div>
+    <div class="fields-val">: <%= @employee.employee_department.name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('position') %></div>
+    <div class="fields-val">: <%= @employee.employee_position.name %></div>
+  </div>
+  <% unless @employee.employee_grade.nil? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('grade') %></div>
+      <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+    </div>
+  <% end %>
+  <div id="past_payslips">
+    <%= render :partial => 'employee_pending_payslips' %>
+  </div>
+</div>

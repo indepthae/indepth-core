@@ -1,0 +1,34 @@
+<div id="form-errors">
+    <% if @errors.present? %>
+      <div id="error-box">
+          <ul>
+              <% @errors.each do |msg| %>
+                <li class="error-font-size"> <%= msg %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div class="modal-description">&#x200E;<%= t('reset_description_new') %>&#x200E;</div>
+<% remote_form_for :log , :url=>{:action=>'reset_by_leave_groups_modal'} ,:before =>"$('submit-button').disable();",:complete=>"$('submit-button').enable();" do |f| %>
+  <%= session_fingerprint_field %>
+  <div class="label-field-pair remark-label-pair" id="remarks">
+      <label><%= t("reset_remarks") %></label>
+      <div class="text-area-bg"><%= f.text_area :reset_remark , :cols => 30, :rows => 5%>
+      </div>
+  </div>
+  <div class="label-field-pair margin-top-30">
+      <label class="margin-top-100"><%= t("reset_date") %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag "log[reset_date]" , @reset_date.present? ? @reset_date : "" , :id => "reset_date",:readonly=>true, :errors => @log.errors[:reset_date],:popup=>"force"%>
+      </div>
+      <label class="reset-leave-hint-label"><%= t('reset_date_hint') %></label>
+  </div>
+  <%= f.hidden_field :reset_type, :value => @reset_type %>
+  <%  @group_leave_type_ids.each_pair do |leave_group, v| %>
+    <% v.each do |leave_type| %>
+      <%=  f.hidden_field "leave_group[#{leave_group}]", :multiple => true, :value => leave_type %>
+    <% end %>
+  <% end %>
+  <%= f.submit  "", :value => "#{t('reset_leaves')}", :class => "submit_button",:id => "submit-button" %>
+
+<% end %>

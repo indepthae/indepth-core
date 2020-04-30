@@ -1,0 +1,16 @@
+<% components = obj.sorted_components %>
+<% if components.present? %>
+  <% components.each do |component| %>
+    <% if component.is_a? CourseElectiveGroup %>
+        <%= render :partial => 'elective_group', :locals => {:e_group => component, :klass => 'level-2'} %>
+    <% elsif component.is_a? CourseSubject %>
+        <%= render :partial => 'subject', :locals => {:subject => component, :klass => 'level-2', :tbody_required => true} %>
+    <% end %>
+  <% end %>
+<% else %>
+  <tbody class="disable_sort">
+      <tr class="disable_sort">
+          <td colspan="4"><div class="table-info pull-left"><%= t('no_subjects') %></div></td>
+      </tr>
+  </tbody>
+<% end %>

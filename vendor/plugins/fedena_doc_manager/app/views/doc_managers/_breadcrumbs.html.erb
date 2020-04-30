@@ -1,0 +1,40 @@
+<div>
+  <% unless @action.nil? %>
+    <% if @action == 'search' %>
+      <div class="breadcrumb"><%= image_tag('search.png',:height=>10) %> </div>
+      <div class="breadcrumb"><%= t('search_results') %></div>
+    <% else %>
+      <div class="breadcrumb"><%= image_tag('icons/folder.png') %> </div>
+      <% if @folder.present? or @user.present?%>
+        <div class="bread_crumb"> 
+          <%= link_to_remote "#{t(@action)}", :url=>{:action=> @action,:controller=>"doc_managers"}, :before => "Element.show('loader3')", :success => "Element.hide('loader3')" %><div class = "bread-crumb-separator"> > </div>
+        </div>
+        <% if @user.present? %>
+          <% if @folder.present? %> 
+            <div class="bread_crumb"> <%= link_to_remote "#{@user.full_name}", :url => update_userspecific_docs_doc_managers_url(:user_id=>@user.id) %> <div class = "bread-crumb-separator"> > </div> </div>
+          <%  else %>
+            <div class="bread_crumb"> <%= "#{@user.full_name}"%> </div>
+          <%  end %>
+        <% end %>
+        <% if @folder.present? %>
+          <div class="bread_crumb"> <%= "#{truncate(@folder.name,20)}" %> </div>
+        <% end %>
+      <% else %>
+        <div class="breadcrumb"><%= t(@action) %></div>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+<script type="text/javascript">
+  function search_user_ajax(){
+    if ($('query').value.include("%")) return;
+    if($('query').value.trim().length > 0){
+<%="#{remote_function(:url => search_docs_ajax_doc_managers_path,
+:with =>  "'query='+ $('query').value",
+:before => "Element.show('loader')",
+:success => "Element.hide('loader')",
+:update=>"user_information"
+)}"%>
+    }
+  }
+</script>

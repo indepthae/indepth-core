@@ -1,0 +1,2 @@
+academics_category = MenuLinkCategory.find_by_name("academics")
+MenuLink.create(:name=>'batch_summary',:target_controller=>'batches',:target_action=>'show',:higher_link_id=>nil,:icon_class=>'batches-icon',:link_type=>'general',:user_type=>nil,:menu_link_category_id=>academics_category.id) unless MenuLink.exists?(:name=>'batch_summary')

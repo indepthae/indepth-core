@@ -1,0 +1,70 @@
+
+
+
+<% unless @events.employee_department_events.empty? %>
+  <ul id="category-list">
+      <li class="listheading">
+          <div class="heading-name">
+              <div class="category-edit">
+                  <%= check_box_tag "full_department_list", "",false%>
+              </div>
+              <%= t("department") %></div>
+          <div class="heading-edit">
+          </div>
+      </li>
+      <div class="scroll">
+          <% f.fields_for :employee_department_events, @events.employee_department_events.select{|c| c.employee_department.present?}.sort_by{|o| o.employee_department.name } do |department| %>
+            <% d_obj = department.object %>
+            <li class="list<%=cycle('odd', 'even')%>">
+                <label>
+                    <div class="category-edit">
+
+                        <%= department.check_box :selected, :id => d_obj.employee_department_id, :class => "category_select1", :checked => d_obj.id.present?, :onclick => "check_all_department();" %>
+                        <%= department.hidden_field :employee_department_id %>
+                    </div>
+                    <div class="category-name">
+                        <%= "#{d_obj.department_name}" %>
+                    </div>
+                </label>
+            </li>
+          <% end %>
+      </div>
+  </ul>
+<% else %>
+  <ul id="category-list">
+      <li class="listheading">
+          <div class="heading-name">No department present</div>
+          <div class="heading-edit">
+          </div>
+      </li>
+  </ul>
+<% end %>
+
+
+<script type="text/javascript">
+    
+    if(j('input.category_select1').length == j('input.category_select1:checked').length)
+    {
+      j("#full_department_list").prop("checked", true);
+    }
+
+    j('#full_department_list').bind('change',function(){
+    if(j(this).is(':checked')){
+    $$('input.category_select1').each(function(checkbox) { checkbox.checked = true; });
+    } else {
+    $$('input.category_select1').each(function(checkbox) { checkbox.checked = false; });
+    }
+    });
+    
+    function check_all_department()
+    {
+      if(j('input.category_select1').length == j('input.category_select1:checked').length)
+      {
+        j("#full_department_list").prop("checked", true);
+      }
+      else
+      {
+        j("#full_department_list").prop("checked", false);
+      }
+    }
+</script>

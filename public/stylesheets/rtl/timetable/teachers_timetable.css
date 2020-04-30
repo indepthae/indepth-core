@@ -1,0 +1,428 @@
+#timetable,#teacher{
+    padding: 10px;
+    background-color: #C3D9FF;
+    border-radius: 8px;
+}
+#teacher{
+    border-left: none;
+    width: 150px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+#timetable{
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-right: none;
+    padding-right: 0px;
+}
+#timetable-container{
+    font-weight: bold;
+    /*    height: 450px;*/
+    /*    overflow-y: scroll;*/
+}
+#timetable-container *{
+    font-family: Arial !important;
+}
+.batch{
+    height: 80px;
+    font-size: 12px;
+    max-width: 150px;
+}
+#weekday-header{
+
+    background-color: #fff;
+    height: 30px;
+    font-size: 12px;
+
+}
+#timetable td{
+    text-align: center;
+    min-width: 70px;
+}
+#period-count{
+    background-color: #fff;
+    height: 66px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.batch_name{
+    background-color: #fff;
+    height: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0px 10px;
+}
+.tte{
+    padding: 0 8px;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #fff;
+    width: 70px;
+    max-width: 70px;
+}
+#table-viewer{
+    /*    height:480px;*/
+    margin-right: 0px;
+    overflow-x: scroll;
+    width: 810px;
+    float: right;
+}
+.box{
+    width: 95%;
+    margin: 0 auto;
+    overflow-x: auto;
+}
+.employee_list{
+    float: right;
+    width: 150px;
+}
+.tte .entries_wrapper{
+    display: none;
+    margin-right: -14px;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    max-height: 0px;
+    position:relative;
+    z-index: 2000;
+    margin-top: -23px;
+    cursor: pointer;
+}
+.tte:hover .entries_wrapper{
+    display: block;
+}
+.tte:hover .entries_wrapper .entries{
+    background-color: white;
+    border: 4px solid #C3D9FF;
+    padding: 5px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    padding-top: 10px;
+    font-weight: bold;
+    font-size: 12px;
+    font-variant: small-caps;
+    overflow-x:hidden;
+    overflow-y:auto;
+    margin-top:-40px
+}
+.add_sym{
+    font-weight: bold;
+    font-size: 14px;
+}
+.batch_code{
+    float: right;
+    width: 100%;
+    color: black;
+    font-weight: normal;
+}
+.sub_name{
+    float: right;
+    width: 100%;
+    color: #444444;
+}
+.gap{
+    float: right;
+    width: 100%;
+    height: 10px;
+}
+
+
+
+#timetable_view{
+    margin-top: 20px;
+}
+#teachers_list_view{
+    float: right;
+    margin-left: 30px;
+    border: 1px solid #c3d9ff;
+}
+#teachers_list_view .list_name{
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    padding: 10px 10px 0px;
+}
+.teacher_list{
+    padding: 0px;/* 10px;*/
+    width: 200px;
+    border-top: 1px solid #c3d9ff;
+    height: 576px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+.teacher_list li{
+    list-style: none;
+    /*    margin: 5px 0px;*/
+    width: 100%;
+    height: 30px;
+}
+.teacher_list li a{
+    padding: 5px 10px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #000;
+    width: 100%;
+    max-width: 180px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 20px;
+    white-space: nowrap;
+}
+.teacher_list li a:hover{
+    color: #006290 !important;
+    background-color: #F1F6FF;
+}
+
+.active-link{
+    font-weight: bold;
+    color: #000 !important;
+    background-color: #F1F6FF;
+}
+
+#teacher_timetable_view{
+    float: right;
+    width: 745px;
+}
+
+#timetable-container{
+    border: 5px solid #c3d9ff;
+    min-height: 621px;
+}
+.employee_timetable_header{
+    float: none;
+    width: 100%;
+    padding: 6px 10px;
+    max-width: 715px;
+    height: 20px;
+    color: #666;
+    font-size: 14px;
+}
+.employee_timetable_header .employee, .employee_timetable_header .emp_dept {
+    width: 50%;
+    height: 100%;
+    white-space: nowrap;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.employee_timetable_header .employee {
+    float: right;
+}
+.employee_timetable_header .emp_dept {
+    float: left;
+    text-align: left;
+    font-weight: normal;
+}
+.emp_lbl {
+    font-size: 14px;
+    font-weight: normal;
+}
+#employee_timetable{
+    border-top: 5px solid #c3d9ff;
+    overflow: hidden;
+}
+.weekdays{
+    width: 49px;
+    border-left: 1px solid #c3d9ff;
+    float: right;
+}
+.weekday-name {
+    color: #666;
+    vertical-align: middle;
+    text-align: center;
+    padding-right: 5px;
+    padding-left: 5px;
+    height: 116px;
+    border-bottom: 1px solid #c3d9ff;
+    font-size: 12px;
+    font-weight: normal;
+}
+.weekday{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    display: block;
+    transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -moz-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -ms-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    -o-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+}
+.timetable_entries_table {
+    width: 685px;
+    min-height: 585px;
+    float: right;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.timetable_entries_table table{
+    border-collapse: collapse;
+    width: 100%;
+}
+.timetable_entries_table .tte_row {
+    border-bottom: 1px solid #c3d9ff;
+    float: none;
+    min-width: 685px;
+    height: 116px;
+    display: flex; /* other browsers */
+    display: -webkit-flex; /* safari */
+    white-space: nowrap;
+}
+
+.tte{
+    padding: 8px;
+    font-size: 13px;
+    background-color: #fff;
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    height: 100px;
+    float: right;
+    display: inline-block;
+    border-left: 1px solid #C3D9FF;
+}
+.tte .batch_name{
+    height: 30px !important;
+    white-space: normal;
+    max-width: 150px;
+    word-break: break-all;
+}
+#table-viewer {
+    float: right;
+    margin-right: 0;
+    max-width: 810px;
+    overflow: auto;
+    width: 810px;
+}
+.box{
+    width: 95%;
+    margin: 0 auto;
+    overflow-x: scroll;
+}
+.tte .entries_wrapper{
+    display: none;
+    margin-right: -14px;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    height: 95px;
+    max-height: 95px;
+    min-height: 95px;
+    position:absolute;
+    z-index: 2000;
+    margin-top: -23px;
+    cursor: pointer;
+}
+.tte:hover .entries_wrapper{
+    display: block;
+}
+.tte:hover .entries_wrapper .entries{
+    background-color: white;
+    border: 4px solid #C3D9FF;
+    padding: 5px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    padding-top: 10px;
+    font-size: 12px;
+    font-variant: small-caps;
+    overflow-x:hidden;
+    overflow-y:auto;
+    height: 95px;
+    max-height: 95px;
+    min-height: 95px;
+}
+.add_sym{
+    font-weight: bold;
+    font-size: 14px;
+}
+.batch_code{
+    float: right;
+    width: 100%;
+    color: black;
+    font-weight: normal;
+}
+.sub_name{
+    float: right;
+    width: 150px;
+    color: #444444;
+    text-align: right;
+    height: 35px;
+    padding-bottom: 5px;
+    word-break: break-all;
+    max-width: 150px;
+    white-space: normal;
+}
+.gap{
+    float: right;
+    width: 100%;
+    height: 10px;
+}
+.no_padding{
+    padding: 0;
+}
+.class_timings{
+    height: 25px;
+    font-weight: normal;
+}
+
+.class_timings span{
+    font-size: 11px;
+    color: #666;
+    padding: 5px;
+    text-align: center;
+    width: 118px;
+}
+.tte:last-child {
+    margin-left: -2px;
+}
+.tte1{
+    text-align: center;
+}
+.tte-more .warning {
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    background-position: -44px -342px !important;
+    padding: 0px;
+    width: 12px;
+    height: 12px;
+    float: right;
+    position: relative;
+    display: block;
+    padding-top: 1px;
+}
+.tte-more{
+    width: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0px;
+    height: 116px;
+}
+.tte-more .batch{
+    float: right;
+    width: 150px;
+    border-left: 1px solid #ccc;
+    padding: 8px;
+    padding-top: 6px;
+    padding-bottom: 7px;
+    padding-left: 8px;
+}
+.tte-more .batch:last-child{
+    border-left: 0px;
+    margin-left: 2px;
+    padding-left: 6px;
+}
+.tte:last-child {
+    margin-left: -2px;
+}
+.tte-more .class_timings {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    height: 20px;
+    padding-top: 6px;
+    padding-bottom: 2px;
+}
+.ct_align{
+    width: 125px;
+    margin: 0px auto;
+}

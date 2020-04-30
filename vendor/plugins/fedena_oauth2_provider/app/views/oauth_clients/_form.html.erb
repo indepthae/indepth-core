@@ -1,0 +1,16 @@
+<% form_for @oauth_client do |f| %>
+  <%= f.error_messages %>
+  <div class="label-field-pair">
+    <label for="client_name"><%= t('client_name') %></label>
+    <div class="text-input-bg"><%= f.text_field :name %></div>
+  </div>
+  <div class="label-field-pair">
+    <label for="redirect_uri"><%= t('redirect_uri') %></label>
+    <div class="text-input-bg"><%= f.text_field :redirect_uri %></div>
+  </div>
+  <div class="label-field-pair">
+    <label for="verified"><%= t('verified') %></label>
+    <div class="text-input-bg"><%= f.check_box :verified %></div>
+  </div>
+  <%= f.submit "#{t('save')}", :class => "submit_button" %>
+<% end %>

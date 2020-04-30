@@ -1,0 +1,50 @@
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('csv_data_import') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('imports_text')}", imports_path(:export_id => @export.id) %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <% unless flash[:error].blank? %>
+      <div class="errorExplanation" id="errorExplanation">
+          <p>There where some problems</p>
+          <ul>
+              <% flash[:error].each do |error| %>
+                <li><%= error %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+
+    <div class="box">
+        <% form_for(:import,:url=>{:controller=>:imports,:action=>:create_import_for_edit},:html=> {:multipart=>true}) do |f| %>
+          <%= f.error_messages %>
+          <%= f.hidden_field :export_id,:value => @export.id %>
+          <div class="label-field-pair move_left">
+              <label for="student_image_file"><%= t('select_file') %> (<%= t('max_size') %>)</label>
+              <div class="text-input-bg"><%= file_field_tag :csv_file, :size=>12  %></div>
+          </div>
+
+
+          <%= f.submit "#{t('upload')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+        <% end %>
+
+        <div class="extender"></div>
+    </div>
+    <%=render :partial=>"edit_instruction"%>
+</div>

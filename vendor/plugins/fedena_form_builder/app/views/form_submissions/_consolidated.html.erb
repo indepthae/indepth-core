@@ -1,0 +1,265 @@
+<div id="reports">
+  <%= hidden_field_tag 'form_id',@form.id %>
+
+
+
+  <% page_count=0 %>
+  <% overall_array = [] %>
+  <% @index = 0 %>
+  <div class="reports_container">
+    <% if @report.present? %>
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head sub-heading">
+          <th><%= t('no_text') %></th>
+          <th class="width-target"><%= t('target') %></th>
+          <th class=""><%= t('target_overall') %></th>
+          <% cnt = @fields.count %>
+          <% (@fields).each do |field| %>
+            <% unless field.field_type == 'hr' %>
+              <th class='width-<%= field.field_type%>'>
+                <%= field.label %>
+              </th>
+            <% end %>
+          <% end %>
+        </tr>
+        <% sn_cnt = 1 %>
+        <% @report.each_with_index do |report,@index| %>
+          <% if params[:page].present? %>
+            <% if params[:page].to_i >= 1 %>
+              <% @index = @index  + (params[:page].to_i - 1) * @report.per_page.to_i %>
+            <% end %> <%else %> <% @index = @index %>
+          <% end %>
+          <% page_count = page_count.next %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td><%= @index + 1 %></td>
+            <% report.each do |key,report_value| %>
+
+              <td class="width-target">
+                <%= key %>
+              </td>
+              <td class="overall_individual">
+
+              </td>
+              <% overall = [] %>
+      
+              <% @fields.each do |field| %>
+                <% unless field.field_type == 'hr' %>
+                  <td>
+                    <%if report_value.present?%>
+      
+
+
+                      <% if ['select','radio','checkbox'].include? field.field_type%>
+
+                        <div class="graph make_dialog" title="Graph">
+                          <div class="graph_index">
+                            <ul>
+                              <% rating = 0 %>
+                              <% count = 0 %>
+                              <% field.form_field_options.each do |opt| %>
+                                <li>
+                                  <%= opt.label %>
+                                  <span class="sub">
+                                    <%= "&rlm;(#{t('wt')} #{opt.weight})" %>
+                                  </span>
+                                </li>
+                                <% count += report_value[field.id][opt.id]['count'] if report_value[field.id][opt.id].present? %>
+                              <% end %>
+                            </ul>
+                          </div>
+                          <div class="vertical_stripes">
+                            <ul>
+                              <% weight = [] %>
+                              <% field.form_field_options.each do |opt| %>
+                                <% if report_value[field.id][opt.id].present? %>
+                                  <% if opt.weight.present? %>
+                                    <% rating += opt.weight * report_value[field.id][opt.id]['count'] %>
+                                    <% per = (report_value[field.id][opt.id]['count']*100)/count %>
+                                  <% end %>
+                                  <li style="width: <%= "calc( #{per}% - 1px )" %>">
+                                    <div class="data">
+                                      <%= report_value[field.id][opt.id]['count'] %>
+                                    </div>
+                                  </li>
+                                <% else %>
+                                  <li style="width:0%">
+                                    <div class="data">
+                                      <%= "0" %>
+                                    </div>
+                                  </li>
+                                <% end %>
+                                <% weight << opt.weight if opt.weight.present? %>
+                              <% end %>
+                              <% rating = (weight.present? and !count.zero?) ? (rating/count.to_f).round(2) : t('na') %>
+                              <% overall << (rating * 100 / weight.max.to_f) unless rating.is_a? String%>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="wt_avg add_dialog themed_text">
+                          <% if rating.is_a? String %> <%## checking if rating is NA %>
+                            <%= "#{count} #{t('responses')}" %>
+                          <% else %>
+                            <%= "#{rating}" %>
+                          <% end %>
+                        </div>
+                      <% else %>
+                        <div attr_href="<%= field.id %>" class="themed_text toggle add_dialog">
+                          <%= "#{report_value[field.id].count} #{t('responses')}" %>
+                        </div>
+                        <% unless report_value[field.id].count.zero? %>
+                          <div id="<%= field.id %>" class="hiden">
+                            <table class="response_list make_dialog" title="Response List">
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <% report_value[field.id].each do |name,response_value| %>
+                                  <tr class="response_text">
+                                    <td class="resp_value">
+                                      <% if(response_value.present?) %>
+                                        <%= response_value %>
+                                      <% else %>
+                                        <span class="not_applicable">
+                                          <%= t('not_applicable') %>
+                                        </span>
+                                      <% end %>
+                                    </td>
+                                  </tr>
+                                <% end %>
+                              </tbody>
+
+                            </table>
+
+                          </div>
+                        <% end %>
+
+                      </td>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+              <% final_overall = overall.sum == 0 ? '' : (overall.sum/overall.count.to_f).round(2) %>
+              <% overall_array << final_overall%>
+            <% end %>
+          </tr>
+          <% sn_cnt = sn_cnt.next %>
+        <% end %>
+      </table>
+    </div>
+  <% else %>
+    <div class="message_notifier">
+      <p class="flash-msg">
+        <%= t('no_submissions_for_report') %>
+      </p>
+    </div>
+
+  <% end %>
+  <% unless @report.per_page.to_i > @report.total_entries.to_i %>
+    <div class="pagination_list">
+      <div class="pagination_text">
+        <%= "#{t('showing')} #{@index+1-(page_count-1)}-#{@index+1} #{t('of')} #{@report.total_entries}" %>
+      </div>
+      <% custom_params = {} %>
+      <% custom_params[:action] = :consolidated_report %>
+      <% custom_params[:id] = @form.id %>
+      <%= will_paginate @report,:renderer => 'RemoteLinkRenderer' ,:page_links=>false,:params=> custom_params %>
+    </div>
+  <% end %>
+  <div class="dialog_here"></div>
+  <style>
+    .make_dialog{
+      display: none !important;
+    }
+  </style>
+  <script>
+    titles = ['response','graph'];    
+    j(document).delegate('.add_dialog','click',function(){
+      c = j(this).parent().find('.graph ,.response_list');
+      clone = c.clone().css('display','block !important');
+      if(j(clone).hasClass('response_list')){
+        title_value = titles[0];
+      }
+      if(j(clone).hasClass('graph')){
+        title_value = titles[1];
+      }
+      j('.dialog_here').html(clone);
+      j('.dialog_here').clone().dialog({
+        parent_id: 1,
+        closeOnEscape: true,
+        draggable: false,
+        modal: true,
+        width: 'auto',
+        id: 'new_dialog',
+        maxWidth: 800,
+        resizable: false,
+        position: { my: "center", at: "center", of: window },
+        close: function(event, ui){
+          j(this).dialog('destroy').remove();
+        }
+      });
+      j('.ui-widget-overlay').height(j(document).outerHeight());
+      j('.ui-dialog-content .make_dialog').attr('style','display:block !important');
+      width = j(document).width();
+      height = j('.ui-dialog-content .make_dialog').height();
+      dwidth = j('.ui-dialog-content .make_dialog').width() + 42;
+      if(j('.ui-widget-content').find('.graph').length > 0){
+        console.log((width - 850)/2);
+        j('.ui-widget-content').css('width','850px').css('left',(width - 850)/2+'px');
+      }else{
+        x = j('.dialog_here.ui-dialog-content').find('.response_text').length;
+        if(x > 10){ // <%# display pagination if more than 10 responses are present%>
+          j('.dialog_here.ui-dialog-content').find('table').dataTable({
+            "language": {
+              "paginate": {
+                "next": "<%= t('next_text') %>", //<%# applying translation to next link %>
+                "previous": "<%= t('previous_text') %>" //<%# applying translation to previous link %>
+              }
+            },
+            "sPaginationType": "simple_numbers",
+            "iDisplayLength": 10,
+            "bLengthChange": false,
+            'bFilter': false,
+            'bInfo': false
+          });
+        }
+        j('.dataTables_paginate').addClass('pagination');
+        odwidth = j('.ui-dialog').first().width();
+        dif = dwidth - odwidth;
+        if(dif > 0){
+          odwidthset = dwidth + 40;
+          if(odwidthset < 600){
+            odwidthset = 600 + 40;
+            dwidth = 600;
+          }
+          j('.ui-dialog').first().css('width',odwidthset+'px');
+        }
+        console.log(odwidth);
+        console.log(dwidth);
+        console.log(width);
+        j('.ui-widget-content').css('max-width','800px').css('min-width','600px').css('min-height','200px')
+        nodwidth = j('.ui-dialog.ui-widget-content').width();
+        j('.ui-dialog.ui-widget-content').css('left',(width - nodwidth)/2+'px')
+        j('.ui-dialog .dialog_here').css('overflow','visible');
+      }
+      j('.ui-widget-content .dialog_here').attr('style','');
+      j('.ui-dialog-titlebar button').html('X');      
+      
+    });
+    
+    j(document).ready(function(){
+      
+      overall_arr = "<%= overall_array.join(',') %>";
+      overall_arr = overall_arr.split(',');
+      na = "<%= t('na') %>";
+      j('.overall_individual').each(function(a,b){
+        p = overall_arr[a].length == 0 ? (na) : (parseFloat(overall_arr[a]).toFixed(2)+'%');
+        j(b).text(p);
+      });
+      
+    });
+  </script>
+
+
+</div>

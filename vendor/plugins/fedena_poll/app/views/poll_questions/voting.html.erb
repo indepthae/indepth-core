@@ -1,0 +1,76 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "poll.js"  %>
+<% end %>
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('online_poll') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('votting_page') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <% if permitted_to? :new,:poll_questions %>
+      <li class='themed_bg themed-dark-hover-background'>
+        <%= link_to t('new_poll'), new_poll_question_path %>
+      </li>
+    <% end %>
+    <li class='themed_bg themed-dark-hover-background'>
+      <%= link_to t('view_all_polls'), poll_questions_path %>
+    </li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%breadcrumb :poll_questions_voting,@poll_question%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"> <p><%= flash[:warn_notice] %> </p></div>
+  <% end %>
+
+
+  <div class="info">
+    <div class="poll-title"><%=h @poll_question.title %></div>
+  </div>
+  <div class="info">
+    <div class="title-options"><%=h @poll_question.description %></div>
+  </div>
+  <div class="info">
+    <ul class="category-list">
+      <% form_for :poll_question do |f| %>
+        <% for option in @poll_question.poll_options %>
+          <li class="vote_options">
+            <div class="option-select">
+              <%=radio_button_tag :poll_option, option.id,false ,:onChange=>"toggle_custom()"%></div>
+            <%= label_tag "#{t('poll_option')}"+'_'+option.id.to_s ,option.option%>
+          </li>
+        <% end %>
+
+        <% if @poll_question.allow_custom_ans %>
+          <li class="vote_options_custom">
+            <%= label_tag :custom_answer,"#{t('write_own_answer')}" %>
+            <div class="option-select">
+              <%= radio_button_tag :poll_option,"custom",false ,:id=>'custom_answer',:onChange=>"toggle_custom()"%></div>
+          <% end %>
+          <div id="custom" style="display: none" >
+            <%= label_tag :custom_answer,"" %>
+            <%= text_field_tag :custom_answer ,{} %>
+            <br />
+          </div>
+        </li>
+      </ul>
+      <div class="results">
+        <%= f.submit "► #{t('vote')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+        <% # #TODO to be replaced using declrative auth logic %>
+        <% if @current_user.already_voted?(@poll_question) || @current_user.admin? ||@poll_question.poll_creator==@current_user%>
+          <%= link_to "#{t('view_results')}" , :poll_question %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

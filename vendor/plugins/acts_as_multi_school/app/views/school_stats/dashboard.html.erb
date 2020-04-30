@@ -1,0 +1,51 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Overall Statistics</h1>
+</fieldset>
+<ul class="bread_crumb">
+  <li><%= link_to "Statistics",school_statistics_live_path %></li> » <li>Overall Statistics</li>
+</ul>
+<div class="container-height">
+  <div class="content-div  bg-light grey-border shadow">
+    <div class="box">
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "Academics", school_statistics_path(['academics'])  if permitted_to? :new, :schools %></div>
+        <div class="link-descr">Generate Academic Reports</div>
+      </div>
+      <% if admin_user_session.school_group.allowed_plugins.include?("fedena_hostel")%>
+        <div class="link-box">
+          <div class="link-heading"><%= link_to "Hostel", school_statistics_path(['hostel'])  if permitted_to? :new, :schools %></div>
+          <div class="link-descr">Generate Hostel Reports </div>
+        </div>
+      <% end %>
+      <% if admin_user_session.school_group.allowed_plugins.include?("fedena_transport")%>
+        <div class="link-box">
+          <div class="link-heading"><%= link_to "Transport", school_statistics_path(['transport'])  if permitted_to? :new, :schools %></div>
+          <div class="link-descr">Generate Transport Reports </div>
+        </div>
+      <% end %>
+      <% if admin_user_session.school_group.allowed_plugins.include?("fedena_library")%>
+        <div class="link-box">
+          <div class="link-heading"><%= link_to "Library", school_statistics_path(['library'])  if permitted_to? :new, :schools %></div>
+          <div class="link-descr">Generate Library Reports </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="extender"></div>
+  <div id="bookmarks" style="margin-top: 20px">
+    <%= render :partial=>"bookmarks" %>
+  </div>
+</div>
+
+<script>
+  j(document).ready(function(){
+    set_link_active();
+  })
+  function set_link_active(){
+    j('.ul-nav a').each(function(i,el){
+      arr=el.pathname.split("/")
+      if(el.pathname == "/schools/statistics/live_statistics")
+        el.classList.add("active")
+    });
+  }
+</script>

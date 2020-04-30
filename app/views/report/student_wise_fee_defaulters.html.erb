@@ -1,0 +1,32 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('reports_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%="#{t('students')} #{t('fees_defaulters_text')}" %></div>
+    <%= report_job_status('students_wise_fee_defaulters', 'student') %>
+</div>
+
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="flash-div"></div> 
+    <div id="information">
+        <%= render  :partial => 'student_wise_fees_defaulters'%>
+    </div>
+</div>
+<%= hidden_field_tag 'check_all', 0 %>
+
+
+
+
+<script type="text/javascript">
+
+
+
+</script>

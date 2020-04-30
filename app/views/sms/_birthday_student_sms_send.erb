@@ -1,0 +1,9 @@
+
+<div class="user_selector" id="user_selector"></div>
+
+<div class="sms_creation"><%=render "sms/sms_creation.html.erb"%></div>
+<div class="sms_notes"><%= t('sms_notes') %></div>
+<script>
+  user_list= <%= raw @student_list.to_json %>;
+  user_selector.generate_select("batch",user_list, [], ["user_selector"], 0,["<%=t('single_student')%>"],[]);
+</script>

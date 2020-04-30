@@ -1,0 +1,33 @@
+
+ <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <% unless @employee.blank? %>
+        <tr class="tr-head">
+          <td>
+            <%= t('sl_no') %>
+          </td>
+          <td>
+            <%= t('employee_name') %>
+          </td>
+          <td>
+           <%= t('emp_id') %>
+          </td>
+          <td>
+            <%= t('employee_department') %>
+          </td>
+        </tr>
+        <tr class="tr-blank"></tr>
+
+        <% @employee.each_with_index do |emp1, i| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-1"><%= i+1 %></td>
+              <td class="col-4"><%=  link_to emp1.full_name, :controller => 'employee', :action => 'profile', :id => emp1.id%></td>
+            <td class="col-3"><%= emp1.employee_number %></td>
+            <td class="col-4"><%= emp1.employee_department.name %></td></tr>
+
+          <% end %>
+          <% else %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%= t('no_employee_found') %></td>
+        </tr>
+      <% end %>
+    </table>

@@ -1,0 +1,320 @@
+#radio-buttons{
+    margin:0;
+}
+
+#submit-button input{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    margin:0px auto;
+    float:left;
+    margin-top:35px;
+    padding:7px 10px;
+    border:none;
+    text-align:center;
+    width:auto;
+    cursor:pointer;
+}
+
+#category-list {
+    clear : both;
+    padding :10px -1px 40px 0px;
+    width:600px;
+    margin:0px auto;
+}
+.small-strike {
+    text-decoration:  line-through;
+    font-size: 0.9em;
+}
+
+#category-list .listeven{
+    background : #EEF2FD;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em; width : 30em;
+    overflow: auto;
+    list-style-type : none;
+    padding : 0.5em 0 0 3em;
+}
+
+#category-list .listodd{
+    background : #DFEAFF;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em; width : 30em;
+    overflow: auto;
+    list-style-type : none;
+    padding : 0.5em 0 0 3em;
+}
+
+#category-list li.heading {
+    background : none;
+    font-weight : bold;
+    list-style-type : none;
+    color : #444;
+    height : 1.5em; width : 30em;
+    padding : 0.5em 0 0 5em;
+}
+#category-list li div {
+    float : left;
+}
+#category-list li div.category-name {
+    width : 400px;
+    font-weight: bold;
+    font-size:13px;
+}
+#category-list li div.category-edit,
+#category-list li div.category-delete {
+    font-size : 0.9em;
+    width : 50px;
+
+}
+#category-list li div a {
+    color : #000;
+    font-size:14px;
+    text-decoration: none;
+}
+#category-list li div a:hover {
+    color : #d00;
+    text-decoration: underline;
+}
+.tr-even{
+    background: #f5f5f5 !important;
+}
+.bread_crumb {
+    margin-left: 10px;
+}
+.pagination{
+    min-width: 158px;
+    height: 33px;
+    border: 1px solid #CCC;
+    float: left;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    /*    margin: auto;
+        margin-top: 7px;
+        margin-bottom: 10px;
+        border: 1px solid #CCC;
+        display: inline-block;
+        float: left;
+        padding-top: 5px;*/
+
+}
+.pagination span{
+
+    color:#666666;
+}
+
+.pagination a{
+    color:#666666;
+    cursor: pointer;
+    border:none !important;
+    border-left: 1px solid #CCCCCC !important;
+    border-bottom: 1px solid #CCCCCC !important;
+    font-size: 14px !important;
+    display: block;
+    float: left;
+    padding: 0px;
+    padding-top: 9px;
+    padding-bottom: 8px;
+    padding-left: 15px;
+    padding-right: 13px;
+
+
+}
+.pagination a:hover {
+    color: #999 !important;
+}
+.pagination .disabled{
+    display: block;
+    float: left;
+    padding-right: 5px;
+    padding-left: 10px;
+    font-size: 14px;
+    border-right: 1px solid #CCC;
+    color:#CCC !important;
+    text-decoration: none !important;
+    padding-bottom: 9px;
+    padding-top:8px;
+}
+.pagination .prev_page{
+    display: block;
+    float: left;
+    padding-right: 5px;
+    padding-left: 10px;
+    font-size: 14px;
+    border-right: 1px solid #CCC;
+    color:#666666 !important;
+    text-decoration: none !important;
+    padding-bottom: 9px;
+    padding-top:8px;
+    /*    color:#CCC !important;
+        text-decoration: none !important;
+        border-right: 1px solid #CCCCCC;
+        font-size: 16px !important;
+        height: 34px;*/
+}
+.pagination .current{
+    display: block;
+    float: left;
+    padding-right: 5px;
+    font-size: 14px;
+    color:#fff !important;
+    /*    padding:0px !important;*/
+    background-color: #666666;
+    padding-top: 10px;
+    padding-bottom: 8px;
+    padding-left: 15px;
+    padding-right: 13px;
+
+
+    /*    color:#CCC !important;
+        font-size: 16px !important;
+        font-weight: lighter !important;
+        height: 34px;*/
+}
+.pagination .next_page{
+    display: block;
+    float: left;
+    padding-right: 5px;
+    padding-left: 10px;
+    font-size: 14px;
+    border-right: 1px solid #CCC;
+    color:#666666 !important;
+    text-decoration: none !important;
+
+
+}
+.pagination .gap{
+    display: block;
+    float: left;
+    border-left:1px solid #cccccc;
+    color:#ccc;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 9px;
+    padding-right: 9px;
+
+
+}
+
+
+p.flash-msg {
+    margin-top: 10px;
+    margin-right: 38px;
+}
+
+#batches_container{
+    /*    border: 1px solid #989898;*/
+    min-height: 100px;
+}
+#batches_menu{
+    width: auto;
+    height: 55px;
+    background-color: #EDEDED;
+    border: 1px solid #989898;
+    padding-left: 15px;
+    margin-top: 24px;
+
+}
+#batches_menu button{
+    outline: none;
+}
+.menu_batch_list{
+    cursor: pointer;
+    float: left;
+    cursor: pointer;
+    width: 175px;
+    height: 35px;
+    display: inline-block;
+    background-color: #EDEDED;
+    border: none;
+    border-bottom: 1px solid #989898;
+    margin-top: 21px;
+    font-family:arial;
+    font-size:15px;
+    font-weight:lighter;
+    color: #444;
+}
+
+.menu_batch_list.hover{
+    background-color: #fff;
+}
+
+.active{
+    background-color: #fff;
+    border: none;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    border-top: 1px solid #999999;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+}
+#batches_list{
+    width: 978px;
+    float:left;
+    min-height: 50px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #989898;
+    border-left: 1px solid #989898;
+    border-right: 1px solid #989898;
+}
+.update_batch_list{
+    margin: 0 auto;
+    width: 940px;
+    min-height: 50px;
+    margin-bottom: 5px;
+    margin-top: 40px;
+}
+#listing{
+    -webkit-border-radius:0 !important;
+    background: #ccc !important;
+    padding: 0px 0px 0px !important;
+
+
+    /*    background: #F5F5F5 !important;*/
+}
+.batch_list_font{
+    color: #444 !important;
+    font-weight: lighter !important;
+}
+.tr_head_style{
+    background: #EDEDED !important;
+
+}
+.tr_blank_style{
+    background: #EDEDED !important;
+    height: 0px !important;
+}
+#batch_loader_div{
+    min-width: 10px;
+    min-height: 10px;
+    float: left;
+    margin-top: 30px;
+    margin-left:12px;
+}
+#flash-div{
+    width: 100%;
+    height: 20px;
+    text-align: center;
+    margin: 0 auto;
+}
+.flash-msg{
+    width: 966px !important;
+    font-weight: normal !important;
+}
+table#listing td.col-1{
+    font-weight: normal !important;
+}
+table#listing td.col-2{
+    font-weight: normal !important;
+}
+table#listing td a{
+
+    font-weight: normal !important;
+}

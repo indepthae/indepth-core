@@ -1,0 +1,37 @@
+<% remote_form_for @profile, :url => fetch_activities_path(@profile), :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |lg| %>
+  <%= session_fingerprint_field %> 
+  <div id="activity_profile_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('activity_profile_name') %></label>
+          <div id ="description"><%= t('activity_profile_name_description') %></div>
+          <div class="text-input-bg"><%= lg.text_field :name, :onchange => "show_display_name(this);" %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('display_name') %></label>
+          <div id ="description"><%= t('display_name_description') %></div>
+          <div class="text-input-bg"><%= lg.text_field :display_name %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="description"><%= t('profile_description') %></label>
+          <div id ="description"><%= t('activity_profile_description') %></div>
+          <div class="text-input-bg"><%= lg.text_area :description %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@profile.new_record? ? t('create_activity_profile') : t('update_activity_profile'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  
+  show_display_name = function (elm) {
+      //var text = '';
+      //var arr = elm.value.split(' ');
+      //for (i = 0; i < arr.length; i++) {
+      //    text += arr[i].substr(0, 1)
+      //}
+      j('#assessment_activity_profile_display_name').val(elm.value);
+  }
+</script>

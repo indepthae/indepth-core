@@ -1,0 +1,205 @@
+<div class="label-field-pair">
+  <label for="group_name">Group name <span class="necessary-field">*</span> </label>
+  <div class="text-input-bg"><%= ia.text_field :name %></div>
+</div>
+<div class="label-field-pair">
+  <label for="description">Description</label>
+  <div class="text-input-bg"><%= ia.text_field :description %></div>
+</div>
+<div class="label-field-pair">
+  <label for="icse_exam_category">ICSE Exam Category <span class="necessary-field">*</span></label>
+  <div class="text-input-bg">
+    <%= ia.select :icse_exam_category_id ,@icse_exam_categories.map{|m| [m.name,m.id]} ,:prompt=>"Select an Exam Category" %>
+  </div>
+</div>
+<div id="indicator">
+  <%i=0%>
+  <% ia.fields_for :ia_indicators do |indicator| %>
+    <div class="slab_<%=i%>">
+      <div class="hor_line"></div>
+      <div class="label-field-pair name">
+        <label for="name">Name <span class="necessary-field">*</span></label>
+        <div class="text-input-bg name"><%= indicator.text_field :name,:class=>"i_indicator" %></div>
+        <%= indicator.hidden_field :_destroy %>
+        <% if i==0 %>
+          <div class="add_indicator">
+            <%= link_to_function "#{image_tag "buttons/add_image.png" } Add indicator","create_slab();",:class=>"add_btn",:style=>"color: #008800 !important;"%>
+          </div>
+        <% else %>
+          <% if action_name=="edit_ia_group" or action_name=="update_ia_group" %>
+            <%= link_to_function "x", "hide_entry(this);" ,:class=>"delete_btn"%>
+          <% else %>
+            <%= link_to_function "x", "remove_entry(this);",:class=>"delete_btn"%>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="label-field-pair indicator">
+        <label for="indicator">Indicator <span class="necessary-field">*</span></label>
+        <div class="text-input-bg indicator"><%= indicator.text_field :indicator ,:class=>"i_indicator"%></div>
+        <%= indicator.hidden_field :_destroy %>
+      </div>
+      <div class="label-field-pair">
+        <label for="name">Maximum Mark <span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= indicator.text_field :max_mark %></div>
+        <%= indicator.hidden_field :_destroy %>
+      </div>
+      <% i=i+1 %>
+    </div>
+  <% end %>
+</div>
+<div id="calculation">
+  <div class="hor_line"></div>
+  <div id="indicator_lists"></div>
+  <% ia.fields_for :ia_calculation do |calculation| %>
+    <div class="label-field-pair-text-area">
+      <label for="formula">Formula (Use Indicators) <span class="necessary-field">*</span></label>
+      <div class="textarea-input-bg"><%= calculation.text_area :formula,:cols => 30, :rows => 5,:class => 'ia_calcutaion-textarea' %></div>
+      <div class="example">View Formula Examples</div>
+    </div>
+  <% end %>
+</div>
+<div class="extender"></div>
+<div id="modal-box" style="display:none;"></div>
+<div id="example_text" style="display:none;"><%=render :partial=>'formula_examples'%></div>
+
+<script type="text/javascript">
+  function create_slab() {
+    var rand = +new Date();
+    var hor_line= '<div class="hor_line"></div>'
+    var field_pair = '<div class="label-field-pair name">';
+    var labels = '<label for="ia_group_ia_indicators_attributes_0_name">Name <span class="necessary-field">*</span></label>';
+    var text='<div class="text-input-bg name">'
+    var inputs = '<input id="ia_group_ia_indicators_attributes_' + rand + '_name" name="ia_group[ia_indicators_attributes][' + rand + '][name]" type="text" class="i_indicator">';
+    var div_end='</div>'
+    var del = '<a class="delete_btn" onclick="remove_entry(this)">x</a>';
+    var el = j('<div class=' + rand + '/>', {})
+    el.html(hor_line + field_pair + labels +text+inputs +div_end+ del + '</div>')
+    el.appendTo('#indicator');
+
+    var field_pair = '<div class="label-field-pair indicator">';
+    var labels = '<label for="ia_group_ia_indicators_attributes_0_indicator">Indicator <span class="necessary-field">*</span></label>';
+    var text='<div class="text-input-bg indicator">'
+    var inputs = '<input id="ia_group_ia_indicators_attributes_' + rand + '_indicator" name="ia_group[ia_indicators_attributes][' + rand + '][indicator]" type="text" class="i_indicator">';
+    var div_end='</div>'
+    var el = j('<div class=' + rand + '/>', {})
+    el.html(field_pair + labels +text+inputs +div_end+ '</div>')
+    el.appendTo('#indicator');
+
+    var field_pair = '<div class="label-field-pair">';
+    var labels = '<label for="ia_group_ia_indicators_attributes_0_max_mark">Maximum Mark <span class="necessary-field">*</span></label>';
+    var text='<div class="text-input-bg">'
+    var inputs = '<input id="ia_group_ia_indicators_attributes_' + rand + '_max_mark" name="ia_group[ia_indicators_attributes][' + rand + '][max_mark]" type="text">';
+    var div_end='</div>'
+    var el = j('<div class=' + rand + '/>', {})
+    el.html(field_pair + labels +text+inputs +div_end+ '</div>')
+    el.appendTo('#indicator');
+  }
+  function remove_entry(el) {
+    var cls = j(el).parent().parent().attr("class")
+    j('.' + cls + '').remove();
+    indicator_slab()
+  }
+  function hide_entry(el) {
+    j(el).parent().parent().find("input:hidden").val(1);
+    j(el).parent().parent().hide();
+    indicator_slab()
+  }
+
+  function indicator_slab(){
+    j(".indicator_list").remove();
+    helper_div=document.createElement('div')
+    helper_div.className="indicator_list"
+    heading=document.createElement('div')
+    heading.className="heading"
+    heading.update("Indicator List")
+    helper_div.appendChild(heading)
+    j("#indicator").each(function(i){
+      j(this).children().each(function(t){
+        j(this).children().each(function(s){
+          var name,indicator,element_common;
+          element_common=document.createElement("div")
+          element_common.className="list_pair1"
+          var i=0
+          if (this.className=="label-field-pair name"){
+            j(this).children().each(function(p){
+              if (this.className=="text-input-bg name"){
+                j(this).children().each(function(){
+                  if (this.className=="fieldWithErrors"){
+                    name=j(j(this).children())[0].value
+                  }
+                  else
+                  {
+                    name=j(this)[0].value
+                  }
+                })
+                  
+              }
+            })
+          }
+          else if (this.className=="label-field-pair indicator"){
+            j(this).children().each(function(p){
+              if (this.className=="text-input-bg indicator"){
+                j(this).children().each(function(){
+                  if (this.className=="fieldWithErrors"){
+                    indicator=j(j(this).children())[0].value
+                  }
+                  else
+                  {
+                    indicator=j(this)[0].value
+                  }
+                })
+              }
+            })
+          }
+
+          if (indicator!=undefined){
+            sp=document.createElement('span')
+            sp.className='header'
+            sp.update(indicator)
+            info.appendChild(sp)
+            element_common.appendChild(info)
+            helper_div.appendChild(element_common)
+          }
+          if (name!=undefined){
+            info=document.createElement('div')
+            info.className='list_pair'
+            sp=document.createElement('span')
+            sp.className='sub_head'
+            sp.update(name)
+            info.appendChild(sp)
+            element_common.appendChild(info)
+          }         
+        })
+      })
+    });
+    j("#indicator_lists").append(helper_div)
+    j('.indicator_list').children().each(function(){
+      j(this).children().each(function(){
+        var head="",text=""
+        j(this).children().each(function(){
+          if (this.className=="sub_head"){
+            text=j(this).text();
+          }
+          else if (this.className=="header"){
+            head=j(this).text();
+          }
+        })
+        if (head==""&& text==""){
+          j(this).parent().remove();
+        }
+      })
+    })
+  }
+
+  j(document).delegate('.i_indicator','keyup',function (){
+    indicator_slab();
+  })
+  j(document).ready(function(){
+    indicator_slab();
+    j('.example').click(function(){
+      j('#modal-box').append(j('#example_text').show());
+      Modalbox.show($('modal-box'), {title: 'Formula Examples', width: 760});
+    });
+  })
+  
+</script>

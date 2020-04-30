@@ -1,0 +1,92 @@
+<% unless rtl? %>
+  <%= stylesheet_link_tag ("payroll_categories/formulas") %>
+<% else %>
+  <%= stylesheet_link_tag ("rtl/payroll_categories/formulas") %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_payroll_group').titleize %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <h3><%= t('create_payroll_group') %></h3>
+  <div class="description" id="payroll_group_desc"><%= t('create_payroll_group_desc') %></div>
+
+  <% form_for @payroll_group do |f| %>
+    <%= render :partial => 'payroll_group_form', :locals => {:f => f} %>
+    <%=submit_tag "#{t('create_payroll_group')}", :disable_with => "#{t('please_wait')}", :class => "submit-button"  %>
+  <% end %>
+  <%= link_to t('cancel'), payroll_groups_path, :class => "submit-button", :id => "cancel-link" %>
+</div>
+
+<script type="text/javascript">
+  show_period_option();
+  selectedCategoryStyle();
+  categoryListStyle();
+  hideExistingCategory();
+  displayEmptyMsgs();
+  soratble();
+  if(<%= params[:action] == "create"%>)
+  retainDependancyError();
+    
+  function reload_payslip_generation(elm)
+  {
+    new Ajax.Request('/payroll_groups/payslip_generation',{
+      parameters:{'payment_period': elm.value, 'generation_day': '<%=  @payroll_group.generation_day %>'},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j('#loader').show();
+      },
+      onComplete:function(resp){
+        j('#loader').hide();
+        j('#payment_periods').html(resp.responseText);
+        show_period_option();
+      }
+    });
+  }
+  function render_formula_partial(elm, object_name, object_id, object_type)
+  {
+    new Ajax.Request('/payroll_categories/hr_formula_form',{
+      parameters:{'formula_type': elm.value, 'object_name' : object_name, 'object_id' : object_id, 'object_type' : object_type},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j('#loader1').show();
+      },
+      onComplete:function(resp){
+        j('#fields').html(resp.responseText);
+        if((elm.value == "3") || (elm.value == "2"))
+        {
+          j('.formula_help').show();
+          set_tab_height();
+        }
+        else
+          j('.formula_help').hide();
+        j('#loader1').hide();
+      }
+    });
+  }
+
+  function remove_fields(link){
+    $(link).previous("input[type=hidden]").value='1';
+  }
+  j(document).ready(function(){
+    if((j('.category:visible').length == 0) && (j('.list:visible').length == 0)){
+      j('#list_earning_empty_msg td').text("<%= t('no_payroll_categories_to_add') %>");
+      j('#list_deduction_empty_msg td').text("<%= t('no_payroll_categories_to_add') %>");
+    }
+  });
+</script>
+

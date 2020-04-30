@@ -1,0 +1,123 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.      -%>
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/finance_extensions/pay_all_fees_receipt_pdf.css', :media => "all" %>
+  <% else %>
+    <%= stylesheet_link_tag 'finance_extensions/pay_all_fees_receipt_pdf.css', :media => "all" %>
+  <% end %>
+<% end %>
+<div id="page-yield" class="available_sections">
+    <div class="section">
+        <center>
+            <div class="hor_line"></div>
+            <h2><%= t('fee_summary') %></h2>
+
+            <div class="hor_line"></div>
+            <div class="extender"></div>
+        </center>
+        <div id="main_info">
+            <div class="col-a">
+                <h4 style="width:505px;"> <%= "#{t('name')}: #{@student.full_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('admission_no')} : #{@student.admission_no}" %></h4>
+                <% if roll_number_enabled? %>
+                  <h4 style="width:505px;"> <%= "#{t('roll_no')} : #{@student.roll_number}" %></h4>
+                <% end %>
+                <h4 style="width:505px;"> <%= "#{t('course_text')} : #{@batch.course.course_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('batch')} : #{@batch.full_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('fees_type')} : #{t('advance_fees_payment')}" %></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <table id="pdf-table" width="100%" cellspacing="0">
+            <% if @advance_fee_categories.present? %>
+              <tr class="table-header">
+                  <td class="sl-td"><%= t('sl_no') %></td>
+                  <td class="collection-td" colspan="3"><%= t('advance_fee_category_name') %>(<%= currency %>)</td>
+                  <td class="amount-td align_center" style="min-width: 100px;"> <%= "#{t('fees_paid')}" %>(<%= currency %>)</td>
+              </tr>
+
+              <tr class="table-header">
+                <td colspan="5"><%= "#{t('advance_fee_collection_text')}" %></td>
+              </tr>
+                <% i = 0 %>
+                <% k = 0 %>
+                <% c = 'even' %>
+                <% total_paid_fees = 0 %>
+                <% @advance_fee_categories.each do |advance_fee_category| %>
+                  <% reset_cycle("even_odd") if k == 0 %>
+                  <tr class="<%= cycle(c, (["even", "odd"]-[c]).first, :name => "even_odd") %>">
+                    <td class="sl-td"><%= i+=1 %></td>
+                    <% k += 1 %>
+                    <% financial_year_name = advance_fee_category.financial_year.present? ? advance_fee_category.financial_year.name : "" %>
+                    <td class="collection-td" colspan="3"><%= advance_fee_category.name %> (<%= financial_year_name %>)</td>
+                      <td class="amount-td align_right">&nbsp;0.00</td>
+                  </tr>
+                <% end %>
+                <% if false %>
+                  <tr class="<%= cycle(c, (["odd", "even"]-[c]).first, :name => "even_odd") %>">
+                      <td class="total align_center" colspan="4"><%= t('total') %></td>
+                      <td class="amount-td align_right">0.00</td>
+                  </tr>
+                <% end %>
+            </table>
+
+        <% end %>
+            <div class="height_fix" style="height:10px;"></div>
+            <div id="pdf-info" class="section">
+            <% page_val=24 %>
+            <% k=19 %>
+            <% if @student_fee_collections.present? %>
+              <div class="section">
+                  <h4><%= "#{t('payment_history')}" %></h4>
+                  <% note_td, date_td = "collection-td" %>
+                  <%  cashier_td = "amount-td" %>
+                  <table id="pdf-table" width="100%" cellspacing="0">
+                      <% c= 'even' %>
+                      <tr class="table-header">
+                          <td class="sl-td"> <%= t('receipt_no') %></td>
+                          <td class="date_td"> <%= t('transaction_date') %></td>
+                          <td class="mode-td"> <%= t('mode') %></td>
+                          <td class="note_td"> <%= t('payment_notes') %></td>
+                          <td class="cashier_td"> <%= t('cashier') %></td>
+                          <td class="amount-td align_center"> <%= t('amount') %> (<%= currency %>)</td>
+                      </tr>
+                      <% k = 0 %>
+                      <% c = 'even' %>
+                      <% @student_fee_collections.reverse.each do |collection| %>
+                        <% reset_cycle("even_odd") if k == 0 %>
+
+                        <tr class="<%= cycle(c, (["even", "odd"]-[c]).first, :name => "even_odd") %>">
+                          <% k += 1 %>
+                          <td class="sl-td"><%= collection.receipt_data.receipt_no %></td>
+                          <td class="date_td "><%= format_date(collection.date_of_payment) %></td>
+                          <td class="mode-td "><%= collection.payment_mode %></td>
+                          <td class="note_td "><%= collection.payment_note %></td>
+                          <td class="cashier_td "><%= collection.payment_mode != "Online Payment" ? "#{t('admin')}" : " " %></td>
+                          <td class="amount-td align_right"><%= precision_label(collection.amount) %></td>
+                        </tr>
+                      <% end %>
+                  </table>
+                </div>
+              <% end %>
+            </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="date_box" style="height: 130px;">
+  <div class="user_set_date" style="width:100%">
+    <% remote_form_for :report, :url => {:action => @target_action},:html=>{:id=>"form_id"} do |form| %>
+      <div class="date_rage" style="display: block">
+        <div class="input_div">
+          <%= calendar_date_select_tag 'start_date', I18n.l(@start_date,:format=>:default) ,:popup=>:force%>
+        </div>
+        <div class="input_div"> <label><%= t('to') %></label>
+          <%= calendar_date_select_tag 'end_date', I18n.l(@end_date,:format=>:default) ,:popup=>:force%>
+        </div>
+        <div class="set_border set_separte_div_margin" style="margin-top: 0px;"></div>
+        <div class="input_div">
+          <%= calendar_date_select_tag 'start_date2', I18n.l(@start_date2,:format=>:default) ,:popup=>:force%>
+        </div>
+        <div class="input_div"> <label><%= t('to') %></label>
+          <%= calendar_date_select_tag 'end_date2', I18n.l(@end_date2,:format=>:default) ,:popup=>:force%>
+        </div>
+      </div>
+      <div id="date_error_div"></div>
+      <div class="bottom_div_date_filter">
+        <span class="themed_hover_text left_cancel" id="hide_date_filter" style="margin-top: 13px"><%=t('cancel')%></span>
+        <%= submit_tag "#{t('view_report')}",:class=>'user_button1 set_button_align2 themed_hover_text' %>
+      <%end%>
+    </div>
+  </div>
+</div>
+<script>
+  j("#hide_date_filter").click(function(){
+    j(".date_box").hide();
+    j("#show_date").show();
+  });
+</script>

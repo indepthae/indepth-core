@@ -1,0 +1,64 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('app_frames_text') %></h1>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new')}", new_app_frame_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @app_frames.empty?  %>
+    <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class ="sl_no"><%= t('sl_no') %></td>
+        <td class="name"><%= t('name') %></td>
+        <td class="link"><%= t('link') %></td>
+        <td class="client_id"><%= t('client_id') %></td>
+        <td class="privilege_list"><%= t('privilege_list') %></td>
+        <% if @current_user.admin? or @current_user.privileges.map(&:name).include? "AppFrameAdmin" %>
+          <td class="options"><%= t('options') %></td>
+        <% end %>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @app_frames.each_with_index do |af,index| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="sl_no"><%= ((@app_frames.current_page - 1) * @app_frames.per_page) + index + 1 %></td>
+          <td class="name"><%= link_to af.name, app_frame_path(:id => af.id) %></td>
+          <td class="link">
+            <% unless af.new_tab or (request.url.match(/https/).present? and !af.link.match(/https/).present?) %>
+              <%= link_to af.link, app_frame_app_frame_path(:id => af.id) %>
+            <% else %>
+              <%= link_to af.link, af.link, :target => "_blank" %><div class ="popup_icon"></div>
+            <% end %>
+          </td>
+          <td class="client_id"><%= af.client.try(:name) %></td>
+          <td class="privilege_list"><%= af.privilege_list.map(&:capitalize).join(', ') %></td>
+          <% if @current_user.admin? or @current_user.privileges.map(&:name).include? "AppFrameAdmin" %>
+            <td class="options">
+              <small>
+                <%= link_to t('edit'),edit_app_frame_path(af) %> |
+                <%= link_to t('delete'),af,:method => "delete", :confirm => t('sure_delete') %>
+              </small>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    <%= will_paginate @app_frames %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_app_frames_present') %></p>
+  <% end %>
+</div>
+
+

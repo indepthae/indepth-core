@@ -1,0 +1,2 @@
+page << "build_modal_box({'title' : '#{(@leave_group.new_record? ? t('create_leave_group') : t('update_leave_group'))}'})" unless params[:leave_group].present?
+page.replace_html 'popup_content', :partial => 'leave_group_form'

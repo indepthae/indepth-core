@@ -1,0 +1,11 @@
+defaults: &defaults
+  host: host_url
+  port: port_number
+  user: username
+  password: password
+
+development:
+  <<: *defaults
+  
+production:
+  <<: *defaults

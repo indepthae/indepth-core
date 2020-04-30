@@ -1,0 +1,23 @@
+<div class="import_container">
+    <div class="course_batches">
+        <div class="label-field-pair">
+            <label for="timetable_entry_course_id"><%= t('course') %>
+                <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+            </label>
+            <div class="text-input-bg">
+                <%= select :course, :id,
+                  @courses.map {|c| [c.full_name, c.id] },
+                  {:prompt => t('select_a_course'), :selected => @course.try(:id)},
+                  {
+                  :onchange => "#{remote_function(
+                  :url => { :action => 'list_import_subjects' },
+                  :with => "'import_from='+value+'&import_to='+#{@course_id}",
+                  :before => "Element.show('loader')",
+                  :success => "Element.hide('loader')"  )}"} %>
+            </div>
+        </div>
+    </div>
+    <hr class="sec_div" />
+    <div id="import_subject_list">
+    </div>
+</div>

@@ -1,0 +1,163 @@
+<script type="text/javascript">
+
+  function remove_fields(link) {
+    $(link).previous("input[type=hidden]").value = "1";
+    $(link).up(".fields").hide();
+  }
+  function add_fields(link, association, content) {
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+  }
+
+</script>
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('new_text') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= link_to "#{t('inventory_home')}",:controller=>"inventories",:action=>"index" %>
+    <div class = "bread-crumb-separator"> > </div>
+    <%= link_to "#{t('indent')}", indents_path %>
+    <div class = "bread-crumb-separator"> > </div>
+    <%= t('status') %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% form_for :indent,@indent, :url => acceptance_indent_url(:id => @indent.id) do |f| %>
+    <%= f.error_messages %>
+    <div class="label-field-pair">
+      <div class="label-container1"><%= "#{t('status')}" %></div>
+      <% if @indent.status == "Pending"  %>
+        <div class="text-input-bg"><%= f.select :status,%w{Issued Rejected},:prompt => "select_status" %></div>
+      <% elsif @indent.status == "Issued" %>
+        <div class="text-input-bg"><%= f.select :status,%w{Rejected },:prompt => "select_status" %></div>
+      <% else %>
+        <div class="text-input-bg"><%= f.select :status,%w{Issued Rejected},:prompt => "select_status" %></div>
+      <% end %>
+    </div>
+
+    <div class="label-field-pair">
+      <div class="label-container1"><%= "#{t('description')}" %></div>
+      <div class="text-input-bg-indent"><%= f.text_area :description, :rows => 3 %></div>
+    </div>
+    <% if @indent.purchase_order_required? %>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('raise_purchase_order')}" %></div>
+        <div class="text-input-bg-indent"><%= f.check_box :raise_purchase_order %></div>
+      </div>
+    <% end %>
+
+
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+
+      <tr class="tr-head">
+        <td class="lable-text">
+          <%= t('store_item_id') %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader",
+            :style =>"display: none;margin-top: -5px;" ) %>
+        </td>
+        <td class="lable-text">   <%= t('required') %></td>
+        <td class="lable-text">   <%= t('pending') %></td>
+        <td class="lable-text">   <%= t('quantity') %></td>
+        <td class="lable-text">
+          <%= t('issued_quantity') %>
+        </td>
+        <td class="lable-text">  <%= t('issued_type') %></td>
+
+        <td class="lable-text">   <%= t('price') %></td>
+        <td class="lable-text">
+          <%= t('batch_no') %>
+        </td>
+
+        <td>  </td>
+
+
+      </tr>
+    </table>
+
+
+
+    <%  f.fields_for :indent_items do |i| %>
+      <%=  render 'indent_item_fields', :f => i %>
+    <%  end %>
+
+    <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+  <% end %>
+</div>
+<script type="text/javascript">
+  var prev_value=[];
+  function remove_fields(link) {
+    $(link).previous("input[type=hidden]").value = "1";
+    $(link).up(".fields").hide();
+  }
+
+  function add_fields(link, association, content) {
+    prev_value=[];
+    $$('select.select_value').each(function(checkbox) { prev_value.push(checkbox.value); });
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    StoreSelected();
+    prev_value_insert();
+  }
+
+  function prev_value_insert()
+  {
+    j=0
+    $$('select.select_value').each(function(checkbox) {
+      checkbox.value=prev_value[j];
+      j+=1;
+    });
+  }
+  var store_items = new Array();
+<% for item in @store_items -%>
+    store_items.push(new Array(<%= item.store_id %>, '<%=escape_javascript item.item_name %>', <%= item.id %>));
+<% end -%>
+  function StoreSelected() {
+    store_id = $('person_store_id').getValue();
+    $$('#person_store_item_id select').each(function (ele){
+      options = ele.options;
+      options.length = 0;
+      options[0] = new Option('<%= t('select_item') %>', '')
+      store_items.each(function(item) {
+        if (item[0] == store_id) {
+          options[options.length] = new Option(item[1], item[2]);
+        }
+      });
+
+    });
+
+  }
+
+  document.observe('dom:loaded', function() {
+    $('person_store_id').observe('change', StoreSelected);
+  });
+</script>
+<script type="text/javascript">
+  function update_pending_value(text_box)
+  {
+    text_box_value = text_box.value;
+    if (isNaN(text_box_value) == true){
+      alert("Please enter numeric value");
+      text_box.value = "";
+      return
+    }
+    pending_text_box_id = text_box.id.replace('required','pending');
+    issued_text_box_id = text_box.id.replace('required','issued');
+    $(pending_text_box_id).value = text_box_value;
+  }
+</script>

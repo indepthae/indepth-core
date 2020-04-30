@@ -1,0 +1,36 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('reg_docs') %></div>
+  
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :applicant_additional_fields_view_addl_docs, @student%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @docs.empty? %>
+    <ul id="category-list">
+      <li class="listheading"><div class="category-name"><%= "#{t('reg_docs')}" %></div></li>
+        <% @docs.each do |att| %>
+          <li class="list<%=cycle('odd', 'even')%>">
+            <div class="category-name">
+              <%= link_to "#{att.attachment_file_name}", att.attachment.url(:original,false) %>
+<% # = link_to att.attachment_file_name, :controller => "applicant_additional_fields", :action => "download", :id => att.id %>
+            </div>
+            <%  if @privilege.include?("StudentsControl") or @privilege.include?("ManageUsers") or @current_user.admin?  or @privilege.include?("Admission") %>
+              <div class="category-delete"><%= link_to(t('delete_text'),{ :controller => "applicant_additional_fields", :action => "delete_doc" , :id => att.id,:id2 => params[:id]},:confirm => "#{t('delete_confirm_msg')}")  %></div>
+            <% end %>
+          </li>
+        <% end %>
+    </ul>
+    <%= will_paginate @docs %>
+    <% else %>
+        <p class="flash-msg"><%= "#{t('no_attachments')}" %></p>
+    <% end %>
+</div>

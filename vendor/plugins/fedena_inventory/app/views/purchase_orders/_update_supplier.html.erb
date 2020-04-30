@@ -1,0 +1,3 @@
+<%= select :purchase_order ,:supplier_id,
+  @suppliers.map{|s| [s.name,s.id]},{:prompt => "#{t('select_supplier')}"}
+%>

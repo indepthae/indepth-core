@@ -1,0 +1,10 @@
+<div id="news_feed">
+  <% dash_poll = PollQuestion.find(:all, :conditions => "is_active=1 AND not exists (select * from `poll_votes` where poll_votes.user_id=#{@current_user.id} AND `poll_votes`.poll_question_id= `poll_questions`.id)", :limit => 4) %>
+  <% dash_poll.each do |n| %>
+    <div class="sidebar_news_item<%= cycle("0", "1") %>">
+      <h5><%= link_to n.title, :controller => 'poll_questions', :action => 'voting', :id => n.id %></h5>
+      <small><%= time_ago_in_words(n.created_at) %> ago</small>
+    </div>
+  <% end %>
+  <div class="extender"> </div>
+</div>

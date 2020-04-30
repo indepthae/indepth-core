@@ -1,0 +1,171 @@
+<% if @schol_report.present? %>
+  <% main_header = @schol_report.try(:report).try(:main_header)||[] %>
+  <% header = @schol_report.try(:report).try(:header)||[] %>
+  <% marks = @schol_report.try(:report).try(:marks)||[] %>
+  <% excluded_marks = @schol_report.try(:report).try(:excluded_marks)||[] %>
+  <% co_sch = @schol_report.try(:report).try(:activities)||[] %>
+  <% agg_marks = @schol_report.try(:report).try(:overall_marks) || [] %>
+  <% agg_grades = @schol_report.try(:report).try(:overall_grades) || [] %>
+  <% agg_percentage = @schol_report.try(:report).try(:overall_percentage) || [] %>
+  <% attendance = @schol_report.try(:report).try(:attendance)||[] %>
+  <% records = @schol_report.try(:report).try(:records)||[] %>
+  <% remarks = @schol_report.try(:report).try(:remarks)||[] %>
+
+  <% if  header.present? %>
+    <table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+        <tr>
+            <td id="firstTd"></td>
+            <td rowspan="2">
+                <div id="divHeader" style="">
+                    <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                        <tr id="main_heading">
+                            <%j=0%>
+                            <% main_header.each_with_index do |m_h,i| %>
+                              <td colspan="<%= m_h.second%>">
+                                  <div class="tableHeader th_<%=i%>"><%=m_h.last%></div>
+                                  <div class="tableHeaderHelp"></div>
+                              </td>
+                              <%j = i+1%>
+                            <%end%>
+                        </tr>
+                        <tr id="sub_header">
+                            <% i = 1 %>
+                            <% j = 0 %>
+                            <% m = main_header.length %>
+                            <% header.each do |name|  %>
+                              <% if ((i-1) < m && j == main_header[i-1][1]) %>
+                                <% i = i + 1 %>
+                                <% j = 0 %>
+                              <% end %>
+                              <td>
+                                  <div class="tableSubHeader tsh_<%=i%>"><%=name%></div>
+                              </td>
+                              <% j = j + 1 %>
+                            <%end%>
+                        </tr>
+
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td id="firstSubTd"><%= t('subject') %>
+            </td>
+        </tr>
+        <% subjects = marks.map { |m| m[0] } %>
+        <% excluded_subjects = excluded_marks.map { |m| m[0] } %>
+        <tr>
+            <td valign="top">
+                <div id="firstcol">
+                    <table width="250px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                        <tbody class="borders">  
+                            <%subjects.each_with_index do |subject,index|%>
+                              <tr class="<%=cycle('odd', 'even')%>">
+                                  <td class="tableFirstCol" id="st_<%=  index %>"><div class="student_names"><%= subject %></div></td>
+                              </tr>
+                            <%end%>
+                            <% [agg_marks, agg_grades,agg_percentage ].reject{|a| a.blank? }.each_with_index do |score, index| %>
+                              <tr class="<%=cycle('odd', 'even')%>">
+                                  <td class="tableFirstCol" id="st_<%= index%>"><div class="student_names"><b><%= score.first %></b></div></td>
+                              </tr>
+                            <% end %>
+                            <%excluded_subjects.each_with_index do |subject,index|%>
+                              <tr class="<%=cycle('odd', 'even')%>">
+                                  <td class="tableFirstCol" id="st_<%=  index %>"><div class="student_names"><%= subject %></div></td>
+                              </tr>
+                            <%end%>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+            <%reset_cycle%>
+            <td valign="top">
+                <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                    <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                        <%  marks.each_with_index do |row,i|%>
+                          <tr class="<%=cycle('odd', 'even')%> st_<%=i%>" id=<%= i == 0 ? "firstTr" : "" %>>
+                              <% sum = 0 %>
+                              <%row.each_with_index do |cell,j|%>
+                                <% next if j == 0 %>
+                                <% if cell.kind_of?(Hash) %>
+                                  <td rowspan="<%= cell[:row_span] %>" class="scores"><%= cell[:remark] %></td>
+                                <% else %>
+                                  <td>
+                                      <div class="scores"><%=  cell %></div>
+                                  </td>
+                                <% end %>
+                              <%end%>
+                          </tr>
+                        <%end%>
+                        <% [agg_marks, agg_grades,agg_percentage ].reject{|a| a.blank? }.each_with_index do |score, index| %>
+                          <tr class="<%=cycle('odd', 'even')%>">
+                              <% if score.second != '1' %>
+                                <td class="cores" id="st_<%= index%>" colspan="<%= score.second.to_i - 1 %>"></td>
+                              <% end %>
+                              <% score.third.each do |cell| %>
+                                <td class="cores" id="st_<%= index%>"><div class="scores"><%= cell %></div></td>
+                              <% end %>
+                          </tr>
+                        <% end %>
+                        <% excluded_marks.each_with_index do |row,i|%>
+                          <tr class="<%=cycle('odd', 'even')%> st_<%=i%>" id=<%= i == 0 ? "firstTr" : "" %>>
+                              <% sum = 0 %>
+                              <%row.each_with_index do |cell,j|%>
+                                <% next if j == 0 %>
+                                <% if cell.kind_of?(Hash) %>
+                                  <td rowspan="<%= cell[:row_span] %>" class="scores"><%= cell[:remark] %></td>
+                                <% else %>
+                                  <td>
+                                      <div class="scores"><%=  cell %></div>
+                                  </td>
+                                <% end %>
+                              <%end%>
+                          </tr>
+                        <%end%>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+  <% end %>
+  <%= render :partial=> 'assessment_reports/show_attendance', :locals=> {:attendance=>attendance} %>
+  <% if co_sch.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table">
+        <% co_sch.each_with_index do |section, i| %>
+          <% header = true %>
+          <% if i > 0 %>
+            <tr class="empty_row">
+                <td class="2"></td>
+            </tr>
+          <% end %>
+          <% section.each do |row| %>
+            <tr class="tr-<%= cycle('even', 'odd') %> <%= header ? 'header-text' : '' %>">
+                <% header = false %>
+                <% row.each_with_index do |cell, index| %>
+                  <td class="<%= (index%2 == 0) ? 'even' : 'odd' %>"><%= cell %></td>
+                <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+  <% end %>
+  <%= render :partial=> 'assessment_reports/show_records', :locals=> {:records=>records} %>
+  <%= render :partial => 'assessment_reports/show_remarks', :locals => {:remarks=>remarks} %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_reports') %> </p>
+<% end %>
+<script type="text/javascript">
+  j(document).ready(function () {
+      fnAdjustTable();
+      if (oth('#table_div').length !== 0 && oth('#table_div').hasHorizontalScrollBar() && oth('#firstcol').height() >= 600)
+      {
+          oth('#table_div').css('height', oth('#table_div').height() - 20 + "px");
+          oth('#firstcol').css('height', oth('#firstcol').height() + 10 + "px");
+          var isFirefox = typeof InstallTrigger !== 'undefined';
+          if (isFirefox){
+             oth('#firstcol').css('height',oth('#firstcol').height() + 6 + "px");
+          }
+
+      }
+  });
+</script>

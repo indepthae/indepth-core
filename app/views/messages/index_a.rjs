@@ -1,0 +1,9 @@
+if @message_threads.next_page
+  page.replace_html "infinite_thread_#{params[:page]}", :partial=> 'infinite_thread'
+  page.replace_html 'infinite-scrolling', :partial=> 'pages'
+else
+  page.replace_html "infinite_thread_#{params[:page]}", :partial=> 'infinite_thread'
+  page.replace_html 'infinite-scrolling', :partial=> 'pages'
+  page << 'j("#thread_listing_main").off("scroll");'
+  page << 'j("#infinite-scrolling .pagination").remove();'
+end 

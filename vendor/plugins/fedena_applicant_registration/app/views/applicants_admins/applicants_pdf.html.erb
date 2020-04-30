@@ -1,0 +1,115 @@
+
+<div id = "page-yield" class="available_sections1">
+    <div class="page1"></div>
+    <div class= "section1 row">
+        <center>
+            <h2><%= params[:applicant_type]=="active" ? t('applicant_s') : t('archived_applicants') %></h2>
+            <div class="extender"> </div>
+        </center>
+    </div>
+    <div class="filter-info">
+        
+            <%= "#{t('course')}" %> : <b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} &#x200E;(#{@registration_course.course.code})&#x200E;" %></b>
+        
+        <% if @search_params.present? %>
+          
+             , <%= t('name_or_reg_no_like') %> : <b><%= @search_params %></b>
+        
+        <% end %>
+        <% if @selected_status.present? %>
+          
+            ,  <%= t('status') %> : <b><%= @selected_status.is_default == true ? t(@selected_status.name) : @selected_status.name %></b>
+                                      
+        <% end %>
+        <% if @start_date.present? %>
+          
+            ,  <%= t('start_date') %> : <b><%= format_date(@start_date,:format=>:long) %></b>
+          
+        <% end %>
+        <% if @end_date.present? %>
+          
+            ,  <%= t('end_date') %> : <b><%= format_date(@end_date,:format=>:long) %></b>
+          
+        <% end %>
+    </div>
+
+    <div class="section1 row" id="table-headers" >
+        <center>
+            <table id="pdf-table" width="100%">
+                <tr class="table-header">
+                    <td class="col-pdf1 reg_no"><%= "#{t('reg_no')}" %></td>
+                    <td class="col-pdf1 name"><%= "#{t('name')}" %></td>
+                    <td class="col-pdf1 date"><%= "#{t('da_te')}" %></td>
+                    <td class="col-pdf1 status"><%= "#{t('status')}" %></td>
+                    <td class="col-pdf1 paid"><%= "#{t('paid')}" %></td>
+                </tr>
+            </table>
+        </center>
+    </div>
+
+
+    <% @applicants.each do |applicant| %>
+      <% c =cycle('even','odd ') %>
+      <div class="section1 row" >
+          <center>
+              <table id="pdf-table" width="100%">
+                  <tr class="<%= "#{c}" %>">
+
+                      <td class="reg_no"><%= applicant.reg_no%></td>
+                      <td class="name"><%= applicant.full_name%></td>
+                      <td class= "date"><%= format_date(applicant.created_at.to_date,:format=>:long) unless applicant.created_at.nil? %></td>
+                      <td class="status"><%= @statuses.find_by_id(applicant.status.to_i).is_default == true ? (@statuses.find_by_id(applicant.status.to_i).name == "alloted" ? (applicant.batch_id.present? ? "#{t('alloted')} - #{applicant.batch.full_name}" : "#{t('alloted')}") : t(@statuses.find_by_id(applicant.status.to_i).name)) : @statuses.find_by_id(applicant.status.to_i).name %></td>
+                      <td class="paid"><%= applicant.has_paid? ? t('y_es') : t('n_o') %></td>
+                  </tr>
+              </table>
+          </center>
+      </div>
+    <%end%>
+</div>
+<% if params[:page_height] %>
+  <script type="text/javascript">
+    var body = document.body,
+            html = document.documentElement;
+    var pg_height = parseInt(<%= params[:page_height] %>);
+    var header = $("table-headers")
+    var page = new Element('div', {'class': 'page1'});
+    var pageBreak = new Element('div', {'class': 'page-break1'});
+    var insertPageBreak = function () {
+        body.appendChild(pageBreak.cloneNode(true))
+    };
+    var insertPage = function () {
+        body.appendChild(page.cloneNode(true));
+    };
+    var currPage = function () {
+        return $$('.page1').last()
+    };
+    var insertHeader = function () {
+        header1 = header.cloneNode(true);
+        header1.style.marginTop = "50px";
+        currPage().appendChild(header1.cloneNode(true));
+    };
+    var current_page_height = 0;
+    var i = 0
+    $$('.available_sections1 .section1').each(function (el) {
+        a = parseInt(el.getHeight());
+        c = current_page_height + a;
+        current_page_height = c;
+        if (c > pg_height) {
+            current_page_height = a
+            body.appendChild(new Element('div', {'id': 'page-blank_' + i, 'class': 'page-blank'}))
+            document.getElementById('page-blank_' + i).style.height = (c - pg_height) + 'px';
+            document.getElementById('page-blank_' + i).innerHTML = "&nbsp;"/* if a div doesnt have any content it may not display.. set height will not work */
+            i += 1
+
+            //el.style.marginTop="50px"; /* for this border-top is coming, top section of each page */
+            insertPageBreak();
+            /* insertHeader(); */
+            insertPage();
+            insertHeader();
+            current_page_height = (current_page_height + header.getHeight() + 50)
+
+        }
+        currPage().appendChild(el);
+    });
+  </script>
+<% end %>

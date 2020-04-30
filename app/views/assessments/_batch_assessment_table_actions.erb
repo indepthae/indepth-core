@@ -1,0 +1,107 @@
+<% if active and (permitted_to?(:reset_assessments , :assessments) or permitted_to?(:imports, :assessment_imports) or batch.is_tutor_and_in_this_batch)%>
+  <% options =  [["#{t('actions')}",'']]%>
+  <% options << [t('import_marks'), 'import'] if (@show_import[batch.id]) and (permitted_to?(:imports, :assessment_imports) or batch.is_tutor_and_in_this_batch) %>
+  <% options << ["#{t('delete_exam')}",'delete'] if permitted_to?(:reset_assessments, :assessments)%>
+  <% options << ["#{t('unlock_exams')}",'unlock'] if permitted_to?(:unlock_assessments, :assessments)%>
+  <% options << ["#{t('notification')}",'notification'] if validate_edit_sms_template.is_enabled == true %>
+  <% content_tag :div, :class => 'flex-col' do -%>
+    <% content_tag :div, :class => 'text-input-bg' do -%>
+      <%= select_tag :batch_assessment_action, options_for_select(options,
+        :selected=>@filter), :onchange =>'show_confirm(this)', :batch_id => batch.id, 
+        :popup_text => "#{marks_entered ?  t('delete_assessment_confirmation_with_marks') : t('delete_assessment_confirmation')}", :marks_entered => marks_entered %>
+    <% end %>
+  <% end %>
+<% end %>
+<% if @type.subject and active and permitted_to? :edit , :assessments and batch.is_active?%>
+  <% content_tag :div, :class => 'flex-col' do -%>
+    <%= link_to t('edit_exam'),{:action=>'edit',:batch_id => batch.id,:id => @assessment_group.id,:academic_year_id => @academic_year.id}, :class => 'submit-button rad5'  %>
+  <% end %>
+<% elsif @type.subject_wise_attribute and permitted_to? :link_attributes , :assessments and batch.is_active? %>
+  <% content_tag :div, :class => 'flex-col' do -%>
+    <%= link_to (active ? t('edit_attributes') : t('link_attributes')),
+      {:action=>'link_attributes',:batch_id=>batch.id,:assessment_group_id=>@assessment_group.id,:academic_year_id=>@academic_year.id}, :class => 'submit-button rad5'  %>
+  <% end %>
+<% end %>
+<% content_tag :div, :class => 'flex-col text' do -%>
+  <%= "#{t('status')} : <b>#{@type.subject ? (active ? t('scheduled') : t('not_scheduled')) : active ? t('active') : t('inactive')}</b>" %>
+<% end %>
+<script>
+    show_confirm = function(el){
+      if(el.value == 'delete'){
+        j(el).prop('selectedIndex',0);
+        if(j(el).attr('marks_entered') == 'true'){
+          show_warning_popup()
+        }else{
+          make_popup_box(el, 'confirm', j(el).attr('popup_text') ,{'ok' : '<%=t('delete_exam')%>', 'cancel' : '<%=t('cancel')%>', 'title' : '<%=t('delete_exam')%>', 'return_status' : true, 'popup_class' : 'remove_lt'}); return load_delete_method(el);
+        }
+      }else if(el.value == 'import'){
+        j(el).prop('selectedIndex',0);
+        batch_id = j(el).attr('batch_id')
+        window.location='/assessment_imports/imports?batch_id='+ batch_id +'&assessment_group_id=<%= @assessment_group.id %>'
+      }else if(el.value === 'unlock'){
+        j(el).prop('selectedIndex',0);
+        batch_id = j(el).attr('batch_id');
+        j.ajax({
+          type: 'POST',
+            url: '/assessments/unlock_assessments',
+            data: {
+              batch_id: batch_id,
+              assessment_group_id: <%= @assessment_group.id %>
+            }
+        });
+      }else if (el.value == 'notification'){
+       j(el).prop('selectedIndex',0);
+        batch_id = j(el).attr('batch_id');
+        j.ajax({
+          url: "/assessments/notification_group_selector",
+          type: 'POST',
+          data: {
+              batch_id: batch_id,
+              assessment_group_id: <%= @assessment_group.id %>
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+      }
+      
+    };
+    
+    load_delete_method = function (el) {
+    j('.submit-button#yes').on('click', function () {
+        batch_id = j(el).attr('batch_id')
+        j.ajax({
+            type: 'POST',
+            url: '/assessments/reset_assessments',
+            data: {
+              batch_id: batch_id,
+              assessment_group_id: <%= @assessment_group.id %>
+            },
+            success: function (resp) {
+                console.log(resp);
+            }
+        });
+    })
+
+  }
+      show_warning_popup = function(){
+      remove_popup_box();
+      build_modal_box({title: '<%=t('delete_exam')%>', popup_class: 'deletion_warning'})
+      j('.deletion_warning #popup_content').html("<%=t('cant_delete_assessments')%>");
+      footer = j('.deletion_warning #popup_footer');
+      ok = j('<div></div>', {
+        'id' : 'yes',
+        'class' : 'submit-button',
+        'text' : '<%=t('ok')%>',
+        'onclick' : 'remove_popup_box()'
+      });
+      footer.append(ok);
+    }
+    
+    
+    
+    
+</script>

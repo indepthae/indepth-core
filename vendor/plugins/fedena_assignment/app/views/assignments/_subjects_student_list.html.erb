@@ -1,0 +1,27 @@
+<% unless @students.nil? %>
+  <% unless @students.empty? %>
+    <% @assigned_students ||= [] %>
+    <div class="scrollable">
+      <div class="select_all">
+        <%= "#{t('select')}:"%> <%= link_to_function "#{t('all')}", "$$('input.right').each(function(checkbox) { checkbox.checked = true; });" ,:class=>"themed_text"%>,
+        <%= link_to_function "#{t('none')}", "$$('input.right').each(function(checkbox) { checkbox.checked = false; });" ,:class=>"themed_text" %>
+      </div>
+      <div id="scrollable-list">
+       
+        <% @students.each do |s| %>
+         <% if roll_number_enabled?  %>
+            <% student_name = "#{s.roll_number} - #{s.full_name}" %>
+          <% else %>
+            <% student_name = "#{s.full_name} &#x200E; ( #{s.admission_no} ) &#x200E;" %>
+          <% end %>
+          <div class="listitem">
+            <div class="student_name"> <%= student_name %> </div>
+            <div class="check_box"><%= check_box_tag "assignment[student_ids][]", s.id,@assigned_students.include?(s),:class=>"right" %></div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="flash-msg"><%= t('no_students') %></p>
+    <% end %>
+  <% end  %>
+</div>

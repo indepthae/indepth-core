@@ -1,0 +1,29 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "poll.js"  %>
+<% end %>
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('online_poll') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('create_new_poll') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('view_all_polls')}", poll_questions_path %></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="form">
+    <%=  render :partial => 'form' %>
+  </div>
+</div>

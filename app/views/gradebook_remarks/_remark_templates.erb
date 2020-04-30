@@ -1,0 +1,85 @@
+<% @remark_templates.each do |rt| %>
+  <div class="each-remark-template">
+      <div class="rt-checkbox">
+          <%= check_box_tag :remark_template_id, rt.id, false, :onclick => 'update_remark_preview(this);', :class => 'template-checkbox' %>
+      </div>
+      <div class="rt-name">
+          <label onclick="check_checkbox(this)"><%= rt.name %></label>
+      </div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  update_remark_preview = function (th_is) {
+      if (j(th_is).prop('checked') == true) {
+          j(th_is).parent().parent().css('background-color', '#CEECF5');
+      } else {
+          j(th_is).parent().parent().css('background-color', '#eee');
+      }
+      let ids = [];
+      j('.template-checkbox:checked').each(function ()
+      {
+          ids.push(j(this).val());
+      });
+      const student_id = '<%= @student_id %>';
+      j.ajax({
+          url: "update_remark_preview",
+          type: 'POST',
+          data: {
+              student_id: student_id,
+              remark_template_ids: ids,
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+
+  }
+  appendButtons = function () {
+      const add_remarks = "<Button class='submit-button footer-sub-button' id='add-remarks-btn'>Add Remarks</Button>";
+      const cancel = "<Button class='submit-button footer-sub-button footer-cancel-button' id='cancel-btn'>Cancel</Button>";
+      j("#popup_footer").append(add_remarks, cancel);
+  };
+  appendButtons();
+  j('#add-remarks-btn').click(function () {
+      let remark_body = j(add_to_remark_bank_element).parent().parent().find('.remark-body').val();
+      const save = '<%= t('save') %>';
+      if (remark_body == "") {
+          let length = 0;
+          j('.each-template-preview').each(function ()
+          {
+              length = length + 1;
+              if (length == j('.each-template-preview').length)
+                  remark_body += j(this).html().trim();
+              else
+                  remark_body += j(this).html().trim() + "\n";
+          });
+      } else {
+          j('.each-template-preview').each(function ()
+          {
+              remark_body = remark_body + "\n" + j(this).html().trim();
+          });
+      }
+      j(add_to_remark_bank_element).parent().parent().find('.remark-body').val(remark_body);
+      j(add_to_remark_bank_element).parent().parent().find('.submit-button').text(save);
+      j(add_to_remark_bank_element).parent().parent().find('.submit-button').css('cursor','pointer');
+      j(add_to_remark_bank_element).parent().parent().find('.remark-body').focus();
+      remove_popup_box();
+  });
+  
+  check_checkbox = function(th_is) {
+    const checkbox = j(th_is).parent().parent().find('#remark_template_id');
+    if(j(checkbox).prop('checked') == true){
+      j(checkbox).prop('checked',false);
+    }else{
+      j(checkbox).prop('checked',true);
+    }
+    update_remark_preview(checkbox);
+  };
+  
+  j('#cancel-btn').click(function () {
+      remove_popup_box();
+  });
+</script>

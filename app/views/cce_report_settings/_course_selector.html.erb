@@ -1,0 +1,53 @@
+<%remote_form_for :student_records,:url=>{:action=>'upscale_scores'},:html=>{:method=>:get} do |s|%>
+  <div class="label-field-pair">
+    <label for="batch_id">Class</label>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader1",
+      :style =>"display: none; margin-top:10px;margin-left: -21px;" ) %>
+    <div class="text-input-bg margin-left-10">
+      <%= select :course, :id,
+        @courses.map {|c| [c.course_name, c.id]},
+        {:selected => @course.id},
+        {:onChange => "#{remote_function(:url => {:action => @batch.is_active ? "get_batches_list" : "get_inactive_batches_list"},
+        :with => "'id='+ value",
+        :before => "Element.show('loader1')",
+        :success => "Element.hide('loader1')"
+        )}"} %>
+    </div>
+  </div>
+  <div id="batches_list">
+    <div class="label-field-pair">
+      <label for="batch_id">Batch</label>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader1",
+        :style =>"display: none; margin-top:10px;margin-left: -21px;" ) %>
+      <div class="text-input-bg margin-left-10">
+        <%= select :batch, :id,
+          @batches.map {|b| [b.name, b.id]},
+          {:selected => @batches.first}
+      %>
+      </div>
+    </div>
+  </div>
+  <%#=s.submit "#{t('view_records')}"%>
+  <div id="submit_button">
+    <%= submit_tag "#{t('view_records')}",:class=>'submit-button'%>
+  </div>
+  <div id="cancel_link"><%=t('cancel')%></div>
+<%end%>
+<div class="hor_line"></div>
+<script type="text/javascript">
+  j('#cancel_link').click(function(){
+    j.ajax({
+      type: 'GET' ,
+      url: "/cce_report_settings/cancel",
+      data : {
+        id: <%=@batch.id%>
+      }
+    });
+  });
+</script>

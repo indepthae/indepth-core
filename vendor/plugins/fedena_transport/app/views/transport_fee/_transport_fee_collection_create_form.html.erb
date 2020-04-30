@@ -1,0 +1,60 @@
+<label class="head_label"><%= t('set_transport_fee_collection_date') %><span></span></label>
+<% form_remote_for @transport_fee_collection,
+  :url => {:action => 'transport_fee_collection_create'},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |form| %>
+  <%= form.hidden_field :tax_enabled, :value => @tax_enabled %>
+  <%= error_messages_for :transport_fee_collection %>
+  <div id="form-errors"></div>
+  <div class="label-field-pair">
+      <label for="reason">  <%= t('transport_fee_name') %>:</label>
+      <div class="text-input-bg"><%= text_field_tag "transport_fee_collection[name]" %></div>
+  </div>
+
+  <div class="label-field-pair"><label> <%= t('select_a_course') %>: </label></div>
+  <div class="fee_category_scroll">
+      <div class="sel-list">
+          <%= t('select') %>: <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+          <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+      </div>
+      <% @batchs.each do |b| %>
+        <div class="each_batch">
+            <%= check_box_tag "transport_fee_collection[batch_ids][]", b.id,false,:class=>'batches_box' %> <%= b.full_name %>
+        </div>
+
+      <% end %>
+
+  </div>
+
+  <div class="label-field-pair">
+      <label for="reason"><%= t('include_employee') %></label>
+      <div class="check_box"><%= check_box_tag "transport_fee_collection[employee][]", "employee" %></div>
+  </div>
+  <div class="label-field-pair">
+      <label for="reason"><%= t('start_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'transport_fee_collection[start_date]', I18n.l(Date.today,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+  </div>
+  <div class="label-field-pair">
+      <label for="reason"><%= t('end_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'transport_fee_collection[end_date]', I18n.l(Date.today,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+  </div>
+  <div class="label-field-pair">
+      <label for="reason"><%= t('due_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'transport_fee_collection[due_date]', I18n.l(Date.today,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+  </div>
+
+  <% if @tax_enabled %>
+    <div class="label-field-pair">
+        <label>  <%= t('tax_slab_text') %>:</label>
+        <div class="text-input-bg">
+            <%= form.select :tax_slab_id, @tax_slabs.map {|slab| ["#{slab.name}-(#{precision_label(slab.rate)}%)", slab.id] }, 
+              :selected => @transport_fee_collection.tax_slab_id,
+              :include_blank => t('select_a_tax_slab') %>
+        </div>                
+    </div>
+  <% end %>
+
+  <div class="extender"></div>
+  <div id="submit-button">
+      <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+      <%=  submit_tag "► #{t('create_text')}",:class=>'submit_button', :id => "submit_button" %>
+  </div>
+<% end %>

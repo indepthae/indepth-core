@@ -1,0 +1,5 @@
+<ul>
+  <% if (permitted_to? :subject_assignment,:employee) %>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('employee_subject_association')}",:controller=>"employee", :action=>"subject_assignment",:batch_id=>@batch.id %></li>
+  <% end %>
+</ul>

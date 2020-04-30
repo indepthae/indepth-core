@@ -1,0 +1,454 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<link href="/stylesheets/pdf_normalize.css" rel="stylesheet">
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('new_template') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+    <div class="error_messages" id="error_messages">
+    </div>
+    <div class="head">
+      <%= t('create_certificate_template') %>
+    </div>
+    <div class="sub_text">
+      <%= t('create_certificate_template_desc') %>
+    </div>
+
+    <div class="sub_head">
+      <%= t('certificate_details') %>
+    </div>
+
+    <% form_for @certificate_template ,:url=>save_certificate_template_certificate_templates_path, :html=>{ :multipart => true, :id=>"certificate_creation", :method=>:post} do |f| %>
+    <div class="certificate_attributes">
+      <div class="first_section section">
+        <div class="section_head">
+          <%= t('certificate_name_heading') %>
+        </div>
+        <div class="section_field">
+          <%= f.text_field :name, :placeholder=>t('certificate_name_place'), :maxlength=> 50%>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%= t('applicable_user_type') %>
+        </div>
+        <div class="section_field">
+          <div class="radio_values">
+            <%= f.radio_button  :user_type, 1, :class=>"check" %>
+            <label class="check_label" for="certificate_template_user_type_1" ><%= t('student_text') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <%= f.radio_button  :user_type, 2, :class=>"check"%>
+            <label class="check_label" for="certificate_template_user_type_2" ><%= t('employee_text') %></label>
+            &nbsp;&nbsp;&nbsp;
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%= t('certificate_serial_number') %>
+        </div>
+        <div class="section_field">
+          <div class="serial_radio">
+            <%= f.radio_button  :manual_serial_no, true, :class=>"check" %>
+            <label class="check_label" for="certificate_template_manual_serial_no_true" ><%= t('enter_manually_while_generating') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <%= f.radio_button  :manual_serial_no, false, :class=>"check"%>
+            <label class="check_label" for="certificate_template_manual_serial_no_false" ><%= t('auto_generate') %></label>
+            &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="serial_no_prefix" id="sl_prefix" <%= "style='display: none;'" if @certificate_template.manual_serial_no == true  %> >
+            <%= f.text_field :serial_no_prefix, :class=>"small_field", :maxlength=> 10%>
+            <label for=" " ><%= t('serial_no_prefix') %></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section_head">
+        <%=t('select_resolution')%>
+      </div>
+      <div class="section_field">
+        <% # f.select :template_resolutions_id , @template_resolutions.map{|r| [r.full_name,r.id]}, {:include_blank=>t('select_resolution')}, :class=>"", id=>"resolution" %>
+        <%if @template_resolutions.present? %>
+        <select class="" id="certificate_template_template_resolutions_id" name="certificate_template[template_resolutions_id]">
+          <option value=""><%= t('select_resolution') %></option>
+          <%@template_resolutions.each do |key,res| %>
+            <option value=<%= key%> data-width=<%= res[:width]%> data-height=<%= res[:height]%>  > <%="#{res[:name]}"%> </option>
+          <%end%>
+        </select>
+        <%end%>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section_head">
+        <%=t('background_image')%>
+      </div>
+      <div class="section_field">
+        <%= f.paperclip_file_field :background_image,  :size=>12, :direct => false%><div class="remove_image" id="cross"></div>
+        <%= f.hidden_field :destroy_background_image, :id=> "destroy_background_image" %>
+      </div>
+    </div>
+
+
+    <div class="section">
+      <div class="section_head">
+        <%=t('layout_spacing')%>
+      </div>
+      <div class="section_field">
+        <%= f.label :top_padding, t("top_spacing") %>
+        <%= f.text_field :top_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+        <%= f.label :right_padding, t("right_spacing") %>
+        <%= f.text_field :right_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+        <%= f.label :bottom_padding, t("bottom_spacing") %>
+        <%= f.text_field :bottom_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+        <%= f.label :left_padding, t("left_spacing") %>
+        <%= f.text_field :left_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+    
+    <div id="barcode_properties" class="section" style="display:none;">
+      <div class="section_head">
+        <%=t('barcode_properties')%>
+      </div>
+      <div class="section_field">
+          <% f.fields_for :base_template do |a|%>
+            <% a.fields_for :barcode_property do |s|%>
+              <%= s.label :linked_to, t("linked_to") %>
+              <%= s.select :linked_to , @linked_to_keys, {}, :class=>"small_field", :id=>"linked_to" %>
+              <%= s.label :rotate, t("orientation") %>
+              <%= s.select :rotate , @barcode_orientaions.map{|r| [r[:name],r[:deg]]}, {}, :class=>"small_field", id=>"barcode_orientation" %>
+            <%end%>
+          <%end%>
+      </div>
+    </div>
+
+
+    <div class="section">
+      <div class="section_head">
+        <%=t('profile_photo_style_front')%>
+      </div>
+      <div class="section_field">
+        <% f.fields_for :base_template do |s|%>
+          <div class="radio_values">
+            <%= s.radio_button  :profile_photo_type, "square", :id=>"front_square", :class=>"check photo_check" %>
+            <label class="check_label" for="front_square" ><%= t('square') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <%= s.radio_button  :profile_photo_type, "circle", :id=>"front_circle", :class=>"check photo_check"%>
+            <label class="check_label" for="front_circle" ><%= t('circle') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <div class="dimension">
+              <label class="check_label" for=" " ><%= t('dimension') %></label>&nbsp;&nbsp;
+              <%= s.text_field :profile_photo_dimension,:id=>"dimension", :class=>"extra_small_field"%> px
+            </div>
+          </div>
+        <%  end %>
+      </div>
+    </div>
+
+
+    <div class="section">
+      <div class="section_head">
+        <%=t('custom_fields')%>
+      </div>
+      <div class="section_head_desc">
+        <%= t('custom_fields_desc') %>
+      </div>
+      <div class="section_field">
+        <div class="custom_fields" id="custom_fields"></div>
+        <%- f.fields_for :template_custom_fields do |t|%>
+          <%= render :partial=> 'attribute_field', :locals=> {:f => t} %>
+        <%  end %>
+        <%= link_to_add_activity_fields "<span class='add_text'>#{t('add_custom_fields')}</span>", f,:template_custom_fields, 'attribute_field'  %>
+      </div>
+    </div>
+
+
+    <div class="template_attributes">
+      <div class="sub_head">
+        <%= t('certificate_content')%>
+      </div>
+      <div class="sub_head_desc">
+        <%= t('certificate_content_desc')%>
+      </div>
+      <div class="notice">
+        <%= t('custom_fields_msg')%><br><br>
+        <div class="example">
+          <b><%= t('example')%></b><br>
+          <%= t('custom_field_example1')%><br>
+          <%= t('custom_field_example2')%><br>
+          <%= t('custom_field_example3')%> {{<%= t('custom_field_example4')%>}}
+        </div>
+      </div>
+      <script>
+      </script>
+
+      <div class="editor">
+        <div class="readctor">
+            <% f.fields_for :base_template do |c| %>
+            <%= c.redactor :template_data, {:callbacks=>{:onchange=>"redactor_change"},:plugin=>[:fontsize, :fontfamily]} %>
+            <%= load_redactor_script %>
+            <%end%>
+        </div>
+        <div class="keys">
+          <div class="key_head">
+            <%=t('field_codes') %>
+          </div>
+          <div class="key_desc">
+            <%= "#{t('keys_desc')}" %>
+          </div>
+          <div id="certificate_keys" class="certificate_keys">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="line">
+    </div>
+    <div class="certificate_preview">
+      <div class="css_container">
+        <div class="preview exclude_font" id="preview">
+        </div>
+      </div>
+    </div>
+
+    <div class="line">
+    </div>
+
+    <div class="submit_controls">
+      <%=f.submit t("create_template"), :class=>"solid_button" %>
+      <%=link_to t('cancel'), certificate_templates_certificate_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+    </div>
+
+    <%end%>
+
+  </div>
+</div>
+
+
+<script>
+var redactor_html = "";
+
+j("input[type=radio][name='certificate_template[base_template_attributes][profile_photo_type]']").change(function(){
+  refresh_preview();
+});
+
+function redactor_change(html)
+{
+  redactor_html = html;
+  formated_html = preview_ready_html(html);
+  generate_preview(formated_html);
+}
+
+j("#dimension").on('change paste keyup',function(){
+  refresh_preview();
+});
+
+function refresh_preview(){
+formated_html = preview_ready_html(redactor_html);
+generate_preview(formated_html);
+}
+
+
+function preview_ready_html(html){
+  dimension = j("#dimension").val();
+  type = j("input[type=radio][name='certificate_template[base_template_attributes][profile_photo_type]']:checked").val();
+
+  dimension = isNaN(dimension) ? 125 : dimension;
+  var photo_tags = ['{{student_photo}}', '{{employee_photo}}', '{{guardian_photo}}','{{fathers_photo}}','{{mothers_photo}}','{{immediate_contacts_photo}}'];
+  formated_html = html;
+  for(var i= 0 ; i < photo_tags.length ;i ++ )
+  {
+    if ( type == "circle" ){
+      formated_html = formated_html.gsub(photo_tags[i] ,'<img src="/images/id_user.png" style="width:'+dimension+'px; height:'+dimension+'px; border-radius:1000px">');
+    }
+    else{
+      formated_html = formated_html.gsub(photo_tags[i] ,'<img src="/images/id_user.png" style="width:'+dimension+'px; height:'+dimension+'px;">');
+    }
+  }
+  return formated_html;
+}
+
+add_fields = function (link, association, content) {
+  var new_id = new Date().getTime();
+  var regexp = new RegExp("new_" + association, "g");
+  $(link).insert({
+    before: content.replace(regexp, new_id)
+  });
+  if ($$('.input-type-select') != "") {
+    $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+  }
+}
+
+remove_field = function (el) {
+  el.up().up().hide();
+  j(el).prev().val(1) //Setting _destroy to 1
+}
+
+
+j("#certificate_creation").submit(function(e){
+  Element.show('loader');
+  form_url = j("#certificate_creation").attr('action');
+  var formData = new FormData(this);
+  j.ajax({
+    url: form_url,
+    type: 'POST',
+    data:  formData,
+    contentType: false,
+    cache: false,
+    processData:false,
+    success: function(data, textStatus, jqXHR)
+    {
+      Element.hide('loader');
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+j("#certificate_template_template_resolutions_id").change(function(){
+  width = j(this).find(':selected').data('width');
+  height = j(this).find(':selected').data('height');
+  set_size(width,height);
+});
+
+function set_size(width,height){
+  j("#preview").css("width",width+"mm");
+  j("#preview").css("height",height+"mm");
+}
+
+j(".set_padding").on('change paste keyup', function(){
+  var top_padding; var left_padding; var right_padding; var bottom_padding;
+  top_padding = j("#certificate_template_top_padding").val();
+  left_padding = j("#certificate_template_left_padding").val();
+  right_padding = j("#certificate_template_right_padding").val();
+  bottom_padding = j("#certificate_template_bottom_padding").val();
+
+  top_padding = isNaN(top_padding) ? 0 : top_padding
+  left_padding = isNaN(left_padding) ? 0 : left_padding
+  right_padding = isNaN(right_padding) ? 0 : right_padding
+  bottom_padding = isNaN(bottom_padding) ? 0 : bottom_padding
+
+  set_padding(top_padding,left_padding,right_padding,bottom_padding);
+});
+
+
+function set_padding(top_padding,left_padding,right_padding,bottom_padding){
+  j("#preview").css('padding-top', top_padding+"px");
+  j("#preview").css('padding-left', left_padding+"px");
+  j("#preview").css('padding-right', right_padding+"px");
+  j("#preview").css('padding-bottom', bottom_padding+"px");
+}
+
+
+function generate_preview(html){
+  j("#preview").html(html);
+}
+
+
+j("#cross").click(function(){
+  var no_file_text = j("#field_certificate_template_background_image").attr("default");
+  j("#field_certificate_template_background_image").val(no_file_text);
+  j("#certificate_template_background_image").val('');
+  j("#destroy_background_image").val(true);
+  j(this).css("display","none");
+  document.getElementById("preview").style.backgroundImage = '';
+});
+
+j("#certificate_template_background_image").change(function () {
+    if (this.files && this.files[0]) {
+        j("#cross").css("display","inline-block");
+        j("#destroy_background_image").val(false);
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+
+        var image = new Image();
+          image.src = e.target.result;
+              document.getElementById("preview").style.backgroundImage = "url('" + image.src + "')";
+        };
+
+        reader.readAsDataURL(this.files[0]);
+        
+    }
+    else{
+      var no_file_text = j("#field_certificate_template_background_image").attr("default");
+      j("#field_certificate_template_background_image").val(no_file_text);
+      j("#destroy_background_image").val(true);
+      j("#cross").css("display","none");
+      document.getElementById("preview").style.backgroundImage = '';
+    }
+});
+
+
+j('input[type=radio][name="certificate_template[manual_serial_no]"]').change(function() {
+  if (this.value == "true") {
+    j("#sl_prefix").css("display","none");
+  }
+  else if (this.value == "false") {
+    j("#sl_prefix").css("display","inline-block");
+  }
+});
+
+
+j("input[type=radio][name='certificate_template[user_type]']").change(function(){
+  j.ajax({
+    url: "certificate_keys",
+    type: 'POST',
+    data: {type: j(this).val()},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+  
+  // barcode linked to  list fetch
+  j.ajax({
+    url: "/templates/barcode_linked_to_list",
+    type: 'POST',
+    data: {type: j(this).val()},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+  //hide barcode properties for parent 
+  set_barcode_properties_view();
+});
+
+function set_barcode_properties_view(){
+  if(j("input[type=radio][name='id_card_template[user_type]']:checked").val() == 3){
+    j("#barcode_properties").css("display","none");
+  }
+  else{
+    j("#barcode_properties").css("display","block");
+  }  
+}
+
+</script>

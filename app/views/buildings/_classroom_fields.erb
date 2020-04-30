@@ -1,0 +1,10 @@
+<div class="fields label-field-pair">
+  <div class="label-field-pair">
+    <div class="label-container"><%= c.label :name, "#{t('classroom_name')}" + " :" %></div>
+    <div class="input-container"><%= c.text_field :name %></div>
+
+    <div class="label-container2"><%= c.label :capacity, "#{t('capacity')}" + " :" %></div>
+    <div class="input-container" id ="capacity"><%= c.text_field :capacity %></div>
+    <div id="remove-field"><%= link_to_remove_fields " ", c %></div>
+  </div>
+</div>

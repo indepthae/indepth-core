@@ -1,0 +1,99 @@
+<div id="vehicle_form">
+    <% form_for(@vehicle) do |v| %>
+      <%= session_fingerprint_field %>
+      <div class="label-field-pair">
+          <label for="name"><%= t('academic_year') %></label>
+          <%= v.hidden_field :academic_year_id %>
+          <div class="text-input-bg"><span><%= @academic_year.try(:name) %></span></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="vehicle_no"><%= t('vehicle_no') %></label>
+          <div class="text-input-bg"><%= v.text_field :vehicle_no %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="mode"><%= t('type') %></label>
+          <div class="text-input-bg">
+              <%= v.select :vehicle_type, options_for_select(Vehicle::VEHICLE_TYPES.map{|k, val| [t(val), k]}, v.object.vehicle_type), 
+                {:include_blank => t('select_type')}  %>
+          </div>
+      </div>
+
+
+      <div class="label-field-pair">
+          <label for="vehicle_no"><%= t('vehicle_model') %></label>
+          <div class="text-input-bg"><%= v.text_field :vehicle_model %></div>
+      </div>
+      
+      <div class="label-field-pair">
+          <label class="label_for_gps_enabled" for="gps_enabled"><%= t('enable_gps') %></label>
+           <div class="text-input-bg"><%= v.check_box  :gps_enabled ,:onchange=>"return get_gps_number()"%></div>
+      </div>
+    
+      <div class="label-field-pair" id="hide_div">
+          <label for="vehicle_no"><%= t('gps_number') %></label>
+          <div class="text-input-bg"><%= v.text_field :gps_number %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="vehicle_no"><%= t('no_of_seats') %></label>
+          <div class="text-input-bg"><%= v.text_field :no_of_seats %></div>
+      </div>
+
+      <div class="label_field_pair">
+          <label class="label_for_status" for="status"><%= t('status') %></label>
+          <div class="status_value">
+              <%= v.radio_button  "status", "Active", :checked => "checked" %>
+              <label class="label_for_active" for="active"> <%= t('active') %></label>
+              <%= v.radio_button  "status", "Inactive" %>
+              <label class="label_for_inactive" for="inactive"><%= t('inactive') %></label>
+          </div>
+      </div>
+
+      <% i=0 %>
+      <% v.fields_for :transport_additional_details, @vehicle_additional_details do |ff| %>
+        <%= ff.hidden_field :transport_additional_field_id %>
+        <% additional = @additional_fields.detect{|a| a.id == ff.object.transport_additional_field_id}  %>
+        <% if additional.input_type=="belongs_to" %>
+          <div class="label-field-pair">
+              <label><%= additional.name %></label>
+              <div class="text-input-bg"><%= ff.select :additional_info,additional.vehicle_additional_field_options.map{|b| [b.field_option,b.field_option]},{:include_blank=>"#{t('select_an_option')}"}%></div>
+          </div>
+        <% elsif additional.input_type=="has_many" %>
+          <div class="label-field-pair select-list">
+              <label><%= additional.name %></label>
+          </div>
+          <div class="fee_category_scroll">
+              <div class="sel-list">
+                  <%= t('select') %>: <%= link_to_function t('all'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = true; });" %>,
+                  <%= link_to_function t('none'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = false; });" %>
+              </div>
+              <% values = (ff.object.additional_info.present? ? ff.object.additional_info : "")  %>
+              <% values = values.split(',') if values.is_a? String %>
+              <% additional.vehicle_additional_field_options.each do |k| %>
+                <div class="each_batch">
+                    <%= ff.check_box :additional_info, {:class=>"batches_box check#{i}", :multiple => true, 
+                      :checked => values.include?(k.field_option)}, k.field_option, nil %>
+                    <label class="check_box_value"><%=k.field_option%></label>
+                </div>
+              <% end %>
+          </div>
+          <div id="addl_values">
+              <%= ff.hidden_field :additional_values %>
+          </div>
+        <% else %>
+          <div class="label-field-pair">
+              <label><%= additional.name %></label>
+              <div class="text-input-bg"><%= ff.text_field :additional_info%></div>
+          </div>
+        <% end %>
+        <% i+=1 %>
+
+        <div class="extender"></div>
+
+      <%end%>
+      <%= submit_tag "", :value => "#{t('save')}", :class => "submit-button", :disable_with => "#{t('please_wait')}" %>
+      <%= link_to t('cancel'), vehicles_path, :class => "submit-button", :id => "cancel-link" %>
+    <% end %>
+</div>

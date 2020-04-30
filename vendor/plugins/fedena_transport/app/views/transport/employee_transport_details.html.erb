@@ -1,0 +1,166 @@
+<%  if (rtl?) %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: (link_off.left)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% end %>
+<% current_username = @current_user.username %>
+<% profile_employee_no = @employee.employee_number %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('employee_profile') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_details') %></div>
+
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to "#{t('profile_text')}" ,:controller=>"employee", :action=>"profile",:id=>@employee.id%>
+            </li>
+
+            <% if @current_user.admin? %>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to "#{t('delete_text')}" ,:controller=>"employee",:action=>'remove',:id=>@employee.id %>
+              </li>
+            <% end %>
+
+            <li class='drop_header themed_bg themed-dark-hover-background'>
+                <a href="#" class="drop_header_link"><%= t('more') %> &#9660;</a>
+                <ul id="box_4" class="more-menu-div" style="display:none;">
+                    <% FedenaPlugin::ADDITIONAL_LINKS[:employee_profile_more_menu].each do |mod| %>
+                      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t(mod[:title])}",mod[:destination].merge(:id=>@employee.id) %></li>
+                    <% end %>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :transport_employee_transport_details, @employee %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="employee_profile_heading">
+
+        <div id="profile_picture_display">
+            <% if @employee.photo.file? %>
+              <%= image_tag @employee.photo.url(:original, false) %>
+            <% else %>
+              <%= image_tag "HR/default_employee.png" %>
+            <% end %>
+        </div>
+
+        <div id ="employee_main_info">
+            <h3> <%= @employee.full_name %>  </h3>
+            <h4><%= t('employee_id') %>: <%= @employee.employee_number %> </h4>
+        </div>
+
+        <div id="profile-general-info">
+
+
+        </div>
+        <div class="extender"></div>
+
+    </div>
+
+
+
+
+    <div id="profile-infos">
+        <div class="extender"></div>
+        <% unless @transport.nil? %>
+          <div id="new_profile_info_top">
+
+              <div class="profile_info_label_top2"><%= t('mode') %></div>
+              <div class="profile_info_text_top2">
+                  <%= @transport.mode_text  %>
+              </div>
+              <% unless (@transport.mode == 3) %>
+                <div class="profile_info_label_top"><%= t('pickup_route') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.pickup_route.name %>
+                </div>
+
+                <div class="profile_info_label_top"><%= t('pickup_stop') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.pickup_stop.name %>
+                </div>
+
+                <div class="profile_info_label_top"><%= t('pickup_vehicle') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.pickup_route.vehicle.try(:vehicle_no)||'-' %>
+                </div>
+              <% end %>
+
+              <% unless (@transport.mode == 2) %>
+                <div class="profile_info_label_top"><%= t('drop_route') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.drop_route.name %>
+                </div>
+
+                <div class="profile_info_label_top"><%= t('drop_stop') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.drop_stop.name %>
+                </div>
+
+                <div class="profile_info_label_top"><%= t('drop_vehicle') %></div>
+                <div class="profile_info_text_top">
+                    <%= @transport.drop_route.vehicle.try(:vehicle_no)||'-' %>
+                </div>
+              <% end %>
+
+              <div class="profile_info_label_top"><%= t('fare') %></div>
+              <div class="profile_info_text_top">
+                  <%=precision_label @transport.bus_fare%>
+              </div>
+          </div>
+        <% else %>
+          <p class="flash-msg"><%= t('employee_did_not_avail_transport') %></p>
+        <% end %>
+
+    </div>
+    <div class="extender"> </div>
+</div>
+
+

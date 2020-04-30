@@ -1,0 +1,180 @@
+
+<script type="text/javascript">
+    var recipient_list = new Array();
+
+    function recipient_html(recipient){
+        return(j('<div/>', {
+            'class': 'hover',
+            'html': j('<a/>', {
+                'href': '#',
+                'class': 'individual',
+                'data-recipient-id': recipient.id,
+                'onclick': 'remove_recipient(this)',
+                'html': recipient.name
+            }).append(j('<span/>', {'html': 'x'}))
+        }))
+    }
+
+    function add_recipient(el) {
+        var recipient = {'id': j(el).data('recipient-id'), 'name': j(el).data('recipient-name')}
+        if (j('#recipients .label-field-pair').length == 0) {
+            var scrollable = j('<div/>', {
+                'class': 'label-field-pair',
+                'html': j('<label/>', {'html': '<%= t('recipient') %>'})
+                        .append(j('<span/>', {'html': '*', 'class': 'necessary-field'}))
+            }).append(j('<div/>', {
+                        'class': 'scrollable', 'id': 'recipient-list',
+                        'html': j('<div/>', {'class': 'scroll-inside'})
+                    }
+            ));
+
+            j('#recipients').append(scrollable);
+        }
+
+        if (!recipient_list.any(function (x) {
+                        return (x.id == recipient.id)
+                    })) {
+            recipient_list.push(recipient);
+            j('#recipient-list.scroll-inside').append(recipient_html(recipient))
+            new_val = (j('#mail_message_recipient_ids').val() == '') ? recipient.id : (j('#mail_message_recipient_ids').val() + ',' + recipient.id)
+            j('#mail_message_recipient_ids').val(new_val);
+        }
+    }
+
+    function remove_recipient(el){
+        var removable = j(el).parent();
+        var recipient = {'id' : j(el).data('recipient-id')}
+        var recipient_input_val = j('#mail_message_recipient_ids').val();
+        var replace_regex = new RegExp('('+recipient.id+'\\,?)')
+        recipient_input_val = recipient_input_val.sub(replace_regex,'').sub('\,$','')
+        removable.remove();
+        j('#mail_message_recipient_ids').val(recipient_input_val);
+        recipient_list = recipient_list.reject(function(x){ return(Number(x.id) == Number(recipient.id)) });
+    }
+
+
+    function add_all_recipient() {
+        j('#source a.individual').each(function(i,x){ add_recipient(x)})
+    }
+
+
+    function clear_recipients(){
+        recipient_list = [];
+        j('#recipients').val('');
+    }
+
+</script>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('email_send') %></h1>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :email_alerts_compose_mail %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash.now[:error].nil? %>
+      <p class="flash-msg flash-error"> <%= flash.now[:error] %> </p>
+  <% end %>
+
+  <div class="head"><%= t('compose_mail') %></div>
+
+  <% form_for @mail_message ,:url=>{:controller=> "email_alerts", :action=> "compose_mail"}, :html => { :multipart => true } do |m| %>
+      <%= session_fingerprint_field %>
+      <div class="user_type_selector">
+        <div class="sub_text"><%= t('type_selector_desc') %></div>
+        <label class="check_label"  >
+          <%= m.radio_button  :recipient_type, "student", :checked => true, :class=>"check"%>
+          <%= t('student_text') %>
+        </label>
+        <label class="check_label" >
+          <%= m.radio_button :recipient_type, "employee", :class=>"check" %>
+          <%= t('employee_text') %>
+        </label>
+        <label class="check_label" >
+          <%= m.radio_button  :recipient_type, "guardian", :class=>"check" %>
+          <%= t('guardian') %>
+        </label>
+        <label class="check_label" >
+          <%= m.radio_button  :recipient_type, "all_users", :class=>"check" %>
+          <%= t('all_users') %>
+        </label>
+      </div>
+      <br/>
+      <div id="form">
+        <div class="extender"></div>
+        <div id="select-student-course">
+          <%= render :partial => 'select_batch_or_department', :locals => {:m => m} unless @mail_message.recipient_type == 'all_users'%>
+        </div>
+      </div>
+
+      <div class="message" id="page-yield">
+        <div class="label-field-pair">
+          <label for="mail_message_subject"><%= t('subject_messages') %><span class="necessary-field">*</span></label>
+          <div class="text-input-bg"><%= m.text_field :subject %></div>
+        </div>
+        <div class="label-field-pair">
+          <label for="mail_message_body"><%= t('message') %><span class="necessary-field">*</span></label>
+          <div class="text-area-bg">
+            <%= m.redactor :body %>
+          </div>
+        </div>
+        <h4 class="attach_files_head"><%= t('email_alerts_attach_files') %></h4>
+        <%= m.hidden_field :attachment_error  %>
+        <% m.fields_for :mail_attachments do |builder| %>
+            <%= render 'mail_attachment_fields', :c => builder %>
+        <% end %>
+        <div class="add_fields">
+          <%= link_to_add_fields "#{t('add')}", m, :mail_attachments %>
+        </div>
+        <div class="extender"></div>
+        <div id="submit-button">
+          <%= submit_tag "#{t('send')}", :class => 'button', :disable_with => "#{t('please_wait')}" %>
+        </div>
+      </div>
+
+  <% end %>
+  <div class="extender"></div>
+
+
+
+</div>
+<%= load_redactor_script %>
+<script>
+    j('.user_type_selector .check_label input').change(function(){
+        recipient_type = j(this).val();
+
+        if(recipient_type == 'all_users'){
+          j('#select-student-course').text('');
+          return;
+        }
+        j.ajax({
+            url: "batch_or_department_list",
+            type: 'GET',
+            data: {'mail_message[recipient_type]': recipient_type},
+            success: function(data, textStatus, jqXHR)
+            {
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+            }
+        });
+    });
+
+    toggleUserSelection = function(){
+        send_to_all = j("input[name='mail_message[send_to_all]']:checked").val();
+
+        if(send_to_all == 'true'){
+          j("#user-selector").hide();
+          j("#user-selector input").prop('disabled', true)
+        }else{
+          j("#user-selector").show();
+          j("#user-selector input").prop('disabled', false)
+        }
+    }
+
+    toggleUserSelection();
+
+</script>

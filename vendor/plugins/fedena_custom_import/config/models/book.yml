@@ -1,0 +1,56 @@
+book:
+    primary_keys:
+      book_number:
+    overrides:
+    associations:
+    associated_columns:
+    filters:
+     - :book_movement_id
+     - :status
+     - :fax
+     - :school_id
+    joins:
+      tags: "books"
+    join_column_search:
+      tags: "name"
+    mandatory_joins:
+     - :tags
+    associates:
+     book_additional_detail: "book_additional_field"
+    associate_columns:
+      book_additional_detail: "additional_info"
+    associate_column_search:
+      book_additional_field: "name"
+    associate_primary_keys:
+      book_additional_detail:
+        book_additional_field_id:
+    mandatory_columns:
+    - :book_number
+    - :title
+    - :author
+    additional_join:
+     - :BookAdditionalField
+    options_join:
+     - :book_additional_field_options
+     
+    
+    instructions:
+      Title: 
+        Type: "Alphanumeric."
+        Input Instruction and example: ""
+      Author:
+        Type: "Alphanumeric."
+        Input Instruction and example: ""
+      Book number:
+        Type: "Alphanumeric."
+        Input Instruction and example: ""
+      Barcode:
+        Type: "Alphanumeric."
+        Input Instruction and example: ""
+        
+      
+# Please refer to employee.yml for basic concept
+
+# If core data is dependent on a join table data as such,that,if join data is not entered it will not save,
+# for example books cannot be saved without tags.Place those joins as mandatory_joins array.
+    

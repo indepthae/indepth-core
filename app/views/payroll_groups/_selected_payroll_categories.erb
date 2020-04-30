@@ -1,0 +1,257 @@
+<%- fields_for @payroll_group do |pg| %>
+  <h3><%= t('selected_payroll_categories') %></h3>
+
+  <table class="selected_cat_list" id="sort">
+    <tr class="tr-head disable_sort">
+      <td class="index sort_opt"><%= t('sort') %></td>
+      <td class="category_name"><%= t('payroll_category') %></td>
+      <td class="category_code"><%= t('code') %></td>
+      <td class="category_val"><%= t('value') %></td>
+      <td class="button"></td>
+    </tr>
+
+    <tr id ="0" class="no_categories disable_sort">
+      <td colspan="5" class="empty_msg"><%= t('add_payroll_categories_from_below_table') %></td>
+    </tr>
+
+    <%= pg.hidden_field :category_present %>
+
+    <tbody class="selected_earning">
+      <tr class="sub_heading disable_sort bg_light_grey">
+        <td colspan="5"><%= t('earnings') %></td>
+      </tr>
+      <% i = 0 %>
+      <% if @pay_earnings.present? %>
+        <% pg.fields_for :payroll_groups_payroll_categories, @pay_earnings do |f| %>
+          <% next if f.object.payroll_category.is_deduction  %>
+          <% unless f.object.marked_for_destruction? %>
+            <tr class="category" cat_id="<%= f.object.payroll_category.id%>" id="<%= i = i+1%>" code ="<%= f.object.payroll_category.code %>" dependant_cats ="<%= f.object.payroll_category.dependant_categories.nil? ? "" : f.object.payroll_category.dependant_categories.join(",") %>">
+              <td class="index sort_opt"><div class="sort_opt_icon"></div></td>
+              <td class="category_name"><%= f.object.payroll_category.name %></td>
+              <td class="category_code"><%= f.object.payroll_category.code %></td>
+              <td class="category_val"><%= f.object.payroll_category.hr_formula.try(:formula_html_display) %></td>
+              <td class="button" id="remove" onclick="removeCategory(this);"><%= link_to_remove_fields t('remove'), f %></td>
+              <%= f.hidden_field :sort_order , :id => 'sort_order'%>
+              <%= f.hidden_field :payroll_category_id , :value => f.object.payroll_category.id , :class => "category_id"%>
+            </tr>
+          <% else %>
+            <%= f.hidden_field :sort_order , :id => 'sort_order'%>
+            <%= f.hidden_field :payroll_category_id , :value => f.object.payroll_category.id , :class => "category_id"%>
+            <%= f.hidden_field :_destroy, :value => 1 %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <tr id ="selected_earning_empty_msg" class="disable_sort"><td colspan="5" class="empty_msg"><%= t('no_selected_earnings') %></td></tr>
+    </tbody>
+
+    <tbody class="selected_deduction" >
+      <tr class="sub_heading disable_sort bg_light_grey">
+        <td colspan="5"><%= t('deductions') %></td>
+      </tr>
+      <% if @pay_deductions.present? %>
+        <% pg.fields_for :payroll_groups_payroll_categories, @pay_deductions do |f| %>
+          <% next unless f.object.payroll_category.is_deduction %>
+          <% unless f.object.marked_for_destruction? %>
+            <tr class ="category" cat_id="<%= f.object.payroll_category.id%>" id="<%= i= i+1%>" code ="<%= f.object.payroll_category.code %>" dependant_cats ="<%= f.object.payroll_category.dependant_categories.nil? ? "" : f.object.payroll_category.dependant_categories.join(",") %>">
+              <td class="index sort_opt"><div class="sort_opt_icon"></div></td>
+              <td class="category_name"><%=  f.object.payroll_category.name %></td>
+              <td class="category_code"><%=  f.object.payroll_category.code %></td>
+              <td class="category_val"><%= f.object.payroll_category.hr_formula.try(:formula_html_display) %></td>
+              <td class="button" id="remove" onclick="removeCategory(this);"><%= link_to_remove_fields t('remove'), f %></td>
+              <%= f.hidden_field :sort_order , :id => 'sort_order'%>
+              <%= f.hidden_field :payroll_category_id , :value =>  f.object.payroll_category.id, :class => "category_id" %>
+            </tr>
+          <% else %>
+            <%= f.hidden_field :sort_order , :id => 'sort_order'%>
+            <%= f.hidden_field :payroll_category_id , :value =>  f.object.payroll_category.id, :class => "category_id" %>
+            <%= f.hidden_field :_destroy, :value => 1 %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <tr  id ="selected_deduction_empty_msg" class="disable_sort"><td colspan="5" class="empty_msg"><%= t('no_selected_deductions') %></td></tr>
+    </tbody>
+
+  </table>
+<% end %>
+
+
+<script type="text/javascript">
+
+  removeCategory = function(link){
+    j("#dependency_error_msg").text("");
+    action = '<%= params[:action]%>' ;
+    parent_row = j(link).parent('tr');
+    cat_id = j(parent_row).attr("cat_id");
+    code = j(parent_row).attr("code");
+    listed_cat = j(".payroll_categories tr[code='" + code +  "']");
+    listed_cat.show();
+    if(action == "new" || action == "create")
+      j(parent_row).remove();
+
+    if(action == "edit" || action == "update"){
+      existing_pg_categories = [];
+      j("tr.category").each(function (i,v) { existing_pg_categories.push(j(v).attr("cat_id"))});
+
+      if (existing_pg_categories.indexOf(cat_id) > -1){
+        id = j(parent_row).children(".button").children("input");
+        j(parent_row).hide();
+        j(id).attr('value',1);
+
+      }else{
+        // new cat
+        j(parent_row).remove();
+      }
+    }
+
+    displayEmptyMsgs();
+    update_formula_help();
+    showDependencyError();
+  }
+
+  displayEmptyMsgs = function(){
+    selected_earnings = j(".selected_earning tr.category:visible");
+    selected_deductions = j(".selected_deduction tr.category:visible");
+    if (selected_earnings.length > 0 || selected_deductions.length > 0){
+      j(".no_categories").hide();
+    }
+
+    if (selected_earnings.length > 0){
+      j("#selected_earning_empty_msg").hide();
+      j(".selected_earning .sub_heading").show();
+    }
+    else{
+      j("#selected_earning_empty_msg").show();
+      j(".selected_earning .sub_heading").show();
+    }
+
+    if (selected_deductions.length > 0){
+      j("#selected_deduction_empty_msg").hide();
+      j(".selected_deduction .sub_heading").show();
+    }
+    else{
+      j("#selected_deduction_empty_msg").show();
+      j(".selected_deduction .sub_heading").show();
+    }
+
+    if (selected_earnings.length == 0 && selected_deductions.length == 0){
+      j("#selected_earning_empty_msg").hide();
+      j(".selected_earning .sub_heading").hide();
+      j("#selected_deduction_empty_msg").hide();
+      j(".selected_deduction .sub_heading").hide();
+      j(".no_categories").show();
+    }
+
+    list_earnings = j(".list_earning tr.list:visible")
+    list_deductions = j(".list_deduction tr.list:visible")
+    if (list_earnings.length == 0 ){
+      j(".list_earning tr#list_earning_empty_msg").show();
+    }
+
+    else{
+      j(".list_earning tr#list_earning_empty_msg").hide();
+    }
+
+    if (list_deductions.length == 0){
+      j(".list_deduction tr#list_deduction_empty_msg").show();
+    }
+    else{
+      j(".list_deduction tr#list_deduction_empty_msg").hide();
+    }
+  }
+
+
+  soratble = function(){
+    selectedCategoryStyle();
+
+    if (j(".category").length > 1){
+      categoryListStyle();
+      j("#sort tbody").sortable({
+        start: function( event, ui ) {
+          j(this).children('tr.category').addClass('my_class');
+        },
+        stop: function( event, ui ) {
+          j(this).children('tr.category').removeClass('my_class');
+
+          updateSortorder();
+
+        },
+        items: "tr:not(.disable_sort)"
+      }).disableSelection();
+    }
+  }
+
+  updateSortorder = function (){
+    j('tr.category').each(function (i) {
+      j(this).attr({id : i + 1});
+      j(this).children('#sort_order').val(i+1);
+    });
+  }
+
+
+  showDependencyError = function() {
+    j.each(j('tr.category'),function(i,v){
+      code = j(parent_row).attr("code");
+      dependant_list = j(v).attr("dependant_cats").split(",");
+
+      if(dependant_list.indexOf(code) >=0 ){
+        cats = [code];
+        j(v).children('td.category_name').addClass('dependency_error');
+        j.each(j(dependant_list),function(i,v){
+          if(selected_categories.indexOf(v) < 0 ){
+            cats.push(v);
+          }
+        })
+        j(v).children('td.category_name').append("<div class='tooltip' style='display:none;'>" + cats.uniq().join(",") + "</div>")
+        j(v).children('td.category_name').hover(
+        function() {
+          j( this ).children().show();
+        },function() {
+          j( this ).children().hide();
+        }
+      );
+
+      }
+    })
+  }
+
+
+  function selectedCategoryStyle(){
+    j(".selected_cat_list .tr-head").css({"width":"981px", "float":"left"});
+    j(".selected_cat_list tr.category").css({"width":"980px", "float":"left"});
+    j(".selected_cat_list tr.disable_sort").css({"width":"981px","float":"left" });
+
+    j(".selected_cat_list tr.sub_heading").css("width","981px");
+    j(".selected_cat_list tr.sub_heading td").css("width","980px");
+    j(".selected_cat_list .empty_msg").css("width", "980px")
+    j(".selected_cat_list tr.sub_heading").css("float","left");
+    j(".selected_cat_list .sort_opt").css("min-width","50px");
+    j(".selected_cat_list .category_name").css("min-width","275px");
+    j(".selected_cat_list .category_code").css("min-width","100px");
+    j(".selected_cat_list .category_val").css("min-width","375px");
+    j(".selected_cat_list .button").css("min-width","75px");
+    //j(".selected_cat_list tr.category").css("border-left", "0px")
+    j(".selected_cat_list tr.category td.sort_opt").css("border-left", "1px solid #bfbfbf")
+<% if rtl? %>
+      j(".selected_cat_list tr.category").css("border-left", "1px solid #bfbfbf");
+<% else %>
+      j(".selected_cat_list tr.category").css("border-right", "1px solid #bfbfbf");
+<% end %>
+  }
+
+
+  function categoryListStyle(){
+    j(".payroll_categories .tr-head").css({"width":"981px","float":"left" });
+    j(".payroll_categories tr").css({"width":"980px","float":"left"});
+    j(".payroll_categories tr.disable_sort").css({"width":"980px", "float":"left"});
+    j(".payroll_categories tr.sub_heading").css("width","980px");
+    j(".payroll_categories tr.sub_heading td").css("width","980px");
+    j(".payroll_categories .empty_msg").css("width", "981px")
+    j(".payroll_categories tr.sub_heading").css("float","left");
+    j(".payroll_categories .sort_opt").css("min-width","50px");
+    j(".payroll_categories .category_name").css("min-width","275px");
+    j(".payroll_categories .category_code").css("min-width","100px");
+    j(".payroll_categories .category_val").css("min-width","375px");
+    j(".payroll_categories .button").css("min-width","75px");
+  }
+
+</script>

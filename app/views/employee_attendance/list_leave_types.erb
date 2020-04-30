@@ -1,0 +1,76 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('leave_types') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('leave_types') %></div>
+  <% if permitted_to? :add_leave_types , :employee_attendance %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_leave_type')}", :controller=>"employee_attendance", :action=>"add_leave_types" %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="leave_type-list">
+    <h4><%= t('leave_types').titleize %></h4>
+    <p class="description"><%= t('leave_type_desc') %></p>
+    <table>
+      <tr class="tr-head">
+        <td class="name"><%= t('leave_type') %></td>
+        <td class="code"><%= t('code') %></td>
+        <td class="code"><%= t('valid_from') %></td>
+        <td class="actions"></td>
+      </tr>
+      <% if @leave_types.present? %>
+        <% @leave_types.each do |type, leaves| %>
+          <% if type == true %>
+            <tr class="sub-head">
+              <td colspan="4"><%= "#{t('active_leave')}" %></td>
+            </tr>
+          <% else %>
+            <tr class="sub-head">
+              <td colspan="4"><%= "#{t('inactive_leave')}" %></td>
+            </tr>
+          <% end %>
+          <% leaves.each do |lt| %>
+            <tr class="bg_light_grey">
+              <td class="name">
+                <div class="leave_name"><%= lt.name %></div>
+                <% if lt.creation_status != 2 %>
+                  <div class="leave_status_<%= lt.creation_status %>"><%= EmployeeLeaveType::LEAVE_STATUS[lt.creation_status] %></div>
+                <% end %>
+              </td>
+              <td class="code"><%= lt.code %></td>
+              <td class="code"><%= lt.reset_date.present? ? format_date(lt.reset_date, :short) : "-" %></td>
+              <td class="actions">
+                <% if lt.creation_status == 1 %>
+                  <div id="edit_inactive"><%=  t('edit') %></div>
+                  <div id="delete_inactive"><%#= t('delete')%></div>
+                <% elsif lt.creation_status == 2 %>
+                  <div id="edit"><%= link_to t('edit'), {:action => "edit_leave_types", :id => lt.id} %></div>
+                  <div id="delete"><%#= link_to t('delete') , {:action => "delete_leave_types", :id => lt.id}, :confirm=>"#{t('are_you_sure_to_delete_leave_type')}"%></div>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+    <% else %>
+      <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+    <% end %>
+    </table>
+    <div id="dialogue"></div>
+  <%= pagination_status(@employee_leave_types) %>
+  <%= will_paginate @employee_leave_types %>
+  </div>
+</div>

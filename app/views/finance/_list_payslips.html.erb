@@ -1,0 +1,94 @@
+<div id="payslips_list">
+  <table>
+    <tr class="tr-head">
+      <td><%= t('employee_text') %></td>
+      <td><%= t('employee_no') %></td>
+      <% if @payslip_query[:department_id] == "All" %>
+        <td><%= t('payment_frequency') %></td>
+      <% end %>
+      <td><%= t('payslip_period') %></td>
+      <td><%= "#{t('amount')} (#{currency})" %></td>
+      <td><%= t('payslip_status') %></td>
+      <% if @total.total_employees.to_i > 0 %><td></td><% end %>
+    </tr>
+    <% if @payslips.present? %>
+      <% @payslips.each do |group_name,payslips| %>
+        <tr class="sub-head">
+          <td colspan = "7">
+            <% if @payslip_query[:department_id] == "All" %>
+              <%= group_name %>
+            <% else %>
+              <%= PayrollGroup.payment_period_translation(group_name) %>
+            <% end %>
+          </td>
+        </tr>
+        <% payslips.each do |p| %>
+          <tr class="bg_light_grey">
+            <td class="emp_name">
+              <%= p.full_name %>
+              <% if p.emp_type == 'ArchivedEmployee' %>
+                <span class ="archived"><%= "&#x200E;(#{t('archived')})&#x200E;" %></span>
+              <% end %>
+            </td>
+            <td class="emp_no"><%= p.employee_number %></td>
+            <% if @payslip_query[:department_id] == "All" %>
+              <td class="payment_free"><%= PayrollGroup.payment_period_translation(p.payment_period) %></td>
+            <% end %>
+            <td class="pay_period"><%= p.date_range %></td>
+            <td class="amount"><%= precision_label(p.net_pay) %></td>
+            <td class="status"><%= p.payslip_status %></td>
+            <td class="actions">
+              <% unless params[:hr].present? %>
+                <% if permitted_to? :view_employee_payslip, :finance %>
+                  <div id="view_link"><%= link_to t('view') , {:controller => "finance", :action => "view_employee_payslip", :id => p.id}, :target => '_blank'%></div>
+                <% end %>
+              <% else %>
+                <% if permitted_to? :view_payslip, :employee_payslips %>
+                  <div id="view_link"><%= link_to t('view') , {:controller => "employee_payslips", :action => "view_payslip", :id => p.id, :from => "payslip_reports"}, :target => '_blank'%></div>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr><td colspan="7"><%= t('nothing_to_list') %></td></tr>
+    <% end %>
+  </table>
+  <% if @payslips_list.present? %>
+    <%= pagination_status(@payslips_list) %>
+    <%= will_paginate @payslips_list,:renderer => 'RemoteLinkRenderer', :params => {:payslip => @payslip_query, :hr => params[:hr]} %>
+  <% end %>
+  <div id="buttons">
+    <div class="label-field-pair dept_name">
+      <label for="employees"><%= t('total_payslips') %> </label>
+      <div class="text-input-bg">
+        <label><b><%= @total.total_payslips %></b></label>
+      </div>
+    </div>
+    <div class="label-field-pair dept_name">
+      <label for="employees"><%= t('total_employees') %> </label>
+      <div class="text-input-bg">
+        <label><b><%= @total.total_employees %></b></label>
+      </div>
+    </div>
+    <div class="label-field-pair dept_name">
+      <label for="total_salary"><%= t('total_salary_text') %> </label>
+      <div class="text-input-bg">
+        <label><b><%= currency + ' ' +(@total.total_salary.present? ? precision_label(@total.total_salary) : '0') %></b></label>
+      </div>
+    </div>
+    <div class="label-field-pair dept_name">
+      <label for="approved_salary"><%= t('approved_salary') %> </label>
+      <div class="text-input-bg">
+        <label><b><%= currency + ' ' +(@total.approved_salary.present? ? precision_label(@total.approved_salary) : '0') %></b></label>
+      </div>
+    </div>
+  </div>
+  <% if @payslips.present? %>
+    <div id="buttons">
+      <%= link_to "#{t('pdf_report')}", {:controller => "finance", :action => "view_monthly_payslip_pdf",:page_height => 680, :report_format_type => "pdf",:payslip => @payslip_query}, :class => "user_button", :target => '_blank'  %>
+      <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", :csv_report_type => "finance_payslip",:report_format_type => "csv",:payslip => @payslip_query},:class => "user_button"%>
+    </div>
+  <% end %>
+</div>

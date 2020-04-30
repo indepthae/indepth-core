@@ -1,0 +1,11 @@
+<div id="form-errors"></div>
+
+<div class="label-field-pair">
+    <div class="label-container">
+        <!--label>< %= t('name') %></label -->
+        <%= form.label :attachment_category_name,"#{t('category_name')}" %>
+    </div>
+    <div class="input-container"> 
+        <%= form.text_field :attachment_category_name %>
+    </div>
+</div>  

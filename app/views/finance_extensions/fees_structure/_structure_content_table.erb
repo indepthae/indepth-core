@@ -1,0 +1,61 @@
+<% total_fees =0 %>
+<!-- < % unless @fee_particulars.nil? %> -->
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+      <tr class="main_head tr-list_head">
+          <td class="sl-col"><%= t('sl_no') %></td>
+          <td class="set_border_right"><%= t('particulars') %></td>
+          <td class="set_border_right">
+              <%= t('amount') %>
+              (<%= currency %>)
+          </td>
+          <% i = 0 %>
+          <% total_fees = @total_payable.to_f  %>
+      </tr>
+      <% if @fee.is_a?(FinanceFee) %>
+        <%= render :partial => 'finance_extensions/fees_structure/particular_list' %>
+        <% unless @total_discount == 0 %>                    
+          <%= render :partial => 'finance_extensions/fees_structure/discount_list', :locals => {:i => i, 
+            :total_fees => total_fees} %>
+        <% end %>
+        <% total_fees = (@total_payable-@total_discount.to_f).to_f  %>
+      <% elsif @fee.is_a?(TransportFee) %>
+        <%= render :partial => 'finance_extensions/fees_structure/transport_fee_particulars_list' %>
+        <% unless @total_discount == 0 %>          
+          <%= render :partial => 'finance_extensions/fees_structure/transport_discount_list', 
+            :locals => {:i => i, :total_fees => total_fees} %>
+        <% end %>
+      <% elsif @fee.is_a?(HostelFee) %>
+        <%= render :partial => 'finance_extensions/fees_structure/hostel_fee_particulars_list' %>
+      <% end %>
+
+      <% unless @fee.is_a?(TransportFee) %>
+        <% if @fee.tax_enabled? and @fee.tax_collections.present? %>          
+          <% total_fees += @total_tax %>
+          <%= render :partial => 'finance_extensions/fees_structure/tax_list', :locals => {:i => i, :total_tax => total_fees } %>          
+        <% end %>
+      <% else %>
+        <% if @fee.tax_enabled? and @fee.tax_collections.present? and @fee.tax_amount.present? %>          
+          <% total_fees += @fee.tax_amount %>
+          <%= render :partial => 'finance_extensions/fees_structure/tax_list', :locals => {:i => i, :total_tax => total_fees } %>
+        <% end %>
+      <% end %>
+
+      <% if @fee.is_a?(FinanceFee) %>
+        <% @total_fine = 0 %>
+        <%= render :partial => 'finance_extensions/fees_structure/student_fine_list', :locals => {:i => i, :total_fees => total_fees,:payment_date=> @transaction_date} %>
+      <% elsif @fee.is_a?(TransportFee)%>
+        <%=  render :partial => 'finance_extensions/fees_structure/transport_fine_list', :locals => {:i => i, :total_fees => total_fees,:payment_date=> @transaction_date}  %>
+      <% else %>
+        <%= render :partial => 'finance_extensions/fees_structure/other_fee_fine', :locals => {:i => i, :total_fees => total_fees} %>
+      <% end %>      
+      <% @show_due_amount = true %>
+      <% @financefee = @fee %>
+      <%= render :partial => 'finance_extensions/fees_structure/fee_structure_summary' ,:locals => {:total_fine=>@total_fine}%>
+
+  </table>
+
+  <%= link_to t("#{@invoice_enabled ? 'view_invoice' : 'view_pdf'}"), { :action => "fee_structure_pdf", 
+    :id => @student.id, :id2 => @date.id,  :fee_type => @fee.class.name.underscore.pluralize}, 
+    :target => '_blank', :class => 'user_button'%>          
+
+<!-- < % end %> -->

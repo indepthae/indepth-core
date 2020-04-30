@@ -1,0 +1,63 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+    <h1><%= t('donations') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%=t('donations')  %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('additional_fields')}", :action => "add_additional_details_for_donation" %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new')}", :action => "donation" %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% form_remote_for :donors_list ,:url=>{:action=>'donors_list'} ,:loading=>"$('loader').show();",:loaded=>"$('loader').hide();" do |f| %>
+    <div class="filter">
+      <div class="label-field-pair">
+        <label for="former_students"><%= t('from') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'donors_list[from]', I18n.l(1.month.ago.to_date,:format=>:default),:year_range => 15.years.ago..0.years.from_now,:popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="former_students"><%= t('to') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'donors_list[to]', I18n.l(Date.today,:format=>:default),:year_range => 15.years.ago..0.years.from_now,:popup=>"force" %>
+        </div>
+      </div>
+      <%= submit_tag "► #{t('search_text')}", :class=> 'submit_button', :disable_with => "#{t('please_wait')}"  %>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </div>
+  <% end %>
+  <% unless flash[:notice].nil? %><p class="flash-msg"><%= flash[:notice] %></p><% end %>
+  <div id="donors_list">
+    <%= render :partial => "donors_list" %>
+  </div>
+</div>

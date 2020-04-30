@@ -1,0 +1,58 @@
+<table align="center" width="75%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+        <td class="check_all">
+            <%= check_box :selected,:all, :class => "select_all" ,:onclick => "select_all(this)" %>
+        </td>
+        <td class="course_name"><%= t('exam_planners') %></td>
+        <td class="count"><%= t('terms') %></td>
+        <td class="count"><%= t('exams_text') %></td>
+        <td class="count"><%= t('courses_linked_count') %></td>
+    </tr>
+    <% @planners.each do |planner| %>
+      <tr>
+          <td class="check_all">
+              <%= check_box_tag 'import_planner[assessment_plan_ids][]', planner.id, @import.fallbacked_assessment_plan_ids.include?(planner.id.to_s), 
+                :class => "select_planner", :onclick => 'check_and_select(this)', :disabled => @imported_planners.include?(planner.id)%>
+          </td>
+          <td class="course_name">
+            <span class="name"><%= planner.name %></span>
+            <% if  @imported_planners.include?(planner.id) %>
+              <span id="info-symbol" tooltip="<%= t('planner_already_imported') %>"></span>
+            <% end %>
+          </td>
+          <td class="count"><%= planner.terms_count %></td>
+          <td class="count"><%= planner.assessment_groups_count %></td>
+          <td class="count"><%= planner.courses.count %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @import.errors.present? and @import.errors[:assessment_plan_ids].present? %>
+  <div class="wrapper">
+      <div class="error-icon"></div>
+      <div class="error-msg">
+        <%= @import.errors[:assessment_plan_ids] %>
+      </div>
+  </div>
+<% end %>
+
+<div class='extender_with_hr pull_left'></div>
+
+<div class='page_sub_head pull_left'><%= t('import_from_planner') %></div>
+<div class="ind_block pull_left">
+    <div class="label_pair">
+      <%= check_box_tag 'import_planner[import_settings][]', 'import_exam_group', false, :checked => @import.import_exam_group %>
+      <label class="general_label" for="assessment_report_setting_show_total_score"><%=t('import_exam_groups')%></label>
+    </div>
+    <div class="label_pair">
+      <%= check_box_tag 'import_planner[import_settings][]', 'import_courses', false, :checked => @import.import_courses %>
+      <label class="general_label" for="assessment_report_setting_show_final_grade"><%=t('import_course_associations')%></label>
+    </div>
+    <div class="label_pair">
+      <%= check_box_tag 'import_planner[import_settings][]', 'import_report_settings', false, :checked => @import.import_report_settings %>
+      <label class="general_label" for="assessment_report_setting_show_final_percentage"><%=t('import_report_settings')%></label>
+    </div>
+</div>
+
+<div class='extender_with_hr pull_left'></div>
+
+<%=submit_tag "#{t('import_exam_planners')}", :class => "submit-button", :id => "submit_button" %>

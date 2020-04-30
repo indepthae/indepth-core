@@ -1,0 +1,3 @@
+page << "build_modal_box({'title' : '#{(@fee_account.new_record? ? t('create_fee_account') : t('update_fee_account'))}', 
+                                           'popup_class' : 'fee_account_form'})" unless params[:fee_account].present?
+page.replace_html 'popup_content', :partial => 'account_form'

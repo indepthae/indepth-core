@@ -1,0 +1,171 @@
+
+<div id="highlight">
+  <div class="today_date"><div class="new_exams_small"><%=t('today')%></div><div class="today_date_text"><%=format_date(@date,:format=>:long_date)%></div></div>
+  <div class="attendance_highlights"><div class="bold_new_exam_text"><%=t('present')%></div><div class="large_present_text"><%=@present_students_count%></div><div class="small_total_text"><%=t('out_of_text')%> <%=@batch_students_count%></div></div>
+  <div class="attendance_highlights"><div class="bold_new_exam_text"><%=t('absentees')%></div><div class="large_present_text"><%=@absentees_count%></div></div>
+  <div class="attendance_highlights no_right_margin"><div class="normal_absentees_text"><%=t('attendance_percentage')%></div><div class="absentees_count"><%="#{@attendance_percentage}%"%></div></div>
+
+</div>
+    <div id="other_details">
+        <%unless @absentees_count==0 || @absentees_count=='-' %>
+          <div id="list_absentees"><%=t('list_of')%> <%=t('absentees')%></div>
+        <%end%>
+        <div id ="combine_portlet">
+            <div class="portlet-date">
+                <%= link_to '<div class ="date-previous"></div>',"#" ,{:class=>"prev_date_arrow", :id=>"date-prev", :onClick=>"get_prev_date(this); return false;"} %>
+                <label id=<%= "date_label" %> ><%= format_date(@date,:format=>:long_date) %> <%= t('today') if @date.to_date==Date.today %></label>
+                <%= link_to '<div class="date-next"></div>',"#" ,{:class=>"next-date-arrow", :id=>"date-next", :onClick=>"get_next_date(this); return false;"} %>
+                <%= hidden_field_tag :datepicker, @date.to_date.strftime("%Y-%m-%d"), :class=>"datepicker",:id=>"today-date", :autocomplete=>:off, :onchange=>"set_date(this)"  %>
+            </div>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "date-loader",
+              :class=>"date-loader",
+              :style =>"display: none;" ) %>
+        </div>
+        <%unless @students.empty?%>
+          <div id="exam_items">
+              <table id="exam_details_table">
+                  <tr>
+                      <th id="sl_no"><%=t('sl_no')%></th>
+                      <th id="st_name"><%=t('student_name')%></th>
+                      <th id="admn_no"><%=t('admission_number')%></th>
+                      <% if roll_number_enabled? %>
+                        <th id="roll_no"><%=t('roll_no')%></th>
+                      <%end%>
+                  </tr>
+                  <%@students.each_with_index do |s,i|%>
+                    <% if params[:page].present? %>
+                      <% if params[:page].to_i >= 1 %>
+                        <% i = i  + (params[:page].to_i - 1) * 20 %>
+                      <% end %> <%else %> <% i = i %> <% end %>
+                    <tr class="list_<%=cycle('odd', 'even')%>">
+                        <td><%=i+1%></td>
+                        <%if permitted_to? :profile,:student%>
+                          <td><%=link_to s.full_name,:controller=>'student',:action=>'profile',:id=>s.id%></td>
+                        <%else%>
+                          <td><%=s.full_name%></td>
+                        <%end%>
+                        <td><%=s.admission_no%></td>
+                        <% if roll_number_enabled? %>
+                          <td class="col-1"><%= s.roll_number.present? ? s.roll_number : "-" %></td>
+                        <% end %>
+                    </tr>
+                  <%end%>
+              </table>
+              <%=will_paginate @students,:renderer => 'RemoteLinkRenderer',:remote=>{:update=>'display_area'},:params=> {:date=>@date.to_date,:request_id=>2,:controller => "batches", :action => "batch_summary",:batch_id=>@batch.id}%>
+          </div>
+        <%else%>
+          <div class="no_entries"><%=t('no_absentees_present')%></div>
+        <%end%>
+    </div>
+    <script type="text/javascript">
+      var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>".split(',');
+      var month_names_short = "<%= I18n.t('date.abbr_month_names').compact.join(',') %>".split(',');
+      j.datepicker.regional["<%= I18n.locale.to_s %>"] = {
+          monthNames: month_names,
+          monthNamesShort: month_names_short
+      }
+      j.datepicker.setDefaults(j.datepicker.regional["<%= I18n.locale.to_s %>"]);
+      j(function () {
+          j(".datepicker").datepicker({
+              showOn: "button",
+              buttonImage: "/images/transparent_1.png",
+              buttonImageOnly: true,
+              changeMonth: true,
+              changeYear: true,
+              showOtherMonths: true,
+              selectOtherMonths: true,
+              buttonText: 'Select Date',
+              isRTL: <%= rtl? %>,
+              dateFormat: "yy-mm-dd",
+              beforeShow: function (input, inst) {
+                  var dp = $(inst.dpDiv);
+                  picker_width = j(dp).width();
+<% unless (rtl?) %>
+                    portlet_left = j(input).siblings('img').position().left - picker_width - 9;
+                    dp.css('margin-left', portlet_left);
+<% else %>
+                    doc_width = j(document).width();
+                    portlet_right = doc_width - j(input).siblings('img').position().left - picker_width - 25;
+                    dp.css('margin-right', portlet_right);
+<% end %>
+              }
+
+          });
+      });
+
+      function set_date(th_is)
+      {
+          curr_date = th_is.value;
+          format = "<%= date_format %>";
+          switch (format) {
+              case '2':
+                  format_str = 'MM dd, yy';
+                  break;
+              case '3':
+                  format_str = 'yy MM dd';
+                  break;
+              default:
+                  format_str = 'dd MM yy';
+                  break;
+          }
+          disp_date = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd", curr_date)));
+          today = j.datepicker.formatDate('yy-mm-dd', new Date());
+          if (curr_date == today)
+          {
+              disp_date_without_today = disp_date
+              disp_date = disp_date + " " + j("#today").val();
+          }
+          j("#date_label").html(disp_date);
+
+          j.ajax({
+              type: 'POST',
+              url: "/batches/batch_summary",
+              data: {
+                  batch_id: j('#batch_id').val(),
+                  request_id: 2,
+                  date: th_is.value
+              },
+              beforeSend: function () {
+                  j("#date-loader").show();
+              },
+              success: function (data) {
+                  j("#date-loader").hide();
+                  j('#display_area').html(data);
+                  if (curr_date == today) {
+                      j('.today_date_text').html(disp_date_without_today);
+                      j('.today_date_text').show();
+                  }
+                  else
+                  {
+                      j('.today_date_text').hide();
+                      j('.new_exams_small').html(disp_date)
+                      j('.new_exams_small').addClass('margin_top_35');
+                  }
+              }
+          });
+      }
+
+      function get_prev_date(th_is)
+      {
+          date_field = j("#today-date");
+          curr_date = j.datepicker.parseDate("yy-mm-dd", date_field.val());
+          prev_date = curr_date.setDate(curr_date.getDate() - 1);
+          date_field.val(j.datepicker.formatDate('yy-mm-dd', new Date(prev_date)));
+          set_date(date_field.get(0));
+      }
+
+      function get_next_date(th_is)
+      {
+          date_field = j("#today-date");
+          curr_date = j.datepicker.parseDate("yy-mm-dd", date_field.val());
+          next_date = curr_date.setDate(curr_date.getDate() + 1);
+          date_field.val(j.datepicker.formatDate('yy-mm-dd', new Date(next_date)));
+          set_date(date_field.get(0));
+
+      }
+
+    </script>
+    <%= hidden_field_tag "today_text", t('today'), :id=>"today", :autocomplete=>:off %>

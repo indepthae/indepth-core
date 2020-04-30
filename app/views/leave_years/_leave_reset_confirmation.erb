@@ -1,0 +1,12 @@
+<div class="confirmation_msg"><%= t('confirmation_dsc') %></div>
+<div id="popup_footer">
+      <%= link_to t('ok'),{:action => "leave_reset_settings", :config => @config_value}, :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+ </div>
+
+
+
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

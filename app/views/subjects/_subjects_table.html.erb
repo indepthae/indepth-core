@@ -1,0 +1,114 @@
+<% form_for :import, :url => {:action => :import_subjects, :id => @batch }, :method => :post do |form| %>
+  <table border="1" class="subject-table" >
+    <tr class="head-row">
+      <th class="head-col-1">
+        <%= check_box_tag '','', false, {:class => 'check_box checkall'} %>
+      </th>
+      <th class="head-col-2"> <%= t('subject') %> </th>
+      <th class="head-col-3"> <%= t('code') %> </th>
+    </tr>
+    <% @normal_subjects.each do |subject| %>
+      <tr class="subject-row">
+        <%if @cce_course%>
+          <%subject_already_present = (@existing_subjects.map(&:code).include? subject.code)%>
+          <%if @asl_subject.present?%>
+            <%subject_is_asl = subject.is_asl%>
+          <%end%>
+          <%if @sixth_subject.present?%>
+            <%subject_is_sixth = subject.is_sixth_subject%>
+          <%end%>
+          <%eligible= (subject_already_present or subject_is_asl or subject_is_sixth)%>
+        <%else%>
+          <% eligible = (@existing_subjects.map(&:code).include? subject.code) %>
+        <%end%>
+        <td class="subject-col-1" attr-id="<%= subject.id %>">
+          <%= check_box_tag 'subjects[]', subject.id, false, {:disabled => eligible, :id => subject.id, :class => 'check_box', :data_type => :subject} %>
+        </td>
+        <td class="subject-col-2">
+          <%= subject.name %>
+          <%if @cce_course and (@asl_subject.present? or @sixth_subject.present?)%>
+            <% if (subject_already_present or subject_is_asl or subject_is_sixth)%>
+              <div class="not_eligible">
+                <div class="notifier">
+                  <%=t('batches.flash9') if subject_already_present%>
+                  <%="ASL Subject already present in this batch" if subject_is_asl%>
+                  <%="Sixth Subject already present in this batch" if subject_is_sixth%>
+                </div>
+              </div>
+            <% end %>
+          <%else%>
+            <% if eligible %>
+              <div class="not_eligible">
+                <div class="notifier"><%= t('batches.flash9') %></div>
+              </div>
+            <% end %>
+          <%end%>
+        </td>
+        <td class="subject-col-3"> <%= subject.code %> </td>
+      </tr>
+    <% end %>
+    <% elective_subject_total = 0 %>
+    <% i_subject_ids = @importable_subjects.map(&:id) %>
+    <% @elective_group_subjects.each do |elective_group, elective_subjects| %>
+      <!--% #elective_subjects = (elective_group.subjects.select {|x| x if (i_subject_ids.include? x.id) } %-->
+      <% if elective_subjects.present? %>
+        <tr class="elective-group-row">
+          <td class="subject-col-1" attr-id="<%= elective_group.id %>">
+            <% eligible_subjects_count = (elective_subjects.map(&:name) - @existing_subjects.map(&:name)).length %>
+            <%= check_box_tag 'elective_groups[]', elective_group.id, false, {:disabled => (eligible_subjects_count > 0 ? false : true ), :id => elective_group.id, :class => 'check_box', :data_type => :elective_group} %>
+          </td>
+          <td class="subject-col-2" colspan="2"> <%= elective_group.name %> </td>
+        </tr>
+        <% elective_subjects.each do |elective_subject| %>
+          <% elective_subject_total += 1 %>
+          <tr class="subject-row">
+            <%if @cce_course and  @sixth_subject.present?%>
+              <% subject_already_present = (@existing_subjects.map(&:name).include? elective_subject.name) %>
+              <% group_is_sixth = elective_subject.elective_group.is_sixth_subject%>
+              <%eligible = (subject_already_present or group_is_sixth)%>
+            <%else%>
+              <% eligible = (@existing_subjects.map(&:name).include? elective_subject.name) %>
+            <%end%>
+            <td class="subject-col-1" attr-id="<%= elective_subject.id %>" >
+              <%= check_box_tag 'subjects[]', elective_subject.id, false, {:disabled => eligible, :id => elective_subject.id, :elective_group_id => elective_group.id, :class => 'check_box', :data_type => :subject} %>
+            </td>
+            <td class="subject-col-2">
+              <%= elective_subject.name %>
+              <%if (@cce_course and  @sixth_subject.present?)%>
+                <% if (subject_already_present or group_is_sixth)%>
+                  <div class="not_eligible">
+                    <div class="notifier">
+                      <%=t('batches.flash9') if subject_already_present%>
+                      <%="Sixth Subject already present in this batch" if group_is_sixth%>
+                    </div>
+                  </div>
+                <% end %>
+              <%else%>
+                <% if eligible %>
+                  <div class="not_eligible">
+                    <div class="notifier"><%= t('batches.flash9') %></div>
+                  </div>
+                <% end %>
+              <%end%>
+            </td>
+            <td class="subject-col-3"> <%= elective_subject.code %> </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </table>
+  <div class="selected_subjects">
+    <span id="selected_subjects_count">
+      0
+    </span>
+    <%= "#{t('of')} " %>&rlm;
+    <span id="total_subjects">
+      <%= @normal_subjects.length + elective_subject_total %>
+    </span>
+    <%= "#{t('subjects_text')}" %>
+  </div>
+  <div class="submit_area">
+    <%= submit_tag "", :value => "#{t('import_subjects')}", :class => "disabled submit_button", :disabled => true %>
+    <%= link_to t('cancel'), {:controller => "subjects", :action => "index", :id => @batch}, :class=>"cancel_link" %>
+  </div>
+<% end %>

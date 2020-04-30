@@ -1,0 +1,24 @@
+<script>
+window.onload = function() {
+    var vars={};
+    var x=document.location.search.substring(1).split('&');
+    for(var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+    var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+    for(var i in x) {
+        var y = document.getElementsByClassName(x[i]);
+        var signature_div = document.getElementsByClassName('pdf-footer')[0];
+            if (vars['page'] == vars['topage']) {
+                signature_div.style.visibility="visible";
+            }
+        for(var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+    }
+};
+
+</script>
+<div class="pdf-footer" style="visibility:hidden;">
+    <div class="generation_info">
+        <span class="info-bold"><%= t('report_generated_by') %></span> : <%="#{@data_hash[:current_user]} on #{format_date(Date.today)} at #{Time.now.strftime("%I:%M%p")}"%>
+        
+    </div>
+    <div class="signature"><%= t('signature') %> </div>
+</div>

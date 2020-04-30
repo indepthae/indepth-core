@@ -1,0 +1,44 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('email_send') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+    <% if permitted_to? :compose_mail, :email_alerts %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('compose_mail')}" ,:controller=>'email_alerts',:action=>'compose_mail'%> </div>
+        <div class="link-descr"><%= t('compose_mail_desc') %></div>
+      </div>
+    <%end%>
+    <% if permitted_to? :index, :mail_logs %>
+        <div class="link-box">
+          <div class="link-heading"><%= link_to "#{t('email_logs_text')}" ,:controller=>'mail_logs',:action=>'index'%> </div>
+          <div class="link-descr"><%= t('email_log_page_desc') %></div>
+        </div>
+    <%end%>
+    <% if permitted_to? :email_alert_settings, :email_alerts %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('settings')}" ,:controller=>'email_alerts',:action=>'email_alert_settings'%> </div>
+        <div class="link-descr"><%= t('email_alert_settings_privilege') %></div>
+      </div>
+    <%end%>
+
+    <% if permitted_to? :email_unsubscription_list, :email_alerts %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('unsubscription_list')}" ,{:controller=>"email_alerts",:action=>"email_unsubscription_list"}%> </div>
+        <div class="link-descr"><%= t('list_of_unsubscribed_users') %></div>
+      </div>
+    <%end%>
+  </div>
+</div>

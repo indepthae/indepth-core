@@ -1,0 +1,25 @@
+<% if @reason.include?("non_deducted_lop_present") and @reason_count == 1 %>
+  <p><%= t("emp_lop_msg", :undeducted_lop_count => @undeducted_lop_count) %></p>
+  <p><%= t('lop_msg') %></p>
+  <%= link_to t('lop_botton'), {:controller => "leave_years", :action => "retry_employee_reset", :id => @logs.id,  :department_id => @department.id ,:leave_year => @leave_year,:employee_id => @employee.id , :lop => "lop"} , :class => "submit_button" %>
+  <%= link_to t('cancel'), {:controller => "leave_years", :action => "end_year_process_detail", :logs => @logs.id, :department_id => @department.id} , :class => "submit_button", :id => "cancel" %>
+
+<% elsif @pending_leave_applications.present? %>
+  <p><%= "#{@employee.full_name}" %><%=  t('pending_leave_msg') %></p>
+  <%= link_to t('cancel'), {:controller => "leave_years", :action => "end_year_process_detail", :logs => @logs.id, :department_id => @department.id} , :class => "submit_button", :id => "cancel" %>
+
+<% elsif  @reason_count > 1 and @pending_leave_applications.present? %>
+  <%= "#{@employee.full_name}" %><%=  t('pending_leave_and_lop') %>
+  <%= link_to t('cancel'), {:controller => "leave_years", :action => "end_year_process_detail", :logs => @logs.id, :department_id => @department.id} , :class => "submit_button", :id => "cancel" %>
+
+<%  elsif @reason.include?("non_deducted_lop_present") and @reason.include?("pending_leave_applications") and @pending_leave_applications.blank?  %>
+  <p><%= t("emp_lop_msg", :undeducted_lop_count => @undeducted_lop_count) %></p>
+  <p><%= t('lop_msg')%></p>
+  <%= link_to t('lop_botton'), {:controller => "leave_years", :action => "retry_employee_reset", :id => @logs.id,  :department_id => @department.id ,:leave_year => @leave_year,:employee_id => @employee.id , :lop => "lop"} , :class => "submit_button" %>
+  <%= link_to t('cancel'), {:controller => "leave_years", :action => "end_year_process_detail",:department_id => @department.id, :logs => @logs.id} , :class => "submit_button", :id => "cancel" %>
+
+<% else %>
+  <p><%= t('are_you_completely_sure') %></p>
+  <%= link_to t('process_leaves'), {:controller => "leave_years", :action => "retry_employee_reset", :id => @logs.id,  :department_id => @department.id,:employee_id => @employee.id, :leave_year => @leave_year } , :class => "submit_button" %>
+  <%= link_to t('cancel'), {:controller => "leave_years", :action => "end_year_process_detail", :logs => @logs.id, :department_id => @department.id} , :class => "submit_button", :id => "cancel" %>
+<% end %>

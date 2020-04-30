@@ -1,0 +1,140 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('fees_receipt_settings') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <div class="">
+    <% unless flash[:notice].nil? %>
+        <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <p class="title"><%= t('fees_receipt_printer_settings') %></p>
+
+    <div id="fee_receipt_form_container">
+      <%= render :partial => "finance_settings/fee_settings/fees_receipt_settings_form" %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+    function load_css(href) {
+        remove_template_stylesheets();
+        var cssLink = j("<link rel='stylesheet' type='text/css' href='" + href + "'>");
+        j("head").append(cssLink);
+    }
+
+    function remove_template_stylesheets() {
+        j('link[rel=stylesheet][href~="/stylesheets/_receipt_templates/_template_thermal_responsive.css"]').
+                remove();
+    }
+
+    function print_preview() {
+        var ifrm = document.getElementById('preview_frame');
+        iframe_window = (ifrm.contentWindow || ifrm.contentDocument);
+        iframe_window.document.execCommand('print', false, null) || iframe_window.print();
+    }
+
+    function set_template() {
+        var logo = j("input[name='receipt_printer[receipt_printer_type]']:checked").val();
+        var enable_logo = (logo == "0" || logo == "1");
+        var template = j('#receipt_template').val();
+        j("#loader_image").show();
+        reset_iframe_dimensions();
+
+        var iframe = document.getElementById('preview_frame');
+        // TODO make https compatiable
+        // iframe.src= "<%= @receipt_printer.preview_url %>";
+
+        printer_type = j("input[name='receipt_printer[receipt_printer_type]']:checked").val();
+        printer_template = j("#receipt_printer_receipt_printer_template").val();
+        receipt_template = j("#receipt_template").val();
+
+        j.get(window.location.protocol + "//" + window.location.host +
+                "/finance_settings/get_printer_message/" + printer_type);
+        //"/finance/get_dotmatrix_printer_message/" + id);
+        //url = window.location.host + "/finance/fees_receipt_preview?type=" + id + "&logo=" + enable_logo;
+        //url = window.location.host + "/finance_settings/fees_receipt_preview?type=" + id + "&logo=" + enable_logo;
+
+        console.log(printer_type);
+        console.log(printer_template);
+        console.log(receipt_template);
+
+        //url = window.location.host + "/finance_settings/fees_receipt_preview?printer_type=" + id + "&logo=" + enable_logo;
+        url = window.location.host + "/finance_settings/fees_receipt_preview?";
+        url += "printer_type=" + printer_type;
+        url += "&printer_template=" + printer_template;
+
+        if (receipt_template !== undefined && receipt_template != "") {
+            url = url + "&receipt_template=" + receipt_template;
+        }
+
+        iframe.src = window.location.protocol + "//" + url;
+
+        /*
+         if (id == 0) {
+         // j("#preview_frame").addClass("a4_preview_overrides");
+         } else {
+         j("#preview_frame").removeClass("a4_preview_overrides");
+         }
+         */
+    }
+
+    function initilize_iframe(obj) {
+        resizeIframe(obj);
+        j("#loader_image").hide();
+        if (current_layout() == 0) {
+            // j("#preview_frame").addClass("a4_preview_overrides");
+        } else {
+            j("#preview_frame").removeClass("a4_preview_overrides");
+        }
+    }
+
+    function current_layout() {
+        return j("#receipt_printer_receipt_printer_template").val();
+    }
+
+    function resizeIframe(obj) {
+        /*
+         console.log(obj.contentWindow.document.body.scrollHeight);
+         console.log(obj.contentWindow.document.body.scrollWidth);
+         console.log(obj.contentDocument.documentElement.scrollWidth);
+         */
+        obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+        obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+        obj.style.width = obj.contentDocument.documentElement.scrollWidth + 'px';
+    }
+
+    function reset_iframe_dimensions() {
+        var iframe = document.getElementById('preview_frame');
+        iframe.style.height = 0 + 'px';
+        iframe.style.width = 0 + 'px';
+    }
+
+    j(function () {
+        reset_iframe_dimensions();
+    });
+
+    j(document).delegate("input[name='receipt_printer[receipt_printer_type]']:radio", 'change', function () {
+        //j.post('/finance/fees_receipt_settings_update_form/' + j(this).val(), function (data) {
+        j.post('/finance_settings/fees_receipt_settings_update_form/' + j(this).val(), function (data) {
+        });
+    });
+
+    update_preview = function () {
+        set_template(j("#receipt_printer_receipt_printer_template").val());
+    };
+
+    j(document).onload = function () {
+        update_preview();
+    };
+
+</script>

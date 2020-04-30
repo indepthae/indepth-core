@@ -1,0 +1,12 @@
+<div id='errorExplanation' class='errorExplanation'>
+  <p>
+    <%= t('there_were_pblm') %>
+  </p>
+  <ul>
+    <li>
+      <%  @group_post_comment.errors.full_messages.each do |error| %>
+        <%= error %>
+        <% end %>
+    </li>
+  </ul>
+</div>

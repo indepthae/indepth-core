@@ -1,0 +1,31 @@
+<% level1 = (klass == 'level-1') %>
+<% if tbody_required -%><tbody class="<%= level1 ? 'disable_sort' : '' %>"><%end-%>
+  <tr class="<%= klass %> <%= tbody_required ? 'disable_sort' : ''%>" id="subject-<%= subject.id %>">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= subject.name_with_code %></div>
+          <div class="component_link component_type">
+              <%= t('subject') %>
+          </div>
+          <div class="hidden-col" id="subject_hour-<%= subject.id %>"><%= subject.max_weekly_classes %></div>
+          <div class="col-37 pull-right" id="operations">
+              <div class="link_button pull-left links">
+                  <%= link_to_remote "#{t('edit_text')}",:url => { :controller=>"subjects",:action => 'edit', :id =>subject,:id2=>subject.elective_group_id},:method => 'get', :html => {:class => ''} %>
+              </div>
+              <% if subject.elective_group_id.present? %>
+                <div class="link_button pull-left links">
+                    <%= link_to "#{ t('assign_student')}", {:controller=>"student", :action=>"electives",:id=>subject.batch_id,:id2=>subject.id }, :class => ''%>
+                </div>
+              <% end %>
+              <div class="link_button pull-left links">
+                  <% if subject.dependency_present? %>
+                    <%= "<strike>#{t('delete_text')}</strike>" %>
+                  <% else %>
+                    <%= link_to_remote(t('delete_text'),:url => subject_path(subject),:method => 'delete',
+                      :confirm => t('delete_confirm_msg'),:update => "subject-#{subject.id}",:complete =>"hide_normal_table();", :success => "$('subject-#{subject.id}').remove();") %>
+                  <% end %>
+              </div>
+          </div>
+      </td>
+  </tr>
+<% if level1 -%></tbody><% end -%>

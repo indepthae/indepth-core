@@ -1,0 +1,655 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<link href="/stylesheets/pdf_normalize.css" rel="stylesheet">
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('id_cards') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('edit_template') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+    <div class="error_messages" id="error_messages">
+    </div>
+    <div class="head">
+      <%= t('create_id_card_template') %>
+    </div>
+    <div class="sub_text">
+      <%= t('create_id_card_template_desc') %>
+    </div>
+
+    <div class="sub_head">
+      <%= t('id_card_details') %>
+    </div>
+
+    <% form_for @id_card_template ,:url=>update_id_card_template_id_card_templates_path(:id=>@id_card_template.id), :html=>{ :multipart => true, :id=>"id_card_creation", :method=>:post} do |f| %>
+    <div class="id_card_attributes">
+      <div class="first_section section">
+        <div class="section_head">
+          <%= t('id_card_name_heading') %>
+        </div>
+        <div class="section_field">
+          <%= f.text_field :name, :placeholder=>t('id_card_name_ph'), :maxlength=> 50%>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%= t('applicable_user_type') %>
+        </div>
+        <div class="section_field">
+          <div class="radio_values">
+            <%= f.radio_button  :user_type, 1, :class=>"check" %>
+            <label class="check_label" for="id_card_template_user_type_1" ><%= t('student_text') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <%= f.radio_button  :user_type, 2, :class=>"check"%>
+            <label class="check_label" for="id_card_template_user_type_2" ><%= t('employee_text') %></label>
+            &nbsp;&nbsp;&nbsp;
+            <%= f.radio_button  :user_type, 3, :class=>"check" %>
+            <label class="check_label" for="id_card_template_user_type_3" ><%= t('parent') %></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('select_resolution')%>
+        </div>
+        <div class="section_field">
+          <% # f.select :template_resolutions_id , @template_resolutions.map{|r| [r.full_name,r.id]}, {:include_blank=>t('select_resolution')}, :class=>"", id=>"resolution" %>
+          <%if @template_resolutions.present? %>
+          <select class="" id="id_card_template_template_resolutions_id" name="id_card_template[template_resolutions_id]">
+            <option value=""><%= t('select_resolution') %></option>
+            <%@template_resolutions.each do |key,res| %>
+              <option <%="selected" if @id_card_template.template_resolutions_id == key%> value=<%= key%> data-width=<%= res[:width]%> data-height=<%= res[:height]%>  > <%="#{t(res[:name])} ( #{res[:width]}mm * #{res[:height]}mm )"%> </option>
+            <%end%>
+          </select>
+          <%end%>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('back_template')%>
+        </div>
+        <div class="section_field">
+            <div class="radio_values">
+              <%= f.radio_button  :include_back, "no", :id=>"no", :class=>"check" %>
+              <label class="check_label" for="no" ><%= t('disable') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <%= f.radio_button  :include_back, "common", :id=>"common", :class=>"check"%>
+              <label class="check_label" for="common" ><%= t('common_for_all_users') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <%= f.radio_button  :include_back, "unique", :id=>"different", :class=>"check"%>
+              <label class="check_label" for="different" ><%= t('different_for_each_user') %></label>
+              &nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('front_background_image')%>
+        </div>
+        <div class="section_field">
+          <%= f.paperclip_file_field :front_background_image %> 
+          <div id="front_image_link" class="image_link">
+          <%= link_to @id_card_template.front_background_image_file_name, @id_card_template.front_background_image.url(:original,false), :target=>"_blank"  if @id_card_template.front_background_image.present? %>
+          </div>
+          <div class="remove_image" id="front_cross"></div>
+          <%= f.hidden_field :destroy_front_background_image, :id=> "destroy_front_background_image" %>
+        </div>
+      </div>
+
+      <div class="section for_back">
+        <div class="section_head">
+          <%=t('back_background_image')%>
+        </div>
+        <div class="section_field">
+          <%= f.paperclip_file_field :back_background_image %> 
+          <div id="back_image_link" class="image_link">
+          <%= link_to @id_card_template.back_background_image_file_name, @id_card_template.back_background_image.url(:original,false), :target=>"_blank"  if @id_card_template.back_background_image.present? %>
+          </div>
+          <div class="remove_image" id="back_cross"></div>
+          <%= f.hidden_field :destroy_back_background_image, :id=> "destroy_back_background_image" %>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('layout_spacing')%>
+        </div>
+        <div class="section_field">
+          <%= f.label :top_padding, t("top_spacing") %>
+          <%= f.text_field :top_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+          <%= f.label :right_padding, t("right_spacing") %>
+          <%= f.text_field :right_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+          <%= f.label :bottom_padding, t("bottom_spacing") %>
+          <%= f.text_field :bottom_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+
+          <%= f.label :left_padding, t("left_spacing") %>
+          <%= f.text_field :left_padding, :class=>"extra_small_field set_padding" %> px &nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+
+
+      <div id="barcode_properties" class="section">
+        <div class="section_head">
+          <%=t('barcode_properties')%>
+        </div>
+        <div class="section_field">
+            <% f.fields_for :front_template do |a|%>
+              <% a.fields_for :barcode_property do |s|%>
+
+                <%= s.label :linked_to, t("linked_to") %>
+                <%=  s.select :linked_to , @linked_to_keys, {}, :class=>"small_field", :id=>"linked_to" %>
+
+                <%= s.label :rotate, t("orientation") %>
+                <%=  s.select :rotate , @barcode_orientaions.map{|r| [r[:name],r[:deg]]}, {}, :class=>"small_field", id=>"barcode_orientation" %>
+              <%end%>
+            <%end%>
+        </div>
+      </div>
+
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('profile_photo_style_front')%>
+        </div>
+        <div class="section_field">
+          <% f.fields_for :front_template do |s|%>
+            <div class="radio_values">
+              <%= s.radio_button  :profile_photo_type, "square", :id=>"front_square", :class=>"check photo_check" %>
+              <label class="check_label" for="front_square" ><%= t('square') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <%= s.radio_button  :profile_photo_type, "circle", :id=>"front_circle", :class=>"check photo_check"%>
+              <label class="check_label" for="front_circle" ><%= t('circle') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <div class="dimension">
+                <label class="check_label" for=" " ><%= t('dimension') %></label>&nbsp;&nbsp;
+                <%= s.text_field :profile_photo_dimension,:id=>"dimension_front", :class=>"extra_small_field"%> px
+              </div>
+            </div>
+          <%  end %>
+        </div>
+      </div>
+
+
+      <div class="section for_back">
+        <div class="section_head">
+          <%=t('profile_photo_style_back')%>
+        </div>
+        <div class="section_field">
+          <% f.fields_for :back_template do |s|%>
+            <div class="radio_values">
+              <%= s.radio_button  :profile_photo_type, "square", :id=>"back_square", :class=>"check photo_check" %>
+              <label class="check_label" for="back_square" ><%= t('square') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <%= s.radio_button  :profile_photo_type, "circle", :id=>"back_circle", :class=>"check photo_check"%>
+              <label class="check_label" for="back_circle" ><%= t('circle') %></label>
+              &nbsp;&nbsp;&nbsp;
+              <div class="dimension">
+                <label class="check_label" for=" " ><%= t('dimension') %></label>&nbsp;&nbsp;
+                <%= s.text_field :profile_photo_dimension,:id=>"dimension_back", :class=>"extra_small_field"%> px
+              </div>
+            </div>
+          <%  end %>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section_head">
+          <%=t('custom_fields')%>
+        </div>
+        <div class="section_field">
+          <div class="custom_fields" id="custom_fields"></div>
+          <%- f.fields_for :template_custom_fields do |t|%>
+            <%= render :partial=> 'attribute_field', :locals=> {:f => t} %>
+          <%  end %>
+          <%= link_to_add_activity_fields "<span class='add_text'>#{t('add_custom_fields')}</span>", f,:template_custom_fields, 'attribute_field'  %>
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+    <div class="template_attributes">
+      <div class="sub_head">
+        <%= t('id_card_content')%>
+      </div>
+      <div class="sub_head_desc">
+        <%= t('id_card_content_desc')%>
+      </div>
+      <div class="notice">
+        <%= t('custom_fields_msg')%><br><br>
+        <div class="example">
+          <b><%= t('example')%></b><br>
+          <%= t('custom_field_example1')%><br>
+          <%= t('custom_field_example2')%><br>
+          <%= t('custom_field_example3')%> {{<%= t('custom_field_example4')%>}}
+        </div>
+      </div>
+      </div>
+      <script>
+      </script>
+
+      <div class="editor">
+        <div class="front_template">
+          <div class="redactor">
+              <% f.fields_for :front_template do |c| %>
+              <%= c.redactor :template_data, {:callbacks=>{:onchange=>"front_redactor_change", :oninit=>"front_redactor_init"},:plugin=>[:fontsize, :fontfamily]} %>
+              <%= load_redactor_script %>
+              <%end%>
+          </div>
+          <div class="keys">
+            <div class="key_head">
+              <%=t('field_codes') %>
+            </div>
+            <div class="key_desc">
+              <%= "#{t('keys_desc')}" %>
+            </div>
+            <div id="id_card_keys_front" class="id_card_keys">
+            </div>
+        </div>
+      </div>
+
+      <div class="line">
+      </div>
+      <div class="id_card_preview">
+        <div class="preview exclude_font" id="front_preview">
+        </div>
+      </div>
+
+      <div class="back_template for_back">
+        <div class="redactor">
+          <% f.fields_for :back_template do |c| %>
+          <%= c.redactor :template_data, {:callbacks=>{:onchange=>"back_redactor_change", :oninit=>"back_redactor_init"}} %>
+          <%= load_redactor_script %>
+          <%end%>
+        </div>
+        <div class="keys">
+          <div class="key_head">
+            <%=t('field_codes') %>
+          </div>
+          <div class="key_desc">
+            <%= "#{t('keys_desc')}" %>
+          </div>
+          <div id="id_card_keys_back" class="id_card_keys">
+          </div>
+        </div>
+      </div>
+      <div class="line">
+      </div>
+      <div class="id_card_preview for_back">
+        <div class="preview exclude_font" id="back_preview">
+        </div>
+      </div>
+    </div>
+
+
+    <div class="line">
+    </div>
+
+    <div class="submit_controls">
+      <%=f.submit t("update_template"), :class=>"solid_button" %>
+      <%=link_to t('cancel'), id_card_templates_id_card_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+    </div>
+
+    <%end%>
+
+  </div>
+</div>
+
+
+<script>
+  var front_redactor_html = "";
+  var back_redactor_html = "";
+  j("input[type=radio][name='id_card_template[front_template_attributes][profile_photo_type]'], input[type=radio][name='id_card_template[back_template_attributes][profile_photo_type]").change(function(){
+    refresh_front_preview();
+    refresh_back_preview();
+  });
+
+  j("#dimension_front, #dimension_back").on('change paste keyup',function(){
+    refresh_front_preview();
+    refresh_back_preview();
+  });
+
+function refresh_front_preview(){
+  formated_html = preview_ready_html(front_redactor_html,"front");
+  generate_preview(formated_html,"front");
+}
+
+function refresh_back_preview(){
+  formated_html = preview_ready_html(back_redactor_html,"back");
+  generate_preview(formated_html,"back");
+}
+
+<%if  @id_card_template.front_background_image.present? %>
+  j("#front_cross").css("display","inline-block");
+<%end%>
+
+<%if  @id_card_template.back_background_image.present? %>
+  j("#back_cross").css("display","inline-block");
+<%end%>
+
+function preview_ready_html(html,side){
+  if (side=="front"){
+    dimension = j("#dimension_front").val();
+    type = j("input[type=radio][name='id_card_template[front_template_attributes][profile_photo_type]']:checked").val();
+  }else if (side == "back") {
+    dimension = j("#dimension_back").val();
+    type = j("input[type=radio][name='id_card_template[back_template_attributes][profile_photo_type]']:checked").val();
+  }
+  else {
+    console.log("Inavlid Side");
+  }
+  dimension = isNaN(dimension) ? 125 : dimension;
+  var photo_tags = ['{{student_photo}}', '{{employee_photo}}', '{{guardian_photo}}', '{{fathers_photo}}', '{{mothers_photo}}', '{{immediate_contacts_photo}}','{{ward_photo}}'];
+  formated_html = html;
+  for(var i= 0 ; i < photo_tags.length ;i ++ )
+  {
+    if ( type == "circle" ){
+      formated_html = formated_html.gsub(photo_tags[i] ,'<img src="/images/id_user.png" style="width:'+dimension+'px; height:'+dimension+'px; border-radius:1000px">');
+    }
+    else{
+      formated_html = formated_html.gsub(photo_tags[i] ,'<img src="/images/id_user.png" style="width:'+dimension+'px; height:'+dimension+'px;">');
+    }
+  }
+  return formated_html;
+}
+
+
+function front_redactor_init(){
+  front_redactor_html = this.get();
+  formated_html = preview_ready_html(this.get(),"front");
+  generate_preview(formated_html,"front");
+}
+
+function back_redactor_init(){
+  back_redactor_html = this.get();
+  formated_html = preview_ready_html(this.get(),"back");
+  generate_preview(formated_html,"back");
+}
+
+function front_redactor_change(html)
+{
+  front_redactor_html = html;
+  formated_html = preview_ready_html(html,"front");
+  generate_preview(formated_html,"front");
+}
+
+function back_redactor_change(html)
+{
+  back_redactor_html = html;
+  formated_html = preview_ready_html(html,"back");
+  generate_preview(formated_html,"back");
+}
+
+
+ j("input[type=radio][name='id_card_template[include_back]']").change(function(){
+   val = j(this).val();
+   set_back_template_creator(val);
+ });
+
+ set_back_template_creator( j("input[type=radio][name='id_card_template[include_back]']:checked").val());
+ function set_back_template_creator(val){
+   if (val=="no"){
+    j(".for_back").hide();
+   }
+   else{
+     j(".for_back").show();
+   }
+ }
+
+add_fields = function (link, association, content) {
+  var new_id = new Date().getTime();
+  var regexp = new RegExp("new_" + association, "g");
+  $(link).insert({
+    before: content.replace(regexp, new_id)
+  });
+  if ($$('.input-type-select') != "") {
+    $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+  }
+}
+
+remove_field = function (el) {
+  el.up().up().hide();
+  j(el).prev().val(1) //Setting _destroy to 1
+}
+
+
+j("#id_card_creation").submit(function(e){
+  Element.show('loader');
+  form_url = j("#id_card_creation").attr('action');
+  var formData = new FormData(this);
+  j.ajax({
+    url: form_url,
+    type: 'POST',
+    data:  formData,
+    contentType: false,
+    cache: false,
+    processData:false,
+    success: function(data, textStatus, jqXHR)
+    {
+      Element.hide('loader');
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+  e.preventDefault();
+  e.stopPropagation();
+
+});
+
+get_size();
+function get_size(){
+  width = j("#id_card_template_template_resolutions_id").find(':selected').data('width');
+  height = j("#id_card_template_template_resolutions_id").find(':selected').data('height');
+  set_size(width,height);
+}
+
+j("#id_card_template_template_resolutions_id").change(function(){
+  get_size();
+});
+
+function set_size(width,height){
+  j("#front_preview").css("width",width+"mm");
+  j("#front_preview").css("height",height+"mm");
+  j("#back_preview").css("width",width+"mm");
+  j("#back_preview").css("height",height+"mm");
+}
+
+get_padding();
+function get_padding (){
+  var top_padding; var left_padding; var right_padding; var bottom_padding;
+  top_padding = j("#id_card_template_top_padding").val();
+  left_padding = j("#id_card_template_left_padding").val();
+  right_padding = j("#id_card_template_right_padding").val();
+  bottom_padding = j("#id_card_template_bottom_padding").val();
+
+  top_padding = isNaN(top_padding) ? 0 : top_padding
+  left_padding = isNaN(left_padding) ? 0 : left_padding
+  right_padding = isNaN(right_padding) ? 0 : right_padding
+  bottom_padding = isNaN(bottom_padding) ? 0 : bottom_padding
+
+  set_padding(top_padding,left_padding,right_padding,bottom_padding);
+}
+
+j(".set_padding").on('change paste keyup', function(){
+    get_padding();
+});
+
+
+function set_padding(top_padding,left_padding,right_padding,bottom_padding){
+  j("#front_preview").css('padding-top', top_padding+"px");
+  j("#front_preview").css('padding-left', left_padding+"px");
+  j("#front_preview").css('padding-right', right_padding+"px");
+  j("#front_preview").css('padding-bottom', bottom_padding+"px");
+
+  j("#back_preview").css('padding-top', top_padding+"px");
+  j("#back_preview").css('padding-left', left_padding+"px");
+  j("#back_preview").css('padding-right', right_padding+"px");
+  j("#back_preview").css('padding-bottom', bottom_padding+"px");
+}
+
+function generate_preview(html,side){
+  if (side=="front"){
+    j("#front_preview").html(html);
+  }
+  else if (side=="back"){
+    j("#back_preview").html(html);
+  }
+  else{
+    console.log("Invalid preview render option")
+  }
+}
+
+j("#front_cross").click(function(){
+  var no_file_text = j("#field_id_card_template_front_background_image").attr("default");
+  j("#field_id_card_template_front_background_image").val(no_file_text);
+  j("#id_card_template_front_background_image").val('');
+  j("#destroy_front_background_image").val(true);
+  j(this).css("display","none");
+  document.getElementById("front_preview").style.backgroundImage = '';
+  j("#front_image_link").css("display","none");
+});
+
+j("#id_card_template_front_background_image").change(function () {
+    if (this.files && this.files[0]) {
+      j("#front_cross").css("display","inline-block");
+      j("#destroy_front_background_image").val(false);
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+
+        var image = new Image();
+          image.src = e.target.result;
+              document.getElementById("front_preview").style.backgroundImage = "url('" + image.src + "')";
+        };
+
+        reader.readAsDataURL(this.files[0]);
+    }
+    else {
+      var no_file_text = j("#field_id_card_template_front_background_image").attr("default");
+      j("#field_id_card_template_front_background_image").val(no_file_text);
+      j("#destroy_front_background_image").val(true);
+      j("#front_cross").css("display","none");
+      document.getElementById("front_preview").style.backgroundImage = '';
+    }
+});
+
+j("#back_cross").click(function(){
+  var no_file_text = j("#field_id_card_template_back_background_image").attr("default");
+  j("#field_id_card_template_back_background_image").val(no_file_text);
+  j("#id_card_template_back_background_image").val('');
+  j("#destroy_back_background_image").val(true);
+  j(this).css("display","none");
+  document.getElementById("back_preview").style.backgroundImage = '';
+  j("#back_image_link").css("display","none")
+});
+
+j("#id_card_template_back_background_image").change(function () {
+    if (this.files && this.files[0]) {
+      j("#back_cross").css("display","inline-block");
+      j("#destroy_back_background_image").val(false);
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+
+        var image = new Image();
+          image.src = e.target.result;
+              document.getElementById("back_preview").style.backgroundImage = "url('" + image.src + "')";
+        };
+
+        reader.readAsDataURL(this.files[0]);
+    }
+    else{
+      var no_file_text = j("#field_id_card_template_back_background_image").attr("default");
+      j("#field_id_card_template_back_background_image").val(no_file_text);
+      j("#destroy_back_background_image").val(true);
+      j("#back_cross").css("display","none");
+      document.getElementById("back_preview").style.backgroundImage = '';
+    }
+});
+
+
+function set_front_background_image(url){
+  j("#front_preview").css("background-image", "url('"+url+"')");
+}
+
+
+<%if @id_card_template.front_background_image.present? %>
+set_front_background_image("<%= @id_card_template.front_background_image.url(:original,false) %>");
+<%end%>
+
+function set_back_background_image(url){
+  j("#back_preview").css("background-image", "url('"+url+"')");
+}
+
+<%if @id_card_template.back_background_image.present? %>
+set_back_background_image("<%= @id_card_template.back_background_image.url(:original,false) %>");
+<%end%>
+
+load_keys();
+load_barcode_list();
+function load_keys(){
+  j.ajax({
+    url: "id_card_keys",
+    type: 'POST',
+    data: {type: j("input[type=radio][name='id_card_template[user_type]']:checked").val()},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+function load_barcode_list(){
+  // barcode linked to  list fetch
+  j.ajax({
+    url: "/templates/barcode_linked_to_list",
+    type: 'POST',
+    data: {type: j("input[type=radio][name='id_card_template[user_type]']:checked").val()},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+j("input[type=radio][name='id_card_template[user_type]']").change(function(){
+  load_keys();
+  load_barcode_list();
+  //hide barcode properties for parent 
+  set_barcode_properties_view();
+});
+
+set_barcode_properties_view();
+function set_barcode_properties_view(){
+  if(j("input[type=radio][name='id_card_template[user_type]']:checked").val() == 3){
+    j("#barcode_properties").css("display","none");
+  }
+  else{
+    j("#barcode_properties").css("display","block");
+  }  
+}
+
+</script>

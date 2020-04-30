@@ -1,0 +1,189 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<% remote_form_for(:weekday, :url => {:action=> 'create'}) do |f| %>
+  <%= hidden_field_tag "batch_id",@batch.try(:id) %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" id="listing">
+    <tr class="tr-head">
+      <td><%= "#{t('weekday')}"%></td>
+      <td><%= "#{t('class_timing_set')}"%></td>
+    </tr>
+    <% @default_weekdays.each_pair do |key,value| %>
+      <tr class="tr-<%= cycle('odd', 'even')%>">
+        <td class="col-4">
+          <span class="weekday_name">
+            <%= check_box_tag "weekdays[#{key.to_i}]", key, @default_weekday_class_timing_set.collect(&:weekday_id).include?(key.to_i),:name=>"weekdays[]",:class=>"weekday_cb",:onchange=>'set_class_timing_set(this)'%><span class="cb_value"><%= t(value.downcase)%></span></span>
+          <%=hidden_field_tag "batch[batch_class_timing_sets_attributes][#{key.to_i}][weekday_id]","#{key.to_i}"%>
+          <%if @default_weekday_class_timing_set.collect(&:weekday_id).include?(key.to_i)==true%>
+            <%=hidden_field_tag "batch[batch_class_timing_sets_attributes][#{key.to_i}][_destroy]",0%>
+            <%=hidden_field_tag "batch[batch_class_timing_sets_attributes][#{key.to_i}][id]",@default_weekday_class_timing_set.find_by_weekday_id(key.to_i).id%>
+          <%else%>
+            <%=hidden_field_tag "batch[batch_class_timing_sets_attributes][#{key.to_i}][_destroy]",1%>
+          <%end%>
+        </td>
+        <td class="col-7">
+          <div class="fleft" id="class_timing_set_<%=key.to_i%>">
+            <span class="class_timing_set_name"><%=@default_weekday_class_timing_set.collect(&:weekday_id).include?(key.to_i) ? (@default_weekday_class_timing_set.find_by_weekday_id(key.to_i).class_timing_set.present? ? @default_weekday_class_timing_set.find_by_weekday_id(key.to_i).class_timing_set.name : '-'): "-"%></span>
+            </div>
+          <div class="change_set_link" id="change_set_link_<%=key.to_i%>" val1="<%=key.to_i%>" val="<%=@default_weekday_class_timing_set.find_by_weekday_id(key.to_i).class_timing_set.id if @default_weekday_class_timing_set.collect(&:weekday_id).include?(key.to_i)%>">
+            <%if @default_weekday_class_timing_set.collect(&:weekday_id).include?(key.to_i) %>
+              <span><%=t('change_text')%></span>
+            <%end%>
+    <%#= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader_#{key.to_i}", :style =>"display: none;" ) %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <%@config = Configuration.find_by_config_key('StudentAttendanceType')%>
+  <%=hidden_field_tag "applicable_from",@local_tzone_time.to_date%>
+  <%if @config.config_value=='Daily' and @batch.present?%>
+    <div class="label-field-pair" >
+      <label for="applicable_from"><%= t('applicable_from') %></label>
+      <div class="text-input-bg">
+        <%= calendar_date_select_tag 'applicable_from', I18n.l(@local_tzone_time.to_date,:format=>:default),
+          :year_range => 1.years.ago..1.years.from_now, :readonly=>true, :popup=>"force" %>
+      </div>
+    </div>
+  <%end%>
+  <%if @batch.present?%>
+    <%= submit_tag "► #{t('save')}", :onclick=>"return validate_weekdays()",:class=>'submit_button' %>
+  <%else%>
+    <%= submit_tag "► #{t('save')}", :onclick=>"return validate_default_weekdays()",:class=>'submit_button' %>
+  <%end%>
+<% end %>
+
+
+<script type="text/javascript">
+  function validate_weekdays(){
+    var count=0;
+    j('.weekday_cb').each(function(){
+      if((this).checked==true){
+        count+=1;
+      }
+    });
+    if(count==0){
+      alert('<%="#{t('select_atleast_one_weekday')}"%>');
+      return false;
+    }
+    else
+    {
+      var confirm_msg=confirm("<%="#{t('alter_batch_message')}"%>");
+      return confirm_msg;
+    }
+  }
+  function validate_default_weekdays(){
+    var count=0;
+    j('.weekday_cb').each(function(){
+      if((this).checked==true){
+        count+=1;
+      }
+    });
+    if(count==0){
+      alert('<%="#{t('select_atleast_one_weekday')}"%>');
+      return false;
+    }
+    else
+    {
+      var confirm_msg=confirm("<%="#{t('alter_message')}"%>");
+      return confirm_msg;
+    }
+  }
+  function set_class_timing_set(elm)
+  {
+    
+    var object_id=j(elm).attr('value');
+    if(elm.checked==true)
+    {
+      
+      j('#batch_batch_class_timing_sets_attributes_'+object_id+'__destroy').attr('value',0);
+      if(j('#class_timing_set_'+object_id).children().size()==1 && j('#change_set_link_'+object_id).children().size()==0)
+      {
+        j('.submit_button').hide();
+        new Ajax.Request('/weekday/get_class_timing_sets',
+        {
+          parameters: "id="+object_id,
+          asynchronous:true,
+          evalScripts:true,
+          method:'get',
+          onComplete:function(resp){
+            j('#class_timing_set_'+object_id).show();
+            j('#change_set_link_'+object_id).show();
+            j('#class_timing_set_'+object_id).children().first().hide();
+            j('#class_timing_set_'+object_id).append(resp.responseText);
+            j('.submit_button').show();
+          }
+        });
+      }
+      else
+      {
+        if(j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').length>0 && j('#cancel_'+object_id).length>0){
+          j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').show();
+          j('#batch_batch_class_timing_sets_attributes_'+object_id+'__destroy').attr('value',0)
+          j('#cancel_'+object_id).show();
+        }
+        else if(j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').length>0 && j('#cancel_'+object_id).length==0){
+          j('#class_timing_set_'+object_id).show();
+          j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').show();
+          j('#batch_batch_class_timing_sets_attributes_'+object_id+'__destroy').attr('value',0)
+        }
+        else{
+          j('#batch_batch_class_timing_sets_attributes_'+object_id+'__destroy').attr('value',0)
+          j('#class_timing_set_'+object_id).show();
+          j('#change_set_link_'+object_id).show();
+        }
+      }
+    }
+    else
+    {
+      j('#class_timing_set_'+object_id).hide();
+      j('#change_set_link_'+object_id).hide();
+      j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').hide();
+      j('#cancel_'+object_id).hide();
+      j('#batch_batch_class_timing_sets_attributes_'+object_id+'__destroy').attr('value',1)
+    }
+  }
+  j('.change_set_link').each(function(index){
+    j('#change_set_link_'+index).click(function(){
+      j('#change_set_link_'+index).hide();
+      var object_id=j(this).attr('val');
+      var obj_id=j(this).attr('val1');
+      new Ajax.Request('/weekday/get_class_timing_set_for_edit',{
+        parameters: "id="+object_id + "&key_id="+obj_id,
+        asynchronous:true,
+        evalScripts:true,
+        method:'get',
+        onComplete:function(resp){
+          j('#change_set_link_'+index).parent().children().first().hide();
+          j('#change_set_link_'+index).parent().append(resp.responseText);
+        }
+      });
+    });
+  });
+  function cancel_this(elm)
+  {
+    var object_id=j(elm).attr('val');
+    j(elm).remove();
+    j('#batch_batch_class_timing_sets_attributes_'+object_id+'_class_timing_set_id').remove();
+    j('#class_timing_set_'+object_id).show();
+    j('#change_set_link_'+object_id).show();
+  }
+
+</script>

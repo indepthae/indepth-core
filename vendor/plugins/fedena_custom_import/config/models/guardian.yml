@@ -1,0 +1,128 @@
+ guardian:
+    primary_keys:
+      ward_id: "Ward Admission Number"
+      first_name: "First name"
+      relation: "Other Relation"
+    overrides:
+      ward_id: "Ward Admission Number"
+      country_id: "Country Name"
+      dob: "Date of Birth"
+      biometric_id: "Set Immediate Contact"
+      relation: "Other Relation"
+      is_father: "Is Father"
+      is_mother: "Is Mother"
+    associations:
+     - :country
+     - :wards
+     - :user
+    mandatory_columns:
+     - :first_name
+     - :ward_id
+    associated_columns:
+      wards: "admission_no"
+      country: "name_as"
+    filters:
+     - :user_id
+     - :school_id
+     - :photo_file_name
+     - :photo_content_type
+     - :photo_file_size
+     - :photo_updated_at
+    attr_accessor_list:
+     - :set_immediate_contact
+     - :is_father
+     - :is_mother
+    instructions:
+      Ward Admission Number:
+        Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+        Input Instruction and example: "Student's admission number. eg:-AYS/2018/S001 "
+      First name: 
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Last name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Is Father:
+          Type: ""
+          Input Instruction and example: "Enter 'y if the relation with the student is 'father'."
+      Is Mother:
+          Type: ""
+          Input Instruction and example: "Enter 'y if the relation with the student is 'mother'."    
+      Other Relation:
+          Type: ""
+          Input Instruction and example: "Enter name of relation like Uncle, Grandmother etc. Either one of the 3 fields is mandatory. This column cannot be modified during bulk edit."
+      Email:
+          Type: ""
+          Input Instruction and example: "Valid email address."
+      Office phone1:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+      Office phone2:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+      Mobile phone: 
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+      Office address line1:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Office address line2:
+          Type: "Alphanumeric."    
+          Input Instruction and example: ""
+      City:
+          Type: "Alphanumeric."
+          Input Instruction and example: "" 
+      State:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Country Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Date of Birth:
+          Type: "mm/dd/yyyy or  dd-mm-yyyy"
+          Input Instruction and example: "03/13/2007 or 13-03-2007"
+      Occupation:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Income:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Education:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Set immediate contact:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "Student's admission number. eg:-AYS/2018/S001 "
+          # every YAML file should contain all the content inside model_name.underscore hash.
+
+# If database columns names needed to be modfied then it should be placed in overrides hash.
+
+# Mention all the associations those arec needed in CSV upload inside associations_array.
+
+# Assoicated columns needs a field that will be searched for getting an ID to place.For example
+# nationality_id needs to be searched in country table by name which will be present in CSV.All those
+# required field to be placed in associated_columns hash.Association name is the key and field will be value.
+
+# Mention all those database columns which u dont want to appear in CSV inside filters array.Note that
+#  id,created_at,updated_at does not needs any mention inside filters.
+
+# If there is any join table data to be uploaded with CSV.Please mention that join name as key
+# and table name as value in joins hash.In this case privilege is the privileges_users is the table.So
+# entry will be privileges: users
+
+# This concept also same as the associated data.Mention the column by which join column names will be searched.
+# In this case privilege table will be searched by name.
+
+# There can be many additional data to upload while uploading a model data.Place all those additional
+# association names and parent names in associates hash.For example we have to upload employee bank detail,
+# so all the values from bank detail to be fetched,thats why the entry is like employee_bank_details: "bank_field".
+# All the current active bank fields will be appearing then to save in the structure.
+
+# The data user will be entering needed to be saved somewhere in the assoiated model.Mention those column names
+# inside associate_columns hash.For example someone entered his passport number as an additional detail.
+# This passport_number column to be get from additional_field table,then have to save the id in
+# employee_additional_detail table with a value for that in additional_info column.So the enry should be
+# employee_additional_detail: "additional_info"
+
+# Every associated parent model value to be searched by a column.For example,all the bank fields to be
+# searched by name from the bank_field table.Mention all those values inside associate_column_search hash.

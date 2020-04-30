@@ -1,0 +1,142 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="/javascripts/JsBarcode.all.min.js"></script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('bulk_export') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+    <div class="error_messages" id="error_messages">
+    </div>
+
+  <div id="box">
+    <%form_for :bulk_export ,:url=>'', :html=>{:id=>"bulk_export", :method=>:post} do |f| %>
+    <div class="head">
+    </div>
+    <div class="initial_values">
+      <div class="certificate_template">
+
+        <div class="field_section">
+          <div class="field_head">
+            <%= t('certificate_type')%>
+          </div>
+          <div class="field">
+            <%= select_tag "certificate_template",
+              options_for_select(([[t('certificate_type_placeholder'),""]]+@certificate_templates.map{|c| [c.name,c.id]})), :class=>"input_box", :id=>"template_selector",
+            :onchange => "#{remote_function(:url => {:action => "bulk_export_group_selector"},:with => "'certificate_template_id='+value" )}" %>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+        </div>
+
+        <div id="selector">
+        </div>
+      </div>
+    </div>
+
+    <div class="select_key_values">
+      <div class="template_keys" id="template_key_form">
+      </div>
+      <div class="certificates_keys" id="certificate_key_form">
+      </div>
+    </div>
+
+    <div class="certificate_for" id="certificate_for">
+    </div>
+
+    <div id="preview" class="exclude_font certificate_preview preview">  
+    </div>
+
+    <div class="line">
+    </div>
+
+
+    <div class="submit_controls">
+      <%= f.submit t('generate_certificate'), :class=>"solid_button" ,:id=>"generate_certificate" %>
+      <%=link_to t('cancel'), generated_certificates_certificate_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+    <%end%>
+  </div>
+  
+  <div id="hidden_generation" class="hidden_generation">
+  </div>
+  
+</div>
+<script>
+  var template_app;
+  var VAppCounter;
+  var actMet;
+
+  function get_certificate_id(){
+    if (j("#template_selector").val()!= undefined && j("#template_selector").val()!=""){
+      return j("#template_selector").val();
+    }
+    return false;
+  }
+  
+  function get_batch_id()
+  {
+    if (j("#batch_selector").val()!= undefined && j("#batch_selector").val()!=""){
+      return j("#batch_selector").val();
+    }
+    return false;
+  }
+
+  j("#generate_certificate").click(function(e){
+    var certificate_id = get_certificate_id();
+    if(certificate_id ==false || j(".bulk_check:checked").length==0){
+      e.preventDefault();
+    }
+  });
+  
+  j("#template_selector").change(function(e){
+    j.ajax({
+      url: "generate_bulk_export_sample_preview",
+      type: 'POST',
+      data:  {
+        certificate_template_id: j(this).val()
+      },
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  });
+  
+  j("#bulk_export").submit(function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    Element.show('loader1');
+    var form_url = j("#bulk_export").attr('action');
+    var formData = new FormData(this);
+      j.ajax({
+        url: form_url,
+        type: 'POST',
+        data:  formData,
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: function(data, textStatus, jqXHR)
+        {
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+        }
+      });
+  });
+
+
+
+</script>

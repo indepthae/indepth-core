@@ -1,0 +1,122 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div class="report_show">
+    <% if !@batch.students.empty? %>
+      <% if @academic_days_count > 0 or (@config == 'SubjectWise' and params[:subject_id] == '0' and @available_timetable.present?) %>
+        <div class="customize_columns">
+            <%= link_to_remote t('customise_columns') ,:url => {:action => "fetch_columns",  :batch => @batch.id, :selected_columns => @selected_columns,:subject_id => params[:subject_id], :start_date => @start_date,  :end_date => @end_date, :mode => @mode, :year => @year, :month => @month},  :class=>'customize_column'%>
+        </div>
+        <% remote_form_for :filter, :url => {:action=> 'filter',  :selected_columns =>@selected_columns} do |f| %>
+          <%= f.hidden_field :batch , :value=> @batch.id %>
+          <%= f.hidden_field :start_date , :value=> @start_date %>
+          <%= f.hidden_field :end_date , :value=> @end_date %>
+          <%= f.hidden_field  :report_type, :value=>@mode %>
+          <% unless params[:subject_id].nil? %>
+            <%= f.hidden_field :subject , :value=> params[:subject_id] %>
+          <% end %>
+          <% unless @students.empty? %>
+
+            <%= submit_tag "#{t('filter')}",:class=>'submit_button', :disable_with => "► #{t('please_wait')}" %>
+            <div class="label-field-pair1">
+                <label><%= t('filter_by_percentage') %>:</label>
+                <div class="text-input-bg1"><%= f.select :range, [["#{t('below')}","Below"], ["#{t('above')}","Above"], ["#{t('equals')}","Equals"]] %></div>
+                <div class="text-input-bg4"><%= f.text_field :value  , :placeholder => "%" %></div>
+            </div>
+          <% end %>
+        <%end%>
+        <% unless @students.empty? %>
+          <div class="label-field-pair">
+              <label>
+                  <%  if @config == 'Daily' %>
+                    <%= "#{t('total_no_of_wrkng_days')} = #{@academic_days_count}" %>
+                  <% else %>
+                    <% unless params[:subject_id] == '0' %> 
+                      <%= "#{t('total_no_of_wrkng_hours')}= #{@academic_days_count}" %>
+                    <% end  %>
+                  <% end  %>
+              </label>
+          </div>
+          <div id="report_section">
+                      <table id="report_result" align="center" width="100%">
+                          <tr class="tr-head">
+                              <td class="sl_no fixed-header"><%= t('s_n') %></td>
+                              <td class="student_name fixed-header"><%= t('name') %></td>
+                              <td class="adm_no fixed-header"><%= t('adm_no') %></td>
+
+                              <% if @selected_columns.present? %>
+                                <% @selected_columns.each do | column| %>
+                                  <td class="<%= column %>"><%= t(column) %></td> 
+                                <% end %>
+                              <% end %>
+                              <% if  @config_enable == "1" %>
+                                <td class="attendance_count"><%= t('present') %></td>
+                                <td class="attendance_count"><%= t('late') %></td>
+                                <td class="attendance_count"><%= t('absent') %></td>
+                              <% end %>
+                              <td  class="total_no"><%= t('total') %></td>
+                              <td  class="per_no"><%= t('percentage') %>(%)</td>
+                          </tr>
+
+                          <% @students.each_with_index do |student, i| %>          
+                            <tr class="tr-<%= cycle('odd', 'even') %>">       
+                                <td class="sl_no"> <%= i+1 %></td>
+                                <td class="student_name"><div id="student-name-link"><%= link_to student.full_name, {:controller => "attendance_reports", :action => "student_details", :id => student.id,:start_date=>@start_date,:end_date=>@end_date,:subject_id => params[:subject_id] } %></div></td>
+                                <td class=""> <%= student.admission_no %> </td>
+                                <% if @selected_columns.present? %>
+                                  <% @selected_columns.each do | column| %>
+                                    <td class=""><%=  student.send(column.to_sym).present? ?  student.send(column.to_sym) : "-" %></td> 
+                                  <% end %>
+                                <% end %>
+                                <% if  @config_enable == "1" %> 
+                                  <td class="attendance_count"><%=  @present[student.id]['present'].present? ? @present[student.id]['present'] : "-" %></td>
+                                  <td class="attendance_count"><%=  @late[student.id].present? ?  @late[student.id].count.to_f : '0.0' %></td>
+                                  <td class="attendance_count"><%= @absent[student.id]['leave'].present? ? @absent[student.id]['leave'] : "-"  %></td>
+                                <% end %>
+                                <% academic_days = @leaves[student.id]['total_academic_days'] %>  
+                                <td class="total_no"> <%= academic_days.present? ? (academic_days == 0 ? '-' : "#{@leaves[student.id]['total']} / #{@leaves[student.id]['total_academic_days']}") : "-" %></td>            
+                                <td class="per_no"> <%= @leaves[student.id]['percent'].present? ? @leaves[student.id]['percent'] : "-" %></td>
+                            </tr>
+                          <% end %>
+                      </table>
+          </div>
+      </div>
+      <div id = "button">
+          <% if @selected_columns.present?  and  @selected_columns.count > 2 %>
+            <span id ="pdf_tooltip" tooltip = "<%= t('selected_columns') %>" onclick ="return false">  <%= link_to "►#{t('pdf_report')}", {:controller=>'attendance_reports', :action=> 'report_pdf',:page_height=>750,:batch=> @batch.id,:report_format_type => "pdf" ,:selected_columns => @selected_columns ,:start_date=> @start_date ,:end_date => @end_date ,:report_type=> @mode,:subject=> params[:subject_id]} ,{:target => '_blank' ,:class=>'pdf_user_button disabled'}  %></span>
+          <% else %>
+            <%= link_to "►#{t('pdf_report')}", {:controller=>'attendance_reports', :action=> 'report_pdf',:page_height=>750,:batch=> @batch.id,:report_format_type => "pdf" ,:selected_columns => @selected_columns ,:start_date=> @start_date ,:end_date => @end_date ,:report_type=> @mode,:subject=> params[:subject_id]} ,{:target => '_blank',:class=>'pdf_user_button' } %>
+          <% end %>
+          <%= link_to "►#{t('csv_report')}", {:controller => 'csv_export', :action => 'generate_csv', :csv_report_type => 'student_attendance_report',:report_format_type => "csv", :batch => @batch.id,:selected_columns => @selected_columns , :start_date => @start_date, :end_date => @end_date, :report_type => @mode, :subject => params[:subject_id]},:class => 'csv_user_button button_align'%>
+      </div>
+    <% else %>
+      <div class="label-field-pair2" >
+          <p class = "flash-msg"><%= t('no_students_found') %></p>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="label-field-pair2" >
+        <p class = "flash-msg"><%= t('no_reports') %></p>
+    </div>
+  <%end %>
+<% else %>
+  <div class="label-field-pair2" >
+      <p class = "flash-msg"><%= t('no_students_found') %></p>
+  </div>
+<% end %>
+

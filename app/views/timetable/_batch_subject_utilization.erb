@@ -1,0 +1,72 @@
+<div class="subject_utilization_header">
+  <div class="subject_header">
+    <div class="subject_header_column_1">
+      <label><%= t('timetable_text') %></label>
+      <div class="text"><%= @timetable.range %></div>
+    </div>
+    <div class="subject_header_column_2">
+      <label><%= t('batch') %></label>
+      <div class="text"><%= @batch.full_name %></div>
+    </div>
+    <div class="subject_header_column_3">
+      <% batch_tutors = @batch.employees %>
+      <% if batch_tutors.present? %>
+        <label><%= t('batch_tutor') %></label>
+        <% tutors = batch_tutors.map {|x| "#{x.full_name} &rlm;(#{x.employee_number}&rlm;)" } %>
+        <div class="text">
+          <%= tutors.join(', ') %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="sub_heading">
+    <div class="header_description">
+      <%= t("#{@utilization == "0" ? 'not_allocated' : (@utilization == "1" ? 'partially_allocated' : 'completely_allocated')}_subject_list_description") %>
+    </div>
+    <div class="manage_link">
+      <%= link_to t('manage_subject'), {:controller => "subjects", :action => "index", :batch_id => @batch.id}, :target => '_tab' %>
+    </div>
+  </div>
+</div>
+<div class="subjects_list_table">
+  <div class="subjects_utilization_table_header">
+    <div class="subject_list_column_1">
+      <div class="table_label_pair">
+        <div class="table_label"><%= "#{t('subjects_text')} #{t(@utilization == "0" ? 'not_allocated' : (@utilization == "1" ? 'partially_allocated' : 'completely_allocated'))}" %></div>
+        <div class="table_data"> <%= "(#{(@subjects.length + @elective_groups.length)} #{t('of')} #{@total_subjects})" %> </div>
+      </div>
+    </div>
+    <div class="subject_list_column_2"> <%= t("planned_hours")%> </div>
+    <div class="subject_list_column_3"> <%= t('allocated_hours') %> </div>
+  </div>
+  <div class="subject_list_rows">
+    <% @subjects.each do |subject| %>
+      <div class="subject_utilization_row">
+        <div class="subject_list_column_1"> <%= "#{subject.name} (#{subject.code})" %> </div>
+        <div class="subject_list_column_2"> <%= subject.max_weekly_classes  %> </div>
+        <% if subject.elective_group_id.present? %>
+          <% hours = subject.elective_group.timetable_entries.select {|x| x.timetable_id == @timetable.id }.length %>
+        <% else %>
+          <% hours = subject.timetable_entries.select {|x| x.timetable_id == @timetable.id }.length %>
+        <% end %>
+        <div class="subject_list_column_3"> <%= hours %> </div>
+      </div>
+    <% end %>
+    
+    <% @elective_groups.each do |elective_group| %>
+      <div class="subject_utilization_row">
+        <div class="subject_list_column_1"> <%= "#{elective_group.name}" %> </div>
+        <div class="subject_list_column_2"> <%= elective_group.subjects.map(&:max_weekly_classes).min  %> </div>
+        <% hours = elective_group.timetable_entries.select {|x| x.timetable_id == @timetable.id }.length %>
+        <div class="subject_list_column_3"> <%= hours %> </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  #modal-box {
+    width: 676px;
+    margin: 0px auto 20px auto;
+  }
+</style>

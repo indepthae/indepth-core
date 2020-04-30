@@ -1,0 +1,29 @@
+[ N 2020-01-05 10:46:07.8358 19329/T1 age/Wat/WatchdogMain.cpp:1373 ]: Starting Passenger watchdog...
+[ N 2020-01-05 10:46:07.8549 19332/T1 age/Cor/CoreMain.cpp:1340 ]: Starting Passenger core...
+[ N 2020-01-05 10:46:07.8550 19332/T1 age/Cor/CoreMain.cpp:256 ]: Passenger core running in multi-application mode.
+[ W 2020-01-05 10:46:07.8673 19332/T1 age/Cor/CoreMain.cpp:1007 ]: WARNING: potential privilege escalation vulnerability detected. Phusion Passenger is running as root, and part(s) of the Passenger root path (/usr/local/rvm/gems/ruby-1.8.7-head/gems/passenger-6.0.4) can be changed by non-root user(s):
+
+ - /usr/local/rvm/gems/ruby-1.8.7-head/gems/passenger-6.0.4 is not secure: it can be modified by group rvm
+ - /usr/local/rvm/gems/ruby-1.8.7-head/gems is not secure: it can be modified by group rvm
+ - /usr/local/rvm/gems/ruby-1.8.7-head is not secure: it can be modified by group rvm
+ - /usr/local/rvm/gems is not secure: it can be modified by group rvm
+ - /usr/local/rvm is not secure: it can be modified by group rvm
+
+Please either fix up the permissions for the insecure paths, or install Passenger in a different location that can only be modified by root.
+[ N 2020-01-05 10:46:07.8673 19332/T1 age/Cor/CoreMain.cpp:1015 ]: Passenger core online, PID 19332
+2020/01/05 10:46:10 [error] 19347#0: *4 "/srv/fedena_app/fedena_cds/vendor/plugins/public/index.html" is not found (2: No such file or directory), client: 127.0.0.1, server: _, request: "HEAD / HTTP/1.1", host: "0.0.0.0"
+[ N 2020-01-05 10:46:10.6666 19332/T5 age/Cor/SecurityUpdateChecker.h:519 ]: Security update check: no update found (next check in 24 hours)
+
+[ N 2020-01-05 10:46:12.4475 19332/T8 age/Cor/CoreMain.cpp:671 ]: Signal received. Gracefully shutting down... (send signal 2 more time(s) to force shutdown)
+[ N 2020-01-05 10:46:12.4476 19332/T1 age/Cor/CoreMain.cpp:1246 ]: Received command to shutdown gracefully. Waiting until all clients have disconnected...
+[ N 2020-01-05 10:46:12.4476 19332/T8 Ser/Server.h:902 ]: [ServerThr.1] Freed 0 spare client objects
+[ N 2020-01-05 10:46:12.4476 19332/T8 Ser/Server.h:558 ]: [ServerThr.1] Shutdown finished
+[ N 2020-01-05 10:46:12.4476 19332/Ta Ser/Server.h:902 ]: [ServerThr.2] Freed 0 spare client objects
+[ N 2020-01-05 10:46:12.4476 19332/Tc Ser/Server.h:902 ]: [ServerThr.3] Freed 0 spare client objects
+[ N 2020-01-05 10:46:12.4476 19332/Ta Ser/Server.h:558 ]: [ServerThr.2] Shutdown finished
+[ N 2020-01-05 10:46:12.4476 19332/Tc Ser/Server.h:558 ]: [ServerThr.3] Shutdown finished
+[ N 2020-01-05 10:46:12.4477 19332/Te Ser/Server.h:902 ]: [ServerThr.4] Freed 0 spare client objects
+[ N 2020-01-05 10:46:12.4477 19332/Te Ser/Server.h:558 ]: [ServerThr.4] Shutdown finished
+[ N 2020-01-05 10:46:12.4477 19332/Tg Ser/Server.h:902 ]: [ApiServer] Freed 0 spare client objects
+[ N 2020-01-05 10:46:12.4478 19332/Tg Ser/Server.h:558 ]: [ApiServer] Shutdown finished
+[ N 2020-01-05 10:46:13.2812 19332/T1 age/Cor/CoreMain.cpp:1325 ]: Passenger core shutdown finished

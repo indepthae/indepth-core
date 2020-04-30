@@ -1,0 +1,22 @@
+<div class="content-div  bg-light grey-border shadow custom_date-form">
+  <% remote_form_for :custom_date, :url=>{:action=>'live_statistics'}, :before=>'j("#palette-list-submit").val("Please Wait..");',:complete=>'j("#palette-list-submit").val("Search");',:html=>{:class=>"form"} do |f| %>
+    <fieldset class="field_pair">
+      <%= f.label :start_date, "Start Date", :class => "field_label custom_date" %>
+      <%= text_field_tag "start_date", value="#{(Date.today).to_date}", options={:id => "start_date", :class => "datepicker date_search"} %>
+    </fieldset>
+    <fieldset class="field_pair">
+      <%= f.label :end_date, "End Date", :class => "field_label custom_date" %>
+      <%= text_field_tag "end_date", value="#{Date.today.to_date}", options={:id => "end_date",:class => "datepicker date_search"} %>
+    </fieldset>
+    <div class = "custom-date-buttons">
+      <%= link_to t('cancel'), "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list_custom_date(); return false;'}%>
+      <%= f.submit "Search", :onClick=>" get_stats_custom_date(); return false;", :id => 'palette-list-submit' %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  function hide_list_custom_date(){
+    j(".custom_date-form").hide();
+  }
+</script>

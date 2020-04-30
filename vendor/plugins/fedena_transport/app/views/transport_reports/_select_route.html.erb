@@ -1,0 +1,7 @@
+<div class="label-field-pair">
+    <label for="route"><%= t('routes.route') %></label>
+    <div class="text-input-bg">
+        <%= select_tag "search[route_id]", options_for_select([["#{t('transport_attendance.select_a_route')}",""]] + @routes.map { |r| [r.name, r.id] }) %>
+        <%= error_message_box(t('cant_be_blank')) %>
+    </div>
+</div>

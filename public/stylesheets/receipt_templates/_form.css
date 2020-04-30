@@ -1,0 +1,122 @@
+/** common **/
+.margin-top-0{
+    margin-top: 0px !important;
+}
+.margin-bottom-20{
+    margin-bottom: 20px !important;
+}
+.a5p_width{
+    width: 690px;
+    width: 563px;
+}
+.thermal_width{
+    width: 400px;
+}
+.header_contents .redactor_box .redactor_toolbar, .header_contents .redactor_editor, 
+.header_contents .redactor_editor:focus, .label-field-pair textarea {
+    border-color: #c6c6c6 !important
+}
+.redactor_box .redactor_toolbar .redactor_dropdown.redactor_dropdown_box_fontsize {
+    width: 130px !important;
+    overflow-x: hidden !important;
+    max-height: 100% !important;
+    height: 20px !important;
+    padding: 5px 0px !important;
+}
+/** header area **/
+.header{
+    font-weight: bold;
+    font-size: 16px;
+    color: #444;
+}
+.description{
+    font-size: 13px;
+    margin: 20px 0px 30px 0px;
+    color: #A5A5A5;
+}
+/** form common styles **/
+.label-field-pair, .text-input-bg {
+    width: 100%;
+    display: inline-table;
+}
+.label-field-pair {
+    display: inline-block;
+    margin-bottom: 20px;
+    height: auto;
+}
+.label-field-pair label{
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    float: none;
+    margin-bottom: 15px;
+}
+.label-field-pair input {
+    float: none;
+    margin-left: 0px;
+    border-radius: 0px;
+    width: 400px;
+    background: #fff;
+}
+/** form header content **/
+.header_contents, .header_contents .fieldWithErrors{
+    height: 300px;
+    margin-bottom: 5px;
+    max-width: 800px;
+}
+.header_contents .fieldWithErrors{
+    height: 298px;
+    margin-bottom: 0px;
+}
+.fieldWithErrors .redactor_box {
+    border: 1px solid #9c0000 !important;
+}
+.fieldWithErrors .redactor_editor {
+    border: 0px !important;
+}
+.redactor_editor, .redactor_editor:focus{
+    height: calc(100% - 60px) !important;
+}
+/** form footer content **/
+.label-field-pair textarea {
+    margin-top: 5px;
+    width: calc(100% - 12px);
+    padding: 5px;
+    height: 100px;
+    resize: none;
+}
+/** submit button **/
+.submit-button{
+    margin-left: 0px;
+    border-radius: 0px;
+    margin-right: 10px;
+}
+
+/** additional templates **/
+.additional_receipt_templates{
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    margin-bottom: 50px;
+    padding-top: 20px;
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    padding-bottom: 40px;
+    width: 100%;
+}
+
+.additional_receipt_templates .text-input-bg {
+    float: none;
+    margin-bottom: 30px;
+}
+
+.additional_receipt_templates .text-input-bg select {
+    margin-left: 0px;
+    border-radius: unset;
+    background: transparent;
+}
+
+.additional_receipt_templates #header_content-1,
+.additional_receipt_templates #header_content-2,
+.additional_receipt_templates #header_content-3{
+    display: none;
+}

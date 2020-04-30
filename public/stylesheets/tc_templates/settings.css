@@ -1,0 +1,519 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 15 Jan, 2016, 11:55:53 AM
+    Author     : foradian
+*/
+#page-yield .edit_btns a:hover{
+    color: white !important;
+}
+.text_area_slot{
+    border: 1px solid;
+    border-color: rgba(0, 0, 0, 0.32);
+    float: right;
+    width: 64%;
+    height: 40px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius:10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}
+/*.page_header_box{
+    margin-bottom: 30px;
+}*/
+.page_header{
+    font-weight: 600;
+    margin-bottom: 19px;
+}
+.page_header_desc{
+    color: #666;
+    font-size: 13.7px;
+    overflow: auto;
+}
+.page_header_desc p{
+    width: 75%;
+    float: left;
+    margin: 0;
+    /*    margin-top: 14px;    */
+}
+
+.template_preview_box{
+    margin: 50px 0 10px 0;
+}
+
+.template_preview_box_preview_box{
+    float: left;
+    width: 100%;
+}
+
+
+.header_preview{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    margin-top: 20px;
+    /*    margin-bottom: 20px;*/
+    float: left;
+    width: 100%;
+    /*    padding: 30px*/
+
+}
+.header_head{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding: 30px 30px 10px 30px;
+    text-align: center;
+    overflow: auto;
+
+}
+.header_bottom{
+    padding: 10px 30px;
+}
+.logo_to_left{
+    float: left;
+    margin-right: 2%;
+    width: 13%;
+}
+.logo_to_right{
+    float: right;
+    margin-left: 2%;
+    width: 13%;
+}
+.institution_details_to_left{
+       width: 80%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_to_center{
+       display: inline-block;
+   
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 69%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_to_right{
+       width: 80%;
+    margin: 0 auto;
+    text-align: right;
+    float: right;
+    overflow: overlay;
+}
+
+.institution_details_with_no_logo_to_left{
+       width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_center{
+       display: inline-block;
+   
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_right{
+       width: 100%;
+    margin: 0 auto;
+    text-align: right;
+    float: left;
+    overflow: overlay;
+}
+
+
+.institution_details_with_no_logo_to_right span{
+    margin-left: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_left span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_center span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.preview_institution_name{
+    font-weight: 600;
+    font-size: 25px;
+    margin-bottom: 6px;
+}
+.preview_institution_address, .preview_institution_email, .preview_institution_website{
+    font-weight: normal;
+    font-size: 13px;
+}
+.preview_certificate_name{
+    font-weight: 600;
+    font-size: 20px;
+    /*    margin-top: 20px;*/
+    margin-bottom: 20px;
+    width:100%;
+    text-align: center;
+}
+.preview_certificate_date_and_serial{
+    font-size: 15px;
+    height:20px;
+}
+.certificate_serial{
+    float: left;
+}
+.certificate_date{
+    float:right;
+}
+.date_format{
+    /*    color:rgb(226, 226, 226);*/
+}
+.date_placeholder{
+    color:#999;  
+}
+
+.preview_additional_large{
+    font-size: 15px;
+}
+.preview_additional_small{
+    font-size: 12px;
+}
+.preview_additional_medium{
+    font-size: 14px;
+}
+.preview_additional_very_small{
+    font-size: 11px;
+}
+.preview_additional_normal{
+    font-size: 13px;
+}
+.preview_additional_black{
+    color: black;
+}
+.preview_additional_grey{
+    color: grey;
+}
+
+
+
+
+
+
+
+.header{
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+/*.edit_btn{
+    float: right;
+    border: 1px solid black;
+    padding: 3px 15px;
+    color: white;
+    background: black;
+    text-decoration: none !important;
+    font-size: 16px;
+    border-radius: 3px;
+    font-size: 16px;
+    background: #27292B !important;
+    -webkit-border-radius: 3px;
+    padding: 4px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.edit_btn > a:-webkit-any-link{
+    text-decoration: none;
+    color: white;
+}
+.edit_btn > a{
+    text-decoration: none;
+    color:white;
+}
+.edit_btn > a:-webkit-any-link:hover{
+    text-decoration: none;
+    color: white !important;
+}
+.edit_btn > a:hover{
+    text-decoration: none;
+    color:white !important;
+}
+.edit_btn > a:focus{
+    outline: none;
+}*/
+.footer_preview{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    margin-top: 20px;
+    margin-bottom: 20px; 
+    padding: 30px;
+    font-size: 14px;
+    color: #666;
+}
+.logo{
+    height: auto;
+    width: auto;
+    /* margin-top: 27px; */
+    float: left;
+   
+}
+.logo img{
+    width: 100%;
+}
+
+div[class^="footer_head"]{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    overflow: auto;
+    justify-content: center;
+    margin-bottom: 50px; 
+}
+.footer_head_large{
+    font-size: 16px;
+}
+.footer_head_small{
+    font-size: 13px;
+}
+.footer_head_medium{
+    font-size: 15px;
+}
+.footer_head_very_small{
+    font-size: 12px;
+}
+.footer_head_normal{
+    font-size: 14px;
+}
+.footer_head_black{
+    color: black;
+}
+.footer_head_grey{
+    color: grey;
+}
+
+.footer_signatures{
+    /*    display:flex;
+        justify-content:space-between;*/
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    color: black;
+}
+.signature{
+    white-space:nowrap;
+    display: table-cell;                 /* Uncheck if using flex*/
+    text-align: center;                    /* Uncheck if using flex*/
+}
+.footer_signatures div:first-child {           /* Uncheck if using flex*/
+    text-align: left;
+}
+.footer_signatures div:last-child {             /* Uncheck if using flex*/
+    text-align: right;
+}
+
+
+
+
+.student_details_box{
+    padding: 30px;
+}
+
+
+
+
+
+
+
+
+.name_slot{
+    margin: 0px 0px 30px 0px;
+    width: 100%;
+    float: right;
+    font-size: 14px;
+}
+.space_slot{
+    float: right;
+    border-bottom: 1px solid #ccc;
+    width: 64%;
+    margin-top: 15px;
+}
+.small_space_slot{
+    float: right;
+    border-bottom: 1px solid #ccc;
+    width: 20%;
+    margin-top: 15px;
+}
+.very_small_space_slot{
+    float: right;
+    border-bottom: 1px solid #ccc;
+    width: 10%;
+    margin-top: 15px;
+}
+.name{
+    float: right;
+}
+.text_area_slot > textarea{
+    height: 45px;
+    width: 585px;
+    float: right;
+}
+.template_preview_box{
+    float: left;
+    width: 100%;
+}
+.template_previews{
+    float: left;
+    width: 100%;
+}
+/*.radio_buttons{
+    float: right;
+    margin-right: 376px;
+}
+.radio_buttons_2{
+    float: right;
+    margin-right: 413px;
+}
+.radio_one{
+    float: left;
+}
+.radio_two{
+    float: left;
+    margin-left: 100px;
+}
+.field_names{
+    float: left;
+    word-break: break-all;
+    max-width: 275px;
+    line-height: 1.5;
+}
+.ratio_3{
+    margin-right: 436px;
+}
+.ratio_2{
+    margin-right: 505px;
+}
+.ratio_1{
+    margin-right: 505px;
+}
+select#select{
+    float: right;
+    margin-right: 463px;
+
+}
+select{
+    -webkit-border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}*/
+.not_enabled_message{
+    margin: 20px;
+    font-size: 22px;
+    color: grey;
+    text-align: center;
+}
+
+.signature_preview{
+    white-space:nowrap;
+    display: table-cell;                 /* Uncheck if using flex*/
+    text-align: center;                    /* Uncheck if using flex*/
+}
+
+.save_preference{
+    background: #27292B !important;
+    color: white;
+    /*    height: 30px;*/
+    font-size: 16px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+    float: right;
+    text-decoration: none !important;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    padding: 5px 16px;
+}
+.save_preference:focus{
+    outline:none;
+}
+.submit-button{
+    float:right;
+    margin: 0px;
+    text-decoration: none;
+    padding:5px 9px !important;
+    -webkit-border-radius: 10px !important;
+    -moz-border-radius:10px !important;
+    border-radius: 10px !important;
+}
+
+.tc_field_value{
+    border-bottom: 1px solid #999;
+    padding: 10px 0px;
+    width:100%;
+}
+td.tc_field_values{
+    width: 646px;
+    padding: 15px 15px 15px 30px;
+}
+.tc_field_value.radio, .tc_field_value.select{
+    border-bottom: none;
+}
+.tc_field_value.radio, .tc_field_value.select{
+    border-bottom: none;
+}
+td.tc_field_labels {
+    max-width: 225px;
+    padding: 0px 10px 5px 10px;
+}
+table{
+    font-size: 0.875em;
+}
+.tc_field_value > table{
+    width: 100%;
+}
+td > p{
+    float: right;
+    margin: 0 !important;
+}
+.name_slots.sub_field > td{
+    padding-left: 30px;
+}
+.name_slots > .tc_field_values{
+    vertical-align: bottom;
+}
+.institution_details_to_right span{
+    display: inline-block;
+}
+.institution_details_to_left span{
+    display: inline-block;
+}
+.institution_details_to_center span{
+    display: inline-block;
+}
+.institution_address_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}
+.institution_contact_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+.institution_additional_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}

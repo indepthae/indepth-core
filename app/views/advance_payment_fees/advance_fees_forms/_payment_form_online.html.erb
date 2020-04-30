@@ -1,0 +1,79 @@
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<div class="online-fee-head">
+  <% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+
+<% if @advance_fee_categories.present? %>
+  <% if FedenaPlugin.can_access_plugin?("fedena_pay") and @enable_online_payment == "true" and @active_gateways.present? %>
+    <div class="fee-head-list-online" >
+    <% form_for :advance_fees_collection, :url => {:action => 'initialize_advance_payment'}, :html => {:id => "fees_form"} do |form| %>
+      <%= form.hidden_field :student_id, :value => @student.id %>
+      <%= form.hidden_field :batch_id, :value => @student.batch.id %>
+      <%= form.hidden_field :user_id,:value => @current_user.id%>
+      <%= form.hidden_field :date_of_advance_fee_payment, :value => Date.today_with_timezone.to_date%>
+      <%= form.hidden_field :payment_mode, :value => "Online Payment"%>
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0" >
+        <tr class="main_head tr-list_head">
+          <td class="sl-col"><%= t('sl_no') %></td>
+          <td class="set_border_right fee-head-particulars"><%= t('fee_head') %></td>
+          <td class="set_border_right" colspan="2">
+              <%= t('amount_rs') %>
+              (<%= currency %>)
+          </td>
+        </tr>
+        
+        <tr class="main_head tr-list_head">
+            <td class="set_border_right"></td>
+            <td class="sl-col" colspan="3"><%= t('advance_fee_categories_text') %></td>
+        </tr>
+        
+        
+        <% if @advance_fee_categories.empty? %>
+          <tr >
+            <td colspan="4">
+              <div class="no_entries"><%= t('no_advance_fees_categories_text') %></div>
+            </td>
+          </tr>
+        <% else %>
+          <%= render :partial => "category_list_form" %>
+        <% end %>
+        
+
+          <tr class="row-a">
+            <td colspan="4" class="fee-head-submission">
+              <div id="payment_form_details" width="100%">
+                <div class="amount_to_pay_block">
+                  <label><%= t('amount_to_pay') %> </label>
+                  <div class="text-input-bg4">
+                      <%= form.text_field :fees_paid,
+                        :value => 0.00,
+                        :readonly => true, :class => "precision_text total_amount" %>
+                  </div>
+                </div>
+              </div>
+              <div class="pay_fees_buttons">
+              <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and @available_gateways.present? and @enable_online_payment and
+                              PaymentConfiguration.op_enabled? and @active_gateway.present?) %>
+                              <%= link_to "► #{t('print_summary')}",
+                              {:controller => "advance_payment_fees", :action => "online_fees_receipt_pdf",
+                              :id => @student.id, :category_id => @advance_fee_category.id}, :target => '_blank',
+                              :class => 'submit_button' %>
+                      <%= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'submit_button' %>
+              <% end %>
+              </div>
+            </td>
+          </tr>
+        </table>
+      <% end %>
+  <% end %>
+<% else %>
+  <div class="no_entries"><%= t('no_advance_fees_categories_text') %></div>
+<% end %>
+<div id="payment_history">
+  <%= render :partial => "payment_history_head", :online_payment => true %>
+</div>

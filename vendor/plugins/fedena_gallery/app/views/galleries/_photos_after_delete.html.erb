@@ -1,0 +1,39 @@
+<% @photos.each_with_index do |image,index| %>
+<% index= index+1%>
+
+  <%= '<div class="row">' if ((index+2)%3) == 0  %>
+
+
+  <div class="album_photo <%= (index+1)%3 == 0 ? " photo_middle" : "" %>" style="background-image: url(<%=  image.photo.url(:thumb, false)%>);" data-value='<%=index-1%>'>
+    <div class="photo_extra">
+      <div class="photo_description"> <%= (image.description.nil?) ? "" : image.description %></div>
+      <div class="photo_options">
+        <div class="dropdown">
+          <button class="dropbtn">Edit</button>
+          <div class="dropdown-content">
+            <a href="#" class="edit_link" data-value= <%=image.id %> id="img_edit_desc">Edit Description</a>
+            <a href="#" class="delete_link" data-value= <%=image.id %> >Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<% #row %>
+<%= '</div>'if (index%3) == 0%>
+
+<% end %>
+<% #In case row doesnt get closed - In last case where no of photos is less than 3 %>
+<%= '</div>'if (@photos.count%3) != 0%>
+<%= will_paginate @photos,:params=>{:controller => "galleries",:action => "category_show", :id=> @category.id},:remote=>{:update=>'album_images'}%>
+
+<script>
+   url_array = <%= raw @original_images_url.to_json %>;
+   description_array = <%= raw @image_description.to_json %>;
+   if(url_array.length==0)
+   {
+     window.location.replace("/galleries/category_show/"+gallery_category_id);
+   }
+</script>

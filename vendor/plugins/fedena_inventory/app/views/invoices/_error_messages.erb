@@ -1,0 +1,11 @@
+<div id='errorExplanation' class='errorExplanation'>
+  <p>There were problems with the following fields:</p>
+  <ul>
+  <% @invoice.errors.full_messages.each do |error| %>
+    <li> <%= error %> </li>
+  <% end %>
+</ul>
+</div>
+<script>
+j("#error_messages")[0].scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+</script>

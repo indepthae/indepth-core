@@ -1,0 +1,112 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('discussion') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('all_discussion') %></div>
+<%#*<div id="page-yield">%>
+<% if permitted_to? :create, :groups %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('create_group')}", :controller=>"groups", :action=>"new" %></li>
+    </ul>
+  </div>
+<% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="leftmargin">
+
+  <div id="replace">
+    <div class="red_heading" id="discussion">
+      <%= link_to "#{t('view_recent_activities')}", {:controller=>"groups"},:class=>"themed_bg" %>
+    </div>
+    <div class="left_sub">
+      <div id="comments_heading"><div id="post_recent"><%= t('post') %></div><div id="comment_recent"><%= t('comment') %></div><div id="activity_recent"><%= t('activity') %></div></div>
+      <% unless @group_posts.count==0 %>
+        <% @group_posts.each do |group_post| %>
+
+          <div class="discussions">
+
+            <div class="left_discussion_recent">
+              <div class="post_comment">
+                <% i=0 %>
+                <%  name="" %>
+                <% time="" %>
+                <% if group_post.group_post_comments.count==0 %>
+                <% if group_post.user.present? %>
+
+                  <% name=group_post.user.first_name %>
+                <% else %>
+                  <% name=t('deleted_user') %>
+                <% end %>
+                  
+                  <% time=time_ago_in_words(group_post.created_at)+ " #{t('ago')}" %>
+                <% else %>
+                <% if group_post.group_post_comments.last.user.present? %>
+
+                  <% name="#{group_post.group_post_comments.last.user.first_name}" %>
+                <% else %>
+                  <% name= t('deleted_user') %>
+                <% end %>
+                  
+                  <% time=time_ago_in_words(group_post.group_post_comments.last.created_at)+ " #{t('ago')}" %>
+                <% end %>
+              </div>
+
+              <div id="post_title_recent">
+                <%= link_to "#{group_post.post_title}", group_group_post_path(:group_id=>group_post.group,:id=>group_post.id), :anchor=>"comments" %>
+              </div>
+              <% if group_post.user.present? %>
+                <div class="posted_by"><%= t('by') %><%="#{group_post.user.first_name}"%></div>
+              <% else %>
+                <div class="posted_by"><%= t('by') %> <%= t('deleted_user') %></div>
+              <% end %>
+            </div>
+            <div class="middle_discussion"><%= group_post.group_post_comments.count %></div>
+            <div class="right_discussion">
+              <div class="time_name">
+                <div><%= time %></div>
+                <div id="commenter_name"><%= name %></div>
+              </div>
+            </div>
+            <div id="horizantal_bar">  </div>
+          </div>
+
+        <% end %>
+      <% else %>
+        <%= t('no_discussion') %>
+      <% end %>
+
+    </div>
+    <div class="paginate">
+      <%= will_paginate @group_posts , :previous_label=>"<", :next_label=>">"%>
+    </div>
+  </div>
+
+
+
+</div>
+<div id="rightmargin" >
+  <div id="right_content">
+    <div class="red_heading themed_text">
+       <%= t('my_group') %>
+    </div>
+    <div class="right_sub">
+      <%  @groups.each do |group| %>
+        <div class="each_group">
+          <%= link_to "#{group.group_name}", group_path(:id=>group)  %>
+        </div>
+      <%end%>
+      <% if @groups.count==0 %>
+         <%= t('no_group') %>
+      <% end %>
+    </div>
+  </div>
+</div>
+</div>

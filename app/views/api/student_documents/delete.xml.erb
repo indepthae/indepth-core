@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.delete{
+  @xml.document_delete do
+    @xml.success(t('student_documents.document_delete_success',:name => @document.attachment_name, :category_name => @category.attachment_category_name))
+  end
+}
+%>

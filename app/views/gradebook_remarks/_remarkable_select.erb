@@ -1,0 +1,41 @@
+<% if @remarkables.first.is_a? RemarkSet %>
+  <label for="_remarkable_id" class="select-box-label"><%= t('remark_set') %></label>
+  <%= select '', :remarkable_id, @remarkables.collect{|s| [s.name, s.id]}, :prompt => t('select_remark_set') %>
+<% elsif @remarkables.first.is_a? Subject %>
+  <label for="_remarkable_id" class="select-box-label"><%= "Subject" %></label>
+  <%= select '', :remarkable_id, @remarkables.collect{|s| [s.name, s.id]}, :prompt => t('select_subject') %>
+<% end %>
+<%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader5",
+                :class => "loader_style",
+                :style =>"display: none;" ) %>
+
+<script type="text/javascript">
+  j('#_remarkable_id').change(function () {
+      j.ajax({
+          url: "update_student_list",
+          type: 'POST',
+          data: {
+              batch_id: get_batch_id(),
+              report_type: get_report_type(),
+              reportable_id: get_reportable_id(),
+              remark_type: get_remark_type(),
+              remarkable_id: get_remarkable_id(),
+              assessment_plan_id: get_assessment_plan_id(),
+          },
+          beforeSend: function()
+          {
+              j('#loader5').show();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j('#loader5').hide();
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+</script>

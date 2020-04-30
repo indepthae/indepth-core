@@ -1,0 +1,23 @@
+<div class="fields">
+  <% if @document.present? and @document.attachment_file_name.present? %>
+    <div class="label-field-pair2">
+      <label for="document_name"><%= t('document_name') %></label>
+      <div class="text-input-bg"><%= text_field_tag "document_attributes[#{Time.now.to_i}][name]", value = @document.name %></div>
+    </div>
+    
+  <% else %>
+    <div class="label-field-pair2">
+      <label for="document_name"><%= t('document_name') %></label>
+      <div class="text-input-bg"><%= text_field_tag "document_attributes[#{Time.now.to_i}][name]",''%></div>
+    </div>
+    <div class="label-field-pair2">
+      <label for="document_file" class="custom_width"><%= t('document_file') %></label>
+      <div class="text-input-bg">
+        <%= paperclip_file_field_tag "document_attributes[#{Time.now.to_i}]",:attachment, :size=> 12,:onchange => "update_name(this)",:direct=>false,:object => @document %>
+      </div>
+    </div>
+    <%= link_to_remove_additional_fields " ","document_attributes[#{Time.now.to_i}]" %>
+    <%= hidden_field_tag "document_attributes[#{Time.now.to_i}][user_id]",@current_user.id %>
+  <%end%>
+  <div class="extender2"></div>
+</div>

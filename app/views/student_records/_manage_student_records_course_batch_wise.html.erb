@@ -1,0 +1,70 @@
+<%if @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name('ManageStudentRecord'))%>
+  <%if @courses_list.present?%>
+    <table id="student_details_table">
+      <tr>
+        <th id="name"><%=t('course_text')%></th>
+        <th id="grade"><%=t('grading_system')%></th>
+        <th id="no_of_batches"><%=t('assigned_batches_snakecase')%></th>
+        <th id="action"></th>
+      </tr>
+
+      <%@courses_list.each do |c|%>
+        <tr class="list_<%=cycle('odd', 'even')%>">
+          <td><%=c["cname"]%></td>
+          <td><%=Batch::GRADINGTYPES[c['grading_type']].nil? ? t('normal') : Batch::GRADINGTYPES[c['grading_type']]%></td>
+          <td><%=c["bcount"]%></td>
+          <td><%=link_to t('view_batches'),{:controller=>'student_records',:action=>'manage_student_records_for_course',:id=>c['id']}%></td>
+        </tr>
+      <%end%>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_courses_assigned')%></div>
+  <%end%>
+<%elsif @current_user.is_a_batch_tutor?%>
+  <%if @batches_list.present?%>
+    <table id="student_details_table">
+      <tr>
+        <th id="name"><%=t('batch')%></th>
+        <th id="no_of_batches"><%=t('students')%></th>
+        <th id="action1"></th>
+      </tr>
+      <%if params[:rg_id].present?%>
+        <%@batches_list.each do |key,value|%>
+          <tr><td colspan="4" class="highlighter"><%=key== true ? "#{t('active')}" : "#{t('inactive')}"%></td></tr>
+          <%value.each do |v|%>
+            <tr class="list_<%=cycle('odd', 'even')%>">
+              <td><%=v["full_name"]%></td>
+              <td><%= key== true ? v.students.count : v.graduated_students.count %></td>
+              <%if v.student_records.all(:conditions=>["additional_field_id in (?)",@record_group.records.collect(&:id)]).present?%>
+                <td><%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"],:rg_id=>@record_group.id%>
+                    <%=link_to "#{t('view_records')}",:controller=>'student_records',:action=>'student_records_for_batch',:id=>v["id"],:rg_id=>@record_group.id%>
+                    <%=link_to "#{t('download_csv')}",:controller=>'student_records',:action=>'student_record_csv_export',:id=>v["id"],:rg_id=>@record_group.id%></td>
+              <%else%>
+                <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"],:rg_id=>@record_group.id%></td>
+              <%end%>
+            </tr>
+          <%end%>
+        <%end%>
+      <%else%>
+        <%@batches_list.each do |key,value|%>
+          <tr><td colspan="4" class="highlighter"><%=key== true ? "#{t('active')}" : "#{t('inactive')}"%></td></tr>
+          <%value.each do |v|%>
+            <tr class="list_<%=cycle('odd', 'even')%>">
+              <td><%=v["full_name"]%></td>
+              <td><%= key== true ? v.students.count : v.graduated_students.count %></td>
+              <%if v.student_records.present?%>
+                <td><%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"]%>
+                    <%=link_to "#{t('view_records')}",:controller=>'student_records',:action=>'student_records_for_batch',:id=>v["id"]%>
+                    <%=link_to "#{t('download_csv')}",:controller=>'student_records',:action=>'student_record_csv_export',:id=>v["id"]%></td>
+              <%else%>
+                <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"]%></td>
+              <%end%>
+            </tr>
+          <%end%>
+        <%end%>
+      <%end%>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_batches_assigned')%></div>
+  <%end%>
+<%end%>

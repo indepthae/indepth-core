@@ -1,0 +1,41 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('stop_details') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('stops') %></div>
+    <% if permitted_to? :new , :vehicle_stops %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('new_stop')}", :url => {:controller => "vehicle_stops", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('vehicle_stop_description') %></div>
+    <div class="label-field-pair active_filter">
+        <div class="text-input-bg">
+            <%= select_tag :active_status, options_for_select([["#{t('active_stops')}", "1"], ["#{t('inactive_stops')}", "0"]], :selected => params[:active_status]||"1"),:onchange => "#{remote_function(:url => {:action => "index"},
+            :with => "'active_status='+value",
+            :method => :get,
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')")}; j('#name').val('')"%>
+        </div>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+    </div>
+    <div id ="addl_details_list">
+        <%= render :partial => 'vehicle_stops' %>
+    </div>
+</div>
+

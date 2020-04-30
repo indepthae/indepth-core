@@ -1,0 +1,11 @@
+<%= render :partial => "employees_list" %>
+<div id="employee_count"><%= t('reset_selected_employee_count', {:total => @employee_ids.count, :selected => @employee_ids.count}) %></div>
+<% remote_form_for :log,:url=>{:action=>'reset_all'}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |form| %>
+  <div id="button">
+    <%= hidden_field_tag :employee_ids%>
+    <%= hidden_field_tag :reset_type %>
+    <% if @employees.present? %>
+      <%= form.submit "", :value => "#{t('reset')}" , :class=>"submit-button", :id => "submit_button", :onClick => "return verify_check()"%>
+    <% end %>
+  </div>
+<% end %>

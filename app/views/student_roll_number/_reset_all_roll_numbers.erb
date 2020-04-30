@@ -1,0 +1,6 @@
+<b><%= t('reset_roll_number_warning_1')  %></b><br><br>
+
+<div id="buttons">
+  <%= link_to "#{t('ok')}",{:action => "set_roll_numbers", :id => params[:id]} , :class => "submit_button" %>
+  <%= link_to_remote "Cancel",  :html => {:class => "submit_button", :id => "cancel",:onclick=>"Modalbox.hide();return false;"}%>
+</div>

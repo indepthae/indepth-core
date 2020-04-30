@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'regenerate_all_roll_numbers'
+page << "Modalbox.show($('modal-box'), {title: '#{t('reset_all_roll_numbers')}', width: 500});"

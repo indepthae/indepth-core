@@ -1,0 +1,8 @@
+<div id="errorExplanation" class="errorExplanation">
+<p><%="#{t('there_were_pblm')}"%></p>
+<ul>
+ <%@errors.uniq.each do |e|%>
+  <li><%=e%></li>
+ <%end%>
+</ul>
+</div>

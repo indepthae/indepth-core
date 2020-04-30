@@ -1,0 +1,4 @@
+<% form_remote_for @category, :url => student_document_categories_path do |form| %>
+  <%= render :partial => "category_form", :locals => {:form => form} %>
+  <%= form.submit  "", :value => "#{t('add_category')}", :class => "submit_button", :id => "submit_button" %>
+<% end %>

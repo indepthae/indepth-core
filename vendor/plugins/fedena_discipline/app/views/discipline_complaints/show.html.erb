@@ -1,0 +1,287 @@
+<script type="text/javascript">
+  function validate(textarea_id)
+  {
+
+    if($('child_comment_body_'+textarea_id).value.trim()=="")
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+  function reply(reply){
+    $("re"+reply).hide();
+    if($("cancel"+reply).select('a')[0] == undefined )
+    {
+      delete_btn=new Element('a',{'onClick':'cancel('+reply+');'});
+      delete_btn.innerHTML='<%=t('cancel')%>';
+      delete_btn.style.cursor='pointer';
+      $("cancel"+reply).appendChild(delete_btn);
+    }
+    else{
+      $("cancel"+reply).show();
+      $("reply"+reply).show();
+    }
+  }
+  function cancel(a){
+    $("cancel"+a).hide();
+    $("re"+a).show();
+    $("reply"+a).hide();
+  }
+
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('discipline') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('comments') %></div>
+  <%discipline_complainees_deleted=@discipline_complaint.discipline_complainees.select{|e| e.user.nil?}%>
+  <%discipline_complainees_employees=@discipline_complaint.discipline_complainees.select{|e| e.user.try(:student) == false }%>
+  <%discipline_complainees_students=@discipline_complaint.discipline_complainees.select{|e| e.user.try(:student) == true}%>
+  <%discipline_accusations_deleted=@discipline_complaint.discipline_accusations.select{|e| e.user.nil?}%>
+  <%discipline_accusations_employees=@discipline_complaint.discipline_accusations.select{|e| e.user.try(:student) == false}%>
+  <%discipline_accusations_students=@discipline_complaint.discipline_accusations.select{|e| e.user.try(:student) == true}%>
+  <%discipline_juries=@discipline_complaint.discipline_juries%>
+  <%discipline_members_deleted=@discipline_complaint.discipline_members.select{|e| e.user.nil?}%>
+  <%discipline_members_employees=@discipline_complaint.discipline_members.select{|e| e.user.try(:student) == false}%>
+  <%discipline_members_students=@discipline_complaint.discipline_members.select{|e| e.user.try(:student) == true}%>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :discipline_complaints_show, @discipline_complaint %>
+    <%= render_breadcrumbs  %>
+  </div></div>
+<div id="wrapper_contents">
+  <div id="content1">
+    <div id="content11"><div class="sub"><li><%=@discipline_complaint.subject%></li></div>
+      <div id="under"><li> Posted on <%=format_date(@discipline_complaint.updated_at,:format=>:long_date)%></li></div>
+    </div>
+
+    <div id="content12">
+      <div class="trial">
+        <div class="trial_date">
+          <div class="st1"><%=t('status')%>  </div>
+          <%unless @discipline_complaint.action_taken==true %>
+            <div class="st2"><p>: <%=t('pending')%></p></div>
+          <%else%>
+            <div class="st2"><p>: <%=t('solved')%></p></div>
+          <%end%>
+        </div>
+        <%unless @discipline_complaint.action_taken==true%>
+          <div class="trial_date">
+            <div class="st1"> <%=t('trial_date')%>  </div> <div class="st2">: <%=format_date(@discipline_complaint.trial_date.to_date)%></div>
+          </div>
+        <%end%>
+      </div>
+      <%if ((@close_privilege || @current_user.admin?)|| DisciplineComplaint.is_privileged_user(@current_user.id)) and (@discipline_complaint.action_taken==false)%>
+        <% if permitted_to? :decision, @discipline_complaint,:context=>:discipline_complaints %>
+          <div class="close_button">    <%= link_to"#{t('close')}", :controller=>"discipline_complaints", :action=>"decision",:id=>@discipline_complaint.id%>
+          </div>
+        <%end%>
+      <%end%>
+      <%if (@action_privillage|| ((@current_user.parent?)and (@discipline_complaint.action_taken==true))) %>
+        <div class="close_button">    <%= link_to"#{t('actions')}", :controller=>"discipline_complaints", :action=>"decision",:id=>@discipline_complaint.id%>
+        </div>
+      <%end%>
+    </div>
+  </div>
+  <div id="content2">
+    <%= sanitize @discipline_complaint.body , :tags => %w[b i a h1 h2 h3 u li ol strike p img font span sup sub tr td table th tbody thead strong em], :attributes => %w[href src style border cellspacing cellpadding]%>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="table">
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td  class="col-11">
+          <%= t('complained_by') %>
+
+        </td>
+        <td class="col-11">
+          <%= t('complained_against') %>
+
+        </td>
+        <td class="col-11">
+          <%= t('jury') %>
+
+        </td>
+        <td class="col-11">
+          <%= t('responsible_officials') %>
+
+        </td>
+      </tr>
+      <tr class="tr-blank">
+
+      </tr>
+      <tr class="tr-odd">
+          <td class="col-11">
+              <% unless discipline_complainees_students.empty? %>
+                <div class="students_list">
+                    <div class="student_name"><%= t('students') %></div> 
+                    <% discipline_complainees_students.each do |complainee| %>
+                      <% unless complainee.user.nil? %>
+                        <p><%=  complainee.user.full_name.length+complainee.user.username.length > 40 ? complainee.user.full_name[0..(38-complainee.user.username.length)]+".. "+" - "+complainee.user.username : complainee.user.full_name+" - "+complainee.user.username %></p>
+                      <%else%>
+      <%# complainee.destroy %>
+                        <p><%= t('deleted_user') %></p>
+                      <% end %>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_complainees_employees.empty? %>
+                <div class="employees_list">
+                    <div class="employee_name"><%= t('employees') %></div>
+                    <% discipline_complainees_employees.each do |complainee| %>
+                      <% unless complainee.user.nil? %>
+                        <p><%=  complainee.user.full_name.length+complainee.user.username.length > 40 ? complainee.user.full_name[0..(38-complainee.user.username.length)]+".. "+" - "+complainee.user.username : complainee.user.full_name+" - "+complainee.user.username %></p>
+                      <%else%>
+      <%# complainee.destroy %>
+                        <p><%= t('deleted_user') %></p>
+                      <% end %>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_complainees_deleted.empty? %>
+                <div class="employees_list">
+                    <%count = discipline_complainees_deleted.count.to_i%>
+                    <div class="employee_name"><%= "#{t('deleted_user')} (#{count})" %></div>
+                </div>
+              <%end%>
+          </td>
+          <td class="col-11">
+              <% unless discipline_accusations_students.empty? %>
+                <div class="students_list">
+                    <div class="student_name"><%= t('students') %></div> 
+                    <% discipline_accusations_students.each do |accusation| %>
+                      <% unless accusation.user.nil? %>
+                        <p><%= accusation.user.full_name.length+accusation.user.username.length > 40 ? accusation.user.full_name[0..(38-accusation.user.username.length)]+".. "+" - "+accusation.user.username : accusation.user.full_name+" - "+accusation.user.username  %></p>
+                      <%else%>
+      <%#accusation.destroy%>
+                        <p><%= t('deleted_user') %></p>
+                      <%end%>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_accusations_employees.empty? %>
+                <div class="employees_list">
+                    <div class="employee_name"><%= t('employees') %></div> 
+                    <% discipline_accusations_employees.each do |accusation| %>
+                      <% unless accusation.user.nil? %>
+                        <p><%= accusation.user.full_name.length+accusation.user.username.length > 40 ? accusation.user.full_name[0..(38-accusation.user.username.length)]+".. "+" - "+accusation.user.username : accusation.user.full_name+" - "+accusation.user.username  %></p>
+                      <%else%>
+      <%#accusation.destroy%>
+                        <p><%= t('deleted_user') %></p>
+                      <%end%>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_accusations_deleted.empty? %>
+                <div class="employees_list">
+                    <%count = discipline_accusations_deleted.count.to_i%>
+                    <div class="employee_name"><%= "#{t('deleted_user')} (#{count})" %></div>
+                </div>
+              <%end%>
+          </td>
+          <td class="col-11">
+              <% unless discipline_juries.empty? %>
+                <% discipline_juries.each do |jury| %>
+                  <% unless jury.user.nil?%>
+                    <p><%= jury.user.full_name.length+jury.user.username.length > 40 ? jury.user.full_name[0..(38-jury.user.username.length)]+".. "+" - "+jury.user.username : jury.user.full_name+" - "+jury.user.username %></p>
+                  <%else%>
+                    <%# jury.destroy %>
+                    <p><%= t('deleted_user') %></p>
+                  <%end%>
+                <% end %>
+              <%end%>
+          </td>
+          <td class="col-11">
+              <% unless discipline_members_students.empty? %>
+                <div class="students_list">
+                    <div class="student_name"><%= t('students') %></div>
+                    <% discipline_members_students.each do |member| %>
+                      <% unless member.user.nil? %>
+                        <p><%= member.user.full_name.length+member.user.username.length > 40 ? member.user.full_name[0..(38-member.user.username.length)]+".. "+" - "+member.user.username : member.user.full_name+" - "+member.user.username %></p>
+                      <%else%>
+      <%# member.destroy %>
+                        <p><%= t('deleted_user') %></p>
+                      <%end%>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_members_employees.empty? %>
+                <div class="employees_list">
+                    <div class="employee_name"><%= t('employees') %></div>
+                    <% discipline_members_employees.each do |member| %>
+                      <% unless member.user.nil? %>
+                        <p><%= member.user.full_name.length+member.user.username.length > 40 ? member.user.full_name[0..(38-member.user.username.length)]+".. "+" - "+member.user.username : member.user.full_name+" - "+member.user.username %></p>
+                      <%else%>
+      <%# member.destroy %>
+                        <p><%= t('deleted_user') %></p>
+                      <%end%>
+                    <% end %>
+                </div>
+              <%end%>
+              <% unless discipline_members_deleted.empty? %>
+                <div class="employees_list">
+                    <%count = discipline_members_deleted.count.to_i%>
+                    <div class="employee_name"><%= "#{t('deleted_user')} (#{count})" %></div>
+                </div>
+              <%end%>
+          </td>
+      </tr>
+
+    </table> </div>
+  <div class="extender"></div>
+  <%if @privilege or @current_user.privileges.collect(&:name).include?("Discipline") %>
+    <%unless @discipline_complaint.discipline_master.discipline_attachments.last.nil?%>
+      <div class="label-field-pair">
+        <label for="student_image_file"><%= t('attachments') %> : </label>
+        <div class="download_file"> <%=link_to @discipline_complaint.discipline_master.discipline_attachments.last.attachment_file_name.length > 50 ? @discipline_attachment.attachment_file_name[0,50] + "..."  : @discipline_attachment.attachment_file_name ,@discipline_attachment.attachment.url(:original, false)%>
+        </div>
+      </div>
+    <%end%>
+    <%unless @discipline_complaint.action_taken==true %>
+      <div class="add_comment">
+        <% form_remote_for :comment ,:url=>{:controller=>"discipline_complaints", :action=>"create_comment"},:before => "$('submit_button').disable();",:complete => "setTimeout(function(){$('submit_button').enable();},5000);",:loading => "$('loading').show();", :loaded => "$('loading').hide();" do |c| %>
+          <%= hidden_field_tag :complaint_id,@discipline_complaint.id %>
+          <div id="errors"></div>
+          <label for="title"><%= t('add_your_comments') %>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loading",
+              :style =>"display: none;" ) %>
+          </label>
+          <div id="txt">
+            <div class="label-field-pair-text-area">
+              <div class="comment-content"><%= c.text_area:body,:cols =>27, :rows => 3,:id=>"child_comment_body_#{"comment"}"%></div>
+            </div>
+          </div>
+          <div id="btn">
+            <%=submit_tag "► #{t('post')}",{ :class => "submit_button",:id => 'submit_button',:onClick => "return validate('#{"comment"}')"} %>
+          </div>
+        <%end%>
+
+      </div>
+    <%end%>
+  <%end%>
+  <div class="extender"></div>
+  <%if (@privilege or @current_user.privileges.collect(&:name).include?("Discipline"))||@current_user.parent? %>
+    <div id="comments_div">
+      <label class="c_head"for="title"><%= t('comments') %>:
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+
+      </label>
+      <ul id="comments_list" class="themed_text comment_list">
+        <%= render :partial => 'discipline_complaints/comment' %>
+      </ul>
+    </div>
+
+  <%end%>
+</div>

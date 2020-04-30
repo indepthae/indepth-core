@@ -1,0 +1,58 @@
+<div id="flash"></div>
+<div class="label-field-pair working_days">
+    <label for="total_working_days"><%= t('total_working_days') %></label>
+    <span class="">
+        <%= text_field_tag :total_working_days,"", :onchange=>"set_total_working_days(this)",:onkeypress => "return isDigit(event,this)" %>
+    </span>
+</div>
+<div class="label-field-pair total_students">
+    <label for="total_students"><%= t('total_students') %><%= ":" %></label>
+    <span class="students_count">
+        <%= @students.count %>
+    </span>
+</div>
+<% remote_form_for @gradebook_attendance_entry, :url=>{:controller=>'gradebook_attendance', :action=>'submit_attendance'} do |form| %>
+    <%= session_fingerprint_field %>
+    <%= hidden_field_tag "batch_id" ,@batch.id %>
+    <table id="attendance-table">
+      <% roll_num_enabled = Configuration.enabled_roll_number? %>
+      <tr class="tr-head">
+          <td class="sl_no"><%= t('no_text') %></td>
+          <td class="name"><%= t('student_text') %></td>
+          <% if roll_num_enabled %>
+            <td class="roll_no"><%= t('roll_nos') %></td>
+          <% else %>
+            <td class="roll_no"><%= t('admission_num') %></td>
+          <% end %>
+          <td class="days"><%= t('no_of_working_days') %></td>
+          <td class="days"><%= t('days_present') %></td>
+      </tr>
+      <% i = 0 %>
+      <% form.fields_for :gradebook_attendances, @gradebook_attendance_entry.build_attendance_form do |field| %>
+        <tr>
+            <%= field.hidden_field :student_id %>
+            <%= field.hidden_field :batch_id %>
+            <%= field.hidden_field :linkable_id, :value=>@gradebook_attendance_entry.linkable_id %>
+            <%= field.hidden_field :linkable_type, :value=>@gradebook_attendance_entry.linkable_type %>
+            <%= field.hidden_field :report_type, :value=>@gradebook_attendance_entry.report_type %>
+            <td class="sl_no"><%= i+=1 %></td>
+            <td class="name" title="<%= field.object.student_name %>"><%=truncate(field.object.student_name,:length=>30) %></td>
+            <% if roll_num_enabled %>
+              <td class="roll_no"><%= field.object.student_roll_no %></td>
+            <% else %>
+              <td class="roll_no"><%= field.object.student_admission_no %></td>
+            <% end %>
+            <td class="days label-field-pair"><%= field.text_field :total_working_days, :class=>"total_days total_working_days total_#{field.object.student_id}", :student_id=>field.object.student_id, :onchange => "validate_attendance(#{field.object.student_id},this)", :onkeypress => "return isDigit(event,this)" %></td>
+            <td class="days label-field-pair"><%= field.text_field :total_days_present, :class=>"total_days present_#{field.object.student_id}", :student_id=>field.object.student_id , :onchange => "validate_attendance(#{field.object.student_id},this)", :onkeypress => "return isNumberKey(event,this,#{field.object.student_id})"%></td>
+        </tr>
+      <% end %>
+  </table>
+  <div class="attendance_submit_btn">
+      <%= submit_tag "", :value => "► #{t('submit')}", :class => "submit-button attendance-submit-button", :disable_with => "► #{t('please_wait')}" %>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loading",
+        :style =>"display: none;" ) %>
+  </div>
+<% end %>

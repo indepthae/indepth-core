@@ -1,0 +1,78 @@
+<tr class="row-b">
+    <td style="width:5%">
+        <% f[:show_field] = true if f[:show_field]=="true" %>
+        <% f[:mandatory] = true if f[:mandatory]=="true" %>
+        <% f[:show_field] = false if f[:show_field]=="false" %>
+        <% f[:mandatory] = false if f[:mandatory]=="false" %>
+        <% if f[:field_name] == "choose_electives" %>
+          <%= check_box_tag "#{i}_#{indx}_show_field",1, @registration_course.is_subject_based_registration.present?,{:class=>"disabled_show_field_checkbox hide-on-sort",:disabled=>true} %>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][show_field]", true,{:class=>"show_field",:readonly=>true} %>
+        <% else %>
+          <% if f[:show_field] == "default_true" %>
+            <%= check_box_tag "#{i}_#{indx}_show_field",1, true,{:class=>"disabled_show_field_checkbox hide-on-sort",:disabled=>true} %>
+            <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][show_field]", f[:show_field],{:class=>"show_field",:readonly=>true} %>
+          <% else %>
+            <%= check_box_tag "#{i}_#{indx}_show_field",1, f[:show_field],{:class=>"show_field_checkbox hide-on-sort",:onchange=>"modify_show_field_value(this);"} %>
+            <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][show_field]", f[:show_field],{:class=>"show_field"} %>
+          <% end %>
+        <% end %>
+        <%= hidden_field_tag "#{i}_field_section_index", i,{:class=>"field_section_index"} %>
+        <%= hidden_field_tag "#{indx}_field_index", indx,{:class=>"field_index"} %>
+        <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_type]", f[:field_type],{:class=>"field_type"} %>
+        <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_name]", f[:field_name],{:class=>"field_name"} %>
+        <div class="reorder-icon invisible-div"></div>
+    </td>
+    <% if f[:field_type]=="default" %>
+      <td style="width:55%"><div class="field-name"><%= t("#{f[:field_name]}") %></div>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_order]", f[:field_order],{:class=>"field_order"} %></td>
+    <% elsif f[:field_type] == "applicant_additional" %>
+      <% ad_field = ApplicantAddlField.find(f[:field_name]) %>
+      <td style="width:55%">
+          <div class="field-name"><%= ad_field.field_name %></div>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_order]", f[:field_order],{:class=>"field_order"} %>
+      </td>
+    <% elsif f[:field_type] == "student_additional" %>
+      <% ad_field = StudentAdditionalField.find(f[:field_name]) %>
+      <td style="width:55%">
+          <div class="field-name"><%= ad_field.name %></div>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_order]", f[:field_order],{:class=>"field_order"} %>
+      </td>      
+    <% elsif f[:field_type] == "applicant_attachment" %>
+      <% ad_field = ApplicantAddlAttachmentField.find(f[:field_name]) %>
+      <td style="width:55%">
+          <div class="field-name"><%= ad_field.name %></div>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][field_order]", f[:field_order],{:class=>"field_order"} %>
+      </td>      
+    <% end %>
+    <td style="width:40%">
+        <% if f[:field_type] == "student_additional" %>
+          <% if ad_field.is_mandatory == true %>
+            <% f[:mandatory] = "default_true"  %>
+          <% else %>
+            <% f[:mandatory] = true if f[:mandatory] == "default_true" %>
+          <% end %>
+        <% end %>
+        <% if f[:field_name] == "choose_electives" %>
+          <%= check_box_tag "#{i}_#{indx}_is_mandatory",1,@registration_course.is_subject_based_registration.present?,{:class=>"disabled_mandatory_field_checkbox hide-on-sort",:disabled=>true} %>
+          <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][mandatory]", true,{:class=>"mandatory_field",:readonly=>true} %>
+        <% else %>
+          <% if f[:mandatory] == "default_true" %>
+            <%= check_box_tag "#{i}_#{indx}_is_mandatory",1,true,{:class=>"disabled_mandatory_field_checkbox hide-on-sort",:disabled=>true} %>
+            <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][mandatory]", f[:mandatory],{:class=>"mandatory_field",:readonly=>true} %>
+          <% else %>
+            <%= check_box_tag "#{i}_#{indx}_is_mandatory",1,f[:mandatory],{:class=>"mandatory_field_checkbox hide-on-sort",:onchange=>"modify_mandatory_field_value(this);"} %>
+            <%= hidden_field_tag "application_section[section_fields][#{i}][fields][#{indx}][mandatory]", f[:mandatory],{:class=>"mandatory_field"} %>
+          <% end %>     
+        <% end %>
+        <% unless f[:field_type] == "default" %>
+          <% if (f[:field_type] == "student_additional" ? (ApplicantStudentAddlField.find_by_registration_course_id_and_student_additional_field_id(@registration_course.id,ad_field.id).present? and ApplicantStudentAddlField.find_by_registration_course_id_and_student_additional_field_id(@registration_course.id,ad_field.id).can_delete_field(@registration_course.id)) : ad_field.can_delete_field(@registration_course.id)) %>
+            <div class="field-delete-link hide-on-sort"><%= link_to "#{t('delete_text')}","#",{:id=>"#{ad_field.id}-field-delete", :onClick=>"delete_field(this); return false;"} %></div>
+          <% end %>
+          <% unless f[:field_type] == "student_additional" %>
+            <% if ad_field.can_edit_field(@registration_course.id) %>
+              <div class="field-edit-link hide-on-sort"><%= link_to "#{t('edit')}","#",{:id=>"#{ad_field.id}-field-edit", :onClick=>"show_edit_field_form(this); return false;"} %></div>
+            <% end %>      
+          <% end %>
+        <% end %>
+        <div class="invisible-div"></div></td>
+</tr>

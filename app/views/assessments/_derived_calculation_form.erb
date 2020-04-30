@@ -1,0 +1,58 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+        <td class="name"><%= t('batch') %></td>
+        <td class="status"><%= t('status') %></td>
+        <td class="actions"></td>
+    </tr>
+    <% @batches.each do |id, batch| %>
+      <tr>
+          <td class="name"><%= batch[:name] %></td>
+          <td class="status"><%= batch[:status] %></td>
+          <td class="actions">
+              <% if batch[:can_calculate] and batch[:status_code] == 2 %>
+                <%= link_to t('recalculate_marks'), calculate_derived_marks_assessments_path(:assessment_id => @assessment_group.id, :batch_id => id) %>
+              <% elsif batch[:can_calculate] %>
+                <%= link_to t('calculate_marks'), calculate_derived_marks_assessments_path(:assessment_id => @assessment_group.id, :batch_id => id) %>
+              <% else %>
+                <span class="strike"><%= t('calculate_marks') %></span>
+              <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>
+    <%# @batches.each do |id, batch| %>
+      <%# if batch[:can_calculate] and batch[:status_code] == 2 %>
+        <%#*<div class="batch_box">%>
+      <%# else %>
+        <%#*<div class="batch_box1">%> 
+      <%# end %>
+            <%#*<div class="header">%>
+                <%#*<div class="col flex">%>
+                    <%#= "#{t('batch')} : <b>#{batch[:name]}</b>" %>
+                <%#*</div>%>
+                <%#*<div class="col flex right">%>
+                      <%# if batch[:can_calculate] and batch[:status_code] == 2 %>
+                        <%# content_tag :div, :class => 'flex-col' do -%>
+                          <%#= link_to t('recalculate_marks'), calculate_derived_marks_assessments_path(:assessment_id => @assessment_group.id, :batch_id => id), :class => 'submit-button rad5' %>
+                        <%# end %>
+                      <%# elsif batch[:can_calculate] %>
+                        <%# content_tag :div, :class => 'flex-col' do -%>
+                          <%#= link_to t('calculate_marks'), calculate_derived_marks_assessments_path(:assessment_id => @assessment_group.id, :batch_id => id), :class => 'submit-button rad5' %>
+                        <%# end %>
+                      <%# else %>
+                        <%# content_tag :div, :class => 'flex-col' do -%>
+                          <%#= button_to t('calculate_marks'),{},:class => 'submit-button rad5 disabled_btn',:disabled => true  %>
+                        <%# end %>
+                      <%# end %>
+                      <%# content_tag :div, :class => 'flex-col text' do -%>
+                        <%#= "#{t('status')} : <b> #{batch[:status]}</b>" %>
+                      <%# end %>
+                <%#*</div>%>
+            <%#*</div>%>
+      <%# if batch[:can_calculate] and batch[:status_code] == 2 %>
+            <%#*<div class="assessment_list">%>
+              <%#= render :partial =>'derived_subject_list', :locals => {:subject_list => @subject_hash[id],:batch_id => id} %>
+            <%#*</div>%>  
+      <%# end %>
+        <%#*</div>%>
+    <%# end %>

@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'batch_allocation_list'
+page << "Modalbox.show($('modal-box'), {title: '#{t('batches_text')} - #{t(@utilization == "0" ? 'not_allocated' : (@utilization == "1" ? 'partially_allocated' : (@utilization == "2" ? 'completely_allocated' : (@utilization == "0" ? 'not_allocated' : 'not_eligible')) ))}', width: 800});"

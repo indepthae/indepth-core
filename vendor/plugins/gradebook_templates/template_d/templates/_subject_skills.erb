@@ -1,0 +1,29 @@
+<div class="section">
+    <% main_sub_length = main_subjects.length  %>
+    <% if main_sub_length == 1 %>
+      <% left_main_subjects = main_subjects%>
+      <% right_main_subjects = [] %>
+    <% elsif main_sub_length == 2 %>
+      <% left_main_subjects = [main_subjects.first] %>
+      <% right_main_subjects = [main_subjects.last] %>
+    <% else %>
+      <% left_main_subjects = main_subjects[0..(main_sub_length/2)] %>
+      <% right_main_subjects = main_subjects[((main_sub_length/2)+1)..(main_sub_length-1)] %>
+    <% end %>
+    <div class="six columns">
+        <% left_main_subjects.each do |subject| %>
+          <table class="primary condensed invert">
+              <%= display_skills({:subjects => [subject], :report => report, :level => 0}) %>
+          </table>
+        <% end %>
+    </div>
+
+    <div class="six columns">
+        <% right_main_subjects.each do |subject| %>
+          <table class="primary condensed">
+              <%= display_skills({:subjects => [subject], :report => report, :level => 0}) %>
+          </table>
+        <% end %>
+    </div>
+
+</div>

@@ -1,0 +1,98 @@
+
+  <div class="left_section">
+    <div id="course_name"><%=@batch.full_name%></div>
+    <%if @current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name('ManageStudentRecord'))%>
+      <%if  params[:rg_id].present?%>
+        <div id="edit_link"><%= link_to  "#{t('change_batch')}" ,:controller=>'student_records',:action=>"manage_student_records_for_course",:id=>@batch.course.id,:rg_id=>params[:rg_id]%></div>
+      <%else%>
+        <div id="edit_link"><%= link_to  "#{t('change_batch')}" ,:controller=>'student_records',:action=>"manage_student_records_for_course",:id=>@batch.course.id%></div>
+      <%end%>
+    <%else%>
+      <div id="edit_link"><%= link_to  "#{t('change_batch')}" ,:controller=>'student_records',:action=>"manage_student_records"%></div>
+    <%end%>
+  </div>
+  <div class="right_section"></div>
+  <%if @all_students.present?%>
+    <table id="student_details_table" class ="sortable" id="listing" width="100%" cellpadding="1" cellspacing="1">
+      <tr>
+        <% if @sort_order=="first_name DESC" %>
+          <th id="name" class="sortheader">
+            <%= link_to_remote  "#{t('student_text')} &#8595;", :url=>{:action=>"list_students",:sort_order=>"first_name ASC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+          </th>
+          <% elsif @sort_order=="first_name ASC" %>
+          <th id="name" class="sortheader">
+            <%= link_to_remote  "#{t('student_text')} &#8593;", :url=>{:action=>"list_students",:sort_order=>"first_name DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page]  } %>
+          </th>
+        <% else %>
+          <th id="name" class="sortheader">
+            <%= link_to_remote  "#{t('student_text')}", :url=>{:action=>"list_students",:sort_order=>"first_name DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page]  } %>
+          </th>
+        <% end %>
+
+
+        <% if @sort_order=="admission_no DESC" %>
+          <th id="admno" class="sortheader">
+            <%= link_to_remote  "#{t('admission_no')} &#8595;", :url=>{:action=>"list_students",:sort_order=>"admission_no ASC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+          </th>
+        <% elsif @sort_order=="admission_no ASC" %>
+          <th id="admno" class="sortheader">
+            <%= link_to_remote  "#{t('admission_no')} &#8593;", :url=>{:action=>"list_students",:sort_order=>"admission_no DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+          </th>
+        <% else %>
+          <th id="admno" class="sortheader">
+            <%= link_to_remote  "#{t('admission_no')}", :url=>{:action=>"list_students",:sort_order=>"admission_no DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+          </th>
+        <% end %>
+
+        
+        <% if roll_number_enabled? %>
+          <% if @sort_order=="LENGTH(roll_number) DESC,roll_number DESC" %>
+            <th id="roll_no" class="sortheader">
+              <%= link_to_remote  "#{t('roll_nos')} &#8595;", :url=>{:action=>"list_students",:sort_order=>"LENGTH(roll_number) ASC,roll_number ASC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+            </th>
+          <% elsif @sort_order=="LENGTH(roll_number) ASC,roll_number ASC" %>
+            <th id="roll_no" class="sortheader">
+              <%= link_to_remote  "#{t('roll_nos')} &#8593;", :url=>{:action=>"list_students",:sort_order=>"LENGTH(roll_number) DESC,roll_number DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+            </th>
+          <% else %>
+            <th id="roll_no" class="sortheader">
+              <%= link_to_remote  "#{t('roll_nos')}", :url=>{:action=>"list_students",:sort_order=>"LENGTH(roll_number) DESC,roll_number DESC",:id=>@batch.id, :rg_id => @record_group.try(:id), :page => params[:page] } %>
+            </th>
+          <% end %>
+        <% end %>
+        
+        <th id="completed"><%="#{t('completed')} %"%></th>
+        <th id="action" class="unsortable"></th>
+      </tr>
+
+      <%@all_students.each do |s|%>
+        <tr class="list_<%=cycle('odd', 'even')%>">
+          <td style="display: none;"></td>
+          <td><%=s.full_name%></td>
+          <td><%=s.admission_no%></td>
+          <% if roll_number_enabled? %>
+            <td><%=@batch.is_active==true ? s.roll_number.present? ? s.roll_number : "-" : s.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number.present? ? s.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number : "-"%></td>
+          <%end%>
+          <td><%=params[:rg_id].present? ? s.completion(@batch.id,params[:rg_id]).to_i : s.completion(@batch.id).to_i%></td>
+
+          <%if params[:rg_id].present?%>
+            <%if s.student_records.all(:conditions=>{:batch_id=>@batch.id,:additional_field_id=>@record_group.records.collect(&:id)}).present?%>
+              <td><%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'new',:id=>s.id,:batch_id=>@batch.id,:rg_id=>params[:rg_id]%></td>
+            <%else%>
+              <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'new',:id=>s.id,:batch_id=>@batch.id,:rg_id=>params[:rg_id]%></td>
+            <%end%>
+          <%else%>
+            <%if s.student_records.all(:conditions=>{:batch_id=>@batch.id}).present?%>
+              <td><%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'new',:id=>s.id,:batch_id=>@batch.id%></td>
+            <%else%>
+              <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'new',:id=>s.id,:batch_id=>@batch.id%></td>
+            <%end%>
+          <%end%>
+        </tr>
+      <%end%>
+    </table>
+    <%=will_paginate @all_students, :renderer => 'RemoteLinkRenderer', :params=>{ :sort_order=>@sort_order } %>
+  <%else%>
+    <div class="no_entries"><%=t('no_students_in_batch')%></div>
+  <%end%>
+</div>

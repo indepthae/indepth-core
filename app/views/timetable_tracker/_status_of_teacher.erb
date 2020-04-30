@@ -1,0 +1,12 @@
+<div id="teacher_status_heading" class="teacher_status_title"> <%= t('teacher_status')%> </div>
+<% swap_occupied = @emp_swaps.to_a.find{|es| es.start_time == "#{format_date(@current_class_timing.start_time,:format=>:time)}" and "#{format_date(@current_class_timing.end_time,:format=>:time)}" == es.end_time} %>
+<% occupied = @class_timings.to_a.find{|ct| ct.class_timing.start_time == @current_class_timing.start_time and @current_class_timing.end_time == ct.class_timing.end_time} %>
+<%  if  occupied.present? or swap_occupied.present? %>
+  <div id ="swap_teacher" class="teacher_status"  tooltip = '<%= render :partial => "teacher_status_tooltip" %>'> 
+      <span class="occupied"> <%= t('occupied') %></span>
+  </div>
+<% else  %>
+  <div id ="swap_teacher1" class="teacher_status"  tooltip = '<%= render :partial => "teacher_status_tooltip" %>'> 
+      <span class="occupied"> <%= t('available') %></span>
+  </div>
+<% end %>

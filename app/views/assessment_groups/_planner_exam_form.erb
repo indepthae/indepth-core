@@ -1,0 +1,123 @@
+<% form_for :assessment_group, @assessment_group, :url => planner_assessment_assessment_groups_path, :html => { :method => fetch_method(@assessment_group), :id=>'assessment_group_form'} do |g| %>
+  <% obj = g.object %>
+  <%= g.hidden_field :type %>
+  <%= g.hidden_field :parent_id %>
+  <%= g.hidden_field :parent_type %>
+  <%= g.hidden_field :assessment_plan_id %>
+  <%= g.hidden_field :academic_year_id %>
+  <%= g.hidden_field :is_final_term, :value => true %>
+  <%= hidden_field_tag :id , (obj.new_record? ? '' :obj.id) %>
+
+  <% settings = obj.settings_as_hash %>
+  
+  <div class="no_exam_check">
+      <div class="label-radio-pair">
+          <div class="radio-buttons">
+              <div class="section">
+                  <%= g.radio_button :no_exam, false ,:class => 'core_field', :onchange => 'toggle_no_exam(this)' %>
+                  <label for="assessment_group_no_exam_false"><%= t('calculate_final_result') %></label>
+                  <div id="description"><%= t('add_final_plan_description') %></div>
+              </div>
+              <div class="section">
+                  <%= g.radio_button  :no_exam, true, :class => 'core_field', :onchange => 'toggle_no_exam(this)'  %>
+                  <label for="assessment_group_no_exam_true"><%= t('dont_calculate_final_result') %></label>
+                  <div id="description"><%= t('dont_add_final_plan_description') %></div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div class="label-field-pair group_name">
+      <label for="name"><%= t('exam_name').titleize %></label>
+      <div class="text-input-bg"><%= g.text_field :name, :onchange => "show_display_name(this);" %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name"><%= t('code') %></label>
+      <div class="text-input-bg"><%= g.text_field :code %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name">
+          <span><%= t('display_name') %></span>
+          <span id="info-symbol" tooltip="<%= t('display_name') %>"></span>
+      </label>
+      <div class="text-input-bg"><%= g.text_field :display_name %></div>
+  </div>
+  <div id="derived_based">
+      <hr class="derived_hr"/>
+      <% assessments = obj.connectable_assessments %>
+      <div class="assessment_group_details" id="ag_group_list">
+          <%= render :partial => 'planner_assessment_groups', :locals=>{:g => g, :assessments => assessments, :obj => obj} %>
+      </div>
+      <% if assessments.present? %>
+        <%= g.hidden_field :assessment_group_id %>
+      <% end %>
+      <hr class='derived_hr'/>
+      <div class="derived__sections">
+          <%= render :partial => 'formula_select', :locals => {:g => g, :obj => obj, :assessments => obj.connectable_assessments, :settings => settings, :exam_type => t('planner').downcase} %>
+      </div>
+      <hr class="derived_hr"/>
+      <div class="derived__sections">
+          <%= render :partial => 'scoring_type_select', :locals => {:g => g, :obj => obj, :is_final => true, :settings => settings} %>
+      </div>
+      <hr class="derived_hr"/>
+      <div class="derived__sections">
+            <%= render :partial => 'subject_advance_settings', :locals => {:g=>g} %>
+      </div>
+  </div>
+  <div id='submit_area'>
+      <%= g.submit "#{@assessment_group.new_record? ? t('create_exam') : t('update_exam') }" , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+      get_profile_details = function (elm, type) {
+      j(elm).parent().next('.wrapper').hide();
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_groups/fetch_profiles', {
+              parameters: {'profile_id': elm.value, 'profile_type': type},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j(elm).closest('.label-field-pair').next('#profile_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j(elm).closest('.label-field-pair').next('#profile_details').html('');
+      }
+      
+      toggle_no_exam = function(elm) {
+        if(elm.value == 'true'){
+          j('.derived__sections, .group_name, .group_code, .derived_hr').fadeOut();
+        }else{
+          j('.derived__sections, .group_name, .group_code, .derived_hr').fadeIn();
+        }
+        new Ajax.Request('/assessment_groups/fetch_assessment_groups', {
+              parameters: {'no_exam': elm.value, 'assessment_plan_id': <%=@plan.id%>},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'get',
+              onComplete: function (resp) {
+                  j('#ag_group_list').html(resp.responseText);
+              }
+        });
+      }
+      
+      if(j('#assessment_group_no_exam_true').is(':checked')){
+        j('.derived__sections, .group_name, .group_code, .derived_hr').hide();
+      }
+      
+      show_display_name = function (elm) {
+        var text = '';
+        var arr = elm.value.split(' ');
+        for (i = 0; i < arr.length; i++) {
+            text += arr[i].substr(0, 1)
+        }
+        j('#assessment_group_display_name').val(text);
+    }
+      
+</script>

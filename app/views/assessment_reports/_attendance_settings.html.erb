@@ -1,0 +1,89 @@
+<% form_for :attendance_settings,:url => {:action => 'attendance_settings', :assessment_plan_id => @plan.id } do |c| %>
+  <div class="box attendance_container">
+      <div class="label_field_pair block">
+          <div class="label_pair">
+              <%= check_box :attendance_settings, :enable_attendance, :checked =>@setting[:enable_attendance]== "1", :onchange=>"toggle_attendance_elements(this)" %>
+              <label for="attendance_settings_enable_attendance" class="core_label sub-header"><%= t('enable_attendance').titleize %></label>
+          </div>
+          <div class="nested_block inner_block">
+              <div class="label_field_pair attendance-block">
+                  <label class="core_label"><%=t('reporting_period')%></label>
+                  <div class="ind_block">
+                      <div class="section">
+                          <%= check_box :attendance_settings, :exam_attendance , :checked =>@setting[:exam_attendance]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label for="attendance_settings_exam_attendance"><%=t('exam_report')%></label>
+                          <div id="description"><%= t('exams_attendance_description') %></div>
+                      </div>
+                      <div class="section">
+                          <%= check_box :attendance_settings, :term_attendance , :checked =>@setting[:term_attendance]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements", :onchange=>"toggle_term_radios(this)" %>
+                          <label for="attendance_settings_term_attendance"><%=t('term_report')%></label>
+                          <div id="description"><%= t('terms_attendance_description') %></div>
+                          <div class="radios">
+                              <%= radio_button :attendance_settings, :term_report ,"0", :checked =>@setting[:term_report]== "0", :disabled=>(@setting[:enable_attendance]== "0" or @setting[:term_attendance]== "0"), :class=>"term_attendance_radio" %>
+                              <label class="general_label" for="attendance_settings_term_report_0"><%=t('all_exams')%></label>
+                              <%= radio_button :attendance_settings, :term_report ,"1", :checked =>@setting[:term_report]== "1", :disabled=>(@setting[:enable_attendance]== "0" or @setting[:term_attendance]== "0"), :class=>"term_attendance_radio" %>
+                              <label class="general_label" for="attendance_settings_term_report_1"><%=t('term_consolidated')%></label>
+                          </div>
+                      </div>
+                      <div class="section planner_section">
+                          <%= check_box :attendance_settings, :planner_attendance , :checked =>@setting[:planner_attendance]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements", :onchange=>"toggle_planner_radios(this)" %>
+                          <label for="attendance_settings_planner_attendance"><%=t('planner_report')%></label>
+                          <div id="description"><%= t('planner_attendance_description') %></div>
+                          <div class="radios">
+                              <%= radio_button :attendance_settings, :planner_report ,"0", :checked =>@setting[:planner_report]== "0", :disabled=>(@setting[:enable_attendance]== "0" or @setting[:planner_attendance]=="0"), :class=>"planner_attendance_radio" %>
+                              <label class="general_label" for="attendance_settings_planner_report_0"><%=t('all_exams')%></label>
+                              <%= radio_button :attendance_settings, :planner_report ,"1", :checked =>@setting[:planner_report]== "1", :disabled=>(@setting[:enable_attendance]== "0" or @setting[:planner_attendance]=="0"), :class=>"planner_attendance_radio" %>
+                              <label class="general_label" for="attendance_settings_planner_report_1"><%=t('all_terms')%></label>
+                              <%= radio_button :attendance_settings, :planner_report ,"2", :checked =>@setting[:planner_report]== "2", :disabled=>(@setting[:enable_attendance]== "0" or @setting[:planner_attendance]=="0"), :class=>"planner_attendance_radio" %>
+                              <label class="general_label" for="attendance_settings_planner_report_2"><%=t('planner_consolidated')%></label>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="label_field_pair attendance-block">
+                  <label class="core_label"><%=t('calculation_mode')%></label>
+                  <div class="ind_block">
+                      <div class="calc_section">
+                          <%= radio_button :attendance_settings, :calculation_mode ,"0", :checked =>@setting[:calculation_mode]== "0", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements", :onclick=>"toggle_calculation_radios()" %>
+                          <label class="general_label" for="attendance_settings_calculation_mode_0"><%=t('auto_calculate')%></label>
+                          <div id="description"><%= t('attendance_calc_description_auto') %></div>
+                      </div>
+                      <div class="calc_section">
+                          <%= radio_button :attendance_settings, :calculation_mode ,"1", :checked =>@setting[:calculation_mode]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements", :onclick=>"toggle_calculation_radios()" %>
+                          <label class="general_label" for="attendance_settings_calculation_mode_1"><%=t('manual_entry')%></label>
+                          <div id="description"><%= t('attendance_calc_description_manual') %></div>
+                      </div>
+                  </div>
+              </div>
+              <div class="label_field_pair attendance-block">
+                  <label class="core_label"><%=t('show_in_report')%></label>
+                  <div class="ind_block">
+                      <div class="label_pair checkbox_label_pair">
+                          <%= check_box :attendance_settings, :percentage, :checked =>@setting[:percentage]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label class="general_label checkbox_label" for="attendance_settings_percentage"><%=t('percentage_of_days')%></label>
+                      </div>
+                      <div class="label_pair checkbox_label_pair">
+                          <%= check_box :attendance_settings, :days_present_by_working_days,:checked =>@setting[:days_present_by_working_days]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label class="general_label checkbox_label" for="attendance_settings_days_present_by_working_days"><%="#{t('days_present')}/#{t('no_of_working_days')}"%></label>
+                      </div>
+                      <div class="label_pair checkbox_label_pair">
+                          <%= check_box :attendance_settings, :working_days,:checked =>@setting[:working_days]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label class="general_label checkbox_label" for="attendance_settings_working_days"><%=t('num_of_working_days')%></label>
+                      </div>
+                      <div class="label_pair checkbox_label_pair">
+                          <%= check_box :attendance_settings, :days_present,:checked =>@setting[:days_present]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label class="general_label checkbox_label" for="attendance_settings_days_present"><%=t('num_of_days_present')%></label>
+                      </div>
+                      <div class="label_pair checkbox_label_pair">
+                          <%= check_box :attendance_settings, :days_absent,:checked =>@setting[:days_absent]== "1", :disabled=>@setting[:enable_attendance]== "0", :class=>"attendance_settings_elements" %>
+                          <label class="general_label checkbox_label" for="attendance_settings_days_absent"><%=t('num_of_days_absent')%></label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div id="submit_button">
+          <%= submit_tag t('save_settings').titleize ,:id=>'submit-button' %>
+      </div>
+  </div>
+<% end %>

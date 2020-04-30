@@ -1,0 +1,66 @@
+<div id="page-yield">
+
+  <div class="hor_line"></div>
+  <h2><%= "#{t('hostel_fee_receipt')}"%></h2>
+  <div class="hor_line"></div>
+
+  <div class="report">
+    <div id ="main_info">
+      <div id="info-left">
+        <h4><%= t('fee_collection_name') %> : <%= @transaction.hostel_fee_collection.name %></h4>
+        <h4><%= t('name') %> : <%= @transaction.student.full_name unless @transaction.student.nil? %></h4>
+        <h4><%= t('admission_number') %>: <%= @transaction.student.admission_no %></h4>
+        <% if roll_number_enabled? %>
+          <h4><%= t('roll_no') %> : <%= @transaction.student.roll_number.nil? ? "-" : @transaction.student.roll_number %></h4>
+        <% end %>
+        <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and @online_transaction_id.present? and ((PaymentConfiguration.config_value("enabled_fees").present? and PaymentConfiguration.is_hostel_fee_enabled?))) %>
+          <h4><%= "#{t('online_transaction_id')}"%>: <%= @online_transaction_id %></h4>
+        <% end %>
+      </div>
+      <div id="info-right">
+        <h4><%= t('receipt_no') %> : <%= @finance_transaction.receipt_number %></h4>
+        <h4><%= "#{t('course')}"%>: <%= @transaction.student.batch.course.course_name %></h4>
+        <h4><%= "#{t('batch')}"%>: <%= @transaction.student.batch.full_name %></h4>
+      </div>
+    </div>
+    <% c= 'odd' %>
+    <% index= 0 %>
+    <div id="pdf-info">
+      <table id="pdf-table" width="100%" cellspacing="0">
+        <tr class="table-header">
+          <td class="col-pdf"><%= t('sl_no') %></td>
+          <td class="col-pdf"><%= t('particulars') %></td>
+          <td class="col-pdf"><%= t('amount') %> </td>
+        </tr>
+        <tr class="<%= cycle((["odd","even"]-[c]).first,c) %>">
+          <td class="col-pdf"><%= index+=1 %></td>
+          <td class="col-pdf"><%= "#{t('rent')}"%></td>
+          <td class="col-pdf"><%= @currency %> <%#= @transaction.rent %><%= precision_label @transaction.rent %></td>
+        </tr>
+        <% unless @fine.blank? %>
+          <tr class="<%= cycle((["odd","even"]-[c]).first,c) %>">
+            <td class="col-pdf"><%= index+=1 %></td>
+            <td class="col-pdf"><%= t('fine') %></td>
+            <td class="col-pdf"><%= @currency %> <%#= @fine %><%= precision_label @fine %></td>
+          </tr>
+        <% end %>
+        <tr class="<%= cycle((["odd","even"]-[c]).first,c) %>">
+          <td colspan="2" class="col-pdf"><%= t('total_amount') %></td>
+          <td class="col-pdf"><%= @currency %><%= precision_label @finance_transaction.amount %> <%#= @finance_transaction.amount %></td>
+        </tr>
+
+      </table>
+    </div>
+    <div id ="main_info">
+      <%if @finance_transaction.reference_no.present?%>
+        <h4><%= t('payment_mode') %> : <%= @finance_transaction.payment_mode %> - <%= @finance_transaction.reference_no %></h4>
+      <%else%>
+        <h4><%= t('payment_mode') %> : <%= @finance_transaction.payment_mode %></h4>
+      <%end%>
+      <%unless @finance_transaction.payment_note.nil? or @finance_transaction.payment_note.blank? %>
+        <h4><%= t('payment_notes') %> :<p> <%= @finance_transaction.payment_note %></p></h4>
+      <% end %>
+    </div>
+  </div>
+
+</div>

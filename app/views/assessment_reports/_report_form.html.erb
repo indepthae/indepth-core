@@ -1,0 +1,242 @@
+<% not_generated_batches = @batches.select{|id, b| !b[:selected]} %>
+<% if not_generated_batches.present? %>  
+  <hr/>
+  <div class="sub-head"><%= t('batch_without_reports') %></div>
+  <% form_for @generated_report, :url => fetch_report_generation_path(@report, @course), :method => :post  do |gr| %>
+    <%= session_fingerprint_field %>
+    <%= gr.hidden_field :report_id %>
+    <%= gr.hidden_field :report_type %>
+    <%= gr.hidden_field :course_id %>
+    <div id="report_form">
+        <table align="center" width="50%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <% marks_submitted = @batches.select{|id, b| !b[:selected] and b[:can_generate]} %>
+                <td class="check_all"><input type="checkbox" class="select_all" <%= marks_submitted.empty? ? "disabled=true" : '' %> onclick="checkAll()"/></td>
+                <td class="name"><%= t('batch') %></td>
+                <td class="status"><%= t('exam_status') %></td>
+                <td class="students"><%= t('multiple_student') %></td>
+            </tr>
+
+            <% @batches.each do |id, batch| %>
+              <% unless batch[:selected] %>
+                <tr>
+                    <td class="check_all">
+                        <%= check_box_tag "generated_report[batch_ids][]", id, batch[:selected], :class => "select_batch", :onclick => "selectBatch()", :disabled => !batch[:can_generate] %>
+                    </td>
+                    <td class="name"><%= batch[:name] %></td>
+                    <td class="status"><%= batch[:can_generate] ? t('marks_submitted') : batch[:generate_status].join(", ") %></td>
+                    <td class="students"><%= batch[:students] %></td>
+                </tr>
+              <% else %>
+                <%= hidden_field_tag "generated_report[batch_ids][]", id  %>
+              <% end %>
+            <% end %>
+        </table>
+    </div>
+    <div id="form-footers">
+        <%= submit_tag "#{t('generate_reports')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button", :disabled => true %>
+    </div>
+  <% end %>
+<% end %>
+<% generated_batches = @batches.select{|id, b| b[:selected]} %>
+<% if generated_batches.present? %>
+  <hr/>
+  <div class="sub-head"><%= t('batch_with_reports') %></div>
+  <% publishing_reports = generated_batches.select{|id, b| ([1, 4].include? b[:status_no])}  %>
+  <% unpublished_reports = generated_batches.select{|id, b| !b[:report_published]}  %>
+  <% if publishing_reports.empty? and unpublished_reports.present? %>
+    <%= link_to t('publish_reports'), publish_reports_assessment_reports_path(:report_id => @generated_report.id, :course_id => @generated_report.course_id), :class => "submit-button" %>
+  <% end %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td><%= check_box_tag "", "" , false, :class=>"notification_select_all" %></td>
+          <td class="name"><%= t('batch') %></td>
+          <td class="status"><%= t('report_status') %></td>
+          <td class="actions"></td>
+      </tr>
+      <% generated_batches.each do |id, batch| %>
+        <tr>
+            <td><%= check_box_tag "batch","", false , :class=>"notification_selection", "data-batch_id"=> id, "data-generated_report_id"=> @generated_report.id , :disabled=> (!batch[:report_published])  %></td>
+            <td class="name"><%= batch[:name] %></td>
+            <td class="status"><%= batch[:publish_status] %></td>
+            <td class="actions">
+                <% unless [1, 4].include? batch[:status_no] %>
+                  <% if @generated_report.report_type == 'AssessmentTerm' %>
+                    <%= link_to t('student_term_reports'), students_term_reports_assessment_reports_path(:term_id => @generated_report.report_id, :course_id => @generated_report.course_id, :batch_id => id) %>
+                  <% elsif @generated_report.report_type == 'AssessmentPlan' %>
+                    <%= link_to t('student_plan_reports'), students_planner_reports_assessment_reports_path(:plan_id => @generated_report.report_id, :course_id => @generated_report.course_id, :batch_id => id) %>
+                  <% else %>
+                    <%= link_to t('view_student_reports'), student_exam_reports_assessment_reports_path(:group_id => @generated_report.report_id, :course_id => @generated_report.course_id,:term_id=>@term.id , :batch_id => id) %>
+                  <% end %>
+                  <% unless batch[:report_published] %>
+                    <%= link_to t('publish_reports'), publish_reports_assessment_reports_path(:report_id => @generated_report.id, :course_id => @generated_report.course_id, :batch_id => id) %>
+                  <% end %>
+                  <%= link_to t('regenerate_reports'), regenerate_reports_assessment_reports_path(:report_id => @generated_report.id, :batch_id => id, :course_id => @generated_report.course_id) %>
+
+
+                <% end %>
+                <% if batch[:status_no] != 2 %>
+                  <% if [5,3].include? batch[:status_no]  and batch[:last_error].present? %>
+                    <span class="status"><%= batch[:status] %></span>
+                    <span id="info-symbol" tooltip="<%= batch[:last_error].join(", ") %>"></span>
+                  <%  else %>
+                    <span class="status"><%= batch[:status] %></span>
+                  <% end %>
+                <% elsif batch[:batch_report_ids].present? %>
+                  <%= link_to_function t('download_batch_report'), "download_batch_report('#{batch[:batch_report_file_name]}',#{raw batch[:batch_report_ids].to_json });", :class => 'batch-report-action'  %>
+                <%  elsif @generated_report.report_type == 'AssessmentPlan' %>
+                  <% if batch[:batch_report_present] %>
+                    <% if batch[:batch_report_link].present? %>
+                      <%= link_to t('download_batch_report'), batch[:batch_report_link], :class => 'batch-report-action'  %>
+                    <% elsif batch[:batch_report_status].present? %>
+                      <span class="batch-report-action batch-report-status status"><%= t(batch[:batch_report_status]) %></span>
+                    <% end %>
+                  <% else %>
+                    <% form_for :batch_wise_report, :url => generate_batch_wise_reports_assessment_reports_path,:method => :post do |f| %>
+                      <%= f.hidden_field :course_id , :value =>  @generated_report.course_id  %>
+                      <%= f.hidden_field :batch_ids , :value => id %>
+                      <%= f.hidden_field :report_type , :value => 'plan_report' %>
+                      <%= f.hidden_field :reportable_id , :value => @generated_report.report_id %>
+                      <%= f.submit t('generate_batchwise_report'), :disable_with => "#{t('please_wait')}", :class => "submit-button-plain" %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+            </td>
+        </tr>
+      <% end %>
+  </table>
+  <div id="error_display" style="clear:both;">
+  </div>
+    <% unless validate_edit_sms_template.is_enabled == false %>
+    <button class="submit-button" onclick="send_notification()"><%= t('send_notification')%></button>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+  function checkAll()
+  {
+      if (j('.select_all').prop('checked') == true)
+      {
+          j('.select_batch:not(:disabled)').each(function () {
+              j(this).prop('checked', true);
+              selectBatch();
+          });
+      } else {
+          j('.select_batch:not(:disabled)').each(function () {
+              j(this).prop('checked', false);
+              selectBatch();
+          });
+      }
+  }
+
+  function selectBatch()
+  {
+      allBatch();
+      atleastOneBatch();
+  }
+
+  function allBatch()
+  {
+      if (j(".select_batch:not(:disabled)").not(":checked").length > 0)
+          j('.select_all').prop("checked", false);
+      else
+          j('.select_all').prop("checked", true);
+  }
+  function atleastOneBatch()
+  {
+      if (j(".select_batch").is(":checked"))
+          j('.submit-button').attr('disabled', false);
+      else
+          j('.submit-button').attr('disabled', true);
+  }
+
+  function download_batch_report(zipFilename, url_array) {
+      var count = 0;
+      var total_reports = (url_array.length);
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      build_modal_box({'title': "<%=t('downloading_reports')%>", 'popup_class': 'confirmation'});
+      j('#popup_content').append('<div class="progress_container"><div class="progress" id="progress"><div class="bar" id="bar"></div></div><div id="upload_status" class="upload_status"><%=t('downloading')%> 1 <%=t('student_out_of')%> ' + total_reports + '</div></div>');
+      j("#upload_status").html("<%=t('downloading')%> 1 <%=t('student_out_of')%> " + total_reports);
+      document.body.style.overflow = "hidden";
+      var zip = new JSZip();
+      var img_folder = zip.folder(zipFilename)
+      url_array.forEach(function (url, i) {
+          var filename = url[1];
+          j.ajax({
+              type: "POST",
+              success: function (msg) {
+
+                  JSZipUtils.getBinaryContent(url[0], function (err, data) {
+                      if (err) {
+                          throw err; // or handle the error
+                      }
+                      var upload_count = count + 1;
+                      j("#upload_status").html("<%=t('downloading')%> " + (upload_count > total_reports ? total_reports : upload_count) + " <%=t('student_out_of')%> " + total_reports);
+                      var width = ((upload_count) / total_reports) * 100;
+                      j("#bar").width(width + '%');
+                      img_folder.file(filename, data, {binary: true});
+                      count++;
+                      if (count == url_array.length) {
+                          zip.generateAsync({type: 'blob'}).then(function (content) {
+                              saveAs(content, zipFilename);
+                              document.body.style.overflow = "auto";
+                              remove_popup_box();
+                          });
+                      }
+                  });
+              }
+          });
+      });
+  }
+
+  function send_notification() {
+      var details = [];
+      var selections = j(".notification_selection:checked");
+      j(".error_msg_box").remove();
+      if (selections.length == 0) {
+          set_error_properties(j("#error_display")[0],<%= t('select_at_least_one_batch').to_json %>)
+      }
+      else {
+          selections.each(function () {
+              details.push(j(this).data());
+          });
+          console.log(details);
+          // continue here
+          j.ajax({
+              url: "send_result_publish_notification",
+              type: 'POST',
+              data: {
+                  details: details,
+                  session_fingerprint: '<%= session_fingerprint %>'
+              },
+              success: function (data, textStatus, jqXHR)
+              {
+              },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+              }
+          });
+      }
+  }
+
+  j(".notification_select_all").change(function () {
+      if (j(this).prop("checked") == true) {
+          j(".notification_selection").each(function () {
+              if (this.disabled == false) {
+                  this.checked = true;
+              }
+          });
+      } else {
+          j(".notification_selection").each(function () {
+              if (this.disabled == false) {
+                  this.checked = false;
+              }
+          });
+      }
+  });
+
+  function set_error_properties(element, message) {
+      var error_box = "<div class='wrapper error_msg_box'><div class='error-icon'></div><div class='error-msg'>" + message + "</div></div>"
+      j(element).after(error_box);
+  }
+
+</script>

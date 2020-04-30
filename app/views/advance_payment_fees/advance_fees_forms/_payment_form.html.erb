@@ -1,0 +1,20 @@
+<div class="label-field-pair3 payment_mode_block">
+  <label>
+      <%= t('payment_mode') %>
+      <%= image_tag("loader.gif", :align => "absmiddle",
+        :border => 0, :id => "loader1",
+        :style => "display: none;") %>
+  </label>
+  <div class="text-input-bg3">
+      <%= render :partial => "advance_payment_fees/advance_fees_forms/advance_fees_payment_modes",
+        :locals => {:form_obj => :advance_fees_collection} %>
+  </div>
+</div>
+<div id="payment_mode">
+  <div id="payment_mode_details">
+      <% if params[:payment_mode] == 'Others'%>
+        <%= render :partial=>'advance_payment_fees/advance_fees_forms/select_payment_modes',:locals =>
+          {:mode=> params[:others_payment_mode]} %>
+      <% end %>
+  </div>
+</div>

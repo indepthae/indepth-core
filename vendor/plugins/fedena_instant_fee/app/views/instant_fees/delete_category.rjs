@@ -1,0 +1,6 @@
+if @error == true
+  page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('unable_to_delete_category')}</p>"
+else
+  page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('instant_fee_particular_deleted_successfully')}</p>"
+end
+page.replace_html :information,:partial=>"list_categories",:locals=>{:instant_fee_categories=>@instant_fee_categories}

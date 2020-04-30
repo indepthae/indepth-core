@@ -1,0 +1,49 @@
+<div id="collection_receipients_data">
+
+<% if @receivers.present? %>
+
+    <div id="questions-main">
+      <div id="left-panel">
+        <div id="left-top-panel">
+         <div class="left-top-header">
+           <% if action_name=="list_employees_by_department" %>
+           <%= t('employees') %>
+               <% else %>
+           <%= t('students_in_batch') %>
+           <% end %>
+         </div>
+        </div>
+        <div id="left-bottom-panel">
+          <div id="question-list">
+            <%#= hidden_field_tag 'bus_fare', @bus_fare %>
+            <%= render :partial => "student_list" %>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div id="right-panel">
+
+        <%= render :partial => 'fees_list' %>
+      </div>
+       <button class="submit_button" onclick="$('allocation_form').request();"><%= t('update') %></button>
+
+    </div>
+<% else %>
+    <% if action_name=="list_employees_by_department" %>
+        <p class="flash-msg"> <%= t("no_employees_present") %> </p>
+        <% else %>
+    <p class="flash-msg"> <%= t("no_students_in_batch") %> </p>
+        <% end %>
+<% end %>
+</div>
+<script type="text/javascript">
+
+
+
+    $$('.student-link').invoke('observe', 'click', draw_report);
+    $$('.student-link').invoke('observe', 'click', set_active);
+</script>
+
+

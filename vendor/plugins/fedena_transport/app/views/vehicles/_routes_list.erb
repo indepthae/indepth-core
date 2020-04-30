@@ -1,0 +1,26 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="route_listing">
+    <tr class="tr-head">
+        <td class="col-1"><%= t('route') %></td>  
+        <td class="col-3"><%= t('routes.no_of_stops') %></td>  
+        <td class="col-2"><%= t('transport_employees.driver') %></td>  
+        <td class="col-2"><%= t('transport_employees.attendant') %></td>  
+    </tr>
+
+    <% if @routes.present? %>
+      <% @routes.each do |r| %>
+        <tr>
+            <td><%= r.name %></td>
+            <td><%= r.route_stops.length %></td>
+            <td><%= r.driver.try(:first_and_last_name) %></td>
+            <td><%= r.attendant.try(:first_and_last_name) %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="4">  <%=t('routes.no_routes')%> </td></tr>
+    <% end %>
+</table>
+<% if @routes.present? %>
+  <%= pagination_status(@routes) %>
+<% end %>
+<%= will_paginate @routes, :renderer => 'RemoteLinkRenderer', :remote => {:method => :get}, 
+  :params=>{:controller => "vehicles", :action => "show", :id => @vehicle.id} %>

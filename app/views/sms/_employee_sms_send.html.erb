@@ -1,0 +1,22 @@
+<div class="batch_selector_section">
+    <div class="select_department" id="select_department"></div>
+    <div class="select_employees" id="select_employees"></div>
+</div>
+<div class="sms_notes"><%= t('sms_notes') %></div>
+<div class="sms_creation"><%=render "sms/sms_creation.html.erb"%></div>
+
+<script>
+  var departments = <%= raw @final_empployee_values.to_json %>;
+  user_selector.generate_select("dep", {}, [], ["select_department", "select_employees"], 0, ["Department", "Employee"], ["Employees"]);
+  user_selector.build_complete(departments);
+</script>
+
+
+
+
+
+
+
+
+
+

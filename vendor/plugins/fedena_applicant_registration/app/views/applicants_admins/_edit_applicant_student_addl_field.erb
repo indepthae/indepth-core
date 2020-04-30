@@ -1,0 +1,47 @@
+<% student_additional_field = st_addl_field.student_additional_field %>
+<% if student_additional_field.present? %>
+<div class="label-field-pair">
+  <label><%= student_additional_field.name %><% if (student_additional_field.is_mandatory==true or [true,"true","default_true"].include?(fld[:mandatory])) %><% @mandatory_student_attributes.push student_additional_field.id %><span class="necessary-field">*</span><% end %> </label>
+  <% addl_value = @applicant.applicant_additional_details.find_by_additional_field_id(st_addl_field.student_additional_field_id) %>
+  <% f.fields_for :applicant_additional_details, (addl_value.present? ? addl_value : @applicant.applicant_additional_details.build) do|build| %>
+      <%= build.hidden_field :additional_field_id, :value=>student_additional_field.id %>
+      <% if student_additional_field.input_type == "text" %>
+        <div class="text-input-bg">
+            <%= build.text_field :additional_info %>
+        </div>
+      <% elsif student_additional_field.input_type == "text_area" %>
+        <div class="textarea-input-bg">
+            <%= build.text_area :additional_info,:cols => 27, :rows => 5,:class => 'admission1-textarea' %>
+        </div>
+      <% elsif student_additional_field.input_type == "belongs_to" %>
+        <% field_options = student_additional_field.student_additional_field_options %>
+        <% if field_options.count < 4 %>
+          <% field_options.each do|o| %>
+            <div class="radio-label-pair">
+                <%= build.radio_button  :additional_info, o.field_option, :checked => (addl_value.present? and addl_value.additional_info == o.field_option) %>
+                <label class="radio-label"> <%= o.field_option %></label>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-input-bg">
+              <%= build.select :additional_info, field_options.map{|m| [m.field_option,m.field_option]}, :selected=>(addl_value.present? ? addl_value.additional_info : nil),:prompt=>"#{t('select_an_option')}"%>
+          </div>
+        <% end %>
+      <% elsif student_additional_field.input_type == "has_many" %>
+        <% field_options = student_additional_field.student_additional_field_options %>
+        <div class="fee_category_scroll1">
+            <div class="sel_batches">
+                <%= check_box_tag "select_all", "", false, {:class=>'batches_box select_all_check',:onclick=>"select_all_fields(this);"}%>
+                <label for="all_active_batches" class="special_prop"><%= "#{t('select_all')}"%></label>
+            </div>
+            <% field_options.each do |o| %>
+              <div class="each_batch">
+                  <%= build.check_box :additional_info,{:multiple=>true,:checked=>(addl_value.present? and addl_value.additional_info.split(", ").include?(o.field_option)),:class=>'batches_box active_batch_list',:onclick=>"toggle_field_selector(this);"}, o.field_option, nil %>
+                  <label class="special_prop no_margin_top"><%= o.field_option %></label>
+              </div>
+            <% end %>
+        </div>
+      <% end %>
+    <% end %>
+</div>
+<% end %>

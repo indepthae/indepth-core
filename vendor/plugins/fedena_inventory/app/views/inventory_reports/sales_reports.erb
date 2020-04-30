@@ -1,0 +1,40 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('sales_reports') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+
+<%  if permitted_to? :item_wise_report, :inventory_reports %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('item_wise_report')}",{:action=>'item_wise_report', :controller => 'inventory_reports'} %>  </div>
+        <div class="link-descr"><%="#{t('generate')} #{t('item_wise_report')}" %></div>
+      </div>
+    <% end %>
+
+    <%  if permitted_to? :day_wise_report, :inventory_reports %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('day_wise_report')}",{:action=>'day_wise_report', :controller => 'inventory_reports'} %>  </div>
+        <div class="link-descr"><%="#{t('generate')} #{t('day_wise_report')}" %></div>
+      </div>
+    <% end %>
+    <%  if permitted_to? :invoice_report, :inventory_reports %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('invoice_report')}",{:action=>'invoice_report', :controller => 'inventory_reports'} %>  </div>
+        <div class="link-descr"><%="#{t('generate')} #{t('invoice_report')}" %></div>
+      </div>
+    <% end %>
+    <div class="extender"></div>
+  </div>
+</div>

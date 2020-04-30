@@ -1,0 +1,22 @@
+<% printer ||= false %>
+<div id="pdf-header">
+    <%# logo_visible = @logo_style #@dotmatrix.present? ? @logo_style : @logo_style(ReceiptPrinter.current_settings_object.dot_matrix? ? 'none':'block') %>
+    <div class="logo" style ="display: <%= @logo_style %>">
+        <% if printer or params.keys.include?(:debug) %>
+          <%= image_tag current_school_detail.logo.url(:original, false) %>
+        <% else %>
+          <%= wicked_pdf_image_tag current_school_detail.logo, :s3 => true, :style => :original, :timestamp => false %>
+        <% end %>
+    </div>
+
+    <% align = default_configs.try(:pdf_receipt_halignment) || "left" %>
+
+    <div class="header-content" style='text-align:<%= align %>;'>
+        <p>
+            <%= default_configs.try(:institution_name) || (@config.present? and @config[:institution_name]) %>
+        </p>
+        <p class="institution_address">
+            <%= default_configs.try(:institution_address) || (@config.present? and @config[:institution_address])%>
+        </p>
+    </div>  
+</div>

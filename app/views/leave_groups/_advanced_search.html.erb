@@ -1,0 +1,89 @@
+<% f_action = (params[:add].present? ? add_employees_leave_group_path(@leave_group) : manage_employees_leave_group_path(@leave_group)) %>
+<% form_tag f_action, :method => :post  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="advanced_search_form">
+      <div id ="description"><%= t('advanced_employee_search_description') %></div>
+      <div class="label-field-pair">
+          <label for="department"><%= t('department') %></label>
+          <div class="text-input-bg"><%= select_tag "advanced_search[employee_department_id_in]", options_from_collection_for_select(@departments, "id", "name"), :multiple => true, :id => 'employee_department_filter' %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="position"><%= t('position') %></label>
+          <div class="text-input-bg"><%= select_tag "advanced_search[employee_position_id_in]", options_from_collection_for_select(@positions, "id", "name"), :multiple => true, :id => 'employee_position_filter' %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="position"><%= t('grade') %></label>
+          <div class="text-input-bg"><%= select_tag "advanced_search[employee_grade_id_in]", options_from_collection_for_select(@grades, "id", "name"), :multiple => true, :id => 'employee_grade_filter' %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="position"><%= t('gender') %></label>
+          <div class="text-input-bg">
+              <div class="radio_button">
+                  <%= radio_button_tag "advanced_search[gender_equals]", "", :checked => "checked" %>
+                  <label for="advanced_search_gender_equals_"><%= t('all') %></label>
+              </div>
+              <div class="radio_button">
+                  <%= radio_button_tag "advanced_search[gender_equals]", "m" %>
+                  <label for="advanced_search_gender_equals_m"><%= t('male') %></label>
+              </div>
+              <div class="radio_button">
+                  <%= radio_button_tag "advanced_search[gender_equals]", "f" %>
+                  <label for="advanced_search_gender_equals_f"><%= t('female') %></label>
+              </div>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="position"><%= t('category') %></label>
+          <div class="text-input-bg"><%= select_tag "advanced_search[employee_category_id_in]", options_from_collection_for_select(@categories, "id", "name"), :multiple => true, :id => 'employee_category_filter' %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="position"><%= t('payroll_group') %></label>
+          <div class="text-input-bg"><%= select_tag "advanced_search[payroll_group_id_in]", options_from_collection_for_select(@payroll_groups, "id", "name"), :multiple => true, :id => 'payroll_group_filter' %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "#{t('autosuggest_menu.search_employees')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  search_values = JSON.parse('<%= @search_params.to_json.gsub("'", %q(\\\')) %>');
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  j('#employee_department_filter').multipleSelect({
+      placeholder: '<%= t('select_employee_department') %>',
+      countSelected: '<%= t('employee_department_text') %>',
+      noMatchesFound: '<%= t('no_employee_department') %>'
+  });
+  j('#employee_position_filter').multipleSelect({
+      placeholder: '<%= t('select_employee_position') %>',
+      countSelected: '<%= t('employee_position') %>',
+      noMatchesFound: '<%= t('no_employee_position') %>'
+  });
+  j('#employee_grade_filter').multipleSelect({
+      placeholder: '<%= t('select_employee_grade') %>',
+      countSelected: '<%= t('employee_grade') %>',
+      noMatchesFound: '<%= t('no_employee_grade') %>'
+  });
+  j('#employee_category_filter').multipleSelect({
+      placeholder: '<%= t('select_employee_category') %>',
+      countSelected: '<%= t('employee_category_text') %>',
+      noMatchesFound: '<%= t('no_employee_category') %>'
+  });
+  j('#payroll_group_filter').multipleSelect({
+      placeholder: '<%= t('select_payroll_group') %>',
+      countSelected: '<%= t('payroll_group') %>',
+      noMatchesFound: '<%= t('no_payroll_group') %>'
+  });
+  if (search_values.hasOwnProperty('employee_department_id_in'))
+      j('#employee_department_filter').multipleSelect('setSelects', search_values.employee_department_id_in);
+  if (search_values.hasOwnProperty('employee_position_id_in'))
+      j('#employee_position_filter').multipleSelect('setSelects', search_values.employee_position_id_in);
+  if (search_values.hasOwnProperty('employee_grade_id_in'))
+      j('#employee_grade_filter').multipleSelect('setSelects', search_values.employee_grade_id_in);
+  if (search_values.hasOwnProperty('employee_category_id_in'))
+      j('#employee_category_filter').multipleSelect('setSelects', search_values.employee_category_id_in);
+  if (search_values.hasOwnProperty('payroll_group_id_in'))
+      j('#payroll_group_filter').multipleSelect('setSelects', search_values.payroll_group_id_in);
+  j("input[type='radio'][value='" + search_values.gender_equals + "']").prop('checked', true);
+</script>

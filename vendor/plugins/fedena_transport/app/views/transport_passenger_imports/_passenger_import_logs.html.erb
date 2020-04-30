@@ -1,0 +1,32 @@
+<span class="table_info"><%= t('showing_last_logs',{:count => @imports.count}) %></span>
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="import_listing">
+    <tr class="tr-head">
+        <td class="col1"><%= t('no_text') %></td>
+        <td class="col2"><%= t('created_date') %></td>
+
+        <td class="col3"><%= t('status') %></td>
+        <td class="col4"><%= t('options') %></td>
+    </tr>
+    <% @imports.each_with_index do |import, i| %>
+      <tr>
+          <% if params[:page].present? %>
+            <% if params[:page].to_i >= 1 %>
+              <% i = i  + (params[:page].to_i - 1) * 5 %>
+            <% end %> <%else %> <% i = i %> <% end %>
+          <td class="col1 sl_no"><%=  i+1 %></td>
+          <td><%= format_date(AssessmentScoreImport.default_time_zone_present_time(import.created_at),:format=>:long) %></td>
+          <td class="status"><%= import.status_text %></td>
+          <td>
+              <% if import.last_message.present? %>
+                <%= link_to_remote "#{t('show_import_log')}", :url => show_import_log_transport_passenger_import_path(import.id), :method => :get %>
+              <% else %>
+                -
+              <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>
+<% if @imports.present? %>
+  <%= pagination_status(@imports) %>
+<% end %>
+<%= will_paginate @imports, :params => {:action => "index"} %>

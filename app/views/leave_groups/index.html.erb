@@ -1,0 +1,53 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_management') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('leave_groups') %></div>
+    <% if permitted_to? :new , :leave_groups %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('create_leave_group')}", :url => {:controller => "leave_groups", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+      
+    <div id ="header"><%= t('leave_groups') %></div>
+    <div id ="description"><%= t('leave_groups_description') %></div>
+    <div id ="leave_group_list">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="name"><%= t('leave_group_name') %></td>
+        <td class="emp_count"><%= t('leave_types') %></td>
+        <td class="categories"><%= t('employees') %></td>
+      </tr>
+      <% if @leave_groups.present? %>
+        <% @leave_groups.each do |lg|  %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+            <td><%= link_to lg.name, leave_group_path(lg) %></td>
+            <td><%= lg.leave_types_count %></td>
+            <td><%= lg.employees_count %></td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="3"><%= t('create_a_leave_group') %></td>
+        </tr>
+      <% end %>
+    </table>
+    <% if @leave_groups.present? %>
+      <%= pagination_status(@leave_groups) %>
+    <% end %>
+    <%= will_paginate @leave_groups %>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="page_header_box">
+    <div class="page_header"><%= t('students_sorting')%> </div>
+    <div class="page_header_desc"><%= t('students_sorting_desc')%> </div>
+</div>
+<%- remote_form_for :sorting_method_config,:url=>{:controller=>"exam",:action=>'save_sorting_method'}, :html => { :method => :post }  do |f| -%>
+  <div id="form-content">
+      <div class="label-radio-pair">
+          <div id="sort-desc">
+            <%= t('sort_students_based_on')%>
+          </div>
+      </div>
+      <div class="label-radio-pair right">
+          <div class="radio-select-options">
+              <div class="radio-select">
+                  <%= f.radio_button 'enabled[value]', "name", :checked => ( @field.config_value == "first_name" || @field.config_value == "last_name")  %>
+                  <label for="sorting_method_config_enabled[value]_name"><%= t('name')%></label>
+                  
+                  <div class="sub-radio-select" style="display: none">
+                      <%= f.radio_button 'enabled[sub_value]', "first_name", :checked => ( @field.config_value == "first_name")  %>
+                      <label for="sorting_method_config_enabled[sub_value]_first_name"><%= t('first_name')%></label>
+                      <%= f.radio_button 'enabled[sub_value]', "last_name", :checked => ( @field.config_value == "last_name")  %>
+                      <label for="sorting_method_config_enabled[sub_value]_last_name"><%= t('last_name')%></label>
+                  </div>
+              </div>
+              <% config_value= Configuration.get_config_value('EnableRollNumber') %>
+              <%if config_value == "1" %>
+              <div class="radio-select">
+                  <%= f.radio_button 'enabled[value]', "roll_number", :checked => ( @field.config_value == "roll_number")  %>
+                  <label for="sorting_method_config_enabled[value]_roll_number"><%= t('roll_no')%></label>
+              </div>
+              <%end%>
+              <div class="radio-select">
+                  <%= f.radio_button 'enabled[value]', "admission_no", :checked => ( @field.config_value == "admission_no")%>
+                  <label for="sorting_method_config_enabled[value]_admission_no"><%= t('admission_number')%> </label>
+                  <div class="submit_form">
+                      <div id="submit-button">
+                          <%=submit_tag " #{t('save')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+                      </div>
+                  </div>
+                  <div class="prv"></div>
+              </div>
+          </div>
+      </div>
+  </div>  
+<% end %>
+<script type="text/javascript">
+  if (j("input[name='sorting_method_config[enabled[value]]']:checked").val() === "name") {
+      j(".sub-radio-select").show();
+  } else {
+      j(".sub-radio-select").hide();
+  }
+   j(document).on('change', "input[name='sorting_method_config[enabled[value]]']:radio", function () {
+     if (j("input[name='sorting_method_config[enabled[value]]']:checked").val() === "name") {
+      j(".sub-radio-select").show();
+      if(j("input[name='sorting_method_config[enabled[sub_value]]']:checked").val() != "first_name" && j("input[name='sorting_method_config[enabled[sub_value]]']:checked").val() != "last_name"){
+        j("input[name='sorting_method_config[enabled[sub_value]]']:first").attr('checked', true);      }
+  } else {
+      j(".sub-radio-select").hide();
+  }
+   });
+
+</script>

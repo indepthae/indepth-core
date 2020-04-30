@@ -1,0 +1,475 @@
+<% form_for :assessment_group, @assessment_group, :url => fetch_save_path(@assessment_group), :html => { :method => fetch_method(@assessment_group), :id=>'assessment_group_form'} do |g| %>
+  <% obj = g.object %>
+  <%= g.hidden_field :parent_id %>
+  <%= g.hidden_field :parent_type %>
+  <%= g.hidden_field :assessment_plan_id %>
+  <%= g.hidden_field :academic_year_id %>
+  <%= g.hidden_field :batches_id %>
+  <div class="label-field-pair group_name">
+      <label for="name"><%= t('exam_name').titleize %></label>
+      <div class="text-input-bg"><%= g.text_field :name, :onchange => "show_display_name(this);" %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name"><%= t('code') %></label>
+      <div class="text-input-bg"><%= g.text_field :code %></div>
+  </div>
+  <div class="label-field-pair group_code">
+      <label for="name">
+          <span><%= t('display_name') %></span>
+          <span id="info-symbol" tooltip="<%= t('display_name').titleize %>"></span>
+      </label>
+      <div class="text-input-bg"><%= g.text_field :display_name,:class=>"display_name" %></div>
+  </div>
+  <hr/>
+  <% unless @assessments_created %>
+    <% dependency_present = @assessment_group.assessment_group_batches.present? %>
+    <div class="label-radio-pair">
+        <label class="status" for="status"><%= t('exam_type').titleize %></label>
+        <div class="radio-buttons">
+            <div class="section">
+                <%= g.radio_button  "type", "SubjectAssessmentGroup", :checked => (obj.type == 'SubjectAssessmentGroup'), :id => "subject_assessment",:class => 'core_field', :onchange => 'fetch_exam_type()', :disabled => dependency_present %>
+                <label for="subject_assessment"><%= t('subject_exams') %></label>
+                <div id="description"><%= t('subject_assessment_description') %></div>
+            </div>
+            <div class="section">
+                <%= g.radio_button  "type", "ActivityAssessmentGroup", :checked => (obj.type == 'ActivityAssessmentGroup'), :id => "activity_assessment",:class => 'core_field', :onchange => 'fetch_exam_type()', :disabled => dependency_present %>
+                <label for="activity_assessment"><%= t('activity_exams') %></label>
+                <div id="description"><%= t('activity_assessment_description') %></div>
+            </div>
+            <% if @subject_assessments.present? and @subject_assessments.count >=2 %>
+              <div class="section">
+                  <%= g.radio_button  "type", "DerivedAssessmentGroup", :checked => (obj.type == 'DerivedAssessmentGroup'), :id => "derived_assessment",:class => 'core_field', :onchange => 'fetch_exam_type()', :disabled => dependency_present %>
+                  <label for="derived_assessment"><%= t('derived_exams') %></label>
+                  <div id="description"><%= t('derived_assessment_description') %></div>
+              </div>
+            <% end %>
+            <%= g.hidden_field :type, :value => @assessment_group.type if dependency_present %>
+        </div>
+    </div>
+    <div id="subject_based">
+        <div class="label-radio-pair">
+            <label class="status" for="status"><%= t('subject_exam_mode') %></label>
+            <div class="radio-buttons">
+                <div class="section">
+                    <%= g.radio_button  "is_single_mark_entry", 1, :checked => obj.is_single_mark_entry?, :id => "single_mark",:class => 'core_field', :onchange => 'fetch_exam_mode()' %>
+                    <label for="single_mark"><%= t('direct_grading') %></label>
+                    <div id="description"><%= t('single_mark_entry_description') %></div>
+                </div>
+                <div class="section">
+                    <%= g.radio_button  "is_single_mark_entry", 0, :checked => !obj.is_single_mark_entry?, :id => "attribute_marks", :class => 'core_field', :onchange => 'fetch_exam_mode()' %>
+                    <label for="attribute_marks"><%= t('subject_based_attributes') %></label>
+                    <div id="description"><%= t('subject_based_attributes_description') %></div>
+                </div>
+            </div>
+        </div>
+        <div class="skill_subject_settings" style="display: <%= obj.is_single_mark_entry? ? 'block' : 'none' %>">
+          <div class="label-field-pair consider_skills">
+              <label class="status" for="max_marks"><%= t('mark_enrty_mode') %></label>
+              <div class="text-input-bg">
+                  <%= g.check_box :consider_skills %>
+                  <label for="conside_skills"><%= t('consider_skills') %></label>
+                  <div id="description"><%= t('consider_skills_description') %></div>
+              </div>
+          </div>
+        </div>
+        <div class="skill_subject_settings" style="display: <%= obj.is_single_mark_entry? ? 'block' : 'none' %>">
+          <div class="label-field-pair consider_skills">
+              <label class="status" for="max_marks"><%= t('attendance_summary') %></label>
+              <div class="text-input-bg">
+                  <%= g.check_box :consider_attendance %>
+                  <label for="conside_skills"><%= t('enable_attendance_for_exam') %></label>
+                  <div id="description"><%= t('enable_attendance_for_exam_description') %></div>
+              </div>
+          </div>
+        </div>
+        <div id="attribute_based" style="display: <%= obj.is_single_mark_entry? ? 'none' : 'block' %>">
+            <div class="label-radio-pair">
+                <label class="status" for="status"><%= t('choose_attributes') %></label>
+                <div class="radio-buttons">
+                    <div class="section">
+                        <%= g.radio_button  "is_attribute_same", 1, :checked => obj.is_attribute_same?, :id => "same_attribute",:class => 'core_field', :onchange => 'fetch_attribute_mode()' %>
+                        <label for="same_attribute"><%= t('same_set_attributes') %></label>
+                        <div id="description"><%= t('same_set_attributes_description') %></div>
+                    </div>
+                    <div class="section">
+                        <%= g.radio_button  "is_attribute_same", 0, :checked => !obj.is_attribute_same?, :id => "diff_attribute", :class => 'core_field', :onchange => 'fetch_attribute_mode()' %>
+                        <label for="diff_attribute"><%= t('different_set_attributes') %></label>
+                        <div id="description"><%= t('different_set_attributes_description') %></div>
+                    </div>
+                </div>
+            </div>
+            <div id="select_attribute" class="select-list" style="display: <%= obj.is_attribute_same? ? 'block' : 'none' %>">
+                <div class="label-field-pair">
+                    <label for="attribute_profile"><%= t('subject_attribute_profile') %></label>
+                    <div class="text-input-bg">
+                        <%= g.select :assessment_attribute_profile_id, @attribute_profiles.map{|p| [p.name, p.id]}, 
+                          {:include_blank => t('choose_an_attribute_profile')}, {:onchange => "get_profile_details(this, 'AssessmentAttributeProfile');",:class => 'core_field'} %>
+                    </div>
+                    <%= image_tag("loader.gif",
+                      :align => "absmiddle",
+                      :border => 0,
+                      :id => "loader",
+                      :style =>"display: none;" ) %>
+    
+                </div>
+                <div id="profile_details">
+                    <div id="profile_details">
+                        <% if @assessment_attribute_profiles.present? %>
+                          <%= render :partial => 'assessment_attribute_profiles' %>
+                        <% end %>
+                    </div>
+                </div>
+                <div id="description"><%= t('subject_attribute_profile_message') %>
+                    <%= link_to t('manage_attributes'), assessment_attributes_path %>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div id="scoring_type">
+            <div class="label-radio-pair" id="score_type">
+                <label for="scoring"><%= t('scoring') %></label>
+                <div class="radio-buttons">
+                    <% AssessmentGroup::SCORE.each do |i, name| %>
+                      <div class="section" id="<%= "r_#{name}" %>" style="display : <%= ((i==2 and (@assessment_group.exam_type.subject_attribute||@assessment_group.exam_type.subject_wise_attribute)) ? 'none' : 'block') %>">
+                          <%= g.radio_button  "scoring_type", i, :id => name, :checked => (obj.scoring_type.to_i == i), :onchange => "fetch_score_type();",:class => 'core_field' %>
+                          <label for="<%= name %>"><%= t(name) %></label>
+                      </div>
+                    <% end %>
+                </div>
+            </div>
+            <div id="select_grade" class="select-list">
+                <div class="label-field-pair max_marks" style="display: <%= (([1, 3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+                    <label for="max_marks"><%= t('maximum_marks') %></label>
+                    <div class="text-input-bg"><%= g.text_field :maximum_marks,:class => 'core_field'%></div>
+                </div>
+                <div class="label-field-pair min_marks" style="display: <%= (([1].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+                    <label for="max_marks"><%= t('pass_criteria') %></label>
+                    <div class="text-input-bg"><%= g.text_field :minimum_marks ,:class => 'core_field'%></div>
+                    <span id="min_text"><%= t('and_above') %></span>
+                </div>
+                <div class="label-field-pair grade_set" id="direct_grades" style="display: <%= (([2].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+                    <label for="grading_profile"><%= t('grading_profile') %></label>
+                    <div class="text-input-bg">
+                        <% puts (obj.scoring_type.to_i != 2) %>
+                        <%= g.select :grade_set_id, @direct_grades.map{|p| [p.name, p.id]}, 
+                          {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field', :disabled => true} %>
+                    </div>
+                    <%= image_tag("loader.gif",
+                      :align => "absmiddle",
+                      :border => 0,
+                      :id => "loader",
+                      :style =>"display: none;" ) %>
+    
+                </div>
+                <div id="profile_details">
+                    <% if (obj.scoring_type.to_i == 2) and @grade_sets.present? %>
+                      <%= render :partial => 'grade_sets' %>
+                    <% end %>
+                </div>
+                <div class="label-field-pair grade_set" id="marks_grades" style="display: <%= (([3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+                    <label for="grading_profile"><%= t('grading_profile') %></label>
+                    <div class="text-input-bg">
+                        <% puts (obj.scoring_type.to_i != 3) %>
+                        <%= g.select :grade_set_id, @mark_grades.map{|p| [p.name, p.id]}, 
+                          {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field', :disabled => true} %>
+                    </div>
+                    <%= image_tag("loader.gif",
+                      :align => "absmiddle",
+                      :border => 0,
+                      :id => "loader",
+                      :style =>"display: none;" ) %>
+                    
+                </div>
+                <div id="profile_details">
+                    <% if (obj.scoring_type.to_i == 3) and @grade_sets.present? %>
+                      <%= render :partial => 'grade_sets' %>
+                    <% end %>
+                </div>
+                <div class="text-input-bg hide_marks" id="hide_marks" style="display: <%= (([3].include? obj.scoring_type.to_i) ? 'block' : 'none') %>">
+                    <label for="conside_skills"><%= t('hide_marks') %></label>
+                    <%= g.check_box :hide_marks %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="activity_based">
+        <div id="select_activity" class="select-list">
+            <div class="label-field-pair">
+                <label for="activity_profile"><%= t('activities_profile') %></label>
+                <div class="text-input-bg">
+                    <%= g.select :assessment_activity_profile_id, @activity_profiles.map{|p| [p.name, p.id]}, 
+                      {:include_blank => t('choose_an_activity_profile')}, {:onchange => "get_profile_details(this, 'AssessmentActivityProfile');",:class => 'core_field'} %>
+                </div>
+                <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader",
+                  :style =>"display: none;" ) %>
+    
+            </div>
+            <div id="profile_details">
+                <% if @assessment_activity_profiles.present? %>
+                  <%= render :partial => 'assessment_activity_profiles' %>
+                <% end %>
+            </div>
+            <div id="description"><%= t('subject_attribute_profile_message') %>
+                <%= link_to t('manage_activities'), assessment_activities_path %>
+            </div>
+        </div>
+        <hr/>
+        <div class="label-field-pair">
+            <label for="scoring"><%= t('scoring') %></label>
+        </div>
+        <div id="select_gp" class="select-list">
+            <div class="label-field-pair">
+                <label for="grading_profile"><%= t('grading_profile') %></label>
+                <div class="text-input-bg">
+                    <%= g.select :grade_set_id, @grading_profiles.map{|p| [p.name, p.id]}, 
+                      {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field'} %>
+                </div>
+                <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader",
+                  :style =>"display: none;" ) %>
+    
+            </div>
+            <div id="profile_details">
+                <% if @grade_sets.present? %>
+                  <%= render :partial => 'grade_sets' %>
+                <% end %>
+            </div>
+        </div>
+    </div>
+    <% if @subject_assessments.present? %>
+      <div id="derived_based">
+          <div class="skill_subject_settings" style="display: <%= obj.is_single_mark_entry? ? 'block' : 'none' %>">
+              <div class="label-field-pair consider_skills">
+                        <label class="status" for="max_marks"><%= t('attendance_summary') %></label>
+                        <div class="text-input-bg">
+                            <%= g.check_box :consider_attendance %>
+                            <label for="conside_skills"><%= t('enable_attendance_for_exam') %></label>
+                            <div id="description"><%= t('subject_based_attributes_description') %></div>
+                        </div>
+              </div>
+          </div>
+          <hr class="derived_hr"/>
+          <% settings = obj.settings_as_hash if obj.derived_assessment? %>
+          <div class="assessment_group_details">
+              <%= render :partial => 'subject_assessment_groups', :locals=>{:g => g, :assessments => @subject_assessments,:derived_assessments => @derived_assessments, :obj => obj} %>
+          </div>
+          <hr class='derived_hr'/>
+          <div class="derived__sections">
+              <%= render :partial => 'formula_select', :locals => {:g => g, :obj => obj, :assessments => @subject_assessments,:derived_assessments=> @derived_assessments, :settings => settings} %>
+          </div>
+          <hr class="derived_hr"/>
+          <div class="derived__sections">
+              <%= render :partial => 'scoring_type_select', :locals => {:g => g, :obj => obj} %>
+          </div>
+          <hr class="derived_hr"/>
+          <div class="derived__sections">
+              <%= render :partial => 'derived_report_settings', :locals => {:g => g, :obj => obj, :settings => settings} %>
+          </div>
+      </div>
+    <% end %>
+    <div class="advance_settings" id='advance_settings'>
+        <hr class="derived_hr"/>
+        <%= render :partial => 'subject_advance_settings', :locals => {:g=>g} %>
+    </div>
+  <% else %>
+    <% if @assessment_group.scoring_type == 3 %>
+      <div class="hide_marks_edit">
+        <div class="scoring_details">
+          <div class="scoring_label"><%= t('scoring') %>:</div>
+          <div class="scoring_val"><%= t('marks_and_grades') %></div>
+        </div>
+        <div class="text-input-bg hide_marks">
+            <label for="conside_skills"><%= t('hide_marks') %></label>
+            <%= g.check_box :hide_marks %>
+        </div>
+      </div>
+    <% end %>
+    <% if @assessment_group.subject_assessment? %>
+        <div class="skill_subject_settings" style="display: <%= obj.is_single_mark_entry? ? 'block' : 'none' %>">
+          <div class="label-field-pair consider_skills">
+              <label class="status" for="max_marks"><%= t('attendance_summary') %></label>
+              <div class="text-input-bg">
+                  <%= g.check_box :consider_attendance %>
+                  <label for="conside_skills"><%= t('enable_attendance_for_exam') %></label>
+                  <div id="description"><%= t('subject_based_attributes_description') %></div>
+              </div>
+          </div>
+        </div>
+        <div class="advance_settings has_dependencies">
+            <%= render :partial => 'subject_advance_settings', :locals => {:g=>g} %>
+        </div>
+    <% end %>
+    <div id="warning"><span id="info-symbol"></span><span id="info-text"><%= t('this_assessment_group_has_dependencies') %></span></div>
+  <% end %>
+  
+  <div id='submit_area'>
+      <%= g.submit "#{@assessment_group.new_record? ? t('create_exam').titleize : t('update_exam').titleize }" , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  get_profile_details = function (elm, type) {
+      j(elm).parent().next('.wrapper').hide();
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_groups/fetch_profiles', {
+              parameters: {'profile_id': elm.value, 'profile_type': type},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j(elm).closest('.label-field-pair').next('#profile_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j(elm).closest('.label-field-pair').next('#profile_details').html('');
+  }
+  
+  fetch_exam_type = function () {
+      if (j('#subject_assessment').is(':checked')) {
+          j('#subject_based').show();
+          j('#activity_based').hide();
+          j('#derived_based').hide();
+          j('#activity_based select').attr('disabled', true);
+          j('#subject_based input, #subject_based select').attr('disabled', false);
+          j('#select_activity select, #select_gp select').val('');
+          j('#select_activity #profile_details, #select_gp #profile_details').html('');
+          j('#select_activity .wrapper, #select_gp .wrapper').hide();
+          j('#advance_settings').show();
+      } else if(j('#activity_assessment').is(':checked')) {
+          j('#subject_based').hide();
+          j('#activity_based').show();
+          j('#derived_based').hide();
+          j('#activity_based select').attr('disabled', false);
+          j('#select_attribute select').val('');
+          j('#select_attribute #profile_details').html('');
+          j('#marks').prop('checked', true);
+          fetch_score_type();
+          j('#single_mark').prop('checked', true);
+          fetch_exam_mode();
+          j('#subject_based input, #subject_based select').attr('disabled', true);
+          j('#advance_settings').hide();
+      } else {
+        j('#derived_based').show();
+        j('#activity_based').hide();
+        j('#subject_based').hide();
+        j('#select_attribute select').val('');
+        j('#select_attribute #profile_details').html('');
+        //j('#derived_marks').prop('checked',true)
+        j('#advance_settings').show();
+      }
+      toggleDerivedElements();
+      
+  }
+  fetch_exam_mode = function () {
+      if (j('#single_mark').is(':checked')) {
+          j('#attribute_based').hide();
+          j('#attribute_based input, #attribute_based select').attr('disabled', true);
+          j('#same_attribute').prop('checked', true);
+          fetch_attribute_mode();
+          j('#score_type #r_grades').show();
+          j('.skill_subject_settings').show();
+      } else {
+          j('#attribute_based').show();
+          j('#attribute_based input, #attribute_based select').attr('disabled', false);
+          j('#select_attribute select').val('');
+          j('#select_attribute #profile_details').html('');
+          j('#select_attribute .wrapper').hide();
+          j('#score_type #r_grades').hide();
+          j('.skill_subject_settings').hide();
+          j('#assessment_group_consider_skills').prop('checked',false);
+          if (j('#score_type #r_grades input').is(':checked')) {
+              j('#marks').prop('checked', true);
+              fetch_score_type();
+          }
+      }
+  }
+
+  fetch_score_type = function () {
+      j('#select_grade .label-field-pair').hide();
+      j('#select_grade select').attr('disabled', true);
+      j('#hide_marks').hide();
+      j('#select_grade select').val("");
+      j('#select_grade #profile_details').html('');
+      j('#select_grade .wrapper').hide();
+      j('#select_grade input').css('border', '1px solid #c6c6c6');
+      if (j('#marks').is(':checked')) {
+          j('.max_marks').show();
+          j('.max_marks input').attr('disabled', false);
+          j('.min_marks').show();
+          j('.min_marks input').attr('disabled', false);
+          j('#hide_marks').hide();
+      }
+      if (j('#grades').is(':checked')) {
+          j('.grade_set#direct_grades').show();
+          j('.grade_set#direct_grades select').attr('disabled', false);
+          j('#hide_marks').hide();
+      }
+      if (j('#marks_and_grades').is(':checked')) {
+          j('.max_marks').show();
+          j('.max_marks input').attr('disabled', false);
+          j('.grade_set#marks_grades').show();
+          j('#hide_marks').show();
+          j('.grade_set#marks_grades select').attr('disabled', false);
+          j('#assessment_group_hide_marks').attr('disabled', false);
+      }
+  }
+  fetch_attribute_mode = function () {
+      if (j('#same_attribute').is(':checked')) {
+          j('#select_attribute').show();
+          j('#select_attribute select').attr('disabled', false);
+          j('#scoring_type').show();
+          j('#scoring_type input, #scoring_type select').attr('disabled', false);
+
+      } else {
+          j('#select_attribute').hide();
+          j('#select_attribute select').attr('disabled', true);
+          j('#select_attribute select').val('');
+          j('#select_attribute #profile_details').html('');
+          j('#select_attribute .wrapper').hide();
+      }
+  }
+
+    show_display_name = function (elm) {
+        var text = '';
+        var arr = elm.value.split(' ');
+        for (i = 0; i < arr.length; i++) {
+            text += arr[i].substr(0, 1)
+        }
+        j('#assessment_group_display_name').val(text);
+    }
+  
+  toggleDerivedElements = function(){
+      j('#derived_based input').each(function(){
+        if(j('#derived_assessment').is(':checked')){
+          if(!j(this).hasClass('weightage_field')){
+            j(this).attr('disabled', false)
+          }
+        }else{
+          j(this).attr('disabled', true)
+        }
+      })
+  }
+  
+  j(document).ready(function () {
+      fetch_exam_type();
+      if(!j('#subject_based #marks_grades').is(':visible'))
+        j('#subject_based #marks_grades select').attr('disabled', true);
+  });
+
+  load_update_method = function () {
+      j('.submit-button#yes').on('click', function () {
+          j('#assessment_group_form').submit();
+      })
+  }
+
+  
+</script>

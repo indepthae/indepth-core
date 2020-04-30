@@ -1,0 +1,44 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('add_new_vehicle') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <!--<li class='themed_bg themed-dark-hover-background'><%#= link_to "#{t('view_all')}", vehicles_path %></li> -->
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= render :partial => 'vehicle_form' %>
+</div>
+
+
+<script type="text/javascript">
+    
+    
+    function get_gps_number()
+    {
+    if (document.getElementById("vehicle_gps_enabled").checked)
+    {
+    j('#hide_div').show();
+    }
+    else
+    {
+    j('#hide_div').hide();
+    document.getElementById('vehicle_gps_number').value='';    
+    }  
+    }
+    
+    window.onload = function() {
+     get_gps_number();
+   };
+</script>

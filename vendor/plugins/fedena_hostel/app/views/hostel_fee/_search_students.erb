@@ -1,0 +1,69 @@
+<div class="extender"></div>
+<div class="label-field-pair" style="margin-top: 7px;">
+  <label for="reason"><%= "#{t('search_text')} #{t('student_text')}" %> :</label>
+
+  <div class="text-input-bg" style="margin-left: 3px">
+    <%= text_field_tag("query1", params['query1'], :autocomplete => 'off', :class => 'query', :action => 'list_students_for_collection') %>
+  </div>
+</div>
+</div>
+
+<div id="batchs">
+  <div class="left-area"></div>
+  <div class="batch_select_box">
+
+    <div class="fee_category_scroll">
+
+      <div class="each_batch">
+        <ul id="list-receivers">
+          <% i=0 %>
+          <% unless action_name=='render_collection_assign_form' %>
+              <% form.fields_for(:hostel_fees) do |hf| %>
+                  <% i=i+1 %>
+                  <li class="listodd">
+                    <div class="list_parent">
+                      <div class="list_c">
+                        <%= hf.object.student.full_name %>
+                        <%= hf.hidden_field :student_id %>
+                        <%= hf.hidden_field :rent %>
+                        <%= hidden_field_tag "event[#{i}][user_id]", hf.object.student.user_id %>
+                      </div>
+                      <a class="list_btn" style="cursor:pointer;" onclick="remove_entry(this);">x</a>
+                    </div>
+                  </li>
+              <% end %>
+          <% end %>
+        </ul>
+
+      </div>
+
+    </div>
+  </div>
+
+  <%# unless params[:fee_collection].nil? %>
+  <%#= render :partial=>'fee_collection_batchs' if params[:fee_collection][:category_ids].present? %>
+  <%# end %>
+</div>
+
+
+<script type="text/javascript">
+
+
+    j('#form').submit(function (e) {
+        j('.submit_button').attr('disable', true)
+        j('.submit_button').val('<%="► #{t('please_wait')}"%>')
+        if (j('.list_parent').children().length == 0) {
+            alert('<%="#{t('collection')} #{t('should_have')} #{t('atleast_one_recepient')}"%>')
+            e.preventDefault();
+            j('.submit_button').attr('disable', false)
+            j('.submit_button').val('<%="► #{t('create_text')}"%>')
+            return false
+
+        }
+        else {
+            return true
+        }
+
+    })
+
+</script>

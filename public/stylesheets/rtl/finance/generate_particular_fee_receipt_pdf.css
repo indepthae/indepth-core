@@ -1,0 +1,445 @@
+body {
+  min-width: 700px;
+}
+#page-yield{
+    font-family: arial !important;
+    page-break-after: always;
+    font-size: 12px !important;
+    /*width: 260mm;*/
+}
+.hor_line{
+    width:100%;
+    border-color: black;
+    /*border-color: #999;*/
+    /*height: 1px;*/
+    float:left;
+    border-width: 1px;
+    margin: 0px;
+    border-top-width: 0px;
+    display: none;
+}
+.light_hor_line{
+  width: 100%;
+  border-color: black;
+  /*border-color: #ccc;*/
+  /* height: 1px; */
+  float: right;
+  border-style: solid;
+  border-width: 1px;
+  margin: 0px;
+  border-top-width: 0px;
+  display: none;
+}
+#receipt_text{
+    float: right;
+    font-size: 20px;
+    font-weight:lighter;
+    padding:10px 0px;
+    font-family: Arial;
+    width:50%;
+    margin-left:30px;
+}
+#receipt_val_text{
+    float: left;
+    font-size: 20px;
+    font-weight:lighter;
+    padding:10px 0px;
+    font-family: Arial;
+    width:40%;
+    text-align: left;
+    margin-right:20px;
+}
+#receipt_val_text span{
+    color:#000;
+    font-weight:bold;
+}
+/*.title_section{
+    float:left;
+    width:100%;
+    color:#666;
+    margin-bottom:20px;
+}*/
+.top{
+  float:right;
+  width:100%;
+  /*color:#666;*/
+  border: 1px solid #999999;
+/*  border-width: 1px 0 1px 0;
+  border-top-style: solid;
+  border-bottom-style: solid;*/
+  /*margin: -1px 0 0 -1px;*/
+  margin: 0px 0 0 0px;
+
+}
+.top span {
+  width: 32%;
+  padding:1px 0px;
+  font-weight:lighter;
+  float: right;
+  /*font-size: 19px;*/
+  font-size: 14px;
+}
+.top .title {
+  margin-right: 20px;
+}
+.top .receipt_no {
+  text-align: center;
+}
+.top .date {
+  text-align: left;
+}
+#sub_text_left{
+    text-align: right;
+    margin-right:20px;
+    /*font-size: 17px;*/
+    font-size: 13px;
+    font-weight:lighter;
+    padding:2px 0px;
+    font-family: Arial;
+    color:#000;
+    float:right;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+#sub_text_right{
+    text-align: left;
+    margin-left:55px;
+    font-size: 13px;
+    font-weight: bold;
+    padding:2px 0px;
+    font-family: Arial;
+    color:#000;
+    float:left;
+}
+.subsection{
+    float:right;
+    width:100%;
+    border-width: 0px 1px 0px 1px;
+    /*border-top-style: solid;*/
+    border-left-style: solid;
+    border-right-style: solid;
+    /*margin: 2px 0px 0px 0px;*/
+    /*margin: 0 auto;*/
+    color: #999999;
+}
+.left_section{
+    float:right;
+    width:50%;
+}
+.right_section{
+    float:left;
+    max-width: 50%;
+    max-height: 30px;
+}
+.combined_sec{
+    float:right;
+    margin-top:30px;
+    max-height: 30px;
+}
+.label_sec{
+    float:right;
+    font-size: 14px;
+    min-width: 120px
+}
+.value_sec{
+    float:right;
+    font-size: 14px;
+    min-width: 120px;
+    max-width: 280px;
+    word-break: break-word;
+}
+
+#pdf-header{
+    width:800px;
+    overflow: hidden;
+    height:100px;
+}
+
+.logo{
+    height: 700px;
+    width:70px;
+    float: right;
+    margin-top:-8px;
+}
+.logo img{
+    width: 100%;
+}
+
+.header-content{
+    color: #000;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 16px;
+    float: left;
+    width: 635px;
+    word-wrap:break-word;
+    margin-right:30px;
+}
+
+.header-content p{
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+}
+.logo{
+    height: 70px;
+width: 110px;
+float: right;
+margin-right: 10px;
+margin-top: -10px;
+}
+.header-content p.institution_address{
+    font-weight: normal !important;
+    color: #000 !important;
+    margin-top: 10px !important;
+    font-size: 13px;
+    line-height: 18px;
+}
+#basic_info_section{
+    float: right;
+    width: 100%;
+    border-left-style: solid;
+    border-left-color: #999999;
+    border-left-width: 1px;
+    border-right-style: solid;
+    border-right-color: #999999;
+    border-right-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #999999;
+    border-bottom-width: 1px;
+    margin-right: 0px;
+    padding-bottom: 3px;
+}
+.particalar_name{
+    float:right;
+    width: 70%;
+    font-size: 12px;
+    font-weight: normal;
+}
+.particalar_amount{
+    float:right;
+    max-width: 25%;
+    /*font-size: 16px;*/
+    font-size: 12px;
+    font-weight: normal;
+    margin-right: 12%;
+}
+.slno{
+    float:right;
+    font-size: 12px;
+    font-weight: normal;
+    margin-right:20px;
+    margin-left:5px;
+    margin-bottom: 2px;
+}
+.particalars_list{
+  width:100%;
+  float:right;
+  margin-bottom: 5px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  margin-bottom: 0px;
+  margin-top: 10px;
+}
+.right_total{
+    float:left;
+    width:44.5%;
+    margin-left:0px;
+    margin-top: 5px;
+    /*line-height: 22px;*/
+    line-height: 17px;
+}
+.right_total_label{
+    float:right;
+    width:38%;
+    word-break: break-word;
+    margin-right:10px;
+}
+.right_total_amount{
+    float:right;
+    margin-right: 100px;
+}
+.left_info{
+    float:right;
+    width:50%;
+    margin-left:20px;
+    line-height: 17px;
+    margin-top: 5px;
+    /*line-height: 30px;*/
+}
+.left_info_label{
+    float:right;
+    max-width:70%;
+    min-width:40%;
+    word-break: break-word;
+    margin-left:10px;
+    margin-right:20px;
+}
+.left_info_value{
+    float:right;
+    width:50%;
+}
+.label_collection_part{
+    float:right;
+    width:100%;
+    color: #000;
+    margin-top: 5px;
+    margin-right: 20px;
+
+}
+.label_part{
+    float:right;
+    /*width:35%;*/
+    width:46%;
+    font-size: 12px;
+    margin-left:26px;
+}
+.student_name{
+    font-size:17px;
+    font-weight: bold;
+
+}
+.value_part{
+    float:right;
+    width:35%;
+    margin-top:2px;
+    margin-bottom:2px;
+    margin-left:20px;
+}
+.width_20{
+    width:20%;
+    margin-left:0px;
+}
+.small_text{
+    font-size: 13px;
+    margin-left:40px;
+}
+.note_text{
+    font-size: 12px;
+    color:#000;
+    margin-right:30px;
+    line-height: 15px;
+}
+.add_width{
+    width:80%;
+}
+.value_collection_part{
+    float:right;
+    width:100%;
+    margin-right: 20px;
+}
+.page-break {
+    display:block;
+    clear:both;
+    page-break-after:always;
+}
+.particalars_list_item {
+    /*margin-top: -18px !important*/
+    float: right;
+    width: 100%;
+    border-width: 0px 1px 0px 1px;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-left-color: #999999;
+    border-right-color: #999999;
+    color: #000;
+}
+#pdf-footer-second{
+    font-size: 14px;
+    /*float: right;*/
+    margin-left: 30px;
+    color: #999999;
+    width: 100%;
+}
+.note_part{
+    width: 70%;
+    float: right;
+    margin: 0 auto;
+    font-size: 11px;
+    color: black;
+    margin-top: 12px;
+}
+.signature_part{
+    width: 20%;
+    float: left;
+    margin-top: 70px;
+    font-size: 14px;
+}
+.small_hor_line{
+  width: 100%;
+  /*border-color: black;*/
+  border-color: #ccc;
+   /*height: 1px;*/ 
+  float: right;
+  border-style: solid;
+  border-width: 1px;
+  margin: 0px;
+  border-top-width: 0px;
+  display: none;
+}
+.value_span{
+    float: left;
+    width: 50%;
+}
+.label_name{
+    float: right;
+    width: 38%;
+    word-break: break-word;
+}
+.label_right{
+    margin-left: 0px !important;
+    float: left !important;
+}
+.label_right_value{
+    width: 25% !important;
+}
+.label_margin_fee{
+       margin-right: 159px;
+}
+.label_margin_parent{
+    margin-right: 173px;
+}
+.label_margin_due{
+    margin-right: 113px;
+}
+.label_bottom_margin{
+    margin-bottom: 2px;
+}
+.receipt-footer-bottom{
+    padding-bottom: 12px;
+    float: right;
+    width: 100%;
+    border: 1px solid #999999;
+}
+.summary-line{
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: #999999;
+    margin-bottom: 0px !important;
+}
+.words_bottom{
+    border-top: none;
+    padding-bottom: 8px !important;
+}
+.amount_margin{
+    margin-right: 12px;
+}
+.particular_wise_item{
+    float: right;
+    width: 100%;
+    border-left: 1px solid #999999;
+border-right: 1px solid #999999;
+}
+.particulars_list{
+    float: right;
+    width: 100%;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+}
+.amount_margin span {
+    float: right;
+    white-space: nowrap;
+}
+.amount_paid{
+    width: 44.5% !important;
+}

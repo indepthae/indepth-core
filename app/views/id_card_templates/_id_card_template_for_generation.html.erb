@@ -1,0 +1,121 @@
+<div id="front_preview_container">
+  <div id="front_preview" class="preview exclude_font">
+    <%= @front_template_data %>
+  </div>
+</div>
+
+<%if @back_included%>
+<div id="back_preview_container">
+  <div id="back_preview" class="preview exclude_font">
+    <%= @back_template_data %>
+  </div>
+</div>
+<%end%>
+
+<script>
+template_app = new Vue({
+ el: '#layouts',
+ data: {
+  <%@keys.each_with_index do |key,index|%>
+    <%if BaseTemplate.is_key_profile_photo(key.first) %>
+      <%=key.first%>: "/images/id_user.png"<%=',' if index != (@keys.count-1) %>
+    <%else%>
+      <%=key.first%>: ''<%=',' if index != (@keys.count-1) %>
+    <%end%>
+  <%end%>
+ }
+});
+
+function set_size(width,height){
+  j("#front_preview").css("width",width+"mm");
+  j("#front_preview").css("height",height+"mm");
+  <%if @back_included%>
+  j("#back_preview").css("width",width+"mm");
+  j("#back_preview").css("height",height+"mm");
+  <%end%>
+}
+
+function set_padding(top_padding,left_padding,right_padding,bottom_padding){
+  j("#front_preview").css('padding-top', top_padding+"px");
+  j("#front_preview").css('padding-left', left_padding+"px");
+  j("#front_preview").css('padding-right', right_padding+"px");
+  j("#front_preview").css('padding-bottom', bottom_padding+"px");
+
+  <%if @back_included%>
+  j("#back_preview").css('padding-top', top_padding+"px");
+  j("#back_preview").css('padding-left', left_padding+"px");
+  j("#back_preview").css('padding-right', right_padding+"px");
+  j("#back_preview").css('padding-bottom', bottom_padding+"px");
+  <%end%>
+}
+
+function set_background_image(url,side){
+  if (side=="front")
+  {
+    j("#front_preview").css("background-image", "url('"+url+"')");
+  }else if (side=="back") {
+    j("#back_preview").css("background-image", "url('"+url+"')");
+  }
+  else{
+    console.log("Invalid side for preview generation");
+  }
+}
+
+
+<% if @id_card_template.front_background_image.present? %>
+  set_background_image("<%= @id_card_template.front_background_image.url(:original,false) %>","front");
+<%end%>
+
+<%if @back_included%>
+<% if @id_card_template.back_background_image.present? %>
+  set_background_image("<%= @id_card_template.back_background_image.url(:original,false) %>","back");
+<%end%>
+<%end%>
+
+set_size(<%=@template_resolution[:width]%>,<%=@template_resolution[:height]%>);
+set_padding(<%=@id_card_template.top_padding.to_i%>,<%=@id_card_template.left_padding.to_i%>,<%=@id_card_template.right_padding.to_i%>,<%=@id_card_template.bottom_padding.to_i%>);
+
+var base_template_id = <%=@front_template.id%>;
+var id_card_template_id = <%=@id_card_template.id%>;
+<%if @back_included%>
+var combine_template_id = <%=@back_template.id %>;
+<%end%>
+
+load_template_key_form();
+load_id_card_key_form();
+function load_template_key_form()
+{
+  j.ajax({
+    url: "/templates/load_template_key_form",
+    type: 'POST',
+    data:  {
+      base_template_id: base_template_id
+      <%if @back_included%>
+      ,combine_template_id: combine_template_id
+      <%end%>
+    },
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+function load_id_card_key_form(){
+  j.ajax({
+    url: "load_id_card_key_form",
+    type: 'POST',
+    data:  {id_card_template_id: id_card_template_id},
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+}
+
+
+</script>

@@ -1,0 +1,48 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('assignments_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('edit_answer')}"%></div>
+
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :assignment_answers_edit, @assignment_answer %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="form-container">
+    <% form_for [@assignment,@assignment_answer] , :html => { :multipart => true } do |f| %>
+      <%= error_messages_for :assignment,:assignment_answer %>
+      <div class="assignment_container">
+        <div class="assignment_form">
+
+          <div class="label-field-pair">
+            <label  for="assignment_title"><%= "#{t('title')}"%></label>
+            <div class="text-input-bg"><%= f.text_field :title %></div>
+          </div>
+
+          <div class="label-field-pair " id="assignment_description">
+            <label ><%= "#{t('content')}"%></label>
+            <div  class="text-input-bg"><%= f.text_area  :content %></div>
+          </div>
+
+          <div class="label-field-pair">
+            <label ><%= "#{t('attach_a_file')}"%> &#x200E;(<%= t('maxi_size') %>)&#x200E;</label>
+            <div  class="text-input-bg" id="assignment-attachment"><%= f.paperclip_file_field :attachment, :size=>12, :direct => false %></div>
+          </div>
+
+          <%= f.submit "#{t('submit_answer')}"  ,:class=>"submit_button"%>
+        </div>
+
+
+      </div>
+
+
+    <% end %>
+  </div>
+</div>

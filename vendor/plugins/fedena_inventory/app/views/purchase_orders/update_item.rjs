@@ -1,0 +1,3 @@
+page << "$('#{@i}').up(2).select('.nested_price').first().value = '#{precision_label(@price)}'"
+page << "$('#{@i}').up(2).select('.nested_tax').first().value = '#{precision_label(@tax)}'"
+

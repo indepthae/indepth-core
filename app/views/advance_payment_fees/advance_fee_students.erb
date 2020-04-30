@@ -1,0 +1,32 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'jquery-ui_1.css' %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/student/student_wise_report' %>
+  <%else %>
+    <%= stylesheet_link_tag 'student/student_wise_report' %>
+  <% end %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('advance_fees_text') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if !@current_user.admin and @enable_online_payment == "true" and @active_gateways.present? and @advance_fee_config and @student.class.name == 'Student' %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pay_advance_fees')}",:controller => 'advance_payment_fees', :action => "advance_payment_by_student",:id => @student.id%> </li>
+      <% end %>
+    </ul>
+  </div>
+</div>  
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :advance_fee_students, @student %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="student_profile_heading1">
+      <%= render :partial => "advance_fee_collection_student_details" %>
+      <div class="hor_line"></div>
+  </div>
+  <%= render :partial=> "student_wise_advance_fees_list", :locals=>{:batches => @batches}%>
+</div>  

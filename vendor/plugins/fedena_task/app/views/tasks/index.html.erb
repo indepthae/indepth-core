@@ -1,0 +1,57 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('task_management') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%=  t('all_tasks') %></div>
+<% if permitted_to? :new, :tasks %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_task')}", :controller=>"tasks", :action=>"new"%></li>
+    </ul>
+  </div>
+<% end %>
+</div>
+<div id="page-yield">
+ <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+    <% form_tag request.path, :method => 'get' do %>
+      <div class="label-field-pair">
+        <label for="filter"><%= t('filter_by') %></label> <div class="text-input-bg">
+          <%= select_tag "filter_assigned_tasks", options_for_select([ [t('all'),"All"], [t('assigned'),"Assigned"], [t('completed'),"Completed"], [t('due_date'),"Due date"]], params[:filter_assigned_tasks]), {:onChange => "#{remote_function(:url => {:action => "list_assigned_tasks"},:with => "'filter_assigned_tasks='+value",:before => "Element.show('loader')",:success => "Element.hide('loader')")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+        </div>
+      </div>
+    <% end %>
+    <div id="list_assigned_tasks">
+      <%= render :partial => "list_assigned_tasks" %>
+    </div>
+    <%if @current_user.admin? or @current_user.tasks.present?%>
+      <div class="label-field-pair">
+        <label for="filter"><%= t('filter_by') %></label>
+        <div class="text-input-bg">
+          <%= select_tag "filter_tasks", options_for_select([ [t('all'),"All"], [t('assigned'),"Assigned"], [t('completed'),"Completed"], [t('due_date'),"Due Date"] ],[:filter_tasks]), {:onChange => "#{remote_function(:url => {:action => "list_created_tasks"},:with => "'filter_tasks='+value",:before => "Element.show('loader1')",:success => "Element.hide('loader1')")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader1",
+            :style =>"display: none;" ) %>
+        </div>
+      </div>
+      <div id="list_created_tasks">
+        <%= render :partial => "list_tasks" %>
+      </div>
+    <%end%>
+  </div>
+  <div class="extender"></div>
+</div>

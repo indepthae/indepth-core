@@ -1,0 +1,44 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('employee_leave_management') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('leave_process_settings').titleize %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% config = leave_reset_configuration %>
+        <% if config == "1"%>
+          <%= make_breadcrumb %>
+        <% else %>
+          <%= breadcrumb :employee_attendance_reset_settings %>
+        <% end %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"><%= flash[:notice] %></p>
+    <% end %>
+
+    <h4><%= t('leave_process_settings').titleize %></h4>
+
+    <div class="description"><%= t('leave_reset_setting_description') %></div>
+
+    <% form_for @reset_settings, :url => {:action => 'settings'} ,:method => 'post', :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |c| %>
+
+      <div class="label-radio-pair" id="lop_enabled">
+          <%= c.radio_button "config_value", "true" %>
+          <label for="configuration_config_value_true"><%= t('donot_reset_leaves_for_those_employees') %></label>
+          <div class="label_description"><%= t('donnot_reset_description') %></div>
+      </div>
+
+      <div class="label-radio-pair" id="lop_enabled">
+          <%= c.radio_button "config_value", "false" %>
+          <label for="configuration_config_value_false"><%= t('ignore_non_deducted_lops_and_reset_leaves') %></label>
+          <div class="label_description"><%= t('ignore_reset_description') %></div>
+      </div>
+
+      <%=  submit_tag "#{t('save_settings')}",:class=>'submit_button', :id => 'submit_button' %>
+    <% end %>
+</div>
+

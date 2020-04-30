@@ -1,0 +1,61 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit_final_term_assessment') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% unless @assessment_group.new_record?  %>
+              <li class="themed_bg themed-dark-hover-background">
+                  <%= link_to t('reorder_assessments'), '#' , :onclick => "build_reorder_box();" %>
+              </li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_groups_edit, [@plan, @assessment_group] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="header"><%= t('edit_final_term_assessment') %></div>
+    <div id ="description"><%= t('create_term_exam_description') %></div>
+    <div id="group_form">
+        <%= render  :partial => 'final_term_assessment_group' %>
+    </div>
+</div>
+<script type="text/javascript">
+  build_reorder_box = function () {
+      build_modal_box({title: '<%= t('reorder_assessments') %>', popup_class: 'reorder_form_popup'});
+      j('.reorder_form_popup #popup_content').append("<%=escape_javascript(render :partial => "reorder_form")%>");
+      j('#popup_footer.part').remove();
+  }
+  
+  updateSortorder = function() {
+    j('.sort_table tr.list').each(function (i) {
+      j(this).children().last().val(i + 1);
+    });
+  }
+  
+  toggle_no_exam = function(elm) {
+        if(elm.value == 'true'){
+          j('#formula, #scoring-type, #formula-hr, #scoring_type-hr').fadeOut();
+        }else{
+          j('#formula, #scoring-type, #formula-hr, #scoring_type-hr').fadeIn();
+        }
+        const term_id = <%= @term.present? ?  @term.id : '' %>;
+        new Ajax.Request('/assessment_groups/fetch_final_term_assessment_groups', {
+              parameters: {'no_exam': elm.value, 'assessment_plan_id': <%=@plan.id%>, 'assessment_term_id': term_id, 'assessment_group_id': <%= @assessment_group.id %>},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'get',
+              onComplete: function (resp) {
+                  j('#ag_group_list').html(resp.responseText);
+              }
+        });
+      }
+</script>

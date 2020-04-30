@@ -1,0 +1,39 @@
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+  <% if @particulars.present? %>
+      <tr class="row-a main_head">
+        <td class="col-name"><%= t('name') %></td>
+        <td class="col-desc set_border_right"><%= t('master_fees.master_particular') %></td>
+      </tr>
+      <% @particulars.each_pair do |p_name, p_ids| %>
+          <tr class="row-b">
+            <td class="col-name"><%= p_name %></td>
+            <td class="col-desc set_border_right">
+              <%= hidden_field_tag "manage_masters_particulars[#{@cat_type}_#{@cat_id}_#{string_to_underscore(p_name)}]", p_ids.join(',') %>
+              <%= select_tag "master_fee_particular_id[]",
+                             options_for_select([[t('select_a_particular'), nil]] + @master_particulars.map { |x| [x.name, x.id] }),
+                             :onchange => "set_linking('particulars', '#{@cat_type}', '#{@cat_id}', '#{string_to_underscore(p_name)}', this)" %>
+            </td>
+          </tr>
+      <% end %>
+
+  <% end %>
+
+  <% if @discounts.present? %>
+      <tr class="row-a main_head">
+        <td class="col-name"><%= t('name') %></td>
+        <td class="col-desc set_border_right"><%= t('master_fees.master_discount') %></td>
+      </tr>
+      <% @discounts.each_pair do |p_name, p_ids| %>
+          <tr class="row-b">
+            <td class="col-name"><%= p_name %></td>
+            <td class="col-desc set_border_right">
+              <%= hidden_field_tag "manage_masters_discounts[#{@cat_type}_#{@cat_id}_#{string_to_underscore(p_name)}]", p_ids.join(',') %>
+              <%= select_tag "master_fee_discount_id[]",
+                             options_for_select([[t('select_a_discount'), nil]] + @master_discounts.map { |x| [x.name, x.id] }),
+                             :onchange => "set_linking('discounts', '#{@cat_type}', '#{@cat_id}', '#{string_to_underscore(p_name)}', this)" %>
+            </td>
+          </tr>
+      <% end %>
+
+  <% end %>
+</table>

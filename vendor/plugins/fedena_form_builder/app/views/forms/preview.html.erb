@@ -1,0 +1,46 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :show, :form_submissions %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('reports')}", form_submission_path(@form)%></li>
+      <% end %>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :forms_preview %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% form_for( :form_submission, :html => {:multipart => true}, :url => new_form_submission_forms_path) do |form| %>
+    <%= error_messages_for :form, :header_message => nil %>
+    <% missing = @form.fields_missing.present? ? @form.fields_missing.split(',') : [] %>
+    <%= form.hidden_field :response %>
+    <%= form.hidden_field :form_id, :value=>@form.id %>
+    <div class="form_name">
+      <%#= form.label @form.name %>
+      <label for="form_submission_<%= @form.name %>"><%= @form.name %></label>
+    </div>
+
+    <% @fields.each do |field|  %>
+      <% if @response.present? %>
+        <%= render_field(field,@response[field.field_type]["#{field.id}"],((missing.include? field.id.to_s) ? true:false)) %>
+      <% else %>
+        <%= render_field(field,{},((missing.include? field.id.to_s) ? true:false)) %>
+      <% end %>
+    <% end %>    
+
+  <% end %>
+</div>
+<script>
+  j('#page-yield').find('input,select,textarea').each(function(a,b){
+    j(b).attr('disabled',true);
+  });
+</script>

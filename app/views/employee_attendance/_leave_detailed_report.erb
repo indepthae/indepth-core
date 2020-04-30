@@ -1,0 +1,134 @@
+
+<table>
+    <tr class="tr-head">
+        <td class="col-3"><%= t('leave_date') %></td>
+        <td class="col-1"><%= t('leave_type') %></td>
+        <td class="col-1"><%= t('leave_criteria') %></td>
+        <td class="col-2"><%= t('reason') %></td>
+        <td class="col-1"><%= t('approver') %></td>
+        <td class="col-2"><%= t('remarks') %></td>
+    </tr>
+    <% config = leave_reset_configuration %>
+    <% add_leaves = @leaves.employee_additional_leaves.collect{|eal| eal.attendance_date} %>
+    <% lt_ids = @leave_types.collect(&:id) %>
+    <% if @start_date&&@end_date %>
+      <% normal_leaves = @leaves.employee_attendances.select{|x| lt_ids.include?(x.employee_leave_type_id) && x.attendance_date >= @start_date && x.attendance_date <= @end_date} %>
+      <% additional_leaves = @leaves.employee_additional_leaves.select{|x| lt_ids.include?(x.employee_leave_type_id) && x.attendance_date >= @start_date && x.attendance_date <= @end_date} %>
+    <% else %>
+      <% normal_leaves = @leaves.employee_attendances.select{|x| lt_ids.include?(x.employee_leave_type_id) && lt_ids.include?(x.employee_leave_type_id) && x.attendance_date >= @recent_reset_date} %>
+      <% additional_leaves = @leaves.employee_additional_leaves.select{|x| lt_ids.include?(x.employee_leave_type_id) && x.attendance_date >= @recent_reset_date} %>
+    <% end %>
+
+    <% if params[:department_id].present?%>
+      <% if params[:department_id] != "All" %>
+        <% normal_leaves = normal_leaves.select{|x| x.employee_leave_type_id == params[:department_id].to_i } %>
+        <% additional_leaves = additional_leaves.select{|x| x.employee_leave_type_id == params[:department_id].to_i } %>
+      <% end %>
+    <% end %>
+
+    <% if params[:leave_criteria].present? %>
+      <% leave_credit = normal_leaves%>
+      <% normal_leaves = [] %>
+      <% if params[:leave_criteria] == "All" %>
+        <% normal_leaves = leave_credit %>
+      <% elsif params[:leave_criteria] == "lop_deducted" %>
+        <% additional_leaves = additional_leaves.select{|eal| eal.is_deductable && eal.is_deducted} %>
+      <% elsif params[:leave_criteria] ==  "lop_not_deducted" %>
+        <% additional_leaves = additional_leaves.select{|eal| eal.is_deductable && !eal.is_deducted} %>
+      <% end %>
+    <% end %>
+
+    <% (normal_leaves).each do |ea| %>
+      <% class_name = "normal_leave data_row" %>
+      <% title = "" %>
+      <% reset_date = (config == '1' ? fetch_old_leaves : ea.employee_leave.reseted_at) %>
+      <% if reset_date.present? and ea.created_at < reset_date %>
+        <% class_name = "future_leave data_row" %>
+        <% title = "This leave doesnot belong to this leave cycle" %>
+      <% end %>
+      <% if ea.apply_leave_id.present? %>
+        <% link_to_leave = "/employee_attendance/leave_application/#{ea.apply_leave_id}?from=#{params[:from]||params[:action]}" %>
+      <% else %>
+        <% link_to_leave = "/employee_attendance/view_attendance/#{ea.id}?from=#{params[:from]||params[:action]}" %>
+      <% end %>
+      <% unless (add_leaves.include?(ea.attendance_date)) %>
+        <tr class="<%= class_name %>" title="<%= title%>" data-href="<%= link_to_leave %>">
+            <td><%= "#{format_date(ea.attendance_date, :format => :short_date)}" + (ea.is_half_day ? ("&nbsp(#{t('half_day')})") : ("&nbsp(#{t('full_day')})" ) ) %></td>
+            <td><%= @leave_types.select{|lt| ea.employee_leave_type_id == lt.id}.first.name%></td>
+            <td><%= t('earned_leave') %></td>
+            <td><%= ea.reason %></td>
+            <td><%= ea.apply_leave.present? ? (ea.apply_leave.approving_manager_record.present? ? "#{ea.apply_leave.approving_manager_record.full_name} (#{ea.apply_leave.approving_manager_record.employee_record.employee_number})&#x200E;" : "#{t('deleted_user')}" ) : "-" %></td>
+            <td><%= ea.apply_leave.present? ? ea.apply_leave.manager_remark : "-" %></td>
+        </tr>
+      <% end %>
+    <% end %>
+
+    <% additional_leaves.each do |eal| %>
+      <% class_name = "normal_leave data_row" %>
+      <% title = "" %>
+      <% reset_date = (config == '1' ? fetch_old_leaves : eal.employee_attendance.employee_leave.reseted_at) %>
+      <% if reset_date.present? and eal.created_at < reset_date %>
+        <% class_name = "future_leave data_row" %>
+        <% title = "This leave doesnot belong to this leave cycle" %>
+      <% end %>
+      <% if eal.employee_attendance.apply_leave_id.present? %>
+        <% link_to_leave = "/employee_attendance/leave_application/#{eal.employee_attendance.apply_leave_id}?from=#{params[:from]||params[:action]}" %>
+      <% else %>
+        <% link_to_leave = "/employee_attendance/view_attendance/#{eal.employee_attendance_id}?from=#{params[:from]||params[:action]}" %>
+      <% end %>
+
+      <tr class="<%= class_name %>" title="<%= title%>" data-href="<%= link_to_leave %>" >
+          <% status = normal_leaves.select{|n| n.attendance_date == eal.attendance_date && n.is_half_day != eal.is_half_day}.present? %>
+          <% text = [] %>
+          <% if status %>
+            <% text << t('earned_leave')+"<br>" %>
+          <% end %>
+          <% if eal.is_deductable %>
+            <% text << t('lop')+"<br>"  %>
+          <% else %>
+            <% text << t('additional_leave') +"<br>"  %>
+          <% end %>
+
+          <% if eal.is_deducted  %>
+            <% text << t('deducted') %>
+          <% else %>
+            <% text << t('not_deducted')  %>
+          <% end %>
+          <% text.count > 2 ? row_span = 2 : row_span = 1%>
+          <td rowspan="<%= row_span %>"><%= format_date(eal.attendance_date, :format => :short_date) + (status ? ("&nbsp(#{t('full_day')})") : (eal.is_half_day ? ("&nbsp(#{t('half_day')})" ) : ("&nbsp(#{t('full_day')})") ))%></td>
+          <td rowspan="<%= row_span %>"><%= @leave_types.select{|lt| eal.employee_leave_type_id == lt.id}.first.name%></td>
+
+          <% if text.count > 2 %>
+            <td><%= text[0]%></td>
+          <% else %>
+            <td><%= text %></td>
+          <% end %>
+          <td rowspan="<%= row_span %>"><%= eal.reason  %></td>
+          <% leave_app = (leave_credit||normal_leaves).select{|l| l.attendance_date == eal.attendance_date.to_date && l.employee_id == eal.employee_id }.first %>
+          <td rowspan="<%= row_span %>"><%= leave_app.present? ? (leave_app.apply_leave.present? ? (leave_app.apply_leave.approving_manager_record.present? ? "#{leave_app.apply_leave.approving_manager_record.full_name} (#{leave_app.apply_leave.approving_manager_record.employee_record.employee_number})&#x200E;" : "-") : "-") : "-" %></td>
+          <td rowspan="<%= row_span %>"><%= leave_app.present? ? (leave_app.apply_leave.present? ? leave_app.apply_leave.manager_remark : "-") : "-"%></td>
+          <% if text.count > 2 %>
+        <tr class="<%= class_name %>" data-href="<%= link_to_leave %>"><td><%= text[1] + text[2]%></td></tr>
+      <% end %>
+  </tr>
+
+<% end %>
+
+<% unless additional_leaves.present? or normal_leaves.present? %>
+  <tr><td colspan="6"><%= t('no_leaves_taken') %></td></tr>
+<% end %>
+</table>
+
+<% unless params[:pdf] %>
+  <div class="pdf">
+  <%#= link_to "#{t('pdf_report')}",
+  {:action => "additional_leave_detailed_pdf", :from => params[:from],:id=> @employee.id , :start_date => @start_date, :end_date => @end_date, :leave_criteria => params[:leave_criteria], :pdf => true},:target => '_blank', :class=> 'user_button' %>
+  </div>
+<% end %>
+
+
+<script>
+  j("tr.data_row").click(function () {
+      window.document.location = j(this).data("href");
+  });
+</script>

@@ -1,0 +1,34 @@
+<% form_for @assessment_group_batch, :url=> {:action => 'link_attributes', :batch_id => @batch.id, :assessment_group_id=> @assessment_group.id, :academic_year_id=>@academic_year.id } do |f|%>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="col2"><%= t('subject')%></td>
+          <td class="col2 attr_select_head"><%= t('attributes_profile')%></td>
+          <td class="col1"><%= t('max_subject_marks_from_profile') %></td>
+      </tr>
+      <%- f.fields_for :subject_attribute_assessments do |c|%>
+        <%= render :partial=> 'subject_attribute_form', :locals=> {:c => c} %>
+      <%  end %>
+  </table>
+  <div class="form-submit">
+      <%= f.submit @assessment_group_batch.new_record? ? t('create_exams') : t('update_exams'),:class=>'submit-button'%>
+      <%= link_to "#{t('cancel')}",:back,:class=>'submit-button cancel-button' %>
+  </div>
+<% end %>
+<script type="text/javascript">
+    update_profile_info = function(el,s_id){
+      if(el.value != ''){
+        j.ajax({
+          type: 'GET',
+          url: "/assessments/update_profile_info",
+          data: {
+            id: el.value
+          },
+          success: function (data) {
+            j('#attributes_view_'+s_id).html(data.attributes);
+            j('#formula_view_'+s_id).html(data.formula);
+            j('#max_mark_view_'+s_id).html(data.max_marks)
+          }
+        });
+      }
+    }
+</script>

@@ -1,0 +1,42 @@
+<label class="head_label"><%= t('edit_course_exam_group') %><span></span></label>
+<div id="form-errors"></div>
+<div id="exam-form">
+  <% remote_form_for @course_exam_group,:url=>{:action=>"update_course_exam_group",:id=> @course_exam_group.id},:html => { :method => :post} do |f|%>
+    <div class="exam_type">
+      <div class="label-field-pair">
+        <label for="exam_name"><%= t('exam_name') %></label>
+        <div class="text-input-bg"><%= f.text_field :name%></div>
+      </div>
+      <%if @course_exam_group.exams.empty?%>
+        <div class="extender"></div>
+        <% if @course.gpa_enabled? or @course.cwa_enabled? %>
+          <div class="label-field-pair">
+            <label for="exam_type"><%= t('exam_type') %></label>
+            <div class="text-input-bg"><%= f.select :exam_type,[[t('marks_and_grades'),"MarksAndGrades"]] %></div>
+          </div>
+        <% elsif @course.cce_enabled? %>
+          <div class="label-field-pair">
+            <label for="cce_exam_category_id"><%= t('cce_exam_category') %></label>
+            <div class="text-input-bg"><%= f.select :cce_exam_category_id,@cce_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>t("select") %></div>
+          </div>
+          <%= f.hidden_field :exam_type, :value=>"MarksAndGrades"  %>
+        <% elsif @course.icse_enabled? %>
+          <div class="label-field-pair">
+            <label for="cce_exam_category_id">ICSE Exam Category</label>
+            <div class="text-input-bg"><%= f.select :icse_exam_category_id,@icse_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>"Select Exam Category" %></div>
+          </div>
+          <%= f.hidden_field :exam_type, :value=>"MarksAndGrades"  %>
+        <% else %>
+          <div class="label-field-pair">
+            <label for="exam_type"><%= t('exam_type') %></label>
+            <div class="text-input-bg"><%= f.select :exam_type,options_for_select([[t('marks'),"Marks"],[t('grades'), "Grades"],[t('marks_and_grades'),"MarksAndGrades"]]) %></div>
+          </div>
+        <%end%>
+      <%end%>
+    </div>
+    <div class="extender"></div>
+    <div class="text-input-bg">
+      <%= f.submit "", :value => "► #{t('save')}",:name=>nil, :class => "submit_button", :id => 'submit_button' %>
+    </div>
+  <%end%>
+</div>

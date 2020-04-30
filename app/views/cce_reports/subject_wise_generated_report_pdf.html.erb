@@ -1,0 +1,159 @@
+<%subject = @subjects[0]%>
+<div id="page-yield" class="available_sections">
+    <div class="header">
+        <span class="logo header_parts">
+            <%if current_school_detail.logo.present?%>
+              <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+            <%else%>
+              <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+            <%end%>
+        </span>
+        <span class="header-content header_parts">
+            <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+            <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+        </span>
+    </div>
+    <div class="section additional_margin" >
+        <div class="hor_line"></div>
+        <h2>Subject-wise Report</h2>
+        <div class="hor_line"></div>
+    </div>
+    <div  class="section">
+        <table id="pdf-table" width="100%" cellspacing="0" class="additional_margin">
+            <tr class="table-header">
+                <td></td>
+                <td colspan="<%=@type == 'm' ? 6 : 7%>"><%=subject.name%></td>
+            </tr>
+            <tr class="table-header">
+                <td rowspan="2">Students</td>
+                <td>FA1</td>
+                <td>FA2</td>
+                <td>FA3</td>
+                <td>FA4</td>
+                <td>SA1</td>
+                <td>SA2</td>
+                <%if @type == "w"%>
+                  <td>Total</td>
+                <%end%>
+            </tr>
+            <tr class="table-header">
+                <%if @type == "m"%>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA1']['total_mark'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA2']['total_mark'] || "-"%></td>
+                  <td><%=@score_hash['sa_marks'][subject.id]['SA1']['total_mark'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA3']['total_mark'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA4']['total_mark'] || "-"%></td>
+                  <td><%=@score_hash['sa_marks'][subject.id]['SA2']['total_mark'] || "-"%></td>
+                <%else%>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA1']['weightage'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA2']['weightage'] || "-"%></td>
+                  <td><%=@score_hash['sa_marks'][subject.id]['SA1']['weightage'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA3']['weightage'] || "-"%></td>
+                  <td><%=@score_hash['fa_marks'][subject.id]['FA4']['weightage'] || "-"%></td>
+                  <td><%=@score_hash['sa_marks'][subject.id]['SA2']['weightage'] || "-"%></td>
+                  <%fa_total = @score_hash['fa_marks'][subject.id]['sum_total']%>
+                  <%sa_total = @score_hash['sa_marks'][subject.id]['sum_total']%>
+                  <td><%=(fa_total+sa_total == 0 ? "-" : (fa_total+sa_total))%></td>
+                <%end%>
+            </tr>
+            <% @students.each_with_index do |s,i| %>
+              <tr class="<%= cycle('even', 'odd') %>">
+                  <% if @config == "admission_no" %>
+                    <% student_text = "#{s.full_name} (#{s.admission_no})" %>
+                  <%elsif @config == "roll_number" %>
+                    <% if s.roll_number.present? %>
+                      <% student_text = "#{s.full_name} (#{s.roll_number})"%>
+                    <%else%>
+                      <% student_text = "#{s.full_name} (-)" %>
+                    <%end%>
+                  <%else%>
+                    <% if Configuration.enabled_roll_number? %>
+                      <% if s.roll_number.present? %>
+                        <% student_text = "#{s.full_name} (#{s.roll_number})"%>
+                      <%else%>
+                        <% student_text = "#{s.full_name} (-)" %>
+                      <%end%>
+                    <%else%>
+                      <% student_text = "#{s.full_name} (#{s.admission_no})" %>
+                    <%end%>
+                  <% end %>
+                  <td class="name-td"><%= student_text %></td>
+                  <%if @type == "m"%>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA1'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA1']['mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA1']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA2'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA2']['mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA2']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['sa_marks'][subject.id][s.id]['SA1'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['sa_marks'][subject.id][s.id]['SA1']['mark'] %>(<%= @score_hash['sa_marks'][subject.id][s.id]['SA1']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA3'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA3']['mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA3']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA4'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA4']['mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA4']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['sa_marks'][subject.id][s.id]['SA2'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['sa_marks'][subject.id][s.id]['SA2']['mark'] %>(<%= @score_hash['sa_marks'][subject.id][s.id]['SA2']['grade'] %>)</td>
+                    <% end %>
+                  <%else%>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA1'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA1']['weighted_mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA1']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA2'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA2']['weighted_mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA2']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['sa_marks'][subject.id][s.id]['SA1'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['sa_marks'][subject.id][s.id]['SA1']['weighted_mark'] %>(<%= @score_hash['sa_marks'][subject.id][s.id]['SA1']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA3'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA3']['weighted_mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA3']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['fa_marks'][subject.id][s.id]['FA4'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['fa_marks'][subject.id][s.id]['FA4']['weighted_mark'] %>(<%= @score_hash['fa_marks'][subject.id][s.id]['FA4']['grade'] %>)</td>
+                    <% end %>
+                    <% unless @score_hash['sa_marks'][subject.id][s.id]['SA2'].present?%>
+                      <td>-(-)</td>
+                    <% else %>
+                      <td><%= @score_hash['sa_marks'][subject.id][s.id]['SA2']['weighted_mark'] %>(<%= @score_hash['sa_marks'][subject.id][s.id]['SA2']['grade'] %>)</td>
+                    <% end %>
+                    <%if @score_hash['fa_marks'][subject.id].present? and @score_hash['fa_marks'][subject.id][s.id].present? and @score_hash['fa_marks'][subject.id][s.id]['sum_total'].present?%>
+                      <%fa_total = @score_hash['fa_marks'][subject.id][s.id]['sum_total']%>
+                    <%else%>
+                      <%fa_total = 0%>
+                    <%end%>
+                    <%if @score_hash['sa_marks'][subject.id].present? and @score_hash['sa_marks'][subject.id][s.id].present? and @score_hash['sa_marks'][subject.id][s.id]['sum_total'].present?%>
+                      <%sa_total = @score_hash['sa_marks'][subject.id][s.id]['sum_total']%>
+                    <%else%>
+                      <%sa_total = 0%>
+                    <%end%>
+                    <td><%=(fa_total+sa_total == 0 ? "-" : (fa_total+sa_total))%></td>
+                  <%end%>
+              </tr>
+            <% end %>
+        </table>
+    </div>
+</div>

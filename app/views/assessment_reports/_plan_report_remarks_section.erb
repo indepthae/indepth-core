@@ -1,0 +1,3 @@
+<% if @student.present? %>
+  <%=generate_common_remark_section("gradebook_plan_report",@student.id,nil,@reportable.id,{:assessment_plan_id=>@reportable.id,:student_id=>@student.id})%>
+<% end %>

@@ -1,0 +1,77 @@
+<% if @ranges.empty? %>
+  <hr></hr>
+  <div class="status">
+    <div class="employee_status">
+      <%= "#{t('employees_in_this_payroll_group')} : " %>
+      <span class="count"><%= @payroll_group.employees.count.to_s %></span>
+    </div>
+    <div class="estimated_cost">
+      <%= "#{t('total_net_pay')} : "  %>
+      <span class="count"><%= "#{@currency} #{precision_label(@estimated_cost)}" %></span>
+    </div>
+  </div>
+  <div class="heading"><%= t('summary') %></div>
+  <div id="emp_list">
+    <table>
+      <tr class="tr-head">
+        <td class="emp_name"><%= t('payslip_status') %></td>
+        <td class="pg_name"><%= t('no_of_employees') %></td>
+        <td class="actions"></td>
+      </tr>
+      <% if @generated != 0 %>
+        <tr class="bg_light_grey">
+          <td class="emp_name"><%= t('payslip_generated') %></td>
+          <td class="pg_name"><%= @generated %></td>
+          <td class="actions">
+            <%= link_to t('view_payslips') , {:action => "payslip_generation_list", :id => @payroll_group.id, :start_date => @start_date , :end_date => @end_date }%>
+          </td>
+        </tr>
+      <% end %>
+      <% if (@lop_employees + @outdated_payroll + @updated_payroll) != 0 %>
+        <tr class="bg_light_grey">
+          <td class="emp_name"><%= t('payslip_not_generated')  %></td>
+          <td class="pg_name"><%= @not_generated %></td>
+          <td class="actions">
+            <% if @lop_employees == 0 && @outdated_payroll == 0 %>
+              <%= link_to t('view_employees') , {:action => "view_regular_employees", :id => @payroll_group.id,  :start_date => @start_date , :end_date => @end_date}%>
+              <%= link_to t('generate_payslip_for_all') , {:action => "generate_all_payslips", :id => @payroll_group.id, :start_date => @start_date, :end_date => @end_date}%>
+            <%end%>
+          </td>
+        </tr>
+      <% end %>
+      <% if @lop_employees != 0 and @payroll_group.enable_lop %>
+        <tr class="not_generated">
+          <td class="emp_name"><%= t('employees_with_lop') %></td>
+          <td class="pg_name"><%= @lop_employees %></td>
+          <td class="actions">
+            <%= link_to t('view_employees') , {:action => "view_employees_with_lop", :id => @payroll_group.id,  :start_date => @start_date, :end_date => @end_date}%>
+          </td>
+        </tr>
+      <% end %>
+      <% if @outdated_payroll != 0 %>
+        <tr class="not_generated">
+          <td class="emp_name"><%= t('employees_with_outdated_payroll').capitalize %></td>
+          <td class="pg_name"><%= @outdated_payroll %></td>
+          <td class="actions">
+            <%= link_to t('view_employees') , {:action => "view_outdated_employees", :id => @payroll_group.id, :start_date => @start_date , :end_date => @end_date}%>
+          </td>
+        </tr>
+      <% end %>
+      <% if @updated_payroll!= 0 && (@lop_employees != 0 or @outdated_payroll != 0) %>
+        <tr class="not_generated">
+          <td class="emp_name"><%= t('employees_with_updated_payroll').capitalize %></td>
+          <td class="pg_name"><%= @updated_payroll %></td>
+          <td class="actions">
+            <%= link_to t('view_employees') , {:action => "view_regular_employees", :id => @payroll_group.id,  :start_date => @start_date , :end_date => @end_date}%>
+            <%= link_to t('generate_payslip_for_all') , {:action => "generate_all_payslips", :id => @payroll_group.id, :start_date => @start_date, :end_date => @end_date}%>
+          </td>
+        </tr>
+      <% end %>
+      <%if @updated_payroll==0 && @outdated_payroll==0 && @lop_employees==0 && @generated==0 %>
+        <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+      <% end %>
+    </table>
+  </div>
+<% else %>
+  <p class="flash-msg"><%= t('payslip_has_been_overlapped_for',:start_date  => format_date(@ranges.first.start_date,:short), :end_date => format_date(@ranges.first.end_date, :short)) %></p>
+<% end %>

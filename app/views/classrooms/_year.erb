@@ -1,0 +1,7 @@
+<div class="label-field-pair"><label><%= t('year') %> :</label>
+  <div class="text-input-bg">
+    <%= select :year, :id,[["#{t('year')}",""],[@year-1,@year-1],[@year,@year],[@year+1,@year+1]],
+    {:prompt => "#{t('year')}"},{:onChange => "#{remote_function(:url=>{:action=>"list_date_specific_activities",:id => params[:id]},:before=>"$('loader2').show();",:success=>"$('loader2').hide();", :with => "'date='+value+'-' + j('#month_id').val()")}"}%>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+  </div>
+</div>

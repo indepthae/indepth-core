@@ -1,0 +1,16 @@
+<div class="label-field-pair">
+  <label for="timetable_entry_batch_id"><%= t('batch') %>
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader2", :style =>"display: none;" ) %>
+  </label>
+  <div class="text-input-bg">
+    <% selection = @batch.present? ? {:selected => @batch.id}:{} %>
+    <%= select :batch, :id,
+      @batches.map {|b| [b.full_name, b.id] },
+      {:prompt => t('select_a_batch')}.merge(selection),
+      {:onchange => "#{remote_function(
+      :url => { :action => 'load_subject_list' },
+      :with => "'batch_id='+value",
+      :before => "Element.show('loader2')",
+      :success => "Element.hide('loader2')"  )}"} %>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<% if @attachment_valid == false and  !@msg.errors.present? %>
+  <div class="conversation <%= "self_conversation" if @msg.sender == @current_user %>">
+      <div class="conversation_body">
+          <%= simple_format_without_p @msg.body %>
+          <% if @msg.has_attachment? %>                             
+                  <% @msg.message_attachments.each do |ma|%>
+                    <div class="message_attachments <%='no_body' if @msg.body.blank?%>">
+                      <% if ma.attachment_file_name.present?  %> 
+                           <%= link_to ma.attachment_file_name, ma.attachment.url(:original,false), { :href => "#{ma.attachment.url(:original, false)}"}%>
+                      <% end %>
+                    </div>    
+                  <% end %>
+          <% end %>                      
+      </div>
+      <div class="message_time">
+          <% if @msg.created_at < Date.today.beginning_of_year %>
+            <%=  format_date(@msg.created_at,:format => :short)  %>
+          <% elsif(@msg.created_at.to_date - Date.today).to_i < 0 %>
+            <%=change_time_to_local_time(@msg.created_at).strftime("%h %e,  %I:%M%p")  %>
+          <% else %>
+            <%=change_time_to_local_time(@msg.created_at).strftime("%I:%M%p")  %>
+          <% end %>
+      </div>
+  </div>
+<% end %>

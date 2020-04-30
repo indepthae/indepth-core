@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.document_collection {
+  @xml.admission_no(@student.admission_no)
+  @categories.each do |category|
+    @category = category
+    category_id = category.category_id
+    category_name = category.attachment_category_name
+    @xml.category_documents{
+      @xml.category{
+        @xml.id(category_id)
+        @xml.name(category_name)
+        }
+      @cat_documents = StudentAttachment.category_documents(@document_groups, @category)      
+      @xml.documents{
+        @xml.no_of_documents(@cat_documents.present? ? @cat_documents.count : 0)
+        if @cat_documents.present?
+          @cat_documents.each do |cat_document|
+            @xml.document{
+              @xml.id(cat_document.id)
+              @xml.name(cat_document.attachment_name)
+              @xml.added_on(format_date(cat_document.created_at,:format=>:short_date) )
+              @xml.batch_id(cat_document.batch_id)
+              @xml.student_id(cat_document.student_id)
+              @xml.uploader_id(cat_document.uploader_id)
+            }
+          end
+        end
+      }        
+    }
+  end
+
+}%>

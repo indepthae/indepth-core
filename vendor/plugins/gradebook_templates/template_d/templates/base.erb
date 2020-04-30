@@ -1,0 +1,220 @@
+<% content_for :head do %>
+  <link rel="stylesheet" type="text/css" href="<%= "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/stylesheets/template_d.css" %>">
+<% end %>
+
+<div class="<%= settings[:template_d_theme] %>" >
+
+    <div class="section">
+        <%= report_header({:school_name=> report.school_details.name, :school_address=> report.school_details.address, :logo1_url=> default_school_logo, :logo2_url => secondary_logo_url(settings[:template_d_logo]), :school_email_with_website=> report.school_details.email_with_website }) %>
+    </div>
+
+    <div class="section">
+        <%= report_name(settings[:template_d_header]) %>
+    </div>
+
+    <!-- Student Details Section -->
+    <% student_details_count = report.student.details.count %>
+    <% no_of_rows = (student_details_count.odd? ? ((student_details_count+1)/2) : (student_details_count/2))  %>
+    <% row = 0 %>
+    <div class="section">
+        <div class="section_head student_section_head">Student Profile</div>
+        <table class="primary field_table profile_head">
+            <colgroup class="field_table">
+                <col>
+                <col>
+            </colgroup>  
+            <colgroup class="field_table">
+                <col>
+                <col>
+            </colgroup> 
+            <% ind = 0 %>
+            <%  no_of_rows.times do %>
+              <% row += 1 %>
+              <% col = 1 %>
+              <tr>
+                  <% report.student.details.to_a.each_with_index do |st_detail, index| %>
+                    <%  break if col == 3 %>
+                    <% next if index < ind %>
+                    <% col += 1 %>
+                    <td colspan="1"><%= st_detail[0] %></td>
+                    <td colspan="<%= ((student_details_count.odd? && (row == no_of_rows)) ? "3": "1") %>"><%= st_detail[1] %></td>
+                    <% ind += 1 %>
+                  <% end %>
+              </tr>
+            <% end %>
+        </table>
+    </div>
+    <!-- Student Details Section -->
+
+    <% grouped_activity_sets = report.activity_sets.group_by{|r| r.profile_name } %>
+    <!--  Exam Sets -->
+    <% if report.exam_sets.present? %>
+      <% if group_report? %>
+        <% unless report.exam_sets.first.consider_skills %>
+          <%= render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_exam_set.erb" , :locals => {:report => report}%>
+        <% else %>
+          <%= render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_nested_exam_sets.erb" , :locals => {:report => report}%>
+        <% end %>
+      <% else %>
+        <%= render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_exam_set.erb" , :locals => {:report => report}%>
+      <% end %>
+    <% end %>
+    <!-- Exam Sets -->
+
+    <div class="section">
+        <!-- Grouped activity set -->
+        <% keys = grouped_activity_sets.keys %>
+        <% length = keys.length %>
+        <% if length == 1 %>
+          <% left_keys = keys %>
+          <% right_keys = [] %>
+        <% elsif length == 2 %>
+          <% left_keys = [keys.first] %>
+          <% right_keys = [keys.last] %>
+        <% else %>
+          <%if length.odd?%>
+            <%len =length/2 %>            
+          <%else%>
+            <%len =(length/2)-1 %>            
+          <%end%>
+          <% left_keys = keys[0..((len))] %>
+          <% right_keys = keys[((len)+1)..(length-1)] %>
+        <% end %>
+        <% if keys.present? %>
+          <div class="<%= group_report? ? 'twelve' : 'six' %> columns">
+              <% left_keys.each do |key| %>
+                <%=render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_grouped_activity_sets.erb", :locals => {:key => key, :activity_sets => grouped_activity_sets[key]}%>  
+              <%end%>
+          </div>
+          <div class="six columns">
+              <% right_keys.each do |key| %>
+                <%=render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_grouped_activity_sets.erb", :locals => {:key => key, :activity_sets => grouped_activity_sets[key]}%>  
+              <%end%>
+          </div>
+        <% end %>
+        <!-- Grouped activity set -->
+
+        <!-- Attendance Report -->
+        <% printed_attendance = false %>
+        <% if !right_keys.present? and !group_report? and report.attendance_reports.present? %>
+          <% printed_attendance = true %>
+          <div class="six columns">
+              <table class="primary striped condensed">
+                  <%= attedance_report(:type => 'term_and_consolidated') %> 
+              </table>
+          </div>
+        <% end %>
+        <!-- Attendance Report -->
+    </div>
+
+    <% unless printed_attendance %>
+      <!-- Attendance Report -->
+      <div class="section">
+          <% if report.exam_attendance_reports.present? %>
+            <div class="six columns">
+                <table class="primary striped condensed">
+                    <%= attedance_report(:type => 'term_and_consolidated') %>
+                </table>
+            </div>
+          <% end %>
+      </div>
+      <!-- Attendance Report -->
+    <% end %>
+
+
+    <!-- Attendance Report -->
+    <div class="section">
+        <% if report.exam_attendance_reports.present? %>
+          <table class="primary striped condensed">
+              <%= attedance_report(:type => 'full') %> 
+          </table> 
+        <% end %>
+    </div>
+    <!-- Attendance Report -->
+
+    <!-- Subject Skills -->
+
+
+
+    <% main_subjects = report.main_subjects_with_sub_skills.to_a %>
+    <% if main_subjects.present? %>
+      <% skil_set_flag = false %>
+      <% if group_report? %>
+        <% unless report.exam_sets.first.consider_skills %>
+          <% skil_set_flag = true %>
+        <% end %>
+      <% else %>
+        <% skil_set_flag = true %>
+      <% end %>
+      <% if skil_set_flag %>
+        <%= render :file=> "#{Rails.root}/vendor/plugins/gradebook_templates/template_d/templates/_subject_skills.erb" , :locals => {:main_subjects => main_subjects, :report => report}%>
+      <% end %>
+    <% end %>
+    <!-- Subject Skills -->
+
+    <!-- Grade scales -->
+    <div class="section">
+        <% report.grade_scales.each do |grade_scale| %>
+          <table class="primary condensed">
+              <tr>
+                  <th colspan="<%= grade_scale.scale.count+1 %>"><%= grade_scale.name %></th>
+              </tr>
+              <% grade_scale.labels.each_with_index do |label_name, label_index| %>
+                <tr>
+                    <td><%=label_name%></td>
+                    <% grade_scale.scale.each do |values| %>
+                      <td> <%= values[label_index] %> </td>
+                    <%end%>
+                </tr> 
+              <%end%>
+          </table>
+        <%end%>
+    </div>
+    <!-- Grade scales -->
+
+    <!-- General Remarks -->
+    <div class="section">
+        <%= report_remarks(report.remarks)  %>
+    </div>
+    <!-- General Remarks -->
+
+    <%  if settings[:signature] == "0"%>
+      <div class="section">
+          <div class="margin_top_3">
+              <div class="four columns left_text">
+                  <span class="bold">
+                      <div class="sign_img">
+                          <% if settings[:sign_left_img].present? %>
+                            <%= wicked_pdf_image_tag settings[:sign_left_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= settings[:sign_left_text] %></div>
+                  </span>
+              </div>
+              <div class="four columns center_text">
+                  <span class="bold">
+                      <div class="sign_img">
+                          <% if settings[:sign_center_img].present?  %>
+                            <%= wicked_pdf_image_tag settings[:sign_center_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= settings[:sign_center_text] %></div>
+                  </span>
+              </div>
+              <div class="four columns right_text">
+                  <span class="bold">
+                      <div class="sign_img">
+                          <% if settings[:sign_right_img].present? %>
+                            <%= wicked_pdf_image_tag settings[:sign_right_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= settings[:sign_right_text] %></div>
+                  </span>
+              </div>
+          </div>
+      </div>
+    <% end %>
+
+
+</div>
+

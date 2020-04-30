@@ -1,0 +1,191 @@
+<% unless (@current_user.admin? or @current_user.employee?) %>
+  <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and 
+        CustomGateway.available_gateways.present? and PaymentConfiguration.first_active_gateway!=0 and 
+        PaymentConfiguration.config_value("enabled_fees").present? and PaymentConfiguration.is_hostel_fee_enabled?) %>
+    <tr class="row-a">
+        <td colspan="4">
+          <% if @student.advance_fee_wallet.present? and @amount_to_pay > 0 %>
+              <div class="wallet-section">
+                    <div class="wallet-amount-block">
+                        <label><%= t('advance_applied') %> </label>
+                        <div class="text-input-bg4">
+                            <%= text_field_tag :advance_fees,' ', {:value => 0.00, :class => "wallet-amount-applied", :precision => 2} %>
+                        </div>
+                    </div>
+                    <div class="wallet-info-block">
+                      <label><%= t('advance_fees_collected')%></label>
+                      <div class="text-input-bg4">
+                          <%= text_field :student_wallet_amount,'', {:value => @student.advance_fee_wallet.amount,
+                            :class => "wallet-amount-field", :precision => 2, :readonly => true} %>
+                      </div>
+                      <%= label_tag '', t('apply_advance'), {:class => "wallet-link user_button1"} %>
+                      <div class="" style="display: none;">
+                        <%= hidden_field_tag :wallet_amount_applied,'', {:value => false} %>
+                      </div>
+                    </div>
+              </div>
+            <% end %>
+            <% unless @hostel_fee.is_paid? %>            
+              <div class="payment_details">
+                  <div class="amount_to_pay_block">
+                      <label><%= t('amount') %></label>
+                      <div class="text-input-bg4">                          
+                          <%= hidden_field_tag :fees_paid, "", :value => precision_label(@hostel_fee.balance.to_f), 
+                            :class => 'precision_text payment', :readonly=>!@partial_payment_enabled %>                          
+                            
+                            <%= text_field_tag :fees_paid_t, "", :value => precision_label(@hostel_fee.balance.to_f), 
+                              :class => 'precision_text payment_t', :readonly=>!@partial_payment_enabled %> 
+                      </div>
+                  </div>
+              </div>
+            <% end %>
+            <div id="gateway_error"></div>
+
+            <div class="pay_fees">
+                <div class="pay_fees_buttons">
+                    <% unless @hostel_fee.is_paid? %>
+                      <%= custom_gateway_intermediate_button(params[:fees_paid], 
+                        'false', 0.00, params[:id], params[:id2], @hostel_fee.hostel_fee_collection.name, 
+                        @current_user.id, 'hostel_fee') %>                    
+                    <% else %>
+                      <% unless (@payer_type.present? and @payer_type=="Archived Student") %>
+                        <h4><%= "#{t('fees_paid')}" %>  </h4>
+                      <% end %>
+                    <% end %>
+                </div>
+            </div>
+        </td>
+    </tr>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+
+  precision = parseInt("<%= @precision %>");
+
+  j('.payment_t').change(function () {
+    amount_to_pay = ('<%=  precision_label(@hostel_fee.balance.to_f) %>')
+    wallet_amount_applied = parseFloat(j('.wallet-amount-applied').val())
+    total_wallet_amount = <%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>
+    if (total_wallet_amount > 0){
+      if (parseFloat(total_wallet_amount) == (0).toFixed(precision)){
+        if (j('.payment_t').val() > amount_to_pay) {
+          j('.payment_t').val(parseFloat(amount_to_pay).toFixed(precision))
+          j('.payment').val(parseFloat(amount_to_pay).toFixed(precision))
+        } else {
+          j('.payment').val(parseFloat(j('.payment_t').val()).toFixed(precision))
+          j('.payment_t').val(parseFloat(j('.payment_t').val()).toFixed(precision))
+        }
+      } else {
+        if (j('.payment_t').val() > amount_to_pay){
+          j('.payment_t').val(parseFloat(amount_to_pay).toFixed(precision))
+          j('.payment').val(parseFloat(amount_to_pay).toFixed(precision))
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+          j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+        } else if (parseFloat(j('.payment_t').val()) > parseFloat(j('.wallet-amount-applied').val())) {
+          j('.payment_t').val(parseFloat(j('.payment_t').val() - j('.wallet-amount-applied').val()).toFixed(precision))
+          j('.payment').val((parseFloat(j('.payment_t').val()) + parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+        } else if (parseFloat(j('.payment_t').val()) < parseFloat(j('.wallet-amount-applied').val())) {
+          j('.wallet-amount-applied').val(parseFloat(j('.payment_t').val()).toFixed(precision))
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount - j('.wallet-amount-applied').val()).toFixed(precision))
+          j('.payment_t').val(parseFloat(0.00).toFixed(precision))
+          j('.payment').val(parseFloat(j('.wallet-amount-applied').val() + j('.payment_t').val()).toFixed(precision))
+        } else if (parseFloat(j('.payment_t').val()).toFixed(precision) == (0).toFixed(precision)){
+            j('.payment').val(parseFloat(j('.payment_t').val()).toFixed(precision));
+            j('.payment_t').val(parseFloat(0).toFixed(precision));
+        }
+      }
+      update_advance_fee_status();
+    } else {
+      j('.payment').val(parseFloat(j('.payment_t').val()).toFixed(precision));
+    }
+  });
+
+  j(".wallet-amount-applied").change(function() {
+    amount_to_pay = ('<%=  precision_label(@hostel_fee.balance.to_f) %>')
+    total_wallet_amount = <%= @student.advance_fee_wallet.nil? ? "0.00" : @student.advance_fee_wallet.amount %>
+    if (parseFloat(j('.wallet-amount-applied').val()) > total_wallet_amount){
+      j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+      j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+      j('.payment_t').val(parseFloat(j('.payment').val()).toFixed(precision))
+      j('.payment').val(parseFloat(j('.payment').val()).toFixed(precision))
+    } else {
+      if (j('.wallet-amount-applied').val().length == 0 || parseFloat(j('.wallet-amount-applied').val()) == 0) {
+        j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+        j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+        j('.payment_t').val(parseFloat(j('.payment').val()).toFixed(precision))
+        j('.payment').val(parseFloat(j('.payment').val()).toFixed(precision))
+      } else {
+        if (parseFloat(j('.wallet-amount-applied').val()) > parseFloat(j('.payment_t').val())){
+          if (parseFloat(j('.payment_t').val()) == 0){
+            j('.wallet-amount-applied').val((0).toFixed(precision))
+            j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+            j('.payment_t').val(parseFloat(0.00).toFixed(precision))
+            j('.payment').val(parseFloat(j('.payment_t').val() + j('.wallet-amount-applied').val()).toFixed(precision))
+          } else {
+            j('.wallet-amount-applied').val(parseFloat(j('.payment_t').val()).toFixed(precision))
+            j('.wallet-amount-field').val(parseFloat(total_wallet_amount - j('.wallet-amount-applied').val()).toFixed(precision))
+            j('.payment_t').val(parseFloat(0.00).toFixed(precision))
+            j('.payment').val(parseFloat(j('.payment').val()).toFixed(precision))
+          }
+        } else {
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount - j('.wallet-amount-applied').val()).toFixed(precision))
+          j('.payment_t').val(parseFloat(amount_to_pay - j('.wallet-amount-applied').val()).toFixed(precision))
+          j('.payment').val((parseFloat(j('.payment_t').val()) + parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+        }
+      }
+    }
+    update_advance_fee_status();
+  });
+
+  j(".wallet-amount-applied").keypress(function(event) {
+     if (!event.charCode) return true;
+     ch = String.fromCharCode(event.charCode);
+     return (/[\d]/.test(ch));
+ });
+
+
+  j('.wallet-link').click(function() {
+    j('.wallet-link').css('pointer-events', 'none')
+      amount_to_pay = ('<%=  precision_label(@hostel_fee.balance.to_f) %>')
+      total_wallet_amount = ('<%= @student.advance_fee_wallet.amount unless @student.advance_fee_wallet.nil? %>')
+      if (amount_to_pay < parseFloat(total_wallet_amount)){
+        j('.wallet-amount-applied').val(parseFloat(amount_to_pay).toFixed(precision))
+        j('.wallet-amount-field').val((parseFloat(total_wallet_amount) - amount_to_pay).toFixed(precision))
+        j('.payment_t').val((0).toFixed(precision))
+        j('.payment').val((parseFloat(j('.payment_t').val()) + parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+      } else {
+        j('.wallet-amount-applied').val(parseFloat(total_wallet_amount).toFixed(precision))
+        j('.wallet-amount-field').val((parseFloat(total_wallet_amount) - parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+        j('.payment_t').val((amount_to_pay - parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+        j('.payment').val((parseFloat(j('.payment_t').val()) + parseFloat(j('.wallet-amount-applied').val())).toFixed(precision))
+      }
+      update_advance_fee_status();
+  });
+
+  update_advance_fee_status = function () {
+    if (parseFloat(j(".wallet-amount-applied").val()) > 0){
+        j('#wallet_amount_applied').val(true)
+        j('#online_payment_wallet_amount_applied').val(true)
+        j('#online_payment_wallet_amount').val(parseFloat(j('.wallet-amount-applied').val()).toFixed(precision))
+      }else {
+        j('#wallet_amount_applied').val(false)
+        j('#online_payment_wallet_amount_applied').val(true)
+        j('#online_payment_wallet_amount').val((0).toFixed(precision))
+      }
+  }
+
+  j('#custom_gateway_online_pay_submit').click(function(event){
+      if (parseFloat(j('#fees_paid_t').val()) < 1){
+          event.preventDefault();
+          j.ajax({
+              url: '/advance_payment_fees/check_amount_to_pay',
+              data: {
+                  
+              },
+              success: function () {
+              }
+          });
+      }
+  })
+
+</script>

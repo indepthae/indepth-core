@@ -1,0 +1,136 @@
+pt-BR:
+  activerecord:
+    attributes:
+
+  email_send: Email
+  to_employees: A Funcionários
+  to_students: A Alunos
+  to_guardians: A Guardiães
+  send_email_to_employees: Enviar email a funcionários
+  send_email_to_students: Enviar email a estudantes
+  send_email_to_guardians: Enviar email a pais
+  student_test: test %{name}  email %{name}
+  student_student_creation: 'Caro %{recipient_name},<p/> Detalhes de <b>%{full_name}</b>
+    em <b>%{user_school_name}</b> estão disponíveis no URL. <p/> username: <b>%{admission_no}</b>
+    <p/> password: <b>%{admission_no}123</b>'
+  parent_parent_creation: 'Caro %{recipient_name},<p/> Detalhes de <b>%{full_name}</b>
+    em <b>%{user_school_name}</b> estão disponíveis no URL. <p/> username: <b>%{immediate_contact_user_username}</b>
+    <p/> password: <b>%{immediate_contact_user_username}123</b>'
+  student_transfer_batch: " Caro %{recipient_name},<p/><b>%{full_name}(%{admission_no})</b>
+    foi transferido para <b>%{old_batch}</b> de <b>%{new_batch}</b>.<p/> Visite URL
+    para mais detalhes."
+  parent_transfer_batch: " Caro %{recipient_name},<p/><b>%{full_name}(%{admission_no})</b>
+    foi transferido para  <b>%{old_batch}</b> de <b>%{new_batch}</b>.<p/> Visite URL
+    para mais detalhes."
+  student_examination_schedule_publishing: 'Caro %{recipient_name},<p/> Exame marcado
+    para <b>%{recipient_name}</b> em <b>%{school_name}</b>.<p/> Nome do exame: <b>%{name}
+    </b><p/> Entre no URL para mais informação'
+  parent_examination_schedule_publishing: 'Caro %{recipient_name},<p/> Exame marcado
+    para <b>%{student_name}</b> em <b>%{school_name}</b>. <p/> Nome do exame: <b>%{name}
+    </b><p/> Entre no URL para mais informação'
+  student_examination_result_publishing: Caro %{recipient_name},<p/> Os resultados
+    do Exame of <b>%{recipient_name}</b> para <b>%{name}</b> foram publicados . <p/> Entre
+    no URL para mais informação
+  parent_examination_result_publishing: Caro %{recipient_name},<p/> Os resultados
+    do Exame of <b>%{student_name}</b> para <b>%{name}</b> foram publicados . <p/> Entre
+    no URL para mais informação
+  student_daily_wise_attendance_registration: 'Caro %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    foi marcado como ausente on <b>%{leave_info} %{month_dates}</b><p/> motivo: <b>%{reason}</b><p/>
+    Visite URL para mais detalhes.'
+  parent_daily_wise_attendance_registration: 'Caro %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    foi marcado como ausente on <b>%{leave_info} %{month_dates}</b><p/> motivo: <b>%{reason}</b><p/>
+    Visite URL para mais detalhes.'
+  student_subject_wise_attendance_registration: 'Caro %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    foi marcado como ausente na hora de aula  <b>%{class_timing_name}</b> de subject:<b>%{subject_name}</b><p/> motivo:
+    <b>%{reason}</b><p/> Visite URL para mais detalhes.'
+  parent_subject_wise_attendance_registration: 'Caro %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    foi marcado como ausente na hora de aula <b> %{class_timing_name}</b> de subject:<b>%{subject_name}</b><p/> motivo:
+    <b>%{reason}</b><p/> Visite URL para mais detalhes.'
+  employee_employee_creation: 'Caro %{recipient_name},<p/> Seus detalhes estão agora
+    disponíveis em URL<p/> username: <b>%{username}</b> <p/> password: <b>%{username}123</b>'
+  student_fee_collection_creation: 'Caro %{recipient_name},<p/>  Por favor pague <b>%{finance_fee_collection_name}</b>
+    criado em <b>%{student_user_school_name}</b><p/> Data limite: <b>%{due_date}</b><p/> Visite
+    URL para mais detalhes.'
+  parent_fee_collection_creation: 'Caro %{recipient_name},<p/>  Por favor pague <b>%{finance_fee_collection_name}</b>
+    criado em <b>%{student_user_school_name}</b><p/> Data limite: <b>%{due_date}</b><p/> Visite
+    URL para mais detalhes.'
+  student_fee_submission: Caro %{recipient_name},<p/> Recebemos <b>%{currency_name}
+    %{amount_to_f}</b> como propinas em <b>%{date_of_transaction}</b> para <b>%{finance_finance_fee_collection_name}</b>.
+  parent_fee_submission: Caro %{recipient_name},<p/> Recebemos <b>%{currency_name}
+    %{amount_to_f}</b> como propinas em <b>%{date_of_transaction}</b> para <b>%{finance_finance_fee_collection_name}</b>.
+  members_common_event_creation: Caro %{recipient_name},<p/> Um evento <b>%{title}</b>
+    está programado para <b>%{event_days}</b><p/> Visite URL para mais detalhes.
+  student_event_creation_for_batch: Caro %{recipient_name},<p/> Um evento <b>%{event_title}</b>
+    está programado para <b>%{event_event_days}</b><p/> Visite URL para mais detalhes.
+  parent_event_creation_for_batch: Caro %{recipient_name},<p/> Um evento <b>%{event_title}</b>
+    está programado para <b>%{event_event_days}</b><p/> Visite URL para mais detalhes.
+  employee_event_creation_for_employee: Caro %{recipient_name},<p/> Um evento <b>%{event_title}</b>
+    está programado para <b>%{event_event_days}</b><p/> Visite URL para mais detalhes.
+  employee_leave_creation: 'Caro %{recipient_name},<p/><b>%{employee_full_name}(%{employee_employee_number})</b>
+    solicitou uma licença em <b>%{leave_days}</b><p/> motivo: <b>%{reason}</b><p/> Visite
+    URL para aprovar ou rejeitar o pedido.'
+  employee_leave_approval: Caro %{recipient_name},<p/> Seu pedido de licença datado
+    de  <b>%{leave_days}</b> por <b>%{reason}</b> foi <b>%{leave_status}</b><p/> Visite
+    URL para mais detalhes.
+  members_poll_creation: Caro %{recipient_name},<p/> Um novo inquérito ''<b>%{poll_question_title}</b>''
+    foi criado em <b>%{poll_question_poll_creator_school_name}</b>.<p/> Por favor
+    visite o URL para participar.
+  event_creation_for_batch: Um evento %{event_title} está programado de %{event_start_date_to_date}
+    a %{event_end_date_to_date}
+  event_creation_for_employee: Um evento %{event_title} está programado de %{event_start_date_to_date}
+    a %{event_end_date_to_date}
+  student_subject_student_creation: Detalhes de Entrada de %{full_name} em %{user_school_name}
+  student_subject_examination_schedule_publishing: Exame marcado para %{recipient_name}
+    em %{school_name}
+  parent_subject_examination_schedule_publishing: Exame marcado para %{student_name}
+    em %{school_name}
+  student_subject_examination_result_publishing: Os resultados do Exame de %{recipient_name}
+    para %{name} foram publicados
+  parent_subject_examination_result_publishing: Os resultados do Exame de %{student_name}
+    para %{name} foram publicados
+  student_subject_daily_wise_attendance_registration: "%{student_full_name} está ausente
+    em %{month_dates}"
+  parent_subject_daily_wise_attendance_registration: "%{student_full_name} está ausente
+    em %{month_dates}"
+  student_subject_subject_wise_attendance_registration: "%{student_full_name} está
+    ausente em %{month_date}"
+  parent_subject_subject_wise_attendance_registration: "%{student_full_name} está
+    ausente em %{month_date}"
+  employee_subject_employee_creation: " Detalhes de login para %{full_name} em %{school_name}"
+  student_subject_fee_collection_creation: "%{finance_fee_collection_name} em %{student_user_school_name}"
+  parent_subject_fee_collection_creation: "%{finance_fee_collection_name} em %{student_user_school_name}"
+  student_subject_fee_submission: "%{currency_name} %{amount_to_f} pago como propina"
+  parent_subject_fee_submission: "%{currency_name} %{amount_to_f} pago como propina"
+  employee_subject_leave_creation: Pedido de licença de %{employee_full_name}
+  employee_subject_leave_approval: Pedido de licença %{leave_status} durante %{leave_days}
+  members_subject_poll_creation: Um novo inquérito ''%{poll_question_title}'' foi
+    criado em %{poll_question_poll_creator_school_name}
+  members_subject_common_event_creation: Novo evento %{title} em %{school_name} em
+    %{event_days}
+  student_subject_event_creation_for_batch: Novo evento %{event_title} em %{event_school_name}
+    em %{event_event_days}
+  parent_subject_event_creation_for_batch: Novo evento %{event_title} em %{event_school_name}
+    em %{event_event_days}
+  employee_subject_event_creation_for_employee: Novo evento %{event_title} em %{event_school_name}
+    em %{event_event_days}
+  student_subject_transfer_batch: Lote transferido para %{full_name} em %{user_school_name}
+  parent_subject_transfer_batch: Lote transferido para %{full_name} em %{user_school_name}
+  parent_subject_parent_creation: Detalhes de login de %{full_name} em %{user_school_name}
+  mail_sent_successfully: Email enviado com sucesso
+  footer: "<p><font size=1> %{school_details}</font>"
+  send_email_privilege: Enviar Email
+  email_alert_settings_privilege: Definições de Alerta de Email
+  dear: Dear
+  unsubscription_list: Lista de remoção de subscrição
+  list_of_unsuscribed_students: Lista de alunos que removeram subscrição
+  invalid_unsubscription_link: Ligação de subscrição inválida
+  unsubscribed: Você tem alertas não subscritos de email.contate admin para subscrição
+  no_students_unsubscribed_yet: Ainda não ha estudantes subscritos!
+  select_date: Selecione data
+  unsubscribe: Remover subscrição
+  unsubscription_success: Remoção de subscrição com sucesso
+  you_will_no_longer_get_updates_from: Você não receberá mais atualizações de
+  to_subscribe_again_contact_administrator: Para subscrever de novo contate as Autoridades
+    da Instituição
+  email_settings_saved: Definições de email guardadas
+  Dear: Caro

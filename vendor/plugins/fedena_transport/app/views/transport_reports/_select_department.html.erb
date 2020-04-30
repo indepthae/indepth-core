@@ -1,0 +1,7 @@
+<div class="label-field-pair dept_name">
+    <label for="department"><%= t('department') %></label>
+    <div class="text-input-bg">
+        <%= select_tag "search[employee_department_id]", options_for_select([["#{t('select_the_department')}",""]] + @departments.map { |c| [c.name, c.id] }) %>
+        <%= error_message_box(t('cant_be_blank')) %>
+    </div>
+</div>

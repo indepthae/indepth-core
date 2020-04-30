@@ -1,0 +1,13 @@
+<fieldset>
+  <label>
+    <%= link_to @domain.domain,"http://#{@domain.domain}",:target=>"_blank" %>
+  </label>
+  <%= link_to_remote 'Delete', :update=>:detail_list, :url=>delete_domain_school_path(@school,:domain_id=>@domain.id), :method=>:get, :html=>{:class=>"button-grey-small float-right-with-margin no_margin_right"} if permitted_to? :delete_domain, @school, :context=>:schools %>
+
+  <% if permitted_to? :session_admin_login, :schools %>
+    <%= link_to 'Login',admin_session_url(:id=>@school.id,:domain_id=>@domain.id), :class=>"non-partial button-grey-small float-right-with-margin", :target=>'_blank', :title => 'login to this school here' %>
+  <% end %>
+  <br/>
+
+
+</fieldset>

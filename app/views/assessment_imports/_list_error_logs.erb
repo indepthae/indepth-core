@@ -1,0 +1,22 @@
+<% if @import.last_message.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class="sl_no"><%= t('sl_no') %></td>
+      <td class="name"><%= t("column_name") %></td>
+      <td class="date"><%= t("last_error") %></td>
+    </tr>
+    <% index = 1 %>
+    <% @import.last_message.each_pair do |key,value| %>
+      <tr>
+        <td class="sl_no"><%= index %></td>
+        <td class="name"><%= key %></td>
+        <td class="date"><%= value.flatten.join(',') %></td>
+      </tr>
+      <% index = index + 1 %>
+    <% end %>
+  </table>
+<% else %>
+  <div id="flash-box">
+    <p class="flash-msg"><%= t('no_error_log') %></p>
+  </div>
+<% end %>

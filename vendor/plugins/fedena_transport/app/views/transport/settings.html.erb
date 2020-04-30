@@ -1,0 +1,97 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('basic_settings') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h4><%= t('basic_settings') %></h4>
+    <div class="description"><%= t('basic_transport_settings_desc') %></div>
+    <% form_for(:configuration,:html=> {:multipart=>true}) do |c| %>
+      <%= session_fingerprint_field %>
+    
+      <div class="label-radio-pair">
+          <h5><%= t('routes_mode') %></h5>
+          <div class="description"><%= t('routes_mode_desc') %></div>                           
+          <div id="radio-buttons" style="margin-bottom: -25px;">
+              <%= c.radio_button  "different_routes", 1, :checked => (@config[:different_routes].to_i == 1), :onchange => "setFeePercentage();" %>
+              <label for="configuration_different_routes_1"><%= t('enable') %></label>              
+          </div>
+      </div>      
+      <div class="label-radio-pair">                                     
+          <div id="radio-buttons">
+              <%= c.radio_button  "different_routes", 0, :checked => (@config[:different_routes].to_i == 0), :onchange => "setFeePercentage();" %>
+              <label for="configuration_different_routes_0"><%= t('disable') %></label>
+          </div>
+      </div>
+    
+      <div class="label-radio-pair" style="margin-top: -28px;">
+          <h5><%= t('fare_mode') %></h5>
+          <div class="description"><%= t('fare_mode_desc') %></div>
+          <div id="radio-buttons" style="margin-bottom: -25px;">
+              <%= c.radio_button  "transport_fee_collection_type", 1, :checked => (@config[:transport_fee_collection_type].to_i == 1), :onchange => "setFeePercentage();" %>
+              <label for="configuration_transport_fee_collection_type_1"><%= t('stop_based') %></label>              
+          </div>
+      </div>      
+      <div class="label-radio-pair">                                     
+          <div id="radio-buttons">
+              <%= c.radio_button  "transport_fee_collection_type", 0, :checked => (@config[:transport_fee_collection_type].to_i == 0), :onchange => "setFeePercentage();" %>
+              <label for="configuration_transport_fee_collection_type_0"><%= t('flat_amount') %></label>
+          </div>
+      </div>
+    
+    
+      <div class="label-field-pair" id="percentage_field" style="margin-top: -28px;display: <%= ((@config[:transport_fee_collection_type].to_i == 0 && @config[:different_routes].to_i == 0) ? 'block' : 'none') %>;">
+          <label for="configuration_currency_type"><%= t('single_route_fee_percentage') %></label>
+          <div class="text-input-bg">
+              <%= c.text_field :single_route_fee_percentage, :value => @config[:single_route_fee_percentage]||50, :id => "fee_percentage", :class => 'precision_text' %>
+              <span id="percentage_text"><%= t('of_total') %></span>
+          </div>
+      </div>
+    
+      <div class="label-radio-pair" style="margin-top: -25px;">
+          <h5><%= t('update_unpaid_transport_fee') %></h5>
+          <div class="description"><%= t('update_unpaid_transport_fee_desc') %></div>          
+          <div id="radio-buttons" style="margin-bottom: -25px;">
+              <%= c.radio_button  "update_unpaid_transport_fee", 1, :checked => (@config[:update_unpaid_transport_fee].to_i == 1) %>
+              <label for="update_unpaid_transport_fee_1"><%= t('update_fees') %></label>              
+          </div>
+      </div>
+      <div class="label-radio-pair">          
+          <div id="radio-buttons">
+              <%= c.radio_button  "update_unpaid_transport_fee", 0, :checked => (@config[:update_unpaid_transport_fee].to_i == 0) %>
+              <label for="update_unpaid_transport_fee_0"><%= t('dont_update_fees') %></label>
+          </div>
+      </div>
+    
+      <div class="label-field-pair" style="margin-top: -25px;">
+          <h5><%= t('academic_year') %></h5>
+          <div class="description"><%= t('academic_year_desc') %></div>
+          <div class="text-input-bg"><%= select_tag "academic_year_id", 
+                options_for_select([["#{t('select_academic_year')}",'']] + @academic_years.map{|a| [a.name, a.id]}, @active_year||'') %>
+          </div>
+      </div>
+      <%= submit_tag t('save_settings'), :disable_with => "#{t('please_wait')}", :class => "submit-button" %>
+    <% end %>
+
+</div>
+<script type="text/javascript">
+  function setFeePercentage() {
+      if (j('#configuration_transport_fee_collection_type_0').is(':checked') && j('#configuration_different_routes_0').is(':checked')) {
+          j('#percentage_field').show();
+          j('#fee_percentage').attr('disabled', false);
+      } else {
+          j('#percentage_field').hide();
+          j('#fee_percentage').attr('disabled', true);
+      }
+  }
+</script>
+

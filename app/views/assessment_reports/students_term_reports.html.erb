@@ -1,0 +1,128 @@
+<%content_for :head do%>
+  <%= javascript_include_tag "render_pdf.js" %>
+<%end%>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%=t('student_reports')%></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% unless @is_student_report %>
+          <% if @from_manage_exam %>
+            <% breadcrumb :assessment_students_term_reports, [@course,@plan.academic_year,@term] %>
+          <% else %>
+            <% breadcrumb :assessment_students_term_reports_new, [@term,@plan.academic_year,@course] %>
+          <% end %>
+        <% else %>
+          <% breadcrumb :assessment_students_term_reports_profile, [@student, @term] %>
+        <% end %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% unless @is_student_report and !@report_published  %>
+      <div class="report_container_box">
+          <div class="header"><%= t('student_term_reports') %></div> 
+          <div class="report_details"><%= render :partial => 'report_details_min', :locals => {:report_type => 'term_report'} %></div>
+          <div class='student_select'>
+              <div class="label-field-pair">
+                  <label for="batch_id"><%= t('batch') %></label>
+                  <div class="text-input-bg margin-left-10">
+                      <% unless @is_student_report %>
+                        <%= select :assessment, :batch,
+                          options_for_select(@batches.map {|b| [b.full_name, b.id]}, @batch.id),
+                          { :selected=>@batch.id},
+                          {:onChange => "#{remote_function(:url => {:action => "refresh_students"},
+                          :with => "'batch_id='+ value +'&exam_type=term_report'+'&reportable_id=#{@term.id}'",
+                          :before => "Element.show('loader1')",
+                          :success => "Element.hide('loader1')"
+                          )}"} %> <%= image_tag("loader.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "loader1",
+                          :style =>"display: none;" ) %>
+                      <% else %>
+                        <span class="student_details">: 
+    <%#= @student.try(:batch).try(:name)%>
+                            <%= @batch.name %>
+                        </span>
+                      <% end %>
+                  </div>
+
+              </div>
+              <div id="student_select">
+                  <%= render :partial => 'student_select', :locals => {:exam_type => 'term_report', :reportable_id => @term.id} %>
+              </div>
+          </div>
+          <div id='student_report'>
+              <div id="pdf_nav">
+                  <div class="prev-btn-container">
+                      <button id="prev" class="pdf-nav-btn">Previous</button>
+                  </div>
+                  <div class="page-num-container">
+                      <span class="page-num-span">Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                  </div>
+                  <div class="next-btn-container">
+                      <button id="next" class="pdf-nav-btn">Next</button>
+                  </div>
+              </div>
+              <canvas id="planner-canvas" dir="ltr"></canvas>
+              <% if @student.present? %>
+                <%= render :partial => 'student_term_report' %>
+              <% end %>
+          </div>
+          <div id="remarks_section">
+              <% if @student.present? %>
+                <%=generate_common_remark_section("gradebook_term_report",@student.id,nil,@term.id,{:assessment_term_id=>@term.id,:student_id=>@student.id})%>
+              <% end %>
+          </div>
+      </div>
+      <div class="extender"></div>
+      <div class="edit-pdf-group" id="pdf_link">
+          <% if @student.present? %>
+            <div class="pdf">
+                <% if @schol_report.individual_report_pdf.present? %>
+                  <%= link_to "#{t('download_pdf')}", @schol_report.individual_report_pdf.attachment.url(:original,false), { :href => "#{@schol_report.individual_report_pdf.attachment.url(:original, false)}", :class=> 'user_button'}%>
+                <% else %>
+                  <%= link_to "#{t('download_pdf')}",
+                    { :action => "student_term_report_pdf", :student_id => @student.s_id, :reportable_id => @term.id, :batch_id => @batch.id},:target => '_blank', :class=> 'user_button' %>
+                <% end %>
+            </div>
+          <% end %>
+      </div>
+    <% else %>
+      <p class="flash-msg"> <%= t('report_is_not_published') %> </p>
+    <% end %>
+</div>
+<script type="text/javascript">
+<% if @student.present? and @schol_report.present? and  @schol_report.individual_report_pdf.present? %>
+    renderPdf('<%=  @schol_report.individual_report_pdf.attachment.url(:original, false) %>', 'planner-canvas')
+<% end %>
+  function completeReq1(elm) {
+      var onclick_attr = j(elm).attr('onclick');
+      j(elm).attr('onclick', 'ss' + onclick_attr);
+      var onclick_attr = j(elm).attr('onclick');
+
+      new Ajax.Request('/remarks/add_remarks', {
+          parameters: 'student_id=' + elm.getAttribute('student_id') + '&target_name=' + elm.getAttribute('target_name') + '&params_hash=' + elm.getAttribute('params_hash') + '&page=' + elm.getAttribute('page') + '&load_object_id=' + elm.getAttribute('load_object_id'),
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onComplete: function (resp) {
+              j(elm).parent().append(resp.responseText)
+              j(elm).hide();
+              if (j('#remark_remark_body').size() > 0) {
+
+                  j('#remark_remark_body').focus();
+
+
+              }
+
+          }
+      });
+
+  }
+</script>

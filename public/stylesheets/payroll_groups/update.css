@@ -1,0 +1,272 @@
+#payroll_group_desc{
+    font-size: 13px;
+    color: grey;
+    margin-bottom: 40px;
+}
+
+td{
+    border-bottom: 1px solid #E0E0E0;
+    border-right: 1px solid #bfbfbf;
+    padding: 10px;
+}
+.my_class td{ border-bottom: 3px solid white}
+tr td:first-child{ border-left:0px !important}
+.selected_earning tr td:nth-child(5), .selected_deduction tr td:nth-child(5){border-right:0px !important}
+.selected_earning tr:last-child td{border-bottom: 0px !important;}
+.selected_deduction tr:last-child td{border-bottom: 1px solid #bfbfbf !important;}
+table{
+    width: 100%;
+    border: 0px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.formula_fields span.fieldWithErrors{ float: left;}
+.formula_fields .wrapper{ width: 260px}
+.formula_fields .wrapper .error-msg{ width: 240px;}
+tr{
+    border-left: 1px solid #bfbfbf;
+}
+.category{ cursor:pointer}
+.category_name{
+    width: 30%;
+}
+
+.category_code{
+    width: 20%
+}
+
+.category_val{
+    width: 30%;
+}
+div.formula{
+    direction: ltr;
+    text-align:left;
+    float: left;
+    width: 280px;
+}
+.condition{
+    float:left;
+    margin-bottom: 7px;
+}
+.condition_text{
+    float: left;
+    width: 90px;
+}
+.sub_heading td{
+    font-weight: bold;
+    border-top: 1px solid #bfbfbf;
+}
+
+.sort_opt_icon{
+    float: left;
+    margin-top: 0px;
+    margin-left: 15px;
+    background-position: -103px -361px !important;
+    width: 14px;
+    height: 15px;
+    background: url(/images/iconsprite-1.png) no-repeat center;
+}
+.sort_opt_icon:hover{background-position: -123px -361px !important;}
+
+.empty_msg{
+    height: 50px;
+    align: center;
+}
+
+.bg_dark_grey{
+    background-color: #f0f0f0;
+}
+
+.selected_earning .bg_light_grey, .selected_deduction .bg_light_grey{
+    background-color: #f0f0f0;
+}
+
+.button{
+
+}
+.description{
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+}
+table tbody tr.tr-head{
+    font-weight: bold;
+    font-size: 14px;
+    color: black !important;
+    border-top: 1px solid #bfbfbf;
+}
+
+.button{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.button a,#page-yield .category .button a:hover{
+    color: black !important;
+    background: none;
+}
+h3{
+    margin-top: 40px;
+    font-size: 17px;
+    color: #444;
+}
+
+.label-field-pair label, .label-radio-pair label {
+    font-weight: normal;
+    font-size: 13px;
+}
+
+hr{
+    width: 100%;
+    margin-top: 28px;
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    float: left;
+}
+
+.lop #fields .label-field-pair, .overtime #fields .label-field-pair{
+    height:auto;
+}
+
+.overtime{
+    float:left;
+}
+
+.overtime, .lop{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    float: left;
+}
+
+.my_class{
+    background: #e6eefa;
+}
+
+.drag_row{
+    border: 1px solid #8aade6;
+}
+
+.selected_earning,.selected_deduction{
+}
+
+.error-icon {
+    width:15px;
+    height:12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right:2px;
+    float:left;
+}
+.error-msg{
+    float:left;
+    color: red;
+    font-size: 13px;
+    width:300px;
+}
+
+.category_section .label-field-pair {
+    min-height:60px;
+    max-height: 80px;
+}
+.wrapper{
+    margin-top: 5px;
+    margin-left: 10px;
+    width: 400px;
+    float: left;
+}
+#tags_warn{
+    display: none;
+}
+.submit-button{
+    margin: 20px 40px 0 0;
+    font-size: 13px;
+}
+a.submit-button, #page-yield a.submit-button:hover{
+    color: white !important;
+    text-decoration: none;
+}
+.dependency_error{
+    color: red;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+.tooltip{
+    width: 250px;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 1px;
+    z-index: 300;
+    position: absolute;
+    background: #FFFFFF;
+    border: 1px solid #B2B2B2;
+    pointer-events: none;
+    color: #27292b;
+    text-align: left;
+    font-size: 13px;
+    margin-left:100px;
+}
+
+
+.tooltip:after, .tooltip:before
+{
+    bottom: 100%;
+    right: 88%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.tooltip:after
+{
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #FFFFFF;
+    border-width: 10px;
+    margin-right: -10px;
+}
+.tooltip:before
+{
+    border-color: rgba(178, 178, 178, 0);
+    border-bottom-color: #B2B2B2;
+    border-width: 11px;
+    margin-right: -11px;
+}
+#enable_lop input {
+    width: 13px;
+    float: left;
+    margin: 10px;
+    margin-left: 0px;
+}
+
+.no_categories .empty_msg{
+    background-color: #f0f0f0;
+}
+#loader1{
+    margin-top: 10px;
+}
+
+#enable_lop label{
+    cursor: pointer;
+}
+.selected_categories .wrapper{
+    margin: 0px 0px 10px 0px;
+    width: 100%
+}
+ .selected_categories .wrapper .error-msg{ width:95%}
+.ui-sortable-helper{ border: 1px solid #c3d9ff; }
+.ui-sortable-helper td{ border-bottom: 0px !important; }
+.ui-sortable-helper .sort_opt_icon{ background-position: -123px -361px !important; }
+.salary_type{
+    margin: 5px 0 0 10px;
+    font-size: 13px;
+    padding-top: 5px;
+    font-weight: bold
+}
+.delete_button_img {
+    width: auto;
+    height: auto;
+    margin-top: 0;
+}

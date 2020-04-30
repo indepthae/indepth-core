@@ -1,0 +1,42 @@
+<label class="head_label"><%= t('edit_transport_fee_collection') %><span></span></label>
+<% form_remote_for :transport_fee_collection,
+                   :url => {:action => 'transport_fee_collection_date_update', :id => @transport_fee_collection.id,
+                            :user_type => params[:user_type], :batch_id => params[:batch_id]} do |form| %>
+    <div id="form-errors"></div>
+    <div class="label-field-pair">
+      <label for="reason"><%= t('financial_year_name') %>:</label>
+
+      <div class="text-input-bg">
+        <span class="collection_name">
+           <%= @transport_fee_collection.financial_year.try(:name) || t('financial_years.default_financial_year') %>
+        </span>
+      </div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="reason"> <%= t('transport_fee_name') %>:</label>
+
+      <div class="text-input-bg"><span class="collection_name"> <%= @transport_fee_collection.name %></span></div>
+      <div id="batchs"></div>
+    </div>
+
+    <%#*<div class="label-field-pair">%>
+    <%#*<label for="reason">  Fee Collection Name:</label>%>
+    <%#*<div class="text-input-bg"><%= form.text_field :name%>
+    <%#*</div>%>
+    <div class="label-field-pair">
+      <label for="reason">  <%= t('start_date') %></label>
+
+      <div class="text-input-bg"><%= calendar_date_select_tag 'fee_collection[start_date]', I18n.l(@transport_fee_collection.start_date, :format => :default), :readonly => true, :popup => "force" %></div>
+    </div>
+    <div class="label-field-pair">
+      <label for="reason"><%= t('due_date') %></label>
+
+      <div class="text-input-bg"><%= calendar_date_select_tag 'fee_collection[due_date]', I18n.l(@transport_fee_collection.due_date, :format => :default), :readonly => true, :popup => "force" %></div>
+    </div>
+
+    <div class="extender"></div>
+    <div id="submit-button">
+      <%= submit_tag "► #{t('update')}", :class => 'submit_button' %>
+    </div>
+<% end %>

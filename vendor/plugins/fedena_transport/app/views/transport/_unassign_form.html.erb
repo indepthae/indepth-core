@@ -1,0 +1,19 @@
+<% transport = p.transport %>
+<tr passenger_id="<%= p.id %>" passenger_type="<%= p.class.to_s %>" id="<%= "#{p.class.to_s.underscore}_#{p.id}" %>">
+    <td colspan="4" class="unassign_passenger">
+        <% remote_form_for @transport, :url => {:action => :unassign_passenger, :passenger_id => p.id, :passenger_type => p.class.to_s, :id => @transport.id}, 
+          :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000); "  do |tr| %>
+          <%= session_fingerprint_field %> 
+          <p><%= "#{t('remove_assigned_transport', {:name => transport.receiver.first_name})}" %></p>
+          <div class="label-field-pair">
+              <div class="input-container">
+                  <%= tr.check_box :remove_fare %>
+                  <label for="remove_fare"><%= t('remove_unpaid_fees') %></label>
+              </div>
+          </div>
+          <%=submit_tag t('unassign_text'), :disable_with => "#{t('please_wait')}", 
+            :class => "submit-button", :id => "submit_button" %>
+          <%= link_to_remote t('cancel'), :url => {:controller=>'transport', :action=>'unassign_passenger', :id => transport.id, :cancel => true}, :html => {:class => "submit-button"} %>
+        <% end %>
+    </td>
+</tr>

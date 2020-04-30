@@ -1,0 +1,536 @@
+<script src="/javascripts/babel-polyfill.js" type="text/javascript"></script>
+<script src="/javascripts/image-compressor.min.js" type="text/javascript"></script>
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('gallery') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('upload_images') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%  breadcrumb :galleries_add_photo,@category %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice]  %> </p>
+  <% end %>
+
+  <div class="upper_panel">
+    <div class="flash_message_custom" id="flash_message">
+     <p class="flash-msg" id="show_message"> </p>
+    </div>
+    <br>
+          <div class="add_photo_text">
+            <%=t('galleries.add_images_to')%> <%=@category.name%>
+          </div>
+          <div class="cancel_button">
+            <div id="select_images" class="select_images">
+              <input type="file" accept="image/x-png,image/gif,image/jpeg" name="file" id="file_more" class="inputfile" multiple/>
+              <label for="file_more"> <%=t('galleries.select_more_images')%></label>
+            </div>
+            <button id="upload_photos_button_top" class="solid_button submit_button" onclick="send_photos(0)"><%=t('galleries.upload_images_to_album')%></button>
+            <%=link_to t('galleries.cancel'),  {:controller => 'galleries', :action => 'category_show', :id => @category.id} ,:class=>"solid_button" ,:id => "cancel_button" %>
+
+          </div>
+        </div>
+
+        <div  class="add_photo_box" id="drop_zone" ondrop="drop_handler(event);" ondragleave="drag_leave()" ondragenter="drag_enter();" ondragover="dragover_handler(event);" ondragend="dragend_handler(event);">
+          <div class="box_center">
+            <center>
+              <div class="upload_head">
+                <%=t('galleries.drag_and_drop_images')%>
+              </div>
+              <div class="upload_image_icon">
+              </div>
+              <div class="upload_button">
+                <input type="file" accept="image/x-png,image/gif,image/jpeg" name="file" id="file" class="inputfile" multiple/>
+                <label for="file">  <%=t('galleries.select_images_to_upload')%></label>
+              </div>
+            </center>
+          </div>
+        </div>
+        <div id="description_mode">
+          <div id="selected_images" class="selected_images">
+          </div>
+
+          <div class="submit_controls">
+            <button id="upload_photos_button_bottom" class="solid_button submit_button" onclick="send_photos(0)"><%=t('galleries.upload_images_to_album')%></button>
+            <%=link_to t('galleries.cancel'),  {:controller => 'galleries', :action => 'category_show', :id => @category.id} ,:class=>"solid_button"  %>
+          </div>
+        </div>
+
+</div>
+
+
+
+<script>
+  var drag_flag = 0;
+  var new_image_set=[];
+  var not_valid_type=false;
+
+  function dragover_handler(ev) {
+    console.log("dragOver");
+    // Prevent default select and drag behavior
+    ev.preventDefault();
+  }
+
+  function detectIE() {
+    var ua = window.navigator.userAgent;
+
+    var msie = ua.indexOf('MSIE ');
+    if (msie > 0) {
+        // IE 10 or older => return version number
+        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    }
+
+    var trident = ua.indexOf('Trident/');
+    if (trident > 0) {
+        // IE 11 => return version number
+        var rv = ua.indexOf('rv:');
+        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    }
+
+    var edge = ua.indexOf('Edge/');
+    if (edge > 0) {
+       // Edge (IE 12+) => return version number
+       return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+    }
+
+    // other browser
+    return false;
+}
+
+  function drop_handler(ev) {
+    console.log("Drop");
+    ev.preventDefault();
+    j("#drop_zone").removeClass("drag_hover");
+    new_image_set=[];
+    // If dropped items aren't files, reject them
+    var dt = ev.dataTransfer;
+    if (dt.items) {
+      // Use DataTransferItemList interface to access the file(s) index for upload_photos
+      var index = 0;
+      for (var i = 0; i < dt.items.length; i++) {
+        if (dt.items[i].kind == "file") {
+          var f = dt.items[i].getAsFile();
+          if ((f.type.indexOf("image/png") != -1) || (f.type.indexOf("image/gif") != -1) || (f.type.indexOf("image/jpeg") != -1) || (f.type.indexOf("image/jpg") != -1)) {
+            new_image_set[index]=f;
+            index++;
+          }
+          else{
+            not_valid_type=true;
+          }
+        }
+      }
+      if(new_image_set.length>20)
+      {
+        console.log("Dropped -> more than 20 images");
+        show_flash_msg("<%= t('galleries.more_than_limit_warning') %>");
+        return;
+      }
+      //files in new_image_set gets compressed
+      compress_files();
+    } else {
+      //index for upload_photos
+      var index = 0;
+      // Use DataTransfer interface to access the file(s)  // safari
+      new_image_set=[];
+
+      for (var i = 0; i < dt.files.length; i++) {
+        var f = dt.files[i];
+        console.log("... file[" + i + "].name = " + dt.files[i].name);
+        if ((f.type.indexOf("image/png") != -1) || (f.type.indexOf("image/gif") != -1) || (f.type.indexOf("image/jpeg") != -1) || (f.type.indexOf("image/jpg") != -1)
+          || (f.type.indexOf("application/png") != -1) || (f.type.indexOf("application/gif") != -1) || (f.type.indexOf("application/jpeg") != -1) || (f.type.indexOf("application/jpg") != -1))  {
+          new_image_set[index] = f;
+          index++;
+        }
+        else{
+          not_valid_type=true;
+        }
+
+      }
+      if(new_image_set.length>20)
+      {
+        console.log("Dropped -> more than 20 images");
+        return;
+      }
+        compress_files();
+    }
+    if(new_image_set.length>0)
+    {
+      // read url to show images
+      activate_description_mode();
+    }
+  }
+
+  function drag_enter() {
+    drag_flag++;
+    j("#drop_zone").addClass("drag_hover");
+    console.log("drag over occured");
+  }
+
+  function drag_leave() {
+    drag_flag--;
+    if (drag_flag === 0) {
+      j("#drop_zone").removeClass("drag_hover");
+      console.log("drag over removed");
+    }
+  }
+
+  function dragend_handler(ev) {
+    console.log("dragEnd");
+    // Remove all of the drag data
+    var dt = ev.dataTransfer;
+    if (dt.items) {
+      // Use DataTransferItemList interface to remove the drag data
+      for (var i = 0; i < dt.items.length; i++) {
+        dt.items.remove(i);
+      }
+    } else {
+      // Use DataTransfer interface to remove the drag data
+      ev.dataTransfer.clearData();
+      console.log("clear clear");
+    }
+  }
+  var compressed_set = [];
+  var compress_count=0;
+
+  function compress_files() {
+    if (new_image_set.length>20)
+    {
+      new_image_set=new_image_set.slice(0,20);
+      console.log("MORE THAN 20 IMAGES ADDED");
+    }
+    var compressed_set = [];
+    var compressed_set_name_IE=[];
+    var compressed_set_extension_IE=[];
+    compress_count=0;
+    if(new_image_set.length!=0)
+    {
+      //show progress
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      document.body.style.overflow = "hidden";
+      build_modal_box({'title': "<%=t('galleries.compressing_images')%>", 'popup_class': 'confirmation'});
+      j('#popup_content').append('<div class="progress_container"><div class="progress" id="progress"><div class="bar" id="bar"></div></div><div id="upload_status" class="upload_status"><%=t('galleries.compressing')%> 0 <%=t('galleries.out_of')%> ' + upload_photos.count + '</div></div>');
+      j("#upload_status").html("<%=t('galleries.compressing')%> 0 <%=t('galleries.out_of')%> " + new_image_set.length);
+    }
+
+    for (var i = 0; i < new_image_set.length; i++) {
+      //cascading
+      (function () {
+        var index = i;
+        var img = new ImageCompressor(new_image_set[i], {
+          quality: .8,
+          maxWidth: 3840,
+           maxHeight: 3840,
+          success:function(result) {
+            compress_count++;
+
+            //update progress
+            j("#upload_status").html("<%=t('galleries.compressing')%> " + (compress_count) + " <%=t('galleries.out_of')%> " + new_image_set.length);
+            var width = ((compress_count) / new_image_set.length) * 100;
+            console.log(width + '%');
+            j("#bar").width(width + '%');
+            console.log(result);
+
+            if(detectIE()==false)
+            {
+              var file = new File([result], result.name,{type: result.type});
+              compressed_set[index] = file;
+            }
+            else{
+              //for Internet Explorer and Edge ... (both dont support file constructor)
+              compressed_set[index] = result;
+              var name=result.name.split('.');
+              compressed_set_extension_IE[index]=name.pop();
+              compressed_set_name_IE[index]=name.join('.');
+              console.log("asdfasdef");
+              console.log(compressed_set_name_IE);
+            }
+
+            //last image got compressed
+            if (compress_count == (new_image_set.length)) {
+              console.log("compression completed");
+
+              append_files(compressed_set,compressed_set_name_IE,compressed_set_extension_IE);
+              readURL();
+              set_description();
+              remove_popup_box();
+              document.body.style.overflow = "auto";
+              if(not_valid_type==true)
+              {
+                show_flash_msg("<%= t('galleries.only_the_following') %>");
+                not_valid_type=false;
+              }
+            }
+          }
+        });
+      })();
+    }
+    if( new_image_set.length==0 && not_valid_type==true)
+    {
+      show_flash_msg("<%= t('galleries.only_the_following') %>");
+      not_valid_type=false;
+    }
+  }
+
+
+  var upload_photos = [];
+  var upload_photos_name_IE=[];
+  var upload_photos_extension_IE=[];
+  upload_photos.count=0;
+  var description_array = [];
+  upload_photos["count"] = 0;
+  var gallery_category = '<%=@id%>';
+
+
+  function display_top_upload_button(){
+    if(upload_photos.count>3)
+    {
+      j("#upload_photos_button_top").css("display","inline-block");
+    }
+    else {
+      j("#upload_photos_button_top").css("display","none");
+    }
+  }
+
+  function activate_description_mode() {
+    //hide upload section
+    j("#drop_zone").css("display", "none");
+    j("#cancel_button").css("display", "none");
+    j("#description_mode").css("display", "block");
+    j("#select_images").css("display", "inline-block");
+    j("#upload_photos_button_top").css("display", "inline-block");
+  }
+
+  function save_description() {
+    for (var i = 0; i < upload_photos.count; i++) {
+      description_array[i] = j("#description" + i).val();
+    }
+  }
+
+  function set_description() {
+    for (var i = 0; i < upload_photos.count; i++) {
+      j("#description" + i).val(description_array[i]);
+    }
+  }
+
+  function reset_data_value(index) {
+    var k = 0;
+    for (var i = 0; i < upload_photos.count; i++) {
+      if (i != index) {
+        //j("#tag"+i).data("value",k);
+        j("#tag" + i).attr("data-value", k);
+        j(("#preview" + i)).attr("id", "preview" + k);
+        j(("#description" + i)).attr("id", "description" + k);
+        j("#tag" + i).attr("id", "tag" + k);
+        k++;
+      } else {
+        j(("#preview" + i)).attr("id", "deletepreview");
+        j(("#description" + i)).attr("id", "deletedescription");
+        j("#tag" + i).attr("id", "stubtag");
+      }
+    }
+  }
+
+  function show_flash_msg(msg){
+    j("#flash_message").css("display","block");
+    j('html,body').scrollTop(0);
+    j("#show_message").html(msg);
+
+    setTimeout(function(){
+      j("#show_message").html("");
+      j("#flash_message").css("display","none");
+
+    }, 10000);
+  }
+
+  function set_remove_listener() {
+    j(".remove_photo_tag").click(function () {
+      var value = j(this).data("value");
+      reset_data_value(value);
+      j("#deletepreview").remove();
+      upload_photos = remove_file(upload_photos, value);
+      display_top_upload_button();
+      if (upload_photos.count==0){
+        window.location.replace("/galleries/add_photo/"+gallery_category);
+      }
+    });
+
+  }
+
+  function remove_file(files, index) {
+    description_array.splice(index, 1);
+    var new_set = [];
+    new_set["count"] = 0;
+    for (var i = 0; i < files.count; i++) {
+      if (i != index) {
+        new_set.push(files[i]);
+        new_set["count"] = new_set["count"] + 1;
+      }
+    }
+    return new_set;
+  }
+
+
+  function readURL() {
+    console.log("length" + upload_photos.count);
+    if (upload_photos && upload_photos[0]) {
+      j("#selected_images").html("");
+      for (var i = 0; i < upload_photos.count; i++) {
+        console.log(i);
+        j("#selected_images").append('<div id="preview' + i + '" class="image_preview"><div id="img' + i + '" class="preview_thumb"></div><div class="preview_description"><label class="description_tag"><%=t('galleries.image_description')%> <span class="faded_text">&#x200E;(<%=t('galleries.optional')%>)&#x200E;</span></label><br><textarea maxlength=220 id="description' + i + '" class="photo_description" rows="4" cols="40" ></textarea><div class="remove_photo"><span id="tag' + i + '" data-value="' + i + '" class="remove_photo_tag themed_text"><%=t('galleries.remove_image')%></span></div></div><div class="line"></div></div>');
+      }
+      for (var i = 0; i < upload_photos.count; i++) {
+        var reader = new FileReader();
+
+        reader.onload = (function () {
+          var index = i;
+          return function (e) {
+            var image = new Image();
+            image.src = e.target.result;
+            document.getElementById("img" + index).style.backgroundImage = 'url(' + image.src + ')';
+          }
+        })(file);
+
+        reader.readAsDataURL(upload_photos[i]);
+      }
+      set_remove_listener();
+    }
+  }
+
+  j("#file").change(function () {
+    new_image_set=[];
+    //filter other file formats
+    var index=0;
+    for(i=0;i<this.files.length;i++)
+    {
+      var f= this.files[i];
+      if((f.type.indexOf("image/png") != -1) || (f.type.indexOf("image/gif") != -1) || (f.type.indexOf("image/jpeg") != -1) || (f.type.indexOf("image/jpg") != -1)
+      || (f.type.indexOf("application/png") != -1) || (f.type.indexOf("application/gif") != -1) || (f.type.indexOf("application/jpeg") != -1) || (f.type.indexOf("application/jpg") != -1))
+      {
+        console.log("format check");
+        new_image_set[index]=this.files[i];
+        index++;
+      }
+      else{
+        not_valid_type=true;
+      }
+    }
+
+    if(new_image_set.length>20)
+    {
+      console.log("Selected -> more than 20 images");
+      show_flash_msg("<%= t('galleries.more_than_limit_warning') %>");
+      return;
+    }
+
+    if(new_image_set.length > 0)
+    {
+      activate_description_mode();
+    }
+
+    compress_files();
+  });
+
+  j("#file_more").change(function () {
+    save_description();
+    new_image_set=[];
+    //filter other file formats
+    var index=0;
+    for(i=0;i<this.files.length;i++)
+    {
+      console.log(this.files);
+      var f= this.files[i];
+      if((f.type.indexOf("image/png") != -1) || (f.type.indexOf("image/gif") != -1) || (f.type.indexOf("image/jpeg") != -1) || (f.type.indexOf("image/jpg") != -1)
+        || (f.type.indexOf("application/png") != -1) || (f.type.indexOf("application/gif") != -1) || (f.type.indexOf("application/jpeg") != -1) || (f.type.indexOf("application/jpg") != -1))
+      {
+        new_image_set[index]=this.files[i];
+        index++;
+      }
+      else{
+        not_valid_type=true;
+
+      }
+    }
+    if(new_image_set.length>20)
+    {
+      console.log("Selected -> more than 20 images");
+      show_flash_msg("<%= t('galleries.more_than_limit_warning') %>");
+      return;
+    }
+
+    compress_files();
+
+  });
+
+  function append_files(next_set_files,next_set_files_name_IE,next_set_files_extension_IE){
+    console.log("appending files");
+    console.log(next_set_files);
+    next_set_files["count"] = next_set_files.length;
+    for (var i = 0; i < next_set_files.length; i++) {
+      description_array.splice(0, 0, "");
+    }
+    var count= upload_photos.count;
+    upload_photos=next_set_files.concat(upload_photos);
+    upload_photos_name_IE=next_set_files_name_IE.concat(upload_photos_name_IE);
+    upload_photos_extension_IE=next_set_files_extension_IE.concat(upload_photos_extension_IE);
+    upload_photos.count=count+next_set_files.length;
+    display_top_upload_button();
+  }
+
+  function show_progress() {
+    //modal box gets created at the top of the page
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
+    build_modal_box({'title': "<%=t('galleries.uploading_images')%>", 'popup_class': 'confirmation'});
+    j('#popup_content').append('<div class="progress_container"><div class="progress" id="progress"><div class="bar" id="bar"></div></div><div id="upload_status" class="upload_status"><%=t('galleries.uploading')%> 1 <%=t('galleries.out_of')%> ' + upload_photos.count + '</div></div>');
+    j("#upload_status").html("<%=t('galleries.uploading')%> 1 <%=t('galleries.out_of')%> " + upload_photos.count);
+  }
+
+  function send_photos(uploadCount) {
+    //first time -- show progress box
+    if (uploadCount == 0) {
+      show_progress();
+      document.body.style.overflow = "hidden";
+    }
+    var description = j("#description" + uploadCount);
+    var image = new FormData();
+
+    image.append('image', upload_photos[uploadCount]);
+    image.append('description', j("#description" + uploadCount).val());
+    image.append('gallery_category', gallery_category);
+    image.append("session_fingerprint","<%=session_fingerprint%>");
+    if(detectIE()!=false)
+    {
+      image.append("image_name",upload_photos_name_IE[uploadCount]);
+      image.append("image_extention",upload_photos_extension_IE[uploadCount]);
+    }
+    j.ajax({
+      url: "/galleries/create_photo", type: "POST", data: image,
+      success: function (msg) {
+        j("#upload_status").html("<%=t('galleries.uploading')%> " + ((uploadCount + 2) > upload_photos.count? upload_photos.count : uploadCount + 2) + " <%=t('galleries.out_of')%> " + upload_photos.count);
+        var width = ((uploadCount + 1) / upload_photos.count) * 100;
+        console.log(width + '%');
+        j("#bar").width(width + '%');
+
+        //recursion for uploading next image after completion of one upload
+        if (uploadCount + 1 < upload_photos.count) {
+          send_photos(uploadCount + 1);
+        } else {
+          // all photos uploaded
+          document.body.style.overflow = "auto";
+          window.location.replace("/galleries/category_show/" + gallery_category);
+        }
+
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+    });
+
+  }
+</script>

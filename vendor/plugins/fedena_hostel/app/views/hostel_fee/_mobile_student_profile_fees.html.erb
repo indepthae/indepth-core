@@ -1,0 +1,20 @@
+<% hostel_fee_collections= student.hostel_fee_collections %>
+<% unless hostel_fee_collections.nil? %>
+  <% hostel_fee_collections.each do |d| %>
+    <tr>
+      <td>
+        <label class="name"><%= d.name %></label>
+        <label class="description"><%= format_date(d.due_date) %></label>
+      </td>
+      <td>
+        <% @balance = student.hostel_fee_balance(d.id)  %>
+        <% if @balance == 0 %>
+          <label class="paid"><%= t("paid") %></label>
+        <% else %>
+          <label class="unpaid"><%= t("unpaid") %></label>
+          <label class="description"><%= precision_label(@balance) %></label>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>

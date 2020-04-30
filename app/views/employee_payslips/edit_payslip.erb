@@ -1,0 +1,359 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_payslip') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% case params[:from]
+    when "assigned_employees"
+      breadcrumb :employee_payslips_edit_assigned_employees, [@employee_payslip, [@employee, @payroll_group]]
+    when "assign_employees"
+      breadcrumb :employee_payslips_edit_assign_employees, [@employee_payslip, [@employee, @payroll_group]]
+    when "payslip_generation_list"
+      breadcrumb :employee_payslips_edit_payslip_generation_list, [@payroll_group, [@employee_payslip.payslips_date_range.start_date, @employee_payslip.payslips_date_range.end_date]]
+    when 'rejected_payslips'
+      breadcrumb :employee_payslips_edit_payslip_rejected_payslips, [@payroll_group, [@employee_payslip.payslips_date_range.start_date, @employee_payslip.payslips_date_range.end_date]]
+    when 'past_payslips'
+      breadcrumb :employee_payslips_past_payslips_edit_payslip, [@payroll_group, [@employee_payslip.payslips_date_range.start_date, @employee_payslip.payslips_date_range.end_date]]
+    else
+      breadcrumb :employee_payslips_edit, @employee_payslip.id
+    end %>
+    <%= render_breadcrumbs  %>
+
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% if @employee_payslip.is_rejected %>
+    <% errors = @employee_payslip.lop_leaves_errors %>
+    <% if errors.present? %>
+      <div class="errorExplanation">
+        <p><%= t('problem_with_selected_lop_leaves') %></p>
+        <ul>
+          <% errors.each do |err| %>
+            <li><%= err %></li>
+          <% end %>
+        </ul>
+        <p id="verify_msg"><%= "#{t('please_verify_lops_leaves_and_regenerate')} " %>
+          <span><%= link_to t('regenerate_payslip'), {:controller => 'employee_payslips', :action => 'generate_employee_payslip', :date => @employee_payslip.payslips_date_range.start_date, :employee_id => @employee.id, :from => "view_all_rejected_payslips", :regenerate => 1, :payslip_id => @employee_payslip.id}, :class => "regenerate_link themed_text"  %></span>
+        </p>
+      </div>
+    <% end %>
+    <% rejector = @employee_payslip.rejector %>
+    <h3><%= "#{t('editing_a_rejected_payslip')}" %></h3>
+    <div id="rejection-remarks">
+        <div id="remarks-head"><b><%= "#{t('rejection_remarks')} #{t('by')} "  %></b><%= rejector.present? ? "#{rejector.full_name} &#x200E;(#{rejector.username})&#x200E;" : "#{t('deleted_user')}" %></div>
+        <div id="remarks-desc"><%= @employee_payslip.reason.present? ? @employee_payslip.reason : '-' %></div>
+    </div>
+    <% unless errors.present? %>
+      <div class="description"><%= "#{t('rejection_remarks_desc')} " %>
+        <span><%= link_to t('regenerate_payslip'), {:controller => 'employee_payslips', :action => 'generate_employee_payslip', :date => @employee_payslip.payslips_date_range.start_date, :employee_id => @employee.id, :from => "view_all_rejected_payslips", :regenerate => 1, :payslip_id => @employee_payslip.id}, :class => "regenerate_link"  %></span>
+      </div>
+    <% end %>
+    <div id="left-sec">
+      <div class="fields-details" id="name">
+        <div class="field-label"><%= t('name') %></div>
+        <div class="fields-val">: <b><%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></b></div>
+      </div>
+      <div class="fields-details">
+        <div class="field-label"><%= t('department') %></div>
+        <div class="fields-val">: <%= @employee.employee_department.name %></div>
+      </div>
+      <div class="fields-details">
+        <div class="field-label"><%= t('position') %></div>
+        <div class="fields-val">: <%= @employee.employee_position.name %></div>
+      </div>
+      <% unless @employee.employee_grade.nil? %>
+        <div class="fields-details">
+          <div class="field-label"><%= t('grade') %></div>
+          <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+        </div>
+      <% end %>
+    </div>
+    <div id="right-sec">
+        <div class="fields-details">
+            <div class="field-label"><%= t('pay_period') %></div>
+            <% date_range = @employee_payslip.date_range %>
+            <div class="fields-val">: <b><%= date_range %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('status') %></div>
+            <div class="fields-val">: <b><%= @employee_payslip.payslip_status %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('payroll_group') %></div>
+            <div class="fields-val">: <%= @employee_payslip.payslips_date_range.payroll_group.name %></div>
+        </div>
+        <% if @employee_payslip.days_count.present? %>
+          <div class="fields-details">
+              <div class="field-label"><%= t('loss_of_pay') %></div>
+              <div class="fields-val">: <%= @employee_payslip.deducted_from_categories ? t('deduct_at_payroll_categories') : "#{t('as_a_deduction', :code => "LOPA")}" %></div>
+          </div>
+        <% end %>
+    </div>
+    <hr/>
+    <div id="attendance-details">
+        <% details_order = (@employee_payslip.days_count.present? ? [:no_of_working_days, :no_of_days_present, :no_of_days_absent, :loss_of_pay_leaves] : [:no_of_working_days, :no_of_days_present, :no_of_days_absent]) %>
+        <% details_order.each do |key| %>
+          <div class="fields-details">
+              <div class="field-label"><%= t(key) %></div>
+              <div class="fields-val"><%= @attendance_details[key] %></div>
+          </div>
+        <% end %>
+    </div>
+    <hr/>
+    <h3><%= t('pay_period') %></h3>
+
+    <div class="payroll_details">
+      <div id="payroll_form">
+
+        <% form_for @employee_payslip, :url => {:action => "update_payslip", :id => @employee_payslip.id, :from => params[:from]}, :html => {:onsubmit => "return validate();"} do |payslip| %>
+          <%= session_fingerprint_field %>
+          <%= payslip.hidden_field :is_rejected, :value => "0" %>
+          <%= payslip.hidden_field :is_approved, :value => "0" %>
+          <%= payslip.hidden_field :reason, :value => "" %>
+          <%= payslip.hidden_field :employee_id %>
+          <%= payslip.hidden_field :employee_type %>
+          <%= payslip.hidden_field :mode, :value => "edit" %>
+          <%= payslip.hidden_field :additional_leaves, :value => @selected_leaves.collect(&:id).join(",")  %>
+          <div class="sub-head"><%= t('earnings') %></div>
+          <div class="earnings">
+            <% total_earnings = 0 %>
+            <% payslip.fields_for :employee_payslip_categories, @earnings do |category| %>
+              <% cat = category.object.payroll_category %>
+              <% c_obj = category.object %>
+              <div class="label-field-pair">
+                <label for="category-name"><%= cat.name %></label>
+                <div class="text-input-bg">
+                  <%= category.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                  <div class="wrapper" id="live-val"></div>
+                </div>
+                <span class="currency-type"><%= @currency %></span>
+                <%= category.hidden_field :payroll_category_id, :value => cat.id %>
+              </div>
+              <% total_earnings += c_obj.amount.to_f %>
+            <% end %>
+
+
+            <div id="individual_earnings">
+              <% payslip.fields_for :individual_payslip_categories, @individual_earnings do |category| %>
+                <% c_obj = category.object %>
+                <% unless c_obj.marked_for_destruction? %>
+                  <div class="label-field-pair individual_category">
+                    <label for="category-name"><%= c_obj.name %></label>
+                    <div class="text-input-bg">
+                      <%= category.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                      <div class="wrapper" id="live-val"></div>
+                    </div>
+                    <span class="currency-type"><%= @currency %></span>
+                    <%= category.hidden_field :name %>
+                    <%= category.hidden_field :is_deduction %>
+                    <%= link_to '', '#/', :class => 'cross_button', :onclick => 'remove_fields(this)' %>
+                  </div>
+                <% end%>
+                <%= category.hidden_field :_destroy, :value => c_obj._destroy||0, :class => 'obj_destroy' %>
+                <% total_earnings += c_obj.amount.to_f %>
+              <% end %>
+            </div>
+            <div id="earning" class="add_link" onclick="showModalBox(this)"><div id="add-icon"></div><%= t('add_an_earning') %></div>
+            <div class="label-field-pair">
+              <label for="total_earnings"><%= "#{t('total_salary').titleize}" %></label>
+              <div class="total"><%= precision_label(total_earnings) %></div>
+              <span class="currency-type"><%= @currency %></span>
+            </div>
+          </div>
+          <div class="sub-head"><%= t('deductions') %></div>
+          <% total_deductions = 0 %>
+
+          <div class="deductions">
+
+            <% payslip.fields_for :employee_payslip_categories, @deductions do |category| %>
+              <% cat = category.object.payroll_category %>
+              <% c_obj = category.object %>
+              <div class="label-field-pair">
+                <label for="category-name"><%= cat.name %></label>
+                <div class="text-input-bg">
+                  <%= category.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                  <div class="wrapper" id="live-val"></div>
+                </div>
+                <span class="currency-type"><%= @currency %></span>
+                <%= category.hidden_field :payroll_category_id, :value => cat.id %>
+              </div>
+              <% total_deductions += c_obj.amount.to_f %>
+            <% end %>
+            <% if @employee_payslip.lop.present? %>
+              <div class="label-field-pair">
+                <label for="category-name"><%= t('loss_of_pay') %></label>
+                <div class="text-input-bg">
+                  <%= payslip.text_field :lop, :value => precision_label(@employee_payslip.lop||0), :class => "amount", :id=> 'loss_of_pay' %>
+                  <div class="wrapper" id="live-val"></div>
+                </div>
+                <span class="currency-type"><%= @currency_type %></span>
+              </div>
+              <% total_deductions += @employee_payslip.lop.to_f %>
+            <% end %>
+            <div id="individual_deductions">
+              <% payslip.fields_for :individual_payslip_categories, @individual_deductions do |comp| %>
+                <% c_obj = comp.object %>
+                <% unless c_obj.marked_for_destruction? %>
+                  <div class="label-field-pair individual_category">
+                    <label for="category-name"><%= c_obj.name %></label>
+                    <div class="text-input-bg">
+                      <%= comp.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                      <div class="wrapper" id="live-val"></div>
+                    </div>
+                    <span class="currency-type"><%= @currency_type %></span>
+                    <%= comp.hidden_field :name %>
+                    <%= comp.hidden_field :is_deduction %>
+                    <%= link_to '', '#/', :class => 'cross_button', :onclick => 'remove_fields(this)' %>
+                  </div>
+                <% end %>
+                <%= comp.hidden_field :_destroy, :value => c_obj._destroy||0, :class => 'obj_destroy' %>
+                <% total_deductions += c_obj.amount.to_f %>
+              <% end %>
+            </div>
+            <div id="deduction" class="add_link" onclick="showModalBox(this)"><div id="add-icon"></div><%= t('add_a_deduction') %></div>
+            <div class="label-field-pair">
+              <label for="total_deductions"><%= "#{t('total_deduction').titleize}" %></label>
+              <div class="total"><%= precision_label(total_deductions) %></div>
+              <span class="currency-type"><%= @currency %></span>
+            </div>
+          </div>
+          <% net_pay = total_earnings - total_deductions %>
+          <div class="label-field-pair" id="net_pay">
+            <label for="net_pay"><%= "#{t('net_pay').titleize}" %></label>
+            <div class="total"><%= precision_label(net_pay) %></div>
+            <span class="currency-type"><%= @currency %></span>
+          </div>
+          <div class="wrapper" id="net_pay_warning" style="display : none"><div class="error-icon"></div><div class="error-msg"><%= t('net_pay_must_be_greater_than_or_equal_to_zero') %></div></div>
+
+          <%= payslip.hidden_field :net_pay, :value => @net_pay ,:id => "net_pay_field"%>
+          <%=submit_tag "#{t('generate_payslip').capitalize}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :disabled => errors.present? %>
+        <% end %>
+        <% case params[:from]
+        when "assigned_employees", "assign_employees" %>
+          <%= link_to t('cancel'), {:action => "view_employee_pending_payslips", :employee_id => @employee.id, :from => params[:from]}, :class => "submit-button", :id => "cancel-link" %>
+        <% when "payslip_generation_list", 'past_payslips' %>
+          <%= link_to t('cancel'), {:action => "payslip_generation_list", :id => @payroll_group.id, :start_date => @employee_payslip.payslips_date_range.start_date, :end_date => @employee_payslip.payslips_date_range.end_date, :from => params[:from]}, :class => "submit-button", :id => "cancel-link" %>
+        <% when 'rejected_payslips' %>
+          <%= link_to t('cancel'), {:action => "rejected_payslips", :id => @payroll_group.id, :start_date => @employee_payslip.payslips_date_range.start_date, :end_date => @employee_payslip.payslips_date_range.end_date, :from => params[:from]}, :class => "submit-button", :id => "cancel-link" %>
+        <% else %>
+          <%= link_to t('cancel'), {:action => "view_all_rejected_payslips"}, :class => "submit-button", :id => "cancel-link" %>
+        <% end %>
+      </div>
+    </div>
+    <div id="overlay"></div>
+    <div id="modalMsg"  class="HideModal">
+      <%= render :partial => "add_individual_category" %>
+    </div>
+  <% else %>
+    <p class="flash-msg"><%= t('payslip_is_not_rejected') %></p>
+  <% end %>
+</div>
+<script type="text/javascript">
+  var precision = <%= FedenaPrecision.get_precision_count %>;
+  var count = j('.obj_destroy').length;
+  j("input[class='amount']").change(function(){
+    calculate_net_pay();
+  });
+  function showModalBox(elm)
+  {
+    document.getElementById("overlay").className = "OverlayEffect";
+    document.getElementById("modalMsg").className = "ShowModal";
+    if(elm.id == 'earning')
+    {
+      j("#MB_caption").text("<%= t('add_an_earning') %>");
+      j("#modalMsg").attr('is_deduction',0);
+      j('#MB_content #ok').text("<%= t('generate_payslip_bulk.add_earning') %>");
+    }
+    else
+    {
+      j("#MB_caption").text("<%= t('add_a_deduction') %>");
+      j("#modalMsg").attr('is_deduction',1);
+      j('#MB_content #ok').text("<%= t('generate_payslip_bulk.add_deduction') %>");
+    }
+    j("#modalMsg").attr('parent_attr_name','employee_payslip[individual_payslip_categories_attributes]');
+    j('#category_name').val('');
+    j('#ind_amount').val('');
+    if(j('html').attr('dir') == 'ltr')
+      j('#modalMsg').css({left : (j('body').width() - j('#modalMsg').width())/2});
+    else
+      j('#modalMsg').css({right : (j('body').width() - j('#modalMsg').width())/2});
+  }
+  function removeModalBox(){
+    document.getElementById("modalMsg").className = "HideModal";
+    document.getElementById("overlay").className = "";
+    j('#MB_content .wrapper').children().hide();
+    return false;
+  }
+
+  function calculate_net_pay()
+  {
+    sum = 0;
+    j(".earnings input[class='amount']").each(function(){
+      if(this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+      {
+        sum += parseFloat(this.value);
+        j(this).parent('.text-input-bg').find('#live-val').html('');
+      }
+      else
+        make_error_message(this);
+    });
+    earnings = sum;
+    j('.earnings .total').text(sum.toFixed(precision).toString());
+    j(".deductions input[class='amount']").each(function(){
+      if(this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+      {
+        sum -= parseFloat(this.value);
+        j(this).parent('.text-input-bg').find('#live-val').html('');
+      }
+      else
+        make_error_message(this);
+    });
+    j('.deductions .total').text((earnings - sum).toFixed(precision).toString());
+    j('#net_pay .total').text(sum.toFixed(precision).toString());
+    j('#net_pay_field').val(sum.toFixed(precision).toString());
+    if(sum < 0)
+      j('#net_pay_warning').show();
+    else
+      j('#net_pay_warning').hide();
+  }
+  function make_error_message(elm)
+  {
+    icon=jQuery('<div></div>',{'class': 'error-icon'});
+    if(isNaN(elm.value))
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': '<%= t('is_not_a_number') %>'});
+    else if(parseInt(elm.value) < 0)
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': '<%= t('must_be_greater_than_or_equal_to_count', {:count => 0}) %>'});
+    else
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': "<%= t('cant_be_blank') %>"});
+    j(elm).parent('.text-input-bg').find('#live-val').html(icon.add(msg));
+  }
+  function validate()
+  {
+    calculate_net_pay();
+    valid = true
+    net_pay = j('#net_pay_field').val();
+    j('.amount').each(function(){
+      if((this.value.length == 0) || isNaN(this.value) || (parseInt(this.value) < 0))
+        valid = false
+    });
+    if((net_pay.length == 0) || isNaN(net_pay) || (parseInt(net_pay) < 0))
+    {
+      j('#net_pay_warning').show();
+      valid = false;
+    }
+    return valid;
+  }
+  function remove_fields(elm)
+  {
+    if(j(elm).parent().next().attr('class') == 'obj_destroy')
+      j(elm).parent().next().val('1');
+    j(elm).parent().remove();
+    calculate_net_pay();
+  }
+</script>

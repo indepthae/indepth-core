@@ -1,0 +1,292 @@
+/*@media print {*/
+@page {
+    margin: 0 10px;
+    /*margin-left: 7mm;
+    margin-right: 5mm;
+    margin-top: 0mm;*/
+
+}
+
+body {
+    font-size: 9px;
+    max-width: 400px;
+    min-width: 200px;
+    /*font-family: arial;*/
+    /*font-family: Lucida Console,Lucida Sans Typewriter,monaco,Bitstream Vera Sans Mono,monospace; */
+    font-family: Verdana, Tahoma, Segoe, sans-serif;
+    /*max-width: 200px;*/
+}
+
+.receipt-container {
+    margin-bottom: 30px;
+    /*width: 300px;*/
+    /*border-width: 1px;
+    border-style: solid;*/
+}
+
+.institution_header {
+    width: 100%;
+    float: right;
+    margin-right: 5px;
+}
+
+.institution_name {
+    font-size: 11px;
+    /*text-align: center;*/
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.institution_address {
+    font-size: 11px;
+}
+
+.receipt_title {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    clear: both;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.institution_logo {
+    float: right;
+    width: 15%;
+    height: 50px;
+    border-width: 1px;
+    border-color: black;
+    border-style: dotted;
+    margin-left: 5px;
+    display: none;
+}
+
+.receipt-details {
+    /*width: 100%;*/
+    margin: 5px;
+}
+
+.student-details {
+    margin: 5px;
+}
+
+td.left-label {
+    padding-left: 10px;
+}
+
+.left {
+    float: right;
+    width: 60%;
+}
+
+.right {
+    float: left;
+    text-align: left;
+    width: 40%;
+    word-wrap: break-word;
+}
+
+.receipt-details_item {
+    /*margin-top: 5px;*/
+    clear: both;
+    line-height: 15px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.receipt-footer {
+    color: gray;
+    margin: 5px;
+}
+
+section {
+    /*border-bottom:2px solid #333;*/
+    border-top: 1px solid black;
+    /*border-bottom:1px solid black;*/
+    border-collapse: collapse;
+    clear: both;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow: auto;
+    margin-top: -1px; /* workaround for border collapse*/
+    margin-bottom: -1px; /* workaround for border collapse*/
+}
+
+.student-details {
+
+}
+
+section.particulars-header {
+    border-bottom-width: 0px;
+    /*margin-left: 10px;
+    margin-right: 10px;*/
+}
+
+.particulars-header-left {
+    float: right;
+}
+
+.particulars-header-right {
+    float: left;
+}
+
+.payment_status {
+    /*font-weight: bold;*/
+}
+
+.payment_status .left {
+    text-align: left;
+    width: 70%;
+}
+
+.payment_status .right {
+    /*text-align: right;*/
+    width: 30%;
+    float: left;
+}
+
+.bottom_fields {
+    clear: both;
+}
+
+.subtitle {
+    /*font-weight: bold;*/
+}
+
+.particulars-header {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.summary p {
+    margin-top: 0px;
+    margin-right: 5px;
+}
+
+.discount p {
+    margin-top: 0px;
+    margin-right: 5px;
+}
+
+.subtitle {
+    margin-top: 0px;
+    margin-right: 5px;
+}
+
+/*Particular wise*/
+.particular_wise_item {
+
+}
+
+.particular_wise_item .particular_name {
+    font-weight: bold;
+    float: right;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.particular_wise_item .particular_wise_item_details {
+    font-weight: normal;
+    float: left;
+    width: 100%;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.particular_wise_item_details .left {
+    width: 70%;
+    text-align: left;
+
+}
+
+.particular_wise_item_details .right {
+    width: 30%;
+}
+
+.table {
+    display: table;
+}
+
+.table-row {
+    display: table-row;
+}
+
+.table-cell {
+    display: table
+}
+
+/*}*/
+/* style defaults*/
+tr {
+    height: 15px;
+}
+
+p {
+    margin: 1em 0 1em 0;
+}
+
+body {
+    margin: 1px;
+    /*padding: 1em;*/
+}
+
+.payment_status-details {
+    width: 100%;
+}
+
+.payment_status-details tr {
+
+}
+
+.payment_status-details td {
+
+}
+
+.payment_status-details .right-label {
+    text-align: left;
+
+}
+
+.payment_status-details .bold {
+    float: left;
+    margin-left: 5px;
+}
+
+hr {
+    background-color: black;
+    height: 1px;
+    border: 0 none;
+    color: black;
+}
+
+td.left {
+    float: inherit;
+    width: inherit;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 40%;
+}
+
+.amount_in_word {
+    float: right;
+}
+
+.amount_in_words {
+    float: right;
+    margin-right: 4px;
+}
+
+.addtional_notes {
+    line-height: 11px;
+}
+
+.no-top-border {
+    border-top: 0px;
+}
+
+.no_bold {
+    font-weight: normal !important;
+}

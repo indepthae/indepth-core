@@ -1,0 +1,66 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('online_exam_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_result_text') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <%if @attendance.present?%>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pdf_report')}", {:action => "exam_result_pdf", :id=>@exam_group.id, :batch_id=>@batch.id},:target => '_blank' %></li>
+            <%end%>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :online_exam_exam_result, [@exam_group,@batch] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="box">
+
+        <% unless @attendance.blank? %>
+          <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+              <tr class="tr-head">
+                  <td><%= t('sno') %></td>
+                  <td><%= t('student_name') %></td>
+                  <td><%= t('admission_no') %></td>
+                  <% if roll_number_enabled? %>
+                    <td><%= t('roll_no') %></td>
+                  <% end %>
+                  <td><%= t('marks') %></td>
+                  <td><%= t('result') %></td>
+              </tr>
+              <tr class="tr-blank"></tr>
+              <% @attendance.each_with_index do |att,i| %>
+                <tr class="tr-<%= cycle('odd', 'even') %>">
+                    <td class="col-1" ><%= ((@attendance.current_page - 1) * @attendance.per_page) + i + 1 %></td>
+                    <td class="col-2" ><%= att.student_full_name %></td>
+                    <td class="col-3" ><%= att.student_admission_no %></td>
+                    <% if roll_number_enabled? && att.student.present? %>
+                      <td class="col-3"><%= att.student.roll_number.nil? ? "-" : att.student.roll_number %></td>
+                    <% end %>
+                    <td class="col-3" ><%= att.total_score %>/<%= @exam_group.online_exam_groups_questions.sum('mark') %></td>
+                    <% if att.answers_evaluated == true %>
+                      <% if att.is_passed %>
+                        <td class="col-3" ><%= t('passed') %></td>
+                      <% else %>
+                        <td class="col-3" ><%= t('failed') %></td>
+                      <% end %>
+                    <% else %>
+                      <td class="col-3" ><%= t('not_evaluated') %></td>
+                    <% end %>
+                </tr>
+              <% end %>
+          </table>
+          <%= will_paginate @attendance,:params => {:controller=>"online_exam",:action => "exam_result", :id=>@exam_group.id,:batch_id=>@batch.id} %>
+
+        <% else %>
+          <p class="flash-msg"><%= t('no_student_attended_this_exam') %></p>
+        <% end %>
+
+        <div class="extender"></div>
+    </div></div>

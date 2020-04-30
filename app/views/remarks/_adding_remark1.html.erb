@@ -1,0 +1,32 @@
+<div id="add_remark_link" class="remarks_widget">
+    <% check_for_gradebook =  ['AssessmentTerm', 'AssessmentGroup', 'AssessmentPlan'].include? @load_model.class_name %>
+  <% if (@current_user.admin? or (@current_user.employee? and @load_model.find(@load_object_id).has_employee_privilege)) and (@stud.present? ? @load_model=='Subject'.constantize ? ((@stud.batch_id==Subject.find(@load_object_id).batch_id)) : (check_for_gradebook ? true : @stud.batch_id==@load_object_id.to_i) : false)%>
+    <%= link_to t('add_remarks_text'),"javascript:void(0);",:class=>"themed_text add_link disabled_link",:student_id=>@student_id,:target_name=>@target_name,:params_hash=>@params_hash.to_json,:page => @page,:general => @target.general,:load_object_id => @load_object_id,:onclick=>'completeReq1(this)'%>
+  <%end%>
+</div>
+<script type="text/javascript">
+  function completeReq1(elm){
+    var onclick_attr=j(elm).attr('onclick');
+    j(elm).attr('onclick','ss'+onclick_attr);
+    var onclick_attr=j(elm).attr('onclick');
+
+    new Ajax.Request('/remarks/add_remarks',{
+      parameters:'student_id='+elm.getAttribute('student_id')+'&target_name='+elm.getAttribute('target_name')+'&params_hash='+elm.getAttribute('params_hash')+'&page='+elm.getAttribute('page')+'&load_object_id='+elm.getAttribute('load_object_id'),
+      asynchronous:true,
+      evalScripts:true,
+      method:'get',
+      onComplete:function(resp){
+        j(elm).parent().append(resp.responseText)
+        j(elm).hide();
+        if (j('#remark_remark_body').size()>0){
+
+          j('#remark_remark_body').focus();
+
+          
+        }
+        
+      }
+    });
+
+  }
+</script>

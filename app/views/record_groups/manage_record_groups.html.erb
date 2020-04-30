@@ -1,0 +1,21 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('courses_and_batches') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box"></div>
+  <div id="manage_record_group_text"><%=t('manage_record_groups_for_courses')%></div>
+  <div id="manage_record_group_desc"><%=t('manage_record_groups_for_courses_desc')%></div>
+  <div id="other_details">
+    <div id="student_items">
+      <%=render :partial=>'course_record_group_list'%>
+    </div>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+</div>

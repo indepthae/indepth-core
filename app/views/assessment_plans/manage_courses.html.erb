@@ -1,0 +1,50 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_planner') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to "#{t('add_courses')}", {:controller => "assessment_plans", :action => "add_courses", :id => @assessment_plan.id} %>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_plans_manage_course, @assessment_plan %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="left">
+        <div class="field_name"><%= t('exam_year_plan_name') %></div>
+        <div class="field_val"><%= @assessment_plan.name %></div>
+    </div>
+    <div class="right">
+        <div class="field_val"><%= @assessment_plan.academic_year.name %></div>
+        <div class="field_name"><%= t('academic_year') %></div>
+    </div>
+    <hr>
+    <div id ="header"><%= t('manage_courses') %></div>
+    <div id="course_list">
+        <% if @plan_courses.present? %>
+          <% @plan_courses.each do |pc| %>
+            <div class="course">
+                <div class="course_name"><%= pc.course.full_name %></div>
+                <%= link_to t('unlink_course'), unlink_course_assessment_plan_path(@assessment_plan, {:course_id => pc.id}), 
+                  :onclick => "return make_popup_box(this, 'confirm', '#{t('unlink_course_confirmation_message', {:name => pc.course.full_name, :planner_name => @assessment_plan.name})}',{'ok' : '#{t('remove')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('unlink_course')}', 'popup_class' : 'remove_lt'});" %>
+                <%= link_to t('manage_exams'),{:action => 'course_assessment_groups', :controller => 'gradebooks',:id=>pc.course.id,:academic_year_id=>@assessment_plan.academic_year_id} %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_course_linked_to_this_planner') %> </p>
+        <% end %>
+    </div>
+
+</div>

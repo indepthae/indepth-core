@@ -1,0 +1,2 @@
+privilege_tag=PrivilegeTag.find_by_name_tag("student_management")
+Privilege.find_or_create_by_name :name => "ManageTransferCertificate", :description => "manage_transfer_certificate_privilege", :privilege_tag_id => privilege_tag.id, :priority => 550

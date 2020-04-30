@@ -1,0 +1,52 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="vehicle_listing">
+    <tr class="tr-head">
+        <td class="vehicle_no"><%= t('vehicle_no') %></td>
+        <td class="seats_no"><%= t('no_of_seats') %></td>
+        <td class="vehicle_type"><%= t('vehicle_type') %></td>
+        <td class="vehicle_model"><%= t('vehicle_model') %></td>
+        <td class="status"><%= t('status') %></td>
+        <%if Transport.gps_enabled%>
+          <td class="gps_enable"><%= t('gps_enabled') %></td>
+        <%end%>
+        <td class="actions"></td>
+    </tr>
+    <%if @vehicles.present?%>
+      <% @vehicles.each do |v| %>
+        <tr>
+            <td><%= link_to v.vehicle_no,vehicle_path(v.id) %></td>
+            <td> <%= v.no_of_seats %></td>
+            <td> <%= v.vehicle_type_text %></td>
+            <td> <%= v.vehicle_model %></td>
+            <td> <%= t("#{v.status.downcase}") %></td>
+            <%if Transport.gps_enabled%>
+              <td ><%= v.gps_enabled.to_s.camelcase %></td>
+            <%end%>
+            <td>
+                <%= link_to "#{t('edit_text')}", edit_vehicle_path(v) %>
+                <% if v.routes.empty? %>
+                  <%= link_to t('delete'), delete_vehicle_vehicle_path(v), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_confirmation', {:name => v.vehicle_no})}',
+      {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle')}', 'popup_class' : 'delete_confirmation'}); " %>
+                <% else %>
+                  <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                    <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <% if @flag == "Active" %>
+        <tr><td colspan=<%=@col_span%><%= t('vehicles.no_active_vehicles') %> </td></tr>
+      <% elsif @flag == "Inactive" %>
+        <tr><td colspan=<%=@col_span%> ><%= t('vehicles.no_inactive_vehicles') %> </td></tr>
+      <% else %>
+        <tr><td colspan=<%=@col_span%> ><%= t('vehicles.no_vehicles_present') %> </td></tr>
+      <% end %>
+      <!-- <tr>
+      <td colspan="6"><%#= t('create_a_vehicle') %></td>
+      </tr> -->
+    <% end %>
+</table>
+<% if @vehicles.present? %>
+  <%= pagination_status(@vehicles) %>
+<% end %>
+<%= will_paginate @vehicles %>

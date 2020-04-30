@@ -1,0 +1,32 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('search') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="label-field-pair">
+    <label><%= "#{t('search')}" %> <%= image_tag('loader.gif', :align => 'absmiddle', :border=> 0, :id=>'loader', :style=>'display: none;') %></label>
+    <div class="text-input-bg" id="search_dropdown"><%= select :search,:inventory, [["Indent","Indent"],["Purchase Order","Purchase_order"],["GRN","GRN"]] %>
+    </div>
+    <div id="search_textbox">
+      <%= text_field_tag('query', params[:query], :autocomplete => 'off') %><br/>
+    </div>
+  </div>
+</div>
+
+<%= observe_fields ['query', 'search_inventory'],
+  :frequency => 0.5,
+  :update => 'information',
+  :before => "Element.show('loader')",
+  :success => "Element.hide('loader')",
+  :url => {:action => 'search_ajax'} %>
+
+<div id="information"></div>
+

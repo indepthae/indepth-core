@@ -1,0 +1,21 @@
+<p><%= t('pending_payslips_warning') %></p>
+<ul id="category-list">
+  <li class="listheading">
+    <div class="heading-no"><%= t('payslip_date_range') %></div>
+    <% if permitted_to? :view_employee_pending_payslips, :employee_payslips %>
+      <%= link_to t('view_all_payslips'), {:controller => 'employee_payslips', :action => 'view_employee_pending_payslips', :employee_id => @employee.id, :from => "profile"} %>
+    <% end %>
+  </li>
+
+  <% @payslip_dependency.each do |payslip| %>
+    <li class="list<%=cycle('odd', 'even')%>">
+      <div class="category-number">
+        <% if permitted_to? :view_payslip, :employee_payslips %>
+          <%= link_to "#{format_date(payslip.payslips_date_range.start_date, :short)} - #{format_date(payslip.payslips_date_range.end_date, :short)}", {:controller => 'employee_payslips', :action => 'view_payslip', :id => payslip.id} %>
+        <% else %>
+          <%= "#{format_date(payslip.payslips_date_range.start_date, :short)} - #{format_date(payslip.payslips_date_range.end_date, :short)}" %>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+</ul>

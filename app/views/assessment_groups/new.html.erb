@@ -1,0 +1,20 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('create_exam') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_groups_new, [@plan, @assessment_group] %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div id ="header"><%= t('create_exam') %></div>
+    <div id ="description"><%= t('create_exam_group_description') %></div>
+    <div id="group_form">
+        <%= render :partial => "group_form" %>
+    </div>
+
+</div>

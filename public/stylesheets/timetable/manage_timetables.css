@@ -1,0 +1,163 @@
+.bread_crumb, .timetables-header .left{
+    text-transform: capitalize;
+}
+#timetables a,#timetables a:hover{
+    color: #000 !important;
+    text-decoration: none;
+}
+#timetables a:hover{
+    text-decoration: underline !important;
+}
+#department-list {
+    clear : both;
+    padding : 10px 0 40px 0px;
+    width:650px;
+    margin:0px auto;
+}
+
+#department-list .listeven{
+    background : #EEF2FD;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em; 
+    width : 33em;
+    list-style-type : none;
+    padding : 0.5em 0 0 2em;
+    overflow: hidden;
+}
+
+#department-list .listodd{
+    background : #DFEAFF;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em; width : 33em;
+    list-style-type : none;
+    padding : 0.5em 0 0 2em;
+    overflow: hidden;
+}
+
+#department-list li.heading {
+    background : none;
+    font-weight : bold;
+    list-style-type : none;
+    color : #444;
+    height : 1.5em; width : 30em;
+    padding : 0.5em 0 0 5em;
+}
+
+#department-list li div {
+    float : left;
+}
+#department-list li div.department-name {
+    width : 350px;
+    font-size:13px;
+    font-weight:bold;
+}
+#department-list li div.department-edit,
+#department-list li div.department-delete {
+    font-size : 0.9em;
+    width : 50px;
+}
+#department-list li div a {
+    color : #000;
+    text-decoration:none;
+    font-size:14px;
+}
+#department-list li div a:hover {
+    color : #d00;
+    text-decoration:underline;
+}
+
+#department-list .listheading {
+    background:none repeat scroll 0 0 #BECFFB;
+    border-bottom:2px solid #BECFFB;
+    color:#444444;
+    height:1.5em;
+    list-style-type:none;
+    padding:0.5em 0 0 1em;
+    width:34em;
+}
+#department-list .listheading div.department-edit{
+    font-weight: bold;
+    font-size: 13px;
+    width: 65px;
+}
+table#listing td.col-1{
+    width:50%;
+    padding: 5px;
+    padding-left:10px;
+    font-size: 13px;
+    font-weight: normal;
+}
+table#listing td.col-2{
+    width:20%;
+    text-align:left;
+    padding: 5px;
+    padding-left:5px;
+    font-size: 13px;
+    font-weight: normal;
+}
+table#listing td.col-3{
+    width:30%;
+    text-align:left;
+    padding: 5px;
+    padding-left:10px;
+    font-size: 13px;
+    font-weight: normal;
+}
+table#listing tr.tr-head{
+    color:#000;
+}
+table#listing tr.tr-head{
+    color:#000000 !important;
+    font-size: 14px;
+}
+table#listing td a:hover{
+    text-decoration: underline;
+    color: #000;
+}
+.padding_left_right{
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.extra_right{
+    padding-right:10px;
+}
+.timetables-header{
+    height: 30px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+.timetables-header .left{
+    float: left;
+    width: 500px;
+    line-height: 30px;
+}
+.timetables-header .right{
+    float: right;
+    width: 480px;
+}
+.timetables-header .right select{
+    float: right;
+    background-color: #eee;
+    border: 1px solid #c6c6c6;
+    margin: 0px 0 0 10px;
+    width: 215px;
+    height: 27px;
+    padding: 3px 6px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.disabled_link{
+    color: #666;
+}
+.timetable_status, .status_warning {
+    float: left;
+}
+.status_warning {
+    margin-left: 5px;
+    width: 12px;
+    height: 12px;
+    background: url(/images/iconsprite-1.png) no-repeat -44px -343px !important;
+}

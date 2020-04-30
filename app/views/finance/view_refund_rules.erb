@@ -1,0 +1,53 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_refund') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_fees_refund') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('create_text')} #{t('refund_rules')}", :action => 'create_refund' %></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "financial_year_info" %>
+    </div>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="batch">
+    <div class="label-field-pair"><label><%= "#{t('select')} #{t('fee_collection')}" %> : </label>
+
+      <div class="text-input-bg"> <%= select("id", :id, @dates.map { |c| ["#{c.name}: #{format_date(c.start_date)} #{t('to')} #{format_date(c.end_date)}", c.id] },
+                                             {:prompt => "#{t('select')} #{t('fee_collection')}"},
+                                             {:onChange => "#{remote_function(:url => {:action => "list_refund_rules"},
+                                                                              :with => "'id='+value",
+                                                                              :before => "Element.show('loader')",
+                                                                              :success => "Element.hide('loader')"
+                                             )}"}) %>
+      </div>
+      <div class="loader_div">
+        <%= image_tag("loader.gif",
+                      :align => "absmiddle",
+                      :border => 0,
+                      :id => "loader",
+                      :style => "display: none;") %>
+      </div>
+    </div>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+  <div id="categories">
+
+  </div>
+</div>

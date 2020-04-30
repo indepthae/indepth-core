@@ -1,0 +1,217 @@
+<%= include_i18n_calendar_javascript %>
+<%= stylesheet_link_tag 'jquery-ui.css' %>
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+    <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20" id="stats-head">
+  <ul class="day-link ul-day-nav ">
+    <li><%= link_to_function "Today", "date_range_report(0,this);",:class=>"nav_link active"%></li>
+    <li><%= link_to_function "Last Week", "date_range_report(1,this);",:class=>"nav_link"%></li>
+    <li><%= link_to_function "Last 2 Weeks", "date_range_report(2,this);",:class=>"nav_link"%></li>
+    <li><%= link_to_function "Last 3 Months", "date_range_report(12,this);",:class=>"nav_link"%></li>
+    <li><%= link_to_function "Last 6 Months", "date_range_report(24,this);",:class=>"nav_link"%></li>
+    <li><%= link_to_function "Custom Date", 'custom_date(this)',:class=>"nav_link"%></li>
+  </ul>
+  <%= link_to 'Overall Statistics', dashboard_school_stats_path, :class  => 'button-red float-right' if permitted_to? :new, :schools%>
+  <%= link_to_function "Manage","show_list(); return false", :class=>"grey-button-large" %>
+  <div class="float-right" id="add-loader" style="display:none; margin-right: 10px;margin-top:2px; ">Loading..</div>
+</fieldset>
+<div id="live_stats"></div>
+<div id="custom_date">
+  <%= render :partial=>"custom_date" %>
+</div>
+<div class="content-div container-width">
+  <div class='content-list float-left margin-bottom-35 school-stats-content-list'>
+    <div id="stats-box">
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var q = jQuery.noConflict();
+  function show_list()
+  {
+    j(".custom_date-form").hide();
+    q.ajax({
+      type: 'POST' ,
+      url: '<%=list_live_entities_school_stats_path%>',
+      data : {
+        live_stats : {
+        }
+      },
+      beforeSend : function() {
+        q("#add-loader").show();
+      },
+      success : function(data) {
+        q("#live_stats").html(data);
+        q("#add-loader").hide();
+        q("#stats-head").hide();
+        q("#live_stats").slideDown();
+
+      }
+
+    });
+  }
+
+  function date_range_report(value,val){
+    j(".custom_date-form").hide();
+    j(".nav_link").removeClass('active')
+    j(val).addClass("active")
+    var end_date = new Date();
+    if(value==0){
+      var start_date=end_date
+    }
+    else if(value=="1"){
+      <%date=I18n.l(Date.today-7).to_date%>
+      var start_date = new Date(<%=date.strftime("%Y")%>,<%=date.strftime("%m").to_i-1%>,<%=date.strftime("%d")%>)
+    }
+    else if(value=="2"){
+      <%date=I18n.l(Date.today-14).to_date%>
+      var start_date = new Date(<%=date.strftime("%Y")%>,<%=date.strftime("%m").to_i-1%>,<%=date.strftime("%d")%>)
+    }
+    else if(value=="12"){
+      <%date= I18n.l(3.months.ago).to_date%>
+      var start_date = new Date(<%=date.strftime("%Y")%>,<%=date.strftime("%m").to_i-1%>,<%=date.strftime("%d")%>)
+    }
+    else{
+      <%date=I18n.l(6.months.ago).to_date%>
+      var start_date = new Date(<%=date.strftime("%Y")%>,<%=date.strftime("%m").to_i-1%>,<%=date.strftime("%d")%>)
+    }
+    date_range_custom_live_statistics(start_date,end_date)
+  }
+  function custom_date(val){
+    j(".nav_link").removeClass('active')
+    j(val).addClass("active")
+    j(".custom_date-form").show()
+  }
+  q(document).ready(function(){
+    q(".datepicker").datepicker({
+      showOn: "button",
+      buttonImage: "/images/transparent.png",
+      buttonImageOnly: true,
+      changeMonth: true,
+      changeYear: true,
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      buttonText: 'Select Date',
+      dateFormat: "yy-mm-dd",
+      maxDate: new Date()
+    });
+    j(".custom_date-form").hide();
+    var start_date = new Date();
+    var end_date = new Date();
+    var entities='<%=@entities%>'
+    entities=entities.split(",")
+    live_statistics(entities,start_date,end_date);
+  });
+
+  function live_statistics(entities,start_date,end_date){
+    if(entities !=""){
+      entities.each(function(e){
+        live_statistics_ajax(e,start_date,end_date)
+      })
+    }
+    else{
+      j("#flash_div").remove();
+      var flash_div=document.createElement('div')
+      flash_div.className="alert alert-warning warn-notice pagination-centered"
+      flash_div.id="flash_div"
+      var span_div=document.createElement('span')
+      span_div.textContent="No statistics enabled. Please click on 'Manage' and configure the statistics to be shown."
+      flash_div.appendChild(span_div);
+      j("#stats-box").append(flash_div)
+    }
+
+  }
+
+  function live_statistics_ajax(entity,start_date,end_date){
+    var name='stats-box_'+entity
+    j('#'+name+'').remove();
+    var statbox_div=document.createElement('div')
+    statbox_div.id=name
+    statbox_div.className="bg-light float-left big-box grey-border shadow margin-right-30 container-box-live"
+    var text=document.createElement('div')
+    text.className="dashboard-heading loader_text"
+    text.textContent="Loading.."
+    text.style="color:#333"
+    statbox_div.appendChild(text);
+    j("#stats-box").append(statbox_div)
+    q.ajax({
+      type: 'GET' ,
+      url: '<%=live_statistics_ajax_school_stats_path%>',
+      data : {
+        'live_entity' :entity,
+        'start_date' :start_date,
+        'end_date' :end_date
+      }
+
+    });
+  }
+
+  function get_stats_custom_date(){
+    var start_date=j("#start_date").val();
+    var end_date=j("#end_date").val();
+    if (start_date > end_date){
+      alert ("Start date should not be greater than End date");
+    }
+    else
+    {
+      date_range_custom_live_statistics(start_date,end_date)
+    }
+  }
+
+  function date_range_custom_live_statistics(start_date,end_date){
+    j('div[id^=stats-box_]').remove();
+    j('#flash_div').remove();
+    var entities='<%=@entities%>'
+    entities=entities.split(",")
+    var attendance_entities='<%=@attendance_entities%>'
+    attendance_entities=attendance_entities.split(",")
+    if(start_date==end_date){
+      var live_entities=entities
+    }
+    else
+    {
+      var live_entities=j(entities).not(attendance_entities).get()
+    }
+    live_statistics(live_entities,start_date,end_date)
+  }
+
+  q(document).delegate("#attendance_date-employee_attendance_live",'change',function(e){
+    var entity='employee_attendance_live';
+    q.ajax({
+      type: 'GET' ,
+      url: '<%=live_statistics_attendance_school_stats_path%>',
+      data : {
+        'live_entity' :entity,
+        'start_date' :this.value,
+        'end_date' :this.value
+      },
+      beforeSend : function() {
+        q(".loader-"+entity).show();
+      },
+      success : function() {
+        q(".loader-"+entity).hide();
+      }});
+  });
+
+  q(document).delegate("#attendance_date-student_attendance_live",'change',function(e){
+    var entity='student_attendance_live';
+    q.ajax({
+      type: 'GET' ,
+      url: '<%=live_statistics_attendance_school_stats_path%>',
+      data : {
+        'live_entity' :entity,
+        'start_date' :this.value,
+        'end_date' :this.value
+      },
+      beforeSend : function() {
+        q(".loader-"+entity).show();
+      },
+      success : function() {
+        q(".loader-"+entity).hide();
+      }});
+  });
+
+</script>

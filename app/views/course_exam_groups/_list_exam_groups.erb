@@ -1,0 +1,10 @@
+<div class="description_text_div">
+<%=t('create_and_manage_course_wise_and_batch_wise_exam_groups')%>
+</div>
+<div id="common_exam_group_div" class="exam_group_div">
+  <%=render :partial=>"common_exam_groups",:object=> @common_exam_groups%>
+</div>
+<div class="extender"></div>
+<div id="batch_wise_exam_group_div">
+  <%= render :partial=>"batch_wise_exam_groups" ,:object=>@batch_wise_exam_groups%>
+</div>

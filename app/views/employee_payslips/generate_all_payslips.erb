@@ -1,0 +1,120 @@
+<%= javascript_include_tag "hr" %>
+<%= javascript_include_tag "jquery.simplePagination" %>
+<%= stylesheet_link_tag ("simplePagination") %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('generate_all_payslips') %></div>
+</div>
+
+<div id="page-yield">
+
+  <div class="bread_crumb">
+    <%= breadcrumb :employee_payslips_generate_all_payslips, [@payroll_group, [@start_date, @end_date] ]%>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="header">
+    <%= t('generate_payslips').titleize %>
+  </div>
+
+  <div id="description"><%= t('generate_all_payslips_description') %></div>
+
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payroll_group') %>: </label>
+    <div class="text-input-bg" id="date_range_text">
+      <%= @payroll_group.name %>
+    </div>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('pay_period') %>: </label>
+    <div class="text-input-bg" id="date_range_text">
+      <%= payslip_range(@payroll_group, @start_date, @end_date) %>
+    </div>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payment_frequency') %>: </label>
+    <div class="text-input-bg" id="date_range_text">
+      <%= @payroll_group.salary_type_value + " - " + @payroll_group.payment_period_value %>
+    </div>
+  </div>
+
+  <div id="overlay"></div>
+
+  <div id="contents" style="display:none;">
+    <div class="select_all_status" style="display:none;">
+      <div class="status"></div>
+      <div id="select_all_employees"><%= t('select_all') %></div>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+    </div>
+    <div id="total_cost"><div class="total_cost_text"> <%= "#{t('total_net_pay')} "%></div> <b></b>
+      <div class="info-icon">
+        <div class="cost_info" style="display:none;"><%= t('estimated') %></div>
+      </div>
+    </div>
+
+    <div class="clear_all_status" >
+      <div class="status"></div><div id="clear_all_employees"><%= t('clear_all') %></div>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+    </div>
+    <div data-attrs="<%=Configuration.to_enable_round_off.config_value%>" id="round_off_value"></div>
+    <div data-attrs="<%= Configuration.get_rounding_off_value.config_value.to_i %>" id="rounding_for"></div>
+    <div class="outer">
+      <div class="inner">
+        <div id="payslip_table"></div>
+      </div>
+    </div>
+    <div class="pagination" style="display:none;"></div>
+    <div class="pagination_status" style="display:none;"></div>
+    <hr></hr>
+
+    <div class="submit-button" id="generate_payslip"><%= t('generate_payslip').capitalize  %></div>
+    <div id="cancel"><%= link_to "#{t('cancel')}", {:controller => "employee_payslips", :action => "generate_payslips",:id => params[:id], :start_date => params[:start_date], :end_date => params[:end_date] }, :class=> "submit-button" %></div>
+    <div class='no_emp_error'><%= t('select_atleast_one_employee') %></div>
+
+    <div id="modalMsg"  class="HideModal">
+      <%= render :partial => 'add_category' %>
+    </div>
+
+    <div id="modalMsg1"  class="HideModal">
+      <%= render :partial => 'confirmation' %>
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+  start_date = "<%= @start_date %>";
+  end_date = "<%= @end_date %>";
+  pg_id = "<%= params[:id]%>";
+  json_data = '<%= @hash.to_json.gsub("'", %q(\\\')) %>'
+  precision = <%= FedenaPrecision.get_precision_count %>;
+  t = <%= I18n.t('generate_payslip_bulk').to_json.html_safe %>
+
+  j(window).load(function(){
+    showOverlay();
+    backup = JSON.parse(json_data);
+    drawTable(JSON.parse(json_data));
+  })
+
+
+
+  j("#generate_payslip").click(function(e){
+    if (selectEmpCount > 0){
+      j('.no_emp_error').hide();
+      document.getElementById("overlay").show();
+      showSaveDialogueBox();
+    }
+    else{
+      j('.no_emp_error').show();
+    }
+  })
+
+</script>

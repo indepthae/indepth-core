@@ -1,0 +1,30 @@
+
+<% @students.each do |receiver| %>
+    <% i=0 %>
+    <% receiver.last.each do |student| %>
+        <% if i==0 %>
+            <div class="receiver_name <%= student.master_receiver_id %>"><%= student.receiver_name %></div>
+        <% end %>
+        <% i=i+1 %>
+        <div class="batch_ids <%= student.master_receiver_id %>" id="<%= student.master_receiver_id %>">
+          <div class="each_batch <%= student.id %> students_data">
+            <% checked = false %>
+            <% unless params[:fee_collection].nil? %>
+                <% checked = params[:fee_collection][:category_ids].include?(student.id.to_s) if params[:fee_collection][:category_ids].present? %>
+            <% end %>
+
+            <div class="<%= student.master_receiver_id %><%= student.id %>">
+                <label> <%= check_box_tag "check_box_students", student.id, checked, :class => 'students_box' ,"data-value"=>"#{student.master_receiver_id}#{student.id}"  %> <%= student.full_name_with_admission_no %></label>
+
+              <%= hidden_field_tag "discounts[fee_discounts_attributes][#{student.master_receiver_id}#{student.id}][receiver_id]", student.id,options={:disabled=>true} %>
+              <%= hidden_field_tag "discounts[fee_discounts_attributes][#{student.master_receiver_id}#{student.id}][batch_id]", student.batch_id, options={:disabled => true} %>
+              <%= hidden_field_tag "discounts[fee_discounts_attributes][#{student.master_receiver_id}#{student.id}][master_receiver_type]", student.master_receiver_type, options={:disabled => true} %>
+              <%= hidden_field_tag "discounts[fee_discounts_attributes][#{student.master_receiver_id}#{student.id}][receiver_type]", 'Student', options={:disabled => true} %>
+              <% if student.master_receiver_type=='FinanceFeeParticular' %>
+                  <%= hidden_field_tag "discounts[fee_discounts_attributes][#{student.master_receiver_id}#{student.id}][master_receiver_id]", student.master_receiver_id, options={:disabled => true} %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+    <% end %>
+<% end %>

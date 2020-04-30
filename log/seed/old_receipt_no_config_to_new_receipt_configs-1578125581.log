@@ -1,0 +1,22 @@
+# Logfile created on Sat Jan 04 12:13:01 +0400 2020 by logger.rb/1.2.6
+INSERT INTO configurations (school_id, config_key, config_value, created_at, updated_at)
+
+       SELECT school_id, 'FeeReceiptPrefix',
+              SUBSTRING(config_value, 1, LENGTH(config_value) - LENGTH(REGEXP_SUBSTR(config_value,'[0-9]*$'))) AS prefix,
+              created_at, updated_at
+
+         FROM configurations
+
+        WHERE `config_key` = 'FeeReceiptNo' AND config_value IS NOT NULL
+INSERT INTO configurations (school_id, config_key, config_value, created_at, updated_at)
+
+       SELECT school_id, 'FeeReceiptStartingNumber', REGEXP_SUBSTR(config_value,'[0-9]*$') AS suffix,
+              created_at, updated_at
+
+         FROM configurations
+
+        WHERE `config_key` = 'FeeReceiptNo' AND config_value IS NOT NULL
+execution time:
+Start : Sat Jan 04 12:13:01 +0400 2020
+End : Sat Jan 04 12:13:01 +0400 2020
+duration : 0.001379

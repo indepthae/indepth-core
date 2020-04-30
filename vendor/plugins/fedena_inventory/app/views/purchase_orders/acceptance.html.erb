@@ -1,0 +1,88 @@
+<script type="text/javascript">
+  var val=j('#person_store_id').val();
+  function remove_fields(link) {
+    $(link).previous("input[type=hidden]").value = "1";
+    $(link).up(".fields").hide();
+  }
+  function add_fields(link, association, content) {
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+  }
+  
+
+</script>
+
+
+<div id="content-header">
+<%#= image_tag("/images/examination/show_exam.png") %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('new_text') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :purchase_orders_acceptance, @purchase_order %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+  <% form_for :purchase_order,@purchase_order, :url => acceptance_purchase_order_url(:id => @purchase_order.id) do |f| %>
+    <%= f.error_messages %>
+    <div class="label-field-pair">
+      <div class="label-container1"><%= "#{t('status')}" %></div>
+      <div class="text-input-bg">
+        <%= f.select :po_status,%w{Issued Rejected Pending}.reject{|status| status == @purchase_order.po_status} %>
+      </div>
+    </div>
+
+
+
+    <div class="label-field-pair">
+      <div class="label-container1"><%= "#{t('store')}" %></div>
+      <div class="text-input-bg"><%= f.select :store_id, @stores.map{|st| [st.name,st.id]}, {}, {:id=>"person_store_id", :disabled =>true } %></div>
+    </div>
+
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+
+      <tr class="tr-head">
+        <td class="lable-text">
+          <%= t('user_id') %></td>
+        <td class="lable-text">
+          <%= t('store_item_id') %></td>
+
+        <td class="lable-text">   <%= t('unit_price') %></td>
+
+        <td class="lable-text">   <%= t('quantity') %></td>
+        <td class="lable-text">
+          <%= t('discount') %>
+        </td>
+        <td class="lable-text">  <%= t('tax') %></td>
+
+        <td>  </td>
+      </tr>
+    </table>
+
+
+
+    <%  f.fields_for :purchase_items do |po| %>
+      <%=  render 'purchase_item_fields', :f => po  %>
+    <% end %>
+
+
+      <div  id ="add_item">
+        <%= link_to_add_fields  "#{image_tag("/images/buttons/icon-add.png",:border => 0)} #{t('add_item')}", f , :purchase_items %>
+      </div>
+      <br />
+      
+    <hr class="label-underline"></hr>
+    <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button",:disable_with => "► #{t('please_wait')}" %>
+  <%  end %>
+</div>

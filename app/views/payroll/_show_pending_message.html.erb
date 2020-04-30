@@ -1,0 +1,43 @@
+<div id="part">
+  <div class="fields-details">
+    <div class="field-label"><%= t('employee_name') %></div>
+    <div class="fields-val"><%= @employee.full_name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('current_payroll_group') %></div>
+    <div class="fields-val"><%= @employee.payroll_group.name %></div>
+  </div>
+  <div class="fields-details" id="desc">
+    <div class="fields-val">
+      <% if params[:from] == "assigned_employees" %>
+        <%= t('removing_from_payroll_group_warning_message') %>
+      <% else %>
+        <%= t('changing_payroll_group_warning_message') %>
+      <% end %>
+    </div>
+    <div class="fields-val">
+      <% if @pending_payslips.count > 0 %>
+        <% if @rejected_payslips.count > 0 %>
+          <%= "#{@pending_payslips.count} #{t('pending_payslips')} #{t('and')} #{@rejected_payslips.count} #{t('rejected_payslips')}" %>
+        <% else %>
+          <%= "#{@pending_payslips.count} #{t('pending_payslips')}" %>
+        <% end %>
+      <% else %>
+        <% if @rejected_payslips.count > 0 %>
+          <%= "#{@rejected_payslips.count} #{t('rejected_payslips')}" %>
+        <% end %>
+      <% end  %>
+    </div>
+    <%= link_to t('view_payslips'),{:controller => 'employee_payslips', :action => 'view_employee_pending_payslips', :employee_id => @employee.id, :from => params[:from]}, :target => "_blank" %>
+    <div class="fields-val">
+      <% if params[:from] == "assigned_employees" %>
+        <%= t('removing_to_this_group_after_fixing') %>
+      <% else %>
+        <%= t('adding_to_this_group_after_fixing') %>
+      <% end %>
+    </div>
+  </div>
+</div>
+<div  id="MB_footer">
+  <input class="submit_button" value="<%= "#{t('ok')}" %>" type="button" onclick="Modalbox.hide();" id="close"/>
+</div>

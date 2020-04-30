@@ -1,0 +1,160 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('generate_payslips') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :employee_payslips_generate_payslips, [@payroll_group, [@start_date, @end_date] ]%>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="header">
+    <%= t('generate_payslips') %>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payroll_group') %>:</label>
+    <div class="text-input-bg" id="label_value"> <%= @payroll_group.name %> </div>
+  </div>
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payment_frequency') %>: </label>
+    <div class="text-input-bg" id="label_value"><%= @payroll_group.salary_type_value + " - " + @payroll_group.payment_period_value %></div>
+  </div>
+
+  <div id="select_date">
+    <%=  render :partial => "date_selection" %>
+  </div>
+
+  <div id="date_range" style="display:none;"><%= render :partial => 'payslip_date_range' %></div>
+  <div id="list_payslip" style="display:none;"><%= render :partial=> 'list_payslips' %> </div>
+
+</div>
+
+<script type="text/javascript">
+
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>".split(',');
+  var month_names_short = "<%= I18n.t('date.abbr_month_names').compact.join(',') %>".split(',');
+  j.datepicker.regional["<%= I18n.locale.to_s %>"] = {
+    monthNames: month_names,
+    monthNamesShort: month_names_short
+  }
+  j.datepicker.setDefaults(j.datepicker.regional["<%= I18n.locale.to_s %>"]);
+
+  format = "<%= date_format %>";
+  switch(format){
+    case '2':
+      format_str = 'mm-dd-yy';
+      break;
+    case '3':
+      format_str = 'yy-mm-dd';
+      break;
+    default:
+      format_str = 'dd-mm-yy';
+      break;
+  }
+  if (<%= request.post? %> || '<%=  params[:from] %>' || '<%= params[:start_date] %>'){
+    j("#select_date").hide();
+    j('#date_range').show();
+    j("#list_payslip").show();
+  }
+  
+  var start_date = "",end_date = "";
+  function calculateDateRange(date){
+    j(".wrapper").hide();
+    pay_period = <%=  @payroll_group.payment_period %>
+    var curr = new Date(date);
+    var firstday, first, lastday;
+    switch(pay_period) {
+      case 1:
+        firstday = new Date(curr);
+        lastday = new Date(curr);
+        start_date = formatDate(firstday);
+        end_date = formatDate(lastday);
+        date_str = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",start_date)))
+
+        break;
+      case 2:
+        first = curr.getDate() - curr.getDay();
+        firstday = new Date(curr.setDate(first));
+        lastday = new Date(curr.setDate(firstday.getDate() + 6));
+        start_date = formatDate(firstday);
+        end_date = formatDate(lastday);
+        date_str = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",start_date))) + " - " + j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",end_date)))
+
+        break;
+      case 3:
+        cur_ranges = <%= @payroll_group.payslips_date_ranges.map{|r| [r.start_date.to_s, r.end_date.to_s]}.to_json %>;
+        flag = 0;
+        cur_ranges.map(function(range){
+          s_date = new Date(range.first());
+          e_date = new Date(range.last());
+          if((s_date <= curr) && (curr <= e_date))
+          {
+            flag = 1;
+            firstday = new Date(s_date);
+            lastday = new Date(e_date);
+          }
+        });
+        if(flag == 0)
+        {
+          first = curr.getDate() - curr.getDay();
+          firstday = new Date(curr.setDate(first));
+          lastday = new Date(curr.setDate(firstday.getDate() + 13));
+        }
+        start_date = formatDate(firstday);
+        end_date = formatDate(lastday);
+        date_str = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",start_date))) + " - " + j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",end_date)))
+        break;
+      case 4:
+        day_of_month = curr.getUTCDate();
+        if(day_of_month >= 1 && day_of_month <= 15){
+          firstday = new Date(curr.getFullYear(), curr.getMonth(), 1);
+          lastday = new Date(curr.getFullYear(), curr.getMonth(), 15);
+        }
+        else if(day_of_month >= 16 && day_of_month <= 31){
+          firstday = new Date(curr.getFullYear(), curr.getMonth(), 16);
+          lastday = new Date(curr.getFullYear(), curr.getMonth() + 1, 0);
+        }
+        start_date = formatDate(firstday);
+        end_date = formatDate(lastday);
+        date_str = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",start_date))) + " - " + j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",end_date)))
+        break;
+      case 5:
+        firstday = new Date(curr.getFullYear(), curr.getMonth(), 1);
+        start_date = formatDate(firstday);
+        lastday = new Date(curr.getFullYear(), curr.getMonth() + 1, 0);
+        end_date = formatDate(lastday);
+        format_str = 'MM yy';
+        date_str = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",start_date)));
+        break;
+      }
+     
+      
+      j(".calendar_label").val(date_str)
+
+
+    }
+
+
+    function formatDate(date) {
+      var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+
+      return [year, month, day].join('-');
+    }
+ 
+  
+
+</script>

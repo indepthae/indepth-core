@@ -1,0 +1,39 @@
+
+<h1><%= @school_group.name %></h1>
+<% form_for :smtp_config do |f| %>
+  <%= error_messages_for "school_group" %>
+  <h2>SMTP Settings</h2>
+
+  <%= hidden_field_tag "id", @school_group.id %>
+
+  <%= f.label :enable_starttls_auto %>
+  <%= f.text_field 'enable_starttls_auto', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['enable_starttls_auto'], :class=>'text', :id=>'username' %>
+
+  <%= f.label :address %>
+  <%= f.text_field 'address', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['address'], :class=>'text', :id=>'password' %>
+
+  <%= f.label :port %>
+  <%= f.text_field 'port', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['port'], :class=>'text', :id=>'host_url' %>
+
+  <%= f.label :user_name %>
+  <%= f.text_field 'user_name', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['user_name'], :class=>'text', :id=>'sendername' %>
+
+  <%= f.label :password %>
+  <%= f.text_field 'password', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['password'] %>
+
+  <%= f.label :authentication %>
+  <%= f.text_field 'authentication', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['authentication'] %>
+
+  <%= f.label :domain %>
+  <%= f.text_field 'domain', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['domain'] %>
+
+  <div class='form-actions'>
+    <%= f.submit 'Save', :class  => 'default btn' %>
+    <%= link_to 'Delete', { :action=>'remove_smtp_settings', :id=>@school_group.id }, :confirm=>"Are you sure?",:class  => 'btn-danger btn' %> <br/>
+  </div>
+
+  <% unless @current_group_settings.nil? %>
+    <%= link_to "Validate SMTP settings", :action=> :check_smtp_settings, :id=> @school_group.id  %>
+  <% end %>
+
+<% end %>

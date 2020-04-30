@@ -1,0 +1,112 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="register">
+  <div class="header">
+    <div class="prev">
+      <%= link_to_remote "◄", :url=>{:controller=>"timetable", :action=>"timetable",:next=>(@today-1.day)} %>
+    </div>
+    <div class="month">
+      <%= format_date(@today,:format=>:long) %>
+    </div>
+    <div class="next">
+      <%= link_to_remote "►", :url=>{:controller=>"timetable", :action=>"timetable",:next=>(@today+1.day)} %>
+    </div>
+    <div class="extender"></div>
+  </div>
+</div>
+
+<div class="table">
+  <% if @batches.present? %>
+    <% @batches.each do |b| %>
+      <% weekday = b.weekday_set.nil? ? @week_day_set_ids : b.weekday_set.weekday_ids %>
+      <% @timetable = nil %>
+      <% timetable_entries_data = Timetable.tte_for_the_day(b, @today) %>
+      <% @timetable = timetable_entries_data[:timetable_entries] %>
+      <% @timetable_swaps = timetable_entries_data[:timetable_swaps] %>
+      <% unless @timetable.blank? %>
+        <table border="0" align="center" width="100%" id="timing"  cellspacing="0">
+          <tr>
+            <td class="head">
+              <div class="top">
+                <%= t('time_text') %>
+              </div>
+              <div class="bottom">
+                <div class="course themed_text">
+                  <%= shorten_string(b.course.code + ' - ' + b.name,30) %>
+                </div>
+              </div>
+            </td>
+            <td class="td-blank"> </td>
+            <% @timetable.each do |t| %>        
+              <% tswap = @timetable_swaps[t.id].present? ? @timetable_swaps[t.id].last : nil %>
+              <% @timing = ClassTiming.find(t.class_timing_id) %>
+              <td class="blocks <%= tswap.present? ? (tswap.is_cancelled ? 'cancelled' : 'swapped') : ''%>">                  
+                <div class="top">
+                  <%= format_date(@timing.start_time,:format=>:time) unless @timing.start_time.nil? %>-<%= format_date(@timing.end_time,:format=>:time) unless @timing.end_time.nil? %>
+                </div>
+                <div class="bottom">
+                  <% title_subject_name = (tswap.present? and !tswap.is_cancelled) ? tswap.subject.full_name : t.assigned_name %>
+                  <% subject_name = (tswap.present? and !tswap.is_cancelled) ? "#{tswap.subject.name} (#{tswap.subject.code})" : t.assigned_name_with_code %>
+                  <div class="subject" title="<%= subject_name %>">
+                    <% if (tswap.present? and !tswap.is_cancelled) %>
+                      <%= shorten_string(t.assigned_name_with_code,15) %><br/>
+                      <%= t('changed_to') %><br/>
+                    <% end %>  
+                    <%= shorten_string(subject_name,15) %>
+                  </div>
+                  <% if @config.include?('HR') %>
+                    <div class="employee" title="<%= (tswap.present? and !tswap.is_cancelled) ? tswap.employee.full_name : ((t.present? and t.employees.present?) ? t.employees.map(&:first_name).join(', ') : t('no_teacher')) %>" >
+                      <% if t.employees.present? %>
+                        <% unless t.nil? %>
+                          <% unless t.entry.nil? %>
+                            <% unless t.entry_type == "Subject"   %>
+                              <%= "(#{t('elective')})" %>
+                            <% else %>
+                              <%= (tswap.present? and !tswap.is_cancelled) ? tswap.employee.full_name : (t.employees.present? ? t.employees.map(&:first_name).join(', ') : t('no_teacher')) %>
+                              <!-- % t.employees.map(&:first_name).join(', ') unless t.employees.nil? %-->
+                            <% end %>
+                          <% end %>
+                        <% end %>
+                      <% else %>
+                        <%= t('no_teacher') %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+            <% end %>
+
+          </tr>
+        </table>
+      <% else %>
+        <div class="no-tt-entry"><%= t('no_timetable_entry_for_this_batch') %>: <%= b.full_name %> </div>
+      <% end %>
+    <% end %>
+  <% else %>
+    <div class="no-tt-entry"><%= t('flash_msg16') %> </div>
+  <% end %>
+
+</div>
+<script>
+  j('.employee').each(function(a,b){
+    w = j(b).width();s = j(b).html().trim();l = s.length;l1 = parseInt(w / 3.2);
+    if(l1 < l){j(b).html(s.substr(0,l1)+'...');}
+  });
+</script>

@@ -1,0 +1,8 @@
+if @deducted
+  page.replace_html 'modal-box', :partial => 'view_attendance'
+  page << "Modalbox.show($('modal-box'), {title: '', width: 500});"
+else
+  page << "j('#session_fingerprint').val('#{session_fingerprint}');"
+  page.replace_html 'modal-box', :partial => 'edit'
+  page << "Modalbox.show($('modal-box'), {title: '', width: 500});"
+end

@@ -1,0 +1,6 @@
+<!--% category_id = @category.new_record? ? (@category.registered ? 'registered' : nil) : @category.id %-->
+<% category_id = @category.category_id %>
+<% form_remote_for @document, :url => student_document_path({:id => @document, :category_id => category_id}) do |form| %>
+  <%= render :partial => "document_form", :locals => {:form => form} %>
+  <%= form.submit  "", :value => "#{t('update_document')}", :class => "submit_button edit_submit_button", :id => "submit_button" %>
+<% end %>

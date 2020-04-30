@@ -1,0 +1,18 @@
+<% printer ||= false %>
+<% preview ||= false %>
+<% template_exists = (template_id.present? and @data[:templates].has_key?(template_id.to_i)) %>
+<% template_exists = false if printer && preview %>
+<% tr_status = transaction_status rescue nil  %>
+<% if !preview and tr_status == 'PENDING' %>
+  <div style="width:100%;float:left;margin-top:20px;"><%= t('pending_receipt_notice') %></div>
+<% end %>
+<% if template_exists %>
+  <div id="pdf-footer-second">
+      <div class="note_part"><%= @data[:templates][template_id.to_i].try(:last).footer_content %></div>
+      <%= render :partial => "finance_extensions/receipts/defaults/receipt_signature",
+        :locals => {:default_configs => default_configs} %>
+  </div>
+<% else %>
+  <%= render :partial => "finance_extensions/receipts/defaults/receipt_footer",
+    :locals => {:default_configs => default_configs, :printer => printer} %>
+<% end %>

@@ -1,0 +1,52 @@
+<% recipient = get_recipient(@thread) %>
+<% entry = get_entry(recipient) %>
+<% if entry %>
+  <td class="thread_entry">
+      <div class="thread_entry">
+          <div class="entry-thumbnail">
+              <% if !recipient.parent? %>
+                <%= image_tag entry.photo.url(:original, false) %>
+              <% else %>
+                <%= image_tag "single_user.png" %>
+              <% end %>
+          </div>
+          <div class="entry_detail">
+              <div class="name"><%= entry.full_name %></div>
+              <div class="sec_info">
+                  <%if recipient.student?%>
+                    <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                  <%elsif recipient.parent?%>
+                    <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                  <%else%>
+                    <%= "#{t('department')} : #{entry.department}" %>
+                  <%end%>
+              </div>
+              <div class="subject"><%= @thread.subject %></div>
+          </div>
+      </div>
+  </td>
+<% else %>
+  <tr class="th_entry" data-id="<%=@thread.id%>" id="thread_<%=@thread.id%>">
+      <td class="thread_entry">
+          <div class="thread_entry">
+              <% if recipient and recipient.admin? and !recipient.is_deleted%>
+                <div class="entry-thumbnail"><%= image_tag "single_user.png" %></div>
+                <div class="entry_detail">
+                    <div class="name"><%= recipient.full_name %></div>
+                    <div class="sec_info"><%=recipient.user_type%></div>
+                    <div class="subject"><%= @thread.subject %></div>
+                </div>
+              <%else%>
+                <div class="entry-thumbnail">
+                    <%= image_tag "blocked_user.png" %>
+                </div>
+                <div class="entry_detail">
+                    <div class="name"><%= t('deleted_user')%></div>
+                    <div class="subject"><%= @thread.subject %></div>
+                </div>
+              <%end%>
+
+          </div>
+      </td>
+  </tr> 
+<% end %>

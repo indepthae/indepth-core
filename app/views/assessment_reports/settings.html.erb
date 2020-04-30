@@ -1,0 +1,282 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%=t('student_report_settings')%></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%#= link_to t('preview_report'),{ :action => 'preview',:report_format_type => "pdf", :assessment_plan_id => @plan.id},:target=>"_blank" %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_report_settings, @plan %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg" id="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <p id="flash-msg1"></p>
+    <div class="exam_planner_head">
+        <div class="left">
+            <div class="clm">
+                <div class="label"><%="#{t('exam_plan_name')}"%></div>
+                <div class="value">
+                    <%=@plan.name%>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="clm">
+                <div class="label"><%=t('academic_year')%></div>
+                <div class="value"><%=@academic_year.name%></div>
+            </div>
+            <div class="clm text-right">
+                <div class="label"><%=t('no_of_terms')%></div>
+                <div class="value"><%=@plan.terms_count%></div>
+            </div>
+            <div class="clm text-right">
+                <div class="label"><%=t('courses_linked_count')%></div>
+                <div class="value"><%=@plan.courses.count%></div>
+            </div>
+        </div>
+    </div>
+    <div class="report_settings_container">
+        <%= render :partial => 'settings_listing_tabs' %> 
+    </div>
+</div>
+<script type="text/javascript">
+  if (<%= @setting[:use_cbse_logo]== "0" %>) {
+      j('#cbse_logo').css('display', 'none');
+  }
+  function toggleCbseLogo(el) {
+      j('#cbse_logo').toggle();
+  }
+
+  get_profile_details = function (elm, type) {
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_groups/fetch_profiles', {
+              parameters: {'profile_id': elm.value, 'profile_type': type},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j(elm).closest('#set_grade').find('#profile_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j(elm).closest('#set_grade').find('#profile_details').html('');
+  }
+
+  get_template_details = function (elm) {
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_reports/fetch_templates', {
+              parameters: {'template': elm.value, 'plan_id': <%=@plan.id%>},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'get',
+              onLoading: function () {
+                  //j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  //j('#select-template-conatiner').html(resp.responseText);
+                  //j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j('#report_cont').html('<%= content_tag(:div, t('select_a_template'), :class => 'no_template') %>');
+  }
+
+  view_templates = function (elm) {
+      new Ajax.Request('/assessment_reports/fetch_templates', {
+          parameters: {'plan_id': <%=@plan.id%>},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function () {
+              //j(elm).closest('.text-input-bg').next('#loader').show();
+          },
+          onComplete: function (resp) {
+              //j('#select-template-conatiner').html(resp.responseText);
+              //j(elm).closest('.text-input-bg').next('#loader').hide();
+          }
+      });
+  }
+  
+  preview_template = function (elm){
+    template_name = j(elm).parent().parent().find('input[type=radio]').val()
+    new Ajax.Request('/assessment_reports/template_preview', {
+          parameters: {'template': template_name},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function () {
+              //j(elm).closest('.text-input-bg').next('#loader').show();
+          },
+          onComplete: function (resp) {
+              //j('#select-template-conatiner').html(resp.responseText);
+              //j(elm).closest('.text-input-bg').next('#loader').hide();
+          }
+      });
+  
+  }
+  
+  set_popup_width_template_preview = function(){
+      j('#popup_header_part').attr('style', 'width: 540px !important');
+      j('#popup_content').attr('style', 'width: 540px !important');
+      j('#popup_footer').attr('style', 'width: 540px !important');  
+  }
+
+  get_gradeset_details = function (elm, type) {
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_reports/fetch_profiles', {
+              parameters: {'profile_id': elm.value, 'profile_type': type},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j(elm).closest('#' + type + '_grade').find('#' + type + '_profile_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j(elm).closest('#' + type + '_grade').find('#' + type + '_profile_details').html('');
+  }
+
+  toggle_grade_set = function (elm) {
+      j('#set_grade').toggle();
+      if (j('#set_grade').is(':hidden')) {
+          j('#assessment_report_setting_grade_set_id').val('');
+          j('#profile_details').html('');
+      }
+  }
+
+  toggle_report_grade_set = function (elm, type) {
+      j('#' + type + '_grade').toggle();
+      if ((j('#' + type + '_grade')).is(':hidden')) {
+          j('#assessment_report_setting_' + type + '_grade_scale').val('');
+          j('#' + type + '_profile_details').html('');
+      }
+  }
+
+  function toggle_attendance_elements(obj) {
+      if (j(obj).prop('checked')) {
+          j('.attendance_settings_elements').prop('disabled', false);
+          if (j('#attendance_settings_term_attendance').prop('checked'))
+              j('.term_attendance_radio').prop('disabled', false);
+          if (j('#attendance_settings_planner_attendance').prop('checked'))
+              j('.planner_attendance_radio').prop('disabled', false);
+      } else {
+          j('.attendance_settings_elements').prop('disabled', true);
+          j('.term_attendance_radio').prop('disabled', true);
+          j('.planner_attendance_radio').prop('disabled', true);
+      }
+  }
+
+  function toggle_custom_report_elements(obj) {
+      var checked = j(obj).prop('checked');
+      if (checked) {
+          j('.select-template-conatiner').css('display', 'block')
+      } else {
+          j('.select-template-conatiner').css('display', 'none')
+          j('.report_cont').html('');
+      }
+      new Ajax.Request('/assessment_reports/general_settings', {
+          parameters: {'plan_id': <%=@plan.id%>, 'enable_custom_template': checked},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function () {
+              j(elm).closest('.text-input-bg').next('#loader').show();
+          },
+          onComplete: function (resp) {
+              j('#report_cont').html(resp.responseText);
+              j(elm).closest('.text-input-bg').next('#loader').hide();
+          }
+      });
+  }
+
+  function toggle_report_elements(obj) {
+      if (j(obj).prop('checked'))
+          j('.advanced_settings_element').prop('disabled', false);
+      else
+          j('.advanced_settings_element').prop('disabled', true);
+  }
+  function toggle_grade_scale_elements(obj) {
+      if (j(obj).prop('checked'))
+          j('.grade_scale_element').prop('disabled', false);
+      else
+          j('.grade_scale_element').prop('disabled', true);
+  }
+  function toggle_term_radios(obj) {
+      if (j(obj).prop('checked'))
+          j('.term_attendance_radio').prop('disabled', false);
+      else
+          j('.term_attendance_radio').prop('disabled', true);
+  }
+  function toggle_planner_radios(obj) {
+      if (j(obj).prop('checked'))
+          j('.planner_attendance_radio').prop('disabled', false);
+      else
+          j('.planner_attendance_radio').prop('disabled', true);
+  }
+  function toggle_calculation_radios() {
+      if (j('#attendance_settings_calculation_mode_0').prop('checked'))
+          j('#attendance_settings_include_exam_duration').prop('disabled', false);
+      else
+          j('#attendance_settings_include_exam_duration').prop('disabled', true);
+  }
+  function enable_student_records(obj, disable) {
+      if (j(obj).prop('checked')) {
+          if (!disable)
+              j('.frequency_radio').prop('disabled', false);
+          j('.manage_link').removeClass('hide_link');
+          j('.disabled_link').removeClass('show_link');
+      } else {
+          j('.frequency_radio').prop('disabled', true);
+          j('.manage_link').addClass('hide_link');
+          j('.disabled_link').addClass('show_link');
+      }
+  }
+
+  function submit_record_links() {
+      if (j('#gradebook_record_group_name').val() === "") {
+          makeError();
+          j('#submit_button').prop('disabled', true);
+      } else {
+          remove_popup_box();
+      }
+  }
+  function validate_name(evt) {
+      if (evt.charCode > 0) {
+          removeError();
+          j('#submit_button').prop('disabled', false);
+      }
+  }
+  makeError = function () {
+      var msg = "hiii";
+      j('#gradebook_record_group_name').siblings('.error-icon').remove();
+      j('#gradebook_record_group_name').addClass("error-field");
+      icon = j('<div></div', {'class': 'error-icon'});
+      icon.attr('tooltip', '<%= t('name_cannot_be_nil') %>');
+      j('#gradebook_record_group_name').parent().append(icon);
+  };
+  removeError = function () {
+      j('#gradebook_record_group_name').siblings('.error-icon').remove();
+      j('#gradebook_record_group_name').removeClass("error-field");
+
+  };
+
+
+</script>

@@ -1,0 +1,16 @@
+<div class="modal-form no-bottom-margin"> 
+    <div class="form_type_selector">
+        <%=radio_button_tag  "form_type", "applicant_addl_field", true, {:id=>"appl_radio",:onchange=>"toggle_field_forms();"} %>
+        <label for="appl_radio"><%= t('create_new_field') %></label>
+        <%= radio_button_tag  "form_type", "student_addl_field", false, {:id=>"addl_radio",:onchange=>"toggle_field_forms();"} %>
+        <label for="addl_radio"><%= t('link_addl_field') %></label>
+    </div>
+    <div class="desc-section" id="new_field_desc"><%= t("add_field_desc") %></div>
+    <div class="desc-section" id="link_field_desc" style="display:none"><%= t("link_field_desc") %></div>
+</div>
+<div id="field_form">
+  <%= render :partial=>"applicants_admins/input_field_form", :locals=>{:field_order=>field_order, :field_index=>field_index, :field_section_index=>field_section_index} %>
+</div>
+<div id="link_field_form" style="display:none">
+  <%= render :partial=>"applicants_admins/link_addl_field_form", :locals=>{:field_order=>field_order, :field_index=>field_index, :field_section_index=>field_section_index} %>  
+</div>

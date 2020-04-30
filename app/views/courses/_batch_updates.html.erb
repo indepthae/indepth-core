@@ -1,0 +1,65 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+<div id="batches_container">
+  <div id="batches_menu">
+    <button id="active_batch_button" class="active menu_batch_list"><%= t('active_batches').titleize %> (<%=  @active_batch_count%>)</button>
+    <button id="inactive_batch_button" class="menu_batch_list"><%= t('inactive_batches').titleize %> (<%=  @inactive_batch_count%>)</button>
+    <div id=batch_loader_div>
+      <%= image_tag("Loader-transparant.gif",:align => "absmiddle",:border => 0,:id => "batch_loader", :style =>"display: none;" ) %>
+    </div>
+  </div>
+  <div id="batches_list">
+    <div id="update_batch"></div>
+  </div>
+</div>
+
+<script type="text/javascript" >
+
+j(document).ready(function(){
+    j('#inactive_batch_button').click(function() {
+        j('#active_batch_button').removeClass('active');
+        if ( j(this).hasClass('active')) {
+          } else {
+            j(this).addClass('active');
+            j.ajax({
+            url: '/courses/update_batch/',
+            type: 'POST',
+            data: {type: 'inactive_batch', course_name: <%=  @course_id %>, page: 1},
+            beforeSend: function(){
+              j('#batch_loader').show()
+              },
+            complete: function(){
+              j('#batch_loader').hide()
+              },
+            success: function(result){
+            }
+            });
+          }
+    });
+});
+  j(document).ready(function(){
+    j('#active_batch_button').click(function() {
+        j('#inactive_batch_button').removeClass('active');
+        if ( j(this).hasClass('active')) {
+        
+        } else {
+            j(this).addClass('active');
+            j.ajax({
+            url: '/courses/update_batch/',
+            type: 'POST',
+            data: {type:'active_batch', course_name: <%=  @course_id %>, page: 1},
+            beforeSend: function(){
+              j('#batch_loader').show()
+              },
+            complete: function(){
+              j('#batch_loader').hide()
+              },
+            success: function(result){
+            }
+            });
+        }
+    });
+});
+</script>

@@ -1,0 +1,69 @@
+<% if (rtl?) %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('expense') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('expense_list') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% _params = [@start_date, @end_date] %>
+
+        <% if @accounts_enabled %>
+          <% _params += [@account_id] %>
+          <% additional_params = {:fee_account_id => @account_id} %>
+        <% else %>
+          <% _params += [] %>
+          <% additional_params = {} %>
+        <% end %>
+        <% breadcrumb :finance_income_details, [@expense_category, _params] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div class="list_table_div">
+        <div class="main_head_label" style="margin-bottom: 30px">
+            <b id="fees_report_title"><%=@expense_category.name%></b>
+        </div>
+        <% unless @expense.empty? %>
+          <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+              <tr class="main_head">
+                  <td><%= t('name') %></td>
+                  <td class="set_border_right"><%= t('description') %></td>
+                  <td class="set_border_right" ><%= t('amount') %> (<%= currency %>)</td>
+                  <td class="set_border_right"><%= t('transaction_date') %></td>
+                  <td class="set_border_right"><%= t('voucher_no') %></td>
+              </tr>
+              <% @expense.each do |i| %>
+                <tr class="row-b">
+                    <td><%= i.title %></td>
+                    <td class="set_border_right"><%= i.description %></td>
+                    <td class="set_border_right" align="right">
+                        <%= precision_label(i.amount) %>
+                    </td>
+                    <td class="set_border_right"><%= format_date(i.transaction_date) %></td>
+                    <td class="set_border_right"><%= i.voucher_no %></td>
+                </tr>
+              <% end %>
+          </table>
+          <div class="total_amount_div">
+              <label><%= t('net_expenses') %></label>
+              <label class="amount_label"><%=precision_label(@grand_total)%></label>
+          </div>
+          <div class="seprater_div_bottom">
+              <div id="inner-tab-menu">
+                  <ul>
+                      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('csv_report')}",
+                            {:controller => "csv_export", :action => "generate_csv",:id=>params[:id],:csv_report_type => "custom_category - #{@expense_category.name}", :report_format_type => "csv",:start_date => @start_date, :end_date=>@end_date}%></li>
+                  </ul>
+              </div>
+          </div>
+        <% else %>
+          <div class="no_entries"><%=t('no_transactions_present')%></div>
+        <% end %>
+    </div>
+</div>
+

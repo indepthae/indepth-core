@@ -1,0 +1,42 @@
+<div id="complete_block">
+  <%unless @courses.blank?%>
+    <div id="info_msg">For each class, set the pass criteria. If required, provide an alternative text for "Passed" and "Eligible for Improvement of Performance" that will be displayed as the result in the students' CCE report. (Alternative text for "Passed" - e.g., Promoted to next class)</div>
+    <div id="core_part">
+      <div id="head_part">
+        <div id="course_part">Class</div>
+        <div id="pass_criteria">Pass criteria</div>
+        <div id="labels_part_1">Alternative text for "Passed"</div>
+        <div id="labels_part_2">Alternative text for "Eligible for Improvement of Performance"</div>
+      </div>
+      <div class="hor_line_1"></div>
+      <% remote_form_for :eiop_setting,:url =>{:controller=>'cce_report_settings',:action=>'manage_criteria'}, :html => { :method => :post } do |c| %>
+        <div class="holder">
+          <%@courses.each_with_index do |course,i|%>
+            <div class="one_row">
+              <div class="course_value padding_top_25"><%=course.full_name%></div>
+              <%=hidden_field_tag "eiop_setting[#{i}][course_id]",course.id%>
+              <div class="criteria_value padding_top_25">
+                <div class="criteria_text">Equal and Above</div>
+                <div class="text-input-bg spl_case">
+                  <%= select_tag "eiop_setting[#{i}][grade_point]",options_for_select(course.batches.map{|b| b.grading_level_list.map{|v| [v.name,v.name]}}.flatten(1).uniq,course.eiop_settings.first.try("grade_point")) %>
+                </div>
+              </div>
+              <div class="label_values">
+                <div class ="blk_data">
+                  <div><%=text_area_tag "eiop_setting[#{i}][pass_text]",course.eiop_settings.first.try("pass_text")%></div>
+                  <div><%=text_area_tag "eiop_setting[#{i}][eiop_text]",course.eiop_settings.first.try("eiop_text")%></div>
+                </div>
+              </div>
+            </div>
+            <div class="hor_line_1 top_bottom_margin"></div>
+          <%end%>
+        </div>
+        <div id="submit_button">
+          <%= submit_tag "Save criteria",:id=>'submit-button'%>
+        </div>
+      <%end%>
+    </div>
+  <%else%>
+    <p class="flash-msg">No classes added yet</p>
+  <%end%>
+</div>

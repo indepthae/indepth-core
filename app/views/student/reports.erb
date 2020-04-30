@@ -1,0 +1,366 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('students') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('report_center') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :student_reports, @student %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div id="compact_student_profile_heading">
+        <div id="profile_picture_display">
+            <% if @student.photo.file? %>
+              <%= image_tag @student.photo.url(:original, false) %>
+            <% else %>
+              <%= image_tag "master_student/profile/default_student.png" %>
+            <% end %>
+        </div>
+
+        <div id ="combact_student_main_info">
+            <div class="combact_student_info_fields"><span class="combact_student_info_label"><%= t('name') %> : </span><span class="combact_student_info_value"><%= @student.full_name %></span></div>
+            <div class="combact_student_info_fields"><span class="combact_student_info_label"><%= t('adm_no') %> : </span><span class="combact_student_info_value"><%= @student.admission_no %></span></div>
+            <div class="combact_student_info_fields"><span class="combact_student_info_label"><%= t('course_text') %> : </span><span class="combact_student_info_value"><%= @student.batch.course.full_name %></span></div>
+            <div class="combact_student_info_fields"><span class="combact_student_info_label"><%= t('roll_no') %> : </span><span class="combact_student_info_value"><%= @student.roll_number.present? ? @student.roll_number : "-" %></span></div>
+        </div>
+
+        <div class="extender"> </div>
+
+    </div>
+
+    <div id="exam-results-dashboard">
+
+        <h3><%= t('academic_reports') %></h3>
+
+        <!-------------------------First Column Grouped/Subject wise and overall / yearly reports------------------------->
+        <div class="exam-results-reports-col">
+            <%unless @batch.cce_enabled?%> <!-------Normal Case----------->
+              <% if can_access_request? :generated_report,@student.batch,:context=>:exam %>
+                <% if @exam_groups.present? %>
+                  <h4><%= t('recent_exams') %></h4>
+                  <ul class="category-list">
+                      <% @exam_groups.each do |e| %>
+                        <li class="list<%=cycle('odd', 'even')%>">
+                            <label>
+                                <div class="category-name">
+                                    <%= link_to e.name,{:controller => 'exam', :action => 'generated_report',:exam_group=>e.id, :student=>@student.id}%>
+                                </div>
+                            </label>
+                        </li>
+                      <% end %>
+                  </ul>
+                <%end%>
+              <%end%>
+              <%if can_access_request? :generated_report3,@student.batch,:context=>:exam%>
+                <% if @subjects.present? %>
+                  <h4><%= t('subject_wise_report') %></h4>
+                  <ul class="category-list">
+                      <% @subjects.each do |s| %>
+                        <li class="list<%=cycle('odd', 'even')%>">
+                            <label>
+                                <div class="category-name">
+                                    <%= link_to s.name, { :controller => 'exam', :action => 'generated_report3', :student => @student.id, :subject => s.id } %>
+                                </div>
+                            </label>
+                        </li>
+                      <% end %>
+                  </ul>
+                <% end %>
+              <%end%>
+              <% unless @old_batches.empty? %>
+                <h4><%= t('previous_batch_reports') %></h4>
+                <ul class="category-list">
+                    <% @old_batches.each do |b| %>
+                      <% unless GroupedExam.find_all_by_batch_id(b.id).empty? %>
+                        <li class="list<%=cycle('odd', 'even')%>">
+                            <label>
+                                <div class="category-name">
+                                    <%= link_to b.full_name+'-G',{:controller=>'exam', :action=>'generated_report4',:student=>@student.id,:batch=>b.id,:type=>'grouped'} %>
+                                </div>
+                            </label>
+                        </li>
+                      <% else %>
+                        <li class="list<%=cycle('odd', 'even')%>">
+                            <label>
+                                <div class="category-name">
+                                    <%= link_to b.full_name,{:controller=>'exam', :action=>'generated_report4',:student=>@student.id,:batch=>b.id,:type=>'general'} %>
+                                </div>
+                            </label>
+                        </li>
+                      <% end %>
+                    <% end %>
+                </ul>
+              <% end %>
+            <% else %> <!-------------CCE------------------------------>
+              <% if @first_term.present? %>
+                <h4>Term 1 - <%=@first_term.name%> </h4>
+                <ul class="category-list">
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "Overall Report",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@first_term.id, :report_type=>'groups'  } %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "FA 1",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@first_term.id,:fa_group=>"FA1",:report_type=>'groups'   } %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "FA 2",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@first_term.id,:fa_group=>"FA2" ,:report_type=>'groups' } %>
+                            </div>
+                        </label>
+                    </li>
+                </ul>
+              <%end%>
+              <%if @second_term.present?%>
+                <h4>Term 2 - <%=@second_term.name%> </h4>
+                <%reset_cycle%>
+                <ul class="category-list">
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "Overall Report",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@second_term.id ,:report_type=>'groups'  } %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "FA 3",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@second_term.id,:fa_group=>"FA3",:report_type=>'groups'   } %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "FA 4",{:controller=>'cce_reports', :action=>'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id, :cat_id=>@second_term.id,:fa_group=>"FA4" ,:report_type=>'groups' } %>
+                            </div>
+                        </label>
+                    </li>
+                </ul>
+              <%end%>
+
+            <% end %>
+            <!-------------------------Overall / yearly Report----------------------------->
+            <% if @batch.cce_enabled? or @batch.icse_enabled? %>
+              <h4>Yearly Reports</h4>
+            <%else%>
+              <h4><%="#{t('overall')} #{t('reports')}"%></h4>
+            <%end%>
+            <ul class="category-list">
+                <%reset_cycle%>
+                <%if @batch.cce_enabled?  or @graduated_cce_batches.present?  %>
+                  <li class="list<%=cycle('odd', 'even')%>">
+                      <label>
+                          <div class="category-name">
+                              <%= link_to "CCE Transcript Report", { :controller => 'cce_reports', :action => 'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id }%>
+                          </div>
+                      </label>
+                  </li>
+                <% end  %>
+                <% if @batch.icse_enabled? or @student.graduated_icse_batches.present?%>
+                  <li class="list<%=cycle('odd', 'even')%>">
+                      <label>
+                          <div class="category-name">
+                              <%= link_to "ICSE Transcript Report", { :controller => 'icse_reports', :action => 'student_transcript',:id=>@student.id,:batch_id=>@student.batch_id }%>
+                          </div>
+                      </label>
+                  </li>
+                <%end%>
+                <%course=@batch.course%>
+                <%unless course.icse_enabled? or course.cce_enabled? %>
+                  <% unless @grouped_exams.empty? %>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "#{t('final_report')}(#{t('exam_goruped')})",{:controller=>'exam', :action=>'generated_report4',:student=>@student.id,:type=>'grouped'} %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "Transcript Report", { :controller => 'exam', :action => 'student_transcript',:transcript=>{:batch_id=>@student.batch_id},:student_id=>@student.id,:flag=>"1" } %>
+                            </div>
+                        </label>
+                    </li>
+                  <%else%>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "#{t('final_report')}",{:controller=>'exam', :action=>'generated_report4',:student=>@student.id,:type=>'general'} %>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "Transcript Report", { :controller => 'exam', :action => 'student_transcript',:transcript=>{:batch_id=>@student.batch_id},:student_id=>@student.id,:flag=>"1"} %>
+                            </div>
+                        </label>
+                    </li>
+                  <%end%>             
+                <%end%>
+                <% if @batch.cce_enabled? or @batch.icse_enabled?%>
+                  <% if @student.graduated_normal_batches.present? or @batch.icse_enabled? %>
+                    <li class="list<%=cycle('odd', 'even')%>">
+                        <label>
+                            <div class="category-name">
+                                <%= link_to "Transcript Report", { :controller => 'exam', :action => 'student_transcript',:transcript=>{:batch_id=>@student.batch_id},:student_id=>@student.id,:flag=>"1"} %>
+                            </div>
+                        </label>
+                    </li>
+                  <%end%>
+                <% end %>
+            </ul>
+
+        </div>
+    </div>
+    <!-------------------------First Column End ------------------------->
+
+
+    <!-------------------------Second Column Gradebook Report----------------------------->
+    <div id="exam-results-dashboard">
+        <% if @gradebook_reports[@batch.id.to_s].present? or @gb_old_batches_ids.present? %>
+          <h3><%= t('gradebook_reports') %></h3>
+        <% end %>
+        <% if @gradebook_reports[@batch.id.to_s].present? %>
+          <div class="exam-results-reports-col">
+              <% term_reports = @gradebook_reports[@batch.id.to_s].select{|r| r.reportable_type == 'AssessmentTerm'} %>
+              <% exam_reports = @gradebook_reports[@batch.id.to_s].select{|r| r.reportable_type == 'AssessmentGroup'} %>
+              <% plan_reports = @gradebook_reports[@batch.id.to_s].select{|r| r.reportable_type == 'AssessmentPlan'} %>
+              <% if term_reports.present? %>
+                <h4><%= t('student_term_reports') %></h4>
+                <ul class="category-list">
+                    <%reset_cycle%>
+                    <% term_reports.each do |e| %>
+                      <li class="list<%=cycle('odd', 'even')%>">
+                          <label>
+                              <div class="category-name">
+                                  <%= link_to e.reportable.name, students_term_reports_assessment_reports_path(:term_id => e.reportable_id, :course_id => @batch.course_id, :batch_id => @batch.id, :student_id => @student.id) %>
+                              </div>
+                          </label>
+                      </li>
+                    <% end %>
+                </ul>
+              <% end %>
+              <% if exam_reports.present? %>
+                <h4><%= t('student_exam_reports') %></h4>
+                <ul class="category-list">
+                    <%reset_cycle%>
+                    <% exam_reports.each do |e| %>
+                      <li class="list<%=cycle('odd', 'even')%>">
+                          <label>
+                              <div class="category-name">
+                                  <%= link_to e.reportable.name, student_exam_reports_assessment_reports_path(:group_id => e.reportable_id, :course_id => @batch.course_id, :batch_id => @batch.id,:student_id => @student.id, :from_student_profile=>true) %>
+                              </div>
+                          </label>
+                      </li>
+                    <% end %>
+                </ul>
+              <% end %>
+              <% if plan_reports.present? %>
+                <h4><%= t('student_plan_reports') %></h4>
+                <ul class="category-list">
+                    <%reset_cycle%>
+                    <% plan_reports.each do |e| %>
+                      <li class="list<%=cycle('odd', 'even')%>">
+                          <label>
+                              <div class="category-name">
+                                  <%= link_to e.reportable.name, students_planner_reports_assessment_reports_path(:plan_id => e.reportable_id, :course_id => @batch.course_id, :batch_id => @batch.id,:student_id => @student.id, :from_student_profile=>true) %>
+                              </div>
+                          </label>
+                      </li>
+                    <% end %>
+                </ul>
+              <% end %>
+
+          </div>
+
+        <% end %>
+        <div class="extender"> </div>
+        <div class="exam-results-reports-col">
+          <% if @gb_old_batches_ids.present? %>
+            <h3><%= t('previous_batches') %></h3>
+            <ul class="category-list">
+            <%reset_cycle%>
+            <% @gb_old_batches_ids.each do |b| %>
+              <% batch = @old_batches.find{|ob| ob.id.to_s == b} %>
+              <% next if batch.nil? %>
+              <li class="list<%=cycle('odd', 'even')%>">
+                <label>
+                    <div class="category-name">
+                      <%= link_to batch.full_name, batch_reports_assessment_report_path(@student.id, :batch_id => batch.id )%>
+                    </div>
+                </label>
+              </li>
+            <% end %>
+            </ul>
+          <% end %>
+        </div>
+    </div>
+    <!-------------------------Second Column End ------------------------>
+    <%if can_access_request? :student,:student_attendance or can_access_request? :student_report,:student_attendance%>
+      <div id="attendance-reports-dashboard">
+          <h3><%= t('attendance_reports_text') %></h3>
+          <div class="attendance-reports-col">
+              <h4><%= t('current_batch_report') %></h4>
+              <ul class="category-list">
+                  <%reset_cycle%>
+                  <li class="list<%=cycle('odd', 'even')%>">
+                      <label>
+                          <div class="category-name">
+                              <%= link_to @batch.full_name, :controller => 'student_attendance', :action => 'student', :id => @student, :year => @batch.id %>
+  <%#= link_to "#{t('current_batch_report')}", :controller => 'student_attendance', :action => 'student', :id => @student %>
+                          </div>
+                      </label>
+                  </li>
+              </ul>
+              <% unless @old_batches.empty? %>
+                <h4><%= t('previous_batches') %></h4>
+                <ul class="category-list">
+                    <%reset_cycle%>
+                    <% @old_batches.each do |b| %>
+                      <li class="list<%=cycle('odd', 'even')%>">
+                          <label>
+                              <div class="category-name">
+                                  <%= link_to b.full_name, :controller => 'student_attendance', :action => 'student_report', :id => @student, :year => b.id %>
+                              </div>
+                          </label>
+                      </li>
+                    <% end %>
+                </ul>
+              <% end %>
+          </div>
+      </div>
+    <%end%>
+
+</div>

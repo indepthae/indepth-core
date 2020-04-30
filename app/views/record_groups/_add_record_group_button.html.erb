@@ -1,0 +1,17 @@
+<div id="add_block"><%="#{t('assign_record_group')}"%></div>
+<script type="text/javascript">
+  j('#add_block').click(function(){
+    j.ajax({
+      type: 'POST' ,
+      url: "/record_groups/add_record_groups_to_course",
+      data : {
+        id : <%=@course.id%>,
+        from_action: "manage_rg_for_course"
+      },
+      success : function(data) {
+        j('tr.st_entry').removeClass('coloured_background');
+        j('tr#'+j('#current_student').val()).addClass('coloured_background');
+      }
+    });
+  });
+</script>

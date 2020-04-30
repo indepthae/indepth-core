@@ -1,0 +1,169 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<link href="/stylesheets/pdf_normalize.css" rel="stylesheet">
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('generate_individual_certificates') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+    <div class="head">
+      <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+      <script src="/javascripts/JsBarcode.all.min.js"></script>
+
+    </div>
+
+    <div class="error_messages" id="error_messages">
+    </div>
+    
+    <div class="academic_year_container">
+      <div class="academic_year_switcher">
+        <label class="normal"><%= t('academic_year') %></label>
+        <%= select '', :academic_year , @academic_years.map{|a| [a.name,a.id]}, {:include_blank=>t('all')}, :class=>"academic_year_selector", :id=>"academic_year" %>
+      </div>
+    </div>
+
+    <div class="initial_values">
+      <div class="certificate_template">
+        <div class="field_section">
+          <div class="field_head">
+            <%= t('certificate_type')%>
+          </div>
+          <div class="field">
+            <%= select "", "certificate_template",
+            options_for_select(@certificate_templates.map{|c| [c.name,c.id]}) ,{:include_blank=>t('certificate_type_placeholder')}, :class=>"input_box", :id=>"template_selector" %>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="select_key_values">
+      <div class="template_keys" id="template_key_form">
+      </div>
+      <div class="certificates_keys" id="certificate_key_form">
+      </div>
+    </div>
+
+    <div id="certificate_preview" class="certificate_preview">
+      <div class="preview exclude_font" id="preview">
+      </div>
+    </div>
+
+
+    <div class="line">
+    </div>
+
+
+    <div class="submit_controls">
+      <button id="generate_certificate" class="solid_button"><%=t('generate_certificate')%></button>
+      <%=link_to t('cancel'), certificate_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+      
+    </div>
+
+
+  </div>
+</div>
+<script>
+  var template_app;
+  var generation_serial_no;
+  var current_academic_year;
+
+  j("#academic_year").change(function(){
+    //reset everything
+    load_template();
+  });
+
+  function load_template(){
+    j.ajax({
+      url: "certificate_template_for_generation",
+      type: 'POST',
+      data:  {certificate_template: j('#template_selector').val()},
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  }
+
+  j("#template_selector").change(function(){
+    load_template();
+  });
+
+  function get_user_id(){
+    var user_id = j("#user_selector").find(':selected').val();
+    if (user_id != undefined && user_id != ""){
+      return user_id;
+    }
+    return false;
+  }
+  
+  function check_if_number(){
+    var flag = !isNaN(j("#user_selector").val()) ; 
+    if (flag == true){
+      return flag;
+    }
+    return false;
+  }
+  
+
+  function get_user_type(){
+    var user_id = j("#user_selector").find(':selected').data("type");
+    if (user_id != undefined && user_id != ""){
+      return user_id;
+    }
+    return false;
+  }
+
+  function get_certificate_id(){
+    if (j("#template_selector").val()!= undefined && j("#template_selector").val()!=""){
+      return j("#template_selector").val();
+    }
+    return false;
+  }
+
+  j("#generate_certificate").click(function(){
+    var user_id = get_user_id();
+    var certificate_id = get_certificate_id();
+    var user_type = get_user_type();
+    var is_a_number = check_if_number();
+    if(user_id != false && certificate_id !=false && is_a_number ){
+      Element.show('loader1');
+      j.ajax({
+        url: "save_generated_certificate",
+        type: 'POST',
+        data: {
+          certificate_html: j("#certificate_preview").html(),
+          user_id: user_id,
+          certificate_template_id: certificate_id,
+          serial_no: generation_serial_no,
+          user_type: user_type
+        },
+        success: function(data, textStatus, jqXHR)
+        {
+          Element.hide('loader1');
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+        }
+      });
+    }
+  });
+
+
+
+
+</script>

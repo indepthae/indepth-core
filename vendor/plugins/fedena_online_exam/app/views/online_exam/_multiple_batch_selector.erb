@@ -1,0 +1,13 @@
+<div class="label-field-pair"><label> <%= t('select_a_batch') %><span class="necessary-field">*</span>  </label></div>
+<div class="fee_category_scroll">
+  <div class="sel-list">
+    Select: <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}" %>,
+    <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}" %>
+  </div>
+  <% batches.each do |f| %>
+    <div class="each_batch">
+      <%= check_box_tag "batch_ids[]", f.id, (batch_ids.include?("#{f.id}") unless batch_ids.nil?) ,:class=>'batches_box', :onChange=>"#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}"%>
+      <span><%= f.full_name %></span>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,36 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('view_results')}", {:action => "view_results"} %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="box">
+    <div id ="errors"></div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="box">
+      <% remote_form_for :exam do |form|  %>
+        <div class="label-field-pair">
+          <label> <%= t('select_exam') %>:</label>
+          <div class="text-input-bg">
+            <%= form.select :exam_id, @exams.map{|c|[c.name,c.id]}, {:prompt => " ► #{t('select_exam')}" }%>
+          </div>
+        </div>
+        <div id="submit-button">
+          <%=form.submit(" ► #{t('go')}") %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

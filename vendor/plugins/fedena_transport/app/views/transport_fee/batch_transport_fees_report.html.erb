@@ -1,0 +1,50 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('finance_transactions') %></h1>
+
+  <div class='header-sep'>|</div>
+  <% batch_or_student_wise = @batch.present? ? @batch.full_name : "#{t('user_text')} #{t('wise')} #{t('fee_collection')}" %>
+  <div class='sub-header'><%= batch_or_student_wise %> <%= t('fees_report') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if @batch.present? %>
+        <% breadcrumb :transport_fee_batch_transport_fees_report, [@batch, [@start_date, @end_date]] %>
+    <% else %>
+        <% breadcrumb :transport_fee_user_wise_transport_fees_report, [@fee_collection, [@start_date, @end_date]] %>
+    <% end %>
+    <%= render_breadcrumbs %>
+  </div>
+  <% total =0 %>
+
+  <b id="transaction-report-title"><%= batch_or_student_wise %> <%= t('transaction_report') %></b>
+
+  <div id="fees-table">
+    <div class="fees-th">
+      <div class="fees-table-description"><p><%= "#{t('student_name')}" %></p></div>
+      <div class="fees-table-income"><%= "#{t('amount')}" %></div>
+      <div class="fees-table-receipt-no"><%= t('receipt_no') %></div>
+      <div class="fees-table-date"><%= "#{t('date_text')}" %></div>
+      <div class="fees-table-payment_mode"> <%= t('payment_mode') %> </div>
+      <div class="fees-table-payment_note"><p> <%= t('payment_notes') %></p></div>
+    </div>
+    <% @transaction.each do |t| %>
+        <div class="list<%= cycle('odd', 'even') %>">
+          <div class="fees-table-description"><p><%= t.transport_student %> </p></div>
+          <div class="fees-table-income"><%= precision_label t.amount %> </div>
+          <div class="fees-table-receipt-no"><%= t.receipt_number %></div>
+          <div class="fees-table-date"><%= format_date(t.created_at, :format=>:short_date) %> </div>
+          <div class="fees-table-payment_mode"> <%= t.payment_mode %></div>
+          <div class="fees-table-payment_note"><p> <%= t.payment_note %></p></div>
+        </div>
+        <% total += t.amount %>
+    <% end %>
+    <br/>
+
+    <div class="fees-th">
+      <div class="fees-table-description"><%= t('total_fees') %></div>
+      <div class="fees-table-income"><%= precision_label total %></div>
+    </div>
+  </div>
+</div>

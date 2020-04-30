@@ -1,0 +1,77 @@
+<% if c.object.marked_for_destruction? %>
+  <%= c.hidden_field :_destroy, :class => "remove_expression", :value => 1 %>
+<% else %>
+  <div class="formula_condition_section">
+    <div class="header"><div><%= t('condition')  %></div>
+      <%= link_to "", "#/" ,:id => "close-link", :onclick => "remove_condition(this)"%>
+    </div>
+    <% if c.object.is_lop or @object_type == 'EmployeeLop' or c.object.hr_formula.try(:formula_type) == 'EmployeeLop' %>
+      <%= c.hidden_field :is_lop, :value => true %>
+    <% end %>
+    <div class="label-field-pair formula_fields">
+      <label for="expression1">If</label>
+      <div class="text-area-bg">
+        <div class="div_link validate" onclick ="clickHandler(this)"><%= t('validate') %></div>
+        <%= c.text_area  :expression1, {:class => "formula"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+        <div class="validate_result">
+          <% if c.object.expression1_valid %>
+            <div class="cross_button tick_symbol"></div>
+            <div class="error-msg success-msg"><%= t('validated_message') %></div>
+          <% end %>
+        </div>
+        <%= c.hidden_field :cat_list, :class => "cat_list_value" %>
+      </div>
+    </div>
+
+    <div class="label-field-pair operations_field">
+      <label for="operation"></label>
+      <div class="text-input-bg"><%= c.select :operation, HrFormula::OPERATIONS.map {|key, value| [t(value), key]}, :prompt =>"#{t('select_operator')}"  %></div>
+    </div>
+
+    <div class="label-field-pair formula_fields">
+      <label for="expression2"></label>
+      <div class="text-area-bg">
+        <div class="div_link validate" onclick ="clickHandler(this)"><%= t('validate') %></div>
+        <%= c.text_area  :expression2, {:class => "formula"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+        <div class="validate_result">
+          <% if c.object.expression2_valid %>
+            <div class="cross_button tick_symbol"></div>
+            <div class="error-msg success-msg"><%= t('validated_message') %></div>
+          <% end %>
+        </div>
+        <%= c.hidden_field :cat_list, :class => "cat_list_value" %>
+      </div>
+    </div>
+
+    <div class="label-field-pair formula_fields">
+      <label for="value">Then</label>
+      <div class="text-area-bg">
+        <div class="div_link validate" onclick ="clickHandler(this)"><%= t('validate') %></div>
+        <%= c.text_area :value, {:class => "formula"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+        <div class="validate_result">
+          <% if c.object.value_valid %>
+            <div class="cross_button tick_symbol"></div>
+            <div class="error-msg success-msg"><%= t('validated_message') %></div>
+          <% end %>
+        </div>
+        <%= c.hidden_field :cat_list, :class => "cat_list_value" %>
+      </div>
+    </div>
+  </div>
+  <%= c.hidden_field :_destroy, :class => "remove_expression", :value => 0 %>
+<% end %>

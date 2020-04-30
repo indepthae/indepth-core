@@ -1,0 +1,111 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('inventory_transaction_report') %> - <%= t('store_items')  %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>
+        </b>
+        <div class="date_align right">
+            <label class="date_tag"><%=params[:date_tag]%></label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %> 
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+                <!--
+                        < %=link_to_remote t('change_date'),:url => {:controller => "invoices",:action =>"show_date_filter",
+                :target_action=>@target_action,:id=>params[:id],:date_tag=>params[:date_tag],:start_date=>@start_date,
+                :end_date=>@end_date}%> -->
+            </span>
+        </div>
+    </div>
+
+    <% unless @store_items.empty? %>
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td style="width: 60%"><%= t('item') %></td>
+              <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+          </tr>
+          <% total_net_amount = 0 %>
+          <% @store_items.each do |t| %>
+            <tr class="row-b">
+                <td>
+                    <%= link_to t.item_name, {:controller => 'invoices', :action => 'sold_item_transactions',
+                      :date_tag => params[:date_tag], :id => t.item_id, :start_date => @start_date,
+                      :end_date => @end_date}.merge(url_params) %>
+                </td>
+                <td class="set_border_right" align="right"><%= precision_label t.amount.to_f %> </td>
+                <% total_net_amount += t.amount.to_f %>
+            </tr>
+          <% end %>
+      </table>
+    <div class="info">
+      <div class="info-left">
+        <div class="info1">
+          <%= will_paginate  @store_items,:params => {:id => params[:id], :date_tag => params[:date_tag],
+            :start_date => @start_date, :end_date => @end_date}.merge(url_params),
+            :renderer => 'RemoteLinkRenderer' %>
+        </div>
+      </div>
+      <div class="info-right">
+        <div class="info1">
+          <label><%= t('additions') %></label>
+          <label class="amount_label"><%=precision_label(@additional_charges)%></label>
+        </div>
+        <div class="info1">
+          <label><%= t('discounts') %></label>
+          <label class="amount_label"><%=precision_label(@discounts)%></label>
+        </div>
+        <div class="info1">
+          <label><%= t('tax') %></label>
+          <label class="amount_label"><%=precision_label(@total_tax_sum.to_f)%></label>
+        </div>
+        <div class="info1">
+          <label><%= t('net_income') %></label>          
+          <label class="amount_label"><%=precision_label(@final_grand_total.to_f)%></label>
+        </div>
+      </div>
+    </div>
+      <%#*<div class="total_amount_div">%>
+         <%#= t('net_income') %>
+          <%#=precision_label(@grand_total)%>
+      <%#*</div>%>
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul id="csv">
+                  <li class="themed_bg themed-dark-hover-background">
+                      <%= link_to "#{t('csv_report')}", {:controller => "invoices", :action => "sold_items_report_csv",
+                        :id => params[:id], :report_format_type => "csv", :start_date => @start_date, 
+                        :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <% end %>
+</div>
+
+<script>
+
+  j('.date_box').hide();
+
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+
+</script>

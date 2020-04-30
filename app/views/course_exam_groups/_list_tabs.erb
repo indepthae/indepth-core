@@ -1,0 +1,17 @@
+<div id="collection_receipients_data">
+      <div class="extender"></div>
+      <ul class="tabrow">
+        <li class="selected" type="batch"><%=link_to_remote "#{t('batch')}-#{t('wise')}",:url => { :action => "list_exam_batches",:course_id=>params[:course_id],:batch_type=>true},:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li type="list_exam_groups"><%=link_to_remote "#{t('exam_group')}",:url => { :action => "list_exam_groups",:course_id=>params[:course_id]},:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li style="width: 10px;"><%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "tab_loader", :style =>"display: none;" ) %></li>
+      </ul>
+      <div id="questions-main">
+        <div id="right-panel">
+          <%= render :partial => "list_batches" %>
+        </div>
+      </div>
+</div>
+
+
+
+

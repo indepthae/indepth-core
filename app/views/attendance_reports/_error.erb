@@ -1,0 +1,8 @@
+<%if @error%>
+  <div class="errorExplanation" id="errorExplanation">
+    <p><%=t('there_were_pblm')%></p>
+    <ul>
+      <li>  <%=@error_msg%></li>
+    </ul>
+  </div>
+<%end%>

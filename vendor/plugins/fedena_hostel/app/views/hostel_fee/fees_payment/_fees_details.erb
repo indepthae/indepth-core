@@ -1,0 +1,216 @@
+<% if @payer_type.present? and @payer_type=='Archived Student' %>
+  <% @transaction.student = @student.to_student %>
+<% end %>
+
+<% @total_fees = 0 %>
+<% @total_paid_fine = 0 %>
+<% @amount_to_pay = 0 %>
+
+<div id="fees_details">
+    <% remote_form_for :fees, :url => {:action => 'hostel_fee_collection_pay', 
+      :student => @hostel_fee.student_id}, :before => "$('submit_button').disable()", 
+      :complete => "setTimeout(function(){$('submit_button').enable();},5000)" do |form| %>
+      <% locals = {:form => form} %>
+
+      <% unless @hostel_fee.nil? %>
+
+        <table class="gray_table_list" cellspacing="0" cellpadding="0">
+            <tr class="main_head tr-list_head">
+                <td class="sl-col"><%= t('sl_no') %></td>
+                <td class="set_border_right"><%= "#{t('name')}" %></td>
+                <td class="set_border_right" colspan="2">
+                    <%= "#{t('amount')}" %> (<%= currency %>)
+                </td>
+            </tr>
+            <% i = 0 %>
+            <%= render :partial => "hostel_fee/fees_payment/particular_list", 
+              :locals => {:i => i} %>
+
+            <%= render :partial => "hostel_fee/fees_payment/tax_list",
+              :locals => {:i => i} %>
+
+            <%= render :partial => 'hostel_fee/fees_payment/student_fine_list', 
+              :locals => {:i => i, :hostel_fee => @hostel_fee, 
+              :total_fees => @total_fees} %>
+
+            <%= render :partial => "hostel_fee/fees_payment/add_fine_due_date_exceeded" %>
+
+            <%= render :partial => 'hostel_fee/fees_payment/summary', 
+              :locals => {:i => i, :total_fine => @total_paid_fine.to_f} %>
+
+            <%= render :partial => "hostel_fee/fees_payment/payment_block", 
+              :locals =>  locals %>
+
+          <% end %>
+      </table>
+    <% end %>
+
+    <%= render :partial => "hostel_fee/fees_payment/paid_fees" %>
+
+</div>
+
+<script type="text/javascript">
+
+  var precision = parseInt("<%= @precision %>");
+
+  MakeBox = function (t_id) {
+      remove_popup_box();
+      options = {
+          'submit': '<%=t('revert_transaction')%>',
+          'cancel': '<%=t('cancel')%>',
+          'field_name': 'reason',
+          'input_type': 'text_area',
+          'title': '<%=t('revert_transaction')%>'
+      };
+
+      build_modal_box(options);
+      build_prompt_popup_box('<%=t('reason')%>', options);
+
+      j('#popup_window #popup_footer > #yes').click(function () {
+          if(j(this).attr('disabled') == undefined) {
+              j(this).attr('disabled', 'disabled');
+              j.ajax({
+                  type: 'POST',
+                  url: '/hostel_fee/delete_hostel_fee_transaction',
+                  data: {
+                      'id': t_id,
+                      'reason': j('#popup_content #prompt_value').val(),
+                      'session_fingerprint': '<%= session_fingerprint %>'
+                  },
+                  success: function () {
+                      remove_popup_box();
+                  }
+              });
+          }
+      });
+  };
+
+  submit_fine = function () {
+      j("body").scrollTop(0);
+      remove_popup_box();
+      options = {
+          'submit': '<%=t('add')%>',
+          'cancel': '<%=t('cancel')%>',
+          'field_name': 'fine_amount',
+          'input_type': 'text_input',
+          'title': '<%=t('add_fine')%>'
+      };
+
+      build_modal_box(options);
+      build_prompt_popup_box('<%=t('fine_amount')%>', options);
+
+      j('#prompt_value').addClass('precision_text')
+      j('#popup_window #popup_footer > #yes').click(function () {
+          show_fine(parseFloat(j('#popup_content #prompt_value').val()));
+          total_wallet_amount = ('<%= (@student.present? and @student.advance_fee_wallet.present?) ? @student.advance_fee_wallet.amount : "0.00" %>')
+          j('#wallet_amount_applied').val(false)
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+          j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+      });
+  };
+
+  show_fine = function (fine) {
+      fine = parseFloat(fine || 0);
+      var fines_count = j('.fine-row:visible').length;
+      var summary_count = j('#summary-show-fine').siblings('.summary-row:visible').length;
+      if (fine > 0) {
+
+          input = '<td class="sl-col">' + (fines_count + 1) + '</td>' +
+                  '<td class="set_border_right particular-col">' +
+                  '<span><%= "#{t('fine_on')} #{format_date(Date.today)}" %></span></td>' +
+                  '<td class="set_border_right amount-col normal_font align_right" id="fine">' + fine.toFixed(precision) +
+                  '</td><td class="cancel-disc cancel-color cancel-fine">x</td>';
+
+          summary_fine = '<td class="sl-col col-1 normal_font">' + (summary_count + 1) + '</td>' +
+                  '<td class="set_border_right particular-col normal_font"><%= "#{t('total')} #{t('fine')}" %>' +
+                  '</td><td class="set_border_right amount-col normal_font align_right">' +
+                  fine.toFixed(precision) + '</td><td class="cancel-disc cancel-color"></td>';
+
+          fine_amount_updations(fine, 'add', precision);
+          j('#fine-slab').hide();
+
+          var fine_amount_hidden_field = j('<input>').attr({
+              type: 'hidden',
+              id: 'hidden_fine_amount',
+              name: 'fees[fine_amount]',
+              value: fine
+          });
+
+          var fine_included_hidden_field = j('<input>').attr({
+              type: 'hidden',
+              id: 'hidden_fine_included',
+              name: 'fees[fine_included]',
+              value: true
+          });
+
+          j(fine_amount_hidden_field).appendTo('form');
+          j(fine_included_hidden_field).appendTo('form');
+      }
+      remove_popup_box();
+  };
+
+  function fine_amount_updations(fine, operator, precision) {
+      console.log(fine);
+      fine = parseFloat(fine || 0);
+      total_fees = parseFloat(j("#total-fees").text());
+      amount_pay = parseFloat(j("#fees_amount").val());
+      total_due_amount = parseFloat(j("#total-due-amount").text());
+      total_fine = parseFloat(j("#total-fine").text() == "" ? 0 : j("#total-fine").text());
+
+      switch (operator) {
+          case "add":
+              //if (total_fine <= 0) {
+              j('#head-show-fine').show();
+              j('#summary-show-fine').show().append(summary_fine);
+              //}
+              j('#show-fine').show().append(input);
+              break;
+      }
+      console.log(operator);
+      console.log(fine);
+      console.log(total_fine);
+      j("#total-fine").text(add_or_subtract(operator, total_fine, fine).toFixed(precision));
+      console.log(total_fees);
+      j("#total-fees").text(add_or_subtract(operator, total_fees, fine).toFixed(precision));
+      console.log(amount_pay);
+      j("#fees_amount").val(add_or_subtract(operator, amount_pay, fine).toFixed(precision));
+      j("#amount_t").val(add_or_subtract(operator, amount_pay, fine).toFixed(precision));
+      console.log(total_due_amount);
+      j("#total-due-amount").text(add_or_subtract(operator, total_due_amount, fine).
+              toFixed(precision));
+  }
+
+  function add_or_subtract(operator, element1, element2) {
+      switch (operator) {
+          case "add":
+              return element1 + element2;
+          case "subtract":
+              return element1 - element2;
+      }
+  }
+
+  j(document).on('click', '.cancel-fine', function () {
+      if (j('.cancel-fine').length == 1) {
+          console.log('cancel fine');
+          console.log(j('#fine').text());
+          fine = parseFloat(j('#fine').text());
+          fine_amount_updations(fine, 'subtract', precision);
+          j('#show-fine').text("");
+          j('#head-show-fine').hide();
+          j('#fine-slab').show();
+          j('#summary-show-fine').text('').hide();
+          j("#fees_amount").removeAttr('tooltip').removeAttr('readonly');
+          j("#amount_t").removeAttr('tooltip').removeAttr('readonly');
+          j('[id^="hidden_fine_amount"]').remove();
+          j('[id^="hidden_fine_included"]').remove();
+      }
+      if (j('.wallet-amount-applied').length == 1){
+        j('#wallet_amount_applied').val(false)
+        j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+        j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+      }
+  });
+
+</script>
+
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>

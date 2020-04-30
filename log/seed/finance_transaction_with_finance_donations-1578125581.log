@@ -1,0 +1,19 @@
+# Logfile created on Sat Jan 04 12:13:01 +0400 2020 by logger.rb/1.2.6
+SELECT count(*) from finance_donations
+   INNER JOIN finance_transactions ft ON ft.id = finance_donations.transaction_id
+        WHERE ft.finance_id IS NULL AND ft.finance_type IS NULL
+Before seed
+[{"count(*)"=>"0"}]
+UPDATE finance_transactions
+   INNER JOIN finance_donations fd ON fd.transaction_id = finance_transactions.id
+          SET finance_type = 'FinanceDonation', finance_id = fd.id
+        WHERE finance_type IS NULL AND finance_id IS NULL
+SELECT count(*) from finance_donations
+   INNER JOIN finance_transactions ft ON ft.id = finance_donations.transaction_id
+        WHERE ft.finance_id IS NULL AND ft.finance_type IS NULL
+After seed
+[{"count(*)"=>"0"}]
+execution time:
+Start : Sat Jan 04 12:13:01 +0400 2020
+End : Sat Jan 04 12:13:01 +0400 2020
+duration : 0.003541

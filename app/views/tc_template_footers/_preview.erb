@@ -1,0 +1,26 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="footer_preview">
+    <% if @current_template.footer_enabled? %>
+      <%unless @footer["Clause"].value.blank? %>
+        <div class ="footer_head_<%= @footer["Clause"].text_size%>">
+            <div class="footer_head_<%= @footer["Clause"].text_color%>">
+                <%=   @footer["Clause"].value %>
+            </div>
+        </div>
+      <%end%>
+      <div class="footer_signatures">
+          <% @footer["Signature"].additional_field.each do |signature| %>
+            <div class="signature_preview">
+                <%=  signature.value %>
+            </div>
+          <% end %>
+      </div>
+    <%else%>
+      <div class="not_enabled_message"><%= t('no_footer_enabled')%></div>
+    <% end %>
+</div>

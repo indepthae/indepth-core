@@ -1,0 +1,102 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('batch')} #{t('wise')} #{t('report')}" %></div>
+  <%= report_job_status('csv_batch_fees_head_wise_report', 'finance_fee') %>
+</div>
+
+
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% form_remote_for :batch_id, :url => {:action => 'batch_fees_headwise_report'}, :html => {:class => 'form_submit'} do |f| %>
+      <div class="filters" style="width:1034px">
+      <div class="filter">
+        <div class="label-field-pair">
+          <label for="course_id"><%= t('select_courses') %></label>
+
+          <div class="text-input-bg margin-left-10">
+            <%= select :course, :course_id,
+                       @courses.map { |c| [c.full_name, c.id] },
+                       {:prompt => "#{t('select_courses')}"},
+                       {:onChange => "#{remote_function(:url => {:action => "batch_list"},
+                                                        :with => "'course_id='+ value",
+                                                        :before => "Element.show('loader')",
+                                                        :success => "Element.hide('loader')"
+                       )}"} %> <%= image_tag("loader.gif",
+                                             :align => "absmiddle",
+                                             :border => 0,
+                                             :id => "loader",
+                                             :style => "display: none;") %>
+          </div>
+        </div>
+        <div class="label-field-pair"></div>
+        <%= link_to_function "► #{t('search_text')}", "form_submission()", :class => 'submit_button user_button' %>
+      </div>
+      <div class="filter_batch">
+        <div id="batch_lists"></div>
+      </div>
+      </div>
+      <div class="extender"></div>
+  <% end %>
+</div>
+<div class="extender"></div>
+<div class="hor_line"></div>
+<div id="information">
+  <%= render :partial => 'batch_fee_headwise_report' %>
+</div>
+<script type="text/javascript">
+
+    function form_submission() {
+        if (j('#loader').is(':hidden')) {
+            Element.show('loader')
+            j(".form_submit").submit(function (e) {
+                var postData = j(this).serializeArray();
+                var formURL = j(this).attr("action");
+                j(".submit_button").text('<%=t('please_wait') %>')
+                j(".submit_button").css({"cursor":"no-drop"});
+                j.ajax(
+                        {
+                            url: formURL,
+                            type: "POST",
+                            data: postData,
+                            success: function (data, textStatus, jqXHR) {
+                                Element.hide('loader')
+                                j(".submit_button").text('<%="► #{t('search_text')}" %>')
+                                j(".submit_button").css({"cursor":"pointer"});
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                //if fails
+                            }
+                        });
+                e.preventDefault(); //STOP default action
+//          e.unbind(); //unbind. to stop multiple form submit.
+            });
+
+            j('.form_submit').submit()
+
+
+        }
+    }
+
+    function batch_check() {
+        var flag = 0
+        $$('input.batches_box').each(function (checkbox) {
+            if (checkbox.checked == true) {
+                flag = 1
+            }
+        })
+        if (flag == 0) {
+            alert('<%= "#{t('select_atleast_one_batch')}"%>');
+            $$('input.batches_box')[0].checked = true
+        }
+    }
+</script>

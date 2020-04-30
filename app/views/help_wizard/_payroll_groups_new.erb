@@ -1,0 +1,26 @@
+
+  <% help_wizard('Guide', 'Here\'s a brief step-by-step guide on how to create a payroll group.') do %>
+      <p>Payroll groups are used to manage employees of your institution with similar payroll structure, pay frequency, and payroll categories.</p>
+
+      <ol>
+        <li>Provide a meaningful and recognizable name for the payroll group.</li>
+        <li>Set the salary preferences:</li>
+        <ul>
+          <li>Salary type</li>
+          <li>Payment Frequency</li>
+        </ul>
+        <li>Add the required payroll categories.</li>
+        <li>When a category is added all the dependent categories are added automatically. It's highly recommended that these dependent categories are not removed from the group.</li>
+        <li>Set the LOP criteria for the employees of the payroll group. If this is enabled, all leaves marked as LOP will be listed during payslip generation.</li>
+      </ol>
+
+      <p><b>Note:</b></p>
+
+      <ul>
+        <li>If the dependent payroll categories are not added to a group, then the group cannot be created.</li>
+        <li>Use GROSS as the base for calculating individual employee payroll, so it is very important that all categories should be somehow be connected directly or indirectly to GROSS.</li>
+        <p>A good example: BASIC=30%GROSS, HRA=40%BASIC, DA=10%BASIC </br>A bad example: BASIC=0, HRA=40%BASIC, DA=10%BASIC</p>
+        <li>Ensure that the numerical value based categories are not 0, as all the dependent categories (if any) will be derived as 0 when calculating payroll.</li>
+      </ul>
+
+  <% end %>

@@ -1,0 +1,51 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_results') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+
+    <% unless @attendances.blank? %>
+      <table id="listing" width="100%">
+        <tr class="tr-head">
+          <td><%= t('exam_name') %></td>
+          <td><%= t('attended_on') %></td>
+          <td><%= t('marks') %></td>
+          <td><%= t('result') %></td>
+          <td></td>
+        </tr>
+        <% @attendances.each do |att| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-2" ><%= att.online_exam_group.name %></td>
+            <td class="col-3" ><%= format_date(att.start_time.to_date)%></td>
+            <td class="col-3" ><%= att.total_score %>/<%= att.online_exam_group.online_exam_groups_questions.sum('mark') %></td>
+            <% if att.answers_evaluated == true %>
+              <% if att.is_passed %>
+                <td class="col-3" ><%= t('passed') %></td>
+              <% else %>
+                <td class="col-3" ><%= t('failed') %></td>
+              <% end %>
+            <% else %>
+              <td class="col-3" ><%= t('not_evaluated') %></td>
+            <% end %>
+            <td class="col-3" ><%= link_to t("view_answersheet"), {:controller=>"online_student_exam",:action=>"view_answersheet",:id=>att.id}, :class=>"themed_text" %></td>
+          </tr>
+        <% end %>
+      </table>
+
+    <% else %>
+      <p class="flash-msg"><%= t('no_exam_attended') %></p>
+    <% end %>
+
+    <div class="extender"></div>
+  </div></div>

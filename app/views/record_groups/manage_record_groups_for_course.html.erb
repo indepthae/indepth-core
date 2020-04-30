@@ -1,0 +1,38 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_record_groups') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_record_groups_for_course') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <div id="rg_priority" class="fleft"><%=render :partial=>"rg_prioritizer"%></div>
+      <div id="form_preview" class="fleft"><%=render :partial=>'student_form_previewer'%></div>
+
+
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box"></div>
+  <div id="course_name"><span><%=t('course')%></span><%=@course.full_name%></div>
+  <div id="course_details">
+    <div class="details"><span><%=t('active_batches')%> : </span><%=@course.batches.active.count%></div>
+    <div class="details"><span><%=t('inactive_batches')%> : </span><%=@course.batches.inactive.count%></div>
+    <div class="details"><span><%=t('grading_system')%> : </span><%=Batch::GRADINGTYPES[@course.grading_type].nil? ? 'Normal' : Batch::GRADINGTYPES[@course.grading_type]%></div>
+    <div class="details"><span><%=t('students')%> : </span><%=@course.students.count%></div>
+    <%unless @rg_remains==0%>
+      <div id="add_button">
+        <%=render :partial=>'add_record_group_button'%>
+      </div>
+    <%end%>
+  </div>
+  <div id="record_group">
+    <%=render :partial=>'record_groups_for_course'%>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+</div>
+

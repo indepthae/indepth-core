@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'save_changes_warning'
+page << "Modalbox.show($('modal-box'), {title: '#{t('edit_subject')}', width: 500});"

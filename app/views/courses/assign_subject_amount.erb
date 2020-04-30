@@ -1,0 +1,89 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('courses_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('assign_subject_amount') %></div>
+
+  <div id="inner-tab-menu">
+    <ul style="margin-top: 33px !important;">
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('courses_text')}", courses_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+
+  <div class="bread_crumb">
+    <%= breadcrumb :courses_assign_subject_amount ,@course %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <% form_for @subject_amount,:url => assign_subject_amount_courses_url(:id => @course.id) do |f| %>
+      <%= f.error_messages %>
+      <div class="label-field-pair">
+        <label for="subjects"><%= t('subjects_text') %></label>
+        <div class="text-input-bg"><%= f.select :code,@subjects.map{|subject| [subject.to_s,subject.to_s]}, :prompt => t('select_subject') %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="amount"><%= t('amount') %></label>
+        <div class="text-input-bg">
+          <%= f.text_field :amount, :class=>'precision_text' %>
+        </div>
+      </div>
+
+      <%= f.submit "#{t('save')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+    <% end %>
+    <% unless @subject_amounts.blank? %>
+      <table class="gray_table_list" style="margin-top: 30px;" align="center" width="100%" cellpadding="0" cellspacing="0">
+        <tr class="main_head">
+          <td style="width:30%">
+            Code
+          </td>
+          <td class="set_border_right" style="width:30%">
+            Amount
+          </td>
+          <td class="set_border_right" style="width:40%">
+            Options
+          </td>
+        </tr>
+        <% @subject_amounts.each do |sa| %>
+          <tr class="row-b">
+
+            <td class="set_border_right">
+              <%= sa.code %>
+            </td>
+            <td class="set_border_right">
+              <%= sa.amount %>
+            </td>
+
+            <td class="set_border_right">
+              <%= link_to 'Edit',edit_subject_amount_courses_path(:subject_amount_id => sa.id) %>
+              | <%= link_to 'Delete',destroy_subject_amount_courses_path(:subject_amount_id => sa.id),:confirm => "Are you sure?" %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    <% else %>
+      <p class="flash-msg"><%= t('no_subject_amount') %></p>
+    <% end %>
+  </div>
+  <div class="extender"></div>
+</div>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,45 @@
+
+<div id="page-yield">
+    <div class="box"> 
+        <% remote_form_for :course_transcript_setting, :url => {:action => 'save_transcript_setting'} do |f| %>
+        <%= session_fingerprint_field %> 
+        <table id="listing" align="center" width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+                <tr class="tr-head">
+                    <td style="width:50%;"><%= t('course') %></td>
+                    <td style="width:25%;"><%= check_box_tag "select_all_grade", "", false, {:class=>'batches_box select_all_check',:onclick=>"select_all_fields_for_grade(this);"}%><div class="text-style"><%= t('show_grade') %></div></td>
+                    <td style="width:25%;"><%= check_box_tag "select_all_percentage", "", false, {:class=>'batches_box select_all_check',:onclick=>"select_all_fields_for_percentage(this);"}%><div class="text-style"><%= t('show_percentage') %></div></td>   
+                </tr>
+                
+                <% if @courses.present? %>
+                  <% @courses.each do |course| %>
+                      <tr id="tr-<%= cycle('odd', 'even')%>">
+                          <td><%= course.full_name %></td>
+                          <td class="show_grade"><%= check_box "course_transcript_setting[#{course.id}]", :show_grade, :checked => course.course_transcript_setting.present? ? course.course_transcript_setting.show_grade : false %></td>
+                          <td class="show_percentage"><%= check_box "course_transcript_setting[#{course.id}]" , :show_percentage ,:checked => course.course_transcript_setting.present? ? course.course_transcript_setting.show_percentage : false %></td>
+                    <% end %>
+                <% end %>
+              <% end %>
+            </tbody>
+        </table>
+        <div id="settings_region"></div>
+        <div id="popup_footer">
+          <%=submit_tag "#{t('save')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  j(document).ready(function () {
+  var unchecked = j(".show_grade").children("input:checkbox:not(:checked)").length
+  if(unchecked == 0){
+    j("#select_all_grade").prop('checked', true);
+  }
+  var percentage_unchecked = j(".show_percentage").children("input:checkbox:not(:checked)").length
+  if(percentage_unchecked == 0){
+    j("#select_all_percentage").prop('checked', true);
+  }
+  });
+  </script>
+

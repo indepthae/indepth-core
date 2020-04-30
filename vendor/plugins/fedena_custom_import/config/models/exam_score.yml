@@ -1,0 +1,72 @@
+exam_score:
+    primary_keys:
+      student_id: "Student Admission Number"
+      exam_id: "exam_group_name"
+    overrides:
+      grading_level_id: "Grading Level Name"
+      student_id: "Student Admission Number"
+    associations:
+     - :grading_level
+     - :student
+     - :exam
+    associated_columns:
+      grading_level: "name"
+      student: "admission_no"
+      exam: "id"
+    inject:
+    - :exam_group_name
+    - :batch_name
+    - :subject_code
+    finders:
+      exam_group:
+        name: "exam_group_name"
+        batch_id: "batch_name"
+      subject:
+        code: "subject_code"
+        batch_id: "batch_name"
+      exam:
+       - :exam_group
+       - :subject
+      grading_level:
+        batch_id: "batch_name"
+        name: "grading_level_name"
+    map_combination:
+      batch: "full_name"
+      grading_level: "name"
+    map_column:
+      batch_id: "batch"
+    filters:
+     - :is_failed
+     - :school_id
+     - :exam_id
+    mandatory_columns:
+     - :student_id
+     - :exam_id
+    instructions:
+        Exam group name:
+            Type: "Alphanumeric."
+            Input Instruction and example: "Name of the exam which is created for the batch."
+        Batch name:
+          Type: "Course code - Batch name"
+          Input Instruction and example: "For a course ‘Grade 1’ having course code ‘G1' and a batch named '2018 A’ batch name is G1 - 2018 A."
+        Subject code:            
+            Type: "Alphanumeric."
+            Input Instruction and example: "subject code of the subject which we want to enter the score."
+        Student Admission Number:
+            Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+            Input Instruction and example: "AYS/2018/S001."
+        Marks:
+            Type: "Enter the marks of the subject as decimal."
+            Input Instruction and example: ""
+        Grading Level Name:
+            Type: "Alphanumeric."
+            Input Instruction and example: "Enter grade value for Grade type exams. It will be auto generated for mark and grade exams."
+        Remarks:
+            Type: ""
+            Input Instruction and example: ""
+
+
+# Please refer to employee.yml for basic concept.
+
+# Whenever some column data needed to be fetched from some parent table,those extra columns should be mentioned
+# in the inject array.

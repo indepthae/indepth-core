@@ -1,0 +1,57 @@
+<% cache_if_memcache(@current_user.menu_link_cache_key(params[:cat_id])) do %>
+
+<% auth_obj = @current_user.parent? ? @current_user.parent_record.user : @current_user %>
+<% parent_links = menu_links.select{|s| (s.higher_link_id.nil?) and (can_access_request?(s.target_action.to_s.to_sym,auth_obj,:context=>s.target_controller.to_s.to_sym))} %>
+<% parentless_sublinks = menu_links.select{|s| s.higher_link_id.present? and !parent_links.collect(&:id).include?(s.higher_link_id) and (can_access_request?(s.target_action.to_s.to_sym,auth_obj,:context=>s.target_controller.to_s.to_sym))} %>
+<% parentless_sublinks.each do|pl| %>
+  <% pl.icon_class = pl.higher_link.icon_class %>
+<% end %>
+<% parent_links = (parent_links + parentless_sublinks).sort_by{|a|a.name} %>
+<div id="col_0" class="menu_cols"></div>
+<div id="col_1" class="menu_cols"></div>
+<div id="col_2" class="menu_cols"></div>
+<div id="col_3" class="menu_cols"></div>
+<% parent_links.each do|link| %>
+  <% target_id = 0 %>
+  <% target_id = @current_user.student_record.id if @current_user.student? %>
+  <% target_id = @current_user.employee_record.id if @current_user.employee_record.present? %>
+  <% target_id = @current_user.guardian_entry.current_ward_id if @current_user.parent? %>
+  <div class="parent-link">
+    <% beta_controllers = ['gradebooks'] %>
+    <% if link.link_type == "own" %>
+      <% unless link.target_action=="index" %>
+        <%= link_to "<div class='parent-link-area themed_hover_text'><div class='link-icon #{link.icon_class}'></div><div class='parent-text'>#{t(link.name)}</div></div>", {:controller=>link.target_controller,:action=>link.target_action,:id=>target_id} %>
+      <% else %>
+        <%= link_to "<div class='parent-link-area themed_hover_text'><div class='link-icon #{link.icon_class}'></div><div class='parent-text'>#{t(link.name)}</div></div>", {:controller=>link.target_controller} %>
+      <% end %>
+    <% else %>
+      <% unless link.target_action=="index" %>
+        <%= link_to "<div class='parent-link-area themed_hover_text'><div class='link-icon #{link.icon_class}'></div><div class='parent-text'>#{t(link.name)}</div></div>", {:controller=>link.target_controller,:action=>link.target_action} %>
+      <% else %>
+        <%= link_to "<div class='parent-link-area themed_hover_text'><div class='link-icon #{link.icon_class}'></div><div class='parent-text'>#{t(link.name)}</div></div>", {:controller=>link.target_controller} %>
+      <% end %>
+    <% end %>
+    <% sub_links = menu_links.select{|s| (s.higher_link_id == link.id) and (can_access_request?(s.target_action.to_s.to_sym,auth_obj,:context=>s.target_controller.to_s.to_sym))}.sort_by{|a|a.name} %>
+    <% unless sub_links.empty? %>
+    <%#*<div class="nav-button" onclick="show_sub_links(this);">+</div>%>
+      <div class="child-link-box" style="display:none;">
+        <% sub_links.each do|sub_link| %>
+          <% if sub_link.link_type == "own" %>
+            <% unless sub_link.target_action == "index" %>
+              <%= link_to "<div class='child-link-text'>#{t(sub_link.name)}</div>", {:controller=>sub_link.target_controller,:action=>sub_link.target_action,:id=>target_id},:class=>"sub_link" %>
+            <% else %>
+              <%= link_to "<div class='child-link-text'>#{t(sub_link.name)}</div>", {:controller=>sub_link.target_controller},:class=>"sub_link" %>
+            <% end %>
+          <% else %>
+            <% unless sub_link.target_action == "index" %>
+              <%= link_to "<div class='child-link-text'>#{t(sub_link.name)}</div>", {:controller=>sub_link.target_controller,:action=>sub_link.target_action},:class=>"sub_link" %>
+            <% else %>
+              <%= link_to "<div class='child-link-text'>#{t(sub_link.name)}</div>", {:controller=>sub_link.target_controller},:class=>"sub_link" %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<% end %>

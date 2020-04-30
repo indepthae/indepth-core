@@ -1,0 +1,225 @@
+.assessments_box {
+    font-size: 13px;
+    margin-top: 80px;
+}
+.assessments_head {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 30px;
+}
+.left {
+    float: left;
+    width: 50%;
+}
+.assessments_head span {
+    font-weight: bold;
+    margin-left: 20%;
+}
+.right {
+    float: right;
+    width: 40%;
+}
+.assessments_details {
+    padding-bottom: 30px;
+    margin-top: 30px;
+    width: 100%;
+    overflow: auto;
+    border-bottom: 1px solid #ccc;
+}
+.col-1 {
+    float: left;
+    width: 50%;
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+.assessment_details_tbl {
+    width: 100%;
+}
+.col-1 .assessment_details_tbl td {
+    width: 50%;
+    padding: 10px 0px;
+}
+.assessment_details_tbl td.value {
+    font-weight: bold;
+}
+
+
+#assessment_table {
+    width: 100%;
+    float: left;
+    white-space: nowrap;
+    z-index: 0;
+    margin-top: 30px;
+}
+.outer {
+    position: relative;
+    margin-bottom: 10px;
+}
+.inner {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 1px;
+}
+table#assessments {
+    border-collapse: collapse;
+    font-size: 13px;
+    width: auto;
+    margin-bottom: 20px;
+    border-right: 1px solid #bfbfbf;
+}
+table#assessments .tr-head {
+    font-weight: bold;
+    border-bottom: 1px solid #bfbfbf;
+    border-top: 1px solid #bfbfbf;
+    color: black !important;
+    background-color: #e5e5e5;
+}
+.tr-head td.fixed-header{
+    background-color: #e5e5e5;
+}
+table#assessments td {
+    white-space: normal;
+    text-overflow: ellipsis;
+    height: 31px;
+    padding: 5px 20px 5px 20px;
+    border-right: 1px solid #ccc;
+}
+.fixed-header {
+    border-top: 1px solid #bfbfbf;
+    top: 0px;
+    /*border-left: 1px solid white !important;*/
+}
+td.student_name {
+    width: 200px;
+    left: 0px;
+    padding: 13px 20px !important;
+    height: 15px !important;
+    border-left: 1px solid #bfbfbf;
+    border-bottom: 1px solid #bfbfbf;
+}
+td.sl_no{
+    width: auto;
+    border-left: 1px solid #ccc;
+}
+td.roll {
+    /*min-width: 120px;*/
+    /*left: 341px;*/
+    text-align: center;
+}
+td.roll input[type="checkbox"]{
+    width: 15px;
+    height: 15px;
+}
+table#assessments tr {
+    border-bottom: 1px solid #bfbfbf;
+}
+.submit-button {
+    font-size: 13px;
+    text-decoration: none;
+    margin: 10px 15px 0 0;
+    border-radius: 5px;
+}
+td.attribs{
+    padding-right: 5px !important;
+}
+.attribs input{
+    width: 44%;
+    height: 17px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    padding: 5px;
+    float: left;
+}
+#page-yield ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+}
+#page-yield ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+    border-left: 1px solid #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+#page-yield ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+#page-yield ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+.tooltip_info{ white-space: normal;}
+.error-text{
+    border: 1px solid red;
+    padding: 4px !important;
+}
+.error-field{
+    border: 1px solid red;
+    padding: 4px !important;
+}
+.error-icon {
+    width: 15px;
+    height: 12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right: 2px;
+    float: left;
+    margin-top: 9px;
+}
+#page-yield .error-field:focus {
+    border: 1px solid red !important;
+}
+td.final_score div{
+    font-weight: bold;
+}
+.grade_column{
+    float: right;
+    font-weight: bold;
+    padding-top: 8px;
+    margin-right: 1px;
+}
+.assessment_form_head{
+    margin-top: 46px;
+    font-weight: bold;
+    font-size: 16px;
+}
+.select-list{
+    background: #fff;
+    height: 29px;
+    margin-right: 15px;
+    padding: 0px 5px 0 5px;
+}
+span.success{
+    color: green;
+}
+span.danger{
+    color: red;
+}
+.exam_group_head{
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+.exam_group_head .clm{
+    display: table-cell;
+}
+.exam_group_head .clm .value{
+    font-weight: bold;
+    margin-top: 20px;
+    max-width: 211px;
+}
+.exam_group_head .clm:first-child{
+    width:290px;
+}
+.assessment_details_short{
+    background: #ececec;
+    border-radius: 3px;
+    margin-top: 50px;
+    padding: 20px;
+}
+#page-yield .edit_activity_assessment a:hover{
+    color: #fff !important;
+}

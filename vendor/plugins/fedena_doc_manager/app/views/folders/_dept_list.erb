@@ -1,0 +1,23 @@
+
+<% if @depts %>
+<div class="dept-list">
+  <div class="label-field-pair">
+    <label for="department" class="label_text"><%= t('department_list') %></label>
+  </div>
+  <% if @depts.present?  %>
+    <div class ="scrolable" >
+    <% x = '<span> x </span>' %>
+      <div class="scroll-inside2">
+      
+        <% @depts.each do |m|  %>
+          <div class="hover">
+          <%= link_to m.name + x, "#", :onClick => "remove_dept(#{m.id})", :class=> 'individual',
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  </div>
+<% end %>

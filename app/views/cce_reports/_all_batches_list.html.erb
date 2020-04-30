@@ -1,0 +1,38 @@
+<% if @batches.present?  %>
+  <div class="list_name">
+      All the batches of student
+      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+  </div>
+  <ul class="student_list">
+      <% @batches.each do |b| %>
+        <li class="student_names">
+            <a href="#" id="<%=b.id%>"  class="student-link <%= "active-link themed_text" if b.id == @batch.id %> " > <%= b.full_name %></a>
+        </li>
+      <% end %>
+  </ul>
+<% else %>
+  <%= t("no_students_in_batch")  %>
+<% end %>
+
+<script type="text/javascript">
+  set_active = function (el) {
+      $$('.active-link').each(function (e) {
+          e.removeClassName('active-link themed_text');
+      });
+      el.addClassName('active-link themed_text')
+  }
+  draw_report = function (e) {
+      Element.show('loader')
+      new Ajax.Request('/cce_reports/student_transcript/<%= @student.id_in_context %>',
+              {asynchronous: true, evalScripts: true,
+                  parameters: 'ref_from=student_list' + '&batch_id=' + e.id + '&type=<%= @type %>' + '&check_term=<%= @check_term %>' + '&cat_id=<%= @cat_id %>' + '&fa_group=<%= @fa_group %>', onSuccess: function (request) {
+                      Element.hide('loader')
+                  }
+              })
+  }
+  j('.student-link').click(function () {
+      draw_report(this);
+      set_active(this);
+  });
+
+</script>

@@ -1,0 +1,111 @@
+
+<div id="student_items">
+    <%=  session_fingerprint_field %>
+    <%if @parent_student_details.present?%>
+      <table class="disable_sort_table">
+          <tr class="disable_sort">
+              <th id="reorder"></th>
+              <th id="name"><%=t('field_label')%></th>
+              <th class="value_criterea"><%= t('value_criterea') %></th>
+              <th id="action"></th>
+          </tr>
+      </table>
+      <%@parent_student_details.each_with_index do |sd,index|%>
+        <table class="student-details_table">
+            <tr class="list">
+                <td class="reorder_val"><i></i></td>       
+                <td class="record_name"><%=sd.field_name%><%if sd.field_info.is_mandatory == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%>    
+                </td>
+                <td class="value_criterea">
+                    <%if sd.field_info.field_type == "custom"%>
+                      <% value_criteria = set_custom_value_criteria(sd.field_info.field_format_value) %>
+                      <%= "Custom" %>: <%= value_criteria %>
+                    <%else%>
+                      <%if sd.field_info.field_format == "additional_field"%>
+                        <% value_criteria = sd.field_info.field_format_value%>
+                      <%else%>
+                        <% value_criteria = set_system_value_criteria(sd.field_info.field_format_value) %>
+                      <%end%>
+                      <%= value_criteria %>
+                    <%end%>
+                </td>
+                <td class="action">
+                    <%= link_to_remote "#{t('edit')}", :url => { :action => 'edit', :id => sd.id },:method=>:get %> | 
+                    <%if @child_student_details.collect(&:parent_field_id).include? sd.id %>
+                      <%= link_to_remote "#{t('delete')}",:url=> {:action=>'delete_field',:id => sd.id},:confirm=>"This field may contain sub fields. Are you sure want to delete this field?" %> 
+                    <%else%>
+                      <%= link_to_remote "#{t('delete')}",:url=> {:action=>'delete_field',:id => sd.id},:confirm=>"Delete Field?" %> 
+                    <%end%>
+                </td>
+            </tr>
+            <%if @child_student_details.collect(&:parent_field_id).include? sd.id %>
+              <% childs =@child_student_details.find(:all,:conditions=>{:parent_field_id=>sd.id})  %>
+              <%childs.sort_by do |item|%>
+                <% item.priority %>
+              <%end%>
+              <% childs.each_with_index do |sdc,ind| %>
+                <tr class="sub_list">
+                    <td class="reorder_val">
+                          <i></i>
+                    </td>       
+                    <td class="record_name"> - <%= sdc.field_name%><%if sdc.field_info.is_mandatory == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%>    </td>
+                    <td class="value_criterea">
+                        <%if sdc.field_info.field_type == "custom"%>
+                          <% value_criteria = set_custom_value_criteria(sdc.field_info.field_format_value) %>
+                          <%= "Custom" %>: <%= value_criteria %>
+                        <%else%>
+                          <%if sdc.field_info.field_format == "additional_field"%>
+                            <% value_criteria = sdc.field_info.field_format_value%>
+                          <%else%>
+                            <% value_criteria = set_system_value_criteria(sdc.field_info.field_format_value) %>
+                          <%end%>
+                          <%= value_criteria %>
+                        <%end%>
+                    </td>
+                    <td class="action">
+                        <%= link_to_remote "#{t('edit')}", :url => { :action => 'edit', :id => sdc.id },:method=>:get %> | <%= link_to_remote "#{t('delete')}",:url=> {:action=>'delete_field',:id => sdc.id},:confirm=>"Delete Field?" %> 
+                    </td>
+                    <%=hidden_field_tag "tc_template_student_details[tc_template_student_details_attributes][#{index.to_s}][#{sd.id}][#{ind.to_s}][id]",sdc.id%>
+                    <%=hidden_field_tag "tc_template_student_details[tc_template_student_details_attributes][#{index.to_s}][#{sd.id}][#{ind.to_s}][priority]",sdc.priority%>
+                  <%end%>
+              </tr>
+            <%end%>
+            <%=hidden_field_tag "tc_template_student_details[tc_template_student_details_attributes][#{index.to_s}][id]",sd.id%>
+            <%=hidden_field_tag "tc_template_student_details[tc_template_student_details_attributes][#{index.to_s}][priority]",sd.priority%>
+        </table>
+      <%end%>
+    <%else%>
+      <div class="no_entries"><%=t('no_fields_yet')%></div>
+    <%end%>
+</div>
+<script type="text/javascript">
+  j(".tool_edit").hover(function () {
+      j(this).children('.edit_info').show();
+  }, function () {
+      j(this).children('.edit_info').hide();
+  });
+  j(".tool_delete").hover(function () {
+      j(this).children('.delete_info').show();
+  }, function () {
+      j(this).children('.delete_info').hide();
+  });
+  if (j('.no_entries').length == 1) {
+      j('.sub_label').hide();
+  } else {
+      j('.sub_label').show();
+  }
+
+  if (j('tr.list').length < 2) {
+      if (j('tr.sub_list').length < 2) {
+          j('#priority').hide();
+      } else {
+          j('#priority').show();
+      }
+  } else {
+      j('#priority').show();
+  }
+</script>

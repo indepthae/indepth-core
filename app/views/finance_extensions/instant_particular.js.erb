@@ -1,0 +1,25 @@
+if (<%= @status %>) {
+    Modalbox.hide();
+
+    j = jQuery.noConflict()
+    if (<%= @target_action=='pay_fees_defaulters'%>) {
+        window.location.href = "/finance/pay_fees_defaulters/<%=@financefee.student_id%>?batch_id=<%=@financefee.batch_id%>&date=<%=@financefee.fee_collection_id%>"
+    }
+    else {
+        j.ajax({
+
+            url: '/<%=@target_controller %>/<%= @target_action%>',
+
+            data: {batch_id: <%=@fee_particular.batch_id%>, date:<%=@financefee.fee_collection_id%>, student:<%=@financefee.student_id%>, id:<%=@financefee.student_id%> }
+
+        });
+    }
+}
+else {
+    j('.modal-box-submit_button').val('<%="► #{t('update')}" %>')
+    j('.modal-box-submit_button').attr('disabled',false)
+    j("#form-errors").html('<%=escape_javascript(render :partial => "class_timings/errors", :object => @fee_particular)%>');
+}
+
+
+

@@ -1,0 +1,21 @@
+<div class="label-field-pair section">
+  <label for="date_range"><%= t('date_range_text') %></label>
+
+  <div class="date_range">
+    <div class="date_select">
+      <%= calendar_date_select_tag 'transaction_report[start_date]', I18n.l(@start_date.try(:to_date) || Date.today,
+                                                        :format => :default), :popup => :force %>
+    </div>
+    <div class="range_separator">
+      <label><%= t('to') %></label>
+    </div>
+    <div class="date_select">
+      <%= calendar_date_select_tag 'transaction_report[end_date]', I18n.l(@end_date.try(:to_date) || Date.today,
+                                                      :format => :default), :popup => :force %>
+    </div>
+    <div id="date_error_div">
+      <%= render :partial => "finance/date_error" %>
+      <%= error_message_box(t('cant_be_blank')) %>
+    </div>
+  </div>
+</div>

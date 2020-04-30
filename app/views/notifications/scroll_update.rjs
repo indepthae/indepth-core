@@ -1,0 +1,9 @@
+if @notifications.next_page
+  page.replace_html "infinite_thread_#{params[:page]}", :partial=> 'infinite_notification'
+  page.replace_html 'notification_scroll', :partial=> 'pages'
+else
+  page.replace_html "infinite_thread_#{params[:page]}", :partial=> 'infinite_notification'
+  page.replace_html 'notification_scroll', :partial=> 'pages'
+  page << 'j(window).off("scroll");'
+  page << 'j("#notification_scroll").remove();'
+end 

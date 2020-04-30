@@ -1,0 +1,28 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('all_placements') %></div>
+<%if permitted_to? :archive,:placementevents %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'>     <%= link_to "#{t('archived_placements')}",:controller => "placementevents", :action => "archive" %>
+      </li>
+      <%if permitted_to? :new,:placementevents %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('announce_new_placements')}" , new_placementevent_path%></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%= render :partial=>"placementevents_list" %>
+</div>

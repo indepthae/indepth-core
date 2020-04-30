@@ -1,0 +1,242 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<% unless @batch.students.empty? %>
+  <p class = "help"><%= t('uncheck_transfer_message') %></p>
+
+  <table class = "gray_table_list" id = "listing" align = "left" width = "100%"  cellpadding = "0" cellspacing = "0">
+      <tr class = "main_head">
+          <td style = "width: 20%   "><%= t('adm_no') %></td>
+          <td class = "set_border_right"style = "width: 40%   "><%= t('name') %></td>
+          <td class = "set_border_right mid" style="width: 20%   ">
+              <% if @student.present? %>
+                <input type="checkbox" id = "select_all"/>
+              <%else%>
+                <input type="checkbox" id = "select_all" checked = "true"/>
+              <%end%>
+              <span id = "s"><%=t('student_text')%></span>
+          </td>
+          <%  if (@config.config_value == 'Daily') and ((@batch.course_id) == (Batch.find(@batches).course_id)) %>
+
+            <td  class = "set_border_right mid" style = "width: 20%">
+                <% if @student.present? %>
+                  <input type = "checkbox" id = "select_all1"/>
+                <%else%>
+                  <input type = "checkbox" id = "select_all1" checked = "true"/>
+                <%end%>
+                <span id = "s"> <%= t('transfer_attendance') %></span>
+            </td><%end%>
+      </tr>  
+
+
+      <% @batch.students.each_with_index do |student,index| %>
+        <tr class = "row-b">
+            <% if student.has_pending_fees? %>  
+              <td>
+                  <div class = "category-number"><%= link_to student.admission_no, :controller => 'student', :action => 'fees', :id=>student.id %>
+                  </div></td>
+              <td class = "set_border_right">
+                  <div class = "category-name"><%= link_to student.full_name, :controller => 'student', :action => 'fees', :id=>student.id %>
+                  </div>
+              </td>
+            <% else %>
+              <td>
+                  <div class = "category-number_disabled"><%= student.admission_no %></div>
+              </td>
+              <td class = "set_border_right">              
+                  <div class="category-name_disabled"><%= student.full_name %></div>
+              </td>
+            <% end %>
+            <td class="set_border_right mid noo"> 
+                <label for ="l<%=index%>">
+                    <div class="cb">
+                        <% if @student.present? %>
+                          <%if @student.id == student.id%>
+                            <%= check_box_tag 'transfer[students][]', student.id, true,:class=>"left",:id=>"l"+index.to_s %>
+                          <%else%>
+                            <%= check_box_tag 'transfer[students][]', student.id, false,:class=>"left",:id=>"l"+index.to_s %>
+                          <%end%>
+                        <%else%>
+                          <%= check_box_tag 'transfer[students][]', student.id, true,:class=>"left",:id=>"l"+index.to_s %>
+                        <%end%>
+                    </div></label>             
+            </td>
+            <%  if (@config.config_value == 'Daily') and ((@batch.course_id) == (Batch.find(@batches).course_id)) %>
+
+              <td class="set_border_right mid noo" id ="c<%=index.to_s%>"> 
+                  <label for ="r<%=index%>">
+                      <div class="cb">
+                         <% if @student.present? %>
+                          <%if @student.id == student.id%>
+                           <%= check_box_tag 'transfer[attendance][]', student.id,true,:class=>"ryt",:id=>"r"+index.to_s%>
+                          <%else%>
+                            <%= check_box_tag 'transfer[attendance][]', student.id,false,:class=>"ryt",:id=>"r"+index.to_s%>
+                          <%end%>
+                        <%else%>
+                          <%= check_box_tag 'transfer[attendance][]', student.id,true,:class=>"ryt",:id=>"r"+index.to_s%>
+                        <%end%>
+                      </div></label>
+              </td>
+            <%end%>               
+        </tr>
+
+      <%end%>
+
+  </table>
+  <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :id => 'submit_button' %>
+<% else %>
+  <ul id="category-list">
+      <li class="listheading">
+          <div class="category-name"><%= t('no_students_found_in_the_batch') %></div>
+      </li>
+  </ul>
+<% end %>
+
+<script type="text/javascript">
+    var select_all = document.getElementById("select_all");
+    var checkboxes = document.getElementsByClassName("left");
+    var select_all1 = document.getElementById("select_all1");
+    var checkboxes1 = document.getElementsByClassName("ryt");
+
+    j("#select_all").change(function ()
+    {
+    for (i = 0; i < checkboxes.length; i++)
+    {
+    checkboxes[i].checked = select_all.checked;
+    }
+    });
+
+    j("#select_all").change(function ()
+    {
+    for (i = 0; i < checkboxes.length; i++)
+    {
+
+    checkboxes1[i].checked = false;
+    checkboxes1[i].disabled = true;
+    j("#select_all1")[0].checked = false;
+    j("#select_all1")[0].disabled = true;
+    if (j("#select_all")[0].checked == true)
+    {
+    checkboxes1[i].disabled = false;
+    j("#select_all1")[0].disabled = false;
+    }
+
+    }
+    });
+
+
+
+    j("#select_all1").change(function ()
+    {
+    for (i = 0; i < checkboxes1.length; i++)
+    {
+    if (checkboxes1[i].disabled == false)
+    {
+    checkboxes1[i].checked = select_all1.checked;
+    }
+    }
+    });
+
+
+
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+    checkboxes[i].addEventListener('change', function (e)
+    { //".checkbox" change 
+    //uncheck "select all", if one of the listed checkbox item is unchecked
+    if (this.checked == false) {
+
+    select_all.checked = false;
+    }
+    //check "select all" if all checkbox items are checked
+    if (this.checked == true) {
+
+    if (j(".left:not(:checked)").length == 0)
+    {
+    select_all.checked = true;
+
+    }
+    }
+    });
+    }
+
+
+
+
+
+    for (var i = 0; i < checkboxes1.length; i++)
+    {
+    checkboxes1[i].addEventListener('change', function (e)
+    { //".checkbox" change 
+    //uncheck "select all", if one of the listed checkbox item is unchecked
+    if (this.checked == false) {
+
+    select_all1.checked = false;
+    }
+
+    //check "select all" if all checkbox items are checked
+    if (this.checked == true)
+    {
+    if (j(".ryt:not(:checked)").length == 0)
+    {
+    select_all1.checked = true;
+    }
+    }
+    });
+    }
+
+
+
+    var checkboxes = document.getElementsByClassName("left");
+
+
+
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+    checkboxes[i].addEventListener('change', function (e)
+    {
+    if (this.checked == false)
+    {
+    j(this).attr("id");
+    var id = j(this).attr("id");
+    id = id.replace("l", "r");
+    j("#" + id).prop('checked', false)
+    j("#" + id).prop('disabled', true)
+
+    if ((j(".ryt:enabled").length) == 0)
+    {
+    j("#select_all1")[0].disabled = true;
+    }
+
+    if (j(".ryt:not(:checked)").length == 0)
+    {
+    select_all1.checked = true;
+    } else {
+    select_all1.checked = false;
+    }
+
+    }
+    if (this.checked === true)
+    {
+    j(this).attr("id");
+    var id = j(this).attr("id");
+    id = id.replace("l", "r");
+    j("#" + id).prop('disabled', false);
+    j("#select_all1")[0].disabled = false;
+
+    }
+
+
+
+    });
+    }
+
+
+
+
+</script>
+
+

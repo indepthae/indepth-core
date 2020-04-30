@@ -1,0 +1,86 @@
+<%= javascript_include_tag "hr" %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('employee_payroll').titleize %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% case @prev_action
+    when 'assigned_employees'
+      breadcrumb :edit_assigned_employee_payroll, [@payroll_group, @employee]
+    when 'assign_employees'
+      breadcrumb :payroll_groups_create_employee_payroll, [@payroll_group, @employee]
+    when 'employee_profile'
+      breadcrumb :employee_profile_edit_employee_payroll, [@payroll_group, @employee]
+    when 'payslip_for_employees'
+      breadcrumb :update_payroll_payslip_for_employees, [@payroll_group, @employee]
+    when 'past_payslips'
+      breadcrumb :update_payroll_past_payslips, [@payroll_group, @employee]
+    when 'view_outdated_employees'
+      breadcrumb :view_outdated_employees_edit_payroll, [[@payroll_group, @employee], [params[:start_date], params[:end_date]]]
+    when 'view_employees_with_lop'
+      breadcrumb :view_employees_with_lop_edit_payroll, [[@payroll_group, @employee], [params[:start_date], params[:end_date]]]
+    when 'generate_employee_payslip'
+      breadcrumb :generate_employee_payslip_edit_payroll, [@payroll_group, @employee]
+    else
+      breadcrumb :edit_assigned_employee_payroll, [@payroll_group, @employee]
+    end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%#= render_help_wizard(:help_config=>:hr, :partial=>'payroll_create_employee_payroll') %>
+
+  <h3><%= "#{t('employee_payroll').titleize}"%></h3>
+  <% unless @salary_structure.current_group and params[:apply].nil? %>
+    <% case params[:apply]
+    when "1" %>
+      <div id="ignore-and-apply"><p><%= t('changed_to_current_payroll_group_warning') %>
+          <% case @prev_action
+          when 'view_outdated_employees', 'generate_employee_payslip', 'view_employees_with_lop' %>
+            <%= link_to t('retain_previous_payroll_structure'), {:controller => 'employee_payslips', :action => 'generate_employee_payslip', :employee_id => @employee.id, :date => params[:start_date], :from => @prev_action}, :class => "themed_text"  %>
+          <% else %>
+            <%= link_to t('retain_previous_payroll_structure'), {:controller => "payroll", :action => "create_employee_payroll", :id => @payroll_group.id, :employee_id => @employee.id, :apply => 0, :from => @prev_action}, :class => "themed_text"  %>
+          <% end %>
+        </p></div>
+    <% when nil, "0" %>
+      <div id="ignore-and-apply"><p><%= t('changes_ignored_warning') %>
+          <%= link_to t('apply_payroll_group_changes'), {:controller => "payroll", :action => "create_employee_payroll", :id => @payroll_group.id, :employee_id => @employee.id, :apply => 1, :from => @prev_action}, :class => "themed_text" %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="fields-details" id="name">
+    <div class="field-label"><%= t('name') %></div>
+    <div class="fields-val">: <%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('department') %></div>
+    <div class="fields-val">: <%= @employee.employee_department.name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('position') %></div>
+    <div class="fields-val">: <%= @employee.employee_position.name %></div>
+  </div>
+  <% unless @employee.employee_grade.nil? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('grade') %></div>
+      <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+    </div>
+  <% end %>
+  <hr/>
+  <div data-attrs="<%= Configuration.get_rounding_off_value.config_value.to_i %>" id="rounding_for"></div>
+  <div id="payroll_details">
+    <h3><%= t('payroll_details').titleize %></h3>
+    <div id="payroll_form">
+      <%= render :partial => "employee_payroll_form" %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var initial_data = JSON.parse('<%= (@dependencies||{}).to_json.gsub("'", %q(\\\')) %>');
+</script>

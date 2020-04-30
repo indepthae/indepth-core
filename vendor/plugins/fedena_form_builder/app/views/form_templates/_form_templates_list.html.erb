@@ -1,0 +1,56 @@
+<% offset = params[:page].nil? ? 0 : (params[:page].to_i-1)*12 %>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1" class='<%= "#{@form_templates.present? ? '' : 'narrow_border'}" %>'>
+  <% if @form_templates.present? %>
+    <tr class="tr-head">
+      <td class="col-1">
+        <%= t('sl_no') %>
+      </td>
+      <td class="col-2">
+        <%= t('template_name') %>
+      </td>
+      <td class="col-3">
+      </td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @form_templates.each_with_index do |template,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1">
+          <%= i+1+offset %>
+        </td>
+        <td class="col-2">
+          <%= link_to "#{template.name}", preview_form_template_path(template), :class => 'themed_text' %>
+        </td>
+        <td class="col-3">
+          <div class="form_actions">
+            <ul>
+              <li>
+                <%= link_to "#{t('use')}", publish_form_path(template), :class => 'themed_text' %>
+              </li>
+              <li>
+                <%= link_to t('edit'), edit_form_template_path(template), :class => 'themed_text' %>
+              </li>
+              <li>
+                <% if template.can_edit_or_delete? %>
+                  <%= link_to t('delete'), template, :confirm => t('confirm_delete'), :method => 'delete', :class => 'themed_text'  %>
+                <% else %>
+                  <%= link_to t('deactivate'), template, :confirm => t('confirm_delete'), :method => 'delete', :class => 'themed_text'  %>
+                <% end %>
+              </li>
+            </ul>
+          </div>
+        </td>
+
+      </tr>
+    <% end %>
+
+  <% else %>
+    <tr class="tr-odd">
+      <td class="col_1">
+        <div class="message">
+          <%= t('no_active_form_templates') %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @form_templates %>

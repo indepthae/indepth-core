@@ -1,0 +1,43 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}" %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('view_fee_collection_dates')}" %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "finance/financial_year_info" %>
+    </div>
+  </div>
+  <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:error].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><p><%= flash[:error] %></p></div>
+  <% end %>
+  <div id="flash"></div>
+  <div class="box">
+    <div class="label-field-pair"><label><%= t('select_a_batch') %></label>
+
+      <div class="text-input-bg">
+        <%= select :batch, '',
+                   @batches.map { |b| [b.full_name, b.id] },
+                   {:prompt => "#{t('select_batch')}"},
+                   {:onChange => "#{remote_function(:url => {:action => "batchwise_collection_dates"},
+                                                    :with => "'batch_id='+ value",
+                                                    :before => "Element.show('loader')",
+                                                    :success => "Element.hide('loader')"
+                   )}"}
+        %>
+      </div>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style => "display: none;") %>
+    </div>
+  </div>
+  <div id="fee-collection-edit">
+  </div>
+  <div id="fee_collection_dates"></div>
+  <div id="modal-box" style="display:none;"></div>
+</div>

@@ -1,0 +1,51 @@
+<% content_for :head do %>
+    <%= stylesheet_link_tag "#{rtl? ? 'rtl/' : ''}gray_table_design" %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('master_fees_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_master_fees_text') %></div>
+  <% if permitted_to? :manage_masters , :master_fees %>
+      <div id="inner-tab-menu">
+        <ul>
+          <li class='themed_bg themed-dark-hover-background'>
+            <%= link_to "#{t('manage_masters_text')}", {:action => :manage_masters} %>
+          </li>
+        </ul>
+      </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :master_fees_index %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%= render :partial => "master_particulars_list" %>
+
+  <%= render :partial => "master_discounts_list" %>
+
+</div>
+
+<script>
+    delete_obj = function (id, token, url) {
+        j('.delete_confirmation #yes').on('click', function () {
+            if (!j('.delete_confirmation #yes').hasClass('disabled')) {
+                j('.delete_confirmation #yes').addClass('disabled');
+                j.ajax({
+                    'type': 'DELETE',
+                    'url': url,
+                    'data': {id: id, session_fingerprint: token}
+                });
+            }
+        });
+    }
+</script>

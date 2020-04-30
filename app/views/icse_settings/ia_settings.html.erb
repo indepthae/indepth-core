@@ -1,0 +1,76 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "ICSE Settings" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "Internal Assessment Settings " %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <%unless flash[:notice].nil?%>
+    <p class="flash-msg"><%= flash[:notice] %></p>
+  <% end %>
+  <h5><%= "Internal Assessment Calculation Mode" %></h5>
+
+  <% form_for(@ia_setting, :url => {:action=> 'ia_settings'}, :html=> {:multipart=>true}) do |s| %>
+
+    <div class="by_average">
+      <div class="label_field_pair">
+        <div class="student_gender_value">
+          <%= s.radio_button  "config_value", "0", :checked => "checked" %>
+          <label class="label_for_gender" for="configuration_config_value_0"> <%= "Common Denominator Mode" %></label>
+        </div>
+      </div>
+      <div class="average_example themed_text">
+        <span><%="#{t('view_example')}"%></span>
+      </div>
+
+      <div class="formula">
+        <div class="numerator">The common denominator mode converts all IA indicator marks to a common denominator (1) before applying the formula. It is useful when the maximum marks are different for each indicator. Click on View Example for an indicative example</div>
+      </div>
+    </div>
+
+    <div class="by_credit_hours">
+      <div class="label_field_pair">
+        <div class="student_gender_value">
+          <%= s.radio_button  "config_value", "1" %>
+          <label class="label_for_gender" for="configuration_config_value_1"> <%= "Total Marks Mode" %></label>
+        </div>
+      </div>
+      <div class="credit_hour_example themed_text">
+        <span><%="#{t('view_example')}"%></span>
+      </div>
+
+      <div class="formula">
+        <div class="numerator">The total marks mode uses actual values of each IA indicator when applying the formula and calculates the result out of the maximum marks of the indicators. Click on View Example for an indicative example.</div>
+      </div>
+    </div>
+    <%= submit_tag "", :value => "#{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+  <% end %>
+
+  <div id="modal-box" style="display:none;"></div>
+  <div id="tmm" style="display:none;">
+    <%= render :partial=>'ia_total_example' %>
+  </div>
+  <div id="cdm" style="display:none;">
+    <%= render :partial=>'ia_average_example' %>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  j('.credit_hour_example span').click(function(){
+    j('#cdm').hide();
+    j('#modal-box').append(j('#tmm').show());
+    Modalbox.show($('modal-box'), {title: 'Total Marks Mode Example', width: 740});
+  });
+  j('.average_example span').click(function(){
+    j('#tmm').hide();
+    j('#modal-box').append(j('#cdm').show());
+    Modalbox.show($('modal-box'), {title: 'Common Denominator Mode Example', width: 740});
+  });
+
+</script>

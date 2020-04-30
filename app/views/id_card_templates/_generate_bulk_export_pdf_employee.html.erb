@@ -1,0 +1,195 @@
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="/javascripts/JsBarcode.all.min.js"></script>
+
+
+<script>
+var template_app;
+</script>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% if params[:d].present? %>
+  <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% end %>
+<script type="text/javascript">
+  var j = jQuery.noConflict();
+
+  VAppCounter = 0;
+  VAppCounterBack=0;
+
+  function set_template_properties(){
+    j(".front_preview").each(function(index, element){
+
+      //set layout size
+      j(element).css("width",'<%=@template_resolution[:width].to_i%>mm');
+      j(element).css("height",'<%=@template_resolution[:height].to_i%>mm');
+
+      //set padding
+      j(element).css('padding-top'," <%=@id_card_template.top_padding.to_i%>px");
+      j(element).css('padding-left', "<%=@id_card_template.left_padding.to_i%>px");
+      j(element).css('padding-right', "<%=@id_card_template.right_padding.to_i%>px");
+      j(element).css('padding-bottom', "<%=@id_card_template.bottom_padding.to_i%>px");
+
+      //set background_image
+      <% if @id_card_template.front_background_image.present? %>
+      <% img_url = FedenaSetting.s3_enabled? ? @id_card_template.front_background_image.url(:original,false) : File.join(RAILS_ROOT,@id_card_template.front_background_image.path) %>
+      j(element).css("background-image", "url('<%= img_url %>')");
+      <%end%>
+    });
+
+    j(".back_preview").each(function(index, element){
+
+      //set layout size
+      j(element).css("width",'<%=@template_resolution[:width].to_i%>mm');
+      j(element).css("height",'<%=@template_resolution[:height].to_i%>mm');
+
+      //set padding
+      j(element).css('padding-top'," <%=@id_card_template.top_padding.to_i%>px");
+      j(element).css('padding-left', "<%=@id_card_template.left_padding.to_i%>px");
+      j(element).css('padding-right', "<%=@id_card_template.right_padding.to_i%>px");
+      j(element).css('padding-bottom', "<%=@id_card_template.bottom_padding.to_i%>px");
+
+      //set background_image
+      <% if @id_card_template.back_background_image.present? %>
+      <% img_url = FedenaSetting.s3_enabled? ? @id_card_template.back_background_image.url(:original,false) : File.join(RAILS_ROOT,@id_card_template.back_background_image.path) %>
+      j(element).css("background-image", "url('<%= img_url %>')");
+      <%end%>
+    });
+  }
+
+  actMet=(function() {
+      if(VAppCounter == <%=@employees.count%> && VAppCounterBack == <%=@total_back_count%> && !lock_save){
+        set_template_properties();
+        j.ajax({
+          url: "save_bulk_generated_id_card",
+          type: 'POST',
+          data:  {
+            pdf_html: j("#hidden_generation").html(),
+            id_card_template_id: get_id_card_id()
+         },
+          success: function(data, textStatus, jqXHR)
+          {
+          },
+          error: function(jqXHR, textStatus, errorThrown)
+          {
+          }
+        });
+
+      }
+  });
+
+</script>
+
+<%@employees.each_with_index do |s,i|%>
+<div class="front keep-together">
+  <div id="front_preview<%=i%>" class="preview exclude_font front_preview keep-together">
+    <div class="css_container">
+      <%= @front_template_data %>
+    </div>
+  </div>
+</div>
+
+  <script>
+  var front_template_app<%=i%> = new Vue({
+   el: '#front_preview<%=i%>',
+   data: {
+     <% index = 0 %>
+     <%@keys.each do |key,val|%>
+       <%=key%>: ''<%=',' if index != (@keys.count-1) %>
+       <% index = index + 1 %>
+     <%end%>
+   },
+   beforeDestroy: function(){
+     VAppCounter = VAppCounter + 1;
+     actMet();
+
+   }
+  });
+  template_app = front_template_app<%=i%>;
+  <%@employee = s%>
+  <%@pdf_mode=true%>
+  <%   @additional_field_values = BaseTemplate.get_employee_additional_values(@employee) %>
+  <%@base_template = @front_template%>
+  <%@container = "#front_preview#{i}" %>
+    <%=render "templates/set_common_keys.js.erb"%>
+  <%=render "templates/set_employee_keys.js.erb"%>
+  Vue.nextTick(function () {
+    front_template_app<%=i%>.$destroy();
+  });
+  </script>
+
+  <%if (@id_card_template.include_back == "unique")%>
+  <div class="back keep-together">
+    <div id="back_preview<%=i%>" class="preview exclude_font back_preview">
+      <div class="css_container">
+        <%= @back_template_data %>
+      </div>
+    </div>
+  </div>
+  <br>
+
+    <script>
+    var back_template_app<%=i%> = new Vue({
+     el: '#back_preview<%=i%>',
+     data: {
+       <% index = 0 %>
+       <%@keys.each do |key,val|%>
+         <%=key%>: ''<%=',' if index != (@keys.count-1) %>
+         <% index = index + 1 %>
+       <%end%>
+     },
+     beforeDestroy: function(){
+       VAppCounterBack = VAppCounterBack + 1;
+       actMet();
+
+     }
+    });
+    template_app = back_template_app<%=i%>;
+    <%@employee = s%>
+    <%@pdf_mode=true%>
+    <%   @additional_field_values = BaseTemplate.get_employee_additional_values(@employee) %>
+    <%@base_template = @back_template%>
+    <%@container = "#back_preview#{i}" %>
+    <%=render "templates/set_common_keys.js.erb"%>
+    <%=render "templates/set_employee_keys.js.erb"%>
+    Vue.nextTick(function () {
+      back_template_app<%=i%>.$destroy();
+    });
+    </script>
+    <%end%>
+
+<%end%>
+
+<%if (@id_card_template.include_back == "common")%>
+<div class="back keep-together">
+  <div id="back_preview_common" class="preview exclude_font back_preview">
+    <div class="css_container">
+      <%= @back_template_data %>
+    </div>
+  </div>
+</div>
+<br>
+
+  <script>
+  var back_template_app = new Vue({
+   el: '#back_preview_common',
+   data: {
+     <% index = 0 %>
+     <%@keys.each do |key,val|%>
+       <%=key%>: ''<%=',' if index != (@keys.count-1) %>
+       <% index = index + 1 %>
+     <%end%>
+   },
+   beforeDestroy: function(){
+     VAppCounterBack = VAppCounterBack + 1;
+     actMet();
+
+   }
+  });
+  template_app = back_template_app;
+  <%@container = "#back_preview_common" %>
+  <%=render "templates/set_common_keys.js.erb"%>
+  Vue.nextTick(function () {
+    back_template_app.$destroy();
+  });
+  </script>
+<%end%>

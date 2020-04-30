@@ -1,0 +1,55 @@
+<div class="batch_weekly_classes">
+  <div class="label">
+    <%= t('weekly_classes') %>
+  </div>
+  <div class="required_classes">
+    <label><%= t('required') %></label>
+    <span id="required_classes">
+      <%= @required_hours %>
+    </span>
+  </div>
+  <div class="alloted_classes">
+    <label><%= t('allocated') %></label>
+    <span id="alloted_classes" class="<%= @required_hours < @tte_total ? 'over_allocation':''%>">
+      <%= @tte_total %>
+    </span>
+  </div>
+</div>
+
+<% if (@subjects.present? or @elective_groups.present?) %>
+  <div class="subject_allocations">
+    <div class="subject-header-row subject-row">
+      <div class="subject-col-1">
+        <%= t('subject') %>
+      </div>
+      <div class="subject-col-2">
+        <%= t('allocated_classes') %>
+      </div>
+    </div>
+    <% tte_counts = {} %>
+    <% @all_timetable_entries.map {|x| tte_counts["#{x.entry_type}_#{x.entry_id}"] ||= 0; tte_counts["#{x.entry_type}_#{x.entry_id}"] += 1 } %>
+    <% @subjects.each do |subject| %>
+      <% tte_count =  tte_counts["Subject_#{subject.id}"].present? ? tte_counts["Subject_#{subject.id}"] : 0 %>
+      <div class="subject-row <%= (tte_count > subject.max_weekly_classes) ? 'over_utilized' : ''%>" id='subject-<%= subject.id %>'>
+        <div class="subject-col-1">
+          <%= "#{subject.name} (&lrm;#{subject.code})" %>
+        </div>
+        <div class="subject-col-2">
+          <%= "#{tte_count} / #{subject.max_weekly_classes}" %>
+        </div>
+      </div>
+    <% end %>
+    <% @elective_groups.each do |elective_group| %>
+      <% tte_count =  tte_counts["ElectiveGroup_#{elective_group.id}"].present? ? tte_counts["ElectiveGroup_#{elective_group.id}"] : 0 %>
+      <% elective_subject_hours = elective_group.subjects.reject {|subject| subject.is_deleted }.map(&:max_weekly_classes) %>
+      <div class="subject-row <%= (elective_subject_hours.present? and (tte_count > elective_subject_hours.min)) ? 'over_utilized' : ''%>" id='elective_group-<%= elective_group.id %>'>
+        <div class="subject-col-1">
+          <%= "#{elective_group.name}" %>
+        </div>
+        <div class="subject-col-2">
+          <%= "#{tte_count} / #{elective_subject_hours.min}" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

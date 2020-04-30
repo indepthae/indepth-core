@@ -1,0 +1,24 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('supplier_type') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_text') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <div class="bread_crumb">
+    <% breadcrumb :supplier_types_edit, @supplier_type%>
+    <%= render_breadcrumbs  %>
+  </div>
+  </div>
+
+
+
+
+
+
+  <%= render :partial => 'form' %>
+
+</div>

@@ -1,0 +1,30 @@
+
+<%if @user_type == "GroupMembers" %>
+  <% if @student_template_content.present? %>
+    <div class="field_set">
+        <label class="head_label"><%= t('student_template') %></label>
+        <%= text_area :message, "template_message[student]", :rows=>6, :class=>"template_content_check", :value=>@student_template_content %>
+    </div>
+  <% end %>
+
+  <% if @employee_template_content.present? %>
+    <div class="field_set">
+        <label class="head_label"><%= t('employee_template') %></label>
+        <%= text_area :message, "template_message[employee]", :rows=>6, :class=>"template_content_check", :value=>@employee_template_content %>
+    </div>
+  <% end %>
+
+  <% if @guardian_template_content.present? %>
+    <div class="field_set">
+        <label class="head_label"><%= t('guardian_template') %></label>
+        <%= text_area  :message, "template_message[guardian]", :rows=>6, :class=>"template_content_check", :value=>@guardian_template_content%>
+    </div>
+  <% end %>
+
+<%else%>
+  <div class="field_set">
+      <label class="head_label"><%= t('template') %></label>
+      <%= text_area :message, :template_message, :rows=>6, :class=>"template_content_check", :value=>@message_template_content %>
+  </div>
+<%end%>
+

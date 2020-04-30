@@ -1,0 +1,4 @@
+if(<%= @status %>){
+    Modalbox.hide();        
+    window.location.href = "/finance_extensions/pay_all_fees/<%=@student.id%>?batch_id=<%= @current_batch.present? ? @current_batch.id : '' %>"
+}

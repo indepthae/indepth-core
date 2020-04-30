@@ -1,0 +1,7 @@
+<div id="pdf-footer-second">
+  <div class="note_part">
+    <%= default_configs.try(:pdf_receipt_custom_footer) %>
+  </div>
+  <%= render :partial => "finance_extensions/receipts/defaults/receipt_signature",
+             :locals => {:default_configs => default_configs} %>
+</div>

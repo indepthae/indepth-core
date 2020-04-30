@@ -1,0 +1,14 @@
+<%if @automated_keys.present?%>
+<table class="block_table"><td class="key_sub_heads"> <%= "#{t("template_keys_set.automated_keys")}" %></td>
+</table>
+<div class="key_set_container">
+  <table class="block_table">
+    <%@automated_keys.each do |key,value| %>
+    <tr>
+      <td><%= value %></td>
+      <td class="center_text"><%= " {{#{key.to_s}}} "%></td>
+    </tr>
+    <%end%>
+  </table>
+</div>
+<%end%>

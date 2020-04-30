@@ -1,0 +1,48 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('email_send') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('unsubscription_list') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+  <% end %>
+  <div class="form-space"></div>
+  <div class="box">
+    <% remote_form_for(:student, :url => {:action=> 'email_unsubscription_list'}, :before => "Element.show('loader')", :success => "Element.hide('loader')", :html=> {:method => :get, :id=>"date_search_form"}) do |s| %>
+      <div class="date-select">
+        <label><%= "#{t('date_select')}" %></label>
+        <div class="date-search">
+          <%= calendar_date_select_tag 'search[updated_at_on]', I18n.l(@date.present? ? @date.to_date : Date.today , :format=> :default),
+                                       :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onChange => "Element.show('loader');this.form.request();"%>
+
+        </div>
+      </div>
+    <%end%>
+    <div class="separator"></div>
+    <% remote_form_for(:student, :url => {:action=> 'email_unsubscription_list'}, :before => "Element.show('loader')", :success => "Element.hide('loader')", :html=> {:method => :get, :id=>"email_search_form"}) do |s| %>
+      <div class="email-search">
+        <label><%= "#{t('username')}/#{t('email')}" %></label>
+        <%= text_field_tag 'search[user_email_or_user_username_like]', '' %>
+        <%= submit_tag t('search') %>
+      </div>
+    <%end%>
+
+    <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader",
+                  :style =>"display: none;" ) %>
+
+  </div>
+
+  <div id="u-list">
+    <%= render 'unsubscription_list' %>
+  </div>
+</div>

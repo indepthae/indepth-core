@@ -1,0 +1,34 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_process_setting') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('manage_leave_process_settings')}" %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="box">
+        <%  if permitted_to? :index, :leave_years %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to t('leave_years_text'), :controller=> "leave_years", :action=>'index' %></div>
+              <div class="link-descr"><%= t('leave_years_desc')%></div>
+          </div>
+        <% end %>
+        <%  if permitted_to? :autocredit_setting, :leave_years %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to t('auto_credit_settings'), :controller=> "leave_years", :action=>'autocredit_setting' %></div>
+              <div class="link-descr"><%= t('auto_credit_desc1')%></div>
+          </div>
+        <% end %>
+        <%  if permitted_to? :credit_date_setting, :leave_years %>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to t('credit_date_settings'), :controller=> "leave_years", :action=>'credit_date_setting' %></div>
+              <div class="link-descr"><%= t('credit_date_desc')%></div>
+          </div>
+        <% end %>
+    </div>
+</div>
+<div class="extender"></div>

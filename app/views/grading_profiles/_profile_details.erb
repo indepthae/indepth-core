@@ -1,0 +1,14 @@
+<% if @default_grade_set.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" id="act_year">
+      <tr class="tr-head">
+          <td class="name"><%= t('grading_profile') %></td>
+          <td class="type"><%= t('type') %></td>
+          <td class="grades_count"><%= t('no_of_grades') %></td>
+      </tr>
+      <tr>
+          <td><%= @default_grade_set.name %></td>
+          <td><%= @default_grade_set.grade_type %></td>
+          <td><%= @default_grade_set.grades_count %></td>
+      </tr>
+  </table>
+<% end %>

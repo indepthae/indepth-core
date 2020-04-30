@@ -1,0 +1,10 @@
+if @initial.present? || @errors.present?
+  page.replace_html 'modal-box', :partial => 'new'
+  page.replace_html 'form-errors', :partial => 'errors', :object => @category if @category.errors.present?
+  page << "Modalbox.show($('modal-box'), {title: '#{t('add_category_title')}', width: 500});" unless @errors.present?
+elsif @saved.present?  
+  page.replace_html 'form-errors', :text => ''
+  page.replace_html "student_document_categories", :partial => "categories", :object => @categories
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page << "Modalbox.hide();"
+end

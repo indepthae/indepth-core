@@ -1,0 +1,29 @@
+   <% unless @sold_items.empty? %>
+
+<table id="listing_theme" class="sold_items" width="100%">
+    <tr class="tr-head">
+      <td><%= "#{t('code')}" %></td>
+      <td><%= "#{t('item_name')}" %></td>
+      <td><%= "#{t('available_qty')}" %></td>
+      <td><%= "#{t('sold_qty')}" %></td>
+      <td><%= "#{t('amount_collected')}  (#{@currency})" %></td>
+    </tr>
+   <tr class="tr-blank"></tr>
+   <% @sold_items.each_with_index do |item, i| %>
+   <% unless item.store_item.nil? %>
+   <tr class="tr-<%= cycle('odd', 'even') %>" id="store_item_fields">
+     <td class="col-1"><%= item.store_item.code %></td>
+     <td class="col-3"><%= item.store_item.item_name %></td>
+     <td class="col-3"><%= item.store_item.quantity %></td>
+     <td class="col-3"><%= item.total_quantity %></td>
+     <td class="col-3"><%= precision_label(item.total_rate) %></td>
+     
+   </tr>
+   <% end %>
+   <% end %>
+     <% else %>
+   <p class="flash-msg">No Reports</p>
+<%end%>
+    </table>
+
+<%= will_paginate @sold_items,:renderer => 'RemoteLinkRenderer', :params=> {:action => "item_wise_report", :status => params[:status]} %>

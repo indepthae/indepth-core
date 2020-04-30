@@ -1,0 +1,70 @@
+<div class="table-heading"><%= "#{type.capitalize} Members" %></div>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+      <tr class="main_head tr-list_head">
+            <td class="sl-col"><%= t('in_no') %></td>
+            <td class="set_border_right">
+              <% if type=="employee" %> 
+                <%= t('employee_name') %></td>
+              <% else %>
+                <%= t('student_name') %></td>
+              <% end %>
+            <% if type=="employee" %>
+              <td class="set_border_right" colspan="2"><%= t('department') %></td>
+            <% elsif type=="student" || type=="parent" %>
+              <td class="set_border_right" colspan="2"><%= t('batch') %></td>
+            <% end %>
+        </tr>
+        <%  members.each_with_index do |m, @i| %>
+          <% if params[:employee_page].present? %>
+            <% @e=@i %>
+            <% if params[:employee_page].to_i >= 1 %>
+              <% @e = @e + (params[:employee_page].to_i - 1) * members.per_page.to_i %>
+            <% end %>
+          <% else %>
+            <% @e=@i %>
+          <% end %>
+          <% if params[:student_page].present?  %>
+            <% @s=@i %>
+            <% if params[:student_page].to_i >= 1 %>
+              <% @s = @s + (params[:student_page].to_i - 1) * members.per_page.to_i %>
+            <% end %>
+          <% else %>
+            <% @s=@i %>
+          <% end %>
+          <% if params[:parent_page].present? %>
+            <% @p=@i %>
+            <% if params[:parent_page].to_i >= 1 %>
+              <% @p = @p + (params[:parent_page].to_i - 1) * members.per_page.to_i %>
+            <% end %>
+          <% else %>
+            <% @p=@i %>
+          <% end %>
+          <tr class="row-b">
+              <td class="sl-col">
+                <%= @e+1 if type=="employee" %>
+                <%= @s+1 if type=="student" %>
+                <%= @p+1 if type=="parent" %>
+              </td>
+              <td class="set_border_right"> <%= "#{m.member.full_name}" %> </td>
+              <td class="set_border_right">
+                <% if type == "employee" %>
+                  <%= "#{m.member.department}" if m.member.present? %>
+                <% else %>
+                  <%= "#{m.member.batch.full_name}" if m.member.present? %>
+                <% end %>
+              </td>
+              <% if permitted_to? :remove_member, :user_groups %>
+                <td class="set_border_right last"><%= link_to "Delete",{ :controller => "user_groups", :action => "remove_member", :id => m.user.id, :group_id => @group.id, :target_type => type, :all => "false" }, :confirm => "Are you sure" %> </td>
+              <% end %>
+          </tr>
+        <% end %>
+  </table>
+
+
+  <% if type=="employee" %>
+    <%= will_paginate members, :param_name => 'employee_page' %>
+  <% elsif type=="student" %>
+    <%= will_paginate members, :param_name => 'student_page' %>
+  <% else %>
+    <%= will_paginate members, :param_name => 'parent_page' %>
+  <% end %>

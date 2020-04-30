@@ -1,0 +1,47 @@
+<%remote_form_for :course,:url => {:action=> 'update_priority',:id=>@course.id} do |f|%>
+  <div class="drag_drop_msg hidden_sec"><i></i><%=t('rg_drag_drop_msg')%></div>
+  <div id="other_details">
+    <div id="student_items">
+      <%if @record_assignments.present?%>
+        <table id="student_details_table">
+          <tr class="disable_sort">
+            <th id="reorder"></th>
+            <th id="name"><%=t('record_group')%></th>
+          </tr>
+          <%@record_assignments.each_with_index do |ra,i|%>
+            <tr class="list">
+              <td class="reorder_val"><i></i></td>
+              <td class="record_name"><%=ra.record_group.name%></td>
+              <%=hidden_field_tag "course[record_assignments_attributes][#{i.to_s}][id]",ra.id%>
+              <%=hidden_field_tag "course[record_assignments_attributes][#{i.to_s}][priority]",ra.priority%>
+            </tr>
+          <%end%>
+        </table>
+      <%else%>
+        <div class="no_entries"><%=t('no_records')%></div>
+      <%end%>
+    </div>
+  </div>
+  <div id="save_button" class="hidden_sec"><%=f.submit%></div>
+  <div id="cancel_link" class="hidden_sec"><%=link_to_remote "#{t('cancel_text')}", :url => { :action => 'cancel',:id=>@course.id },:method=>:get%></div>
+<%end%>
+<script type="text/javascript">
+  function updateSortorder(){
+
+    j('tr:visible.list').each(function (i) {
+      j(this).children().last().val(i+1);
+    });
+  }
+  j('th#name').css('min-width','900px');
+  j('td.record_name').css('min-width','900px');
+  j("#student_details_table tbody").sortable({
+    cursor: 'move',
+    opacity: 0.6,
+    start: function( event, ui ) {
+    },
+    stop: function( event, ui ) {
+      updateSortorder();
+    },
+    items: "tr:not(.disable_sort)"
+  }).disableSelection();
+</script>

@@ -1,0 +1,144 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('discussion') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('view_post') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <%# if @current_user.id==@group_post.user_id or @current_user.admin? %>
+    <% if permitted_to? :destroy,@group_post %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('delete_text')}", group_group_post_path(:group_id=>@group_post.group,:id=>@group_post), :confirm => "#{t('confirm_post')}",:method => :delete, :action => "destroy" %></li>
+    <% end %>
+  </ul>
+</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :groups_group_posts,@group_post%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div>
+    <div id="part1">
+      <div>
+        <div class="red_heading themed_text">
+          <h3><%= @group_post.post_title %></h3>
+        </div>
+        <div id="post_details">
+          <%  if @group_post.user.present? %>
+            <div class="bread_crumb1">
+              <%= t('posted_by') %><span id="posters_name"><%= "#{@group_post.user.first_name}"%></span> <%= t('on_text') %> <%= format_date(@group_post.created_at,:format=>:long) %>
+            </div>
+          <% else %>
+            <div class="bread_crumb1">
+              <%= t('posted_by_deleted_member') %><%= format_date(@group_post.created_at,:format=>:long) %>
+            </div>
+          <% end %>
+          <span class="bread_crumb2"><a href="#comments"><span id="comments_no" class="themed_text">
+                <%= "#{@group_post.group_post_comments.count} #{t('comments')}" %>
+              </span></a></span>
+        </div>
+        <div id="files_field1">
+          <% @group_post.group_files.each do |file| %>
+            <%  if Group::VALID_IMAGE_TYPES.include?(file.doc_content_type)  %>
+              <%=  link_to image_tag(file.doc.url(:small, false)), file.doc.url(:original, false), :target=>"_blank"%>
+            <% end %>
+          <% end %>
+
+        </div>
+        <div class="textt">
+          <%=@group_post.post_body.gsub( /(\A|\s)((https?:\/\/|www\.)[^\s<]+)/, '<a target="blank" href="\2">\2</a>' ) %>
+        </div>
+        <div id="files_field">
+          <% @group_post.group_files.each do |file| %>
+            <%  unless Group::VALID_IMAGE_TYPES.include?(file.doc_content_type)  %>
+              <%= image_tag("/images/discussion/PaperClip1.png", :border=>0,:height=>16, :width=>16) %>
+              <%=link_to "#{file.doc_file_name}", file.doc.url(:original, false) ,:class=>"themed_text" %>
+            <% end %>
+          <% end %>
+
+        </div>
+
+
+      </div>
+      <div id="comment_height">
+        <div id="top">
+          <% form_remote_for(:group_post_comment,:url=>{:controller=>"group_post_comments",:group_id=>params[:group_id],:group_post_id=>params[:id]},:html => { :id => "comment_form"},:before => "$('#{@group_post.id}').disable();",:complete => "setTimeout(function(){$('#{@group_post.id}').enable();},5000);",:loading => "$('loading').show();", :loaded => "$('loading').hide();") do |f| %>
+            <div id="er"><%= error_messages_for :group_post_comment, :header_message=> nil %></div>
+            <div class="label-field-pair" id="add_comment">
+              <div class="label-container1"><label><%=  t('add_comment') %></label></div>
+              <div id="img_load">
+                <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loading",
+                  :style =>"display: none;" ) %>
+              </div>
+              <div class="text-area-bg"><%= f.text_area :comment_body, :cols=>50, :rows=>5 %></div>
+              <div id="go"><%= f.submit "#{t('submit')}", :id=>@group_post.id %></div>
+            </div>
+          <% end %>
+        </div>
+        <div class="extender"></div>
+        <div id="down">
+          <table class="commenttable">
+            <tr>
+              <td id="ajax">
+                <%= render :partial=>"group_posts/comments",:locals=>{:group_post_comments=>@group_post_comments,:is_current_user_admin=>@is_current_user_admin, :group_post=>@group_post} %>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+    </div>
+    <div id="part2">
+      <div id="main">
+        <div id="one">
+        </div>
+        <div id="two">
+          <div class="red_heading2 themed_text">
+            <h3><%= t('member') %></h3>
+
+          </div>
+          <div  class="content2">
+            <% @group_post.group.group_members[0..9].each do |member| %>
+              <% if  member.user.present? %>
+                <% if  member.user.employee? or member.user.admin?  %>
+                  <% employee_record=member.user.employee_record %>
+                  <div class="td-name themed_hover_text" ><%=  "#{member.user.first_name}"%>
+                    <% if employee_record.present? %>
+                      <div class="date"><span><%="#{employee_record.employee_number}<br />#{employee_record.employee_department.name}"%></span></div>
+                    <% end %>
+                  </div>
+
+                <% else %>
+                  <div class="td-name themed_hover_text" ><%=  "#{member.user.first_name}"%><div class="date"><span><%= "#{member.user.student_record.admission_no}<br />#{member.user.student_record.batch.full_name}"%></span></div></div>
+                <% end %>
+              <% else %>
+                <div class="td-name themed_hover_text" ><%= t('deleted_user') %><div class="date"><span><%= t('data_not_found')%></span></div></div>
+              <% end %>
+
+            <% end %>
+
+            <div id="members"> <%= link_to "#{t('see_all_members')}", members_group_path(:id=>@group_post.group) ,:class=>"themed_text"%></div>
+
+          </div>
+          <div class="red_heading2 themed_text">
+            <h3><%= t('my_group') %></h3>
+          </div>
+          <div  class="content2">
+            <% @current_user.member_groups.each do |group| %>
+              <div class="group_name">
+                <%= link_to "#{group.group_name}", group_path(:id=>group) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div id="page-yield" class="available_sections">
+  <div class="hor_line"></div>
+  <h2><%= t('finance_expense_report') %></h2>
+  <div class="hor_line"></div>
+  <div class="extender"> </div>
+  <div class="plot">
+    <div id ="main_info">
+      <h3><%= @expense_category.name%></h3>
+      <h4> <%= "#{t('from')} (#{format_date(@start_date)}) #{t('to')} (#{format_date(@end_date)})" %></h4>
+    </div>
+    <div id="pdf-info" class="plot">
+      <table id="pdf-table" width="100%" cellspacing="0">
+        <tr class="table-header"><td class="col-pdf"><%= t('sl_no') %>
+          </td><td class="col-pdf"> <%= t('name') %> </td>
+          <td class="col-pdf"> <%= t('description') %> </td>
+          <td class="col-pdf"> <%= t('receipt_no') %> </td>
+          <td class="col-pdf"><%= "#{t('amount')}( #{currency})" %></td>
+          <td class="col-pdf"> <%= t('transaction_date') %></td></tr>
+      </table>
+      <% index = 0 %>
+      <% total = 0 %>
+      <% i = 0 %>
+      <% c= 'even' %>
+      <% income_total = expense_total = 0 %>
+      <% @expense.each do |d| %>
+        <table id="pdf-table" width="100%" cellspacing="0" class="plot">
+          <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+            <td class="col-pdf"><%= index+=1 %></td>
+            <td class="col-pdf"><%= d.title %></td>
+            <td class="col-pdf"><%= d.description %></td>
+            <td class="col-pdf"><%= d.receipt_no %></td>
+            <td class="col-pdf"><%=precision_label(d.amount)%>
+            </td>
+            <td class="col-pdf"><%= format_date(d.transaction_date) unless d.transaction_date.nil?%></td>
+          </tr>
+        </table>
+        <% expense_total += d.amount %>
+      <% end %>
+    </div>
+    <table id="pdf-table" width="100%" cellspacing="0" class="plot">
+      <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+        <td class="col-pdf"></td>
+        <td class="col-pdf" colspan="3"><%= t('grand_total') %></td>
+        <td class="col-pdf" colspan="2">
+          <%= precision_label(expense_total)%>
+        </td>
+      </tr>
+
+    </table>
+
+
+  </div>
+
+</div>

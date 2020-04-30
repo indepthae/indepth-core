@@ -1,0 +1,8 @@
+if @assessment_term.errors.present?
+  page.replace_html 'popup_content', :partial => 'edit_assessment_term'
+else
+  page << 'remove_popup_box()'
+  page.replace_html "term_#{@assessment_term.id}", :partial => 'term_box', 
+    :locals => {:term => @assessment_term, :assessment_groups => @assessment_term.assessment_groups.without_final}
+  page << "toggle_updated_glow('#term_#{@assessment_term.id}')"
+end

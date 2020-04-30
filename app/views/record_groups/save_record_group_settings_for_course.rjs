@@ -1,0 +1,19 @@
+if @error.nil?
+	page.replace_html 'form-errors', :text => ''
+  page.replace_html 'student_items', :partial => 'record_groups_for_course', :object => @course_record_groups
+  if @course.record_assignments.count > 1
+    page.replace_html 'rg_priority', :partial => 'rg_prioritizer', :object => @course
+  else
+    page.replace_html 'rg_priority', :text => ''
+  end
+  if @assigned_batches_count > 0
+    page.replace_html 'form_preview', :partial => 'student_form_previewer', :object => @assigned_batches_count
+  else
+    page.replace_html 'form_preview', :text => ''
+  end
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page << "Modalbox.hide();"
+else
+	page.replace_html 'form-errors', :partial => 'errors', :object => @record_assignment
+  page.visual_effect(:highlight, 'form-errors')
+end

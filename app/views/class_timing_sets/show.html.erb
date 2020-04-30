@@ -1,0 +1,53 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('class_timing_sets') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_class_timings') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :class_timing_sets_show, @class_timing_set %>
+    <%=  render_breadcrumbs %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="flash_box"></div>
+  <% unless flash[:warn_notice].nil? %>
+    <div class="errorExplanation">
+      <p><%=t('activerecord.errors.template.body')%></p>
+      <ul>
+        <%  flash[:warn_notice].each do |err| %>
+          <li><%=err%></li>
+        <%end%>
+      </ul>
+    </div>
+  <% end %>
+  <div id="class_timing_set_details"><%=render :partial => 'show_class_timing_set_details'%></div>
+  <div id="add_class_timings">
+    <% unless @tt_class_timing_set.present? %>
+      <%= link_to_remote "#{t('add_new_class_timing')}", :url => new_class_timings_class_timing_set_url(@class_timing_set),:html=>{:class=>'themed_text'} %>
+    <%end%>
+  </div>
+  <div id="class_timings"><%= render :partial => "class_timings" %></div>
+  <div id="modal-box" style="display:none;"></div>
+</div>

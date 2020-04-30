@@ -1,0 +1,10 @@
+<div class="template_body_container">
+    <div class="template_name_container">
+        <%= c.text_field :name, :class => "template_name", :placeholder => t('name') %>
+    </div>
+    <div class="template_body_container">
+        <%= c.text_area :template_body, :class => "template_body", :placeholder => t('body'), :onclick => "save_focused_id(this);" %>
+    </div>
+    <%= c.hidden_field :_destroy, :value => 0 %>
+    <div class="remove_field" onclick="remove_field(this)"></div>
+</div>

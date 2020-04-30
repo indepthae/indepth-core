@@ -1,0 +1,53 @@
+<% remote_form_for @vehicle_addl_field, :url => fetch_path(@vehicle_addl_field), 
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |c| %>
+  <%= session_fingerprint_field %> 
+  <div id="addl_detail_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('name') %></label>
+          <div class="text-input-bg"><%= c.text_field :name %></div>
+      </div>
+      <div class="label-checkbox-pair">
+          <label class="status" for="status"><%= t('status') %></label>
+          <div id="radio-buttons">
+              <%= c.radio_button  "is_active", "true", :checked => "checked" %>
+              <label class="label_for_status" for="vehicle_additional_field_is_active_true"><%= t('active') %></label>
+
+              <%= c.radio_button  "is_active", "false" %>
+              <label class="label_for_status" for="vehicle_additional_field_is_active_false"><%= t('inactive') %></label>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <%= c.label :is_mandatory, t('is_mandatory') %>
+          <div class="input-container">  <%= c.check_box :is_mandatory %></div>
+      </div>
+      <div class="label-field-pair">
+          <%= c.label :input_type,"#{t('input_method')}" %>
+          <div class="text-input-bg"><%= c.select :input_type, [["TextBox","text"],["Select Box","belongs_to"],["CheckBox","has_many"]] ,{},:class=>"input-type-select"%>
+          </div>
+      </div>
+      <div class="custom" style="display: none" >
+          <% c.fields_for :vehicle_additional_field_options do |builder| %>
+            <%= render "vehicle_additional_field_option_fields" ,:c=>builder%>
+          <% end %>
+          <div id="add_img_div">
+              <%= link_to_add_fields "<span>#{t('add')}</span>", c, :vehicle_additional_field_options  %>
+          </div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@vehicle_addl_field.new_record? ? t('create_vehicle_additional_detail') : t('update_vehicle_additional_detail'))}", 
+        :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  if ($$('.input-type-select') != "") {
+      $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      $$('.input-type-select').first().fire('change');
+      $$('select').each(function (e) {
+          toggle_custom.call(e);
+      });
+  }
+</script>

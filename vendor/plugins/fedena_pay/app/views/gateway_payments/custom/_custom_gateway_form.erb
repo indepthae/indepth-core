@@ -1,0 +1,7 @@
+<% form_for :custom_gateway_online_pay ,:url => {:controller=>'payment_settings', :action=>'initialize_payment'},:method => :post,:html=>{:class=>'payment-form'} do |f| %>
+  <% @variable_params.each_pair do|k,v|%>
+    <%= hidden_field :online_payment, k.to_sym, :value=>v,:readonly => true %>
+  <% end %>
+  <%= hidden_field :online_payment, :current_school, :value=>current_school_name ,:readonly => true %>
+  <%= f.submit 'Pay Fee',:class => "submit_button",:style => @button_style %>
+<% end %>

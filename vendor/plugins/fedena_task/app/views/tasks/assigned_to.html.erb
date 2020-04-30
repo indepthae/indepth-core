@@ -1,0 +1,72 @@
+<% i=1 %>
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('task_text') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('listing_assignees') %></div>
+
+<div id="inner-tab-menu">
+
+</div>
+
+
+
+
+</div>
+<div id="page-yield">
+ <div class="bread_crumb">
+    <%breadcrumb :tasks_assigned_to,@task%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+
+  <div id="application-list">
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td>
+          <%= t('sl_no') %>
+        </td>
+        <td>
+          <%= t('name') %>
+        </td>
+        <td>
+          <%= t('emp_code_admssn_no') %>
+        </td>
+        <td>
+          <%= t('dept_name_course_name') %>
+        </td>
+      </tr>
+      <tr class="tr-blank"></tr>
+
+
+      <% @assignees.each do |assignee| %>
+        <tr class="tr-read-<%= cycle('odd', 'even') %>">
+          <td class="col-1"><%= i %> </td>
+          <td class="col-2"><%= assignee.full_name %></td>
+          <% if assignee.student? %>
+            <td class="col-2"><%= assignee.student_record.admission_no %></td>
+            <td class="col-2"><%= assignee.student_record.batch.full_name %></td>
+
+          <% else %>
+            <td class="col-2"><%= assignee.employee_record.employee_number %></td>
+            <td class="col-2"><%= assignee.employee_record.employee_department.name %></td>
+          <% end %>
+
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+
+
+    </table>
+    <%= will_paginate @assignees %>
+
+
+
+
+
+  </div>
+</div>

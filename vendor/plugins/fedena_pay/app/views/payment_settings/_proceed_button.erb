@@ -1,0 +1,3 @@
+<% random_token = rand(36**25).to_s(36) %>
+<% return_url = make_payment_url(@fee_type, @student.id, @fee_id, random_token, @wallet_amount_applied, @wallet_amount)%>
+<%= gateway_pay_button(@active_gateway, @amount, @wallet_amount_applied, @wallet_amount, @billing_info,return_url,@user_info,random_token,@fee_type,@fee_id,"",@fee_name) %>

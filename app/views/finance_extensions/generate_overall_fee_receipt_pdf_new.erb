@@ -1,0 +1,38 @@
+<% content_for :head do %>
+    <% if rtl? %>
+        <%= stylesheet_link_tag 'rtl/finance_extensions/generate_overall_fee_receipt_pdf.css', :media => "all" %>
+    <% else %>
+        <%= stylesheet_link_tag 'finance_extensions/generate_overall_fee_receipt_pdf.css', :media => "all" %>
+    <% end %>
+<% end %>
+<%# default_configs ||= nil %>
+<% @config ||= {} %>
+<% @transactions_data.transactions.each_pair do |template_id, transactions_data| %>
+    <% if @transactions_data.receipt_mode == 'SINGLE' %>
+        <% transactions_data.each_pair do |receipt_no, transactions| %>
+            <%= render :partial => "finance_extensions/receipts/common/receipt_header",
+                       :locals => {:template_id => template_id, :default_configs => @transactions_data.default_configs,
+                                   :printer => false} %>
+            <div id="page-yield">
+              <%= render :partial => "finance_extensions/receipts/overall/receipt_content_single_mode",
+                         :locals => {:receipt_no => receipt_no, :transactions => transactions,
+                                     :payee => @transactions_data.payee,
+                                     :default_configs => @transactions_data.default_configs} %>
+              <%= render :partial => "finance_extensions/receipts/common/receipt_footer",
+                         :locals => {:template_id => template_id, :default_configs => @transactions_data.default_configs, :transaction_status => @transactions_data.transaction_status} %>
+            </div>
+        <% end %>
+    <% else %>
+        <%= render :partial => "finance_extensions/receipts/common/receipt_header",
+                   :locals => {:template_id => template_id, :default_configs => @transactions_data.default_configs,
+                               :printer => false} %>
+        <div id="page-yield">
+          <%= render :partial => "finance_extensions/receipts/overall/receipt_content_multi_mode",
+                     :locals => {:transactions => transactions_data, :payee => @transactions_data.payee,
+                                 :default_configs => @transactions_data.default_configs} %>
+          <%= render :partial => "finance_extensions/receipts/common/receipt_footer",
+                     :locals => {:template_id => template_id, :default_configs => @transactions_data.default_configs, :transaction_status => @transactions_data.transaction_status} %>
+        </div>
+    <% end %>
+    <div class="page-break"></div>
+<% end %>

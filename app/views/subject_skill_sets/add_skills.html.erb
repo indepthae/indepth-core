@@ -1,0 +1,169 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_skill') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :add_subject_skills, @set %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="ativity_box">
+        <div class="header"><%=t('manage_skill')%></div>
+        <div class="details">
+            <div class="details_strip">
+                <div class="label"><%= t('skill_set') %></div>
+                <div class="field bold"><%= @set.name %></div>
+            </div>
+            <% if @set.formula %>
+              <div class="details_strip">
+                  <div class="label"><%= t('skill_set_mark_derivation') %></div>
+                  <div class="field"><%= @set.formula_text %></div>
+              </div>
+            <% end %>
+        </div>
+        <hr>
+        <% form_for :subject_skill_set, @set, :url=>{:controller=>'subject_skill_sets', :action => 'update_skills', :id=>@set.id} do  |form |%>
+          <div class="activities">
+              <div class="activity_strip head">
+                  <div class="label"><%= t('skill_name') %></div>
+                  <div class="field"><%= t('max') %></div>
+              </div>
+              <%- form.fields_for :subject_skills do |f|%>
+                <%= render :partial=> 'skill_field', :locals=> {:f => f, :type => 'skill'} %>
+              <%  end %>
+              <% unless @set.exam_dependencies_present? %>
+                <%= link_to_add_nested_field "<div id='add-icon'></div><div id='add-text'>#{t('add_subject_skills')}</div>", form,:subject_skills, 'skill_field'  %>
+              <% end %>
+          </div>
+          <% if @set.calculate_final %>
+            <hr>
+
+            <div class="attribute_formula">
+                <div class="formula_head"><%=t('skill_set_derivation_formula')%></div>
+                <div class="formula_box">
+                      <div class="formula_select_pair">
+                          <%= form.radio_button :formula, 'sum', :class=>'choose_formula', :onchange=>"", :checked=> true  %>
+                          <label class="label_for_formula" for="profile_formula_sum"><%=t('sum')%></label>
+                          <div class="desc_for_formula"><%=t('skill_set_sum_formula_desc')%></div>
+                      </div>
+                      <div class="formula_select_pair">
+                          <%= form.radio_button :formula, 'average', :class=>'choose_formula', :onchange=>""  %>
+                          <label class="label_for_formula" for="profile_formula_average"><%=t('average')%></label>
+                          <div class="desc_for_formula"><%=t('skill_set_average_formula_desc')%></div>
+                          <div class="warning" id="average_warning"><%=t('average_mark_warning')%></div>
+                      </div>
+                      <div class="formula_select_pair">
+                          <%= form.radio_button :formula, 'bestof', :class=>'choose_formula', :onchange=>""  %>
+                          <label class="label_for_formula" for="profile_formula_bestof"><%=t('best_of')%></label>
+                          <div class="desc_for_formula"><%=t('skill_set_bestof_formula_desc')%></div>
+                      </div>
+                  </div>
+            </div>
+          <% end %>
+          <hr>
+          <%= form.submit t('save_subject_skills'),:class=>'submit-button'%>
+          <%= link_to "#{t('cancel')}",subject_skill_set_path(@set),:class=>'submit-button cancel-button' %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+    add_fields = function (link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).insert({
+        before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+        $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+    }
+
+    remove_field = function (el) {
+      el.up().up().hide();
+      j(el).prev().val(1) //Setting _destroy to 1
+      check_and_show_warning()
+      show_max_sub_marks();
+      if (j('.remove_field:visible').length == 1)
+        j('.remove_field:visible').attr('onclick', 'reset_field(this);')
+    }
+
+    reset_field = function (el) {
+      j(el).closest('.activity_strip').find("input[type='text']").val('')
+      j(el).prev().val(1) //Setting _destroy to 1
+    }
+    
+    
+    validate_mark =  function (el) {
+      show_max_sub_marks();
+      check_and_show_warning()
+      if(parseFloat(j(el).val()) <= 0.0)
+        j(el).focus();
+    };
+    
+    check_and_show_warning = function (){
+      flag = 0
+      first_val = parseFloat(j('.max_mark_field:visible').first().val())
+      j('.max_mark_field:visible').each(function(){
+        if(first_val != parseFloat(this.value))
+          flag = 1
+      })
+      if(j("input[name='profile[formula]']:checked").val() == 'average'){
+        if(flag == 1){
+          j('#average_warning').show();
+        }else{
+          j('#average_warning').hide();
+        }
+      }
+    }
+    
+    
+    j("input[name='profile[formula]']").on('change',function(){
+      show_max_sub_marks();
+      check_and_show_warning();
+    })
+    
+    show_max_sub_marks = function(){
+      values = []
+      j('.max_mark_field:visible').each(function(){
+        if(isNaN(parseFloat(this.value))){
+          values.push(0.0);
+        }else{
+          values.push(parseFloat(this.value));
+        }
+      })
+      var total = 0.0;
+      if(j("input[name='profile[formula]']:checked").val() == 'sum'){
+        for (var i = 0; i < values.length; i++) {
+          total += values[i] || 0.0;
+        }
+      }
+      if(j("input[name='profile[formula]']:checked").val() == 'average'){
+        total = Math.max.apply(Math,values);
+      }
+      if(j("input[name='profile[formula]']:checked").val() == 'bestof'){
+        total = Math.max.apply(Math,values);
+      }
+      j('#max_subject_mark').html(total);
+      j('#profile_maximum_marks').val(total)
+    }
+    
+    
+    function isNumberKey(evt,element){
+      var charCode = (evt.which) ? evt.which : evt.keyCode
+        if ((charCode != 46 || j(element).val().indexOf('.') != -1) && (charCode < 48 || charCode > 57))
+        {
+          if(charCode == 8)
+            return true;
+          return false;
+        }
+       return true;
+    }
+</script>

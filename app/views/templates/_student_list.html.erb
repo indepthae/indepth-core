@@ -1,0 +1,33 @@
+<div class="field_head">
+  <%= t('select_student')%>
+</div>
+<div class="field">
+
+  <select class="" id="user_selector">
+    <option><%= t('select_student') %></option>
+    <%@students.each do |student| %>
+      <option value=<%= student.s_id %> data-value=<%= student.s_id %> data-type=<%= student.class.name %>  > <%="#{student.full_name}"%> </option>
+    <%end%>
+  </select>
+</div>
+
+<script>
+j("#user_selector").change(function(){
+  j.ajax({
+    url: "/templates/set_student_keys",
+    type: 'POST',
+    data:  {
+      base_template_id: <%= @base_template_id%>,
+      student_id: ""+j(this).find(':selected').data("value"),
+      type: ""+j(this).find(':selected').data("type"),
+      <%= "combine_template_id: #{@combine_template_id} " if @combine_template_id.present? %>
+    },
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+});
+</script>

@@ -1,0 +1,63 @@
+<%unless @timetables.blank? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" id="listing">
+    <tr class="tr-head">
+      <td><%= (@active.present? and @active == '0') ? t('inactive_timetables') : t('active_timetables') %></td>
+      <td><%= t('allocation_status') %></td>
+      <td></td>
+    </tr>
+    <% @timetables.each_with_index do |tt,i| %>
+      <tr class="tr-<%= cycle('odd', 'even')%>">
+        <td class="col-1">
+          <%="#{format_date(tt.start_date,:format=>:long)}  -  #{format_date(tt.end_date,:format=>:long)}"%>
+        </td>
+        <td class="col-2">
+          <% timetable_status_arr = tt.check_allocation_status %>
+          <% timetable_status = timetable_status_arr[0] %>
+          <% not_eligible = false %>
+          <% unless timetable_status == 3 %>
+            <% timetable_overall_status = case timetable_status
+            when 0
+              t('not_allocated')
+            when 1
+              t('partially_allocated')
+            when 2
+              t('completely_allocated')
+            else
+              not_eligible = true
+              t('not_eligible')
+            end%>
+            <span class="timetable_status">
+              <%= timetable_overall_status %>
+            </span>
+            <% if timetable_status_arr[1] == -1 %>
+              <span class="status_warning" tooltip="<%= t('timetable_not_eligible_batch_warning')  %>"></span>            
+            <% end %>
+          <% else %>
+            <div class="progress">
+              <%= t('auto_allocation_progress') %>
+            </div>
+          <% end %>
+        </td>
+        <td class="col-3">
+          <% unless timetable_status == 3 %>
+            <span class="padding_left_right"><%= link_to t('timetable_allocations'),:controller=>:timetable,:action => "manage_allocations",:id=>tt.id %></span>
+            | <span class="padding_left_right"> <%= link_to t('edit'),:controller=>:timetable,:action=>:update_timetable,:id=>tt.id %></span>
+          <% else %>
+            <% unless not_eligible %>
+              <span class="padding_left_right disabled_link"><%= t('timetable_allocations') %></span>
+              | <span class="padding_left_right disabled_link"> <%= t('edit') %></span>
+            <% else %>
+              <span class="padding_left_right disabled_link"> <%= t('edit') %></span>
+            <% end %>
+            <% #t('wait_allocation_progress') %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @timetables, :renderer => "RemoteLinkRenderer", :remote => {:before => "Element.show('loader')",:success => "Element.hide('loader')"}, :params => {:controller => 'timetable', :action => 'manage_timetables', :active => @active} %>
+<%else%>
+  <p class="flash-msg">
+    <%= (@active.present? and @active.to_s == "1") ? t('no_active_timetables') : t('no_inactive_timetables') %>
+  </p>
+<%end%>

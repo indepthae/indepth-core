@@ -1,0 +1,44 @@
+<%= session_fingerprint_field %>
+<div class="label-field-pair">
+  <label for="category_name"><%= t('payroll_group_name') %></label>
+  <div class="text-input-bg"><%= f.text_field :name %></div>
+  <div id="name"></div>
+</div>
+
+<hr></hr>
+<h3><%= t('salary_preference') %></h3>
+
+<div class="label-field-pair">
+  <label for="category_name"><%= t('employee_salary_type') %></label>
+  <div class="text-input-bg salary_type">
+    <%= t('salaried') %>
+    <%= f.hidden_field :salary_type, :value => 2 %>
+    <%#= f.select :salary_type, PayrollGroup::SALARY_TYPE.map {|key, value| [t(value), key]}, {}%>
+  </div>
+</div>
+
+<div class="label-field-pair">
+  <label for="category_name"><%= t('payment_period') %></label>
+  <div class="text-input-bg">
+    <%= f.select :payment_period,PayrollGroup::PAYMENT_PERIOD.sort.map {|p| [payment_period_text(p.first), p.first]}, {},:onchange => "reload_payslip_generation(this);" %>
+  </div>
+  <%= image_tag("loader.gif",
+    :align => "absmiddle",
+    :border => 0,
+    :id => "loader",
+    :style =>"display: none;" ) %>
+</div>
+
+<div id="payment_periods">
+  <%= render :partial => "payslip_generation", :locals => {:generation_day => @payroll_group.generation_day }%>
+</div>
+
+<hr></hr>
+
+<div class="selected_categories">
+  <%= render :partial => "selected_payroll_categories" %>
+</div>
+<div id="dependency_error_msg" style="display:none;"></div>
+<div class="payroll_categories">
+  <%= render :partial => "list_payroll_categories" %>
+</div>

@@ -1,0 +1,116 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_poll') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('listing_all_polls') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :new,:poll_questions %>
+        <li class='themed_bg themed-dark-hover-background'>
+          <%= link_to t('new_poll'), new_poll_question_path %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page_yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+    <% if @poll_questions_active.present? %>
+      <h5><%= t('active') %></h5>
+
+      <table id ="poll-table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <div class="tr-head themed_text">
+          <div class="poll-name"><div class="square"></div><%= t('poll') %></div>
+          <div class="poll-date"><%= t('posted_on') %></div>
+          <div class="poll-votes"><%= t('votes') %></div>
+          <% if permitted_to? :new,:poll_questions %>
+            <td></td>
+          <% end %>
+        </div>
+
+        <div class="tr-blank"></div>
+
+        <% @poll_questions_active.each do |poll| %>
+          <div class="tr-<%= cycle('odd', 'even') %>">
+            <div class="poll-name">
+              <% if @current_user.already_voted?(poll) %>
+                <% if poll.poll_question_can_be_viewed_by?(@user) %>
+                  <li class="poll-title"> <%= link_to  poll.title , poll%></li>
+                  <br/>
+                <% end %>
+              <% else %>
+                <li class="poll-title"><%= link_to  poll.title , voting_poll_question_path(poll)%></li>
+                <br/>
+              <% end %>
+              <% if permitted_to? :open_poll,:poll_questions %>
+                <% if poll.poll_question_can_be_edited_by?(@user) %>
+                  <%if poll.poll_votes.empty?%>
+                    <%= link_to t('edit_text'), edit_poll_question_path(poll) %>  <span class="colon"> | </span>
+                  <%else%>
+                    <span class="small-strike"><%= t('edit_text') %></span>  <span class="colon"> | </span>
+                  <%end%>
+                  <%= link_to t('delete_text'), poll , :confirm => t('delete_confirm_msg'), :method => "delete" %> <span class="colon"> | </span>
+                <% end %>
+              <% end %>
+              <% if poll.poll_question_can_be_edited_by?(@user) %>
+                <%= link_to t('close'),{ :controller=>'poll_questions',:action=>'close_poll',:id=>poll.id} , :confirm => t('delete_confirm_msg') %>
+              <% end %>
+            </div>
+            <div class="poll-date-col"><%= format_date(poll.created_at,:format=>:long_date) %></div>
+            <div class="poll-votes"><%= poll.total_poll_votes %></div>
+          </div>
+        <% end %>
+      </table>
+
+    <% else %>
+      <h5><%= t('no_polls_are_active') %></h5>
+    <% end %>
+  </div>
+
+  <%  if permitted_to? :open_poll,:poll_questions  %>
+    <div class="box">
+      <% if @poll_questions_inactive.present? %>
+        <h5 id="closed"><%= t('closed') %></h5>
+        <table  align="center" width="100%" cellpadding="1" cellspacing="1">
+          <div class="tr-head themed_text">
+            <div class="poll-name"><div class="square"></div><%= t('poll') %></div>
+            <div class="poll-date"><%= t('posted_on') %></div>
+            <div class="poll-votes"><%= t('votes') %></div>
+            <% if permitted_to? :new,:poll_questions %>
+              <td></td>
+            <% end %>
+          </div>
+          <tr class="tr-blank"></tr>
+          <% @poll_questions_inactive.each do |poll| %>
+            <div class="tr-<%= cycle('odd', 'even') %>">
+              <div class="poll-name">
+                <li class="poll-title"><%= link_to  poll.title , poll%></li>
+                <br/>
+                <% if poll.poll_question_can_be_edited_by?(@user) %>
+                  <% if permitted_to? :open_poll,:poll_questions %>
+                    <%= link_to t('delete_text'), poll , :confirm => t('delete_confirm_msg'), :method => "delete" %> <span class="colon"> | </span>
+                  <% end %>
+                  <%= link_to t('open'),{ :controller=>'poll_questions',:action=>'open_poll',:id=>poll.id }, :confirm => t('delete_confirm_msg') %>
+                <% end %>
+              </div>
+              <div class="poll-date-col"><%= format_date(poll.created_at,:format=>:long_date) %></div>
+              <div class="poll-votes"><%= poll.total_poll_votes %></div>
+            </div>
+          <% end %>
+        </table>
+
+      <% else %>
+        <h5><%= t('closed_polls_are_not_present') %></h5>
+      <% end %>
+    </div>
+  <% end %>
+</div>

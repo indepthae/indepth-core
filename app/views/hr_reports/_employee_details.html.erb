@@ -1,0 +1,30 @@
+<% if @employee.present? %>
+  <div id="employee_details">
+    <div class ="filter_values filters filter_values_sec" id="<%= @base_template.name %>_filter_values">
+      <div class="filter_result">
+        <label><%= t("employee_name") %> : </label>
+        <div class="text_value"><%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+      </div>
+      <div class="filter_result">
+        <label><%= t("department") %> : </label>
+        <div class="text_value"><%= @employee.employee_department.try(:name)||"-" %></div>
+      </div>
+      <div class="filter_result">
+        <label><%= t("joining_date") %> : </label>
+        <div class="text_value"><%= format_date(@employee.joining_date) %></div>
+      </div>
+      <div class="filter_result">
+        <label><%= t("position") %> : </label>
+        <div class="text_value"><%= @employee.employee_position.try(:name)||"-" %></div>
+      </div>
+      <div class="filter_result">
+        <label><%= t("payroll_group") %> : </label>
+        <div class="text_value"><%= (@employee.class == Employee ? @employee.employee_salary_structure.try(:payroll_group).try(:name)||"-" : @employee.archived_employee_salary_structure.try(:payroll_group).try(:name)||"-") %></div>
+      </div>
+      <div class="filter_result">
+        <label><%= t("grade") %> : </label>
+        <div class="text_value"><%= @employee.employee_grade.try(:name)||"-" %></div>
+      </div>
+    </div>
+  </div>
+<% end %>

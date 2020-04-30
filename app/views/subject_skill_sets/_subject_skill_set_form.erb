@@ -1,0 +1,31 @@
+<% remote_form_for @set, :url => (@set.new_record? ? subject_skill_sets_path : subject_skill_set_path), :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="attribute_profile_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('skill_set_name') %></label>
+          <div id ="description"><%= t('skill_set_description') %></div>
+          <div class="text-input-bg"><%= s.text_field :name  %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('calculation_text') %></label>
+          <div class="grade_type">
+              <%= s.radio_button :calculate_final, 1, :checked => s.object.calculate_final %>
+              <label for="subject_skill_set_calculate_final_1"><%= t('calculate_skill_scores') %></label>
+              <div id ="description"><%= t('calculate_skill_scores_desc') %></div>
+          </div>
+          <div class="grade_type">
+              <%= s.radio_button :calculate_final, 0, :checked => !s.object.calculate_final %>
+              <label for="subject_skill_set_calculate_final_0"><%= t('dont_calculate_skill_scores') %></label>
+              <div id ="description"><%= t('dont_calculate_skill_scores_desc') %></div>
+          </div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@set.new_record? ? t('create_skill_set') : t('update_skill_set'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlay').click(remove_popup_box);
+</script>

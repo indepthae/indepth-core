@@ -1,0 +1,54 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_gps_syncs.sync') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+         <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('transport_gps_settings.gps_settings')}", {:controller=>'transport_gps_settings',:action=>'index'} %></li>
+        </ul> 
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+
+    <%= link_to_remote "#{t('transport_gps_syncs.sync_button')}",:url => {:controller => "transport_gps_syncs", :action => "sync_data"},:confirm=>t('transport_gps_syncs.confirm_transport_sync'),:html=>{:class=>"submit-button"} %>
+
+
+      
+      <div class="table_label"><%=t('transport_gps_syncs.previous_syncs')%></div>
+      <div class="table_class">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1"  id="stop_details">
+
+            <tr class="tr-head">               
+                <td><%=t('transport_gps_syncs.started_at')%></td>
+                <td><%=t('transport_gps_syncs.completed_at')%></td>
+                <td><%=t('status')%></td>
+                <td><%=t('last_error')%></td>
+            </tr>
+            <%if @transport_gps_syns.present?%>
+              <%@transport_gps_syns.each_with_index do |syn,i|%>
+            <tr>                 
+                 <td><%=format_date(syn.started_at)%></td>
+                 <td><%=format_date(syn.completed_at)%></td>
+                 <td><%=syn.show_status%></td>
+                 <td><%=syn.last_error%></td>
+            </tr>
+              <%end%>
+            <%else%>
+              <tr><td colspan="4"><%=t('transport_gps_syncs.not_sync')%></td></tr>
+            <%end%>
+        </table> 
+          <% if @transport_gps_syns.present? %>
+          <%= pagination_status(@transport_gps_syns) %>
+        <% end %>
+        <%= will_paginate @transport_gps_syns %>
+    </div> 
+</div>

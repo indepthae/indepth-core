@@ -1,0 +1,14 @@
+<div class="field_head">
+  <%= t('select_batch')%>
+</div>
+<div class="field">
+  <%= select_tag "batch",
+  options_for_select([t('select_batch')]+@batches.map{|b| [b.full_name,b.id]}), :class=>"input_box", :id=>"batch_selector",
+  :onchange => "#{remote_function(:url => {:action => "batch_students"},:with => "'batch_id='+value",
+  :before => "Element.show('loader')",:success => "Element.hide('loader')" )}" %>
+  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+</div>
+
+<script>
+ j('#bulk_export').attr('action', '<%= generate_bulk_export_pdf_student_certificate_templates_path %>');
+</script>

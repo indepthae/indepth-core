@@ -1,0 +1,169 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('sms_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('settings') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% ms_present = MultiSchool rescue false %>
+    <% if ms_present %>
+      <% assigned_package = MultiSchool.current_school.assigned_packages.first(:conditions=>{:is_using=>true}) %>
+      <% if assigned_package.present? %>
+        <% available_sms = assigned_package.sms_count.present? ? (assigned_package.sms_count.to_i - assigned_package.sms_used.to_i) : "#{t('unlimited')}" %>
+        <% valid = assigned_package.validity.present? ? (assigned_package.validity.to_date >= Date.today ? "" : "(#{t('validity_expired')})") : "" %>
+      <% else %>
+        <% available_sms = 0 %>
+      <% end %>
+      <div class="message_balance"><%= t('available_sms') %> : <%= available_sms %> <%= valid %> </div>
+    <% end %>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for :sms_settings do |s| %>
+      <div class="sms_application_settings">
+          <h4><%= t('application_settings') %>:</h4>
+          <div class="application_field_set setting_head">
+              <label>
+                  <%= s.check_box :application_enabled, :checked=>@application_sms_enabled.is_enabled %>
+                  <%= t('enable_sms') %> 
+              </label>
+          </div>
+          <%= s.submit "#{t('update')}", :class=>'solid_button' %>
+      </div>
+    <% end %>
+    <% unless @application_sms_enabled.is_enabled == false %>
+      <h4><%= t('general_sms_setting') %>:</h4>
+      <div class="sms_settings">
+          <% form_for :general_settings, :url=>{:controller=>"sms",:action=>"update_general_sms_settings"} do |sms| %>
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('student_admission') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :student_admission_sms_enabled_student, :checked=>@student_admission_sms_enabled_student.is_enabled %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :student_admission_sms_enabled_guardian, :checked=>@student_admission_sms_enabled_guardian.is_enabled %> <%= t('guardian') %> </label>
+                </div>
+            </div>
+
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('employee_admission') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :employee_admission_sms_enabled_employee, :checked=>@employee_admission_sms_enabled_employee.is_enabled %> <%= t('employee_text') %> </label>
+                </div>
+            </div>
+
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('exam_schedule') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :exam_schedule_result_sms_enabled_student, :checked=>@exam_schedule_result_sms_enabled_student.is_enabled %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :exam_schedule_result_sms_enabled_guardian, :checked=>@exam_schedule_result_sms_enabled_guardian.is_enabled %> <%= t('guardian') %> </label>
+                </div>
+            </div>
+
+
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('timetable_swap_sms') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :timetable_swap_sms_enabled_student, :checked=>(@timetable_swap_sms_enabled_student.present? ? @timetable_swap_sms_enabled_student.is_enabled : false) %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :timetable_swap_sms_enabled_guardian, :checked=>(@timetable_swap_sms_enabled_student.present? ? @timetable_swap_sms_enabled_guardian.is_enabled : false) %> <%= t('guardian') %> </label>
+                    <label><%= sms.check_box :timetable_swap_sms_enabled_employee, :checked=>(@timetable_swap_sms_enabled_student.present? ? @timetable_swap_sms_enabled_employee.is_enabled : false) %> <%= t('employee_text') %> </label>
+                </div>
+            </div>
+
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('events') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :news_events_sms_enabled_student, :checked=>@news_events_sms_enabled_student.is_enabled %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :news_events_sms_enabled_guardian, :checked=>@news_events_sms_enabled_guardian.is_enabled %> <%= t('guardian') %> </label>
+                    <label><%= sms.check_box :news_events_sms_enabled_employee, :checked=>@news_events_sms_enabled_employee.is_enabled %> <%= t('employee_text') %> </label>        
+                </div>
+            </div>
+
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('fee_submission_sms') %>
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :fee_submission_sms_enabled_student, :checked=>@fee_submission_sms_enabled_student.is_enabled %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :fee_submission_sms_enabled_guardian, :checked=>@fee_submission_sms_enabled_guardian.is_enabled %> <%= t('guardian') %> </label>
+                    <label><%= sms.check_box :fee_submission_sms_enabled_employee, :checked=>@fee_submission_sms_enabled_employee.is_enabled %> <%= t('employee_text') %> </label>
+                </div>
+            </div>
+          
+            <div class="setting_block">
+                <div class="setting_head">
+                    <%= t('attendance') %>
+                </div>
+                 <div class="setting_head">
+                    <label><%= sms.check_box :delayed_sms_notification_enabled, :checked=>@delayed_sms_notification_enabled.is_enabled %></label> <%= t('attendance_manual') %>  
+                </div>
+                <div class="setting_controls">
+                    <label><%= sms.check_box :student_attendance_sms_enabled_student, :checked=>@student_attendance_sms_enabled_student.is_enabled %> <%= t('single_student') %> </label>
+                    <label><%= sms.check_box :student_attendance_sms_enabled_guardian, :checked=>@student_attendance_sms_enabled_guardian.is_enabled %> <%= t('guardian') %> </label>
+                </div>
+            </div>
+          
+            <div class="submit">
+                <%= sms.submit "#{t('update')}",:class=>'solid_button' %>
+            </div>
+          <%end%>
+      </div>
+    <% end %>
+</div>
+
+
+
+<script type="text/javascript">
+  j(document).ready(function () {
+
+      if (j('#attendance_enable').prop('checked') == false) {
+          j('#delay_notification').hide();
+          j('#delayed_sms_enable').prop('checked', false);
+      }
+      else {
+          j('#delay_notification').show();
+      }
+  });
+  function toggle_delay_sms() {
+      if (j('#attendance_enable').prop('checked')) {
+          j('#delay_notification').show();
+      }
+      else {
+          j('#delay_notification').hide();
+          j('#delayed_sms_enable').prop('checked', false);
+      }
+  }
+  ;
+</script>

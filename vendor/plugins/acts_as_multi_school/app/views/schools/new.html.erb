@@ -1,0 +1,14 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">New School</h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+  <%= render "form" %>
+</div>
+<script type="text/javascript">
+  //j('#school_school_domains_attributes_0_domain').attr("readonly","readonly");
+  j("#school_code").keyup(function(){
+    ho = "<%= set_domain(@school_group,request.host_with_port) %>"
+    fd = j("#school_code").val() + "." + ho;
+    j('#school_school_domains_attributes_0_domain').val(fd)
+  });
+</script>

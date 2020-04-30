@@ -1,0 +1,61 @@
+<div id="reorder_container">
+    <div id="description"><%= t('reorder_description') %></div>
+    <% associations = @assessment_group.grouped_associations %>
+    <% if associations.present? %>
+      <% form_for :assessment_groups ,@assessment_group, :url => {:action => 'reorder_assessments', :assessment_group_id => @assessment_group.id } do |f|%>
+        <table class="sort_table">
+            <thead>
+                <tr class="disable_sort">
+                    <th id="reorder"></th>
+                    <th class="col4"><%= t('exams_text') %></th>
+                    <th class="col5"><%= t('term_text') %></th>
+                    <th class="col6"><%= t('exam_mode') %></th>
+                    <th class="col7"><%= t('scoring') %></th>
+                    <th class="col7"><%= t('max') %></th>
+                </tr>
+            </thead>
+            <% associations.each_pair do |term_id, assessment_groups_associations| %>
+              <tbody>
+                  <% f.fields_for :derived_assessment_groups_associations, assessment_groups_associations do |daga| %>
+                    <% daga.fields_for :assessment_group do |ag|%>
+                      <% assessment = ag.object %>
+                      <% parent_name = assessment.parent.name %>
+                      <tr class="list" parent_name="<%=parent_name%>">
+                          <td class="reorder_val"><i></i></td>
+                          <td class="col4"><%= assessment.name_with_code %></td>
+                          <td class="col5"><%= parent_name %></td>
+                          <td class="col6"><%= assessment.exam_mode %></td>
+                          <td class="col7"><%= assessment.score_type %></td>
+                          <td class="col7"><%= assessment.maximum_marks %></td>
+                          <%#= hidden_field_tag "assessment_groups[#{assessment.id}]" , assessment.priority%>
+                          <%= daga.hidden_field :priority %>
+                      </tr>
+                    <% end %>
+                  <% end %>
+              </tbody>
+            <% end %>
+        </table>
+        <div id='submit_area'>
+          <%= f.submit t('save_order') , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+          <%= link_to "#{t('cancel')}","#",:onclick=>'close_modal_box();',:class=>'modal-box-cancel_button submit-button' %>
+        </div>
+      <% end %>
+
+    <% end %>
+</div>
+<script type="text/javascript">
+  j('.sort_table tbody').sortable({
+      cursor: 'move',
+      opacity: 0.8,
+      nested: true,
+      start: function (event, ui) {
+      },
+      stop: function (event, ui) {
+          updateSortorder();
+      },
+      items: "tr:not(.disable_sort)"
+
+  }).disableSelection();
+  
+  
+</script>

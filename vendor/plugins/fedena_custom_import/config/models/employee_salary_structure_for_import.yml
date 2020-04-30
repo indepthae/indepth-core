@@ -1,0 +1,62 @@
+ employee_salary_structure_for_import:
+    primary_keys:
+      employee_id:
+    overrides:
+      employee_id: "Employee Number"
+      payroll_group_id: "Payroll Group Name"
+    associations:
+     - :employee
+     - :payroll_group
+    associated_columns:
+      employee: "employee_number"
+      payroll_group: "name"
+    associates:
+      employee_salary_structure_component: "payroll_category"
+    associate_columns:
+      employee_salary_structure_component: "amount"
+    associate_column_search:
+      payroll_category: "name_and_code"
+    compulsory_associates:
+      - :employee_salary_structure_component
+    nested_associates:
+      - :employee_salary_structure_component
+    associate_column_condition:
+      payroll_category: "is_deleted = false"
+    associate_primary_keys:
+      employee_salary_structure_component:
+        payroll_category_id:
+    booleans:
+        - :auto_calculate
+    filters:
+     - :amount
+     - :school_id
+     - :net_pay
+     - :revision_number
+     - :payroll_category_id
+     - :latest_revision_id
+   
+    mandatory_columns:
+     - :gross_salary
+     - :net_pay
+     - :payroll_group_id
+     - :employee_id
+    instructions:
+       Employee Number:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "AYS/2018/S001."
+       Auto calculate:
+          Type: "Y or Leave blank"
+          Input Instruction and example: "When enabled,dependent payroll categories are autocalculated"
+       Gross salary:
+         Type: "Numeric."
+         Input Instruction and example: ""
+       Payroll Group Name:
+         Type: "Alphanumeric."
+         Input Instruction and example: "Enter the payroll group name of the employee."
+       employee_salary_structure_component:
+         Type: "Numeric."
+         Input Instruction and example: "Enter the amount if this category is in employee's payroll group."
+
+
+ 
+# Please refer to employee.yml for basic concept.

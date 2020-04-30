@@ -1,0 +1,113 @@
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<div id="page-yield" class="available_sections">
+    <div class="header">
+        <span class="logo header_parts">
+            <%if current_school_detail.logo.present?%>
+              <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+            <%else%>
+              <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+            <%end%>
+        </span>
+        <span class="header-content header_parts">
+            <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+            <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+        </span>
+    </div>
+    <div class="section" >
+        <div class="hor_line"></div>
+        <h2><%= t('remark').upcase %></h2>
+        <div class="hor_line"></div>
+    </div>
+    <div class="section" id="details">
+        <div class="fields-details" id="name">
+            <div class="field-label"><%= t('name') %></div>
+            <div class="fields-val"><%= ": #{@data_hash[:student].full_name}" %></div>
+        </div>
+        <div class="fields-details" id="right_align">
+            <div class="fields-val"><%= ": #{@data_hash[:student].batch.complete_name}" %></div>
+            <div class="field-label"><%= params[:history].present? ? t('current_batch') : t('batch') %></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('admission_number') %></div>
+            <div class="fields-val"><%= ": #{@data_hash[:student].admission_no}" %></div>
+        </div>
+        <% if roll_number_enabled? %>
+          <div class="fields-details" id="right_align">
+              <div class="fields-val"><%= ": #{(@data_hash[:student].roll_number.present? ? @data_hash[:student].roll_number : "-")}" %></div>
+              <div class="field-label"><%= t('roll_no') %></div>
+          </div>
+        <% end %>
+    </div>
+    <div class="hor_line"></div>
+    <div class="section">
+        <center>
+            <% unless @data_hash[:batches].present? %>
+              <table id="pdf-table" class="table-wrapper" width="100%">
+                  <% @data_hash[:remarks].each do |val| %>
+                    <tr class="first-td">
+                        <td class="remarks-text">
+                            <div class="remark_subject_section"><%= val.remark_subject.present? ? val.remark_subject : '-' %></div>
+                            <div class="remarked_by_section"><%= "#{t('by')}" %> <span><%= " #{(val.remarked_by.present? ? val.remarked_by : '-')}" %></span></div>
+                            <div class="remark_body_section"><%= val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-' %></div>
+                        </td>
+                        <td class = "last_updated_section"><%= format_date(val.updated_at,:format=>:long_date) %></td>
+                    </tr>
+                  <% end %>
+              </table>
+            <% else %>
+              <% @data_hash[:batches].each do |batch| %>
+                <% remarks = @data_hash[:remarks][batch.id] %>
+                <table id="pdf-table" class="avoid_page_break_inside <%= ((remarks.present? and (remarks.length > 1)) ? 'first-row' : '') %>" width="100%">
+                    <tr class="batch-details">
+                        <td class="batch_name"><%= "#{t('batch')} : <b>#{batch.complete_name}</b>" %></td>
+                        <td class="remarks_count"><%= remarks.present? ? "#{t('remarks_count', {:count => remarks.length})}" : "" %></td>
+                    </tr>
+                    <tr class="first-td">
+                        <% if remarks.present? %>
+                          <% val = remarks.first %>
+                          <td class="remarks-text">
+                              <div class="remark_subject_section"><%= val.remark_subject.present? ? val.remark_subject : '-' %></div>
+                              <div class="remarked_by_section"><%= "#{t('by')}" %> <span><%= " #{(val.remarked_by.present? ? val.remarked_by : '-')}" %></span></div>
+                              <div class="remark_body_section"><%= val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-' %></div>
+                          </td>
+                          <td class = "last_updated_section"><%= format_date(val.updated_at,:format=>:long_date) %></td>
+                        <% else %>
+                          <td colspan="2"><%= t('no_remarks_were_added') %></td>
+                        <% end %>
+                    </tr>
+                </table>
+                <table id="pdf-table" width="100%">
+                    <% if remarks.present? %>
+                      <% remarks.each_with_index do |val, index| %>
+                        <% if index > 0 %>
+                          <tr class="first-td">
+                              <td class="remarks-text">
+                                  <div class="remark_subject_section"><%= val.remark_subject.present? ? val.remark_subject : '-' %></div>
+                                  <div class="remarked_by_section"><%= "#{t('by')}" %> <span><%= " #{(val.remarked_by.present? ? val.remarked_by : '-')}" %></span></div>
+                                  <div class="remark_body_section"><%= val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-' %></div>
+                              </td>
+                              <td class = "last_updated_section"><%= format_date(val.updated_at,:format=>:long_date) %></td>
+                          </tr>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                </table>
+              <% end %>
+            <% end %>
+        </center>
+    </div>
+</div>
+
+<script type="text/javascript">
+  j = jQuery;
+  j( document ).ready(function() {
+    var maxWidthLabelRight = Math.max.apply(null, j("#right_align .fields-val").map(function ()
+    {
+      return j(this).width();
+    }).get());
+    j("#right_align .fields-val").css({"width": maxWidthLabelRight + 2 });
+  });
+</script>

@@ -1,0 +1,94 @@
+<% fields_for(@mail_message) do |m| %>
+    <div class="sub_text"><%= t('user_list_selector_desc') %></div>
+    <div class="user_list_modifier">
+      <label class="check_label"  >
+        <%= m.radio_button  :send_to_all, "false", :checked => (!@mail_message.send_to_all), :class=>"check"%>
+        <%= t('send_to_selected') %>
+      </label>
+      <label class="check_label"  >
+        <%= m.radio_button  :send_to_all, "true", :checked => @mail_message.send_to_all, :class=>"check"%>
+        <%= t('send_to_all') %>
+      </label>
+  </div>
+
+  <div id='user-selector'>
+
+  <% if @recipient_type == 'employee' %>
+
+
+      <div class="label-field-pair">
+        <label style="width:150px;"><%= t('select_a_department') %>:<span class="necessary-field">*</span></label>
+        <div class="text-input-bg">
+          <%= select_tag  'department_id',
+                    options_for_select([[t('select_a_department'),'']] + @employee_departments.map {|b| [b.name, b.id]}),
+                    :prompt => "#{t('select_a_department')}",
+                    :onChange => "#{remote_function(:url => {:action => "user_list"},
+                                                      :method => :get,
+                                                      :with => "'department_id='+ value +'&mail_message[recipient_type]=employee'",
+                                                      :before => "Element.show('loader')",
+                                                      :success => "Element.hide('loader');"
+                    )}" %>
+        </div>
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;margin-top:5px" ) %>
+      </div>
+
+  <% elsif @recipient_type == 'student' || @recipient_type == 'guardian' %>
+    
+      <div class="label-field-pair">
+        <label style="width:150px;"><%= t('select_a_batch') %>:<span class="necessary-field">*</span></label>
+        <div class="text-input-bg">
+          <%= select_tag 'batch_id',
+                    options_for_select([[t('select_a_batch'),'']] + @batches.map {|b| [b.full_name, b.id]}),
+                    :include_blank => "#{t('select_a_batch')}",
+                    :onChange => "#{remote_function(:url => {:action => "user_list"},
+                                                      :method => :get,
+                                                      :with => "'batch_id='+ value +'&mail_message[recipient_type]=#{@recipient_type || 'student'}'",
+                                                      :before => "Element.show('loader')",
+                                                      :success => "Element.hide('loader');"
+                    )}" %>
+        </div>
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;margin-top:5px" ) %>
+      </div>
+
+  <% end %>
+
+
+  <div class="user-list">
+    <div id="source">
+      <div class="label-field-pair">
+        <label><%= t('select_recipient').humanize %><span class="necessary-field">*</span></label>
+        <div class ="scrollable" >
+          <div class="scroll-inside">
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="recipients">
+      <div class="label-field-pair">
+        <label style="width:150px;"><%= t('recipient') %><span class="necessary-field">*</span></label>
+        <div class ="scrollable" >
+          <div class="scroll-inside" id="recipient-list">
+            <% x = '<span> x </span>' %>
+            <% (@mail_message.try(:recipients)||[]).each do |r|  %>
+                <div class="hover">
+                  <%= link_to shorten_string(r.full_name,22) + x, "#", 'data-recipient-id' => r.id, :onClick => "remove_recipient(this)", :class=> 'individual'%>
+                </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="extender"></div>
+    <%= hidden_field 'mail_message', 'recipient_ids' %>
+  </div>
+  </div>
+<% end %>
+
+<script>
+
+    j("[name='mail_message[send_to_all]']").change(function(){
+        toggleUserSelection();
+    })
+
+</script>

@@ -1,0 +1,7 @@
+require 'fedena_patches/delayed_additional_report_csv_patch.rb'
+require 'fedena_patches/delayed_reminder_job_patch.rb'
+require 'fedena_patches/sms_manager_patch.rb'
+require 'fedena_patches/news_fragment_cache_patch.rb'
+require 'fedena_patches/sms_setting_patch.rb'
+require 'fedena_patches/sms_log_patch.rb'
+require 'fedena_patches/delayed_additional_report_pdf_patch.rb'

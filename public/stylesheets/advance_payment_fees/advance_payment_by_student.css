@@ -1,0 +1,1167 @@
+#search_box_bg {
+    overflow: hidden;
+    height: 50px;
+    padding-top: 10px;
+    margin-bottom: 30px;
+}
+#search_box_bg label {
+    /* width: 80px; */
+    font-size: 16px;
+    color: #555;
+    font-weight: normal;
+    float: left;
+    display: block;
+    line-height: 33px;
+}
+
+.student_search_form {
+    width: 290px;
+    float: left;
+    display: block;
+}
+
+.student_search_form input {
+    float: left;
+    width: 167px;
+    height: 17px;
+    padding: 5px;
+    background: #ffffff;
+    border: 1px solid #c6c6c6;
+    border-radius: unset;
+    -o-border-radius: unset;
+    -moz-border-radius: unset;
+    -webkit-border-radius: unset;
+}
+
+.loader_div {
+    float: left;
+    width: 16px;
+    display: block;
+    height: 32px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.loader_div img {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.set_border {
+    width: 2px;
+    float: left;
+    height: 66px;
+    border-right: 1px solid #999;
+    margin: 13px -43px;
+}
+
+.header{
+    list-style-type: none;
+    font-weight: bold;
+}
+li.student_names, li.student_names a{
+    text-decoration: none;
+    /*    margin-top: 5px;*/
+    color: black;
+    width:100%;
+    min-width:100%;
+    display: block;
+    padding: 2px 0 2px 0;
+}
+.student_list{
+    list-style-type: none;
+    clear : both;
+    width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 13px;
+    padding: 0px;
+    float: left;
+}
+
+.student_list a:hover{
+    text-decoration: none;
+    background-color:  #F1F6FF;
+    width:100%;
+
+}
+.student_list a:active{
+    text-decoration: none;
+    /*    font-weight: bold;*/
+}
+.active-link{
+    font-weight: bold;
+    color: #C00 !important;
+}
+.student-name{
+    height: 28px;
+}
+.label-field-pair-select-class {
+    /*margin: 0 auto;*/
+    height:40px;
+    padding-top:3px;
+    /*width:600px;*/
+
+}
+.label-field-pair-select-class label {
+    color:#444444;
+    display:block;
+    float:left;
+    font-size:14px;
+    font-weight:600;
+    margin:0 0 10px;
+    padding-top:10px;
+    /*width:264px;*/
+}
+#loader{
+    padding-top:10px;
+}
+
+
+/*
+#page-yield
+{
+    width:650px;
+}*/
+
+#list {
+    margin-top: 15px;
+    /*margin:20px auto;*/
+    width:440px;
+    overflow: hidden;
+}
+#list li {
+    padding:6px 0 0 50px;
+    list-style-type:none;
+}
+#list li label input {
+    margin-right:10px;
+}
+.name_listodd{
+    background:#E4EBFE;
+    height:30px;
+    width:425px;
+    border-top:1px solid #C2CEEF;
+}
+.name_listeven{
+    background:#DAE6FF;
+    height:30px;
+    width:425px;
+    border-top:1px solid #C2CEEF;
+}
+.att_list_names {
+    float: left;
+    width:300px;
+    display:inline;
+    /*font-weight: 600;*/
+    font-size: 13px;
+}
+label {display:inline;}
+.submit_button {
+    margin:23px 7px;
+    -moz-border-radius:12px;
+    -webkit-border-radius:12px;
+    background:none repeat scroll 0 0 #27292B;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    padding:7px 10px;
+    border:none;
+    cursor:pointer;
+}
+.submit_button:hover{
+    background:  #373B3F;
+}
+#skip{
+    margin-top:29px;
+    margin-left: 20px;
+    float:left;
+    -moz-border-radius:12px;
+    -webkit-border-radius:12px;
+    background:none repeat scroll 0 0 #27292B;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    padding:7px 10px;
+}
+#skip a{
+    color:#fff;
+    text-decoration: none;
+}
+#skip:hover{
+    background:  #373B3F;
+}
+.autocomplete-w1 {
+    position:absolute;
+    top:0px; left:0px;
+    margin:6px 0 0 6px;
+    _background:none;
+    _margin:1px 0 0 0;
+}
+.autocomplete {
+    border:1px solid #C6C6C6;
+    background:#fff;
+    cursor:default;
+    color:#000;
+    text-align:left;
+    max-height:350px;
+    overflow:auto;
+    margin:-7px 5px 6px -7px;
+    _height:350px;
+    _margin:0;
+    _overflow-x:hidden;
+    width:218px !important;
+}
+.autocomplete .selected {
+    background:#F8F1D1;
+    color:#BB0000;
+
+    /*    border-top:1px solid #990A10;
+        border-bottom:1px solid #990A10;*/
+}
+.autocomplete div {
+    padding:2px 5px;
+    white-space:nowrap;
+    overflow:hidden;
+}
+.autocomplete strong {
+    font-weight:bold;
+}
+.collection_info{
+    overflow-y: auto;
+    max-height: 250px;
+}
+.list_name{
+    width: 250px;
+    float: left;
+}
+#flash-div{
+    float: left;
+    width: 100%;
+}
+.collection-select {
+    width: auto;
+    float:left;
+    border-left:1px solid #808080;
+    min-height: 58px;
+    /*padding-top: 45px;*/
+}
+
+.collection-select label {
+    /*min-width: 270px;*/
+    float: left;
+    padding-top: 10px;
+    display: block;
+    color: #444;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 45px;
+}
+
+.select-type {
+    margin: 0 auto;
+    float: left;
+    min-height: 58px;
+}
+
+.collection_operation_select {
+
+    float: left;
+    padding-top: -5px;
+    margin: 10px;
+}
+
+.collection_operation_select label {
+    font-weight: normal;
+    display: inline;
+    max-width: 132px;
+    float: left;
+    margin-top: -2px;
+    word-break: break-all;
+}
+#receivers{
+    margin-top: 60px;
+}
+
+table#collection_list tr{
+
+    height:35px;
+    overflow-y: auto;
+    /*border: 1px solid #000000;*/
+}
+
+table#collection_list .header{
+    background-color: #808080;
+    font-weight: bold;
+    /*width:150px;*/
+    /*border: 1px solid #000000;*/
+}
+table#collection_list{
+    width:100%;
+    border-collapse: collapse;
+    /*width:150px;*/
+    /*border: 1px solid #808080;*/
+}
+table#collection_list td {
+    border: 1px solid #000000;
+}
+.cbox {
+    /*border-right: 1px solid #000000;*/
+    width:35px;
+}
+table#collection_list td {
+    border: 1px solid #000000;
+}
+
+table#collection_list td.collection_name{
+    padding-left: 5px;
+    width:250px;
+}
+
+table#collection_list td.student_name{
+    padding-left: 5px;
+    width:150px;
+}
+
+
+.student-link{
+    text-decoration:none;
+    font-size:13px;
+    color: #000000;
+}
+.students-box{
+    width: 200px;
+    float:left;
+    height:250px;
+    overflow-y: auto;
+}
+
+.collections-box{
+    width: 365px;
+    float:left;
+    margin-left:74px;
+    height:250px;
+    overflow-y: auto;
+}
+
+
+
+#questions-main {
+    margin-bottom: 60px;
+    width:956px;
+    border: 1px solid #999999;
+    height:550px;
+    float:left;
+    border-top:none;
+}
+#left-panel {
+    float:left;
+    width:390px;
+    border-right:1px solid #cccccc;
+    height:550px;
+}
+#right-panel {
+    /*float:right;*/
+    /*width:565px;*/
+    height:555px;
+    font-size:13px;
+    /*overflow-x:hidden;*/
+    /*overflow-y:auto;*/
+}
+#left-top-panel {
+    width:390px;
+    float:left;
+    height:50px;
+    border-bottom:1px solid #cccccc;
+    background-color:#ededed;
+}
+#left-top-panel select {
+    background-color: #fdfdfd;
+    border: 1px solid #cccccc;
+    margin: 10px 0 0 10px;
+    width: 120px;
+    height: 31px;
+    padding: 5px 6px;
+    font-size:13px;
+}
+#left-bottom-panel {
+    width:390px;
+    float:left;
+    background-color:#ededed;
+    height:499px;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+.each-question {
+    width:360px;
+    float:left;
+    padding-left:20px;
+    padding-right:20px;
+    padding-top:10px;
+    padding-bottom:10px;
+    border-bottom: 1px solid #cccccc;
+    color:#000000;
+    cursor:pointer;
+}
+.each-question input {
+    float:left;
+    margin:0;
+}
+.question-box {
+    float:left;
+    width:360px;
+    font-size: 13px;
+}
+.assigned{
+    background-color:#ffffcc;
+}
+.question-box p{
+    margin: 0 !important;
+}
+.selected {
+    background-color:#ffffff;
+    color:#000000;
+}
+/*.question-box iframe{
+    width:340px !important;
+    height:190px !important;
+    margin-top:5px !important;
+}*/
+.top-div {
+    height:50px;
+    float:left;
+    width:100%;
+    background: #f1f1f1;
+}
+.question-text {
+    float:left;
+    width:auto;
+    margin-top:15px;
+    font-weight:bold;
+    color:#000000;
+    margin-left: 20px;
+    margin-bottom: 6px;
+}
+.format-text{
+    float:right;
+    width:auto;
+    margin-right:30px;
+    margin-top:5px;
+    color:#666666;
+    font-weight:normal;
+}
+.marks-div{
+    float:right;
+    width:auto;
+    margin-right:30px;
+    margin-top:5px;
+    color:#000000;
+    font-weight:normal;
+}
+.input-marks{
+    margin-top:0 !important;
+}
+.marks-div label{
+    float:left;
+    margin-top:5px;
+    margin-right:5px;
+}
+.marks-div input{
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    height: 13px;
+    margin: 0 !important;
+    padding: 5px;
+    text-align: left;
+    width: 35px;
+    font-size:13px;
+}
+.question-div {
+    float:left;
+    margin-top:15px;
+    width:525px;
+    color:#000000;
+}
+.question-div p{
+    margin-top:0 !important;
+    margin-bottom:10px !important;
+}
+.answer-text {
+    float:left;
+    width:525px;
+    margin-top:5px;
+    font-weight:bold;
+}
+.option-main {
+    height: 35px;
+    float:left;
+    width:100%;
+    margin-top:12px;
+    border-bottom: 1px solid #cccccc;
+}
+.option-div {
+    margin-left: 20px;
+    float:left;
+    /*width:445px;*/
+    margin-bottom: 6px;
+    /*background-color: #ededed;*/
+}
+.option-div p{
+    margin:10px !important;
+}
+.correct-text {
+    float:left;
+    margin-top:10px;
+    margin-left:10px;
+    height:20px;
+    width:20px;
+    background: url(/images/iconsprite-1.png) no-repeat center;
+    background-position:0px -360px;
+}
+.no-questions {
+    width:390px;
+    float:left;
+    text-align:center;
+    font-size:13px;
+    color:#666666;
+    margin-top:220px;
+}
+
+.left-top-header{
+    margin-left: 20px;
+    margin-top: 24px;
+    font-weight: bold;
+    font-size: 13px;
+}
+#right-panel-loader label{
+    /*margin-top: 250px;*/
+    float: left;
+    margin-top: 205px;
+    margin-left: 440px;
+}
+#blank_message label {
+    /*margin-top: 250px;*/
+    float: left;
+    margin-top: 205px;
+    margin-left: 320px;
+}
+#right-panel-loader {
+    width: auto;
+    height: 485px;
+    font-size: 13px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #666666;
+}
+#blank_message {
+    width: auto;
+    /*height: 485px;*/
+    font-size: 13px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #666666;
+}
+#right-panel-bottom{
+    float:left;
+    width: 100%;
+    height: 435px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.label-field-pair label {
+    float: left;
+    width: 100%;
+}
+
+.label-field-pair {
+    float: left;
+    width:auto;
+    height: auto;
+    max-width: 300px;
+}
+.label-field-pair-1 {
+    float: left;
+    width:auto;
+    height: auto;
+    max-width: 300px;
+}
+.label-field-pair-1 label {
+    float: left;
+    width: 100%;
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    float: left;
+    width: 200px;
+    padding-top: 10px;
+    font-weight: 600;
+}
+.label-field-pair-1 input {
+  -webkit-border-radius: 10px;
+  background: none repeat scroll 0 0 #EEEEEE;
+  border: 1px solid #C6C6C6;
+  height: 17px;
+  margin: 12px 0 0 0;
+  padding: 5px;
+  width: 205px;
+}
+.text-input-bg select{
+    width:170px;
+    margin:10px 0 0 0;;
+}
+
+
+.tabrow {
+    width:958px;
+    list-style: none;
+    margin: 20px 0 0px;
+    padding: 0;
+    line-height: 24px;
+    height: 26px;
+    overflow: hidden;
+    font-size: 12px;
+    font-family: verdana;
+    position: relative;
+}
+.tabrow li {
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+    text-shadow: 0 1px #FFF;
+    padding: 0 20px;
+}
+.tabrow a {
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+}
+.tabrow li.selected {
+    border: 1px solid #AAA;
+    background: #FFF;
+    color: #333;
+    z-index: 2;
+    border-bottom-color: #FFF;
+    font-weight: bold;
+}
+.tabrow:before {
+    position: absolute;
+    content: " ";
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid #AAA;
+    z-index: 1;
+}
+.bottom-panel{
+    height:65px;
+    float:left;
+    width:100%;
+    background: #f1f1f1;
+}
+
+.right-part{
+    float:right;
+}
+.right-part ul li {
+    text-decoration: none;
+    list-style: none;
+}
+.tabrow li.selected a, .tabrow li.selected a:hover
+{
+    color: #000 !important;
+}
+.batch-count,.student-category-count,.student-count{
+    margin-left: 10px;
+    margin-right: 10px;
+    float: left;
+}
+.total-count{
+    float: right;
+    margin-right: 10px;
+}
+.fixer{
+    height:30px
+}
+.count-details{
+    margin:0;
+    color: #808080;
+}
+.collection_box_main{
+    min-width: 200px;
+    float: left;
+    max-width: 200px;
+}
+.select_all_main{
+    min-width: 50px;
+    float: left;
+    max-width: 50px;
+}
+.option-main .collection_box_main:first-child{
+    min-width: 50px;
+    float: left;
+    max-width: 50px;
+}
+.collection_box_main.tax_slabs{
+    min-width: 150px;
+    max-width: 150px;
+}
+.disc_part_name{
+    min-width: 300px;
+    float: right;
+}
+
+#revert-pop-up {
+    margin-left: 170px;
+}
+.revert_arrow_down:after, .revert_arrow_down:before{
+    left:-6%
+}
+.checkbox-hover{
+    width:20px;
+    float:left;
+}
+#blank_message .msg{
+    margin-top: 205px;
+}
+.discount_radio_align{
+    float: right !important;
+}
+.margin_left_1px{
+    margin-left: 1px;
+}
+#fee_collections{
+    float: left;
+}
+#batch_or_department{
+    float: left;
+}
+.batch_fee_collection{
+    float: left;
+    width: auto;
+}
+.fee_head_section_p{
+    float: left;
+    width: 100%;
+}
+.student_list_p{
+    float: left;
+    margin-top: 4%;
+    width: 100%;
+}
+.gray_table_list .sl-col{
+  width: 45px;
+}
+.fee-head-submission{
+  border-top: 1px solid #CCC;
+}
+.fee-head-particulars{
+  width: 725px;
+}
+#payment_form_details{
+    display: inline-block;
+    width: 100%;
+}
+#payment_form_details .label-field-pair3 {
+    height: auto;
+    display: inline-block;
+}
+#payment_form_details label {
+    color: #444 !important;
+    font-size: 14px;
+    font-weight: bold !important;
+    margin-left: 0px !important;
+}
+/** payment mode**/
+.payment_mode_block, .payment_history{
+    height: 40px;
+    float: left;
+    padding-top: 3px;
+}
+
+.payment_mode_block label, .payment_history label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 130px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+#payment_mode_details{
+  margin-left: 35px;
+}
+.payment_mode_block input {
+    background: #fff !important;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 150px;
+    height: auto;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    padding: 5px;
+}
+.text-input-bg3 select {
+    background-color: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 140px;
+    height: 29px;
+    padding: 3px 6px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+}
+/** other payment mode **/
+#payment_mode {
+    float: left;
+}
+/** reference number **/
+.reference_no {
+    width: 88px;
+    float: left;
+    padding-top: 3px;
+    padding-left: 32px;
+
+}
+
+.reference_no label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.reference_no input, .amount_to_pay_block input {
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 200px;
+    height: 17px;
+    padding: 5px;
+}
+.reference_no input {
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 200px;
+    height: 17px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    padding: 5px;
+}
+.reference_no label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.amount_to_pay_block .text-input-bg4{
+    position: relative;
+    margin-right: 0px !important;
+    /*right: 5px;*/
+}
+.text-input-bg4 {
+    background: transparent;
+    height: 28px;
+    width: 200px;
+}
+.special_case{
+    height: auto;
+    margin-right: 35px;
+}
+.cheque_details {
+    margin-left: 5px;
+}
+.cheque_no input{
+    width: 150px;
+}
+.date-input-bg-c{
+      width: 189px;
+}
+.cheque_due_date{
+  margin-left: 15px;
+}
+.reference_no input, .amount_to_pay_block input {
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 130px;
+    height: 17px;
+    padding: 5px;
+}
+/** Amount to pay **/
+
+.amount_to_pay_block {
+    height: 76px;
+    width: 100px;
+    float: right;
+    padding-top: 3px;
+    margin-right: 10px;
+}
+
+.amount_to_pay_block label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 101px;
+    padding-top: 10px;
+    margin-left: 6px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.amount_to_pay_block.paid input {
+    border: 0px;
+}
+.amount_to_pay_block input {
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 -11px;
+    width: 98px;
+    height: 17px;
+    text-align: right;
+    width: 100px !important;
+}
+.payment_box{
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    width: 80px;
+    float:left;
+    padding-right: 6px;
+    text-align: left;
+    padding-left: 5px;
+}
+.payment_notes {
+  height: 70px;
+  padding-top: 3px;
+  width: 417px;
+  float: left;
+}
+.payment_notes label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.payment_notes textarea {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #C6C6C6;
+    margin: 5px 0 0 0px;
+    padding: 5px;
+    width: 518px;
+    height: 17px;
+    position: relative;
+    font-size: 13px;
+}
+.payment_notes textarea{
+    width: 400px !important;
+}
+.pay_fees_buttons {
+    float: right;
+    margin-top: 18px;
+    margin-right: 7px;
+}
+.pay_fees_buttons.no_top_margin{
+    margin-top: 0px !important;
+}
+.pay_fees_buttons a {
+  margin: 23px 14px 0 !important;
+  color: #fff !important;
+  background: #27292B !important;
+  font-size: 13px !important;
+  height: 17px;
+  border: none !important;
+  float: left !important;
+}
+.pay_fees_buttons a:hover {
+    background: #373B3F;
+}
+.pay_fees_buttons.no_top_margin a{
+    margin: 22px 10px 0 !important;
+}
+.pay_fees_buttons{
+    margin-right: 0px;
+}
+.pay_fees {
+    margin-bottom: 14px;
+    float: left;
+    width: 938px;
+}
+.pay_fees h4 {
+    text-align: right;
+    float: right;
+    margin-top: 40px;
+}
+.pay_fees .no_top_margin h4{
+    margin-top: 29px;
+}
+.pay_fees .payment_mode_block{
+    width: 200px;
+    margin-right: 0px;
+}
+/** payment notes **/
+.pay_fees {
+    margin-bottom: 14px;
+    float: left;
+    width: 938px;
+}
+.empty-info{
+    float: right;
+    width: 98%;
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    margin-top: 28px;
+    font-size: 13px;
+}
+/** payment details / history **/
+#payments_details{
+    border-top: 1px solid #ccc;
+    display: inline-block;
+    /* margin-top: 30px; */
+    /*    padding-top: 10px;*/
+    width: 100%;
+}
+#payments_details .label-field-pair3 {
+    height: 40px;
+    display: inline-block;
+    margin: 10px 0 0 0;
+}
+#payments_details label {
+    color: #444 !important;
+    font-size: 14px;
+    font-weight: bold !important;
+    margin-left: 0px !important;
+}
+.pay_fees .calendar_field{
+  float: left;
+}
+.pay-fees-date{
+  width: auto;
+  float: left;
+  margin-top: 15px;
+}
+.pay-fees-date label {
+    color: #444 !important;
+    font-size: 14px;
+    font-weight: bold !important;
+    margin-left: 0px !important;
+}
+.user_button {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    background: #27292B none repeat scroll 0 0;
+    color: #FFFFFF !important;
+    font-family: arial;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0px;
+    margin-top: 30px;
+    padding: 7px 10px;
+    border: none;
+    text-align: center;
+    width: auto;
+    cursor: pointer;
+    float: left;
+    margin-right: 20px;
+    text-decoration: none;
+    display: block;
+}
+
+.user_button:hover {
+    background: #373b3f;
+    text-decoration: none !important;
+}
+.pay_fees_buttons h4{
+  text-align: right;
+    float: right;
+    margin-top: 30px;
+}
+.no_entries{
+    text-align: center;
+}
+.gray_table_list .main_head td {
+  font-size: 13px !important;
+}
+#a_f_c {
+  width: 70%;
+}
+.hor_line{
+    width:100%;
+    background: #ccc;
+    height: 1px;
+    float: left;
+    margin-bottom: 10px;
+}
+.details {
+    padding-bottom: 15px;
+    display: inline-block;
+}
+.name {
+    color: #000 !important;
+    float: left;
+    width: 220px;
+    font-size: 14px;
+    height: 2px;
+    line-height: 20px;
+}
+.val {
+    width: 750px;
+    color: #000 !important;
+    line-height: 20px !important;
+    font-size: 14px;
+    float: left;
+}
+.val span {
+    margin-right: 12px;
+    color: black;
+}
+.val-align {
+    float: right;
+    width: 730px;
+    word-wrap: break-word;
+}
+.student-name-div {
+    float: left;
+    margin-right: 10px;
+    font-weight: bold;
+}
+.receipt-actions a {
+    margin: 0px 5px;
+    padding: 5px;
+    display: block;
+    float: left;
+}
+.receipt-actions {
+    width: 68% !important;
+}

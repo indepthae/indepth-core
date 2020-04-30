@@ -1,0 +1,79 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('view_room_details')}"%></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_room')}", edit_room_detail_path(@room_details) %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :room_details_show, @room_details %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+  <% end %>
+  <div class="detail_box">
+    <div class="name"><%= "#{t('hostel_name')}"%></div><div class="val themed_text"><span class="themed_text">:</span><%= @room_details.hostel.name %></div>
+    <div class="name"><%= "#{t('room_number')}"%></div><div class="val themed_text"><span>:</span><%= @room_details.room_number %></div>
+    <div class="name"><%= "#{t('students_per_room')}"%></div><div class="val themed_text"><span>:</span><%= @room_details.students_per_room %></div>
+    <div class="name"><%= "#{t('rent')}"%></div><div class="val themed_text"><span>:</span><%#= @room_details.rent %><%= precision_label(@room_details.rent) %></div>
+    <% @additional_details.each do |additional_detail| %>
+      <%if additional_detail.additional_info.present?%>
+    <div class="name"><%= additional_detail.hostel_room_additional_field.name %></div><div class="val themed_text"><span>:</span><span class="additional_value"><%=h additional_detail.additional_info %></span></div>
+      <%end%>
+    <% end %>
+  </div>
+  <table id="listing" align="right" width="60%" cellpadding="1" cellspacing="1">
+    <% unless @students.blank? %>
+      <tr class="tr-head">
+        <td>
+          <%= "#{t('sl_no')}"%>
+        </td>
+        <td>
+          <%= "#{t('name')}"%>
+        </td>
+        <td>
+          <%= "#{t('batch')}"%>
+        </td>
+        <td>
+
+        </td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @students.each_with_index do |s,i| %>
+
+
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-1">
+            <%= i+1 %>
+          </td>
+          <td class="col-3">
+            <%=  link_to s.student.full_name, :controller=>'student', :action=>'profile', :id => s.student.id %>
+          </td>
+          <td class="col-3">
+            <%= s.student.batch.full_name %>
+          </td>
+          <td class="col-3">
+            <small>
+              <%= link_to "#{t('change')}", :controller=>'room_allocate', :action=>'change_room', :id=>s.id %>
+              |
+              <%= link_to "#{t('vacate')}",
+                { :controller=>'room_allocate', :action=>'vacate', :id=>s.id},
+                {:confirm => "#{t('are_you_sure')}"} %>
+            </small>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="tr-head"><td><%= "#{t('no_allocation_in_this_room')}"%></td></tr>
+    <% end %>
+  </table>
+</div>

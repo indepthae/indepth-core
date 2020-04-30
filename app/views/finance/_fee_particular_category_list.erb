@@ -1,0 +1,8 @@
+<div class="label-field-pair">
+  <label><%= t('master_fees_Category') %> :</label>
+  <div class="text-input-bg"><%= select "fee_discount","finance_fee_category_id", @fees_categories.map { |c| [c.name , c.id] },{:prompt=>"#{t('select_fee_category')}"},{:onChange => "#{remote_function(:url => {:action => "load_fee_category_particulars"},
+                                                                                                                                                                                                         :with => "'fee_category='+value+'&batch_id='+#{params[:batch]}",
+                                                                                                                                                                                                         :before => "Element.show('loader_batch')",
+                                                                                                                                                                                                         :success => "Element.hide('loader_batch')")}"  }%></div>
+
+</div>

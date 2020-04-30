@@ -1,0 +1,6 @@
+<p><%= "This employee has #{@undeducted_lop_count} undeducted lops" %></p>
+
+<p><%= "You can either ignore the Lops and reset the leaves or retry after changing the non deducted lops as non lops"%></p>
+
+<%= link_to "Ignore lop and reset leaves", {:controller => "employee_attendance", :action => "retry_employee_reset", :id => @log.id, :employee_id => @employee.id } , :class => "submit_button" %>
+<%= link_to "Cancel", {:controller => "employee_attendance", :action => "employee_reset_logs", :id => @log.id} , :class => "submit_button", :id => "cancel" %>

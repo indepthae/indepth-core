@@ -1,0 +1,39 @@
+
+
+<div class="batch-row-header">
+  <div class="batch-column-1">
+    <%= t('batches_text') %>
+  </div>
+  <div class="batch-column-2">
+    <%= t('subjects_text') %>
+  </div>
+  <div class="batch-column-3">
+    <%= t('allocation_status') %>
+  </div>
+  <div class="batch-column-4">
+    
+  </div>
+</div>
+<% @course.batches.reject {|x| x.is_active == false or x.is_deleted == true}.each do |batch| %>
+  <div class="batch-row">
+    <div class="batch-column-1">
+      <%= batch.name %>
+    </div>
+    <div class="batch-column-2">
+      <% totals = batch.subject_totals %>
+      <%= totals[:sum] %>
+    </div>
+    <div class="batch-column-3">
+      <% if(totals[:sum] == 0) %>
+        <%= t('no_subjects') %>
+      <% elsif(totals[:allocations] > 0) %>
+        <%= "#{totals[:allocations]} #{t('of')} #{totals[:sum]}" %>
+      <% else %>
+        <%= t('no_subjects_allocated') %>
+      <% end %>
+    </div>
+    <div class="batch-column-4">
+      <%= (totals[:sum]==0) ? '-' : (link_to t('manage_work_allocations'), {:controller => :timetable, :action => :manage_work_allocations, :batch_id => batch}, :class => "themed_hover_text") %>
+    </div>
+  </div>
+<% end %>

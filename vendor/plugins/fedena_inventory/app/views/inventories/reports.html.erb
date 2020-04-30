@@ -1,0 +1,67 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%="#{t('generate')} #{t('reports_text')}" %></div>
+
+</div>
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% form_remote_for :status ,:url=>{:action=>'reports'},:loading=>"$('loader').show();",:loaded=>"$('loader').hide();"  do |f| %>
+    <div class="filter">
+      <div class="label-field-pair">
+        <label for="type"><%= t('select_category') %></label>
+        <div class="text-input-bg margin-left-10">
+          <%= f.select :type, [["#{t('indent')}", "indent"],["#{t('purchase_order')}", "purchase_order"],["#{t('grn')}", "grn"] ], {} ,{:onChange => "#{remote_function(:url => {:action => "select_sort_order"},
+            :with => "'category='+value",:before => "$('loader1').show();",
+            :success => "$('loader1').hide();")}"}  %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader1",
+            :style =>"display: none;" ) %>
+        </div>
+      </div>
+      <div id="sort_type">
+        <div class="label-field-pair">
+          <label for="sort"><%= t('sort_type') %></label>
+          <div class="text-input-bg margin-left-10">
+            <%= f.select :sort_type, [["#{t('all')}", "all"],["#{t('pending')}", "pending"],["#{t('issued')}", "issued"],["#{t('rejected')}", "rejected"] ], {}  %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="filter1">
+      <div class="label-field-pair">
+        <label for="from"><%= t('from') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'status[from]', I18n.localize(Date.today, :format=>:default), :year_range => 5.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="to"><%= t('to') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'status[to]', I18n.localize(Date.today, :format=>:default), :year_range => 5.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+        </div>
+      </div>
+
+    </div>
+
+    <%= submit_tag "► #{t('search_text')}", :class=> 'submit_button', :disable_with => "#{t('please_wait')}"  %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  <% end %>
+</div>
+<div class="extender"></div>
+<div class="hor_line"></div>
+<div id="information">
+</div>

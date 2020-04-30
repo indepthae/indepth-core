@@ -1,0 +1,127 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="certificate_headline_box radio-select">
+    <div class="template_settings_sub_head">
+     <%#= f.check_box "certificate_name[is_enabled]", :checked => (@header["CertificateName"].is_enabled) %>
+        <%= check_box_tag("certificate_name_enabled","1",(@header["CertificateName"].is_enabled ) )  %>
+  <%= t('certificate_details')%></div>
+    <div class = "institution_details_form">
+        <div class = "institution_details_row">
+            <div class = "row_sub_head"><%= t('certificate_name')%> (<%= t('heading')%>)</div>
+            <%= f.text_field "certificate_name[value]", :value => @header["CertificateName"].value %>
+        </div>
+        <div class = "institution_details_row">
+            <table>
+                <tr>
+                    <td class="sub_head_td">
+                        <div class = "row_sub_head"><%= t('certificate_serial_number')%></div>
+                    </td>
+                    <td class="certificate_serial_td">
+                        <%= f.radio_button  "certificate_serial_number[value]", "Manual", :checked => (@header["CertificateSerialNumber"].value == "Manual") %>
+                        <label for="header_config_certificate_serial_number[value]_manual" class="label_for_align_institution_logo"><%= t('enter_manually_while_generating') %></label>
+                    </td>
+                    <td class="certificate_serial_td">
+                        <%= f.radio_button  "certificate_serial_number[value]", "Auto", :checked => (@header["CertificateSerialNumber"].value == "Auto") %>
+                        <label for="header_config_certificate_serial_number[value]_auto" class="label_for_align_institution_logo"><%= t('auto_generate') %></label>
+                    </td>
+                    <td class="hidden_auto_td">
+                        <div class="auto_generate_data">
+                            <% if @header["CertificateSerialNumber"].value == "Auto" %>
+                              <div class = "reveal-if-auto">
+                                  <div class ="prefix">
+                                      <label class="label_for_serial_prefix"><%= t('prefix') %></label>
+                                      <%= f.text_field "serial_prefix[value]", :value => @header["SerialPrefix"].value %>
+                                  </div>
+                                  <div class="starting_count">
+                                      <label class="label_for_serial_starting_count"><%= t('starting_count') %></label>
+                                      <%= f.text_field "serial_starting_count[value]", :value => @header["SerialStartingCount"].value %>
+                                  </div>
+
+                              </div>
+                              <div class="hidden_fields">
+                                  <%= hidden_field_tag "header_config[serial_starting_count][is_enabled]", "1" %>
+                                  <%= hidden_field_tag "header_config[serial_prefix][is_enabled]", "1" %>
+                              </div>
+                            <% else %>
+                              <div class="hidden_fields">
+                                  <%= hidden_field_tag "header_config[serial_starting_count][value]", "" %>
+                                  <%= hidden_field_tag "header_config[serial_starting_count][is_enabled]", "0" %>
+                                  <%= hidden_field_tag "header_config[serial_prefix][value]", "" %>
+                                  <%= hidden_field_tag "header_config[serial_prefix][is_enabled]", "0" %>
+                              </div>
+                            <% end %>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div id="radio-buttons" class="radio_serial_number">
+            </div>
+
+        </div>
+        <div class = "institution_details_row">
+            <div class ="doi_labels">
+                <%= f.check_box "date_of_issue[is_enabled]", :checked => (@header["DateOfIssue"].is_enabled) %>
+                <label for="header_config_date_of_issue[is_enabled]" class="cb_value"><%= t('date_of_issue') %></label>
+                <%= link_to_function t("rename"),"create_field(this);", :id=>"rename_label"%>
+            </div>
+            <div class = "rename_doi" id="doi_new"><span>as</span><%= text_field_tag "header_config[date_of_issue][value]" , @header["DateOfIssue"].value %><span class="close_btn_doi"><%= link_to_function "","remove_field(this);", :id=>"close_rename_label", :class=>"delete_button_img" %></span> </div>
+
+            <div class="extra_hidden"><% hidden_field_tag "header_config[date_of_issue][is_deleted]", true %></div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  var rename_field = j(".rename_doi");
+  var rename_btn = j("#rename_label");
+  var extra_hidden = j('.extra_hidden')
+  j("input[name='header_config[certificate_serial_number[value]]']:radio").change(function () {
+      if (this.value == "Auto") {
+          var container = '<div class = "reveal-if-auto">';
+          var prefix_cont = '<div class ="prefix">';
+          var prefix_label = '<label class="label_for_serial_prefix">' + '<%= t('prefix') %>' + '</label>';
+          var prefix_field = '<%= f.text_field "serial_prefix[value]", :value => @header["SerialPrefix"].value %>' + '</div>';
+          var strt_coun_lab = '<div class="starting_count"><label class="label_for_serial_starting_count">' + '<%= t('starting_count') %>' + '</label>';
+          var strt_coun_field = '<%= f.text_field "serial_starting_count[value]", :value => @header["SerialStartingCount"].value %>' + '</div></div>';
+          var hidden_prefix_status = '<%= hidden_field_tag "header_config[serial_prefix][is_enabled]", "1" %>';
+          var hidden_count_status = '<%= hidden_field_tag "header_config[serial_starting_count][is_enabled]", "1" %>';
+          j(".auto_generate_data").html(container + prefix_cont + prefix_label + prefix_field + strt_coun_lab + strt_coun_field + hidden_prefix_status + hidden_count_status);
+      }
+      if (this.value == "Manual") {
+          j(".reveal-if-auto").remove();
+          var hidden_prefix = '<%= hidden_field_tag "header_config[serial_prefix][value]", "" %>';
+          var hidden_prefix_status = '<%= hidden_field_tag "header_config[serial_prefix][is_enabled]", "0" %>';
+          var hidden_count = '<%= hidden_field_tag "header_config[serial_starting_count][value]", "" %>';
+          var hidden_count_status = '<%= hidden_field_tag "header_config[serial_starting_count][is_enabled]", "0" %>';
+          j(".auto_generate_data").html(hidden_count + hidden_prefix + hidden_count_status + hidden_prefix_status);
+      }
+  });
+
+  if ("<%= @header["DateOfIssue"].value%>" == "") {
+      rename_btn.show();
+      rename_field.hide();
+  } else {
+      rename_btn.hide();
+      rename_field.show();
+  }
+
+
+  function create_field(el) {
+      el.hide();
+      rename_field.show();
+  }
+  ;
+
+  function remove_field(el) {
+      var hidden_field = '<input id="header_config_date_of_issue_is_deleted" name="header_config[date_of_issue][is_deleted]" type="hidden" value="true">'
+      extra_hidden.append(hidden_field);
+      rename_field.hide();
+      rename_btn.show();
+
+  }
+</script>

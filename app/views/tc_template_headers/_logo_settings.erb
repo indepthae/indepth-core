@@ -1,0 +1,54 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="institution_logo_box">
+    <div class="template_settings_sub_head"><%= t('institution_logo')%></div>
+    <div class = "institution_details_form">
+        <div class = "institution_details_row">
+            <div class = "institution_details_label_logo">
+                <%= f.check_box "institution_logo[is_enabled]", :checked => (@header["InstitutionLogo"].is_enabled) %>
+                <label for="header_config_institution_logo[is_enabled]" class="cb_value"><%= t('institution_logo') %></label>
+            </div>
+            <div class = "institution_details_field_logo">
+                <div class="logo">
+                    <%= image_tag current_school_detail.logo.url(:original, false) %>
+                </div>
+                <div class="align_institution_logo">
+                    <div class = "align_institution_logo_label"><%= t('position')%> </div>
+                    <div id="radio-buttons-logo">
+                        <div class="radio_button_pair">
+                            <%= f.radio_button  "institution_logo[value]", "left", :checked => (@header["InstitutionLogo"].value == "left") %>
+                            <label for="header_config_institution_logo[value]_left" class="label_for_align_institution_logo"><%= t('left') %></label>
+                        </div>
+
+                        <div class="radio_button_pair">
+                            <%= f.radio_button  "institution_logo[value]", "right", :checked => (@header["InstitutionLogo"].value == "right") %>
+                            <label for="header_config_institution_logo[value]_right" class="label_for_align_institution_logo"><%= t('right') %></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+  if (j('input[name="header_config\[institution_logo\[is_enabled\]\]"][type="checkbox"]').is(":checked") == true) {
+
+          j('input[name="header_config\[institution_logo\[value\]\]"]').prop('disabled', false);
+      } else {
+          j('input[name="header_config\[institution_logo\[value\]\]"]').prop('disabled', true);
+      }
+      
+  j('input[name="header_config\[institution_logo\[is_enabled\]\]"][type="checkbox"]').click(function () {
+      if (j('input[name="header_config\[institution_logo\[is_enabled\]\]"][type="checkbox"]').is(":checked") == true) {
+
+          j('input[name="header_config\[institution_logo\[value\]\]"]').prop('disabled', false);
+      } else {
+          j('input[name="header_config\[institution_logo\[value\]\]"]').prop('disabled', true);
+      }
+  });
+</script>

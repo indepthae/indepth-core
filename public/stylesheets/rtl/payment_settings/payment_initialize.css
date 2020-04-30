@@ -1,0 +1,126 @@
+* {
+    box-sizing: border-box;
+    font-family: arial;
+}
+.main, .name_info {
+    float: left;
+    width: 100%;
+    padding: 0 20px;
+    overflow: hidden;
+}
+.list_payment {
+    list-style-type: none;
+    background-color: #f1f1f1;
+    font-size: 13px;
+    padding: 0px;
+    border-top:1px solid #ccc;
+    border-left:1px solid #ccc;
+    border-right:1px solid #ccc;
+    margin-bottom: 25px;
+}
+.name_info {
+    font-size: 14px;
+}
+.pay {
+    overflow:auto;
+    padding-top: 5%;
+    margin: 0 auto;
+    width: 35%;
+}
+.label_name {
+    float: right;
+    text-align: right;
+    width: 27%;
+    padding: 5px;
+    padding-left: 0px;
+}
+.label_info {
+    float: left;
+    text-align: right;
+    width: 65%;
+    padding: 5px;
+}
+.label_sep {
+    margin: 0 auto;
+    float: right;
+    padding: 5px;
+}
+#proceed_button{
+    padding: 0 20px;
+}
+.select_payment {
+    padding-top: 40px;
+    text-align: right;
+    padding-bottom: 15px;
+    margin: 0 auto;
+}
+.select_payment_radio {
+    float: right;
+}
+.select_payment_label {
+    float: right;
+    padding-top: 3px;
+    padding-left: 5px;
+}
+#custom_gateway_online_pay_submit{
+    border-radius: 3px 3px 3px 3px;
+    background: #27292b none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    font-family: arial;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 7px 25px;
+}
+.cancel_user_button {
+    border-radius: 3px 3px 3px 3px;
+    background: #27292b none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    font-family: arial;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 7px 25px;
+    margin-right: 10%;
+    text-decoration: none;
+}
+.list_payment li{
+    padding: 10px 10px 30px 10px;
+    border-bottom:1px solid #ccc;
+}
+
+@media only screen and (max-width:800px) {
+    /* For tablets: */
+    .main, .name_info {
+        width: 100%;
+        padding: 0;
+    }
+    .pay {
+        overflow:auto;
+        padding-top: 5%;
+        margin: 0 auto;
+        width: 80%;
+    }
+    #proceed_button{
+        padding: 0px;
+    }
+}    
+@media only screen and (max-width:500px) {
+    /* For mobile phones: */
+    .main, .name_info {
+        width: 100%;
+    }
+    #proceed_button{
+        padding: 0px;
+    }
+    .pay {
+        overflow:auto;
+        padding-top: 5%;
+        margin: 0 auto;
+        width: 90%;
+    }
+}

@@ -1,0 +1,28 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('classroom_allocation') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%=  t('home')%></div>
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+     <%= make_breadcrumb %>
+     <%= render_breadcrumbs  %>
+   </div>
+   <div class="box">
+      <%  if @user.admin? or @user.privileges.map{|p| p.name}.include?("ManageBuilding") or @user.privileges.map{|p| p.name}.include?("ManageBuildingAndAllocation")%>
+
+     <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('manage_buildings')}", :controller => "buildings", :action => "index" %></div>
+      <div class="link-descr"><%= t('add_building') %></div>
+     </div>
+     <% end %>
+
+   <%  if @user.admin? or @user.privileges.map{|p| p.name}.include?("ManageTimetable") or @user.privileges.map{|p| p.name}.include?("ClassroomAllocation") or @user.privileges.map{|p| p.name}.include?("ManageBuildingAndAllocation") %>
+     <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('allocate')}" ,:controller => "classroom_allocations", :action => "new" %></div>
+      <div class="link-descr"><%= t('allocate_classroom') %></div>
+     </div>
+     <% end %>
+   </div>
+</div>

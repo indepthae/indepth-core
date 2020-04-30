@@ -1,0 +1,9 @@
+<div class="label_field_pair">
+  <div class="student_gender_value">
+    <%= f.radio_button  "multi_select_type","single_select", :class=>'type_select' %>
+    <label class="label_for_gender" for="record_multi_select_type_single_select"> <%= t('select_one_option') %></label>
+
+    <%= f.radio_button  "multi_select_type","multi_select",:class=>'type_select' %>
+    <label class="label_for_gender" for="record_multi_select_type_multi_select"><%= t('select_multiple_option') %></label>
+  </div>
+</div>

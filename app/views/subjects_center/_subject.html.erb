@@ -1,0 +1,22 @@
+<% level1 = (klass == 'level-1') %>
+<% if tbody_required -%><tbody class="<%= level1 ? 'disable_sort' : '' %>"><%end-%>
+  <tr class="<%= klass %> <%= tbody_required ? 'disable_sort' : ''%>">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= subject.name_with_code %></div>
+          <div class="component_link component_type">
+              <%= t('subject') %>
+          </div>
+          <div class="col-37 pull-right">
+              <div class="link_button pull-left">
+                  <%= component_edit_link(t('edit_text'), 'course_subject', @course.id, subject.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_delete_link(t('delete_text'), 'course_subject', @course.id, subject) %>
+              </div>
+          </div>
+      </td>
+  <%#= hidden_field_tag "course_subjects[subject][#{subject.id}]", subject.priority, :class => "#{(klass == 'level-1') ? 'component_field' : 'subject_field'}", :component_type => 'subject', :component_id => subject.id%>    
+  <%= hidden_field_tag "course_subjects[subject][#{subject.id}]", subject.priority, :class => 'priority_field', :component_type => 'subject', :component_id => subject.id%>    
+  </tr>
+<% if level1 -%></tbody><% end -%>

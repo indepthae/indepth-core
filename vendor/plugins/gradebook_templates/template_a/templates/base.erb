@@ -1,0 +1,168 @@
+<% content_for :head do %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="<%= "#{Rails.root}/vendor/plugins/gradebook_templates/template_a/templates/stylesheets/template_a_style.css" %>">
+<% end %>
+
+<div class="<%= settings[:template_a_theme] %>" >
+
+    <div class="">
+
+        <div class="section">
+            <%= report_header({:school_name=> report.school_details.name, :school_address=> report.school_details.address, :logo1_url=> default_school_logo,  :logo2_url=> secondary_logo_url(settings[:template_a_logo]), :school_email_with_website=> report.school_details.email_with_website }) %>
+        </div>
+
+        <div class="section">
+            <%= report_name(settings[:template_a_header]) %>
+        </div>
+
+        <div class="section">
+            <%= param_set(report.student.details, settings[:template_a_show_student_photo] == 'yes')%>
+        </div>
+
+        <% grouped_activity_sets = report.activity_sets.group_by{|r| r.profile_name } %>
+
+        <% if report.exam_sets.present? %>
+          <div class="section">
+              <%column_padding = report_column_padding(report)%>
+              <table class="<%=  column_padding %> primary condensed margin_top_0">
+                  <thead>
+                  <th><%= I18n.t('scholastic_areas') %></th>
+                  <% report.term_names.each do |term_name| %>
+                    <th colspan="<%=report.term_section_col_count(term_name) %>"><%= term_name%></th>
+                  <%end%>
+                  <% final_column = report.term_section_col_count %>
+                  <% unless final_column.zero? %>
+                    <th colspan="<%=  final_column %>"></th>
+                  <% end %>
+                  </thead>
+                  <tr class="shaded_bg">
+                      <%= sub_headers(report) %>
+                  </tr>
+
+                  <% if aggregate_enabled? %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects_included_in_total, :level => 0, :grouped_exams=>true}) %>
+                    <%= aggregate_rows %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects_excluded_from_total, :level => 0, :grouped_exams=>true}) %>
+                  <% else %>
+                    <%= nested_subject_rows({:subjects => report.main_subjects, :level => 0, :grouped_exams=>true}) %>
+                  <% end %>
+
+              </table>
+          </div>
+        <% end %>
+
+        <div class="section">
+          <% if grouped_activity_sets.present? %>
+            <div class="<%= group_report? ? 'twelve' : 'six' %> columns">
+                <% grouped_activity_sets.each do |key, activity_sets| %>
+                  <table class="primary striped condensed">
+                      <thead>
+                      <th style="width:70%"><%= activity_sets.first.name %></th>
+                      <% activity_sets.each do |activity_set| %>  
+                        <th><%= display_name_for_activity_exam(activity_set)%></th>
+                      <%end%>
+                      </thead>
+                      <%activity_sets.first.activities.each_with_index do |activity, index| %>
+                        <tr>
+                            <td><%= activity.name %></td>
+                            <% activity_sets.each do |activity_set| %>
+                              <td><%= activity_set.scores[index].grade %></td>
+                            <%end%>  
+                        </tr>  
+                      <%end%>
+                  </table>
+                <%end%>
+            </div>
+            <%end%>
+
+            <div class="six columns">
+                <% if report.attendance_reports.present? %>
+                  <table class="primary striped condensed">
+                      <%= attedance_report(:type => 'term_and_consolidated') %> 
+                  </table>    
+                <% end %>
+                <%= report_remarks(report.remarks)  %>
+
+                <% report.grade_scales.each do |grade_scale| %>
+                  <table class="primary striped condensed">
+                      <thead>
+                      <th colspan="<%= grade_scale.scale.count+1 %>" ><%= grade_scale.name %></th>
+                      </thead>
+                      <% grade_scale.labels.each_with_index do |label_name, label_index| %>
+                        <tr>
+                            <td><%=label_name%></td>
+                            <% grade_scale.scale.each do |values| %>
+                              <td> <%= values[label_index] %> </td>
+                            <%end%>
+                        </tr> 
+                      <%end%>
+                  </table>
+                <%end%>
+
+            </div>
+        </div>
+
+        <% if report.student.records.present? %>
+          <div class="section">
+              <%= gradebook_records(report) %>
+          </div>
+        <% end %>
+
+        <div class="section">
+            <% if report.exam_attendance_reports.present? %>
+              <table class="primary striped condensed">
+                  <%= attedance_report(:type => 'full') %> 
+              </table> 
+            <% end %>
+        </div>
+
+
+        <!--        <div class="section">
+                    <div class="padded_space">
+                        Report Published on: <span class="bold"> 14 January 2018 </span>
+                        Promoted to: <span class="bold"> Class 8 </span> 
+                    </div>
+                </div> 
+        -->
+        <%  if settings[:signature] == "0"%>
+          <div class="section">
+              <div class="margin_top_3">
+                <div class="four columns left_text">
+                    <span class="bold">
+                        <div class="sign_img">
+                            <% if settings[:sign_left_img].present? %>
+                              <%= wicked_pdf_image_tag settings[:sign_left_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                            <% end %>
+                        </div>
+                        <div><%= settings[:sign_left_text] %></div>
+                    </span>
+                </div>
+                <div class="four columns center_text">
+                    <span class="bold">
+                        <div class="sign_img">
+                            <% if settings[:sign_center_img].present?  %>
+                              <%= wicked_pdf_image_tag settings[:sign_center_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                            <% end %>
+                        </div>
+                        <div><%= settings[:sign_center_text] %></div>
+                    </span>
+                </div>
+                <div class="four columns right_text">
+                    <span class="bold">
+                        <div class="sign_img">
+                            <% if settings[:sign_right_img].present? %>
+                              <%= wicked_pdf_image_tag settings[:sign_right_img] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                            <% end %>
+                        </div>
+                        <div><%= settings[:sign_right_text] %></div>
+                    </span>
+                </div>
+              </div>
+          </div>
+        <% end %>
+
+
+    </div>
+
+</div>

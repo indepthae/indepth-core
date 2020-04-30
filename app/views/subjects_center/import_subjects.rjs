@@ -1,0 +1,4 @@
+page << "document.body.scrollTop = document.documentElement.scrollTop = 0;"
+page << "build_modal_box({'title' : '#{t('import_subjects')}', 'popup_class' : 'pupup_import_subjects'})"
+page.replace_html 'popup_content', :partial => "import_subjects"
+page << "show_modal_actions();"

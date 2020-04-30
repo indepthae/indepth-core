@@ -1,0 +1,13 @@
+<div class="label-field-pair">
+  <label for=""><%= t('master_fees.fee_category') %></label>
+
+  <div class="text-input-bg">
+    <%= select_tag 'manage_masters[fee_categories]',
+                   options_for_select([["#{t('select')}", '']] + @fee_categories.map { |x| [x.name, x.id] }),
+                   {:onchange => "load_fee_particulars(this)"} %>
+  </div>
+</div>
+
+<div id="fee_particulars">
+  <%= render :partial => 'flash_notice' %>
+</div>

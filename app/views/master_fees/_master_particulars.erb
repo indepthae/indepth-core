@@ -1,0 +1,39 @@
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+  <%= render :partial => "master_fee_table_head" %>
+  <% if @master_particulars.present? %>
+      <% @master_particulars.each do |mp| %>
+          <tr class="row-b">
+            <td class="col-name"><%= mp.name %></td>
+            <td class="col-desc set_border_right"><%= mp.description %></td>
+            <td class="col-options set_border_right">
+              <% if permitted_to? :edit_master_particular, :master_fees %>
+                  <% unless mp.has_dependencies? %>
+                      <%= link_to_remote t('edit'), {:url => edit_master_particular_master_fee_path(mp), :method => :get} %>
+                      <%= link_to t('delete'), '#',
+                                  :onclick => "make_popup_box(this, 'confirm',
+                                           '#{t('delete_master_discount_confirmation', {:name => mp.name})}',
+                                           {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}',
+                                           'title' : '#{t('delete_master_particular')}', 'return_status' : true,
+                                           'popup_class' : 'delete_confirmation'}); return delete_obj(#{mp.id},
+                                           '#{session_fingerprint}','#{delete_master_particular_master_fee_path(mp)}')" %>
+                  <% else %>
+                      <span> <%= t('edit') %> </span> <span> <%= t('delete') %> </span>
+                  <% end %>
+              <% end %>
+            </td>
+          </tr>
+      <% end %>
+  <% else %>
+      <tr class="row-b">
+        <td colspan="3">
+          <%= t('no_master_discounts') %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+
+<%= pagination_status(@master_particulars) %>
+
+<% if @master_particulars.present? %>
+    <%= will_paginate @master_particulars, :renderer => 'RemoteLinkRenderer', :params => {:to_fetch => 'particulars'} %>
+<% end %>

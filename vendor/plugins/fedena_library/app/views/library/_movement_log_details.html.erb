@@ -1,0 +1,179 @@
+<% unless @log.blank? %>
+  <div class="info">
+      <div class="field_pair">
+          <div class="label1"><%= "#{t('total')} #{t('book_text')}" %></div>
+          <div class="label2"><%=": #{@log.total_entries}" %></div>
+      </div>
+  </div>
+  <div class="submit-button">
+      <%= link_to "#{t('export_as_csv')}" ,{:action=>'movement_log_csv',:sort_order=>@sort_order,:book_log=>params[:book_log]} %>
+  </div>
+  <div class="extender"></div>
+  <div id="page-yield">
+      <div class="extender"></div>
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head sub-heading">
+              <td><%= t('no_text') %></td>
+
+              <% if @sort_order=="book_number DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('book_number')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"book_number ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="book_number ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('book_number')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"book_number DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('book_number')}", :url=>{:action=>"movement_log",:sort_order=>"book_number DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>
+              <% if @sort_order=="title DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('title')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"title ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="title ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('title')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"title DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('title')}", :url=>{:action=>"movement_log",:sort_order=>"title DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>  
+
+              <% if @sort_order=="first_name DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('borrowed_by')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"first_name ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="first_name ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('borrowed_by')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"first_name DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('borrowed_by')}", :url=>{:action=>"movement_log",:sort_order=>"first_name DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>
+              <td><%= t('employee/admission number') %></td>
+              <td><%= t('library.batch_or_department') %></td>  
+
+              <% if @sort_order=="status DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('status')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"status ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="status ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('status')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"status DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('status')}", :url=>{:action=>"movement_log",:sort_order=>"status DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>
+              <% if @sort_order=="issue_date DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('issue_date')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"issue_date ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="issue_date ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('issue_date')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"issue_date DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('issue_date')}", :url=>{:action=>"movement_log",:sort_order=>"issue_date DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>
+              <% if @sort_order=="due_date DESC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('due_date')} &#8595;", :url=>{:action=>"movement_log",:sort_order=>"due_date ASC",:book_log=>params[:book_log]} %>
+                </td>
+              <% elsif @sort_order=="due_date ASC" %>
+                <td class="batch_order_select">
+                    <%= link_to_remote  "#{t('due_date')} &#8593;", :url=>{:action=>"movement_log",:sort_order=>"due_date DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% else %>
+                <td class="batch_order">
+                    <%= link_to_remote  "#{t('due_date')}", :url=>{:action=>"movement_log",:sort_order=>"due_date DESC",:book_log=>params[:book_log]} %>
+                </td>
+              <% end %>
+          </tr>
+          <%j=0 %>    
+          <% @log.each_with_index do |r,@i| %>          
+            <% if params[:page].present? %>
+              <% if params[:page].to_i >= 1 %>
+                <% @i = @i  + (params[:page].to_i - 1) * @log.per_page.to_i %>
+              <% end %> <%else %> <% @i = @i %>
+            <% end %>
+            <% j+=1 %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+                <td class="col-5"> <%=@i+1 %></td>
+                <% if @sort_order=="book_number ASC" or @sort_order=="book_number DESC" %>
+                  <td class="col-4 batch_order_select"><%=r.book_number%></td>
+                <% else %>
+                  <td class="col-4"><%=r.book_number%></td>
+                <% end %>
+                <% if @sort_order=="title ASC" or @sort_order=="title DESC" %>
+                  <td class="col-2 batch_order_select"><%=r.title%></td>
+                <% else %>
+                  <td class="col-2"><%=r.title%></td>
+                <% end %>  
+                <% if @sort_order=="first_name ASC" or @sort_order=="first_name DESC" %>
+                  <% if r.student? && r.is_deleted? %>
+                    <td class="col-2 batch_order_select"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'archived_student',:action=>'profile' ,:id=>r.archived_student_id}%></td>
+                  <% elsif r.student? %>
+                    <td class="col-2 batch_order_select"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'student',:action=>'profile' ,:id=>r.student_id}%></td>
+                  <% else %>
+                    <td class="col-2 batch_order_select"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'employee',:action=>'profile' ,:id=>r.employee_id}%></td>
+                  <% end %>
+                <% else %>
+                  <% if r.student? && r.is_deleted? %>
+                    <td class="col-2"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'archived_student',:action=>'profile' ,:id=>r.archived_student_id}%></td>
+                  <% elsif r.student? %>
+                    <td class="col-2"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'student',:action=>'profile' ,:id=>r.student_id}%></td>
+                  <% else %>
+                    <td class="col-2"><%=link_to "#{r.first_name} #{r.last_name}" ,{:controller=>'employee',:action=>'profile' ,:id=>r.employee_id}%></td>
+                  <% end %>
+                <% end %>
+                <% if r.student? && r.is_deleted? %>
+                  <td class="col-2"><%=link_to " #{r.username}" ,{:controller=>'archived_student',:action=>'profile' ,:id=>r.archived_student_id}%></td>
+                <% elsif r.student? %>
+                  <td class="col-2"><%=link_to " #{r.admission_no}" ,{:controller=>'student',:action=>'profile' ,:id=>r.student_id}%></td>
+                <% else %>
+                  <td class="col-2"><%=link_to "#{r.employee_number}" ,{:controller=>'employee',:action=>'profile' ,:id=>r.employee_id}%></td>
+                <% end %>
+                <% if r.student? %>
+                  <td class="col-2"><%= r.course_code %> - <%= r.batch_name %></td>
+                <% else %>
+                  <td class="col-2"> <%= r.employee_department_name %></td>
+                <% end %>
+                <% if @sort_order=="status ASC" or @sort_order=="status DESC" %>
+                  <td class="col-4 batch_order_select"><% case r.book_status when 'Lost'%><%= "#{t('lost')}" %> <% when 'Binding' %> <%= "#{t('binding')}" %> <% else %><%= t("#{r.status.downcase}") %><% end %></td>
+                <% else %>
+                  <td class="col-4"><% case r.book_status when 'Lost'%><%= "#{t('lost')}" %> <% when 'Binding' %> <%= "#{t('binding')}" %> <% else %><%= t("#{r.status.downcase}") %><% end %></td>
+                <% end %>
+                <% if @sort_order=="issue_date ASC" or @sort_order=="issue_date DESC" %>
+                  <td class="col-4 width-date batch_order_select"><%= format_date(r.issue_date) %></td>
+                <% else %>
+                  <td class="col-4 width-date"><%=format_date(r.issue_date) %></td>
+                <% end %>
+                <% if @sort_order=="due_date ASC" or @sort_order=="due_date DESC" %>
+                  <td class="col-4 width-date batch_order_select"><%= format_date(r.due_date) %></td>
+                <% else %>
+                  <td class="col-4 width-date"><%=format_date(r.due_date) %></td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+      <% unless @log.per_page.to_i > @log.total_entries.to_i %>
+        <div class="pagination_list">
+            <div class="pagination_text">
+                <%= "#{t('showing')} #{@i+1-(j-1)}-#{@i+1} #{t('of')} #{@log.total_entries}" %>
+            </div>
+            <%= will_paginate @log,:renderer => 'RemoteLinkRenderer' ,:page_links=>false ,:params=>{:sort_order=>@sort_order,:book_log=>params[:book_log]}%>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="flash-msg"> <%= t('no_record_found') %></p>
+    <% end %>
+</div>

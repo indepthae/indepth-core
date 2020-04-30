@@ -1,0 +1,29 @@
+<% if f.object._destroy and f.object._destroy == true %>
+  <div class="fields label-field-pair" style ="display:none;" />
+<% else %>
+  <div class="fields label-field-pair">
+<% end %>
+  <%= link_to_remove_fields "", f %>
+  <div class="label-field-pair">
+    <div class="label-container"><%= f.label :field_name, "#{t('field_name')}" %></div>
+    <div class="input-container">  <%= f.text_field :field_name, :size => 50 %></div>
+  </div>
+  <div class="label-field-pair">
+    <div class="label-container"><%= f.label :is_mandatory, t('is_mandatory') %></div>
+    <div class="input-container">  <%= f.check_box :is_mandatory %></div>
+  </div>
+  <div class="label-field-pair">
+    <div class="label-container"> <%= f.label :field_type,"#{t('input_method')}" %></div>
+    <div class="text-input-bg"><%= f.select :field_type, [[t('textbox'),"text"],[t('selectbox'),"belongs_to"],[t('checkbox'),"has_many"]] ,{},:class=>"input-type-select"%>
+    </div>
+  </div>
+  <div class="custom" style="display: none" >
+    <% f.fields_for :applicant_addl_field_values do |builder| %>
+      <%= render "applicant_addl_field_value_fields" ,:f=>builder%>
+    <% end %>
+    <div>
+      <%= link_to_add_fields t('add_vlues'), f, :applicant_addl_field_values %>
+    </div>
+  </div>
+  <hr/>
+</div>

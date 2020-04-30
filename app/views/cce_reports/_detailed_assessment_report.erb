@@ -1,0 +1,145 @@
+<div class="form_container">
+    <%  unless  @students.count > 0 and @report_data.present?%>
+      <div id="hider">
+          <p class="flash-msg">No reports found for the search</p>
+      </div>
+    <% else %>
+      <div class="formula_desc">
+          <div id="fa_criteria_calc">FA Criteria Calculation : <span>Uses <%=@fa_group.di_formula ==1 ? "Average" : "Sum"%> of descriptive indicators</span></div>
+          <div id="fa_group_calc">FA Group Calculation : <span><%=@fa_group.criteria_formula.present? ? @fa_group.criteria_formula : "Average"%></span></div>
+      </div>
+      <table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+          <tr>
+              <td id="firstTd"></td>
+              <td rowspan="2">
+                  <div id="divHeader" style="">
+                      <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                          <tr id="main_heading">
+                              <%j=0%>
+                              <% @fa_criterias.each_with_index do |fa,i| %>
+                                <% indicators=fa.descriptive_indicators %>
+                                <% if indicators.present? %>   
+                                  <td colspan="<%=indicators.count + 1%>">
+                                      <div class="tableHeader th_<%=i%>"><%=fa.fa_name%></div>
+                                      <div class="tableHeaderHelp"><span>(Maximum Marks = <%=fa.max_marks%>)</span></div>
+                                  </td>
+                                <%end%>
+                                <%j = i+1%>
+                              <%end%>
+                              <td class="empty_td">
+                                  <div class="tableHeader th_<%=j%>"></div>
+                              </td>
+                              <td class="empty_td">
+                                  <div class="tableHeader th_<%=j+1%>"></div>
+                              </td>
+                              <td class="empty_td">
+                                  <div class="tableHeader th_<%=j+2%>"></div>
+                              </td>
+                          </tr>
+                          <tr id="sub_header">
+                              <% j=0 %>
+                              <% @fa_criterias.each_with_index do |fa,i|  %>
+                                <% i = i + 1 %>
+                                <% indicators=fa.descriptive_indicators %>
+                                <% if indicators.present? %>
+                                  <%indicators.each do |indicator|%>
+                                    <td>
+                                        <div class="tableSubHeader tsh_<%=i%>"><%=truncate(indicator.name,:length => 80,:ommision => '...')%><%#=indicator.name%></div>
+                                    </td>
+                                  <%end%>
+                                  <td>
+                                      <div class="tableSubHeader tsh_<%=i%>">Total</div>
+                                  </td>
+                                  <%j=i+1%>
+                                <%end%>
+                              <%end%>
+                              <td>
+                                  <div class="tableSubHeader tsh_<%=j%>">FA Total</div>
+                              </td>
+                              <td>
+                                  <div class="tableSubHeader tsh_<%=j+1%>">Percentage</div>
+                              </td>
+                              <td>
+                                  <div class="tableSubHeader tsh_<%=j+2%>">Grade</div>
+                              </td>
+                          </tr>
+
+                      </table>
+                  </div>
+              </td>
+          </tr>
+          <tr>
+              <td id="firstSubTd">Student
+              </td>
+          </tr>
+          <tr>
+              <td valign="top">
+                  <div id="firstcol">
+                      <table width="250px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                          <%@students.each do |student|%>
+                            <tr class="<%=cycle('odd', 'even')%>">
+                                <td class="tableFirstCol" id="st_<%=student.id%>"><div class="student_names"><%=student.name_with_suffix%><%#=truncate(student.full_name+" " + "<span>(#{student.admission_no})</span>",:length => 60,:ommision => '...')%></div></td>
+                            </tr>
+                          <%end%>
+
+                      </table>
+                  </div>
+              </td>
+              <%reset_cycle%>
+              <td valign="top">
+                  <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                      <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                          <%@students.each_with_index do |student,i|%>
+                            <tr class="<%=cycle('odd', 'even')%> st_<%=student.id%>" id=<%= i ==0 ? "firstTr" : "" %>>
+                                <%fa_total=0%>
+                                <% @fa_criterias.each do |fa| %>
+                                  <% indicators=fa.descriptive_indicators %>
+                                  <% if indicators.present? %> 
+                                    <% sum = 0 %>
+                                    <%indicators.each do |di|%>
+                                      <td>
+                                          <div class="scores"><%=  @scores[student.id][di.id].present? ? @scores[student.id][di.id].first.grade_points : "-"%></div>
+                                          <% sum = sum +  @scores[student.id][di.id].first.grade_points.to_f if @scores[student.id][di.id].present? %>
+                                      </td>
+                                    <%end%>
+                                    <%fa_total=fa_total+sum%>
+                                    <td>
+                                        <div class="scores"><%= @report_data['criteria'][student.id].present? ? @report_data['criteria'][student.id]["criteria_total"][fa.id] : "-" %></div>
+                                    </td>
+                                  <%end%>
+                                <%end%>
+                                <td>
+                                    <div class="scores"><%=@report_data['total'][student.id].present? ? @report_data['total'][student.id]['obtained_mark'] : "-"%></div>
+                                </td>
+                                <td>
+                                    <div class="scores"><%=@report_data['total'][student.id].present? ? @report_data['total'][student.id]['converted_mark'] : "-"%></div>
+                                </td>
+                                <td>
+                                    <div class="scores"><%=@report_data['total'][student.id].present? ? @report_data['total'][student.id]['grade'] : "-"%></div>
+                                </td>
+                            </tr>
+                          <%end%>
+                      </table>
+                  </div>
+              </td>
+          </tr>
+      </table>
+    <%end%>
+    <%  if @students.count > 0 and @report_data.present?%>
+      <div class="button">
+          <div class="pdf-button">
+              <%= link_to "► CSV Export", {:controller => "cce_reports", :action => "generated_detailed_fa_report_csv",:batch_id=>params[:assessment][:batch_id],:student_category_id=>params[:assessment][:student_category_id],:subject_id=>params[:assessment][:subject_id], :assessment_group=>params[:assessment][:assessment_group],:gender=>params[:assessment][:gender],:exam_group_id=>params[:assessment][:exam_group_id]},:style=>"color:#fff !important;",:target => '_blank' %>
+          </div>
+      </div>
+    <% end %>
+</div>
+<div class="overlay">
+    <div id="loading_big"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader1") %>
+        <span><%= "#{t('loading')}.." %></span>
+    </div>
+</div>
+<script type="text/javascript">
+  j(document).ready(function () {
+      fnAdjustTable();
+  });
+</script>

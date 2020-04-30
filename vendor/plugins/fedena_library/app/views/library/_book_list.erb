@@ -1,0 +1,25 @@
+<% if @books.nil? or @books.empty?%>
+  <p class="flash-msg"> <%= "#{t('try_again')}"%></p>
+<% else %>
+  <table  id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= "#{t('book_number')}"%></td>
+      <td><%= "#{t('book_title')}"%></td>
+      <td><%= "#{t('author')}"%></td>
+
+      <td><%= "#{t('status')}"%></td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @books.each do |b| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-2"><%= b.book_number %></td>
+        <td class="col-2"><%= link_to b.title, b%></td>
+        <td class="col-2"><%= b.author %></td>
+
+        <td class="col-2"><%= t("#{b.status.downcase}") %></td>
+      </tr>
+      <div id="availability-<%= b.id  %>"></div>
+    <% end  %>
+  </table>
+  <%= will_paginate @books, :renderer => 'RemoteLinkRenderer',  :params => {:controller=>"library",:action => "search_result", :search=>params[:search]} %>
+<% end %>

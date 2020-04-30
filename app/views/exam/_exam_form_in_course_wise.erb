@@ -1,0 +1,44 @@
+<% unless params[:exam_group].blank? %>
+        <% if params[:exam_group][:exam_type] == 'Marks' or params[:exam_group][:exam_type] == 'MarksAndGrades' %>
+          <%= render :partial=>'exam/exam_marks_form' %>
+        <% else %>
+          <%= render :partial=>'exam/exam_grade_form' %>
+        <% end %>
+      <% else %>
+        <%= error_messages_for :exam_group %>
+          <div class="label-field-pair">
+            <label for="exam_name"><%= t('exam_name') %></label>
+            <% if params[:ename].nil?  %>
+              <% @ename = "" %>
+            <% else %>
+              <% @ename = params[:ename] %>
+            <% end  %>
+            <div class="text-input-bg"><%= form.text_field :name, :value=>@ename%></div>
+          </div>
+          <% if @course.gpa_enabled? or @course.cwa_enabled? %>
+            <div class="label-field-pair">
+              <label for="exam_type"><%= t('exam_type') %></label>
+              <div class="text-input-bg"><%= select :exam_option,:exam_type,[[t('marks_and_grades'),"MarksAndGrades"]] %></div>
+            </div>
+          <% elsif @course.cce_enabled? %>
+            <div class="label-field-pair">
+              <label for="cce_exam_category_id"><%= t('cce_exam_category') %></label>
+              <div class="text-input-bg"><%= select :exam_option,:cce_exam_category_id,@cce_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>t("select") %></div>
+            </div>
+            <%= hidden_field :exam_option,:exam_type, :value=>"MarksAndGrades"  %>
+          <% elsif @course.icse_enabled? %>
+            <div class="label-field-pair">
+              <label for="cce_exam_category_id">ICSE Exam Category</label>
+              <div class="text-input-bg"><%= select :exam_option,:icse_exam_category_id,@icse_exam_categories.map{|ec| [ec.name,ec.id]},:prompt=>"Select Exam Category" %></div>
+            </div>
+            <%= hidden_field :exam_option,:exam_type, :value=>"MarksAndGrades"  %>
+          <% else %>
+            <div class="label-field-pair">
+              <label for="exam_type"><%= t('exam_type') %></label>
+              <div class="text-input-bg"><%= select :exam_option,:exam_type,[[t('marks'),"Marks"],[t('grades'), "Grades"],[t('marks_and_grades'),"MarksAndGrades"]] %></div>
+            </div>
+          <% end %>
+
+          <%  #  form.submit("Save") %>
+        <%end%>
+ <% end %>

@@ -1,0 +1,32 @@
+<div id="deductions_header"><%= t('deductions')%></div>
+<div id="deductions_desc"><%= t('deductions_decription') %> </div>
+<div id="deductions_list">
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class="category_name"><%= t('category_name') %></td>
+      <td class="category_code"><%= t('category_code') %></td>
+      <td class="value"><%= t('value') %></td>
+      <td class="actions"></td>
+    </tr>
+    <% if @deductions.present? %>
+      <% @deductions.each do |deduction|  %>
+        <tr id="deduction-<%=deduction.id%>">
+          <td><%= link_to deduction.name,payroll_category_path(deduction) %></td>
+          <td><%= deduction.code %></td>
+          <td><div class="formula-text"><%= deduction.hr_formula.try(:formula_html_display) %></div></td>
+          <td class="actions">
+            <%= link_to t('view'),payroll_category_path(deduction) %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="tr-even" >
+        <td colspan="4"><%= t('add_a_payroll_category') %></td>
+      </tr>
+    <% end %>
+  </table>
+  <% if @deductions.present? %>
+    <%= pagination_status(@deductions) %>
+    <%= will_paginate @deductions, :renderer => 'RemoteLinkRenderer', :params => {:is_deductions => true}%>
+  <% end %>
+</div>

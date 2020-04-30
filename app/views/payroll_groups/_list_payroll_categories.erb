@@ -1,0 +1,267 @@
+<h3><%= t('add_payroll_categories') %></h3>
+
+<table>
+  <tr class="tr-head">
+    <td class="category_name"><%= t('payroll_category') %></td>
+    <td class="category_code"><%= t('code') %></td>
+    <td class="category_val"><%= t('value') %></td>
+    <td class="button"></td>
+  </tr>
+
+  <tr class="sub_heading bg_dark_grey">
+    <td colspan="5"><%= t('earnings') %></td>
+  </tr>
+
+  <tbody class="list_earning">
+    <% if @earnings.present? %>
+      <% @earnings.each do |earning| %>
+        <tr class="list" id="<%= earning.id %>" code ="<%= earning.code %>" dependant_cats ="<%= earning.dependant_categories.present? ? earning.dependant_categories.join(",") : "" %>">
+          <td class="category_name"><%= earning.name %></td>
+          <td class="category_code"><%= earning.code %></td>
+          <td class="category_val"><%= earning.hr_formula.try(:formula_html_display) %></td>
+          <td class="button" id="add" onclick="addPayrollCategory(this);"><%= t('add') %></td>
+        </tr>
+      <% end %>
+    <%end%>
+    <tr id="list_earning_empty_msg" style="display:none;"><td colspan="5" class="empty_msg"><%= t('you_have_added_all_the_payroll_categories') %></td></tr>
+  </tbody>
+
+  <tr class="sub_heading bg_dark_grey">
+    <td colspan="5"><%= t('deductions') %></td>
+  </tr>
+
+  <tbody class="list_deduction">
+    <% if @deductions.present? %>
+      <% @deductions.each do |deduction| %>
+        <tr class="list" id="<%= deduction.id %>" code ="<%= deduction.code %>" dependant_cats ="<%= deduction.dependant_categories.present? ? deduction.dependant_categories.join(",") : "" %>">
+          <td class="category_name"><%= deduction.name %></td>
+          <td class="category_code"><%= deduction.code %></td>
+          <td class="category_val"><%= deduction.hr_formula.try(:formula_html_display) %></td>
+          <td class="button" id="add" onclick="addPayrollCategory(this);"><%= t('add') %></td>
+        </tr>
+      <% end %>
+    <% end %>
+    <tr id="list_deduction_empty_msg" style="display:none;"><td colspan="5" class="empty_msg"><%= t('you_have_added_all_the_payroll_categories') %></td></tr>
+  </tbody>
+
+</table>
+
+<script type="text/javascript">
+
+
+  addPayrollCategory = function(link){
+    added_categories = [];
+    addCategory(link);
+  }
+  
+  addCategory = function(link){
+    
+    j("#dependency_error_msg").text("");
+    parent_row = j(link).parents('tr');
+    parent_clone = parent_row.clone();
+
+    category_id = j(parent_row).attr('id')
+    code = j(parent_row).attr('code')
+    dependant_cats = j(parent_row).attr('dependant_cats')
+    removeDependancyError(code);
+    current_class_name = '.' + parent_row.closest('tbody').attr("class");
+    new_class_name = current_class_name.replace("list", "selected");
+    new_class_name = new_class_name.replace("ui-sortable", "");
+    attr_id = "0";
+    last_sort_order = 0;
+
+    selected_cat_count = j('tr.category:visible','.selected_cat_list').length;
+    all_category_count = j('.category_id','.selected_cat_list').length;
+    
+    if (selected_cat_count > 0) last_sort_order = selected_cat_count + 1;
+    if (all_category_count > 0) attr_id = all_category_count;
+
+    // create cat row
+
+    j(parent_clone).removeClass().addClass('category');
+
+    j(parent_clone).attr({id: last_sort_order,cat_id: category_id,code: code, dependant_cats: dependant_cats });
+
+    j(parent_clone).prepend("<td class='index sort_opt'><div class='sort_opt_icon'></div></td>");
+
+    remove_link = j(parent_clone).children('#add').html("<%= t('remove') %>").removeAttr("onclick").attr({
+      href: "#",
+      id: "remove",
+      onclick: "removeCategory(this); return false;"
+    });
+
+
+    destroy_input_id = 'payroll_group_payroll_groups_payroll_categories_attributes_' + attr_id + '__destroy'
+    destroy_input_name = 'payroll_group[payroll_groups_payroll_categories_attributes][' + attr_id +'][_destroy]'
+    
+    j('<input>').attr({
+      id: destroy_input_id,
+      name: destroy_input_name,
+      type: 'hidden'
+    }).appendTo(remove_link)
+
+    form_id = 'payroll_group_payroll_groups_payroll_categories_attributes_' + attr_id + '_sort_order'
+    form_name = 'payroll_group[payroll_groups_payroll_categories_attributes][' + attr_id +'][sort_order]'
+    j('<input>').attr({
+      type: 'hidden',
+      id: form_id,
+      name: form_name,
+      value: j(parent_clone).attr("id"),
+      'class': 'sort_order',
+      id: 'sort_order'
+    }).appendTo(parent_clone);
+
+    form_id = 'payroll_group_payroll_groups_payroll_categories_attributes_' + attr_id + '_payroll_category_id'
+    form_name = 'payroll_group[payroll_groups_payroll_categories_attributes][' + attr_id +'][payroll_category_id]'
+    j('<input>').attr({
+      type: 'hidden',
+      id: form_id,
+      name: form_name,
+      value: category_id,
+      'class': 'category_id'
+    }).appendTo(parent_clone);
+
+    
+    j('.selected_earning, .selected_deduction').show();
+    j(parent_clone).appendTo(new_class_name);
+    j(parent_row).hide();
+
+
+    
+    add_dependant_categories(parent_row);
+    removeDependancyError(code);
+    displayEmptyMsgs();
+    update_formula_help();
+    soratble();
+
+
+    if (added_categories.uniq().length > 0){
+      dependency_msg = "Dependent categories " + added_categories.uniq().join(",") + " has been added";
+      j("#dependency_error_msg").addClass('dependency_error').text(dependency_msg).show();
+    }
+  }
+
+  add_dependant_categories = function(parent_row){
+    dependant_cats = parent_row.attr("dependant_cats");
+    dependant_list = [];
+    dependant_cats = parent_row.attr("dependant_cats");
+    if (dependant_cats != undefined) dependant_list = dependant_cats.split(",");
+
+    var existing_list = j(".selected_cat_list tr.category:visible").children("td.category_code").map(function(i, el) {
+      return j(el).text();
+    }).get();
+
+    selected_categories = j(".selected_categories").find(".selected_earning tr.category:visible, .selected_deduction tr.category:visible");
+    categories = j(".payroll_categories").find(".list_earning tr:visible, .list_deduction tr:visible")
+    j.each(dependant_list,function(index,val){
+      if (!existing_list.indexOf(val) > -1 && (categories.filter("tr[code='" + val  + "']").length > 0) && (selected_categories.filter("tr[code='" + val + "']").length == 0)){
+        v = "tr[code='" + val +  "']";
+        link = j(v).children("td.button");
+        added_categories.push(j(j(v).children('td.category_name')[0]).text())
+        addCategory(link);
+        add_dependant_categories(link);
+      }
+      else{
+        cat_code = "tr[code='"+ val + "']"
+        if (selected_categories.filter(cat_code).length == 0 && (categories.filter(cat_code).length > 0)){
+          added_categories = [];
+          add_dependant_categories(j(cat_code));
+        }
+      }
+    })
+  }
+
+  update_formula_help = function(){
+    j('.formula_help #earnings-help').html('');
+    j('.formula_help #deductions-help').html('');
+    j('.selected_earning .category:visible').each(function(){
+      row = j('<div></div>',{'class' : "row"});
+      name_div = j('<div></div>',{'class' : "name", 'text': j(this).children('.category_name').clone().children().remove().end().text()});
+      code = j('<div></div>',{'class' : "code", 'text': j(this).children('.category_code').text()});
+      row.append(name_div.add(code));
+      j('.formula_help #earnings-help').append(row);
+    });
+    j('.selected_deduction .category:visible').each(function(){
+      row = j('<div></div>',{'class' : "row"});
+      name_div = j('<div></div>',{'class' : "name", 'text': j(this).children('.category_name').clone().children().remove().end().text()});
+      code = j('<div></div>',{'class' : "code", 'text': j(this).children('.category_code').text()});
+      row.append(name_div.add(code));
+      j('.formula_help #deductions-help').append(row);
+    });
+    selected_categories = [];
+    j('.selected_categories .category:visible .category_code').each(function(){
+      selected_categories.push(j(this).text());
+    });
+    j('.cat_list_value').val(selected_categories.join(","));
+  }
+
+  hideExistingCategory = function(){
+    existing_pg_categories = [];
+    j("tr.category").each(function (i,v) { existing_pg_categories.push(j(v).attr("cat_id"))});
+    j.each(j("tr.list"),function(i,v){
+      c = j(v).attr("id");
+      if (existing_pg_categories.indexOf(c) > -1)
+        j(".payroll_categories tr[id='" + c +  "']").hide();
+
+    })
+  }
+
+
+  
+
+
+  removeDependancyError = function(code){
+    retainDependancyError();
+  }
+
+  calculateExistingDependency = function(){
+    existing_cat_dependants = []
+    if (j("tr.category:visible").length > 0 ){
+      existing_cat_dependants = []
+      j("tr.category:visible").each(function (i,v) {
+        j(v).attr("dependant_cats").split(",").each(function(x,y) {
+          existing_cat_dependants.push(x)
+          if(j(v).attr("has_gross") == "true") existing_cat_dependants.push("GROSS")
+        })
+
+      });
+    }
+  }
+  retainDependancyError = function(){
+    if (j("tr.category:visible").length > 0 ){
+      existing_pg_categories = [];
+      j("tr.category:visible").each(function (i,v) { existing_pg_categories.push(j(v).attr("code"))});
+      j("tr.category:visible").each(function (i,v) {
+        error_arr = [];
+        j(v).attr("dependant_cats").split(",").filter(Boolean).each(function(x,y) {
+          console.log(x);
+          console.log(existing_pg_categories.indexOf(x) > -1);
+          if(existing_pg_categories.indexOf(x) > -1){
+            error_arr.push(true)
+            //  j(v).children(".category_name").removeClass("dependency_error");
+          }
+          else{
+            error_arr.push(false)
+            // j(v).children(".category_name").addClass("dependency_error");
+
+          }
+
+        })
+
+        if(error_arr.indexOf(false) > -1)
+        {  
+          j(v).children(".category_name").addClass("dependency_error");
+        }
+        else{
+          j(v).children(".category_name").removeClass("dependency_error");
+          j(v).children(".category_name").children().remove();
+        }
+      });
+    }
+  }
+
+ 
+     
+ 
+  
+</script>

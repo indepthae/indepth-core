@@ -1,0 +1,92 @@
+<div id="assessment_form">
+    <div class="assessment_form_head">
+        <%= "#{t('select_grade')} #{t('for_text')} #{t('students_text')}" %>
+    </div>
+    <div id="assessment_table">
+        <% form_for @activity_assessment, :url => activity_scores_assessments_path(:batch_id=>@batch.id,:subject_id=>@subject.id,:assessment_group_id=>@assessment_group.id, :assessment_id => @activity_assessment.id) do |af| %>
+          <% roll_num_enabled = Configuration.enabled_roll_number? %>
+          <div class="outer">
+              <div class="inner">
+                  <table id="assessments">
+                      <tr class="tr-head">
+                          <td class="sl_no"><%= t('no_text') %></td>
+                          <td class="fixed-header student_name"><%= t('single_student') %></td>
+                          <% if roll_num_enabled %>
+                              <td class="roll"><%= t('roll_nos') %></td>
+                          <% else %>
+                              <td class="roll"><%= t('admission_no') %></td>
+                          <% end %>
+                          <td class="roll"><%= t('absent') %></td>
+                          <td class="attribs"><%= t('grade') %></td>
+                          <td class="final_score"><%= t('result') %></td>
+                      </tr>
+                      <%= session_fingerprint_field %> 
+                      <% i=0 %>
+                      <% af.fields_for :assessment_marks, @students_scores do |builder| %>
+                        <% i+=1 %>
+                        <tr>
+                            <td class="sl_no"><%= i %></td>
+                            <td class="student_name"><div class="student_name_div" title="<%= builder.object.student_name %> "><%= truncate(builder.object.student_name,:length=>30) %></div></td>
+                            <% if roll_num_enabled %>
+                                <td class="roll"><%= builder.object.student_roll_no.present? ? builder.object.student_roll_no : '-' %></td>
+                            <% else %>
+                                <td class="roll"><%= builder.object.student_admission_no.present? ? builder.object.student_admission_no : '-' %></td>
+                            <% end %>
+                            <td class="roll">
+                                <%= builder.check_box :is_absent, :class=>'mark_absent', :onclick => "check_absent(this)", :disabled=>@mark_entry_locked %>
+                            </td>
+                            <td class="attribs">
+                                <%= builder.select :grade_id, options_for_select([[t('select_grade'), ""]]+@grades.map{|grade| [grade.name,grade.id]},builder.object.grade_id), {}, {:class => 'select-list exam_grade',:student_id=>builder.object.student_id, :onchange=>'set_grade(this);', :disabled => builder.object.is_absent || @mark_entry_locked} %>
+                                <%= builder.hidden_field :grade, {:id=>"grade_#{builder.object.student_id}"} %>
+                                <%= builder.hidden_field :student_id, {:id=>"grade_#{builder.object.student_id}"} %>
+                            </td>
+                            <td class="final_score">
+                                <%= builder.object.grade_id.present? ? (builder.object.grade_details.pass_criteria ? "<span class='success'>#{t('pass_text')}</span>" : "<span class='danger'>#{t('fail_text')}</span>") : "<span class='none'>-</span>" %>
+                            </td>
+                        </tr>
+                      <% end %>
+
+                  </table>
+              </div>
+          </div>
+          <%= submit_tag t('submit_marks'), :class => 'submit-button',:name=> 'save_and_submit_marks'%>
+          <% unless @mark_entry_locked %>  
+            <%= submit_tag t('save_marks') , :class => 'submit-button', :name=> 'save_marks' %>
+          <% end %>
+          <%= link_to "#{t('cancel')}", :back, :class => 'submit-button cancel-button' %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  var pass_grades = JSON.parse('<%= (@grades||[]).map{|g| g.name if g.pass_criteria}.compact.to_json.gsub("'", %q(\\\')) %>');
+
+  check_result = function (elm) {
+      selected = j(elm).find('option:selected').text();
+      if (j.inArray(selected, pass_grades) !== -1)
+          j(elm).closest('tr').find('.final_score').html('<span class="success">' + '<%= t('pass_text') %>' + '</span>');
+      else
+          j(elm).closest('tr').find('.final_score').html('<span class="danger">' + '<%= t('fail_text') %>' + '</span>');
+  }
+
+  set_grade = function (el) {
+      if (el.value !== "") {
+          el_id = j(el).attr('id');
+          stud_id = j(el).attr('student_id');
+          text = j('#' + el_id + ' option:selected').text();
+          check_result(el);
+          j(el).next().val(text);
+      } else {
+          j(el).closest('tr').find('.final_score').html("<span class='none'>-</span>");
+      }
+  }
+
+  check_absent = function (elm) {
+      if (j(elm).is(':checked')) {
+          j(elm).closest('tr').find('.exam_grade').attr('disabled', true);
+          j(elm).closest('tr').find('.final_score span').hide();
+      } else {
+          j(elm).closest('tr').find('.exam_grade').attr('disabled', false);
+          j(elm).closest('tr').find('.final_score span').show();
+      }
+  }
+</script>

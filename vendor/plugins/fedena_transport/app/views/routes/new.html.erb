@@ -1,0 +1,14 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('transport_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('add_new_route') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%= render :partial => 'route_form' %>
+</div>

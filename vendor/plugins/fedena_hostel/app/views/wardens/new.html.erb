@@ -1,0 +1,51 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('assign_warden') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('assign_warden_to_hostel') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :wardens_new,  @hostel%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="vehicle_form">
+    <% form_for @warden, :url => {:action => :create} do |h| %>
+      <%= error_messages_for :warden %>
+
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= t('hostels.hostel_name') %></label>
+        <div class="text-input-bg"><%= h.label :hostel_name, @hostel.name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= t('employee_department') %><span class="necessary-field">*</span> </label>
+        <div class="text-input-bg">
+
+          <%= select :employee, :department_id, @departments.map { |s| [s.name, s.id] },
+            {:prompt => "#{t('select_department')}"},
+            {:onChange => "#{remote_function(:url => {:action => "update_employees"},
+            :with => "'department_id='+value",:before => "Element.show('loader')",:success => "Element.hide('loader')")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= t('warden') %><span class="necessary-field">*</span> </label>
+        <div class="text-input-bg">
+          <div id="employee_list">
+            <%= render :partial=>'employee_list' %>
+          </div>
+        </div>
+      </div>
+
+      <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+    <% end %>
+
+  </div>
+</div>

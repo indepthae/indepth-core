@@ -1,0 +1,67 @@
+<% remote_form_for @multi_transaction_fine, :url => {:controller => 'finance_extensions', 
+  :action => "add_pay_all_manual_fine" }, 
+  :html => {:method => :post, :id => @student.id}, :before=>"$('submit_button').disable()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |f| %>
+  <%= session_fingerprint_field %> 
+  <%= hidden_field_tag :student_id, @student.id %>
+  <%= hidden_field_tag :transaction_date, @transaction_date %>
+  <%= hidden_field_tag :batch_id, @current_batch.id %>
+  <%= hidden_field_tag :fee_type %>
+  <% if @temporary_manual_fines.present? %>
+    <% @temporary_manual_fines.each_pair do |fee_type, fee_data| %>
+      <% fee_data.each_pair do |fee_id, fi_amt| %>
+        <% if !fi_amt.is_a?(Hash) and fi_amt.to_f != 0 %>
+          <%= hidden_field_tag "manual_fines[#{fee_type}][#{fee_id}]", fi_amt %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div id="pay_all_manual_fine_form">      
+      <div class="label-field-pair">
+          <label for="collections"><%= "Collections" %></label>
+          <div class="text-input-bg">              
+              <% fee_options = @grouped_fees.map do |fee_type, fees|                 
+                ["#{fee_type.capitalize.gsub('_',' ')}", fees.map{|fee| [fee.collection_name, fee.id]}]
+                end %>
+              <%= f.select :fee_id, options_for_select([["#{t('select_fee_collection')}",nil]]) + 
+                grouped_options_for_select(fee_options) %>
+          </div>
+
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('fine') %></label>
+          <div class="text-input-bg">
+              <%= f.text_field :amount, :class => "precision_text" %>
+          </div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "Add", 
+        :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+
+      <div class="submit-button" onclick="remove_popup_box();">
+          <%= t('cancel') %>
+      </div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  reset_selected_fee();
+<% if params[:multi_transaction_fine].present? and @multi_transaction_fine.fee_type.present? and @multi_transaction_fine.fee_id.present? %>
+    selected_fee_type = '<%= @multi_transaction_fine.fee_type %>';
+    selected_fee_lbl = '<%= @multi_transaction_fine.fee_type.humanize %>';
+    selected_fee_id = <%= @multi_transaction_fine.fee_id %>;
+    set_collection();
+<% end %>
+  //function update_particular_list() {
+
+  //}
+
+</script>

@@ -1,0 +1,16 @@
+<td class="col-1">
+    <%= link_to document.attachment_name, document.attachment.url(:original, false) %>
+</td>
+<td class="col-2"><%= format_date(document.created_at,:format=>:short_date) %></td>
+<% if (permitted_to? :edit, :student_documents) || (permitted_to? :destroy, :student_documents) %> 
+  <td class="col-3">  
+      <% category ||= @category  %>
+      <% category_name = category.attachment_category_name %>
+      <% if permitted_to? :edit, :student_documents %>
+        <%= link_to_remote "#{t('edit_text')}", :url => {:action => "edit", :id => document.id, :category_id => (category.new_record? ? (category.registered ? 'registered' : 'nil') : category.id) }, :method => :get if permitted_to? :edit, :student_documents %>
+      <% end %>
+      <% if permitted_to? :destroy, :student_documents %>
+        <%= link_to_remote "#{t('delete_text')}", :url => student_document_path(document),:method => 'delete', :confirm => t('delete_confirm_msg',:name => "#{document.attachment_name}",:category_name => "#{category_name}") if permitted_to? :destroy, :student_documents%>
+      <% end %>
+  </td>
+<% end %>

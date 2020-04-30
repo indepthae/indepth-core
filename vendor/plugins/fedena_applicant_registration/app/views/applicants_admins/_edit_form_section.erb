@@ -1,0 +1,103 @@
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% if field_group.description.present? %>
+    <div class="desc-section"><%= field_group.description %></div>
+  <% end %>
+<% else %>
+
+  <% if a[:section_description].present? %>
+    <div class="desc-section">
+      <%= t("#{a[:section_description]}") %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each do|fld| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type]=="applicant_additional" %>
+        <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+        <% if addl_field.present? %>
+          <%= render :partial=>"applicants_admins/edit_applicant_addl_field", :locals=>{:addl_field=>addl_field,:fld=>fld,:guardian_ind=>guardian_ind,:f=>f,:c=>nil} %>
+        <% end %>
+      <% elsif fld[:field_type]=="student_additional" %>
+        <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+        <% if st_addl_field.present? %>
+          <%= render :partial=>"applicants_admins/edit_applicant_student_addl_field", :locals=>{:st_addl_field=>st_addl_field,:fld=>fld,:guardian_ind=>guardian_ind,:f=>f} %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% default_section = @default_fields[a[:section_name].to_sym] %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each do|fld| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type] == "default" %>
+        <% if default_section.present? %>
+          <% field_details = default_section[:fields][fld[:field_name].to_sym] %>
+          <% unless default_section[:m_name] == "applicants" %>
+            <%= render :partial=>"applicants_admins/edit_default_field",:locals=>{:field_details=>field_details,:fld=>fld,:build=>build,:m_name=>default_section[:m_name]} %>
+          <% else %>
+            <%= render :partial=>"applicants_admins/edit_default_field",:locals=>{:field_details=>field_details,:fld=>fld,:build=>f,:m_name=>default_section[:m_name]} %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% if fld[:field_type]=="applicant_additional" %>
+          <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if addl_field.present? %>
+            <%= render :partial=>"applicants_admins/edit_applicant_addl_field", :locals=>{:addl_field=>addl_field,:fld=>fld,:guardian_ind=>guardian_ind,:f=>f,:c=>build} %>
+          <% end %>
+        <% elsif fld[:field_type]=="student_additional" %>
+          <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+          <% if st_addl_field.present? and st_addl_field.student_additional_field.status==true %>
+            <%= render :partial=>"applicants_admins/edit_applicant_student_addl_field", :locals=>{:st_addl_field=>st_addl_field,:fld=>fld,:f=>f} %>
+          <% end %>
+        <% elsif fld[:field_type]=="applicant_attachment" %>
+          <% att_field = @addl_attachment_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if att_field.present? %>
+            <%= render :partial=>"applicants_admins/edit_applicant_attachment_field", :locals=>{:att_field=>att_field,:fld=>fld,:f=>f} %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+
+
+<%# if a[:applicant_addl_field_group_id].present? %>
+
+<%# else %>
+<%# default_section = @default_fields[a[:section_name].to_sym] %>
+<%# if default_section.present? %>
+<%# unless default_section[:m_name] == "applicants" %>
+<%# a[:fields].each do|fld| %>
+<%# if ["true",true,"default_true"].include?(fld[:show_field]) %>
+<%# if fld[:field_type] == "default" %>
+<%# field_details = default_section[:fields][fld[:field_name].to_sym] %>
+<%#= render :partial=>"default_field",:locals=>{:field_details=>field_details,:fld=>fld,:build=>build} %>
+<%# end %>
+<%# end %>
+<%# end %>
+
+<%# else %>
+
+<%# end %>
+<%# end %>
+<%# end %>
+
+<%# a[:fields].each do|fld| %>
+<%# if ["true",true,"default_true"].include?(fld[:show_field]) %>
+<%# if fld[:field_type] == "default" %>
+
+<%# field_details = default_section[:fields][fld[:field_name].to_sym] %>
+<%# if field_details %>
+
+<%# end %>
+<%# render :partial=>"default_field",:locals=>{:section_name=>a[:section_name],:fld=>fld} %>
+<%# elsif (fld[:field_type]=="applicant_additional" and @applicant_addl_fields.collect(&:id).include?(fld[:field_name].to_i)) %>
+
+<%# elsif (fld[:field_type]=="student_additional") %>
+
+<%# end %>
+<%# end %>
+<%# end %>

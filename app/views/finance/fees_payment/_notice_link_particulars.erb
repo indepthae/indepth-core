@@ -1,0 +1,7 @@
+<p class="flash-msg" style="display: inline-block;width: 100%;">
+  <%= t('link_particulars',
+        {:url => "#{link_to "#{t('link_particular')}",
+                            manage_masters_master_fees_path({:fee_type => 'core',
+                                                             :cat_id => @fee_collection.try(:fee_category_id) || @category_id || params[:category_id]}),
+                            :target => "_blank"}"}) %>
+</p>

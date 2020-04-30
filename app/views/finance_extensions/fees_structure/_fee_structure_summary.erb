@@ -1,0 +1,64 @@
+<tr class="row-a tr-head">
+    <td class="sl-col col-1"></td>
+    <td class="set_border_right col-1 bold_font" colspan="2"><span><%= t('summary') %></span></td>
+</tr>
+<% si = 0 %>
+<tr class="row-b">
+    <td class="sl-col col-1 normal_font"><%= si+= 1%></td>
+    <td class="set_border_right particular-col normal_font"><%= "#{t('total')}  #{t('fees_text')}" %></td>
+    <td class="set_border_right amount-col amount-cols normal_font align_right"> <%= precision_label(@total_payable) %></td>    
+</tr>
+<tr class="row-b">
+    <td class="sl-col col-1 normal_font"><%= si+= 1%></td>
+    <td class="set_border_right particular-col normal_font"><%= "#{t('total')} #{t('discount')}" %></td>
+    <td class="set_border_right amount-col amount-cols normal_font align_right"><%= precision_label(@total_discount) %></td>    
+</tr>
+<% if @financefee.tax_enabled %>
+  <tr class="row-b">
+      <td class="sl-col col-1 normal_font"><%= si+= 1%></td>
+      <td class="set_border_right particular-col normal_font"><%= "#{t('total')} #{t('tax_text')}" %></td>
+      <td class="set_border_right amount-col amount-cols normal_font align_right"> <%= precision_label(@total_tax) %></td>      
+  </tr>
+<% end %>
+
+<% if @total_fine != 0 %>  
+  <tr class="row-b">
+      <td class="sl-col col-1 normal_font"><%= si+= 1%></td>
+      <td class="set_border_right particular-col normal_font"><%= "#{t('total')} #{t('fine')}" %></td>
+      <td class="set_border_right amount-col amount-cols normal_font align_right"> <%= precision_label(@total_fine) %></td>            
+  </tr>
+<% end %>
+  
+<% total_fees = (@total_payable.to_f - @total_discount.to_f + total_fine) %>
+<% total_fees += @total_tax.to_f if @financefee.tax_enabled %>
+<tr class="row-b" cellpadding="1" cellspacing="1">
+    <td class="bold_font amount-col align_right" colspan="2"><%= t('total_amount_to_pay') %> </td>
+    <td class="set_border_right amount-col amount-cols bold_font total_fees align_right">
+        <%= @financefee.is_paid? ? precision_label(@financefee._paid_amount.to_f) : precision_label(total_fees) %>
+    </td>    
+</tr>
+<% balance=@financefee.balance.to_f+@fine.to_f %>
+<% unless @paid_fees.nil? %>
+  <% paid=0 %>
+  <% @paid_fees.each { |a| paid += a.amount.to_f } %>
+  <% total_fees -= paid %>  
+  <tr class="row-b" cellpadding="1" cellspacing="1">
+      <td class="bold_font particular-col align_right" colspan="2"><%= t('total_amount_paid') %></td>
+      <td class="set_border_right amount-col amount-cols bold_font payment_done align_right">
+          <%= precision_label(paid) %>
+      </td>      
+  </tr>
+<% end %>
+  
+<% if !@financefee.is_paid?  or !(precision_label(balance+@fine_amount.to_f).to_f <= 0) or @show_due_amount %>  
+  <tr class="row-b" cellpadding="1" cellspacing="1">
+      <td class="bold_font particular-col align_right" colspan="2">
+          <%= t('total_due_amount') %> 
+      </td>
+      <td class="set_border_right bold_font amount-col amount-cols align_right">
+          <% unless precision_label(balance+@fine_amount.to_f).to_f < 0 %>
+            <%= precision_label(balance+@fine_amount.to_f) %> 
+          <% end %>
+      </td>
+  </tr>
+<% end %>

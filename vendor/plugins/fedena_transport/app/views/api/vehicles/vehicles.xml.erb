@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.vehicle_details{
+  @vehicles.each do |vehicle|
+    @vehicle = vehicle
+    @xml.vehicle do
+      @xml.vehicle_number(@vehicle.vehicle_no)
+      @xml.main_route(@vehicle.main_route.try(:destination))
+      @xml.no_of_seats(@vehicle.no_of_seats)
+      @xml.status(@vehicle.status)
+      @xml.occupied_seats(@vehicle.transports.count)
+      @xml.available_seats(@vehicle.available_seats)
+    end
+  end
+}%>
+
+

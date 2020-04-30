@@ -1,0 +1,56 @@
+<div class="assessment_details_short">
+    <div class="exam_group_head">
+        <% type = @assessment_group.exam_type %>
+        <div class="clm">
+            <% if type.activity  %>
+                <div class="label"><%="#{t('activity')}"%></div>
+                <div class="value"><%=  @activity_assessment.assessment_activity_name %></div>
+            <% else %>
+                <div class="label"><%="#{t('subject_exam')}"%></div>
+                <div class="value"><%=@subject.name%></div>
+            <% end %>
+        </div>
+        <% if type.subject%>
+          <div class="clm">
+              <div class="label"><%=t('exam_date')%></div>
+              <div class="value"><%=  format_date(@assessment.start_date_time) %></div>
+          </div>
+          <div class="clm">
+            <div class="label"><%=t('max_mark')%></div>
+            <div class="value"><%=  @assessment.maximum_marks_text %></div>
+          </div>
+        <% end %>
+        <% if type.subject_attribute or type.subject_wise_attribute %>
+          <div class="clm">
+              <div class="label"><%=t('formulas')%></div>
+              <div class="value"><%= @formula.capitalize || '-' %></div>
+          </div>
+          <div class="clm">
+              <div class="label"><%=t('attribute_profile')%></div>
+              <div class="value"><%= @profile.try(:name) || '-' %></div>
+          </div>
+          <div class="clm">
+            <div class="label"><%=t('max_mark')%></div>
+            <div class="value"><%=  @assessment_group.maximum_marks_text %></div>
+          </div>
+        <% end %>
+        <% if type.activity %>
+          <div class="clm">
+              <div class="label"><%=t('activity_profile')%></div>
+              <div class="value"><%=  @activity_assessment.assessment_activity_profile_name || '-' %></div>
+          </div>
+        <% end %>
+        <% if @grades.present? %>
+            <div class="clm">
+                <div class="label"><%=t('grading_profile')%></div>
+                <div class="value"><%=  @grade_set.present? ? @grade_set.name : @assessment_group.grade_set.name%></div>
+            </div>
+        <% end %>
+        <% if type.subject %>
+          <div class="clm">
+              <div class="label"><%=t('mark_entry_last_date')%></div>
+              <div class="value"><%=@agb.mark_entry_last_date.present? ? format_date(@agb.mark_entry_last_date) : t('no_last_date')%></div>
+          </div>
+        <% end %>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+en-ch:
+  activerecord:
+    attributes:
+      applicant:
+        registration_course_id: "Registration %{cw_course}"
+
+      course_pin:
+        course_id: "%{cw_course_capital}"
+
+      pin_group:
+        course_ids: "%{cw_course_capital}"
+
+      registration_course:
+        course_id: "%{cw_course_capital}"
+
+    errors:
+      models:  
+        registration_course:
+          attributes:
+            base:
+              no_elective_subjects : "No elective %{cw_subject} in selected %{cw_course}"
+
+      messages:
+        batch_not_contain_the_subject_choosen : "%{cw_batch_capital} does not contain all the %{cw_subjects} the applicant has chosen"
+        batch_not_contain_the_applicant_choosen: "%{cw_batch_capital} does not contain all the %{cw_subjects} the applicant has chosen"
+        registration_course_is_in_use_and_cannot_be_deleted: "Registration %{cw_course} is in use and cannot be deleted"
+
+  applicants:
+    choose_normal_subjects: "Choose Normal %{cw_subjects_capital}"
+    course: "%{cw_course_capital}"
+    flash5: "This pin is not applicable for the %{cw_course} you applied"
+    no_course_avalible_for_reg: "No %{cw_course} available for registration"
+    select_course: "Select %{cw_course_capital}"
+    registration_course_not_found: "Couldn't find Registration %{cw_course_capital}"
+
+  applicants_admins:
+    admit_applicant_to_a_batch: "Admit applicant to a %{cw_batch}"
+    course: "%{cw_course_capital}"
+    course_s: "%{cw_courses_capital}"
+    manage_course: "Manage %{cw_courses_capital}"
+    no_applicants_for_course: "No applicants for this %{cw_course}"
+    no_courses_found: "No %{cw_courses} registered"
+    select_batch_to_allot: "Please select a %{cw_batch} to allot"
+    select_batch: "Select a %{cw_batch}"
+    inactivate_courses: "Inactivate %{cw_courses_capital}"
+    activate_courses: "Activate %{cw_courses_capital}"
+    activate_applicant_reg_for_courses: "Activate Applicant Registration for %{cw_courses_capital}"
+    inactivate_applicant_reg_for_courses: "Inactivate Applicant Registration for %{cw_courses_capital}"
+    inactivate_desc: "The following %{cw_courses} have applicant registration activated. You can inactivate them."
+    activate_desc: "The following %{cw_courses} have applicant registration inactivated. You can activate them."
+    courses_inactivated: "Applicant Registration for selected %{cw_courses} inactivated successfully."
+    courses_activated: "Applicant Registration for selected %{cw_courses} activated successfully."
+    add_course_desc: "By adding a %{cw_course} to applicant registration, now prospective students can apply to this %{cw_course}. You can evaluate each applicant, track and log the applicant's status using this plugin."
+    customize_desc: "Customize the application form based on your requirements. All the %{cw_courses} of this organisation will be having this form by default. If required, this form can be customized for each %{cw_course} too."
+    listing_all_applicants: "Listing all the applications of this %{cw_course}."
+    listing_applicants_with_status: "Listing all the applications of this %{cw_course} with status"
+
+  pin_groups:
+    course_ids: "%{cw_courses_capital}"
+    course_names: "%{cw_course_capital} names"
+
+  registration_courses:
+    add_course: "Add %{cw_course_capital}"
+    course: "%{cw_course_capital}"
+    course_name: "%{cw_course_capital} Name"
+    course_registration: "%{cw_course_capital} Registration"
+    course_s: "%{cw_courses_capital}"
+    create_successfully: "Registration %{cw_course} was successfully created"
+    deleted_successfully: "Registration %{cw_course} was successfully deleted"
+    enabled_courses: "Enabled %{cw_courses_capital}"
+    no_registration_courses: "No %{cw_courses} found"
+    set_subject_registration: "Set %{cw_subject} registration"
+    subject_based_fee_collection: "%{cw_subject_capital} based collection"
+    subject_based_registration: "%{cw_subject_capital} based registration"
+    update_successfully: "Registration %{cw_course} was successfully updated"
+    course_delete_confirm: "Are you sure you want to delete this registration %{cw_course}?"
+    update_successfully: "Registration %{cw_course} was successfully updated"
+    course_settings: "%{cw_course_capital} Settings"
+    active_desc: "Now this %{cw_course} will be able to accept applications from students."
+    inactive_desc: "Applicant Registration will be deactivated for this %{cw_course}. Still all the received applications will be accessible."
+    elective_desc: "Applicants can choose their electives when applying for a particular %{cw_course}. After evaluation, the applicant can be allotted to a %{cw_batch} with those active electives."
+    customize_desc: "Customize the application form for this %{cw_course} based on your requirements. All the changes made to this application form will be applicable for this %{cw_course} only."
+    restore_default_confirmation: "This will restore the application form for this %{cw_course} to form set for the institution. All modifications you made to the form of this %{cw_course} will be discarded. Are you sure you want to continue?"  
+  active_course_applications: "Active %{cw_courses_capital}"
+  inactive_course_applications: "Inactive %{cw_courses_capital}"
+  applicants_admin_desc_text: "Create and manage applications for new joinees of %{cw_courses} in your organisation. You can activate applicant registration for each %{cw_course} with customized forms and fields based on your requirements."
+  instruction_desc: "Any information and general guidelines that need to be given to the candidates before filling the application form should be put here. %{cw_course_capital} specific instructions can be given inside specific %{cw_courses}, and will be shown to the applicant, once a %{cw_course} is selected."
+  status_instructions: "There can be many levels that an application may go through, before it is allotted or discarded. Based on your institutions's requirements and process, you can add new status to track the application throughout its lifecycle. You will be able to filter applicants of each %{cw_course} by these filters."
+  elective_subjects_selection: "Elective %{cw_subjects_capital} Selection"
+  enable_elective_selection: "Enable Elective %{cw_subjects_capital} Selection"
+  elective_count: "Elective %{cw_subjects_capital} Count"
+  allotted_to_batch: "Alloted to %{cw_batch_capital}"
+  select_batch_to_admit: "Select a %{cw_batch} to admit the selected applicants"
+  select_batch_to_admit_applicant: "Select a %{cw_batch} to admit the applicant"
+  no_allocation_batch_selected: "No %{cw_batch} has been selected"
+  subject_fees: "%{cw_subject_capital} Fees"
+  elective_subject_fees: "Elective %{cw_subject_capital} Fees"
+  restrict_the_access: "Restrict the access to applicants with a PIN number for applying to this %{cw_course}"
+  enable_subject_based_fee: "Enable %{cw_subject_capital} Based Fee Collection"
+  enable_or_disable_subject_based: "Enable or disable %{cw_subject} based fee collection to collect fee"

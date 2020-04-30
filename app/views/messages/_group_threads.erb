@@ -1,0 +1,130 @@
+<div id="threads_container">
+    <div id="count_label">
+        <%= link_to "<div class='links'><span class='back-button'></span>#{t('back')}</div>", {:action=>'index'} %>
+        <div class="tab_header"><%=t('broadcast_message') %></div>
+    </div>
+    <div class="tabs_section">
+        <div class="tabs selected_tab"><%=link_to "#{t('responses',:count=>@responses.count)}",'#',:onClick => "update_group_thread('response',this); return false;"%></div>
+        <div class="tabs"><%=link_to "#{t('group_recipients',:count=>@recipients_count)}",'#',:onClick =>"update_group_thread('recipient',this); return false;"%></div>
+    </div>
+    <div id="thread_listing_main" class="group_listing">
+        <table id="thread_listing" width="100%" cellpadding="1" cellspacing="1">
+            <% if @responses.present? %>
+              <% @responses.each do |message_recipient| %>
+                <% recipient = message_recipient.recipient %>
+                <% entry = get_entry(recipient) %>
+                <% has_unread_messages = message_recipient.thread.has_unread_messages_from message_recipient.recipient_id %>
+                <% if entry %>
+                  <tr class="th_entry" data-id="<%=message_recipient.id%>" data-thread="<%=@thread.id%>" id="thread_<%=message_recipient.recipient_id%>">
+                      <td class="thread_entry">
+                          <div class="thread_entry">
+                              <div class="entry-thumbnail">
+                                  <% if !recipient.parent? %>
+                                    <%= image_tag entry.photo.url(:original, false) %>
+                                  <% else %>
+                                    <%= image_tag "single_user.png" %>
+                                  <% end %>
+                              </div>
+                              <div class="entry_detail">
+                                  <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= entry.full_name %></div>
+                                  <div class="sec_info">
+                                      <%if recipient.student?%>
+                                        <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                                      <%elsif recipient.parent?%>
+                                        <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                                      <%else%>
+                                        <%= "#{t('department')} : #{entry.department}" %>
+                                      <%end%>
+                                  </div>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+                <%else%>
+                  <tr class="th_entry" data-id="<%=message_recipient.id%>" data-thread="<%=@thread.id%>" id="thread_<%=message_recipient.recipient_id%>">
+                      <td class="thread_entry">
+                          <div class="thread_entry">
+                              <div class="entry-thumbnail">
+                                  <%= image_tag "blocked_user.png" %>
+                              </div>
+                              <div class="entry_detail">
+                                  <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= t('deleted_user')%></div>
+                              </div>
+                          </div>
+                      </td>
+                  </tr> 
+                <%end%>
+              <%end%>
+            <%else%>
+              <tr class="no_thread_entry">
+                  <td class="no_thread"><%=t('no_conversations')%></td>
+              </tr>
+            <%end%>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+  (function ($) {
+      $.fn.hasScrollBar = function () {
+          if (this.get(0) != undefined) {
+              return this.get(0).scrollHeight > this.height();
+          }
+      }
+  })(jQuery);
+  if (j('tbody').hasScrollBar() == true)
+  {
+      j('.td_val').css('width', '67px');
+  }
+  else {
+      j('.td_val').css('width', '82px');
+  }
+  if (j("#thread_<%=@recipient_id%>").length > 0) {
+      j("#thread_<%=@recipient_id%>").addClass('coloured_background');
+  }
+  j('#thread_listing tr.th_entry').each(function () {
+      j(this).click(function () {
+          $reply_attachment_error = false;
+          j(".coloured_background").removeClass('coloured_background');
+          j(this).addClass('coloured_background');
+          j.ajax({
+              type: 'GET',
+              url: "/messages/update_conversation",
+              data: {
+                  recipient_id: j(this).attr('data-id'),
+                  type: 'group_update',
+                  thread_id: j(this).attr('data-thread')
+              },
+              beforeSend: function () {
+                  j('#message_conversation').html("");
+                  j('#message_conversation').append("<img  alt='Loading...' src='/images/pk-loader.gif' style='display:none;' id='loader_4'></img>")
+                  j('#loader_4').css('display', 'block');
+              },
+              success: function () {
+              }
+          });
+      });
+  });
+
+  update_group_thread = function (e, obj) {
+      j('.selected_tab').removeClass('selected_tab');
+      j(obj).parent().addClass('selected_tab');
+      j.ajax({
+          type: 'POST',
+          url: "/messages/switch_tabs",
+          data: {
+              section: e,
+              type: 'group_update',
+              thread_id: "<%=@thread.id%>"
+          },
+          beforeSend: function () {
+              j('#thread_listing_main').html("");
+              j('#thread_listing_main').append("<img  alt='Loading...' src='/images/pk-loader.gif' style='display:none;' id='loader_3'></img>")
+              j('#loader_3').css('display', 'block');
+          },
+          success: function () {
+          }
+      });
+  };
+
+</script>

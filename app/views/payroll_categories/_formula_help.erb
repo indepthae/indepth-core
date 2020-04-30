@@ -1,0 +1,112 @@
+<div class="tabs">
+  <div class="tab-links">
+    <div id="link_tab1"><a href="#tab1"><%= t('list_of_payroll_categories') %></a></div>
+    <div class="tab-active"id="link_tab2"><a href="#tab2"><%= t('examples') %></a></div>
+  </div>
+</div>
+
+<div class="tab-content">
+  <div id="tab1" class="tab">
+    <div id="num_and_for">
+      <ul>
+        <% if @category.nil? %>
+          <li><%= "#{t('lop_formula_example')}"  %></li>
+        <% else %>
+          <li><%= "#{t('category_formula_example_1')}"  %></li>
+          <li><%= "#{t('category_formula_example_2')}"  %></li>
+          <li><%= "#{t('category_formula_example_3')}"  %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab2" class="tab active">
+    <div class="section_header">
+      <div class="name"><%= t('standard_codes') %></div>
+    </div>
+    <div class="row">
+      <div class="name"><%= t('gross_pay') %></div>
+      <div class="code"><%= 'GROSS' %></div>
+    </div>
+    <div class="row">
+      <div class="name"><%= t('no_of_working_days') %></div>
+      <div class="code"><%= 'NWD' %></div>
+    </div>
+    <% if @category.nil? %>
+      <div class="row">
+        <div class="name"><%= t('net_pay') %></div>
+        <div class="code"><%= 'NET' %></div>
+      </div>
+    <% end %>
+    <div class="row">
+      <div class="name"><%= t('number_of_days_worked') %></div>
+      <div class="code"><%= 'NDW' %></div>
+    </div>
+    <div class="row">
+      <div class="name"><%= t('loss_of_pay_days') %></div>
+      <div class="code"><%= 'LOPD' %></div>
+    </div>
+    <div class="section_header">
+      <div class="name"><%= t('earnings') %></div>
+      <div class="code"><%= t('code') %></div>
+    </div>
+    <div id="earnings-help">
+      <% if @earnings_list.present? %>
+        <% @earnings_list.each do |e| %>
+          <div class="row">
+            <div class="name"><%= e.name %></div>
+            <div class="code"><%= e.code %></div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="row">
+          <%= t('nothing_to_list') %>
+        </div>
+      <% end %>
+    </div>
+    <div class="section_header">
+      <div class="name"><%= t('deductions') %></div>
+      <div class="code"><%= t('code') %></div>
+    </div>
+    <div id="deductions-help">
+      <% if @deductions_list.present? %>
+        <% @deductions_list.each do |d| %>
+          <div class="row">
+            <div class="name"><%= d.name %></div>
+            <div class="code"><%= d.code %></div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="row">
+          <%= t('nothing_to_list') %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  j('.tabs .tab-links a').on('click', function(e)  {
+    par = j(this).parent()
+    par.removeClass('tab-active');
+    if(par.attr('id') == "link_tab1")
+      par.next().addClass('tab-active')
+    else
+      par.prev().addClass('tab-active')
+
+    var currentAttrValue = j(this).attr('href');
+    j('.tabs ' + currentAttrValue).show().siblings().hide();
+    j(this).parent('li').addClass('active').siblings().removeClass('active');
+    par.parent().parent().next().children(currentAttrValue).removeClass('active');
+    par.parent().parent().next().children(currentAttrValue).siblings().addClass('active');
+    e.preventDefault();
+  });
+  function set_tab_height(){
+    tab1 = j('#link_tab1').height();
+    tab2 = j('#link_tab2').height();
+    if(tab1 > tab2)
+      j('#link_tab2').height(tab1)
+    else
+      j('#link_tab1').height(tab2);
+  }
+</script>

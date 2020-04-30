@@ -1,0 +1,88 @@
+
+
+<tr class="tr-<%= cycle('odd', 'even') %>" id="store_item_fields">
+        <td>
+
+      <div class="label-field-pair2">
+        <div class="text-input-bg"><%= c.text_field :code, :id => "code" %></div>
+      </div>
+
+        </td>
+        <td >
+
+      <div class="label-field-pair3">
+        <div class="text-input-bg"><%= c.text_field :item_name, :class => "store_item" %></div>
+         <%= c.hidden_field :store_item_id , :class => "item_id"%>
+      </div>
+
+        </td>
+        <td>
+
+      <div class="label-field-pair4">
+        <div class="text-input-bg"><%= c.text_field :quantity, :id => "quantity" %></div>
+      </div>
+
+        </td>
+        <td >
+
+      <div class="label-field-pair5">
+        <div class="text-input-bg"><%= c.text_field :rate, :id => "rate",:readonly => true %></div>
+      </div>
+
+        </td>
+        <td class="col-1"><div class="label-field-pair8">
+        <div class="text-input-bg"><%= c.text_field "rate", :id => "total",:readonly => true %></div>
+          </div></td>
+          <td class="col-1">
+    <div id="remove-field"><%= link_to_remove_fields " ", c , "store_item_fields" %></div>
+
+
+
+        </td>
+</tr>
+
+<script type="text/javascript">
+  j("input#code").click(function(){
+   var ele = j(this).parents('tr');
+   var store_id = j('#invoice_store_id').val();
+
+    a = j(this).autocompleteAjax({serviceUrl:'/invoices/search_code',
+        onSelect: function(value,data){
+update_item_name(value,data,ele);},
+        params: {store_id: store_id}
+      });
+  })
+
+  j("input.store_item").click(function(){
+var ele = j(this).parents('tr');
+    var store_id = j('#invoice_store_id').val();
+  c = j(this).autocompleteAjax({serviceUrl:'/invoices/search_store_item',
+        onSelect: function(value,data){
+          update_item_name(value,data,ele);},
+        params: {store_id: store_id}
+        });
+})
+
+   j("input#quantity").change(function(){
+      var parent = j(this).parents('tr');
+      var rate = j(parent).find("#rate").val();
+      var total = parseFloat(rate) * parseFloat(j(this).val());
+      j(parent).find("#total").val(total);
+      calculate_subtotal();
+      calculate_grandtotal();
+    })
+
+      j('a.delete_button_img').click(function(){
+      calculate_grandtotal();
+      calculate_subtotal();
+    })
+
+   j("input.store_item").keypress(function(){
+        j('#loader1').show();
+    })
+
+     j("input#code").keypress(function(){
+        j('#loader1').show();
+    })
+     
+</script>

@@ -1,0 +1,87 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1> <%= t('discussion') %> </h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('all_discussion') %></div>
+<% if permitted_to? :create, :groups %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('create_group')}", :controller=>"groups", :action=>"new" %></li>
+    </ul>
+  </div>
+<% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="leftmargin">
+  <div id="replace">
+    <div class="red_heading" id="discussion">
+      <%= link_to "#{t('all_posts')}", {:controller=>"groups", :action=>"recent_posts" },:class=>"themed_bg" %>
+    </div>
+    <div class="left_sub">
+      <div id="comments_heading"><div id="comment"><%= t('comment') %></div><div id="activity"><%= t('activity') %></div></div>
+      <% unless @comments.blank?%>
+        <% @comments.each do |group_post_comment| %>
+          <div class="discussions">
+            <div class="left_discussion">
+              <div class="post_comment">
+                <%  body_html = group_post_comment.comment_body %>
+                <%  regex = Regexp.new '((www\.)([-\w\.]+)+(:\d+)?(\/([\w\/_\.]*(\?\S+)?)?)?)' %>
+                <%= link_to  body_html.gsub( regex, '<a target="blank" class="link" href="http://\1">\1</a>') ,group_group_post_path(:group_id=>group_post_comment.group_post.group,:id=>group_post_comment.group_post_id,:anchor=>"comments") %>
+              </div>
+              <div id="post_title">
+                <%= link_to "- #{group_post_comment.group_post.post_title}", group_group_post_path(:group_id=>group_post_comment.group_post.group,:id=>group_post_comment.group_post_id)%>
+              </div>
+            </div>
+            <div class="right_discussion">
+              <div class="time_name">
+                <div><%= time_ago_in_words(group_post_comment.created_at)+ " #{t('ago')}" %></div>
+                <% if group_post_comment.user.present? %>
+                  <div id="commenter_name"><%= group_post_comment.user.first_name %></div>
+                <% else %>
+                  <div class="commenter_name"><%= t('deleted_user') %></div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <span class="no_comment"><%= t('no_comment') %></span>
+      <% end %>
+    </div>
+    <div class="right_discussion">
+      <div class="time_name">
+      </div>
+    </div>
+    <div id="horizantal_bar">  </div>
+  </div>
+  <div class="paginate">
+    <%= will_paginate @comments , :previous_label=>"<", :next_label=>">"%>
+  </div>
+</div>
+
+<div id="rightmargin" >
+  <div id="right_content">
+    <div class="red_heading themed_text">
+      <%= t('my_group') %>
+    </div>
+    <div class="right_sub">
+      <% unless @mygroups.blank? %>
+        <%  @mygroups.each do |group| %>
+          <div class="each_group">
+            <%= link_to "#{group.group_name}", group_path(:id=>group)  %>
+          </div>
+        <%end%>
+      <% else %>
+        <%= t('no_group') %>
+      <% end %>
+    </div>
+  </div>
+</div>
+</div>

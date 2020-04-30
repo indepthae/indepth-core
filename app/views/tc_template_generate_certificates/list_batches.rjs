@@ -1,0 +1,4 @@
+# TODO Operate on the page object
+page.replace_html 'batch-select', :partial=>'batch_select'
+page.replace_html 'other_details', :text=>""
+page.replace_html 'other_details', :text=>"<p class='flash-msg'> #{t('select_a_course')}</p>" unless params[:course_id].present?

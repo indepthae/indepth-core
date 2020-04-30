@@ -1,0 +1,35 @@
+<% if @mode == "custom_date" %>
+  <div class="label-field-pair" id="date_range">
+      <label for="course"><%= t('start_date') %></label>
+      <div class="text-input-bg">
+          <%= calendar_date_select_tag "search[start_date]", I18n.l(Date.today.beginning_of_month,:format=>:default), :popup=>"force", :id=>'start_date'%>
+          <%= error_message_box(t('cant_be_blank')) %>
+      </div>
+  </div>
+  <div class="label-field-pair" id="date_range">
+      <label for="course"><%= t('end_date') %></label>
+      <div class="text-input-bg">
+          <%= calendar_date_select_tag "search[end_date]", I18n.l(Date.today,:format=>:default), :popup=>"force", :id=>'end_date'%>
+          <%= error_message_box(t('cant_be_blank')) %>
+      </div>
+  </div>
+<% elsif @mode == "monthly" %>
+  <div class="label-field-pair" id="custom_range">
+      <label for="route"><%= t('month_and_year') %></label>
+      <div class="text-input-bg">
+          <%= select_tag "search[month]", options_for_select([["#{t('month')}",''],["#{t('jan')}",'01'], ["#{t('feb')}",'02'], ["#{t('mar')}",'03'], 
+              ["#{t('apr')}",'04'], ["#{t('may')}",'05'], ["#{t('jun')}",'06'], ["#{t('jul')}",'07'], 
+              ["#{t('aug')}",'08'], ["#{t('sep')}",'09'], ["#{t('oct')}",'10'], ["#{t('nov')}",'11'], ["#{t('dec')}",'12']]) %>          
+          <%#= select_tag "search[year]",
+            options_for_select([["#{t('year')}",""],[@year-2,@year-2],[@year-1,@year-1],[@year,@year]]),
+            {:prompt => "#{t('year')}"} %>
+          <%= error_message_box(t('cant_be_blank')) %>          
+      </div>
+      <div class="text-input-bg msg">          
+          <%= select_tag "search[year]",
+            options_for_select([["#{t('year')}",""],[@year-2,@year-2],[@year-1,@year-1],[@year,@year]]),
+            {:prompt => "#{t('year')}"} %>
+          <%= error_message_box(t('cant_be_blank')) %>          
+      </div>
+  </div>
+<% end %>

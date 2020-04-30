@@ -1,0 +1,35 @@
+<div id="page-yield">
+  <div id="box">
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="form-errors"></div>
+  <%remote_form_for :exam_group, :url=>{:action=>'update_exam_group', :id=>@exam_group.id} do |form| %>
+
+    <div class="label-field-pair">
+      <label><%= t('name') %></label>
+      <div class="text-input-bg"><%= form.text_field :name %></div>
+    </div>
+    <div class="label-field-pair">
+      <label><%= t('start_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag "exam_group[start_date]",I18n.l(@exam_group.start_date),:readonly=>true,:popup=>:force%></div>
+    </div>
+    <div class="label-field-pair">
+      <label><%= t('end_date') %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag "exam_group[end_date]",I18n.l(@exam_group.end_date),:readonly=>true,:popup=>:force%></div>
+    </div>
+    <div class="label-field-pair">
+      <label><%= t('maximum_time_minutes') %></label>
+      <div class="text-input-bg"><%= form.text_field :maximum_time %></div>
+    </div>
+    <div class="label-field-pair">
+      <label><%= t('pass_percentage') %></label>
+      <div class="text-input-bg"><%= form.text_field :pass_percentage %></div>
+    </div>
+    
+    <div id="submit-button">
+      <%=form.submit("► #{t('update')}") %>
+    </div>
+  <% end %>
+  </div>
+  </div>

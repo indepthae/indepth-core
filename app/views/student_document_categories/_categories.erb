@@ -1,0 +1,15 @@
+<table id="listing" width="100%">
+    <tbody>
+        <tr class="tr-head">
+            <td class="col-1">
+                <%= t('document_categories') %>
+            </td>
+            <td class="col-2"></td>
+        </tr>
+        <% @categories.each do |category| %>
+          <tr class="tr-<%= cycle('odd', 'even')%>" id='<%= "category_row_#{category.id}" %>'>
+              <%= render :partial => 'category_row', :locals => {:category => category} %>
+          </tr>
+        <% end %>
+    </tbody>
+</table>

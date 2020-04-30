@@ -1,0 +1,107 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('employee_payroll') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <% case params[:from]
+      when 'assigned_employees'
+        breadcrumb :assigned_employee_view_payroll, [@employee.payroll_group, @employee]
+      when 'past_payslips'
+        breadcrumb :past_payslips_view_payroll, [@employee_payroll, @employee]
+      when 'past_payslips_archived'
+        breadcrumb :past_payslips_archived_view_payroll, [@employee_payroll, @employee]
+      end %>
+    <% else %>
+      <% case params[:from]
+      when 'past_payslips_finance'
+        breadcrumb :past_payslips_view_payroll_finance, [@employee_payroll, @employee]
+      when 'past_payslips_finance_archived'
+        breadcrumb :past_payslips_archived_view_payroll_finance, [@employee_payroll, @employee]
+      else
+        breadcrumb :assigned_employee_view_payroll_finance, [@employee_payroll, @employee.payroll_group]
+      end %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% if params[:archived].nil? and params[:finance].nil? and !@employee_payroll.current_group %>
+    <div class="warning"><div class="error-icon"></div><%= t('outdated_payroll_message') %></div>
+  <% end %>
+  <h3><%= "#{t('employee_payroll')} - #{@employee.full_name}" %></h3>
+  <div class="fields-details" id="name">
+    <div class="field-label"><%= t('name') %></div>
+    <div class="fields-val">: <%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('department') %></div>
+    <div class="fields-val">: <%= @employee.employee_department.name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('position') %></div>
+    <div class="fields-val">: <%= @employee.employee_position.name %></div>
+  </div>
+  <% unless @employee.employee_grade.nil? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('grade') %></div>
+      <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+    </div>
+  <% end %>
+  <hr/>
+  <div class="sections">
+    <h3><%= t('payroll_details') %></h3>
+    <div class="fields-details" id="gross_salary">
+      <div class="field-label"><%= t('gross_pay') %></div>
+      <div class="fields-val">: <%= "#{currency} #{precision_label(@employee_payroll.gross_salary)}" %></div>
+      <% if params[:finance].nil? and permitted_to? :create_employee_payroll, :payroll and params[:archived].nil? %>
+        <%= link_to t('edit_payroll'), {:controller => "payroll", :action => 'create_employee_payroll', :id => @employee_payroll.payroll_group.id, :employee_id => @employee.id, :from => params[:from]}, :class => "submit-button" %>
+      <% end %>
+    </div>
+  </div>
+  <div class="sections">
+    <h3><%= t('payroll_categories_of_this_payroll_group') %></h3>
+    <div class="description"><%= t('payroll_categories_of_payroll_group_desc') %></div>
+  </div>
+  <div class="sections">
+    <div class="sub-head"><%= t('earnings') %></div>
+    <% earnings = 0 %>
+    <% deductions = 0 %>
+    <% @earnings.each do |cat| %>
+      <div class="cat-details">
+        <div class="cat-label"><%= cat.payroll_category.name %> :</div>
+        <div class="cat-val"><%= "#{currency} #{precision_label(cat.amount)}" %></div>
+        <% earnings += cat.amount.to_f %>
+      </div>
+    <% end %>
+    <div class="cat-details">
+      <div class="cat-label"><%= "#{t('total_salary')}" %> :</div>
+      <div class="cat-val"><b><%= "#{currency} #{precision_label(earnings)}" %></b></div>
+    </div>
+  </div>
+  <div class="sections">
+    <div class="sub-head"><%= t('deductions') %></div>
+    <% @deductions.each do |cat| %>
+      <div class="cat-details">
+        <div class="cat-label"><%= cat.payroll_category.name %> :</div>
+        <div class="cat-val"><%= "#{currency} #{precision_label(cat.amount)}" %></div>
+        <% deductions += cat.amount.to_f %>
+      </div>
+    <% end %>
+    <div class="cat-details">
+      <div class="cat-label"><%= "#{t('total_deduction')}" %> :</div>
+      <div class="cat-val"><b><%= "#{currency} #{precision_label(deductions)}" %></b></div>
+    </div>
+  </div>
+  <div  id="net-pay" class="cat-details">
+    <div class="cat-label"><%= "#{t('net_pay')}" %> :</div>
+    <div class="cat-val"><b><%= "#{currency} #{precision_label(@employee_payroll.net_pay)}" %></b></div>
+  </div>
+  <hr/>
+</div>

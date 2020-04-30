@@ -1,0 +1,69 @@
+<% if @student_leaves.present? %>
+  <table id="listing" align="center" width="80%">
+      <tr class="tr-head">
+          <td>
+              <%= t('date_text') %>
+          </td>
+          <td>
+              <%= t('status') %>
+          </td>
+          <% if @config.config_value =="SubjectWise" %>
+            <td>
+                <%= t('subject') %>
+            </td>
+            <td>
+                <%= t('class_timing') %>
+            </td>
+          <% end %>
+          <td>
+              <%= t('reason') %>
+          </td>
+      </tr>
+      <tr class="blank"></tr>
+      <% @student_leaves.each do |r| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">    
+            <td class="col-3"><%= format_date(r.month_date.to_date) %></td>
+            <td class="col-3">
+                <% if @config.config_value == 'Daily' %>
+                  <% if r.forenoon and r.afternoon %>
+                    <%= "#{t('full_day')}" %>
+                  <% elsif r.afternoon %>
+                    <%= "#{t('afternoon')}" %>
+                  <% elsif r.forenoon %>
+                    <%= "#{t('forenoon')}" %>
+                  <% else %>
+                    <%= "#{t('absent')}" %>
+                  <% end %>
+                <% else %>
+                  <%= "#{t('absent')}" %>
+                <% end %>
+            </td>
+            <% if @config.config_value =="SubjectWise" %>
+              <td  class="col-3">
+                  <%= r.subject.name %>
+              </td>
+              <td  class="col-3" >
+                  <%= r.class_timing.name %>
+              </td>
+            <% end %>
+            <td class="col-2">
+                <%= r.reason %></td>
+          <% end %>
+      </tr>
+  </table>
+  <% pagination_params = (@subject.present? or params[:subject_id]) ? {:subject_id => params[:subject_id] || @subject.id} : {} %>
+  <%= will_paginate @student_leaves,
+    :renderer => 'RemoteLinkRenderer' ,
+    :remote=>{:update=>'leave_reports'},
+    :params=> pagination_params.merge({
+      :batch_id => params[:batch_id] || @batch.id,
+      :student_id => params[:student_id] || @student.id,
+      :start_date => @start_date || params[:start_date],
+      :end_date => @end_date || params[:end_date],
+      :controller => "student_attendance", :action => "leaves_report"
+    })  %>
+<% else %>
+  <div class="label-field-pair2" >
+      <p class = "flash-msg"><%= t('no_report_for_given_period') %></p>
+  </div>
+<% end %>

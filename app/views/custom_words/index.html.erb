@@ -1,0 +1,77 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('configuration_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('custom_words_text') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for @word_form, :url => custom_words_path do |f| %>
+      <div class="label-radio-pair">
+          <label class="status" for="status"><%= t('custom_words_text') %></label>
+          <div id="radio-buttons">
+              <%= f.radio_button  "disable_custom_words", false, :onchange => "setStatus();" %>
+              <label for="custom_word_form_disable_custom_words_true"><%= t('enable') %></label>
+
+              <%= f.radio_button  "disable_custom_words", true, :onchange => "setStatus();" %>
+              <label for="custom_word_form_disable_custom_words_false"><%= t('disable') %></label>
+          </div>
+      </div>
+      <div id ="description"><%= t('custom_words_desc') %></div>
+      <div id="custom-section" style="display: <%= f.object.disable_custom_words ? 'none' : 'block' %>;">
+          <% [:course, :batch, :subject].each_with_index do |term, index| %>
+            <div class = "term-sec">
+                <div class="sub-head"><%= "#{index+1}. #{t("#{term.to_s}_capital_terminology")}" %></div>
+                <div class="div_link" onclick="resetValues(this)"><%= t('reset_to_default') %></div>
+                <% f.fields_for :custom_translations, @terminologies[term] do |field| %>
+                  <% form_object = field.object %>
+                  <%= field.hidden_field :key %>
+                  <%= field.hidden_field :term %>
+                  <%= field.hidden_field :term_type %>
+                  <%= field.hidden_field :default_value %>
+                  <div class="label-field-pair">
+                      <label for="key"><%= t(form_object.term_type) %></label>
+                      <div class="text-input-bg">
+                          <%= field.text_field :translation, :class => "translation", :default_value => form_object.default_value %>
+                      </div>
+                      <% if form_object.term == :course %>
+                        <div class="field_description"><%= (form_object.term_type == "small_case" ? 
+                                t('small_case_description_html') : t('small_case_plural_description_html')) %></div>
+                          <% end %>
+                  </div>
+                <% end %>
+            </div>
+          <% end %>
+      </div>
+      <hr/>
+      <%= submit_tag "#{t('save_changes')}", :disable_with => "#{t('please_wait')}", :class => "submit-button" %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  function resetValues(elm) {
+      j(elm).parent('.term-sec').find('.translation').each(
+              function ()
+              {
+                  j(this).val(j(this).attr('default_value'))
+              }
+      );
+  }
+
+  function setStatus() {
+      if (j('#custom_word_form_disable_custom_words_false').is(':checked')) {
+          j('#custom-section').show();
+      } else {
+          j('#custom-section').hide();
+      }
+  }
+  j(document).ready(function () {
+      setStatus();
+  });
+</script>

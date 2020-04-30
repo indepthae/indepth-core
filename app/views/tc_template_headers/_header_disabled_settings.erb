@@ -1,0 +1,15 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class = "disabled_header">
+    <div class="disabled_header_note"><%= t('disable_header_note')%> </div>
+    <div class="disabled_header_field">
+        <div class="disabled_header_label"><%= t('blank_from_top')%><span class="necessary-field">*</span> </div>  
+        <%= f.text_field "space_instead[value]", :value =>( @current_template.header_space || nil)%>
+        <div class="disabled_header_measure"><%= t('millimeters')%></div>
+        <div class="disabled_header_label_hint"><%= t('optimum_size') %></div>
+    </div>
+</div>

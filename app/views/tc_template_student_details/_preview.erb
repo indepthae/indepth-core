@@ -1,0 +1,61 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="header_preview">
+    <div class="student_details_box">
+        <% if @student_details.empty? %>
+          <div class="not_enabled_message"><%= t('no_student_details_entered')%></div>
+        <%end%>
+        <table>
+            <% @student_details_ids.each do |id| %>
+              <tr class="name_slots">
+                  <td class="tc_field_labels"><%= @student_details[id][:field_name] %><%if @student_details[id][:is_mandatory] == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%></td>
+                  <% if @student_details[id][:field_format] == 'multiple_type' %>
+                    <td class="tc_field_values">
+                        <div class="tc_field_value">
+                            <table>
+                                <tr>
+                                    <%- if @student_details[id][:is_in_figures_enabled]%><td class="in_figures"><p>(<%= "#{t('in_figures')}" %>)</p></td><%- end %>
+                                    <%- if @student_details[id][:is_in_words_enabled]%><td class="words"><p>(<%=  "#{t('in_words')}"%>)</p> </td><%- end %>
+                                    <%- unless @student_details[id][:is_in_figures_enabled] || @student_details[id][:is_in_words_enabled] %><td class="in_figures"></td><%- end %>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                  <% else %>
+                    <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                  <% end %>
+              </tr>
+              <%  keys = get_child_field_ids(id) %>
+              <% for key in keys do %>
+                <% value = @student_details[id][:sub_fields][key] %>
+                <tr class="name_slots sub_field">
+                    <td class="tc_field_labels"><%= value[:field_name] %><%if value[:is_mandatory] == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%></td></td>
+                    <% if @student_details[id][:sub_fields][key][:field_format] == "multiple_type"%>
+                      <td class="tc_field_values">
+                          <div class="tc_field_value">
+                              <table>
+                                  <tr>
+                                      <%- if @student_details[id][:sub_fields][key][:is_in_figures_enabled]%><td class="in_figures"><p>(<%= "#{t('in_figures')}" %>)</p></td><%- end %>
+                                      <%- if @student_details[id][:sub_fields][key][:is_in_words_enabled]%><td class="words"><p>(<%=  "#{t('in_words')}"%>)</p> </td><%- end %>
+                                      <%- unless @student_details[id][:sub_fields][key][:is_in_figures_enabled] || @student_details[id][:sub_fields][key][:is_in_words_enabled] %><td class="in_figures"></td><%- end %>
+                                  </tr>
+                              </table>
+                          </div>
+                      </td>
+                    <%else%>
+                      <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                    <% end %>
+                </tr>
+              <% end %>
+            <%end%>
+        </table>
+    </div>
+</div>

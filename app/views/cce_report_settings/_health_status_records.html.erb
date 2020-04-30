@@ -1,0 +1,51 @@
+<div class="hor_line_1"></div>
+<%if @health_status_rg.present? and @health_status_rg.records.present?%>
+  <div class="label-field-pair no_bottom_margin">
+    <label for="configuration_currency_type" class="style_1">Map Records</label>
+  </div>
+  <div class="messages modal_spec_style fleft">Map each student record detail to the fields in the “Health Status” section.</div>
+  <div class="all_sub_sec">
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Height</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :height, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:height].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Weight</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :weight, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:weight].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Blood Group</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :blood_group, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:blood_group].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Vision Left</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :vision_left, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:vision_left].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Vision Right</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :vision_right, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:vision_right].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Dental Hygiene</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :dental_hygiene, options_for_select(@health_status_rg.records.map{|b| [b.name,b.id]},@setting[:dental_hygiene].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+  </div>
+<%elsif @health_status_rg.present? and !@health_status_rg.records.present?%>
+  <div class="label-field-pair no_bottom_margin">
+    <label for="configuration_currency_type" class="style_1">Map Records</label>
+  </div>
+  <div class="messages modal_spec_style fleft  no_bottom_margin">Map each student record detail to the fields in the “Health Status” section.</div>
+  <div class="messages modal_spec_style no_bottom_margin fleft">No records added to this record group yet.</div>
+<%end%>

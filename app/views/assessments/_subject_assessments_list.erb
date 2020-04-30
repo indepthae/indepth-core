@@ -1,0 +1,45 @@
+<% subjects = assessments['assessments'].collect(&:subject_id) %>
+<% if subjects & @subject_ids != [] or @privileged or batch.is_tutor_and_in_this_batch %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="col-1"><%= "#{t('subject')} &#x200E;(#{assessments['assessments'].count})&#x200E;" %></td>
+          <td class="col-1"><%= t('date_text') %></td>
+          <% if [1, 3].include? @assessment_group.scoring_type %>
+            <td class="col-3"><%= t('max_mark') %></td>
+          <% end %>
+          <% if @assessment_group.scoring_type == 1 %>
+            <td class="col-3"><%= t('pass_criteria') %></td>
+          <% end %>
+          <td class="col-6"><%= t('submission_status') %></td>
+          <td class="action"></td>
+      </tr>
+      <% assessments['assessments'].each do |assessment| %>
+        <% if @subject_ids.include? assessment.subject.id or @privileged or batch.is_tutor_and_in_this_batch %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <td><%= assessment.subject.name %></td>
+              <td class="float"><%= format_date(assessment.start_date_time) %></td>
+              <% if [1, 3].include? @assessment_group.scoring_type %>
+                <td class="float"><%= assessment.maximum_marks %></td>
+              <% end %>
+              <% if @assessment_group.scoring_type == 1 %>
+                <td class="float"><%= assessment.minimum_marks %></td>
+              <% end %>
+              <td>
+                  <span class="status"><%= assessment.submission_status_text %></span>
+              </td>
+              <td>
+                  <% if assessment.has_skill_assessments? %>
+                    <%= link_to t('enter_results_privilege'), skill_scores_assessments_path(:batch_id=>batch.id, :assessment_group_id => assessment_group.id, :assessment_id => assessment.id) %>
+                  <% else %>
+                    <%= link_to t('enter_results_privilege'), subject_scores_assessment_path(assessment) %>
+                  <% end %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+  </table>
+<% else %>
+  <div class="no_subjects">
+      <%=t('no_subject_for_exam')%>
+  </div>
+<% end %>

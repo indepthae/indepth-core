@@ -1,0 +1,118 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('exams_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('new_exam') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :add_course_wise_exam,@course_exam_group%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%target_action=params[:new_batch_ids].present? ? "update_imported_exams" : "update" %>
+  <div class="box">
+    <% form_for @course_exam_group,:url=>{:action=>target_action,:id=>@course_exam_group.id} do |f| %>
+      <%= error_messages_for :course_exam_group %>
+      <div class="exam-basic-details">
+        <div class="label-field-pair">
+          <%= label :name,t('exam_group_name') %>
+          <div class="text-input-bg"><%= f.text_field :name, :value=>@ename,:disabled=>true%></div>
+        </div>
+        <% if @course.cce_enabled? %>
+          <div class="label-field-pair">
+            <label for="cce_exam_category_id"><%= t('cce_exam_category') %></label>
+            <div class="text-input-bg"><%= f.text_field :cce_exam_category_id,:value=>CceExamCategory.find(@course_exam_group.cce_exam_category_id).name,:disabled=>true %></div>
+          </div>
+        <% elsif @course.icse_enabled? %>
+          <div class="label-field-pair">
+            <label for="cce_exam_category_id">ICSE Exam Category</label>
+            <div class="text-input-bg"><%= f.text_field :cce_exam_category_id ,:value=> IcseExamCategory.find(@course_exam_group.icse_exam_category_id).name,:disabled=>true %></div>
+          </div>
+        <% else %>
+          <div class="label-field-pair">
+            <%= label :exam_type, t('exam_type')%>
+            <div class="text-input-bg"><%= f.text_field :exam_type,:value=>t(@course_exam_group.exam_type.underscore),:disabled=>true %></div>
+          </div>
+        <% end %>
+        <%unless @course_exam_group.exam_type=='Grades' or  params[:batch_ids].present?%>
+          <div class="label-field-pair">
+            <%= label :maximum_marks, t('max_mark') %>
+            <div class="text-input-bg"><%= f.text_field :maximum_marks %></div>
+          </div>
+          <div class="label-field-pair">
+            <%= label :minimum_marks, t('min_mark') %>
+            <div class="text-input-bg"> <%= f.text_field :minimum_marks %></div>
+          </div>
+        <%end%>
+      </div>
+      <%if params[:new_batch_ids]%>
+        <%params[:new_batch_ids].each do |id|%>
+          <%= hidden_field_tag "new_batch_ids[]",id %>
+        <%end%>
+      <%end%>
+      <div id="exam_form_main">
+        <h4>
+          <%= t('enter_exam_related_details') %>:
+        </h4>
+        <table width="100%" id="listing">
+          <tr class="tr-head">
+            <td><%= t('subject_name') %></td>
+            <%unless @course_exam_group.exam_type=='Grades'%>
+              <td><%= t('max') %></td>
+              <td><%= t('min') %></td>
+            <%end%>
+            <td><%= t('start_time') %></td>
+            <td><%= t('end_time') %></td>
+            <td><%= t('no_exam') %></td>
+          </tr>
+          <%subject_count=0%>
+          <%field_for_attributes=params[:new_batch_ids].present? ? :new_batch_exams : :new_exams%>
+          <% f.fields_for field_for_attributes do |exam_form| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="col-2">
+                <div class="label-field-pair3">
+                  <div class="text-input-bg3">
+                    <%= exam_form.object.subject_name%><%=exam_form.hidden_field :subject_id %><%= exam_form.hidden_field :subject_code%>
+                  </div>
+                </div>
+              </td>
+              <%subject_count+=1%>
+              <%unless @course_exam_group.exam_type=='Grades'%>
+                <td class="col-1"><div class="label-field-pair2">
+                    <div class="text-input-bg2">
+                      <%= exam_form.text_field :maximum_marks, :size => 4, :class => 'max_marks' %>
+                    </div>
+                  </div>
+                </td>
+                <td class="col-1">
+                  <div class="label-field-pair2">
+                    <div class="text-input-bg2">
+                      <%= exam_form.text_field :minimum_marks, :size => 4, :class => 'min_marks' %>
+                    </div>
+                  </div>
+                </td>
+              <%end%>
+              <td class="col-2"> <div class="label-field-pair3"> <div class="text-input-bg3"><%= exam_form.calendar_date_select :start_time ,:readonly=>true,:popup=>"force"%></div></div></td>
+              <td class="col-3"> <div class="label-field-pair3"> <div class="text-input-bg3"><%= exam_form.calendar_date_select :end_time,:readonly=>true,:popup=>"force" %></div></div></td>
+              <td class="col-1"><%= exam_form.check_box :_destroy, :checked=>(exam_form.object[:_destroy] == "1") %></td>
+            </tr>
+          <% end %>
+        </table>
+        <% FedenaPlugin.deliver_registered_hook(:event_alert_form).each do |mod| %>
+          <%= render :partial=>mod.camelize.constantize.send("event_alert_form"), :locals => {:f => f} %>
+        <% end %>
+        <div class="extender"></div>
+        <%unless subject_count==0%>
+          <%= submit_tag "", :value => "► #{t('create_exam')}",:id=>"submit2", :class => "submit_button2",:disable_with => "► #{t('please_wait')}" %>
+        <%end%>
+      <%end%>
+    </div>
+  </div>
+</div>
+<script>
+  $('course_exam_group_maximum_marks').observe('blur', function() { $$('.max_marks')      .each(function(max_marks_obj){ max_marks_obj.value = $F('course_exam_group_maximum_marks'); }); });
+  $('course_exam_group_minimum_marks').observe('blur', function() { $$('.min_marks')      .each(function(min_marks_obj){ min_marks_obj.value = $F('course_exam_group_minimum_marks'); }); });
+</script>

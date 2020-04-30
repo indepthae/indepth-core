@@ -1,0 +1,11 @@
+if @initial.present?
+  page.replace_html 'modal-box', :partial => 'employee_hour_overlaps'
+  page << "Modalbox.show($('modal-box'), {title: '#{t('employee_overlap')}', width: 800});"
+elsif @error.present?
+#	page.replace_html 'form-errors', :partial => 'errors', :object => @entity_setting
+#  page.visual_effect(:highlight, 'form-errors')
+else
+#  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+#  page.replace_html "subject_hour-#{@entity.id}", :text => @entity.max_weekly_classes if (@entity.is_a? Subject)
+#  page << "Modalbox.hide();"
+end

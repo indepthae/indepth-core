@@ -1,0 +1,87 @@
+<div id="cat_name"><%= t('payroll_category') %>: <b></b></div>
+<div class="label-field-pair">
+    <label><%= t('payroll_category_value_expression_without_lop') %></label>
+    <span class="cat_formula"></span>
+</div>
+<div class="new_formula">
+    <div class="label-field-pair" id="enable_lop">
+        <%= radio_button_tag :actual_value, true, true, :id => "actual_value_true", :onclick => "show_new_formula();" %>
+        <label for="actual_value_true"><%= t('use_the_actual_value_or_formula') %></label>
+        <div class="description"><%= t('use_the_actual_value_or_formula_desc') %></div>
+    </div>
+    <div class="label-field-pair" id="enable_lop">
+        <%= radio_button_tag :actual_value, false, false, :id => "actual_value_false", :onclick => "show_new_formula();" %>
+        <label for="actual_value_false"><%= t('add_a_lop_formula') %></label>
+        <div class="description"><%= t('add_a_lop_formula_desc') %></div>
+    </div>
+</div>
+<div class="lop_formula_fields formula_fields">
+    <div id='formula-head'><b><%= "#{t('loss_of_pay_condition_for')} " %><span id='code'></span></b> - <span id='name'></span></div>
+    <div class="description"><%= t('loss_of_pay_condition_desc') %></div>
+    <div class="text-area-bg">
+        <div class="div_link lop_validate" is_lop='1'><%= t('validate') %></div>
+        <%= text_area_tag  :lop_formula, nil, {:class => "formula"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+        <div class="validate_result">
+        </div>
+        <%= hidden_field_tag :cat_list, @payroll_categories.collect(&:code).join(","), :class => "cat_list_value" %>
+        <%= hidden_field_tag :valid_formula, 0 %>
+    </div>
+</div>
+<script type="text/javascript">
+  j('.formula').on('change', function () {
+      j(this).closest('.formula_fields').find('.validate_result').html('');
+      j(this).closest('.formula_fields').find('.wrapper').remove();
+      j(this).closest('.formula_fields').find('#valid_formula').val(0);
+  });
+
+  clickLopValidate = function (p) {
+      save_lop = (typeof (p) == "number")
+      if (save_lop)
+          elm = j('#popup_content .lop_validate');
+      else
+          elm = j(this);
+      new Ajax.Request('/payroll_categories/validate_formula', {
+          parameters: {'formula': elm.parent().find('.formula').val(), 'selected_cats': elm.parent().find('.cat_list_value').val(), 'is_lop': j('#payroll_category_code').length, 'cat_formula': '1'},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              elm.siblings('#loader').show();
+          },
+          onComplete: function (resp) {
+            console.log(JSON.parse(resp.responseText));
+              par_div = elm.siblings('.validate_result');
+              if (JSON.parse(resp.responseText).first().length > 0) {
+                  j('.lop_validate').siblings('#valid_formula').val(false);
+                  elements = []
+                  icon = j('<div></div>', {'class': "error-icon"});
+                  elements.push(icon);
+                  JSON.parse(resp.responseText).first().each(function (m) {
+                      msg = j('<div></div>', {'class': 'error-msg', 'text': m});
+                      elements.push(msg);
+                  });
+                  par_div.html(elements);
+              }
+              else {
+                  j('.lop_validate').siblings('#valid_formula').val(true);
+                  if (save_lop)
+                      add_lop_formula(elm.attr("cat_id"));
+                  else {
+                      icon = j('<div></div>', {'class': "cross_button tick_symbol"})
+                      msg = j('<div></div>', {'class': 'error-msg success-msg', 'text': '<%= t('validated_message') %>'})
+                      par_div.html(icon.add(msg));
+                  }
+              }
+              elm.parent().find('.wrapper').remove();
+              elm.parent().find('.formula').val(JSON.parse(resp.responseText).last());
+              elm.siblings('#loader').hide();
+          }
+      });
+  }
+  j('.lop_validate').click(clickLopValidate);
+</script>

@@ -1,0 +1,4 @@
+<div class="batch_details"><span><%=t('grading_system')%> : </span><%=Batch::GRADINGTYPES[@batch.course.grading_type].nil? ? 'Normal' : Batch::GRADINGTYPES[@batch.course.grading_type]%></div>
+<div class="batch_details"><span><%=t('students')%> : </span><%= @batch.is_active ? @batch.students.count : @batch.graduated_students.count%></div>
+<div class="batch_details"><span>Eligible Students : </span><%= @batch.get_eligible_students_count%></div>
+<div class="batch_details"><span>Upscaled Students  : </span><%=@batch.upscaled_students_count%></div>

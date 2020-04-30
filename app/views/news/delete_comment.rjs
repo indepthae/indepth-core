@@ -1,0 +1,17 @@
+if Configuration.get_config_value("EnableNewsCommentModeration") == "0"
+  page.replace_html 'comments-list', :partial => 'all_comments'
+  page.replace_html "comments", :text => "#{t('comments')}(#{@news.comments.count})"
+else
+  if @is_moderator
+    if @comment.is_approved
+      page.replace_html 'comments-list', :partial => 'comment'
+    else
+      page.replace_html 'comments-list', :partial => 'pending_comments'
+    end 
+    page.replace_html "approve_text", :text => "#{t('approved_comments')}(#{@news.comments.approved_comments.count})"
+    page.replace_html "pending_text", :text => "#{t('pending_comments')}(#{@news.comments.pending_comments.count})"
+  else
+    page.replace_html 'comments-list', :partial => 'comment'
+    page.replace_html 'comments', :partial => 'viewable_comments'
+  end
+end

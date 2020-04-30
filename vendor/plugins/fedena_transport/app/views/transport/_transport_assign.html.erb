@@ -1,0 +1,19 @@
+<hr class="label-underline"></hr>
+<div class="label-field-pair transport_check">
+    <label for="enable_transport"><%= t('enable_transport') %></label>
+    <div class="text-input-bg"><%= s.check_box :enable_transport, {:onchange =>  "#{remote_function(:url => {:controller => "transport", :action => "show_transport_form"},
+          :with => "'value='+this.checked+'&receiver_id='+'#{student.id}'+'&receiver_type='+'#{type}'",
+          :before => "Element.show('loader2');",
+          :success => "Element.hide('loader2')")}"}  %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader2",
+          :style =>"display: none;" ) %>
+    </div>
+</div>
+<div id="transport_assign_form">
+    <% if @enable_transport %>
+      <%= render :partial => "transport/transport_assign_form", :locals => {:transport => @transport} %>
+    <% end %>
+</div>

@@ -1,0 +1,75 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="<%= (rtl?) ? 'rtl' : 'ltr' %>">
+<head>
+  <script>
+      function subst() {
+          var vars={};
+          var x=document.location.search.substring(1).split('&');
+          for (var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+          var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+          for (var i in x) {
+              var y = document.getElementsByClassName(x[i]);
+              for (var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+              if (vars["topage"]==vars["page"]) {
+                // document.getElementById("pdf-footer").innerHTML = "equal";
+              } else {
+                document.getElementsByTagName("body")[0].innerHTML =""
+                // document.getElementsByTagName("body")[0].style.display = "none";
+                document.getElementById("pdf-footer").innerHTML =""
+                document.getElementById('pdf-footer').style.display = "none";
+              }
+          }
+      }
+  </script>
+</head>
+  <body onload="subst()">
+    <div id="pdf-footer">
+      <span class="signature"><%= t('parent') %></span>
+      <span class="signature"><%= t('class_teacher') %></span>
+      <span class="signature"><%= t('principal') %></span>
+      <%#= t('signature') %>
+    </div>
+  </body>
+</html>
+<style >
+  #pdf-footer {
+    color: black;
+    width: 100% !important;
+    /*margin: 0px !important;*/
+    /*background-color: red;*/
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 50px;
+    padding-bottom: 100px;
+    /*padding:0px !important;*/
+  }
+  .signature {
+    width: 33%;
+    float: left;
+    text-align: center;
+    /*background-color: green;*/
+  }
+  body {
+    /*background-color: yellow;*/
+  }
+</style>

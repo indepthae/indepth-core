@@ -1,0 +1,45 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('room_details')}"%></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <%if @hostels.present?%>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_room')}", :action => "new" %></li>
+      <%end%>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <%if @hostels.present?%>
+    <div class="label-field-pair">
+      <label ><%= "#{t('select_a_hostel')}:"%></label>
+      <div class="text-input-bg">
+        <%= select :hostel, :id,
+          @hostels.map {|b| [b.name, b.id] },
+          {:prompt => "#{t('select_a_hostel')}"},
+          {:onchange => "#{remote_function(
+          :url => { :action => 'update_room_list' },
+          :with => "'hostel_id='+value",
+          :update=>'room-list',
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')"
+          )}"} %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+  <%else%>
+    <p class="flash-msg"> <%=t('hostels.no_hostels')%> </p>
+  <%end%>
+
+  <div id="room-list"></div>
+</div>

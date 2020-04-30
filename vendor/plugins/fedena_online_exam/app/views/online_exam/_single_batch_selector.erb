@@ -1,0 +1,23 @@
+<div class="label-field-pair">
+  <label><%= t('select_a_batch') %><span class="necessary-field">*</span> <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %></label>
+  <div class="text-input-bg">
+    <%= select "online_exam", "assigned_batch",
+      batches.map {|b| [b.full_name, b.id]}.reverse.push(["#{t('select_a_batch')}",""]).reverse,
+      {:selected=>batch_id.to_i},
+      {:onChange => "#{remote_function(:url => {:action => "list_subjects"},
+      :with => "'batch_id='+value",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')"
+      )}"} %>
+  </div>
+</div>
+<div id="subject-selector">
+  <% if subjects.present? %>
+  <% selected_subjects = subject_ids.present? ? subject_ids : []  %>
+    <%= render :partial=>"multiple_subject_selector", :locals=>{:subjects=>subjects, :subject_ids=>selected_subjects} %>
+  <% end %>
+</div>

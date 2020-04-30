@@ -1,0 +1,142 @@
+
+<script type="text/javascript">
+<% @hsh={}; @students.each{|s| @hsh[s.id] = s.revert_batch_transfer_eligiblity} %>
+<%= "var mesg= '#{t('no_previous_batch')}'" %>
+  <%= "var mesg1= '► #{t('please_wait')}'" %>
+  var messg=<%= @hsh.to_json %>;
+  j(".info_wrapper").click(function() {
+    j(".helper_info").css("opacity",0);
+    j(".info_wrapper").css("color",'#919294');
+    j(this).css("color",'#27292b');
+    value=collect_values(j(this));
+    insert_element(j(this),value);
+
+  });
+  j(document).click(function(event){
+    if(j(event.target).prop("class")!="info_header")
+    {
+      j(".info_wrapper").css("color",'#919294');
+      j(".helper_info").css("opacity",0);
+    }
+  });
+  if(j(".check").length==0)
+  {
+    j(".submit_button").hide();
+  }
+  else
+  {
+    j(".submit_button").show();
+  }
+  j('#submit_button').click(function(){
+    j('#submit_button').attr("disabled",true);
+    j('#submit_button').attr("value",mesg1);
+  });
+  function insert_element(ul1,value)
+  {
+    var helper_div=document.createElement('div');
+    helper_div.className='helper_info';
+    var ull=document.createElement('ul')
+    ull.className='info_list';
+    for(var i=0; i < value.length; i++)
+    {
+      var ls=document.createElement('li');
+      if(value.length > 1){
+        ls.update((i+1)+". "+ value[i]);
+      }else{
+        ls.update(value[i]);
+      }
+      ull.appendChild(ls);
+    }
+    helper_div.appendChild(ull);
+    ul1.append(helper_div);
+  }
+  function insert_message(ul1,value)
+  {
+    var helper_div=document.createElement('div');
+    helper_div.className='helper_info';
+    var ull=document.createElement('ul')
+    ull.className='info_list';
+    var ls=document.createElement('li');
+    ls.update(value);
+    ull.appendChild(ls);
+    helper_div.appendChild(ull);
+    ul1.append(helper_div);
+  }
+  function collect_values(p_div)
+  {
+    var student_id=j("input[type=hidden]", p_div);
+    if(student_id.length){
+      return messg[student_id.val()]
+    }
+    else
+    {
+      insert_message(p_div,mesg)
+    }
+  }
+</script>
+<% unless @students.empty? %>
+  <% remote_form_for :revert_transfer, :url => {:controller => "revert_batch_transfers", :action => "revert_transfer",:id => @batch.id} ,:success => "j('html, body').animate({ scrollTop: 0 }, 0);" do |f| %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td>
+          <%= t('admission_no') %>
+        </td>
+        <td>
+          <%=t('student_name')%>
+        </td>
+        <td>
+          <%=t('previous_batch')%>
+        </td>
+        <td>
+          <%=t('revert')%>
+          <div id="all-list">
+            <%= link_to_function t('all'), "$$('input.check').each(function(checkbox) { checkbox.checked = true; });" , :class => "themed_text"%>,
+            <%= link_to_function t('none'), "$$('input.check').each(function(checkbox) { checkbox.checked = false; });", :class => "themed_text"  %>
+          </div>
+        </td>
+      </tr>
+      <tr class="tr-blank">
+
+      </tr>
+      <% @students.each do |student| %>
+        <tr class="tr-<%= cycle('odd', 'even')%>">
+          <td class="col-1">
+            <%= student.admission_no %>
+          </td>
+          <td class="col-2">
+            <%= student.full_name %>
+          </td>
+          <td class="col-3">
+            <% prev_batch = student.previous_batch %>
+            <% unless prev_batch.nil? %>
+              <%= prev_batch.batch.full_name%>
+            <% else %>
+              <%= t("none") %>
+            <% end %>
+          </td>
+
+          <td class="col-4">
+            <% unless prev_batch.nil? %>
+              <% if student.revert_batch_transfer_eligiblity.empty? %>
+                <%= check_box_tag 'revert_transfer[students][]', student.id,false,:class => "check" %>
+              <% else %>
+                <div class="info_wrapper">
+                  <div class="info_header"><%= t('not_applicable') %></div>
+                  <%= hidden_field_tag 'student_id', student.id %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="info_wrapper">
+                <div class="info_header"><%=  t('not_applicable') %></div>
+              </div>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+    <%= f.submit "", :value => "#{t('revert_selected')}", :disable_with => "► #{t('please_wait')}" ,:class => "submit_button", :id => 'submit_button' %>
+  <% end %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_students_found_in_the_batch') %> </p>
+<% end %>
+

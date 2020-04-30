@@ -1,0 +1,113 @@
+<table class="receipt-details">
+  <tr class="">
+    <td class="left-label">
+      <%= t('receipt_no') %>:
+    </td>
+    <td class="bold">
+      <%= transaction_hash.receipt_no %>
+    </td>
+  </tr>
+  <tr class="">
+    <td class="left-label">
+      <%= t('date_text') %>:
+    </td>
+    <td class="">
+      <%= format_date(transaction_hash.transaction_date, :format => :short_date) %>
+    </td>
+  </tr>
+</table>
+<hr>
+<table class="student-details">
+  <% if transaction_hash.payee.payee_type =='Student' %>
+      <tr>
+        <td class="left-label">
+          <%= t('student_text') %>:
+        </td>
+        <td class="bold rtl_bracket_fix">
+          <%= transaction_hash.payee.full_name %> (<%= transaction_hash.payee.admission_no %>)
+        </td>
+      </tr>
+      <tr>
+        <td class="left-label">
+          <%= t('parent') %>:
+        </td>
+        <td>
+          <%= transaction_hash.payee.guardian_name %>
+        </td>
+      </tr>
+      <tr>
+        <td class="left-label">
+          <%= t('course_text') %>:
+        </td>
+        <td>
+          <%= transaction_hash.payee.full_course_name %>
+        </td>
+      </tr>
+      <% if has_roll_number?(transaction_hash) %>
+          <tr>
+            <td class="left-label">
+              <%= t('roll_number') %>:
+            </td>
+            <td>
+              <%= transaction_hash.payee.roll_number %>
+            </td>
+          </tr>
+      <% end %>
+  <% elsif transaction_hash.payee.payee_type =='Employee' %>
+      <tr>
+        <td class="left-label">
+          <%= t('employee_text') %>:
+        </td>
+        <td class="bold">
+          <%= transaction_hash.payee.full_name %>
+        </td>
+      </tr>
+      <tr>
+        <td class="left-label">
+          <%= t('employee_number') %>:
+        </td>
+        <td>
+          <%= transaction_hash.payee.employee_number %>
+        </td>
+      </tr>
+      <tr>
+        <td class="left-label">
+          <%= t('department') %>:
+        </td>
+        <td>
+          <%= transaction_hash.payee.employee_department_name %>
+        </td>
+      </tr>
+  <% else %>
+      <tr>
+        <td class="left-label">
+          <%= t('guest_text') %>:
+        </td>
+        <td class="bold">
+          <%= transaction_hash.payee.full_name %>
+        </td>
+      </tr>
+  <% end %>
+  <% if transaction_hash.collection.present? %>
+      <tr>
+        <td class="left-label">
+          <%= transaction_hash.collection.title %>:
+        </td>
+        <td>
+          <%= transaction_hash.collection.name %>
+        </td>
+      </tr>
+  <% end %>
+  <% unless transaction_hash.finance_type == 'InstantFee' %>
+      <tr>
+        <% if has_due_date?(transaction_hash) %>
+            <td class="left-label">
+              <%= t('due_date') %>:
+            </td>
+            <td>
+              <%= format_date(transaction_hash.due_date, :format => :short_date) %>
+            </td>
+        <% end %>
+      </tr>
+  <% end %>
+</table>

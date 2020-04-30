@@ -1,0 +1,27 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "buildings" %>
+  <%= javascript_include_tag :defaults, :cache => true %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('buildings')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('add_building')}" %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :buildings_edit, @building%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% form_for @building do |f| %>
+    <%= f.error_messages  %>
+    <div class="label-field-pair">
+      <div class="label-container"><%= f.label :name, "#{t('building_name')}" + " :" %></div>
+      <div class="input-container"><%= f.text_field :name %></div>
+    </div>
+    <%= f.submit "#{t('save')}",:class=>"submit_button", :disable_with => "#{t('please_wait')}" %>
+  <% end %>
+</div>
+

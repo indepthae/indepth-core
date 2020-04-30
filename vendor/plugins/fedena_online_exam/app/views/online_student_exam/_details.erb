@@ -1,0 +1,10 @@
+<div class="details">
+  <div class="detail-box"><div class="label"><%= t('exam_name') %></div> <div class="record themed_text"><span>: </span><%= @current_exam.name %> </div></div>
+  <div class="detail-box"><div class="label"><%= t('maximum_time_minutes') %></div>  <div class="record themed_text"><span>: </span> <%= @current_exam.maximum_time %> <%= t('minutes') %> </div></div>
+  <div class="detail-box"><div class="label"><%= t('pass_percentage') %></div> <div class="record themed_text"><span>: </span> <%= @current_exam.pass_percentage %></div></div>
+</div>
+<div class="buttons">
+
+  <%= link_to " ► #{t('start_exam')}",
+    { :action => "start_exam", :id => @current_exam.id},:class=> 'user_button',:onclick => "this.hide();window.open(this.href,'exam_dialog','toolbar=no,location=no,menubar=no,scrollbars=yes,resizable=no');return false;"%>
+</div>

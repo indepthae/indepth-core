@@ -1,0 +1,30 @@
+<% unless questions.empty? %>
+<% questions.each do|question| %>
+  <div id="qn-<%= question.id %>">
+    <% if assigned_questions.include?(question.id) %>
+      <div class="each-question assigned" id="<%= question.id %>" onclick="show_question_details(this);">
+        <div class="question-box">
+          <%= question.question %>
+        </div>
+      </div>
+    <% else %>
+      <div class="each-question" id="<%= question.id %>" onclick="show_question_details(this);">
+        <div class="question-box">
+          <%= question.question %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<%= will_paginate questions %>
+<% else %>
+<div class="no-questions"><%= t("no_questions_available") %></div>
+<% end %>
+<script type="text/javascript">
+  if(j("#question-list").find(".selected").length==0){
+    j("#question-list").find(".each-question").first().addClass("selected");
+  }
+  MathJax.Hub.Typeset();
+  j("#left-bottom-panel").find('iframe').attr("width","340px");
+  j("#left-bottom-panel").find('iframe').attr("height","191px");
+</script>

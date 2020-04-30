@@ -1,0 +1,38 @@
+<% remote_form_for @gradebook_record_group,:url=>{:action=>'save_record_group_links'}, :html => { :method => :post } do |form|  %>
+  <%= form.hidden_field :assessment_plan_id, :value=>@gradebook_record_group.assessment_plan_id %>
+  <%= form.hidden_field :id, :value=>@gradebook_record_group.id %>
+  <%= form.hidden_field :priority, :value=>@gradebook_record_group.priority %>
+  <%= hidden_field_tag :frequency, @type %>
+  <div class="record-title">
+      <span class="name name_of_record"><%= t('name_of_record').titleize %></span>
+      <div class="label-field-pair">
+          <%= form.text_field :name ,:onkeypress=>'validate_name(event)'%>
+      </div>
+  </div>
+  <% form.fields_for :gradebook_records do |field| %>
+    <%= field.hidden_field :linkable_id %>
+    <%= field.hidden_field :linkable_type %>
+    <%= field.hidden_field :gradebook_record_group_id %>
+    <%= field.hidden_field :record_group_id %>
+    <div class="model_box_row">
+        <span class="name">
+            <%= field.object.item_name %>
+        </span>
+        <div class="record_group_selector">
+            <%= field.select :record_group_id,
+              [[t('select_record_group'),'unlink']]+@record_groups.map{|obj| [obj.name,obj.id]},
+              field.object.record_group_id.present? ? { :selected=>field.object.record_group_id} : {:selected =>'unlink'}
+          %>
+        </div>
+    </div>
+  <% end %>
+  <div id="popup_footer">
+      <%=submit_tag t('ok'), :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" ,:onclick=>"submit_record_links()" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  <%#*window.scrollTo(0, 0);%>
+  j('#popup_footer.part').remove();
+</script>

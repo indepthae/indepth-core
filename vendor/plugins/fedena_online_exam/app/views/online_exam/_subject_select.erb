@@ -1,0 +1,13 @@
+<div class="label-field-pair">
+  <label class="exam-label"><%= t('select_subject_code') %></label>
+  <div class="text-input-bg">
+    <%= select "online_exam", "select_subject_code",
+      subject_codes.map {|s| [s,s]},
+      {:prompt=>"#{t('select_subject_code')}"},
+      {:onChange => "#{remote_function(:url => {:action => "list_questions"},
+      :with => "'subject_code='+value+'&exam_id='+get_exam_id()+'&question_format='+get_question_format()+'&course_id='+get_course_id()",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')"
+      )}"} %>
+  </div>
+</div>

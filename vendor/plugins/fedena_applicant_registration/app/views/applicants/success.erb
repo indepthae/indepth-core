@@ -1,0 +1,151 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant')%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('view_details') %></div>
+</div>
+<div id="page-yield">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id='top-buttons-div'>
+        <div class="course-name-display">
+            <label><%= t('course') %></label>
+            <label><b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name}" : "#{@registration_course.course.course_name}" %></b></label>
+        </div>
+        <div id='buttons-div'>
+            <%= link_to "#{t('applicants_admins.print')}", {:action=>"print_application", :print_token=>@applicant.print_token}, :target=>'_blank', :class=>"user_button" %>
+            <% if (@applicant.has_paid and !(@registration_course.amount.to_i == 0 and @applicant.amount.to_i==0) and @financetransaction.present?) %>
+              <%= link_to "Download Fee Receipt",generate_fee_receipt_pdf_applicant_path(@applicant) , :target=>'_blank', :class=>"user_button" %>
+            <%end%>
+            <% unless (@applicant.has_paid == true or @applicant.application_status.name == 'discarded' or @registration_course.is_active == false)  %>
+              <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and PaymentConfiguration.op_enabled? and PaymentConfiguration.is_applicant_registration_fee_enabled?) %>
+                  <%= custom_gateway_intermediate_button(@applicant.amount, "false", 0.00, "", "", "Registration Fee", @applicant.print_token, 'applicants') %>
+              <% end %>
+            <% end %>
+        </div>
+    </div>
+
+    <div class='show-section'>
+        <div class='student-header'>
+            <div class='student-info'>
+                <div class='info-vertical-pair' style="width:360px;">
+                    <label class='info-name'><%= t('applicant_name') %></label>
+                    <label class='info-value'><%= @applicant.full_name %></label>
+                </div>
+                <div class='info-vertical-pair' style="width:350px;">
+                    <label class='info-name'><%= t('status') %></label>
+                    <label class='info-value'><%= @applicant.application_status.is_default == true ? (@applicant.application_status.name == "alloted" ? (@applicant.batch_id.present? ? "#{t('alloted')} - #{@applicant.batch.full_name}" : "#{t('alloted')}") : t(@applicant.application_status.name)) : @applicant.application_status.name %></label>
+                </div>
+                <% unless (@registration_course.amount.to_i == 0 and @applicant.amount.to_i == 0) %>
+                  <div class='info-vertical-pair' style="width:165px;">
+                      <label class='info-name'><%= t('applicants.application_fee') %> <%= "(#{@currency})" %></label>
+                      <label class='info-value'><%= precision_label @applicant.amount %> (<%= @applicant.has_paid == true ? t('paid_text') : t('not_paid') %>)</label>
+                  </div>
+                <% end %>
+            </div>
+        </div>
+        <div class="registration-info">
+            <div class="reg-data"><%= "#{t('applicants.reg_no')}" %> : <b><%= @applicant.reg_no %></b></div>
+            <div class="reg-data" style="float:right;"><%= "#{t('applicants.application_date')}" %> : <b><%= format_date(FedenaTimeSet.current_time_to_local_time(@applicant.created_at).to_date,:format=>:long) %></b></div>
+        </div>
+        <div id='application-details'>
+            <% application_sections = @application_section.present? ? @application_section.section_fields : Marshal.load(Marshal.dump(ApplicationSection::DEFAULT_FORM)) %>
+            <% @default_fields = ApplicationSection::DEFAULT_FIELDS %>
+            <% application_sections.sort_by{|k| k[:section_order].to_i}.each_with_index do|a,i| %>
+              <% field_group = nil %>
+              <% show_section = false %>
+              <% if a[:applicant_addl_field_group_id].present? %>
+                <% field_group = @field_groups.find_by_id(a[:applicant_addl_field_group_id].to_i) %>
+                <% if field_group.present? %>
+                  <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?)  %>
+                  <% section_name = field_group.name %>
+                <% end %>
+              <% else %>
+                <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present? and a[:section_name] != "administration_section") %>
+                <% section_name = t("#{a[:section_name]}") %>
+                <% if a[:section_name]=="elective_subjects" %>
+                  <% if @registration_course.is_subject_based_registration.present? %>
+                    <% show_section = true %>
+                  <% else %>
+                    <% show_section = false %>
+                  <% end %>
+                <% end %>
+                <%# show_section = false if (a[:section_name]=="elective_subjects" and @registration_course.present? and @registration_course.is_subject_based_registration == false) %>
+              <% end %>
+              <% if show_section == true %>
+                <% if a[:section_name]=="guardian_personal_details" or a[:section_name]=="guardian_contact_details" %>
+                  <% if a[:section_name]=="guardian_personal_details" %>
+                    <% guardian_ind = 0 %>
+                    <% guardian_contact_section = application_sections.find{|as| as[:section_name] == "guardian_contact_details"} %>
+                    <% show_contact_section = false %>
+                    <% show_contact_section = true if (guardian_contact_section.present? and guardian_contact_section[:fields].present? and (guardian_contact_section[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+                    <% @applicant.applicant_guardians.each do|guardian| %>
+                      <div class="section_list"><%= "#{section_name} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></div>
+
+                      <div class="section-fields">
+                          <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>guardian} %>
+                      </div>
+                      <% if show_contact_section == true %>
+                        <div class="section_list"><span class="record_group_name_label"><%= "#{t('guardian_contact_details')} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></span></div>
+                        <div class="section-fields">
+                            <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>guardian_contact_section,:field_group=>field_group,:section_object=>guardian} %>
+                        </div>
+                      <% end %>
+                      <% guardian_ind += 1 %>
+
+
+
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <div class="section_list"><%= section_name %></div>
+                  <% if a[:section_name] == "previous_institution_details" %>
+
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant.applicant_previous_data} %>
+                    </div>
+                  <% elsif ["student_personal_details","student_communication_details","elective_subjects"].include?(a[:section_name]) %>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant} %>
+                    </div>
+                  <% else %>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>nil} %>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+
+        </div>
+        <% if (@applicant.has_paid and !(@registration_course.amount.to_i == 0 and @applicant.amount.to_i == 0) and @financetransaction.present?) %>
+          <div class="section_list payment-details"><%= t('payment_details') %></div>
+          <div class="section-fields">
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('applicants.registration_amount') %> <%= "(#{@currency})" %></label>
+                  <label class='value-label'><%= precision_label @applicant.amount %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('applicants_admins.has_paid_fees') %></label>
+                  <label class='value-label'><%= @applicant.has_paid == true ? t('paid_text') : t('not_paid') %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('payment_mode') %></label>
+                  <label class='value-label'><%= @online_transaction_id.present? ? t('online') : t('offline') %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('receipt_no') %></label>
+                  <label class='value-label'><%= @financetransaction.receipt_number %></label>
+              </div>
+              <% if @online_transaction_id.present? %>
+                <div class="label-value-pair">
+                    <label class='field-label'><%= t('online_transaction_id') %></label>
+                    <label class='value-label'><%= @online_transaction_id %></label>
+                </div>
+              <% end %>
+          </div>
+        <% end %>
+    </div>
+
+</div>

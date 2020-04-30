@@ -1,0 +1,34 @@
+<% form_remote_for :applicant_student_addl_field,:url=>{:controller=>'registration_courses',:action=>'link_student_additional_fields'},:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+  <div id="link-form-content">
+      <div class="form-box">
+          <div id="link-form-errors"></div>
+          <div class="fee_category_scroll1">
+              <div class="sel_batches">
+                  <%= check_box_tag "select_all", "", false, {:class=>'batches_box',:id=>"select_all_addl",:onclick=>"select_all_fields();"}%>
+                  <label for="all_active_batches" class="special_prop"><%= "#{t('applicant_additional_fields.additional_fields')}"%></label>
+              </div>
+              <% if @student_addl_fields.present? %>
+                <%@student_addl_fields.each do |c| %>
+                  <div class="each_batch">
+                      <%= check_box_tag "additional_field_ids[]", c.id, false, {:class=>'batches_box active_batch_list',:onclick=>"toggle_field_selector();"}%>
+                      <label class="special_prop no_margin_top"><%= c.name %></label>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="each_batch"><label class="special_prop no_margin_top"><%= t('no_unassigned_field') %></label></div>
+              <% end %>
+          </div>
+      </div>
+  </div>
+  <% if @applicant_addl_field.section_name.present? %>
+    <%= hidden_field_tag 'section_name', @applicant_addl_field.section_name %>
+  <% else %>
+    <%= hidden_field_tag 'applicant_addl_field_group_id', @applicant_addl_field.applicant_addl_field_group_id %>
+  <% end %>
+  <%= hidden_field_tag 'registration_course_id', @applicant_addl_field.registration_course_id %>
+  <%= hidden_field_tag 'field_order',field_order %>
+  <%= hidden_field_tag 'field_index',field_index %>
+  <%= hidden_field_tag 'field_section_index',field_section_index %>
+  <div class="hor-line"></div>
+  <%= f.submit "", :value => "#{t('add_addl_fields')}", :class => "submit_button", :id => 'submit_button' %>
+<% end %>

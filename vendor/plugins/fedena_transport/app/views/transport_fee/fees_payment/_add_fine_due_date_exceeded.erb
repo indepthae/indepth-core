@@ -1,0 +1,16 @@
+<% unless (@receiver_profile.present?) %>  
+  <% if (!@transport_fee.is_paid and @date.due_date < (@payment_date || Date.today) ) %>
+    <tr class="row-b fine-row" id="show-fine"></tr>
+    <tr class="row-a" id="fine-slab">
+        <td colspan="2" class="col-2 fine_text align_right">
+            <label><%= "#{t('due_date_has_been_exceeded')}" %></label>
+        </td>
+        <td>
+            <div class="instant-particular">
+                <%= link_to_function "+ #{t('add_fine')}", "submit_fine()" %>                
+            </div>
+        </td>
+        <td class="cancel-disc"></td>
+    </tr>
+  <% end %>
+<% end %>

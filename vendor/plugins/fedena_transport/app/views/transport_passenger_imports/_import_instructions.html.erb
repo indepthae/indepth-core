@@ -1,0 +1,14 @@
+<h5><%= t('instructions') %></h5>
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="import_listing">
+    <tr class="tr-head">
+        <td class="col5"><%= t('columns') %></td>
+        <td class="col3"><%= t('accepted_values') %></td>
+    </tr>
+    <% @instructions.each do |instr| %>
+      <tr>
+          <% instr.each do |i| %>
+            <td><%= i %></td>
+          <% end %>
+      </tr>
+    <% end %>
+</table>

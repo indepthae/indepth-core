@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.payroll_group_details{
+  @payroll_groups.each do |payroll_group|
+    @payroll_group = payroll_group
+    @xml.payroll_group do
+      @xml.name(@payroll_group.name)
+      @xml.salary_type(@payroll_group.salary_type_value)
+      @xml.payment_period(@payroll_group.payment_period_value)
+      @xml.generation_day(@payroll_group.generation_day)
+      @xml.payroll_categories do
+        @payroll_group.payroll_categories.each do |payroll_category|
+          @xml.payroll_category do
+            @payroll_category = payroll_category
+            @xml.name(@payroll_category.name)
+            @xml.code(@payroll_category.code)
+            @xml.is_deduction(@payroll_category.is_deduction)
+            @xml.hr_formula(@payroll_category.hr_formula_value(' '))
+          end
+        end
+        end
+      employee_lop = @payroll_group.employee_lop if @payroll_group.enable_lop
+      @xml.enable_lop(@payroll_group.enable_lop)
+      @xml.employee_lop_formula(@payroll_group.employee_lop_formula(' '))
+      @xml.lop_calculation_method(employee_lop.present? ? employee_lop.lop_calculation_method : "")
+      lop_prorated_formulas = ((employee_lop.present? and !employee_lop.lop_as_deduction) ? employee_lop.lop_prorated_formulas : [])
+      @xml.lop_prorated_formulas do
+        lop_prorated_formulas.each do |lpf|
+          @xml.lop_prorated_formula do
+            @xml.payroll_category_name("#{lpf.payroll_category.name} (#{lpf.payroll_category.code})")
+            @xml.value(lpf.actual_value ? '-' : lpf.hr_formula.default_value)
+          end
+        end
+      end
+    end
+  end
+  }
+%>
+
+

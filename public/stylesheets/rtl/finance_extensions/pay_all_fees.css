@@ -1,0 +1,429 @@
+/** student details and student search **/
+#search_box_bg {
+    display: inline-block;
+}
+.common-label {
+    padding-top: 0px;
+    color: #555;
+    font-size: 16px;
+    float: right;
+    float: right;
+    min-width: 130px;
+    font-weight: bold;
+    margin-left: 5px!important;
+    word-break: break-word;
+    max-width: 130px;
+}
+.val {
+    width: 750px;
+    color: #000 !important;
+    line-height: 20px !important;
+    font-size: 14px;
+    float: right;
+}
+#search_textbox input {
+    background: #eee;
+    float: right;
+    border: 1px solid #c6c6c6;
+    margin: -5px 10px 0 0;
+    width: 198px;
+    height: 22px;
+    padding: 4px 5px 0 0;
+}
+
+#search_textbox a{
+    margin: 0px 10px 0px 10px;
+}
+
+#loader {
+    margin: -5px 5px 1px 0px;
+}
+
+.autocomplete div {
+    cursor: pointer;
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete .selected {
+    background: #F8F1D1;
+    color: #BB0000;
+}
+
+.details {
+    padding-bottom: 15px;
+    display: inline-block;
+}
+
+.name {
+    color: #000 !important;
+    float: right;
+    width: 220px;
+    font-size: 14px;
+    height: 2px;
+    line-height: 20px;
+}
+
+.val {
+    width: 750px;
+    color: #000 !important;
+    line-height: 20px !important;
+    font-size: 14px;
+    float: right;
+}
+
+.val span {
+    margin-left: 12px;
+    color: black;
+}
+
+.val-align {
+    float: left;
+    width: 730px;
+    word-wrap: break-word;
+}
+
+.student-name-div {
+    float: right;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.change-student {
+    float: right;
+}
+
+.seprate_div {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    float: right;
+    display: block;
+    width: 100%;
+}
+
+.each-detail {    
+    display: inline-block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100% !important;
+}
+
+.common-label {
+    padding-top: 0px;
+    color: #555;
+    font-size: 15px;
+    line-height: 28px;
+    float: right;
+    min-width: 130px;
+    font-weight: bold;
+    margin-left: 5px!important;
+    word-break: break-word;
+    max-width: 130px;
+}
+
+.text-input-bg {
+    float: right;
+    margin: 0 40px 0 0;
+    background: none repeat scroll 0 0 transparent;
+    float: right;
+    height: 28px;
+    width: 130px;
+}
+
+.text-input-bg select {
+    margin: 0px 11px 0 0;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    background: #fff !important;
+}
+
+.margin-set-batch {
+    margin: 0px -11px 18px 10px;
+}
+
+.loader_div {
+    float: right;
+    margin: 7px -110px 0 0;
+}
+
+.batch-selector{
+    width: 60%;	
+}
+.payment-date{
+    width: 40%;
+}
+
+.batch-selector{
+    float: right;
+}
+
+.payment-date{
+    float: left;
+}
+
+.payment-date label, .payment-date .date-input-bg{
+    float: left;
+}
+
+.calendar_label{    
+    height: 14px !important;
+    top: 0px !important;
+}
+
+.payment-date .date-input-bg{
+    width: 225px;
+}
+
+img.calendar_date_select_popup_icon{
+    margin-top: 0px !important;
+}
+
+/** discount & fine links **/
+#payment_form .option_link, 
+#payment_form .add_link {
+    margin-left: 20px;
+    text-decoration: underline;
+}
+#payment_form .add_link {
+    font-weight: bold;
+}
+#payment_form .option_link{
+    margin-left: 0px;
+}
+/** instant pay all discount **/
+/** discounts list **/
+.discount_options {
+    min-width: 120px;
+}
+.discount-collection-details{
+    color: #666;
+    font-size: 12px;
+}
+/** fines list **/
+/** popup **/
+#popup_window {
+    width: 690px;
+    /*width: 500px;*/
+    /*overflow: hidden;*/
+    top: 40px;
+    float: right;
+}
+#popup_frame .part {
+    width: 610px;
+}
+#popup_content {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    width: 690px !important;
+}
+#popup_content .error-msg {
+    width: 231px;
+}
+#multi_fee_discount_form {
+    float: right;
+    padding-right: 40px;
+    padding-left: 40px;
+    margin-bottom: 40px;
+    width: 610px;
+}
+#popup_content .label-field-pair {
+    height: 40px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding-top: 0px;
+    clear: both !important;
+}
+#popup_content .label-field-pair:last-child {
+    /*height: 72px;*/
+    margin-bottom: 0px;
+}
+#popup_content .label-field-pair label {
+    /*width: 100%;*/
+    width: 150px;
+    margin-bottom: 10px;
+}
+#popup_content .text-input-bg{
+    /*width: 225px;*/  
+    min-width: 225px;
+    width: calc(100% - 150px);
+}
+#popup_content #multi_fee_discount_form img#loader {
+    margin: 10px 0px;
+}
+#popup_content .text-input-bg select {
+    height: 29px;
+    margin-right: 0px;
+    margin-top: 5px;
+    padding: 5px;
+}
+#popup_content .text-input-bg input {
+    -webkit-border-radius: 0;
+    background: #fff;
+    margin-right: 0;
+    /*width: 400px;*/
+    width: 203px;
+}
+#popup_content .text-input-bg span{
+    margin-right: 0px !important;
+}
+#popup_content .discount_type {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+#popup_content .discount_type .text-input-bg, #popup_content .discount_type .text-input-bg label,
+#popup_content .text-input-bg .radio_group {
+    width: auto
+}
+#popup_content .text-input-bg .radio_group{
+    /*width: 175px;*/
+    float: right;
+    margin-left: 10px;
+}
+#popup_content .text-input-bg .check_box_group input{
+    width: 30px !important;
+}
+#popup_content .text-input-bg input[type=radio] {
+    width: 17px;
+    float: right;
+    height: 27px;
+    margin-left: 5px;
+}
+popup_content .text-input-bg input[type=checkbox] {
+    width: 17px;
+    float: right;
+    height: 27px;
+    margin-left: 5px;
+}
+#popup_content .text-input-bg textarea {
+    resize: none;
+    -webkit-border-radius: 0;
+    /*width: 400px;*/
+    width: 200px;
+    height: 60px;
+}
+/** popup error style overrides **/
+#popup_content .wrapper{
+    padding-right: 0px !important;
+    margin-right: 0px !important;
+    width: 100%;
+}
+#popup_content .wrapper .error-msg{
+    width: calc(100% - 18px) !important;
+    line-height: 20px;
+}
+/** popup footer **/
+#popup_footer {
+    padding-right: 40px;
+    padding-left: 40px;
+    border-top: 1px solid #c6c6c6;
+    float: right;
+    width: 610px;
+    padding-top: 20px;
+}
+/* style overrides for revert transaction popup */
+#popup_window.revert_transaction_box { 
+    width: 450px !important;
+}
+.revert_transaction_box #popup_frame .part {
+    width: 370px !important;
+}
+.revert_transaction_box #popup_frame #popup_content {
+    padding: 20px 40px !important;
+    border-bottom: 0px;
+}
+.revert_transaction_box #popup_frame #popup_content .label-field-pair label {
+    min-width: 100px;
+    width: auto;
+}
+.revert_transaction_box #popup_content .text-input-bg{
+    width: calc(100% - 120px);
+}
+.revert_transaction_box #popup_content .text-input-bg textarea{
+    width: 100%;
+}
+/** style overrides **/
+/** payment notes **/
+.payment_notes textarea{
+    width: 535px !important;
+}
+/** pay all manual fine popup **/
+.manual_fine_box{
+    width: 480px !important;
+}
+.manual_fine_box #popup_frame {
+    width: 100%;
+}
+.manual_fine_box .part{
+    width: 400px !important;
+}
+.manual_fine_box #popup_content.part {
+    width: 480px !important;
+}
+#pay_all_manual_fine_form{
+    float: right;
+    padding-right: 40px;
+    padding-left: 40px;
+    margin-bottom: 40px;
+    width: 400px;
+}
+.manual_fine_box #pay_all_manual_fine_form label {
+    width: auto !important;
+    min-width: 65px;
+    margin-left: 20px;
+}
+.manual_fine_box #popup_footer{
+    width: 400px !important;
+}
+/** reference no, other text, payment mode input **/
+.payment_mode_block select, .payment_mode_block input, .reference_no input{
+    width: 150px !important;
+}
+.amount_to_pay_block input {
+    width: 98px !important;
+    border: 0px !important;
+    margin-right: -1px !important;
+}
+
+.particular_heading label {
+    font-weight: bold;
+}
+/** payment form **/
+/* .amount_to_pay_block, .pay_fees_buttons {
+    margin-left: 0px !important;
+} */
+.amount_to_pay_block input{
+    background-color: transparent !important;
+}
+#popup_content .error_wrapper{
+    padding-right: 0px !important;
+    margin-right: 0px !important;
+    width: 75% !important;
+}
+#student-category{
+    float: right;
+    width: 100px;
+    margin-top: 10px;
+}
+#pending_fees_info{
+    width: 200px;
+    font-size: 13px;
+    float: left;
+    color: red;
+    margin-left: 33px;
+    margin-top: 4px;
+}
+.advance-fee-field {
+  border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  background: #fff;
+  border: 1px solid #c6c6c6;
+  width: 60px;
+  float: right;
+  padding-right: 6px;
+  text-align: left;
+  padding-left: 5px;
+}

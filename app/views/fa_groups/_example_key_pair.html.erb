@@ -1,0 +1,25 @@
+<div class="tabs">
+  <div class="tab-links">
+    <div id="link_tab1">Formula Keys</div>
+    <div id="link_tab2"><span><%= "#{t('view_example')}"%></span></div>
+  </div>
+</div>
+
+<div class="tab-content">
+  <div id="tab1" class="tab">
+
+  </div>
+
+  <div id="tab2" class="tab active">
+    <div class="section_header">
+      <div class="name">Criterion</div>
+      <div class="code">Formula Key</div>
+    </div>
+    <%fa.object.fa_criterias.active.each do |fa_criteria|%>
+      <div class="row">
+        <div class="name"><%=fa_criteria.fa_name%></div>
+        <div class="code"><%=fa_criteria.formula_key%></div>
+      </div>
+    <%end%>
+  </div>
+</div>

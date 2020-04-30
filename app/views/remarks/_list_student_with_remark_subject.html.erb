@@ -1,0 +1,50 @@
+<% unless @batch.students.active.empty? %>
+  <% remote_form_for @batch, :url => {:action => 'employee_custom_remark_update'}, :before=>"j('#batch_submit')[0].disable()" do |f|%>
+    <div id="remark-captions">
+      <div class="label-field-pair">
+        <label for="remark_subject"><%= t('subject') %></label>
+        <div class="text-input-bg"><%=text_field_tag "remark[remark_subject]"%></div>
+      </div>
+      <div class="label-field-pair" id="re-subject">
+        <label for="remark_by"><%= t('remark_by') %></label>
+        <div class="text-input-bg"><%=text_field_tag "remark[remarked_by]"%></div>
+      </div>
+    </div>
+    <div id="remarks-form">
+      <div class="single-remark">
+        <div class="st-name"><%= t('student_name') %></div>
+         <% if roll_number_enabled? %>
+          <div class="st-admssn-no"><%= t('roll_no') %></div>
+         <% end %>
+         <div class="st-admssn-no"><%= t('admission_no') %></div>
+       
+      </div>
+      <%f.fields_for :students,@batch.students.active.all(:order=>"first_name ASC") do |s|%>
+        <div class="single-remark">
+          <div class="st-name">
+            <%= s.object.full_name %>
+          </div>
+
+          <% if roll_number_enabled?%>
+            <div class="st-admssn-no">
+              <%= s.object.roll_number.present? ? s.object.roll_number : "-" %>
+            </div>
+          <% end %>
+          
+          <div class="st-admssn-no">
+            <%= s.object.admission_no %>
+          </div>
+
+
+          <%s.fields_for s.object.remarks.build do |r|%>
+            <%=r.text_area :remark_body%>
+          <%end%>
+        </div>
+      <%end%>
+      <%=f.hidden_field :batch_id,:value=>@batch.id%>
+    </div>
+    <%=f.submit "#{t('finish')}"%>
+  <%end%>
+<% else %>
+  <p class='flash-msg fleft width_960'><%= t('no_students_in_batch') %></p>
+<% end %>

@@ -1,0 +1,63 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_questions') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_create_question, @online_exam_question %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="question-form">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= error_messages_for 'online_exam_question' %>
+    <% form_for @online_exam_question, :url=>{:action=>'create_question'} do |f| %>
+
+      <div class="question_label_field">
+        <p><%= t('question') %></p>
+        <div class="label-field-pair1">
+          <label ><%= t('mark') %></label>
+          <div class="text-input-bg"><%= f.text_field :mark %></div>
+        </div>
+        <div id="question_text_field_bg">
+  <%#= f.tinymce :question %>
+          <%= f.redactor :question,:latex=>true%>
+        </div>
+      </div>
+
+      <h4><%= t('enter_options_here') %>:</h4>
+
+      <% i= 1 %>
+      <% f.fields_for :online_exam_options do |exam_form| %>
+
+        <div class="option_label_field">
+          <p><%= t('option') %>-<%= i %></p>
+          <div class="label-field-pair2">
+            <label><%= t('is_answer') %></label>
+            <div class="text-input-bg"><%= exam_form.check_box :is_answer %></div>
+          </div>
+          <div id="option_text_field_bg">
+    <%#= exam_form.tinymce :option %>
+            <%= exam_form.redactor :option,:latex=>true %>
+          </div>
+        </div>
+        <%i+=1 %>
+      <% end %>
+
+      <% @group_ids.each do |g| %>
+        <%= hidden_field_tag "group_ids[]", g %>
+      <% end %>
+      <%= hidden_field_tag "option_count", @option_count %>
+      <div id="submit-button">
+        <%=f.submit("► #{t('create_text')}") %>
+      </div>
+      <div >
+        <%= link_to "► #{t('finish')}" ,{:action=>:index },:class=>"user_button" %>
+      </div>
+    <% end %>
+    <%= load_redactor_script %>
+  </div>
+</div>

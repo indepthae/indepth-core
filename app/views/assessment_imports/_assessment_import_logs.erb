@@ -1,0 +1,24 @@
+<span class="table_info"><%= t('showing_last_logs',{:count => @imports.count}) %></span>
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="logs">
+    <tr class="tr-head">
+        <td class="col-1"><%= t('no_text') %></td>
+        <td class="course_name"><%= t('created_date') %></td>
+        
+        <td class="course_name"><%= t('status') %></td>
+        <td class="course_name"><%= t('options') %></td>
+    </tr>
+    <% @imports.each_with_index do |import, index| %>
+      <tr>
+          <td class="col-1"><%= index + 1 %></td>
+          <td class="course_name"><%= format_date(AssessmentScoreImport.default_time_zone_present_time(import.created_at),:format=>:long) %></td>
+          <td class="course_name status"><%= import.status_text %></td>
+          <td class="course_name">
+            <% if import.last_message.present? %>
+              <%= link_to "#{t('show_import_log')}", '#', :onclick=>'open_log(this)', :import_id => import.id %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>

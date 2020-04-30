@@ -1,0 +1,122 @@
+<% form_for @search, :url => { :action => 'fee_receipts' }, :html => { :method => :post} do |f| %>
+
+  <div class="indi_sec">
+      <div class="label_section"><%="#{t('payment_date_range')}"%></div>
+      <div class="fleft width_220">
+          <div class="cal_label"><%=t('from')%></div>
+          <div class="text-input-bg-admission fleft right_20_margin">
+              <%= calendar_date_select_tag 'search[start_date_as]', I18n.l(@start_date || Date.today),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force",:class=>'date_val' %>
+          </div>
+      </div>
+      <div class="fleft width_220">
+          <div class="cal_label"><%=t('to')%></div>
+          <div class="text-input-bg-admission fleft right_20_margin">
+              <%= calendar_date_select_tag 'search[end_date_as]', I18n.l(@end_date || Date.today),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force",:class=>'date_val' %>
+          </div>
+      </div>
+  </div>
+
+  <div class="hor_line1"></div>
+
+  <% if @accounts_enabled %>
+
+    <div class="indi_sec">
+        <div class="label_section"><%= t('fee_account_text') %></div>
+        <%= select :search, :fee_account_equals, [[t('default_account'), 0]] + @accounts.map{|a| [a.name,a.id]},
+          { :prompt => "#{t('all_accounts')}"}, :class => 'tb' %>
+    </div>
+
+    <div class="hor_line1"></div>
+
+  <% end %>
+
+  <div class="indi_sec">
+      <div class="label_section"><%="#{t('collection_name')}"%></div>
+      <%= text_field_tag("query", params['query'], :autocomplete => 'off',:class=>'query') %>  
+      <%= f.hidden_field :collection_name_type_equals%>  
+  </div>
+
+  <div class="hor_line1"></div>
+
+  <div class="indi_sec">
+      <div class="label_section addl_59"><%="#{t('payment_details')}"%></div>
+      <div class="fleft width_220">
+          <div class="cal_label"><%=t('payment_mode')%></div>
+          <div class="text-input-bg-admission fleft right_20_margin">
+              <%= select :search,:payment_mode_equals, @payment_modes,{:prompt=>"#{t('select')}"} %>
+          </div>
+      </div>
+      <div class="fleft width_220">
+          <div class="cal_label"><%=t('reference_no')%></div>
+          <div class="text-input-bg-admission fleft right_20_margin">
+              <%= f.text_field :reference_no_like,:class=>'no_margin' %>
+          </div>
+      </div>
+  </div>
+
+  <div class="hor_line1"></div>
+
+  <div class="indi_sec">
+      <div class="label_section"><%="#{t('cashier')} (#{t('employee_text')})"%></div>
+      <%= select :search,:user_name_equals, @users.map{|u| [u.full_name,u.id]},{:prompt=>"#{t('select')}"},:class=>'tb' %>
+  </div>
+
+  <div class="hor_line1"></div>
+
+  <div class="indi_sec">
+      <div class="label_section"><%="#{t('payee_details')}"%></div>
+      <div class="label_field_pair">
+          <div class="student_gender_value">
+              <label class="label_for_gender" for="student_gender_true"> <%= t('student_text') %></label>
+              <%=  radio_button_tag 'payee_type', 'student', true,:class=>'payee_type',:onclick=>'radio_click(this);' %>
+              <label class="label_for_gender" for="student_gender_false"><%= t('employee_text') %></label>
+              <%=  radio_button_tag 'payee_type', 'employee',false,:class=>'payee_type',:onclick=>'radio_click(this);' %>
+          </div>
+      </div>
+      <div id="payee_info"><%=render :partial => 'student_search', :locals => { :f => f } %></div>
+  </div>
+
+  <div class="dark_hor_line"></div>
+
+  <%= f.submit "#{t('search_receipts')}",:class=>'fleft right_30_margin margin_top_4 addl_30', 
+    :onclick=>'submit_press();' %>
+
+<% end %>
+
+<script type="text/javascript">
+
+  radio_click = function (e) {
+      j.ajax({
+          type: 'GET',
+          url: "/finance/get_payee",
+          data: {
+              payee_type: e.value
+          },
+          beforeSend: function () {
+              j("#loader").show();
+          },
+          success: function (data) {
+              j('#payee_info').html(data);
+              j("#loader").hide();
+          }
+      });
+  };
+
+  j('#MB_close').click(function () {
+      j('.autocomplete').each(function () {
+          j(this).parent().remove();
+      });
+      j('.query').val("")
+  });
+
+  submit_press = function () {
+      if (j('#query').val() == "")
+      {
+          j('#search_collection_id_equals').val("");
+      }
+  };
+
+  // });
+</script>

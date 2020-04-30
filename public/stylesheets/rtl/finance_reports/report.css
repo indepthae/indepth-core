@@ -1,0 +1,291 @@
+#flash_msg {
+    display: inline-block;
+    width: 100%;
+}
+
+.substitute {
+    padding: 100px 0 300px;
+    background-color: #f4f4f4;
+    text-align: center;
+    border: 1px solid #bfbfbf;
+    display: none;
+    float: right;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#loading {
+    margin-top: 30px;
+}
+
+.outer {
+    position: relative;
+}
+
+.inner {
+    overflow-x: auto;
+    margin-right: 292px;
+    overflow-y: visible;
+    padding-bottom: 1px;
+}
+
+.inner.fix-3-columns {
+    margin-right: 404px;
+}
+
+.inner.fix-3-columns-2 {
+    /*margin-left: 250px;*/
+    margin-right: 284px;
+}
+
+.inner.fix-3-columns-3 {
+    margin-right: 394px;
+}
+
+.inner.fix-3-columns-4 {
+    margin-right: 404px;
+}
+
+table#report_result {
+    border-collapse: collapse;
+    font-size: 13px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+tr {
+    border-bottom: 1px solid #bfbfbf;
+}
+
+table#report_result td {
+    border-left: 1px solid #bfbfbf;
+    /*white-space: nowrap;*/
+    text-overflow: ellipsis;
+    height: 20px;
+    padding: 10px;
+    /*text-align: center;*/
+}
+
+table#report_result .tr-head {
+    font-weight: bold;
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #bfbfbf;
+    border-top: 1px solid #bfbfbf;
+    color: black !important;
+}
+
+table#report_result .tr-head td {
+    vertical-align: baseline !important;
+}
+
+td.header-col {
+    border-top: 1px solid #bfbfbf;
+}
+
+td.sl_no {
+    width: 50px;
+    position: absolute;
+    right: 0px;
+    border-bottom: 1px solid #bfbfbf;
+}
+
+.fixed-header {
+    border-top: 1px solid #bfbfbf;
+    top: 0px;
+    background-color: #e8e8e8;
+}
+
+td.fee_header {
+    /*text-align: center;*/
+}
+
+td.sl_no {
+    border-right: 1px solid #bfbfbf;
+}
+
+td.name, td.employee_name, td.student_name, td.row_total, td.date_col, td.batch_name, td.particular_name {
+    position: absolute;
+    max-width: 200px;
+    right: 72px;
+    min-width: 200px;
+    border-bottom: 1px solid #bfbfbf;
+}
+
+td.date_col {
+    right: 72px !important;
+    width: 80px !important;
+    min-width: 50px !important;
+}
+
+td.row_total {
+    right: 293px !important;
+    width: 90px !important;
+    min-width: 50px !important;
+}
+
+td.row_total, td.amount_col {
+    text-align: left !important;
+}
+
+.fix-3-columns-2 .row_total {
+    right: 173px !important;
+}
+
+.fix-3-columns-3 .batch_name {
+    width: 200px;
+    right: 72px;
+}
+
+.fix-3-columns-3 .row_total {
+    right: 293px !important;
+}
+
+.fix-3-columns-4 .particular_name {
+    width: 250px;
+    right: 72px;
+}
+
+.fix-3-columns-4 .row_total {
+    right: 293px !important;
+}
+
+td.col2 {
+    min-width: 100px;
+}
+
+.grand-total-col {
+    width: 271px !important;
+    text-align: left;
+    background-color: #efefef;
+    font-weight: bold;
+    position: absolute;
+    right: 0px;
+    border: 1px solid #bfbfbf;
+    border-top: 0px;
+}
+
+.report-total-col {
+
+}
+.dummy_col{
+    padding: 0px !important;
+}
+.adjusted_height{
+    height: 71px !important;
+}
+.tr-head td.center_align{
+    text-align: center !important;
+}
+.fix-3-columns-2 .grand-total-col {
+    width: 151px !important;
+}
+.inner.fix-4-columns {
+    margin-right: 624px;
+}
+.fix-4-columns td.batch_name {
+    right: 293px;
+    overflow-y: visible !important;
+    min-height: 20px !important;
+    /*height: auto !important;*/
+}
+.fix-4-columns td.row_total {
+    right: 514px !important;
+}
+.fix-4-columns .grand-total-col {
+    width: 492px !important;
+}
+#buttons {
+    float: right;
+    width: 100%;
+}
+
+.submit-button {
+    margin: 8px 0 0 40px;
+    margin: 25px 0px auto;
+    font-size: 13px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white !important;
+    margin-left: 10px;
+}
+
+/** pagination **/
+.pagination {
+    margin-top: 20px;
+    margin-left: 0px;
+    min-width: 158px;
+    height: auto;
+    border: 1px solid #CCC;
+    border-right: 0px;
+    float: right;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.pagination a {
+    color: #666;
+    cursor: pointer;
+    border: none !important;
+    border-right: 1px solid #CCCCCC !important;
+    font-size: 13px !important;
+    display: block;
+    float: right;
+    font-weight: normal;
+    padding: 9px 15px 9px 13px;
+}
+
+#page-yield .pagination a:hover {
+    color: #333 !important;
+}
+
+.pagination .disabled {
+    display: block;
+    float: right;
+    padding: 9px 10px 9px 5px;
+    font-size: 13px;
+    color: #666 !important;
+    text-decoration: none !important;
+    border-right: 1px solid #ccc;
+}
+
+.pagination .prev_page {
+    display: block;
+    float: right;
+    padding: 9px 10px 9px 5px;
+    font-size: 13px;
+    border-left: 1px solid #CCC;
+    color: #666 !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+}
+
+.pagination .current {
+    display: block;
+    float: right;
+    padding: 9px 15px 9px 13px;
+    font-size: 13px;
+    color: #fff !important;
+    background-color: #666666;
+    font-weight: normal;
+}
+
+.pagination .next_page {
+    display: block;
+    float: right;
+    padding: 9px 10px 9px 5px;
+    font-size: 13px;
+    color: #666 !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+}
+
+.pagination .gap {
+    display: block;
+    float: right;
+    border-right: 1px solid #cccccc;
+    color: #666;
+    padding: 9px;
+    font-size: 13px !important;
+}

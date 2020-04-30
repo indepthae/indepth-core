@@ -1,0 +1,93 @@
+
+
+
+<div id="box">
+  <% unless @exam_questions.nil? or @exam_questions.empty? %>
+    <% form_for @exam_attendance, :url=>{:action=>'save_exam'} do |f| %>
+      <% @exam_questions.each_with_index do |question_row,i| %>
+        <% question = question_row.online_exam_question %>
+        <% if params[:page].present? %>
+          <% if params[:page].to_i >= 1 %>
+            <% i = i  + (params[:page].to_i - 1) * @exam_questions.per_page.to_i %>
+          <% end %> <%else %> <% i = i %>
+        <% end %>
+        <div class="qa-box">
+          <div class="question-box">
+            <div class="q-label"><%="#{ i+1} )" %></div>
+
+            <div class="question-content">
+              <%=question.question %>
+            </div>
+            <div class="mark">
+              <%=question_row.mark %> <%= t('marks') %>
+            </div>
+
+          </div>
+          <% if question.question_format == "descriptive" %>
+            <div class="options-box">
+              <div class="op-label"><%= t('answer') %> :</div>
+              <% f.fields_for :online_exam_score_details ,@descriptive_answers[question.id] do |exam_form| %>
+                <div id="question_text_field_bg"><%= exam_form.redactor :answer,:latex=>true%></div>
+                <%= exam_form.hidden_field :online_exam_question_id %>
+              <% end %>
+            </div>
+        <%# cnt = 0 %>
+        <%# f.fields_for :online_exam_score_details do |exam_form| %>
+        <%#= exam_form.redactor :answer,:latex=>true%>
+        <%#= cnt %>
+        <%# cnt=cnt.next %>
+        <%# end %>
+          <% else %>
+            <div class="options-box">
+              <div class="op-label"><%= t('options') %> :</div>
+              <% f.fields_for :online_exam_score_details ,@options[question.id] do |exam_form| %>
+                <% if exam_form.object.online_exam_question_id==question.id %>
+                  <div class="option_pair">
+                    <%= exam_form.hidden_field :online_exam_option_id %>
+                    <%= exam_form.hidden_field :online_exam_question_id %>
+                    <% unless @selected_options.nil? %>
+                      <%= exam_form.hidden_field :id,:value=>@selected_options[exam_form.object.online_exam_option_id].nil?? "" :@selected_options[exam_form.object.online_exam_option_id][0].id %>
+                      <div class="text-input-bg">
+                        <%= exam_form.check_box :_delete ,{:checked => @selected_options[exam_form.object.online_exam_option_id]!= nil},0,1 %>
+                      </div>
+                    <% else %>
+                      <div class="text-input-bg">
+                        <%= exam_form.check_box :_delete ,{},0,1 %>
+                      </div>
+                    <% end %>
+                    <div class="option"><%=exam_form.object.online_exam_option.option%> </div>
+                  </div>
+                <% end %>
+              <% end %>
+
+            </div>
+          <% end %>
+              <%=hidden_field_tag('attendance_id',@exam_attendance.id )%>
+        </div>
+      <% end %>
+      <div id="waiting"><%=t('please_wait')%></div>
+      <%= will_paginate @exam_questions,:renderer => 'RemoteLinkRenderer' ,:params=>{:controller=>"online_student_exam",:action=>"started_exam",:id=>params[:id],:attendance_id=>@exam_attendance.id}%>
+      <div id="submit-button">
+        <%= f.submit " ► #{t('finish')}" %>
+      </div>
+    <% end %>
+  <% end %>
+
+
+
+</div>
+<script type="text/javascript">
+  var j = jQuery.noConflict();
+  j('.pagination a').click(function(e){
+    j.post('/online_student_exam/save_scores',j('form').serialize())
+    j('.pagination').hide();
+    j("#waiting").css("display","block");
+
+  });
+  j('html, body').animate({ scrollTop: 0 }, "slow");
+  //call_redactor_onload();
+  if(typeof(call_redactor_onload) == "function"){
+    call_redactor_onload();
+  }
+  MathJax.Hub.Typeset();
+</script>

@@ -1,0 +1,12 @@
+var newOptions = {
+  <% @linked_to_keys.each do |l|  %>
+    "<%= l[0] %>":"<%= l[1] %>",
+  <%end%>
+};
+
+var el = j('#linked_to');
+el.html(' ');
+j.each(newOptions, function(key, value) {
+    el.append(j("<option></option>")
+    .attr("value", value).text(key));
+});

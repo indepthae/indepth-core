@@ -1,0 +1,133 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payslip_for_payroll_group') %></div>
+  <% if permitted_to? :view_all_rejected_payslips, :employee_payslips %>
+    <div id="inner-tab-menu">
+      <ul>
+        <% if params[:finance].nil? %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('rejected_payslips')}", :controller=>"employee_payslips", :action=>"view_all_rejected_payslips" %></li>
+        <% else %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('rejected_payslips')}", :controller=>"employee_payslips", :action=>"view_all_rejected_payslips", :finance => params[:finance], :from => 'payslip_group' %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% breadcrumb :employee_payslips_payslip_for_payroll_group_finance %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <div class="header">
+    <%= t('payslip_for_payroll_group') %>
+  </div>
+
+  <div class="description">
+    <%= params[:finance].present? ? t('generate_payslips_for_payroll_group_finance_description') : t('generate_payslips_for_payroll_group_description') %>
+  </div>
+
+  <div class="salary_waged_payroll">
+    <div class="sub_heading"><%= t('salary_waged_payroll') %></div>
+    <div class="salary_waged_payroll_listing">
+      <table>
+        <tr class="tr-head">
+          <td class="pg_name"><%= t('payroll_group')%></td>
+          <td class="recent_payslip"><%= t('recent_payslip') %></td>
+          <td class="emp_count"><%= t('employees') %></td>
+          <td class="actions"></td>
+        </tr>
+        <%if @salaried_payroll_groups%>
+          <% @salaried_payroll_groups.sort.each do |key,val| %>
+            <tr class="tr-sub-head">
+              <td colspan="4"><%= PayrollGroup.payment_period_translation(key)%></td>
+            </tr>
+            <% val.each do |v| %>
+              <tr>
+                <td class="pg_name"><%= v.name %></td>
+                <td class="recent_payslip"><%= payslip_range(v, v.start_date, v.end_date) %></td>
+                <td class="emp_count"><%= v.emp_count %> </td>
+                <% payslips_count = v.payslips_date_ranges.length %>
+                <td class="actions">
+                  <% if params[:finance].nil? and permitted_to? :generate_payslips, :employee_payslips %>
+                    <% if v.emp_count.to_i > 0 %>
+                      <%= link_to t('generate_payslip').capitalize, {:action => "generate_payslips", :id => v.id} %>
+                    <% else %>
+                      <div class="info_wrapper"><div class="info_header" tooltip ="<%= t('no_employees_added') %>"><%= t('generate_payslip').capitalize %></div></div>
+                    <% end %>
+                  <% end %>
+                  <% if permitted_to? :view_past_payslips, :employee_payslips  %>
+                    <% if payslips_count > 0 %>
+                      <%= link_to t('view_payslips') , {:action => "view_past_payslips",  :id => v.id, :finance => params[:finance]}%>
+                    <% else %>
+                      <div class="info_wrapper"><div class="info_header" tooltip="<%= t('no_payslips_generated') %>"><%= t('view_payslips') %></div></div>
+                    <% end %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% else %>
+          <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+        <% end %>
+      </table>
+
+    </div>
+  </div>
+  <%= pagination_status(@payroll_groups) %>
+  <%= will_paginate @payroll_groups %>
+
+  <div class="hourly_waged_payroll" style="display:none;">
+    <div class="sub_heading"><%= t('hourly_waged_payroll') %></div>
+    <div class="hourly_waged_payroll_listing">
+      <table>
+        <tr class="tr-head">
+          <td class="pg_name"><%= t('payroll_group')%></td>
+          <td class="recent_payslip"><%= t('recent_payslip') %></td>
+          <td class="emp_count"><%= t('employees') %></td>
+          <td class="actions"></td>
+        </tr>
+        <%if @hourly_payroll_groups%>
+          <%  @hourly_payroll_groups.sort.each do |key,val| %>
+            <tr class="tr-sub-head">
+              <td colspan="4"><%= PayrollGroup.payment_period_translation(key)%></td>
+            </tr>
+            <% val.each do |v| %>
+              <tr>
+                <td class="pg_name"><%= v.name %></td>
+                <td class="recent_payslip"><%= payslip_range(v, v.start_date, v.end_date) %></td>
+                <td class="emp_count"><%= v.emp_count %> </td>
+                <td class="actions">
+                  <div id="generate_link"><%= link_to t('generate_payslip'), {:action => "generate_payslips", :id => v.id} %></div>
+                  <div id="view_link"><%= link_to t('past_payslips') , {:action => "view_past_payslips",  :id => v.id}%></div>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% else %>
+          <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+        <% end %>
+      </table>
+    </div>
+    <%= pagination_status(@payroll_groups) %>
+    <%= will_paginate @payroll_groups %>
+  </div>
+
+</div>
+<script type="text/javascript">
+  j('.info_wrapper').hover(function(){j(this).children('.helper_info').show()}, function(){j(this).children('.helper_info').hide()})
+</script>
+
+

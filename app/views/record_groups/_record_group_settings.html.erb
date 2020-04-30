@@ -1,0 +1,60 @@
+<div id="page-yield">
+  <div class="box">
+    <% form_remote_for @record_assignment,:url=>{:controller=>"record_groups",:action=>'save_record_group_settings_for_course',:id=>@record_assignment.id,:course_id=>@course.id},:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+      <div id="form-errors"></div>
+      <div class="fee_category_scroll1">
+        <%@batches_list.each do |k,v| %>
+          <div class="sel_batches">
+            <label  for="all_active_batches" class="special_prop no_margin_top"><%=k== "1" ? "#{t('active_batches')}" : "#{t('inactive_batches')}"%></label>
+          </div>
+          <%v.each do |b|%>
+            <div class="each_batch">
+              <%= check_box_tag "batch_id[#{b['bid']}]", b['bid'], @associated_batches.include?(b['bid']) ,:class=>'batches_box active_batch_list',:onchange=>'set_state(this)'%>
+              <label  for="<%="batch_id_#{b['bid']}"%>" class="special_prop no_margin_top"><%= b['bname'] %></label>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b['bid']}][record_group_id]",@record_group.id,:class=>'hidden_record_group_id'%>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b['bid']}][batch_id]","#{b['bid']}"%>
+              <%if @associated_batches.include?(b['bid'])%>
+                <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b['bid']}][_destroy]",0%>
+                <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b['bid']}][id]",RecordBatchAssignment.find_by_batch_id_and_record_group_id(b['bid'],@record_group.id).id%>
+              <%else%>
+                <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b['bid']}][_destroy]",1%>
+              <%end%>
+            </div>
+          <%end%>
+        <% end %>
+      </div>
+      <div class="add_for_future1">
+        <%= check_box_tag "add_for_future",1, @record_assignment.add_for_future,:onclick=>"handle_value(this);"%>
+        <%= hidden_field_tag "record_assignment[add_for_future]",@record_assignment.add_for_future%>
+        <label  for="add_for_future" class="special_prop"> <%= t('auto_add_for_future_active_batches') %></label>
+      </div>
+      <div class="hor_line"></div>
+      <div class="record_group_status"><div id="delete_msg"><%=t('record_group_hard_delete_conf_course')%> <%=link_to_remote "#{t('unassign_record_group')}", :url => { :action => 'delete_warning',:id=>@record_group.id,:course_id=>@course.id }%></div></div>
+      <div class="hor_line"></div>
+      <%= f.submit "", :value => "#{t('update_settings')}", :class => "submit_button", :id => 'submit_button' %>
+    <%end%>
+  </div>
+</div>
+<script type="text/javascript">
+  set_state = function(elm){
+    var object_id=j(elm).attr('value');
+    if(elm.checked==true)
+    {
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+    }
+    else
+    {
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+    }
+  }
+  handle_value= function(e){
+    if (j(e).is(":checked") == true){
+      j(e).val(1);
+      j('#record_assignment_add_for_future').val(true);
+    }
+    else{
+      j(e).val(0);
+      j('#record_assignment_add_for_future').val(false);
+    }
+  }
+</script>

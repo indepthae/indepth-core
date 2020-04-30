@@ -1,0 +1,36 @@
+<%= stylesheet_link_tag (rtl?) ? 'rtl/asset_entries/assets_pdf.css' : 'asset_entries/assets_pdf.css' %>
+<div id="page-yield">
+  <div class="hor_line"></div>
+  <h2><%=@school_asset.asset_name+" "+ t('details') %></h2>
+  <div class="hor_line"></div>
+  <% @asset_entries.each_with_index do |asset_entry,count| %>
+    <% count+=1 %>
+    <ul id="categorylist">
+      <li class="heading">
+        <%= "#{asset_entry.school_asset.asset_name} #{count}" %>
+      </li>
+      <% asset_entry.asset_field_names.each do |key,val|  %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="category-name">
+            <%=  "#{val["field_name"]}".upcase %>
+          </div>
+          <% if val["field_type"]=="has_many" %>
+            <div class="category-delete">
+              <% rec=asset_entry.send val["related"] %>
+              <%= rec.map{ |d| d.default_field }.join(", ") %>
+            </div>
+          <% elsif val["field_type"]=="belongs_to" %>
+            <div class="category-delete">
+              <% rec=asset_entry[val["related"]] %>
+              <%= rec.default_field unless rec.nil? %>
+            </div>
+          <% else %>
+            <div class="category-delete">
+              <%= asset_entry[key] %>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

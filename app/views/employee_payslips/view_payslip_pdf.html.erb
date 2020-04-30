@@ -1,0 +1,292 @@
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+
+<%= stylesheet_link_tag(*get_stylesheets) %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% content_for :head do  %>
+  <title><%= "#{@employee.employee_number} - #{format_date(@start_date)}" %></title>
+<% end %>
+<div id="page-yield" class="available_sections">
+
+    <div  class="section">
+        <div id="payslip">
+
+            <div class="main_info">
+                <div class="payslip_text" colspan="2"><%= t('payslip') %></div>
+                <% if @employee_payslip.payslips_date_range.payroll_group.payment_period == 5%>
+                  <div class="date_range" colspan="2"><%= "#{@start_date.to_date.strftime("%B %Y")}" %></div>
+                <% else %>
+                  <% start_year = @start_date.to_date.strftime("%Y") %>
+                  <% end_year = @end_date.to_date.strftime("%Y") %>
+
+                  <% if @start_date == @end_date %>
+                    <div class="date_range" colspan="2"><%= "#{@start_date.to_date.strftime("%d %B %Y")}" %></div>
+                  <% elsif start_year == end_year %>
+                    <div class="date_range" colspan="2"><%= "#{@start_date.to_date.strftime("%d %B")} - #{@end_date.to_date.strftime("%d %B %Y")}" %></div>
+                  <% else %>
+                    <div class="date_range" colspan="2"><%= "#{@start_date.to_date.strftime("%d %B %Y")} - #{@end_date.to_date.strftime("%d %B %Y")}" %></div>
+                  <% end %>
+                <% end %>
+            </div>
+        </div>
+        <div  class="section">
+            <div class="employee_info">
+                <% if @header.count > 4 %>
+                  <% tot_count = @header.length + @att_details.length %>
+                  <% tot_att_count = @att_details.length %>
+                  <% half_count = (tot_count.to_f/2).round %>
+                  <% left_count =  half_count %>
+                  <% right_count = tot_count - left_count%>
+                  <% left_header =  @header.slice(0,left_count) %>
+                  <% right_header = @header.slice(left_count,@header.length ) %>
+                  <%@att_details.each do |att| %>
+                    <% right_header << att %>
+                  <% end %>
+                <% else %>
+                  <% left_header = @header %>
+                  <% right_header = @att_details %>
+                <% end %>
+                <% all_header = [] %>
+                <% max_length = [left_header.length, right_header.length].max %>
+                <% (0..(max_length-1)).each do |l| %>
+                  <% all_header << [left_header[l], right_header[l]] %>
+                <% end %>
+                <table id="pdf-table" width="100%" cellspacing="0">
+                    <% all_header.each do |header| %>
+                      <tr>
+                          <td class="left">
+                              <div class="info_left">
+                                  <% if header.first.present? %>
+                                    <div class="label"><%= header.first[:label] %></div><span>:</span>
+                                  <% end %>
+                                  <% if header.first.present? %>
+                                    <div class="text"><%= header.first[:text] %></div>
+                                  <% end %>
+                              </div>
+                          </td>
+                          <td class="right">
+                              <div class="info_right">
+                                  <% if header.last.present? %>
+                                    <div class="label"><%= header.last[:label] %></div><span>:</span>
+                                  <% end %>
+                                  <% if header.last.present? %>
+                                    <div class="text"><%= header.last[:text].present? ? header.last[:text] : '-' %></div>
+                                  <% end %>
+                              </div>
+                          </td>
+                      </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+        <% pay_cond = (@employee_payslip.deducted_from_categories and @employee_payslip.payroll_revision.present?) %>
+        <div  class="section">
+            <div class="categories">
+                <table id="pdf-table" width="100%" cellspacing="0">
+                    <thead>
+                    <td class="left">
+                        <div class="table-header">
+                            <div class="col-pdf"><%= t('earnings') %></div>  
+                            <% if pay_cond %>
+                              <div id="amount_value"><%= "#{t('actual_amount')} &#x200E;(#{currency})&#x200E;" %></div>
+                            <% end %>
+                            <div id="amount_value"><%= "#{t('credited')} &#x200E;(#{currency})&#x200E;" %></div>
+                        </div>
+                    </td>
+                    <td class="right">
+                        <div class="table-header">
+                            <div class="col-pdf"><%= t('deductions') %></div>  
+                            <% if pay_cond %>
+                              <div id="amount_value"><%= "#{t('actual_amount')} &#x200E;(#{currency})&#x200E;" %></div>
+                            <% end %>
+                            <div id="amount_value"><%= "#{t('deducted')} &#x200E;(#{currency})&#x200E;" %></div>
+                        </div>
+                    </td>
+                    </thead>
+
+                    <% c = 'even' %>
+                    <% payroll_earnings = 0 %>
+                    <% payroll_deductions = 0 %>
+                    <tbody>
+                        <% @payslip_categories.each do |cat| %>
+                          <% earning = cat.first %>
+                          <% deduction = cat.last %>
+                          <% c =cycle('even','odd ') %>
+                          <tr>
+                              <td class="left">
+                                  <% if earning.present? %>
+                                    <% if ((earning[:amount].to_f > 0) or (pay_cond and earning[:pay_amount].to_f > 0)) %>
+                                      <div class="tb_row">
+                                          <div class="col-pdf"><%= earning[:category] %></div>
+                                          <% if pay_cond %>
+                                            <div id="amount_value"><%= earning[:pay_amount] %></div>
+                                            <% payroll_earnings += earning[:pay_amount].to_f %>
+                                          <% end %>
+                                          <div id="amount_value"><%= earning[:amount] %></div>
+                                      </div>
+                                    <% end %>
+                                  <% else %>
+                                    <div class="tb_row">
+                                        <div class="col-pdf"></div>
+                                        <% if pay_cond %>
+                                          <div id="amount_value"></div>
+                                        <% end %>
+                                        <div id="amount_value"></div>
+                                    </div>
+                                  <% end %>
+                              </td>
+                              <td class="right">
+                                  <% if deduction.present? %>
+                                    <% if deduction[:amount].to_f > 0 or deduction[:category] == t('loss_of_pay') or (pay_cond and deduction[:pay_amount].to_f > 0) %>
+                                      <div class="tb_row">
+                                          <% if deduction[:category] == t('loss_of_pay') %>
+                                            <div class="col-pdf"><%= "#{deduction[:category]} (#{t("datetime.distance_in_words.x_days",:count => @employee_payslip.days_count.to_f)})" %></div>
+                                          <% else %>
+                                            <div class="col-pdf"><%= deduction[:category] %></div>
+                                          <% end %>
+                                          <% if pay_cond %>
+                                            <div id="amount_value"><%= deduction[:pay_amount] %></div>
+                                            <% payroll_deductions += deduction[:pay_amount].to_f %>
+                                          <% end %>
+                                          <div id="amount_value"><%= deduction[:amount] %></div>
+                                      </div>
+                                    <% end %>
+                                  <% else %>
+                                    <div class="tb_row">
+                                        <div class="col-pdf"></div>
+                                        <% if pay_cond %>
+                                          <div id="amount_value"></div>
+                                        <% end %>
+                                        <div id="amount_value"></div>
+                                    </div>
+                                  <% end %>
+                              </td>
+                          </tr>
+                        <% end %>
+                        <tr class="total_amnt">
+                            <td class="left">
+                                <div class="tb_row">
+                                    <div class="col-pdf earning_header">
+                                        <%= t('total_earning').titleize %>
+                                    </div>
+                                    <% if pay_cond %>
+                                      <div id="amount_value" class="tot_earning"> <%= payroll_earnings  %></div>
+                                    <% end %>
+                                    <div id="amount_value" class="tot_earning"> <%=  @employee_payslip.total_earnings  %></div>
+                                </div>
+                            </td>
+                            <td class="right">
+                                <div class="tb_row">
+                                    <div class="col-pdf earning_header">
+                                        <%= t('total_deduction').titleize %>
+                                    </div>
+                                    <% if pay_cond %>
+                                      <div id="amount_value" class="tot_earning"> <%= payroll_deductions  %></div>
+                                    <% end %>
+                                    <div id="amount_value" class="tot_earning"> <%= @employee_payslip.total_deductions  %></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot><td></td></tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="section">
+            <div class="net_pay_sec">
+                <table id="pdf-table" class="net-pay" width="100%" cellspacing="0">
+                    <tbody>
+                        <tr class="net_pay">
+                            <td>
+                                <div class="even" id="net_pay_val">
+                                    <div class="col-pdf"><%= t('net_salary').titleize %></div>
+                                    <div id="amount_value"><%= "#{currency} #{@employee_payslip.net_pay}"  %></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="foot_note">
+                            <td>
+                                <div class="footnote">
+                                    <% if @info.present? %>
+                                      <p><%= @info %></p>
+                                    <% end %>
+                                    <% if @footnote.present? %>
+                                      <p><%= @footnote %></p>
+                                    <% end %>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  j = jQuery;
+  j(document).ready(function () {
+      var maxWidthLabelLeft = Math.max.apply(null, j(".info_left .label").map(function ()
+      {
+          return j(this).width();
+      }).get());
+
+      var maxWidthLabelRight = Math.max.apply(null, j(".info_right .label").map(function ()
+      {
+          return j(this).width();
+      }).get());
+
+      hgt = 0;
+      l_hgt = 0;
+      j(".info_left").each(function (i, v) {
+          l_hgt = l_hgt + j(v).height();
+      })
+      r_hgt = 0;
+      j(".info_right").each(function (i, v) {
+          r_hgt = r_hgt + j(v).height();
+      })
+      if (l_hgt > r_hgt)
+          hgt = l_hgt
+      else
+          hgt = r_hgt
+
+
+
+      j(".info_left .label").css({"width": maxWidthLabelLeft + 10});
+      j(".info_right .label").css({"width": maxWidthLabelRight + 10});
+      var label_left = j(".info_left .label").first().outerWidth();
+      var label_right = j(".info_right .label").first().outerWidth();
+      var left_span = j(".info_left span").first().outerWidth();
+      var right_span = j(".info_right span").first().outerWidth();
+      var info_left_width = j('.info_left').first().width();
+      var info_right_width = j('.info_right').first().width();
+      var left_text_width = (info_left_width - (label_left + left_span) - 30);
+      var right_text_width = (info_right_width - (label_right + right_span) - 30);
+      j(".info_left .text").css({"width": left_text_width});
+      j(".info_right .text").css({"width": right_text_width});
+      j(j(".text")[0]).css({"font-weight": "bold"});
+
+      if (j(".info_right").length == 0)
+          j(".employee_info .left").css({"border-right": "0px solid #ccc"});
+
+      cat_left = j('.categories .left').height();
+      cat_right = j('.categories .right').height();
+      if (cat_left < cat_right)
+          j('.categories .left').height(cat_right);
+
+      j('.categories tr, .employee_info tr').each(function () {
+          left_ht = j(this).children().first().height();
+          right_ht = j(this).children().last().height();
+          if (left_ht < right_ht)
+              j(this).children().first().height(right_ht);
+          else if (right_ht < left_ht)
+              j(this).children().last().height(left_ht);
+      });
+      j('.left #amount_value, .right #amount_value').each(function () {
+          sib_height = j(this).closest('td').height();
+          j(this).outerHeight(sib_height);
+      });
+      if (j('.table-header').first().children().length < 3)
+          j('.categories .col-pdf').width('65%');
+  });
+  
+</script>

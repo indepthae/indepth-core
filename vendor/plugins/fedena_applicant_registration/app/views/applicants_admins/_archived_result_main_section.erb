@@ -1,0 +1,109 @@
+<div id="search-section">
+    <div id="search-top-section">
+        <div id="search-box">
+            <div class="label-field-pair">
+                <div class="text-input-bg">
+                    <%= text_field_tag :search, @search_params, :name => "search[registration_no]",:placeholder => "#{t('search_by_name_or_reg_no')}" %>
+                </div>
+            </div>
+            <%= link_to t('search_text'),"#",:onclick=>"search_by_name(); return false;",:class=>"user_button1" %>
+            <% if @search_params.present? %><a href="#" onclick="clear_name_search();
+        return false;" id="clear-button" class='page-link'><%= t('clear_text') %></a><% end %>
+               <%= hidden_field_tag "search_params", @search_params %>
+        </div>
+
+        <%= select_tag "status_id", options_for_select([["#{t('all_statuses')}",""]] + @active_statuses.map{|a| a.is_default==true ? ["#{t(a.name)}",a.id] : [a.name,a.id]},(@selected_status.present? ? @selected_status.id : "")),:onchange=>"show_applicants_list(this); return false;" %>
+
+        <div id="date-show-box">
+            <% if @start_date.present? and @end_date.present? %>
+              <label><%= t('filter_by_date') %> : </label>
+              <label class='bold-black'><%= format_date(@start_date,:format=>:short_date) %> <%= t('to_text') %> <%= format_date(@end_date,:format=>:short_date) %></label>
+              <a href="#" onclick="show_date_filter();
+                      return false;" id="date-change-button" class='page-link'><%= t('change') %></a>
+              <a href="#" onclick="clear_date_search();
+                      return false;" id="date-clear-button" class='page-link'><%= t('clear_text') %></a>
+               <% else %>
+              <a href="#" onclick="show_date_filter();
+                      return false;" id="show-date-filter" class='page-link'><%= t('filter_by_date') %></a>
+               <% end %>
+               <%= hidden_field_tag "start_date_params", @start_date %>
+               <%= hidden_field_tag "end_date_params", @end_date %>
+        </div>
+    </div>
+    <div id="date_box" class='date_box' style='display:none;'>
+        <div class="set_fixed_range">
+            <%=link_to t('last_month'),"#", :id=>"show_today", :onclick=>"show_last_months_applicants(); return false;"%>
+            <%=link_to t('last_six_months'),"#", :id=>"show_last_ten_days", :onclick=>"show_six_months_applicants(); return false;"%>
+            <%=link_to t('last_one_year'),"#", :id=>"show_last_ten_days", :onclick=>"show_one_year_applicants(); return false;"%>
+        </div>
+        <div class="set_border"></div>
+        <div class="user_set_date">
+            <div>
+                <label><%= t('start_date') %></label>
+                <%= calendar_date_select_tag 'start_date', @start_date.present? ? I18n.l(@start_date,:format=>:default) : nil ,:popup=>:force%>
+            </div>
+            <div> 
+                <label><%= t('end_date') %></label>
+                <%= calendar_date_select_tag 'end_date', @end_date.present? ? I18n.l(@end_date,:format=>:default) : nil ,:popup=>:force%>
+            </div>
+        </div>
+        <div class='filter-buttons'>
+            <%=  link_to_function "#{t('filter_applicants')}","filter_by_date();",{:class=>'user_button1',:style=>"color:#000 !important"} %>
+            <%=  link_to_function "#{t('cancel')}","hide_date_filter(); return false;",{:class=>'user_button1',:style=>"color:#000 !important"} %>
+        </div>
+
+    </div>
+</div>
+<div id='result-section'>
+    <div id='status-list'>
+        <%= hidden_field_tag "selected_status", @selected_status.present? ? @selected_status.id : ""  %>
+    </div>
+    <div id='list-section'>
+        <div id='applicants-div'>
+            <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+
+                <tbody>
+                    <tr class="tr-list_head">
+                        <td><%= t('regi_no') %></td>
+                        <td style="width:40%"><%= t('applicant_name') %></td>
+                        <td><%= t('date_format') %></td>
+                        <% unless @selected_status.present? %>
+                          <td><%= t('status') %></td>
+                        <% else %>
+                          <% if (@selected_status.name == "alloted" and @selected_status.is_default == true) %>
+                            <td><%= t('allotted_to_batch') %></td>
+                          <% end %>
+                        <% end %>
+                        <td><%= t('application_fee') %> </td>    
+                    </tr>
+
+                    <% if @shown_applicants.present? %>
+                      <% @shown_applicants.each do |applicant| %>
+                        <tr class="row-<%=cycle('b', 'a')%>">
+                            <td><%= applicant.reg_no %></td>
+                            <td><%= link_to applicant.full_name, {:action=>'view_applicant',:id=>applicant.id} %></td>
+                            <td><%= format_date(FedenaTimeSet.current_time_to_local_time(applicant.created_at).to_date,:format=>:short_date) %></td>
+                            <% unless @selected_status.present? %>
+                              <td><%= applicant.application_status.is_default == true ? (applicant.application_status.name == "alloted" ? (applicant.batch_id.present? ? "#{t('alloted')} - #{applicant.batch.full_name}" : "#{t('alloted')}") : t(applicant.application_status.name)) : applicant.application_status.name %></td>
+                            <% else %>
+                              <% if (@selected_status.name == "alloted" and @selected_status.is_default == true) %>
+                                <td><%= applicant.batch_id.present? ? applicant.batch.full_name : "-" %></td>
+                              <% end %>
+                            <% end %>
+                            <td><%= applicant.has_paid == true ? t('paid') : t('not_paid') %></td>
+                        </tr>
+                      <% end %>
+                    <% else %>
+                      <tr class='row-b'><td colspan='0'><%= t('no_applicants_found') %></td></tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+        <div id='buttons-div'>
+            <%= link_to t('export_as_csv'), {:controller=>"csv_export", :action => "generate_csv", :csv_report_type => "applicant_registration", :report_format_type => "csv",:id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"archived"}, :class => "user_button right-float" %>
+            <%= link_to t('detailed_csv_report'), {:controller=>"applicants_admins", :action => "detailed_csv_report", :id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"archived"},:class => "user_button right-float", :target => "blank" %>
+            <%= link_to t('download_pdf'), {:controller=>"applicants_admins", :action => "applicants_pdf", :report_format_type => "pdf",:id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"archived", :page_height => 760}, :target => '_blank',:class => "user_button right-float" %>
+        </div>
+
+    </div>
+</div>

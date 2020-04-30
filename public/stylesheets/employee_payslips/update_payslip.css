@@ -1,0 +1,460 @@
+hr {
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    width: 980px;
+    float: left;
+}
+h3 {
+    font-size: 16px;
+    color: #444;
+    float: left;
+    width: 100%;
+}
+.label-field-pair label, .label-radio-pair label {
+    font-weight: normal;
+    font-size: 13px;
+    width: 130px;
+}
+.fields-details {
+    float: left;
+    width: 100%;
+    font-weight: normal;
+    font-size: 13px;
+    color: #444;
+    margin: 3px 0;
+}
+.field-label {
+    float: left;
+    min-width: 200px;
+    color: #8C8C8C;
+}
+.fields-val {
+    float: left;
+    /* max-width: 200px; */
+    margin-left: 20px;
+}
+.payroll_details{
+    float:left;
+}
+.description {
+    font-size: 13px;
+    float: left;
+    padding-top: 10px;
+    color: #A5A5A5;
+    margin-bottom: 20px;
+    width: 100%;
+}
+label[for="gross_pay"] {
+    text-align: left;
+    width: 80px;
+}
+.text-input-bg input {
+    width: 100px;
+}
+span.currency-type {
+    font-size: 13px;
+    color: #444;
+    float: left;
+    margin-top: 6px;
+}
+.text-input-bg {
+    width: 125px;
+    margin-left: 10px;
+    height: auto;
+}
+div.sub-head {
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+}
+.label-field-pair .total {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 10px 3px 0 10px;
+    float: left;
+    color: #444;
+    min-width: 116px;
+    text-align: right;
+}
+div#net_pay {
+    border: 1px solid #ccc;
+    background-color: #ECECEC;
+    width: 275px;
+    margin-right: 337px;
+}
+div#net_pay label {
+    margin-left: 5px;
+}
+div#net_pay .total {
+    margin-left: 5px;
+}
+.submit-button {
+    margin: 20px 20px 0 0;
+    font-size: 13px;
+}
+#MB_frame .submit-button{
+    font-size:13px;
+    margin-left: 130px;
+}
+#MB_frame #cancel-link{margin-left: 20px}
+a#cancel-link,#page-yield a#cancel-link:hover{
+    text-decoration: none;
+    color: #fff !important;
+}
+.earnings, .deductions {
+    padding-top: 10px;
+    width: 600px;
+    float: left;
+}
+.earnings{ padding-bottom: 20px; }
+#payroll_form
+{
+    float: left;
+    margin-top: 10px;
+    width: 600px;
+}
+#date-range{ display : none; }
+#date_range_text {
+    margin: 3px 0 0 0;
+    width: 200px;
+    text-align: left;
+}
+.calender_text
+{
+    margin-bottom: 20px;
+    float: left;
+}
+p.flash-msg
+{
+    width: 980px;
+}
+.error-icon {
+    width:15px;
+    height:12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right:2px;
+    float:left;
+}
+.error-msg{
+    float:left;
+    color: red;
+    font-size: 13px;
+    font-style: italic;
+    width:205px;
+}
+
+.label-field-pair, #value_type  {
+    min-height: 40px;
+    max-height: 80px;
+    float: left;
+    height: auto;
+}
+.wrapper{
+    margin-top: 5px;
+    float: left;
+    min-width: 400px;
+    min-height: 15px;
+}
+.ShowModal
+{
+    top: 200px;
+    left: 250px;
+    z-index: 1000;
+    position: fixed;
+    background-color: White;
+    display: block;
+    width: 465px;
+    left: 393px;
+    overflow: visible;
+}
+.HideModal
+{
+    display: none;
+}
+.OverlayEffect
+{
+    background-color: black;
+    filter: alpha(opacity=70);
+    opacity: 0.7;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+#MB_window{
+    width: 500px; height: 375px; left: 393px; overflow: visible;
+}
+.label-field-pair input {
+    margin: 0px;
+    margin-right: 10px;
+    width: 110px;
+    float: left;
+    text-align: right;
+}
+#MB_header{
+    -webkit-border-radius: 0px;
+
+}
+#MB_header #MB_close
+{
+    background: white;
+    background-image: url("/images/iconsprite-1.png");
+    background-position: -31px 1px;
+    float: right;
+    height: 16px;
+    width: 10px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+    text-indent: -99999px;
+    margin-left: 5px;
+    right: 39px;
+    top: 18px;
+    cursor: pointer;
+}
+#MB_header #MB_close:hover {
+    background-position: -31px -15px;
+}
+#MB_content .label-field-pair input
+{
+    width: 150px;
+    text-align: left;
+    outline: 0;
+}
+div.add_link
+{
+    font-size: 13px;
+    color: green;
+    margin: 10px 0 10px 140px;
+    width: 140px;
+    float: left;
+    cursor: pointer;
+}
+div#add-icon {
+    background-image: url(/images/iconsprite-1.png);
+    background-position: -105px 55px;
+    float: left;
+    height: 10px;
+    width: 10px;
+    margin: 2px 4px 0 0;
+}
+div#net_pay_warning
+{
+    float: left;
+    width: 100%;
+}
+.cross_button{
+    float: left !important;
+    margin: 5px 10px;
+}
+#apply p {
+    color: #444;
+    font-size: 13px;
+}
+#MB_content .wrapper
+{
+    min-width: 200px;
+    margin-left: 130px;
+}
+#MB_content .wrapper div{display: none;}
+#loader{ margin: 9px 0 0 5px;}
+#lop-details{
+    background-color: #EFEFEF;
+    float: left;
+    width: 430px;
+    margin-left: 140px;
+    padding: 5px 20px;
+    margin-bottom: 10px;
+}
+#lop-details .fields-details{
+    margin: 5px 0;
+}
+div.div_link {
+    float: left;
+    font-size: 13px;
+    text-decoration: underline;
+    margin: 0 0 0 10px;
+    cursor: pointer;
+}
+#MB_window
+{
+    width: 690px;
+    top: 40px;
+    left: 298px;
+    float: left;
+}
+#MB_lop_frame
+{
+    -webkit-border-radius: 0px;
+    float: left;
+    display: block;
+    background-color: #fff;
+}
+#search_fields label
+{
+    margin-top: 15px;
+}
+#MB_lop_frame label
+{
+    color: #444;
+    font-size: 13px;
+    font-weight: bold;
+    width: 200px;
+    float: left;
+}
+#MB_lop_frame .part
+{
+    padding: 20px 40px;
+    border-bottom: 1px solid #c6c6c6;
+    float: left;
+    width: 610px;
+}
+#MB_header_part h4
+{
+    margin: 0px;
+}
+.remove-icon {
+    background-image: url("/images/iconsprite-1.png");
+    background-position: -31px 1px;
+    float: right;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+    text-indent: -99999px;
+    margin-left: 5px;
+}
+.remove-icon:hover {
+    background-position: -31px -15px;
+}
+.close-link
+{
+    float: right;
+    color: #999;
+    font-size: 13px;
+    text-decoration: none;
+    margin-left: 5px;
+    margin-top: 2px;
+}
+.close-link:hover
+{
+    color: #333;
+}
+#MB_lop_frame table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    overflow: auto;
+    max-height: 386px;
+    display: block;
+}
+#page-yield table .tr-head {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+}
+.tr-odd {
+    background-color: #f0f0f0;
+}
+#MB_lop_frame td {
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+td.category{
+    width:30%;
+}
+td.from{
+    width: 13%;
+}
+td.reason{
+    width: 50%
+}
+td.check_all{
+    width: 7%;
+}
+#MB_lop_frame ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+    border: 0px;
+}
+#MB_lop_frame ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+}
+#MB_lop_frame ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#MB_lop_frame ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#MB_lop_frame ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#MB_lop_frame ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#MB_lop_frame ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+#MB_lop_frame .field-label {
+    max-width: 200px;
+    min-width: 0px;
+    width: auto;
+}
+#MB_lop_frame #add_leaves{ float: right;}
+#MB_lop_frame .fields-details{
+    width: auto;
+    margin-bottom: 10px;
+}
+#MB_footer .submit_button {
+    margin-left: 0px;
+    margin-right: 20px;
+    background: #27292B !important;
+    border: none !important;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 7px 9px !important;
+    float: left;
+    cursor: pointer;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0px;
+}
+#selected-leaves{
+    width: 230px !important;
+}
+.calendar_date_select{
+    margin-left: -205px;
+}
+.warning{
+    color: red;
+    font-size: 13px;
+}
+.total + span.currency-type{
+    margin-top: 10px;
+}
+.errorExplanation{
+    background: #ffdedf no-repeat 10px 14px;
+    font-size: 13px;
+}
+.errorExplanation p, .errorExplanation ul li{
+    font-weight: normal;
+    padding-left: 0px;
+    line-height: 20px;
+}
+.errorExplanation ul{ padding-right: 20px;}
+.errorExplanation p#verify_msg{
+    padding-top:0px;
+    font-size: 13px !important;
+}
+#ind_amount{ width: 110px !important;}

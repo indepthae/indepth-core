@@ -1,0 +1,39 @@
+<div class="report_summary">
+  <div class="report_label">
+    <label>
+      <%= t('feedback') %> : <%= @form.name %>
+    </label>
+  </div>
+  <div class="overall_rating">
+    <label id="overall_rating"></label>
+  </div>
+</div>
+<% if @analysis_hash.present? %>
+  <div id="single_analysis">
+    <%= render :partial => 'single_analysis' %>
+  </div>
+<% else %>
+  <% if @targets.present? %>
+    <div class="form_target">
+      <%= label_tag t('target') %>
+      <%= select :target, :user, @targets.map { |s| [s.full_name, s.id] },
+        {:prompt => "#{t('select_target')}"},
+        {:onChange => "#{remote_function(:url => get_target_analysis_form_submission_path, :with => "'target_id='+value",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')")}"} %>
+
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </div>
+    <div id="single_analysis"></div>
+  <% else %>
+    <div class="message_notifier">
+      <p class="flash-msg">
+        <%= t('no_submission_analysis') %>
+      </p>
+    </div>
+  <% end %>
+<% end %>

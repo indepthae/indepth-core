@@ -1,0 +1,114 @@
+
+
+<div id="page-yield">
+
+
+
+  <div class="hor_line"></div>
+  <div id ="main_info">
+    <h2><%= t('grn_text') %>  </h2>
+  </div>
+  <div class="hor_line"></div>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('grn_no')}" %></div>
+    <div class="label-output">:  <%=h @grn.grn_no  %></div>
+  </div>
+
+  <% supplier = @grn.purchase_order.supplier %>
+  <% supplier_type = supplier.nil? ? nil: supplier.supplier_type %>
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('supplier_type')}" %></div>
+    <div class="label-output">:  <%=h  supplier_type.name unless supplier_type.nil? %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('supplier')}" %></div>
+    <div class="label-output">:  <%=h  supplier.name unless supplier.nil? %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('purchase_order')}" %></div>
+    <div class="label-output">:  <%=h  @grn.purchase_order.po_no  %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('store')}" %></div>
+    <div class="label-output">:  <%=h @grn.purchase_order.store.name %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('invoice_no')}" %></div>
+    <div class="label-output">:  <%=h @grn.invoice_no %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('grn_date')}" %></div>
+    <div class="label-output">:  <%=h format_date(@grn.grn_date,:format=>:long_date) %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('invoice_date')}" %></div>
+    <div class="label-output">:  <%=h format_date(@grn.invoice_date,:format=>:long_date) %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('other_charges')}" %></div>
+    <div class="label-output">:  <%=h precision_label @grn.other_charges  %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('raised_by')}" %></div>
+    <div class="label-output">:  <%=h @user.first_name unless @user.nil?  %></div>
+  </div>
+
+  <div class="label-container1"></div>
+
+  <table id="pdf-table" width="100%" cellspacing="0">
+
+    <tr class="table-header">
+      <td class="col-pdf"><%= t('sl_no') %></td>
+      <td class="col-pdf"><%= t('item') %></td>
+      <td class="col-pdf"><%= t('quantity') %></td>
+      <td class="col-pdf"> <%= t('price') %></td>
+      <td class="col-pdf"> <%= t('discount') %> (%)</td>
+      <td class="col-pdf"> <%= t('tax') %> (%)</td>
+      <td class="col-pdf"> <%= t('total') %></td>
+    </tr>
+    <% p = 0  %>
+    <% c= 'even' %>
+
+    <%  @grn.grn_items.each_with_index do |i, p| %>
+      <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+        <td class="col-pdf"><%= p+=1 %></td>
+        <td class="col-pdf"> <%=h  i.store_item.item_name  unless i.store_item.nil? %></td>
+        <td class="col-pdf"> <%=h  i.quantity %></td>
+        <td class="col-pdf"><%=h precision_label i.unit_price  %></td>
+        <td class="col-pdf"><%=h precision_label i.discount  %></td>
+        <td class="col-pdf"><%=h precision_label(i.tax) unless i.tax.nil?%></td>
+        <td class="col-pdf"><%=h precision_label(i.total_amount) %></td>
+      </tr>
+
+    <% end %>
+
+    <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+      <td colspan="5" class="col-8"><%= t('grand_total') %></td>
+      <td class="col-pdf"></td>
+      <td class="col-pdf"><%=h  @grn.other_charges.nil? ? precision_label(@total) : precision_label(@total+=@grn.other_charges) %></td>
+    </tr>
+  </table>
+
+
+</div>

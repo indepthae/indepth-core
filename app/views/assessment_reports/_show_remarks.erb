@@ -1,0 +1,28 @@
+<% if remarks.flatten.present? %>
+  <% remarks.each do |remarks_array| %>
+    <% unless remarks_array.first.is_a? Array %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table records_table">
+          <tr>
+              <td class="remark_head"><%= remarks_array.first %></td>
+          </tr>
+          <tr>
+              <td><%= remarks_array.last %></td>
+          </tr>
+      </table>
+    <% else %>
+      <% remarks_array.each do |ra| %>
+        <% count = ra.count %>
+        <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table records_table">
+            <tr>
+                <td colspan='<%= count %>' class="remark_head"><%= ra.first.first %></td>
+            </tr>
+            <tr>
+                <% ra.each do |r| %>
+                  <td style="width:<%= "#{100/count}%" %>"><b><%= r.second %></b><br><%= r.last %></td>
+                        <% end %>
+            </tr>
+        </table>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

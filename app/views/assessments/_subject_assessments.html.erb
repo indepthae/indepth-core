@@ -1,0 +1,293 @@
+<div id="assessment_form">
+    <div class="sub-head"><%= t('exam_subjects') %></div>
+    <div id="description"><%= t('exam_subjects_desc') %></div>
+    <div id="warning"><%= t('exam_subjects_warning') %></div>
+    <div class="wrapper"><div class="error-icon"></div><div class="error-msg"> <%= t('highlighted_rows_are_overlaped') %></div></div>
+    <div id="assessment_table">
+        <% form_for @assessment_form, :url => assessments_path(:schedule_id => @assessment_schedule.id) do |af| %>
+          <div class="outer">
+              <div class="inner">
+                  <table id="assessments">
+                      <tr class="tr-head">
+                          <td class="date fixed-header"><%= t('date_text') %></td>
+                          <td class="time"><%= t('start_time') %></td>
+                          <td class="time"><%= t('end_time') %></td>
+                          <% if [1, 3].include? @assessment_group.scoring_type %>
+                            <td class="max_marks"><%= t('max_mark') %></td>
+                          <% end %>
+                          <% if @assessment_group.scoring_type == 1 %>
+                            <td class="max_marks"><%= t('pass_criteria') %></td>
+                          <% end %>
+                          <% @batches.each do |b| %>
+                            <td class="batch"><%= shorten_string(b.name, 25) %></td>
+                          <% end %>
+                      </tr>
+                      <%= session_fingerprint_field %> 
+                      <%= af.hidden_field :assessment_group_id %>
+                      
+                      <%= af.hidden_field :scoring_type %>
+                      <% af.fields_for :assessment_form_fields do |field| %>
+                        <tr>
+                            <td class="date"><%= field.calendar_date_select :date, :popup => "force", :id => "exam_date", :onchange => "checkOverlap();" %></td>
+                            <td class="time"><%= field.text_field :start_time, :class => "start_time", :onchange => "checkStartTime(this); checkOverlap();" %></td>
+                            <td class="time"><%= field.text_field :end_time, :class => "end_time", :onchange => "checkEndTime(this); checkOverlap();" %></td>
+                            <% if [1, 3].include? @assessment_group.scoring_type %>
+                              <td class="max_marks"><%= field.text_field :max_marks, :class => "max_marks", :onchange => "checkMaxMarks(this);" %></td>
+                            <% end %>
+                            <% if @assessment_group.scoring_type == 1 %>
+                              <td class="max_marks"><%= field.text_field :min_marks, :class => "min_marks", :onchange => "checkMinMarks(this);" %></td>
+                            <% end %>
+                            <% field.fields_for :subject_assessments do |sa| %>
+                              <td class="batch">
+                                  <%= sa.hidden_field :batch_id %>
+                                  <%= sa.hidden_field :course_id %>
+                                  <%= sa.select :subject_list, grouped_options_for_select_with_option_new(@subjects[sa.object.batch_id.to_i], sa.object.subject_id,t('select_subject_exam')), {}, {:class => 'select-list'} %>
+                              </td>
+                            <% end %>
+                        </tr>
+                      <% end %>
+
+                  </table>
+              </div>
+          </div>
+          <%= af.submit t('schedule_exams'), :class => 'submit-button', :onclick => "return validate();" %>
+          <% unless validate_edit_sms_template.is_enabled == false %>
+            <%= af.submit t('save_and_notify'), :id=>"notify_initiate" ,:class => 'submit-button', :onclick => "return validate_exams();"%>
+          <% end %>
+          <%= link_to "#{t('cancel')}", :back, :class => 'submit-button cancel-button' %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  var previous;
+  var valid;
+  j('.start_time, .end_time').timepicker({'timeFormat': 'h:i A', 'step': 5});
+  updateMaxMarks = function (elm) {
+      j('.max_marks').val(elm.value)
+  }
+  updateMinMarks = function (elm) {
+      j('.min_marks').val(elm.value)
+  }
+  checkMaxMarks = function (elm) {
+      if (elm.value == "") {
+          makeError(elm, "<%= t('cant_be_blank') %>");
+      } else {
+          if (isNaN(elm.value))
+              makeError(elm, "<%= t('invalid_marks') %>");
+          else
+          {
+              min_marks = j(elm).closest('tr').find('input.min_marks');
+              if ((min_marks.val() != "") && (parseFloat(min_marks.val()) > parseFloat(elm.value))) {
+                  makeError(elm, "<%= t('cant_be_less_than_minmarks') %>");
+              } else {
+                  removeError(elm);
+              }
+              if ((min_marks.val() != "") && (!isNaN(min_marks.val())) && (parseFloat(min_marks.val()) <= parseFloat(elm.value))) {
+                  removeError(min_marks);
+              }
+          }
+      }
+  }
+  checkMinMarks = function (elm) {
+      if (elm.value == "") {
+          makeError(elm, "<%= t('cant_be_blank') %>");
+      } else {
+          if (isNaN(elm.value))
+              makeError(elm, "<%= t('invalid_marks') %>");
+          else
+          {
+              max_marks = j(elm).closest('tr').find('input.max_marks');
+              if ((max_marks.val() != "") && (parseFloat(max_marks.val()) < parseFloat(elm.value))) {
+                  makeError(elm, "<%= t('cant_be_more_than_maxmarks') %>");
+              } else {
+                  removeError(elm);
+              }
+              if ((max_marks.val() != "") && (!isNaN(max_marks.val())) && (parseFloat(max_marks.val()) >= parseFloat(elm.value))) {
+                  removeError(max_marks);
+              }
+          }
+      }
+  }
+  checkStartTime = function (elm) {
+      if (elm.value == "") {
+          makeError(elm, "<%= t('cant_be_blank') %>");
+      } else {
+          start_time = elm.value;
+          if (isNaN(Date.parse("1/1/2000 " + start_time)))
+              makeError(elm, "<%= t('invalid_time_format') %>");
+          else
+          {
+              end_time = j(elm).closest('tr').find('input.end_time');
+              if ((end_time.val() != "") && (Date.parse("1/1/2000 " + start_time) > Date.parse("1/1/2000 " + end_time.val()))) {
+                  makeError(elm, "<%= t('cant_be_after_end_time') %>");
+              } else {
+                  removeError(elm);
+              }
+              if ((end_time.val() != "") && (!isNaN(Date.parse("1/1/2000 " + end_time.val()))) &&
+                      (Date.parse("1/1/2000 " + start_time) <= Date.parse("1/1/2000 " + end_time.val()))) {
+                  removeError(end_time);
+              }
+          }
+      }
+  }
+  checkEndTime = function (elm) {
+      if (elm.value == "") {
+          makeError(elm, "<%= t('cant_be_blank') %>");
+      } else {
+          end_time = elm.value;
+          if (isNaN(Date.parse("1/1/2000 " + end_time)))
+              makeError(elm, "<%= t('invalid_time_format') %>");
+          else
+          {
+              start_time = j(elm).closest('tr').find('input.start_time');
+              if ((start_time.val() != "") && (Date.parse("1/1/2000 " + start_time.val()) > Date.parse("1/1/2000 " + end_time))) {
+                  makeError(elm, "<%= t('cant_be_before_start_time') %>");
+              } else {
+                  removeError(elm);
+              }
+              if ((start_time.val() != "") && (!isNaN(Date.parse("1/1/2000 " + start_time.val()))) &&
+                      (Date.parse("1/1/2000 " + start_time.val()) <= Date.parse("1/1/2000 " + end_time))) {
+                  removeError(start_time);
+              }
+          }
+      }
+  }
+  makeError = function (elm, msg) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).addClass("error-field");
+      icon = j('<div></div', {'class': 'error-icon'});
+      icon.attr('tooltip', msg);
+      j(elm).parent().append(icon);
+  }
+  removeError = function (elm) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).removeClass("error-field");
+  }
+
+  overlap = function (dateRanges) {
+      var sortedRanges = dateRanges.sort(function (previous, current) {
+
+          // get the start date from previous and current
+          var previousTime = previous.start.getTime();
+          var currentTime = current.start.getTime();
+
+          // if the previous is earlier than the current
+          if (previousTime < currentTime) {
+              return -1;
+          }
+
+          // if the previous time is the same as the current time
+          if (previousTime === currentTime) {
+              return 0;
+          }
+
+          // if the previous time is later than the current time
+          return 1;
+      });
+
+      var result = {overlap: false, ranges: []};
+
+      sortedRanges.each(function (current, idx) {
+          // get the previous range
+          if (idx === 0) {
+              return;
+          }
+          var previous = sortedRanges[idx - 1];
+
+          // check for any overlap
+          var previousEnd = previous.end.getTime();
+          var currentStart = current.start.getTime();
+          var overlap = (previousEnd > currentStart);
+
+          // store the result
+          if (overlap) {
+              // yes, there is overlap
+              result.overlap = true;
+              // store the specific ranges that overlap
+              result.ranges.push(previous.row_idx);
+              result.ranges.push(current.row_idx);
+          }
+      });
+
+      // return the final results  
+      return result;
+  }
+  checkOverlap = function () {
+      ranges = []
+      j('#assessments tr:not(.tr-head)').each(function (idx, elm) {
+          exam_date = j(elm).find('#exam_date').val().replace(/-/g, '/');
+          start_time = j(elm).find('.start_time').val();
+          end_time = j(elm).find('.end_time').val();
+          if ((start_time !== "") && (!isNaN(Date.parse("1/1/2000 " + start_time))) &&
+                  (end_time !== "") && (!isNaN(Date.parse("1/1/2000 " + end_time)))) {
+              ranges.push({start: new Date(exam_date + " " + start_time),
+                  end: new Date(exam_date + " " + end_time), row_idx: idx});
+          }
+      });
+      res = overlap(ranges);
+      j('#assessments tr:not(.tr-head)').removeClass('row-warn');
+      j('.wrapper div').hide();
+      if (res.overlap) {
+          res.ranges.each(function (elm) {
+              element = j('#assessments tr:not(.tr-head)').get(elm);
+              j(element).addClass('row-warn');
+          });
+          j('.wrapper div').show();
+      }
+  }
+  j(".select-list").focus(function () {
+      // Store the current value on focus, before it changes
+      previous = this.value;
+  }).change(function () {
+      // Do something with the previous value after the change
+
+      if (previous != "") {
+          j(".select-list option[value='" + previous + "']").attr('disabled', false);
+          values = previous.split(",");
+          values.each(function (v) {
+              j(".select-list option[value='" + v + "']").attr('disabled', false);
+          });
+      }
+      if (this.value != "") {
+          j(".select-list[name!='" + this.name + "'] option[value='" + this.value + "']").attr('disabled', true);
+          name = this.name
+          values = this.value.split(",");
+          values.each(function (v) {
+              j(".select-list[name!='" + name + "'] option[value='" + v + "']").attr('disabled', true);
+          });
+      }
+      previous = this.value;
+  });
+
+  validate = function () {
+      valid = true;
+      j('#assessments tr:not(.tr-head)').each(function (idx, elm) {
+          sub_selected = j(elm).find('.select-list').filter(function (idx, sub) {
+              return j(sub).val();
+          }).length > 0;
+          if (sub_selected) {
+              exam_date = j(elm).find('#exam_date').val();
+              start_time = j(elm).find('input.start_time').val();
+              end_time = j(elm).find('input.end_time').val();
+              max_marks = j(elm).find('input.max_marks').val();
+              min_marks = j(elm).find('input.min_marks').val();
+              if (exam_date == "")
+                  valid = false;
+              if ((start_time == "") || (isNaN(Date.parse("1/1/2000 " + start_time))) || (end_time == "") || (isNaN(Date.parse("1/1/2000 " + end_time))))
+                  valid = false;
+              if ((Date.parse("1/1/2000 " + start_time) > Date.parse("1/1/2000 " + end_time)))
+                  valid = false;
+              if ((j(elm).find('input.max_marks').length > 0)) {
+                  if ((max_marks == "") || (isNaN(max_marks)))
+                      valid = false;
+              }
+              if ((j(elm).find('input.min_marks').length > 0)) {
+                  if ((min_marks == "") || (isNaN(min_marks)) || (parseFloat(min_marks) > parseFloat(max_marks)))
+                      valid = false;
+              }
+          }
+      });
+      return valid;
+  }
+
+</script>

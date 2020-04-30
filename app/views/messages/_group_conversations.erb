@@ -1,0 +1,231 @@
+<% if @thread.present? %>
+  <div id="conv_cont_<%=@thread.id%>">
+      <div class="conversation_header">
+          <div class="subject_space">
+              <%= @thread.subject %>
+          </div>
+          <% if (!@responses.present? and @recipient_list) or ( @recipient_id and @sub_thread.present? )%>
+            <div class="actions">
+                <% message = t('are_you_sure_message') %>
+                <%= link_to "#{t('delete')} #{t('conversation')}", '#', :onclick => "make_popup_box(this, 'confirm', '#{message}',{'ok' : '#{t('delete_message')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_message')}', 'return_status' : true, 'popup_class' : 'remove_lt'}); return load_delete_method();" %>
+            </div>
+          <%end%>
+      </div>
+      <div class="conversations scrollbar <%='outer-container' if @recipient_list %>" id="conversations-scroll">
+          <% if @recipient_list %>
+            <div class='subject_line'>
+                <div class="thread_tag">
+                    <div class="thread_thumbnail">
+                        <%= image_tag "group_icon.png" %>
+                    </div>
+                    <div class="thread_detail">
+                        <%="#{@recipients_count} #{t('recipients')}"%>
+                    </div>
+                    <div class="thread_date">
+                        <% if @thread.created_at < Date.today.beginning_of_year %>
+                          <%= format_date(@thread.created_at,:format => :short) %>
+                        <% elsif(@thread.created_at.to_date - Date.today).to_i < 0 %>
+                          <%=change_time_to_local_time(@thread.created_at).strftime("%h %e,  %I:%M%p")  %>
+                        <% else %>
+                          <%=change_time_to_local_time(@thread.created_at).strftime("%I:%M%p")  %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+          <% end %>
+          <% conditional_div(:show_div => @recipient_list.present?, :class => 'container') do %>
+            <% if @sub_thread.present?  %>
+              <% (@messages.total_pages.to_i).downto(2)  do |i|%>
+                <div id="infinite_messages_<%=i%>"></div>
+              <% end %>
+              <% @messages.each do |message|   %>
+                <div class="conversation <%= "self_conversation" if message.sender == @current_user %>">
+                    <div class="conversation_body">
+                        <%= simple_format_without_p message.body %>
+                        <% if message.has_attachment?  %>
+                          <% message.message_attachments.each do |ma| %>
+                            <div class="message_attachments <%='no_body' if message.body.blank?%>">
+                                <%= link_to ma.attachment_file_name, ma.attachment.url(:original,false), { :href => "#{ma.attachment.url(:original,false)}"}%>
+                            </div>
+                          <% end %>
+                        <% end %>
+                    </div>
+                    <div class="message_time">
+                        <% if message.created_at < Date.today.beginning_of_year %>
+                          <%= format_date(message.created_at,:format => :short)  %>
+                        <% elsif(message.created_at.to_date - Date.today).to_i < 0 %>
+                          <%=change_time_to_local_time(message.created_at).strftime("%h %e,  %I:%M%p")  %>
+                        <% else %>
+                          <%=change_time_to_local_time(message.created_at).strftime("%I:%M%p")  %>
+                        <% end %>
+                    </div>
+                </div>
+              <% end %>
+              <div id="infinite-scrolling-messages">
+                  <%= will_paginate @messages %>
+              </div>
+            <%else%>
+              <div class="no_messages"><%=t('no_messages')%></div>
+            <% end %>
+          <%end%>
+      </div>
+      <% if @recipient_id %>
+        <% if can_reply?(@recipient_id,@thread.id) %>
+          <div class="conversation_reply">
+              <% form_for(@message, :url => {:action => 'create_message'}, :html=> {:multipart=>true,:id=>'message_reply'}) do |m| %>
+                <div class="form_cont">
+                    <div class="label-field-pair">
+                        <div class="text-area-bg"><%= m.text_area :body,:placeholder=>'Write a message or attach a file', :rows => 2, :cols => 20 %></div>
+                    </div>
+                    <div id="form_data" data-recipient="<%=@recipient_id%>" data-thread="<%=@thread.id%>"></div>
+
+                    <div class="reply_actions">                        
+                        <% m.fields_for :message_recipients do |mr| %>
+                          <%= mr.hidden_field :recipient_id, :value=>@recipient_id%>
+                        <% end %>
+                        <%= m.hidden_field :message_thread_id, :value=>@thread.id  %>
+                        <%= m.hidden_field :sender_id, :value=>@current_user.id  %> 
+                        <div class="add_fields" id="add_fields_button">                
+                            <div class="text-input-bg" id="browse-style">
+                                <div id="selected_attachments" class="selected_attachments"></div>
+                                <%= paperclip_file_field_tag_multiple 'message[message_attachments_attributes][0]','attachment', :size=>12, :multiple =>true,:direct => false, :object => MessageAttachment.new,:uni =>"reply_message", :onclick =>"this.value = null;" %>         
+                            </div>           
+                            <div class='wrapper' id='attachment-error' style='display:none;'>
+                                <div class='error-icon'></div><div class='error-msg'></div>                                  
+                            </div>
+                            <div class="right-actions">
+                                <%= hidden_field_tag :session_fingerprint, session_fingerprint%>  
+                                <%=  m.submit "#{t('send')}", :class => 'submit-button', :id => 'submit_button' %>
+                            </div>
+                        </div>                        
+                    </div>
+                  <%end%>
+              </div>
+            <%else%>
+              <div id="cant_reply_message"><%=t('cant_reply_to_thread')%></div>
+            <%end%>
+          <%end%>
+      </div>
+    <%end%>
+    <script>
+      if (j(".scrollbar").length > 0) {
+          j(".scrollbar").scrollTop(j(".scrollbar")[0].scrollHeight);
+      }
+
+      if (j('.conversation_reply').length == 0) {
+          j('.conversations').css('height', '633px');
+      }
+      if (j('.outer-container').length > 0) {
+          j('.container').css('height', '590px');
+      }
+
+      var enterPressed = false;
+
+      jQuery(function () {
+          if (j('#infinite-scrolling-messages').size() > 0) {
+              j('.conversations').on('scroll', function () {
+                  var more_posts_url;
+                  if (j('#infinite-scrolling-messages .pagination').length > 0) {
+                      url = j('#infinite-scrolling-messages .pagination .next_page').attr('href');
+                      update_url = '/messages/update_message_scroll'
+                      if (url != undefined) {
+                          page = url.substring(url.lastIndexOf('?') + 1, url.length);
+                      }
+                      if (page != undefined) {
+                          more_posts_url = update_url + '?' + page
+                      }
+                      if (more_posts_url && j('.conversations').scrollTop() < 200) {
+                          j('#infinite-scrolling-messages .pagination').html('<img src="/images/filler_ring_loader.gif" alt="Loading..." title="Loading..." />');
+                          j('#infinite-scrolling-messages .pagination').css('display', 'block');
+                          //j.getScript(more_posts_url);
+                          j.ajax({
+                              type: 'GET',
+                              url: more_posts_url,
+                              dataType: "script",
+                              data: {
+                                  thread_id: '<%=@thread.id%>',
+                                  type: 'broadcast_resp',
+                                  recipient_id: '<%=@recipient_id%>'
+                              },
+                              success: function (resp) {
+
+                              }
+                          });
+                      }
+                  }
+              });
+          }
+      });
+
+      check_disable = function () {
+          if (j('#message_body').val() != '' || window.reply_message.attachment_set.length != 0) {
+              j('#submit_button').removeAttr('disabled');
+          } else {
+              disable_submit();
+              field = j("#message_message_attachments_attributes_0_attachment");
+              no_file = check_file_absence();              
+              if (no_file) {
+                  j('#submit_button').attr('disabled', 'disabled');
+              } else {
+                  j('#submit_button').removeAttr('disabled');
+              }
+          }
+      }
+      load_delete_method = function () {
+          j('.submit-button#yes').on('click', function () {
+              thread_id = <%=@thread.id%>
+              recp_id = <%=@recipient_id || @thread.id %>
+              j.ajax({
+                  type: 'GET',
+                  url: '/messages/apply_actions',
+                  data: {
+                      thread_id: thread_id,
+                      recipient_id: recp_id,
+                      type: 'broadcast_resp',
+                      act: 'delete',
+                      options: "<%='hard' unless @responses.present?%>"
+                  },
+                  success: function (resp) {
+                      if (resp == 'success') {
+                          remove_popup_box()
+                          j('#thread_' + recp_id).hide();
+                          j('#conv_cont_' + thread_id).hide();
+                          update_response_count(thread_id)
+
+                      } else if (resp == 'success_hard') {
+                          window.location = '/messages'
+                      }
+                  }
+              });
+          })
+
+      }
+
+      function update_response_count(thread_id) {
+          el = j('#response_count')
+          new_count = parseInt(el.html()) - 1
+          if (isNaN(new_count) || new_count <= 0) {
+              el.parent().parent().hide();
+              window.location = '/messages?thread_id=' + thread_id
+          } else {
+              el.html(new_count);
+          }
+      }
+
+      j('#message_body').on('keydown', function (event) {
+          if (event.keyCode == 13)
+              if (!event.shiftKey)
+              {
+                  if (!enterPressed) {
+                      event.preventDefault();
+                      j('#group_message_reply').submit();
+                      enterPressed = true;
+                      setTimeout(function () {
+                          enterPressed = false;
+                      }, 1000);
+                  }
+                  return false;
+              }
+      });
+
+    </script>

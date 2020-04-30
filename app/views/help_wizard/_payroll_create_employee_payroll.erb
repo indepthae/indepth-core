@@ -1,0 +1,16 @@
+
+  <% help_wizard('Guide', 'Here\'s a brief step-by-step guide on how to update an employee’s payroll.') do %>
+      <p>When an employee is assigned to a payroll group, the payroll of that employee has to be added.</p>
+
+      <ol>
+        <li><b>Gross:</b> The payroll of the employee will be calculated based on the Gross Pay.</li>
+        <li>All the values of the payroll categories can be altered after calculation.</li>
+      </ol>
+
+      <p><b>Note:</b></p>
+
+      <ul>
+        <li>If a category has no relation to GROSS, then the value of the category is highly likely to be 0 after calculation.</li>
+        <li>If the total earning is not equal to GROSS, you will be warned, however it is still valid.</li>
+      </ul>
+  <% end %>

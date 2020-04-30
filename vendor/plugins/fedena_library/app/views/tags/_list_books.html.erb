@@ -1,0 +1,40 @@
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <tr class="tr-head">
+    <td>
+      <%= t('sl_no') %>
+    </td>
+    <td>
+      <%= t('book_number') %>
+    </td>
+    <td>
+      <%= "#{t('title')}"%>
+    </td>
+    <td>
+      <%= "#{t('author')}"%>
+    </td>
+  </tr>
+  <tr class="tr-blank">
+
+  </tr>
+  <% @books.each_with_index do |book,i| %>
+    <% if params[:page].present? %>
+      <% if params[:page].to_i >= 1 %>
+        <% i = i  + (params[:page].to_i - 1) * 10 %>
+      <% end %> <%else %> <% i = i %> <% end %>
+    <tr class="tr-<%= cycle('odd', 'even')%>">
+      <td class="col-1">
+        <%= i+1 %>
+      </td>
+      <td class="col-2">
+        <%= book.book_number %>
+      </td>
+      <td class="col-3">
+        <%= book.title %>
+      </td>
+      <td class="col-4">
+        <%= book.author %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @books,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "tags", :action => "show", :id => @tag.id } %>

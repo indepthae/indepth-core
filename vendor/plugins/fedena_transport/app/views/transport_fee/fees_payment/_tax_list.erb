@@ -1,0 +1,21 @@
+<% if @transport_fee.tax_enabled? and @tax_slab.present? %>
+  <% tax_amount = @transport_fee.tax_amount %>  
+  <% i = 0 %>
+  <tr class="row-a tr-head">
+      <td class="sl-col col-1"></td>
+      <td class="bold_font" colspan="3">
+          <span><%= t('tax_text') %></span>
+      </td>
+  </tr>
+  <tr class="row-b tax">
+      <td class="sl-col normal_font tax_index"><%= i += 1 %></td>          
+      <td class="set_border_right particular-col normal_font">
+          <%= "#{@tax_slab.name} - &#x200E;(#{precision_label(@tax_slab.rate)}%)&#x200E;" %>
+      </td>
+      <td class="set_border_right amount-col normal_font align_right">
+          <%= precision_label(@transport_fee.tax_amount) %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+  <% @total_fees += precision_label(tax_amount).to_f %>
+<% end %>

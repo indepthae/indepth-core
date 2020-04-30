@@ -1,0 +1,14 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= @admin_user.full_name.titleize %></h1>
+</fieldset>
+<div class="content-div">
+  <div class="nav-vertical width-15-pc">
+    <ul>
+      <li><%= link_to 'Profile',profile_admin_user_path(@admin_user),:class=>"active" %></li>
+      <li><%= link_to 'Change Password',change_password_admin_user_path(@admin_user) if permitted_to? :change_password, @admin_user, :context=>:admin_users%></li>
+    </ul>
+  </div>
+  <div class="detail-list width-80-pc bg-light shadow grey-border" id="content_div">
+    <%= render "profile.html" %>
+  </div>
+</div>

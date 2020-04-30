@@ -1,0 +1,10 @@
+<% remote_form_for :order_by,  :url => {:action => 'update_sort_order'} do %>
+  <div class="text-input-bg">
+    <%= select :configuration, :roll_number_order, Configuration::ROLL_NUMBER_SORT_ORDER.map{|k,v| [t(v),k]} ,
+               :selected => @sort_order.nil? ? "" : @sort_order.config_value%>
+  </div>
+  <%=submit_tag "Save",:class=>'submit_button',  :disable_with => "► #{t('please_wait')}" %>
+  <% if Configuration.roll_number_sort_order %>
+    <%= link_to_remote "Cancel", :url => {:action => 'update_sort_order'}, :html => {:class => "submit_button"} %>
+  <% end %>
+<% end %>

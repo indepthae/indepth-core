@@ -1,0 +1,80 @@
+<div class="remark-preview-head">
+    <%= t('remark_preview') %>
+</div>
+<div class="template-preview-container">
+    <div class="template-preview-sub-container">
+        <% @remark_templates.each do |rt| %>
+          <div class="each-template-preview">
+              <%= rt.template_body %>
+          </div>
+        <% end %>
+    </div>
+</div>
+
+<script type="text/javascript">
+  template_app = new Vue({
+  el: '#app',
+          data: {
+<%@keys.each_with_index do |key,index|%>
+  <%=key.first%>: ''<%=',' if index != (@keys.count-1) %>
+<%end%>
+          }
+  });
+<%if @keys[:full_name].present?%>
+    template_app.full_name = '<%= @student.full_name%>';
+<%end%>
+
+<%if @keys[:first_name].present?%>
+    template_app.first_name = '<%= @student.first_name%>';
+<%end%>
+
+<%if @keys[:he_she_up].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.he_she_up = '<%= "She" %>';
+  <% else %>
+      template_app.he_she_up = '<%= "He" %>';
+  <% end %>
+<%end%>
+
+<%if @keys[:he_she_down].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.he_she_down = '<%= "she" %>';
+  <% else %>
+      template_app.he_she_down = '<%= "he" %>';
+  <% end %>
+<%end%>
+
+<%if @keys[:him_her_up].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.him_her_up = '<%= "Her" %>';
+  <% else %>
+      template_app.him_her_up = '<%= "Him" %>';
+  <% end %>
+<%end%>
+
+<%if @keys[:him_her_down].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.him_her_down = '<%= "her" %>';
+  <% else %>
+      template_app.him_her_down = '<%= "him" %>';
+  <% end %>
+<%end%>
+
+<%if @keys[:his_her_up].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.his_her_up = '<%= "Her" %>';
+  <% else %>
+      template_app.his_her_up = '<%= "His" %>';
+  <% end %>
+<%end%>
+
+<%if @keys[:his_her_down].present?%>
+  <% if @student.gender.downcase == 'f' %>
+      template_app.his_her_down = '<%= "her" %>';
+  <% else %>
+      template_app.his_her_down = '<%= "his" %>';
+  <% end %>
+<%end%>
+
+
+</script>

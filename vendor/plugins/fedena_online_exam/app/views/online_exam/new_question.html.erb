@@ -1,0 +1,159 @@
+<script>
+  j(document).ready(function() {
+    select_div = j("#online_exam_question_question_format")
+    if(select_div.val() == "descriptive"){
+      j("#options-input").hide();
+    }
+    else{
+      j("#options-input").show();
+    }
+  })
+<%#*function add_option_box(){%>
+<%#*op_box = j(".option_label_field:last").clone();%>
+<%#*div_count = j(".option_label_field").length%>
+<%#*op_box = adjust_option_boxes(op_box,div_count);%>
+<%#*op_box.find("#option_text_field_bg").find(".redactor_box:first").find(".redactor_redactor_call:first").html("<p></p>");%>
+
+<%#*j("#more-options").append(op_box);%>
+<%#*}%>
+
+  function add_option_box(){
+    div_count = j(".option_label_field").length
+    op_box = j(".option_label_field:last").clone();
+    update_field = op_box.find("#option_text_field_bg").find("#redactor_to_update").clone();
+    update_field.attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][redactor_to_update]");
+    delete_field = op_box.find("#option_text_field_bg").find("#redactor_to_delete").clone();
+    delete_field.attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][redactor_to_delete]");
+    opt_str = op_box.find(".op-count:first").text().split(' ');
+    op_box.find(".op-count:first").text(opt_str[0]+" "+(div_count+1));
+    op_box.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=checkbox]:first").attr("id","online_exam_question_online_exam_options_attributes_"+(div_count)+"_is_answer");
+    op_box.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=checkbox]:first").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][is_answer]");
+    op_box.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=checkbox]:first").attr("checked",false);
+    op_box.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=hidden]:first").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][is_answer]");
+    remove_link = op_box.find("#option_text_field_bg").find(".remove-link:first").clone();
+    op_box.find("#option_text_field_bg").empty();
+    op_box.find("#option_text_field_bg").append("<textarea rows=20 columns=40></textarea>");
+    txt_area = op_box.find("#option_text_field_bg").find('textarea:first')
+    txt_area.attr("id","online_exam_question_online_exam_options_attributes_"+(div_count)+"_option");
+    txt_area.attr("class","redactor_call");
+    txt_area.attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][option]")
+    op_box.find("#option_text_field_bg").append(remove_link);
+    j("#more-options").append(op_box);
+    init_redactor(txt_area.get(0));
+    delete_field.insertAfter(j(".option_label_field:last").find("#option_text_field_bg").find(".redactor_box:first"))
+    update_field.insertAfter(j(".option_label_field:last").find("#option_text_field_bg").find(".redactor_box:first"))
+  }
+
+  function adjust_option_boxes(th_is,div_count){
+    d=j(th_is);
+    opt_str = d.find(".op-count:first").text().split(' ');
+    d.find(".op-count:first").text(opt_str[0]+" "+(div_count+1));
+    d.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=checkbox]:first").attr("id","online_exam_question_online_exam_options_attributes_"+(div_count)+"_is_answer");
+    d.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=checkbox]:first").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][is_answer]");
+    d.find(".label-field-pair2:first").find(".text-input-bg:first").find("input[type=hidden]:first").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][is_answer]");
+
+    d.find("#option_text_field_bg").find(".redactor_box:first").find(".redactor_upload_errors:first").attr("id","redactor_upload_errors_online_exam_question_online_exam_options_attributes_"+(div_count)+"_option");
+    d.find("#option_text_field_bg").find(".redactor_box:first").find(".redactor_toolbar:first").attr("id","redactor_toolbar_"+(div_count+1));
+    d.find("#option_text_field_bg").find(".redactor_box:first").find("textarea:first").attr("id","online_exam_question_online_exam_options_attributes_"+(div_count)+"_option");
+    d.find("#option_text_field_bg").find(".redactor_box:first").find("textarea:first").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][option]");
+
+    d.find("#option_text_field_bg").find("#redactor_to_update").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][redactor_to_update]");
+    d.find("#option_text_field_bg").find("#redactor_to_delete").attr("name","online_exam_question[online_exam_options_attributes]["+(div_count)+"][redactor_to_update]");
+    return d;
+  }
+
+  function remove_option(th_is){
+    div_count = j(".option_label_field").length
+    if(div_count <= 2){
+      alert("Atleast 2 options are required.")
+    }
+    else{
+      j(th_is).parent().parent().remove();
+      i=0
+      j(".option_label_field").each(function(){
+        adjust_option_boxes(this,i);
+        i=i+1
+      });
+    }
+  }
+
+  function toggle_options_div(th_is){
+    sel_value = j(th_is).val();
+    if(sel_value == "descriptive"){
+      j("#options-input").hide();
+    }
+    else{
+      j("#options-input").show();
+    }
+  }
+
+  
+</script>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_questions') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_new_question, @online_exam_group%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="question-form">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for @online_exam_question, :url=>{:action=>:new_question,:ref_id=>@ref_id} do |f| %>
+    <%= error_messages_for 'online_exam_question',:header_message=>nil %>
+      <div class="question_label_field">
+        <p><%= t('question') %></p>
+        <div class="label-field-pair1">
+          <label ><%= t('mark') %></label>
+          <div class="text-input-bg"><%= f.text_field :assigned_mark %></div>
+        </div>
+        <div id="question_text_field_bg">
+          <%= f.redactor :question,:latex=>true%>
+        </div>
+      </div>
+      <% if @online_exam_group.exam_type == "subject_specific" %>
+        <div class="label-field-pair">
+          <label><%= t('select_a_subject') %></label>
+          <div class="text-input-bg long-input">
+            <%= f.select :subject_id, @subjects.map{|s| [s.name,s.id]}  %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @online_exam_group.exam_format == "hybrid" %>
+        <div class="label-field-pair">
+          <label><%= t('select_question_format') %></label>
+          <div class="text-input-bg long-input">
+            <%= f.select :question_format, [["#{t('objective')}","objective"],["#{t('descriptive')}","descriptive"]],{},:onChange=>"toggle_options_div(this); return false;"  %>
+          </div>
+        </div>
+      <% end %>
+
+      <div id="options-input">
+  <%#= render :partial=>"options_input_box", :object=>@online_exam_question %>
+
+
+        <h4><%= t('enter_options_here') %>:</h4>
+        <div id="more-options">
+          <% i=1 %>
+          <% f.fields_for :online_exam_options do |exam_form| %>
+            <%= render 'option_form', :s=>exam_form,:i=>i %>
+            <% i=i+1 %>
+          <% end %>
+        </div>
+        <%= link_to "#{image_tag("/images/examination/add_2.png",:border => 0)} #{t('add_option')}","#", {:id=>"add_option_link",:onClick=>"add_option_box(); return false;"}  %>
+      </div>
+      <div id="submit-button">
+        <%=f.submit("#{t('create_text')}") %>
+        <%= link_to "#{t('skip')}", {:action=>"exam_details",:id=>@online_exam_group.id},:class=>"user_button" %>
+      </div>
+    <% end %>
+    <%= load_redactor_script %>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<%= wicked_pdf_stylesheet_link_tag "pdf_normalize" -%>
+
+<%= @bulk_generated_certificate.generated_certificates.collect(&:get_pdf_html).join %>

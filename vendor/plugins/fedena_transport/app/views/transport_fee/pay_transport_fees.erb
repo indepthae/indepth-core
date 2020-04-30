@@ -1,0 +1,33 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('transport_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('pay_fees') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash"></div>
+  <div class="box">
+    <div id ="message"></div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('user_text')}-#{t('wise')}", :action => "transport_fee_search" %></div>
+      <div class="link-descr"><%= t('search_for_users_to_pay') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('batch')}-#{t('wise')}", :action => "pay_batch_wise" %></div>
+      <div class="link-descr"><%= "#{t('pay_fees')} #{t('in').downcase} #{t('batch')}-#{t('wise')}" %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('defaulters')}",:action => "transport_fee_defaulters_view" %></div>
+      <div class="link-descr"><%= t('users_with_fees_due') %></div>
+    </div>
+
+    <div id="modal-box" style="display:none;"></div>
+  </div>
+</div>

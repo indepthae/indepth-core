@@ -1,0 +1,26 @@
+
+<tr class="tr-<%= cycle("odd", "even") %> discount temp_name">
+  <td class="col-2" colspan="2">
+    <div class="fleft">
+
+    </div>
+    <div class="fleft">
+      <label>Discount Name<span class="necessary-field">*</span>:</label>
+    </div>
+    <div class="fright">  <%= text_field_tag "particular_payment[particular_payments_attributes][replace_this_by_particular_id][particular_discounts_attributes][replace_this][name]", value="", options={:class => "discount_name"} %></div>
+  </td>
+  <td class="col-6">
+    <div class="fleft">
+      <label>Discount:</label>
+    </div>
+    <div class="input-fields">
+      <%= text_field_tag "particular_payment[particular_payments_attributes][replace_this_by_particular_id][particular_discounts_attributes][replace_this][discount]", value="", options={:class => "precision_text amount_box discount_amount"} %>
+      <div id="delete_link">
+        <%= link_to_function "&times", "discount_delete(this)" %>
+      </div>
+
+</div>
+
+  </td>
+</tr>
+

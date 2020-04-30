@@ -1,0 +1,11 @@
+<div class="text-input-bg fieldWithErrors">
+  <%= text_field :batch, :roll_number_prefix, :value => params[:batch][:roll_number_prefix] %>
+  <div id="info"><%= t('max_characters') %></div>
+</div>
+<div id="error-msg">
+  <% @batch.errors.full_messages.each do |error| %>
+   <%= error %><br>
+  <% end %>
+</div>
+<div class="error-icon"></div>
+

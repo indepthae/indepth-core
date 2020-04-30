@@ -1,0 +1,96 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class = "box">
+    <hr>
+    <div class = "header_settings_institution_details_box">
+        <div class="header_settings_institution_details_header"><%= t('institution_details')%></div>
+        <div class = "header_settings_institution_details_form">
+            <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td  colspan="1">
+                        <%= f.check_box :enable_name, :checked => (@header["InstitutionName"][:is_enabled]) %>
+                        <span class="cb_value"><%= t('institution_name') %></span>
+                    </td>
+                    <td colspan="3"><span class="institution_details_form_input"><%= f.text_field "institution_name", :value => @header["InstitutionName"][:field_info] %></span></td>
+                </tr>
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td colspan="1">
+                        <%= f.check_box :enable_address, :checked => (@header["Address"][:is_enabled]) %>
+                        <span class="cb_value"><%= t('address') %></span>
+                    </td>
+                    <td colspan="3"><span class="institution_details_form_input"><%= f.text_area "address", :value => @header["Address"][:field_info] %></span></td>
+                </tr>
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td colspan="1"> 
+                        <%= f.check_box :enable_email, :checked => (@header["Email"][:is_enabled]) %>
+                        <span class="cb_value"><%= t('email') %></span>
+                    </td>
+                    <td colspan="3"><span class="institution_details_form_input"><%= f.text_field "email", :value => @header["Email"][:field_info] %></span></td>
+                </tr>
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td colspan="1">
+                      <%= f.check_box :enable_phone, :checked => (@header["Phone"][:is_enabled]) %>
+                      <span class="cb_value"><%= t('phone') %></span>  
+                    </td>
+                    <td colspan="3"><span class="institution_details_form_input"><%= f.text_field "phone", :value => @header["Phone"][:field_info] %></span></td>
+                </tr>
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td><%= f.check_box :enable_email, :checked => (@header["Website"][:is_enabled]) %><span class="cb_value"><%= t('website') %></span> </td>
+                    <td colspan="3"><span class="institution_details_form_input"><%= f.text_field "website", :value => @header["Website"][:field_info], :placeholder=>"Not Entered" %></span></td>
+                </tr>
+                
+                <div class="additional_field_add_box">
+                    <tr class="institution_details_row" style="height: 40px;">
+                        <td>
+                            <%= link_to_function "X", "remove_entry(this);",:class=>"close-field"%>
+                            <span class="cb_value"><%= text_field_tag "additional_field" %></span>
+                        </td>
+                        <td colspan="2">
+                            <span class="text_size_select"><%= select_tag "text_size", options_for_select([["#{t('select_text_size')}", '']]+["Large","Small","Normal","Medium","Very Small"]) %></span>
+                            <span class="text_color_select"><%= select_tag "text_color", options_for_select([["#{t('select_text_color')}", '']]+["Grey","Black"]) %></span>
+                        </td>
+                    </tr>
+                </div>
+                
+                <tr class="institution_details_row" style="height: 40px;">
+                    <td class="institution_details_form_label" colspan="3">
+                        <label class="add_additional_details_btn">
+                            <%= link_to_function "+ Add additional details","create_row();",:style=>"color: #008800 !important;"%>
+                        </label>
+                    </td>                    
+                </tr>
+            </table>
+            
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  function create_row() {
+    var rand = +new Date();
+    var inst_details = '<tr class="institution_details_row" style="height: 40px;">'
+    var close_and_input = '<td><a class="close-field" onclick="remove_entry(this)">x</a><span class="cb_value"><%= text_field_tag "additional_field" %></span></td>'
+    var new_td = '<td colspan="2">'
+    var text_size_select = '<span class="text_color_select">'
+    var select_size = '<select id="text_size" name="text_size"><option value="">Select a text size</option><option value="Large">Large</option>'+
+                       '<option value="Small">Small</option>'+
+                      '<option value="Normal">Normal</option>'+
+                      '<option value="Medium">Medium</option>'+
+                      '<option value="Very Small">Very Small</option></select></span>'
+    var text_color_select = '<span class="text_color_select">'
+    var select_color = '<span class="text_color_select"><select id="text_color" name="text_color"><option value="">Select a text color</option>'+
+                      '<option value="Grey">Grey</option>'+
+                      '<option value="Black">Black</option></select></span>'
+    var tr_td_close = '</td></tr>'
+   
+    j('#listing > tbody:last').append(inst_details + close_and_input + new_td + text_size_select + select_size + text_color_select + select_color + tr_td_close);
+     
+  }
+    
+    function remove_entry(el) {
+    j(el).parent().parent().remove();
+  }
+</script>

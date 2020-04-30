@@ -1,0 +1,98 @@
+<div id="lop_as_deduction_example">
+    <div class="description">
+        <%= t('lopa_as_a_deduction_desc', :code => "LOPA") %>
+    </div>
+    <div class="description">
+        <%= t('lop_amount_example') %>
+    </div>
+    <table cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+            <td class="name"><%= t('earnings') %></td>
+            <td class="value"><%= "#{t('amount')} &#x200E;(#{currency})&#x200E;" %></td>
+        </tr>
+        <tr>
+            <td><%= "Basic Salary" %></td>
+            <td class="amount"><%= precision_label(2000) %></td>
+        </tr>
+
+        <tr>
+            <td><%= "HRA" %></td>
+            <td class="amount"><%= precision_label(1000) %></td>
+        </tr>
+    </table>
+    <table cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+            <td class="name"><%= t('deductions') %></td>
+            <td class="value"><%= "#{t('amount')} &#x200E;(#{currency})&#x200E;" %></td>
+        </tr>
+        <tr>
+            <td><%= "Pension Fund" %></td>
+            <td class="amount"><%= precision_label(200) %></td>
+        </tr>
+
+        <tr>
+            <td><%= t('lop') %></td>
+            <td class="amount"><%= precision_label(500) %></td>
+        </tr>
+    </table>
+</div>
+<div id="lop_from_cat_example">
+    <div class="description">
+        <%= t('deduct_lopa_from_payroll_categories_desc', :code => "LOPA") %>
+    </div>
+    <div class="description">
+        <%= t('lop_amount_example') %>
+    </div>
+    <table cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+            <td class="name"><%= t('earnings') %></td>
+            <td class="value"><%= "#{t('actual_amount')} &#x200E;(#{currency})&#x200E;" %></td>
+            <td class="value"><%= "#{t('credited')} &#x200E;(#{currency})&#x200E;" %></td>
+        </tr>
+        <tr>
+            <td><%= "Basic Salary" %></td>
+            <td class="amount"><%= precision_label(2000) %></td>
+            <td class="amount"><%= precision_label(1500) %></td>
+        </tr>
+
+        <tr>
+            <td><%= "HRA" %></td>
+            <td class="amount"><%= precision_label(1000) %></td>
+            <td class="amount"><%= precision_label(750) %></td>
+        </tr>
+    </table>
+    <table cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+            <td class="name"><%= t('deductions') %></td>
+            <td class="value"><%= "#{t('actual_amount')} &#x200E;(#{currency})&#x200E;" %></td>
+            <td class="value"><%= "#{t('deducted')} &#x200E;(#{currency})&#x200E;" %></td>
+        </tr>
+        <tr>
+            <td><%= "Pension Fund" %></td>
+            <td class="amount"><%= precision_label(200) %></td>
+            <td class="amount"><%= precision_label(150) %></td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+  var lop_as_deduction_text = '<%= t('as_a_deduction', :code => "LOPA") %>';
+  var lop_from_cat_text = '<%= t('deduct_lopa_from_payroll_categories', :code => "LOPA") %>';
+  more_examples = function (type) {
+      build_modal_box({title: eval(type + '_text'), popup_class: 'example_popup'});
+      var content = j('#' + type + '_example').clone();
+      j('.example_popup #popup_content').append(content);
+      j('.example_popup #popup_footer').remove();
+      j('.example_popup').prev('#popup_box_overlay').click(remove_example_popup);
+      j('.example_popup #MB_close').attr('onclick', 'remove_example_popup()');
+      if (j('html').attr('dir') == 'ltr')
+          j('.example_popup').css({left: (j('body').width() - j('.example_popup').width()) / 2});
+      else
+          j('.example_popup').css({right: (j('body').width() - j('.example_popup').width()) / 2});
+  }
+  function remove_example_popup()
+  {
+      overlay = j('.example_popup').prev('#popup_box_overlay')
+      j('.example_popup').remove();
+      overlay.remove();
+  }
+</script>

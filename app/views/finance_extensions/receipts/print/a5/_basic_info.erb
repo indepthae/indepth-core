@@ -1,0 +1,105 @@
+<section class="top">
+    <span class="title">
+        <%= t('fee_receipt') %>
+    </span>
+  <span>&nbsp</span>
+  <span class="receipt_no"><%= t('receipt_no') %>:<%= transaction_hash.receipt_no %></span>
+</section>
+<section class="receipt-details">
+  <div class="receipt-details-list">
+    <% if transaction_hash.payee.payee_type =='Student' %>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('student_text') %>:
+          </div>
+          <div class="right bold rtl_bracket_fix">
+            <%= transaction_hash.payee.full_name %> (<%= transaction_hash.payee.admission_no %>)
+          </div>
+        </div>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('course_text') %>:
+          </div>
+          <div class="right">
+            <%= transaction_hash.payee.full_course_name %>
+          </div>
+        </div>
+    <% elsif transaction_hash.payee.payee_type =='Employee' %>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('employee_text') %>:
+          </div>
+          <div class="right bold rtl_bracket_fix">
+            <%= transaction_hash.payee.full_name %>
+          </div>
+        </div>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('department_text') %>:
+          </div>
+          <div class="right">
+            <%= transaction_hash.payee.employee_department_name %>
+          </div>
+        </div>
+    <% else %>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('guest_text') %>:
+          </div>
+          <div class="right bold rtl_bracket_fix">
+            <%= transaction_hash.payee.full_name %>
+          </div>
+        </div>
+    <% end %>
+    <div class="receipt-details-list-item">
+      <% if transaction_hash.collection.present? %>
+          <div class="left"><%= transaction_hash.collection.title %></div>
+          <div class="left"><%= transaction_hash.collection.name %></div>
+      <% end %>
+    </div>
+  </div>
+  <div class="receipt-details-list">
+    <% if transaction_hash.payee.payee_type =='Student' %>
+        <div class="receipt-details-list-item">
+          <div class="left">
+            <%= t('parent') %>
+          </div>
+          <div class="right">
+            <%= transaction_hash.payee.guardian_name %>
+          </div>
+        </div>
+        <% if has_roll_number?(transaction_hash) %>
+            <div class="receipt-details-list-item">
+              <div class="left">
+                <%= t('roll_number') %>
+              </div>
+              <div class="right">
+                <%= transaction_hash.payee.roll_number %>
+              </div>
+            </div>
+        <% end %>
+    <% end %>
+    <div class="receipt-details-list-item">
+      <% unless transaction_hash.finance_type == 'InstantFee' %>
+          <% if transaction_hash.due_date.present? %>
+              <div class="sub-receipt-details-list-item">
+                <div class="left">
+                  <%= t('due_date') %>
+                </div>
+                <div class="right">
+                  <%= format_date(transaction_hash.due_date, :format => :short_date) %>
+                </div>
+              </div>
+          <% end %>
+      <% end %>
+      <div class="sub-receipt-details-list-item">
+        <div class="left">
+          <%= t('payment_date') %>
+        </div>
+        <div class="right">
+          <%= format_date(transaction_hash.transaction_date, :format => :short_date) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

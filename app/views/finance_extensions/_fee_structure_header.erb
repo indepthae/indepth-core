@@ -1,0 +1,91 @@
+<div id="pdf-header">
+    <div class="logo">
+        <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+    </div>
+    <div class="header-content" style='text-align:<%= @config[:pdf_receipt_halignment].present? ? "#{@config[:pdf_receipt_halignment]}" : "left" %>;'>
+        <p><%=Configuration.get_config_value('InstitutionName'); %></p>
+        <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+    </div>
+
+</div>   
+<div class="top">
+    <hr class="hor_line"/>
+    <% if @invoice_enabled and @inv_data["collection"].invoice_enabled? %>
+      <span class="title">
+          <%= t('student_fee_invoice') %>
+      </span>
+      <span class="receipt_no">
+          <%= t('invoice_no') %>:<%= @inv_data["invoice_no"] %>
+      </span>    
+      <span class="date">
+          <%= "#{t('date_text')}:#{format_date(@inv_data["collection"].start_date, :format=>:short_date)}"%>
+      </span>
+
+    <% else %>
+      <span class="title">
+          <%= t('fee_structure') %>
+      </span>
+    <% end %>
+    <hr class="hor_line"/>
+</div>
+<div id="basic_info_section">
+    <div class="label_collection_part">
+        <div class="label_part">
+            <div class="label_name"><%=t('student_name')%></div>
+            <div class="value_span" style="font-weight:bold;">
+                <%= @inv_data["full_name"] %>
+            </div>
+        </div>
+        <div class="label_part label_right">
+            <div class="label_name label_right_value"><%=t('course_text')%></div>
+            <div class="value_span">
+                <%= @inv_data["full_course_name"] %>
+            </div>
+        </div>    
+    </div>
+    <div class="label_collection_part">
+        <div class="label_part">
+            <div class="label_name"><%=t('admission_no')%></div>
+            <div class="value_span">
+                <%= @inv_data["admission_no"]%>
+            </div>
+        </div>    
+        <div class="label_part label_right">
+            <div class="label_name label_right_value"><%=t('parent')%></div>
+            <div class="value_span">
+                <%= @inv_data["guardian_name"] %>
+            </div>
+        </div>    
+    </div>
+
+    <div class="label_collection_part">
+        <div class="label_part">
+            <div class="label_name">
+                <%=t("#{@fee.class.name.underscore}_collection")%>
+            </div>
+            <div class="value_span">
+                <%= @inv_data["collection"].name %>
+            </div>
+        </div>
+        <%unless @inv_data["finance_type"] == 'InstantFee'%>
+          <div class="label_part label_right">
+              <div class="label_name label_right_value">
+                  <%=t('due_date')%>
+              </div>
+              <div class="value_span">
+                  <%= format_date(@inv_data["due_date"],:format=>:short_date) %>
+              </div>
+          </div>
+        <%end%>
+    </div>
+
+    <% if roll_number_enabled? and @inv_data["roll_number"].present? %>
+      <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%=t('roll_no')%></div>
+              <div class="value_span"><%= @inv_data["roll_number"] %></div>
+          </div>
+      </div>
+    <%end%>
+
+</div>

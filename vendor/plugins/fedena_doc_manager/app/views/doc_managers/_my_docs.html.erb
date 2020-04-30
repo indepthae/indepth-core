@@ -1,0 +1,32 @@
+<div id="navigator">
+  <li class="themed_text themed_text_doc">
+    <%= "#{t('my_docs')}" %>
+  </li>
+  <li><%= link_to_remote "#{t('shared_docs')}", :url => shared_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+  </li>
+  <% if permitted_to? :privileged_docs, :doc_managers or (@current_user.admin? or @current_user.uploadable_privileged_folders.present? or (@current_user.student_record.batch.course.privileged_folders.present? if @current_user.student?) or (@current_user.employee_record.employee_department.privileged_folders.present? if @current_user.employee?)) %>
+    <li><%= link_to_remote "#{t('privileged_docs')}", :url=> privileged_docs_doc_managers_path,
+        :before => "Element.show('loader3')",
+        :success => "Element.hide('loader3')" %>
+    </li>
+  <% end %>
+  <li><%= link_to_remote "#{t('favorite_docs')}", :url=> favorite_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+  </li>
+  <li><%= link_to_remote "#{t('recent_docs')}", :url=> recent_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+  </li>
+  <% if permitted_to? :user_docs, :doc_managers %>
+    <li><%= link_to_remote "#{t('user_docs')}", :url=> user_docs_doc_managers_path,
+        :before => "Element.show('loader3')",
+        :success => "Element.hide('loader3')" %>
+    </li>
+  <% end %>
+</div>
+<div id="docs_pane">
+  <%= render :partial => "doc_list" %>
+</div>

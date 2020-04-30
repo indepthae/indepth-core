@@ -1,0 +1,1 @@
+ActiveRecord::Base.connection.execute("update  course_exam_groups csg inner join courses on courses.id=csg.course_id set csg.school_id=courses.school_id where csg.school_id is null")

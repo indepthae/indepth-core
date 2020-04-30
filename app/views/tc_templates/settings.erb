@@ -1,0 +1,102 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<% content_for :head do  %>
+  <%= javascript_include_tag("tc_printer") %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tc_template_settings') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('preview_certificate')}",{ :action => 'current_tc_preview',:report_format_type => "pdf"},:target=>"_blank" %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_settings%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div class="box">
+        <div class="page_header_box">
+            <div class="page_header"><%= t('tc_template_settings')%> </div>
+            <div class="page_header_desc"><%= t('template_settings_desc')%> </div>
+        </div>
+        <div class="template_previews">
+            <div class="template_preview_box">
+                <div class="header_description_edit_box">
+                    <div class="header">
+                        <%= t('header') %>
+                    </div>
+                    <div class="page_header_desc">
+                        <p><%= t('tc_header_settings_desc') %></p>
+                        <div class="edit_btns">
+                            <%= link_to "#{t('edit')}", {:action => "edit", :controller=>"tc_template_headers"}, :class=>'submit-button' %>
+                        </div>
+                    </div>
+                </div>
+                <%= render :partial => "tc_template_headers/preview" %>
+            </div>
+			            <div class="template_preview_box">
+                <div class="header_description_edit_box">
+                    <div class="header">
+                        <%= t('student_details') %>
+                    </div>
+                    <div class="page_header_desc">
+                        <p><%= t('tc_student_details_settings_desc') %></p>
+                        <div class="edit_btns">
+                            <%= link_to "#{t('edit')}", {:action => "index", :controller=>"tc_template_student_details"}, :class=>'submit-button' %>
+                        </div>
+                    </div>
+                </div>
+                <%= render :partial => "tc_template_student_details/preview" %>
+            </div>
+            <div class="template_preview_box">
+                <div class="header_description_edit_box">
+                    <div class="header">
+                        <%= t('signature_and_clauses') %>
+                    </div>
+                    <div class="page_header_desc">
+                        <p><%= t('tc_footer_settings_desc') %></p>
+                        <div class="edit_btns">
+                            <%#= link_to "#{t('edit')}", :action => "edit", :controller=>"tc_template_footers" %>
+                            <%= link_to "#{t('edit')}", {:action => "edit", :controller=>"tc_template_footers"}, :class=>'submit-button' %>
+                        </div>
+                    </div>
+                </div>
+                <%= render :partial => "tc_template_footers/preview" %>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+<iframe class="" style="display: none" id="tc_printer_template_container"></iframe>
+
+<script type="text/javascript">
+if(j('.logo_to_left').length == 1){
+  j('.institution_details_to_center').css('float', 'left');
+}
+else{
+  j('.institution_details_to_center').css('float', 'right');
+}
+  if(j('.institution_contact_preview').children().length == 0){
+    j('.institution_contact_preview').css('display', 'none');
+  }
+  else{
+    j('.institution_contact_preview').css('display', 'inline-block');
+  }
+
+</script>

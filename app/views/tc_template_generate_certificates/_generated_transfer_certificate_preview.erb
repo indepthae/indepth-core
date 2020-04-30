@@ -1,0 +1,91 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="page-yield" class="available_sections">
+
+    <% if @tc_version.header_enabled? %>
+      <div class="header_preview">
+          <div class ="header_head">
+              <% if @header["InstitutionLogo"].is_enabled %>
+                <div class="<%= @header["InstitutionLogo"].value == "left" ? 'logo_to_left' : 'logo_to_right' %>">
+                    <%= image_tag current_school_detail.logo.url(:original, false) %>
+                </div>
+              <%  end %>  
+              <div class="institution_details_to_<%= @header['AlignInstitutionDetail'].value%>">
+                  <div class="preview_institution_name"><%= @header["InstitutionName"].value if @header["InstitutionName"].is_enabled%> </div>
+                  <div class="preview_institution_address"><%= @header["Address"].value if @header["Address"].is_enabled%></div>
+                  <div class="preview_institution_website"><%= @header["Website"].value if @header["Website"].is_enabled%></div>
+                  <div class="preview_institution_website"><%= @header["Phone"].value if @header["Phone"].is_enabled%></div>
+                  <div class="preview_institution_email"><%= @header["Email"].value if @header["Email"].is_enabled%></div>
+                  <% if  @header["AdditionalField"].present?%>
+                    <% @header["AdditionalField"].additional_field.each do |additional_field| %>
+                      <div class="preview_additional_<%= additional_field.text_size%> preview_additional_<%= additional_field.text_color%>">
+                          <%= additional_field.value%>
+                      </div>
+                    <% end %>
+                  <% end %>  
+              </div>
+
+          </div>
+          <div class="header_bottom">
+
+              <div class="preview_certificate_name">
+                  <%= @header["CertificateName"].value%>
+              </div>
+              <%  if @header["DateOfIssue"].value == "" %>
+                  <% date_text = t('date_of_issue') %>
+                <% else %>
+                  <% date_text = @header["DateOfIssue"].value %>
+                <% end %>
+              <div class="preview_certificate_date_and_serial">
+                  <div class="certificate_serial"><%=t('certification_no')%> : <%=  (@tc_data.certificate_number)%> </div>
+                  <% if @header["DateOfIssue"].is_enabled%><div class="certificate_date"><%= date_text %> : <%=  @tc_data.created_at.strftime("%m/%d/%Y")%></div><% end %>
+
+              </div>
+
+          </div>
+      </div>
+    <% else %>
+      <div  style="height: <%= @tc_version.header_space.to_i%>mm"></div>
+    <% end %>
+
+    <div class="tc_data">
+        <% @student_details_ids.each do |id| %>
+          <div class="name_slot">
+              <div class="tc_field_label"><%= @student_details[id][:field_name] %></div>
+              <% if @student_details[id][:field_format] == "text_field_numeric" or @student_details[id][:field_format] == "date"%>
+                <div class="tc_field_value_numeric"><%= @student_details[id][:field_value] %></div>
+              <%elsif @student_details[id][:field_format] == "text_area"%>
+                <div class="tc_field_value_text_area"><%= @student_details[id][:field_value] %></div>
+              <%else%>
+                <div class="tc_field_value"><%= @student_details[id][:field_value] %></div>
+              <% end %>
+          </div>
+        <%end%>
+    </div>
+    <div class="page">
+        <% if @tc_version.footer_enabled? %>
+          <div class="footer_preview">
+              <div class ="footer_head">
+                  <div class ="footer_head_<%= @footer["Clause"].text_size%>">
+                      <div class="footer_head_<%= @footer["Clause"].text_color%>">
+                          <%=   @footer["Clause"].value %>
+                      </div>
+                  </div>
+              </div>
+              <div class="footer_signatures">
+                  <% @footer["Signature"].additional_field.each do |signature| %>
+                    <div class="signature">
+                        <%=  signature.value %>
+                    </div>
+                  <% end %>
+              </div>
+          </div>        
+        <% end %>
+
+    </div>
+</div>
+<iframe class="" style="display: none" id="tc_printer_template_container"></iframe>

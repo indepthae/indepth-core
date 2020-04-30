@@ -1,0 +1,666 @@
+#leave-info { }
+
+#category-list {
+    clear : both;
+    padding: 10px 0 20px 0px;
+    width:540px;
+    margin:0px auto;
+}
+#category-list .listeven{
+    background : #EEF2FD;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em;
+    width: 38em;
+    list-style-type : none;
+    padding : 0.5em 0 0 5em;
+    float:left;
+    font-size: 13px;
+}
+#category-list .listodd{
+    background : #DFEAFF;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    min-height : 1.5em;
+    width: 38em;
+    list-style-type : none;
+    padding : 0.5em 0 0 5em;
+    float: left;
+    font-size: 13px;
+}
+#category-list li div {
+    float : left;
+}
+#category-list li div.category-name {
+    width: 180px;
+    font-weight: bold;
+    font-size:13px;
+}
+div.category-val{
+    width: 200px;
+}
+#category-list li div a {
+    color : #000;
+    font-size:14px;
+    text-decoration: none;
+}
+#category-list li div a:hover {
+    color : #d00;
+    text-decoration: underline;
+}
+
+.approve-deny{
+    width:125px;
+    margin:0 0 0 280px;
+}
+.approve-deny a{
+    color:black;
+    text-decoration:underline;
+}
+.approval-form{
+    margin: 0 auto;
+}
+.approval-form a{
+    display:block;
+    float:right; 
+}
+.approval-form{
+    margin-left: 220px;
+    margin-bottom: 25px;
+    float: left;
+    margin-top: 20px;
+    width: 38em;
+}
+.approve_button a {
+    padding: 7px 10px;
+    color: #fff;
+    background: #27292B;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    font-weight: bold;
+    font-size: 14px;
+    float: left;
+    border:none;
+    font-family: arial;
+    cursor:pointer;
+    margin: 0 auto;
+    text-decoration: none;
+}
+.approve_button a:hover{
+    background:  #373B3F;
+}
+.cancel_button a {
+    padding: 7px 10px;
+    color: #fff;
+    float: left;
+    background: #27292B;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    font-weight: bold;
+    font-size: 14px;
+    border:none;
+    font-family: arial;
+    cursor:pointer;
+    margin-left: 40px;
+    margin-top: 0;
+    text-decoration: none;
+}
+.cancel_button a:hover{
+    background:  #373B3F;
+}
+
+.remark-field-pair {
+    float : left;
+    height : 110px;
+    width : 450px;
+}
+.remark-field-pair label {
+    color : #444;
+    display : block;
+    font-weight : bold;
+    margin : 25px 0 0 75px;
+}
+.remark-field-pair input {
+    background : transparent;
+    border : 0;
+    margin : 5px 0 0 10px;
+    width : 330px;
+}
+.remark-input-bg {
+    background : #fff url(../../images/form_bg/remarks_text_bg.png) no-repeat;
+    height : 26px;
+    width : 341px;
+    margin: 5px 0 0 75px;
+}
+.submit-button {
+    float:left;
+    margin-top:47px;
+}
+.buttons{
+    margin-left: 43px 217px;
+    width: 540px;
+    float: left;
+    display: flex;   align-items: center;   justify-content: center;
+    margin-top: 50px;
+}
+.submit_button {
+    padding: 7px 10px;
+    color: #fff;
+    background: #27292B;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    font-weight: bold;
+    font-size: 14px;
+    border:none;
+    font-family: arial;
+    cursor:pointer;
+    margin-right: 10px;
+}
+.submit_button:hover{
+    background:  #373B3F;
+}
+
+#MB_frame .submit-button {
+    -moz-border-radius: 8px 8px 8px 8px;
+    background: none repeat scroll 0 0 #27292B;
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    float: left;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 26px 0 0 212px;
+    padding: 0;
+}
+
+.error-msg{
+    float:left;
+    color: red;
+    font-size: 13px;
+    width: 96%;
+}
+.error-icon {
+    width:15px;
+    height:12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right: 5px;
+    float:left;
+}
+textarea{
+    width: 464px;
+    height: 50px;
+}
+
+.label-field-pair label{
+    width: 90px;
+    cursor: pointer;
+}
+#lop label{
+    width: 90px;
+}
+#lop input{
+    width: 20px;
+    padding-top:10px;
+}
+#lop .label-field-pair{
+    margin-top: 30px;
+    margin-left: 90px;
+}
+.info{
+    font-size: 13px;
+    color: grey;
+    margin-left: 20px;
+    margin-top: 25px;
+}
+.additional_leave_notification{
+    background-color: #eeeeee;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 15px;
+    width: 540px;
+}
+.additional_leave_notification label{
+    font-size: 13px;
+    color: grey;
+    margin-left: 50px;
+}
+.additional_leave_notification .label-checkbox-pair{
+    margin-top: -15px;
+    margin-left: 9px;
+}
+h4{
+    margin-left: 220px;
+    font-size: 14px;
+    float: left;
+}
+
+.text-input-bg label{
+    min-width: 210px !important;
+    margin-left: 10px;
+}
+
+.label-field-pair label{
+    width: 90px;
+}
+.label-field-pair input{
+    width: 20px;
+    cursor: pointer;
+}
+.text-input-bg input{
+    float:left;
+    margin-top: 10px;
+    margin-left:  0px;
+}
+
+span{
+    float: left;
+}
+
+#select_leaves{
+    font-size: 13px;
+    margin-top: 5px;
+}
+#select_leaves{
+    text-decoration: underline;
+    cursor: pointer;
+    float: left;
+}
+.additional_leave_notification{
+    padding-left: 15px;
+    float: left;
+}
+
+/* Modal box*/
+
+hr {
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    width: 980px;
+    float: left;
+}
+h3 {
+    font-size: 16px;
+    color: #444;
+}
+.fields-details {
+    float: left;
+    width: 100%;
+    font-weight: normal;
+    font-size: 13px;
+    color: #444;
+    margin: 3px 0;
+}
+.field-label {
+    float: left;
+    min-width: 200px;
+    color: #8C8C8C;
+}
+.fields-val {
+    float: left;
+    max-width: 200px;
+    margin-left: 20px;
+}
+.payroll_details{
+    float:left;
+}
+.description {
+    font-size: 13px;
+    float: left;
+    padding-top: 10px;
+    color: #A5A5A5;
+    margin-bottom: 20px;
+    width: 100%;
+}
+label[for="gross_pay"] {
+    text-align: left;
+    width: 80px;
+}
+
+span.currency-type {
+    font-size: 13px;
+    color: #444;
+    float: left;
+    margin-top: 6px;
+}
+div.sub-head {
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+}
+
+.submit-button {
+    margin: 20px 20px 0 0;
+    font-size: 13px;
+}
+#MB_frame .submit-button{
+    font-size:13px;
+    margin-left: 200px;
+}
+a#cancel-link,#page-yield a#cancel-link:hover{
+    text-decoration: none;
+    color: #fff !important;
+}
+.earnings, .deductions {
+    padding-top: 10px;
+    width: 600px;
+    float: left;
+}
+.earnings{ padding-bottom: 20px; }
+#payroll_form
+{
+    float: left;
+    margin-top: 10px;
+    width: 600px;
+}
+#date-range{ display : none; }
+#date_range_text {
+    margin: 3px 0 0 0;
+    width: 200px;
+}
+.calender_text
+{
+    margin-bottom: 20px;
+    float: left;
+}
+.wrapper{
+    margin-top: 5px;
+    float: left;
+    min-width: 400px;
+    min-height: 15px;
+}
+.ShowModal{
+    top: 200px;
+    left: 250px;
+    z-index: 1000;
+    position: fixed;
+    background-color: White;
+    display: block;
+    width: 465px;
+    left: 393px;
+    overflow: visible;
+}
+.HideModal{
+    display: none;
+}
+.OverlayEffect{
+    background-color: black;
+    filter: alpha(opacity=70);
+    opacity: 0.7;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+#MB_window{
+    width: 500px; height: 375px; left: 393px; overflow: visible;
+}
+.input_desc {
+    margin-top: 6px;
+    font-size: 13px;
+    float: left;
+}
+#MB_header{
+    -webkit-border-radius: 0px;
+}
+#MB_header #MB_close{
+    background: white;
+    background-image: url("/images/iconsprite-1.png");
+    background-position: -31px 1px;
+    float: right;
+    height: 16px;
+    width: 10px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+    text-indent: -99999px;
+    margin-left: 5px;
+    right: 39px;
+    top: 18px;
+}
+#MB_header #MB_close:hover {
+    background-position: -31px -15px;
+}
+#MB_content .label-field-pair input{
+    width: 150px
+}
+div.add_link{
+    font-size: 13px;
+    color: green;
+    margin: 10px 0 10px 140px;
+    width: 140px;
+    float: left;
+}
+div#add-icon {
+    background-image: url(/images/iconsprite-1.png);
+    background-position: -105px 42px;
+    float: left;
+    height: 10px;
+    width: 10px;
+    margin: 2px 4px 0 0;
+}
+div#net_pay_warning{
+    float: left;
+    width: 100%;
+}
+.cross_button{
+    float: left !important;
+    margin: 5px 10px;
+}
+#apply p {
+    color: #444;
+    font-size: 13px;
+}
+#MB_content .wrapper{
+    min-width: 200px;
+    margin-left: 130px;
+}
+#MB_content .wrapper div{display: none;}
+#loader{ margin: 9px 0 0 5px;}
+#lop-details{
+    background-color: #EFEFEF;
+    float: left;
+    width: 430px;
+    margin-left: 140px;
+    padding: 5px 20px;
+    margin-bottom: 10px;
+}
+#lop-details .fields-details{
+    margin: 5px 0;
+}
+div.div_link {
+    float: left;
+    font-size: 13px;
+    text-decoration: underline;
+    margin: 0 0 0 10px;
+    cursor: pointer;
+}
+#MB_window{
+    width: 581px;
+    top: 40px;
+    left: 298px;
+    float: left;
+}
+#MB_lop_frame{
+    -webkit-border-radius: 0px;
+    float: left;
+    display: block;
+    background-color: #fff;
+}
+#search_fields label{
+    margin-top: 15px;
+}
+#MB_lop_frame label{
+    color: #444;
+    font-size: 13px;
+    font-weight: bold;
+    width: 200px;
+    float: left;
+}
+#MB_lop_frame .part{
+    padding: 20px 40px;
+    border-bottom: 1px solid #c6c6c6;
+    float: left;
+    width: 521px;
+}
+#MB_header_part h4{
+    margin: 0px;
+}
+.remove-icon {
+    background-image: url("/images/iconsprite-1.png");
+    background-position: -31px 1px;
+    float: right;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+    text-indent: -99999px;
+    margin-left: 5px;
+}
+.remove-icon:hover {
+    background-position: -31px -15px;
+}
+.close-link{
+    float: right;
+    color: #999;
+    font-size: 13px;
+    text-decoration: none;
+    margin-left: 5px;
+    margin-top: 2px;
+}
+.close-link:hover {
+    color: #333;
+}
+#MB_lop_frame table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    overflow-x: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 350px;
+    display: block;
+    border-right: 1px solid #bfbfbf;
+}
+#page-yield table .tr-head {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+}
+.tr-odd {
+    background-color: #f0f0f0;
+}
+#MB_lop_frame td {
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+td.check_all{
+    width: 10%;
+}
+td.from{}
+#MB_lop_frame ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+    border: 0px;
+}
+#MB_lop_frame ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+}
+#MB_lop_frame ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#MB_lop_frame ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#MB_lop_frame ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#MB_lop_frame ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#MB_lop_frame ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+#MB_lop_frame .field-label {
+    max-width: 200px;
+    min-width: 0px;
+    width: auto;
+}
+#MB_lop_frame #add_leaves{ float: right;}
+#MB_lop_frame .fields-details{
+    width: auto;
+    margin-bottom: 10px;
+}
+#MB_footer .submit_button {
+    margin-left: 0px;
+    margin-right: 20px;
+    background: #27292B !important;
+    border: none !important;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 7px 9px !important;
+    float: left;
+    cursor: pointer;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0px;
+}
+#selected-leaves{
+    width: 200px !important;
+}
+.calendar_date_select{
+    margin-left: -205px;
+}
+
+
+.additional_leave_notification .label-field-pair{
+    margin-left: 20px;
+    height: 30px;
+    float: left;
+}
+
+#select_status{  
+    float: left;
+    margin-right: 20px;
+    margin-top: 5px;  
+}
+
+.leave_select{
+    height: 20px;
+    float: left;
+}
+
+tbody {
+    width: 100%;
+    display: inline-table;
+}
+
+.lop_deducted_warning{
+    margin-left: -215px;
+    font-size: 13px;
+}
+
+#deducted_count{
+    color: grey;
+    margin-left: 10px;
+    font-size:13px;
+}
+
+.user_button{
+    margin-top: 0px;
+    margin-right: 10px;
+}
+
+#MB_overlay{
+    opacity: 0 !important;
+}

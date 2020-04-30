@@ -1,0 +1,17 @@
+<html>
+  <body >
+    Dear <%=  @username %>,<br/><br/>
+      Your payment to <%= @school %>  of amount <%= @currency.to_s %> <%=@amount.to_s %> for <%=  @fee_name || "Applicant" %> is complete.
+      <br/>
+      Transaction Reference is <%=  @transaction_ref %>.
+    <br/><br/>
+    <%@em=Digest::SHA1.hexdigest( "#{@recipients}#{Time.now.to_s.split(//).sort_by {rand}.join}" )%>
+    <%if FedenaSetting.company_details[:company_name].present?%>
+       <%="#{t('powered_by')} #{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"}"%>
+    <%end%>
+    <br/>
+
+    <%="#{@footer.gsub("URL","#{@hostname}")}#{" "}"%>
+    
+  </body>
+</html>

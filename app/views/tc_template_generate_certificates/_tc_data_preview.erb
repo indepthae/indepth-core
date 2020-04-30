@@ -1,0 +1,83 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<div class="tc_data">
+    <div class="student_details">
+        <table>
+            <% @student_details_ids.each do |id| %>
+              <tr class="preview_additional_student_<%= @current_template.font_value%>">
+                  <td class="tc_field_labels"><%= @student_details[id][:field_name] %><%if @student_details[id][:is_mandatory] == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%></td>
+                  <% if @student_details[id][:field_format] == "text_field_numeric" or @student_details[id][:field_format] == "date"%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:field_value][:value_1] %></div></td>
+                  <%elsif @student_details[id][:field_format] == "text_area"%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:field_value][:value_1] %></div></td>
+                  <% elsif @student_details[id][:field_format] == "multiple_type" || @student_details[id][:field_format] == "admission_date"%>
+                    <td class="tc_field_values">
+                        <div class="tc_field_value">
+                            <%- if @student_details[id][:is_in_figures_enabled]%><span class="in_figures"><%= format_date(@student_details[id][:field_value][:value_1],:format=>:short_date)%> </span><p>(in figures)</p><%- end %>
+                            <%- if @student_details[id][:is_in_words_enabled]%><span class="words"><%= @student_details[id][:field_value][:value_2]%> </span><p>(in words)</p><%- end %>
+                            <%- unless @student_details[id][:is_in_figures_enabled] || @student_details[id][:is_in_words_enabled] %><span class="in_figures"><%= format_date(@student_details[id][:field_value][:value_1],:format=>:short_date)  %></span><%- end %>
+                        </div>
+                    </td>
+                  <%else%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:field_value][:value_1] %></div></td>
+                  <% end %>
+              </tr>
+              <%  keys = get_child_field_ids(id) %>
+              <% for key in keys do %>
+                <%  value = @student_details[id][:sub_fields][key] %>
+                    <tr class="preview_additional_student_<%= @current_template.font_value%> sub_field">
+                        <td class="tc_field_labels"><%= value[:field_name] %></td>
+                        <% if @student_details[id][:sub_fields][key][:field_format] == "text_field_numeric" or @student_details[id][:sub_fields][key][:field_format] == "date"%>
+                          <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                        <%elsif @student_details[id][:sub_fields][key][:field_format] == "text_area"%>
+                          <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                        <% elsif @student_details[id][:sub_fields][key][:field_format] == "multiple_type" || @student_details[id][:sub_fields][key][:field_format] == "admission_date"%>
+                          <td class="tc_field_values">
+                              <div class="tc_field_value">
+                                  <%- if @student_details[id][:sub_fields][key][:is_in_figures_enabled]%><span class="in_figures"><%= format_date(@student_details[id][:sub_fields][key][:field_value][:value_1],:format=>:short_date)%> </span><p>(in figures)</p><%- end %>
+                                  <%- if @student_details[id][:sub_fields][key][:is_in_words_enabled]%><span class="words"><%= @student_details[id][:sub_fields][key][:field_value][:value_2]%> </span><p>(in words)</p><%- end %>
+                                  <%- unless @student_details[id][:sub_fields][key][:is_in_figures_enabled] || @student_details[id][:sub_fields][key][:is_in_words_enabled] %><span class="in_figures"><%= format_date(@student_details[id][:sub_fields][key][:field_value][:value_1],:format=>:short_date)  %></span><%- end %>
+                              </div>
+                          </td>
+                        <%else%>
+                          <td class="tc_field_values"><div class="tc_field_value"><%= @student_details[id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                        <% end %>
+                    </tr>
+              <% end %>
+            <%end%>
+        </table> 
+    </div>
+</div>
+
+  <script type="text/javascript">
+ 
+    var width = 0;
+    j(".tc_field_labels").each(function(){
+    var text = j(this).text();
+    var div_width = get_width(this);
+    if (div_width > width){
+      width = div_width;
+    }
+    });
+    if (width > 250){
+      width = 250;
+    }
+    j(".tc_field_labels").width(width + 30);
+    
+    
+    function get_width(el){
+      var html_org = j(el).html();
+      var html_calc = '<span>' + html_org + '</span>';
+      j(el).html(html_calc);
+      var width = j(el).find('span:first').width();
+      j(el).html(html_org);
+      return width;
+    };
+
+
+  </script>

@@ -1,0 +1,107 @@
+<%#= include_i18n_calendar_javascript %>
+<%= stylesheet_link_tag 'jquery-ui.css' %>
+<script type="text/javascript">
+  var q = jQuery.noConflict();
+  q(document).ready(function(){
+    q(".datepicker").datepicker({
+      showOn: "button",
+      buttonImage: "/images/transparent.png",
+      buttonImageOnly: true,
+      changeMonth: true,
+      changeYear: true,
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      buttonText: 'Select Date',
+      dateFormat: "yy-mm-dd",
+      minDate: new Date()
+    });
+  });
+
+</script>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Create SMS Package</h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+  <% if @owner.present? %>
+    <% owner_object = @owner.class.name.underscore.to_sym %>
+    <% form_path = "#{owner_object}_sms_packages_path" %>
+  <% end %>
+  <% form_for @sms_package,:url=>(@owner.present? ? send(form_path, @owner) : {:controller=>"sms_packages",:action=>"create"}),:html=>{:class=>'form'} do|f| %>
+    <fieldset>
+      <%= error_string_for(f) %>
+      <%= f.error_message_on :base %>
+    </fieldset>
+    <div class="config-header">Package Details</div>
+    <fieldset>
+      <label>Package Name</label>
+      <div class="text-input-bg"><%= f.text_field :name %></div>
+    </fieldset>
+    <fieldset>
+      <label>Service Provider</label>
+      <div class="text-input-bg"><%= f.text_field :service_provider %></div>
+    </fieldset>
+    <fieldset>
+      <label>Message Limit</label>
+      <div class="text-input-bg"><%= f.text_field :message_limit %></div>
+    </fieldset>
+    <fieldset>
+      <label>Valid Till</label>
+      <div class="text-input-bg"><%= f.text_field :validity, :value=>Date.today, :class => "datepicker" %></div>
+    </fieldset>
+    <fieldset>
+      <label>Character Limit</label>
+      <div class="text-input-bg"><%= f.text_field :character_limit %></div><label style="color:#999;margin-left:10px;">Default Limit : 160</label>
+    </fieldset>
+    <fieldset>
+      <label>Multipart Character Limit</label>
+      <div class="text-input-bg"><%= f.text_field :multipart_character_limit %></div><label style="color:#999;margin-left:10px;">Default Limit : 153</label>
+    </fieldset>
+    <div class="config-header">Parameter Mappings</div>
+    <fieldset>
+      <label>Username</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][parameter_mappings][username]",(@sms_package.settings ? @sms_package.settings[:parameter_mappings][:username] : nil),:placeholder=>"Parameter name" %>
+        <%= text_field_tag "sms_package[settings][sms_settings][username]",(@sms_package.settings ? @sms_package.settings[:sms_settings][:username] : nil),{:placeholder=>"Parameter value",:class=>"margin-left-15"} %></div>
+    </fieldset>
+    <fieldset>
+      <label>Password</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][parameter_mappings][password]",(@sms_package.settings ? @sms_package.settings[:parameter_mappings][:password] : nil),:placeholder=>"Parameter name" %>
+        <%= text_field_tag "sms_package[settings][sms_settings][password]",(@sms_package.settings ? @sms_package.settings[:sms_settings][:password] : nil),{:placeholder=>"Parameter value",:class=>"margin-left-15"} %></div>
+    </fieldset>
+    <fieldset>
+      <label>Sender name</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][parameter_mappings][sendername]",(@sms_package.settings ? @sms_package.settings[:parameter_mappings][:sendername] : nil),:placeholder=>"Parameter name" %>
+        <%= text_field_tag "sms_package[settings][sms_settings][sendername]",(@sms_package.settings ? @sms_package.settings[:sms_settings][:sendername] : nil),{:placeholder=>"Parameter value",:class=>"margin-left-15"} %></div>
+    </fieldset>
+    <fieldset>
+      <label>Sender name modification</label>
+      <div class="text-input-bg">
+        <%= f.radio_button :enable_sendername_modification,true %><label class="width-50">Enable</label>
+        <%= f.radio_button :enable_sendername_modification,false %><label class="width-50">Disable</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <label>Host URL</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][sms_settings][host_url]",(@sms_package.settings ? @sms_package.settings[:sms_settings][:host_url] : nil),:placeholder=>"Parameter value" %></div>
+    </fieldset>
+    <fieldset>
+      <label>Success Code</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][sms_settings][success_code]",(@sms_package.settings ? @sms_package.settings[:sms_settings][:success_code] : nil),:placeholder=>"Parameter value" %></div>
+    </fieldset>
+    <fieldset>
+      <label>Message</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][parameter_mappings][message]",(@sms_package.settings ? @sms_package.settings[:parameter_mappings][:message] : nil),:placeholder=>"Parameter name" %></div>
+    </fieldset>
+    <fieldset>
+      <label>Phone No.</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][parameter_mappings][phone]",(@sms_package.settings ? @sms_package.settings[:parameter_mappings][:phone] : nil),:placeholder=>"Parameter name" %></div>
+    </fieldset>
+    <fieldset>
+      <label>Additional Parameters</label>
+      <div class="text-input-bg"><%= text_field_tag "sms_package[settings][additional_parameters]",(@sms_package.settings ? @sms_package.settings[:additional_parameters] : nil),:placeholder=>"Parameters separated by '&'" %></div>
+    </fieldset>
+    <fieldset>
+      <%#= link_to 'Cancel', "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list_custom_date(); return false;'}%>
+      <%= f.submit 'Create', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    </fieldset>
+  <% end %>
+</div>

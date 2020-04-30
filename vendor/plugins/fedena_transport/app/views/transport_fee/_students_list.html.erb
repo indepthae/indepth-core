@@ -1,0 +1,36 @@
+<% if @transport_fee.nil? or @transport_fee.empty? %>
+  <p class="flash-msg"><%= t('no_defaulters') %></p>
+<% else %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" id="listing">
+    <tr class="tr-head">
+      <td><%= t('sl_no') %></td>
+      <td><%= t('name') %></td>
+      <td><%= t('bus_fare') %></td>
+      <td><%= t('due_amount') %></td>
+      <td></td>
+    </tr>
+    <% @transport_fee.each_with_index do |t,i| %>
+      <% discount =   t.total_discount_amount %>
+      <% fine_amount = t.auto_fine_amount(t.transport_fee_collection,discount,t) %>
+      <% s = t.receiver %>
+      <tr class="tr-<%= cycle('odd', 'even')%>">
+        <td class="col-6"><%= i+1 %></td>
+        <td class="col-2">
+        <%if s.instance_of? Student%>
+          <%= s.full_name %><%= "(#{t('transfered_to_batch')}:#{s.batch.full_name})" unless s.batch_id==params[:batch_id].to_i %>
+        <%else%>
+          <%= s.full_name %>
+        <%end%>
+        </td>
+        <td class="col-3"><%= precision_label t.bus_fare %></td>
+        <td class="col-3"><%= precision_label(t.balance+fine_amount) %></td>
+        <% if t.receiver_type == 'Student' %>
+          <td class="col-7"><%= link_to_remote "► #{t('pay_fees')}",:class=>'submit_button' ,:url=>{:action=>'fees_submission_defaulter_student'} , :with=>"'student="+s.id.to_s+'&date='+@collection_id.to_s+"'" %></td>
+        <% else %>
+          <td class="col-7"><%= link_to_remote "► #{t('pay_fees')}",:class=>'submit_button' ,:url=>{:action=>'fees_submission_employee'} , :with=>"'employee="+s.id.to_s+'&date='+@collection_id.to_s+"'" %></td>
+        <% end %>
+
+      </tr>
+    <% end %>
+  </table>
+<% end %>

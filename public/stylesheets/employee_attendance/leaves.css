@@ -1,0 +1,283 @@
+.heading{
+    font-weight:bold;
+    padding-bottom:20px;
+}
+
+#application-list{
+    margin:10px auto;
+}
+#submit-button input{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    margin-left:211px;
+    margin-top:30px;
+    padding:7px 10px;
+    border:none;
+    cursor:pointer;
+}
+
+#item-list {
+    clear : both;
+    padding : 10px 0 40px 40px;
+}
+#item-list li {
+    background : #fff url(../../images/_global/list-bg-repeat.jpg) repeat;
+    color : #444;
+    height : 1.5em; width : 200px;
+    list-style-type : none;
+    padding : 0.5em 0 0 5em;
+}
+#item-list li div {  float : left; }
+#item-list li div.item-name {  width : 350px; }
+.item-edit a { color : #000; }
+#item-list li div a {  color : #000; }
+
+.label_field_pair input {
+    background : #eee;
+    border : 1px solid #c6c6c6;
+    margin : 5px 0 0 10px;
+    width : 10px;
+    height:17px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    padding: 5px;
+}
+.label-field {
+    height : 80px;
+    width : 250px;
+    margin:10px 0 0 40px;
+}
+.container {}
+.container-head {}
+.containereven{
+    background : #EEF2FD;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    height : 1.5em;
+    list-style-type : none;
+    padding : 0.5em 0 0 0;
+    width:600px;
+}
+.containerodd{
+    background : #DFEAFF;
+    border-bottom:1px solid #BECFFB;
+    color : #444;
+    height : 1.5em;
+    list-style-type : none;
+    padding : 0.5em 0 0 0;
+    width:600px;
+}
+
+#startdate-label{
+    border-bottom:2px solid;
+    float:left;
+    width:200px;
+    padding:10px 0 10px 0;
+    text-align:center;
+    font-weight:bold;
+}
+#enddate-label{
+    border-bottom:2px solid;
+    float:left;
+    width:200px;
+    padding:10px 0 10px 0;
+    text-align:center;
+    font-weight:bold;
+}
+#status-label{
+    border-bottom:2px solid;
+    float:left;
+    width:200px;
+    padding:10px 0 10px 0;
+    text-align:center;
+    font-weight:bold;
+}
+#name-label{
+    border-bottom:2px solid;
+    float:left;
+    width:200px;
+    padding:10px 0 10px 0;
+    text-align:center;
+    font-weight:bold;
+}
+.start-date{
+    float:left;
+    width:200px;
+    text-align:center;
+}
+.pending-start-date{
+    float:left;
+    width:200px;
+    text-align:center;
+    font-weight:bold;
+}
+.start-date a{
+    text-decoration:none;
+    color:black;
+}
+.pending-start-date a{
+    text-decoration:none;
+    color:black;
+}
+.end-date{
+    float:left;
+    width:200px;
+    text-align:center;
+}
+.pending-end-date{
+    float:left;
+    width:200px;
+    text-align:center;
+    font-weight:bold;
+}
+.end-date a{
+    text-decoration:none;
+    color:black;
+}
+.pending-end-date a{
+    text-decoration:none;
+    color:black;
+}
+.status{
+    float:left;
+    width:200px;
+    text-align:center;
+}
+.pending-status{
+    float:left;
+    width:200px;
+    text-align:center;
+    font-weight:bold;
+}
+.status a{
+    text-decoration:none;
+    color:black;
+}
+.pending-status a{
+    text-decoration:none;
+    color:black;
+}
+.name{
+    float:left;
+    width:200px;
+    text-align:center;
+}
+.name a{
+    text-decoration:none;
+    color:black;
+}
+.opt{
+    float:left;
+    width: 240px;
+    font-size: 14px;
+}
+.opt input{
+    width: 30px;
+    margin-top:10px;
+    height: 15px;
+    margin-left: 2px;
+    float: left;
+}
+
+.label-field-pair{
+    width: 960px !important;
+    display: table;
+}
+#date_range .text-input-bg{
+    width: 240px;
+}
+.text-input-bg label{
+    width: auto;
+    margin-left:10px;
+    font-weight: normal;
+}
+.text-area-bg {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    background:transparent none repeat scroll 0 0;
+    float:left;
+    width:250px;
+}
+.label-field-pair textarea {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    -webkit-border-radius:10px;
+    background:#EEEEEE none repeat scroll 0 0;
+    border:1px solid #C6C6C6;
+    margin:5px 0 0px 10px;
+    padding:5px;
+    width:205px;
+}
+
+#single_date .text-input-bg input, 
+#date_range .text-input-bg input {
+    width: 120px;
+}
+
+.error-msg{
+    color: red;
+    font-size: 13px;
+}
+.error-icon {
+    width:15px;
+    height:12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right:2px;
+    float:left;
+}
+.info{
+    font-size: 13px;
+    color: grey;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+.additional_leave_notification{
+    padding-bottom: 10px;
+    margin-left: 210px;
+    width: 520px;
+}
+.error{
+    padding-bottom: 10px;
+    margin-left:  210px;
+}
+.opt label{
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.calendar_label{
+    cursor: pointer;
+}
+
+#additional_errors{
+    padding-bottom: 10px;
+    margin-left: 210px;
+    width: 520px;
+    font-size: 13px;
+    color: red;
+}
+
+#loader1{
+    margin-top: 10px;
+    float:left;
+    margin-left: -30px;
+}
+
+.wrapper {
+  margin-top: 5px;
+  margin-left: 10px;
+  float: left;
+  width: 100%;
+}

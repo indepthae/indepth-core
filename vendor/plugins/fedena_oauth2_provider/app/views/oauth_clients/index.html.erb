@@ -1,0 +1,71 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('configuration_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('client_apps') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", {:controller => 'oauth_clients', :action => :new} %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+
+  <%# if request.ssl? %>
+    <!--<h2>OAuth 2.0 (v9) provider endpoints for this server</h2>
+
+  <%# if Oauth2::Provider::Configuration.ssl_base_url_as_url_options[:protocol] == 'https' %>
+      <div class='summary info-box oauth_config_info'>
+        <p><span>Authorization URL:</span> <%#= url_for Oauth2::Provider::Configuration.ssl_base_url_as_url_options.merge(:controller => :oauth_authorize, :action => :index) %></p>
+        <p><span>Token URL:</span> <%#= url_for Oauth2::Provider::Configuration.ssl_base_url_as_url_options.merge(:controller => :oauth_token, :action => :get_token) %></p>
+      </div>
+  <%# else %>
+      <div class="error-box"><%#= Oauth2::Provider::Configuration.ssl_not_configured_message %></div>-->
+  <%# end %>
+  <%# end %>
+    <% unless @oauth_clients.empty? %>
+      <div class="box">
+        <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+            <td class="sl_no"><%= t('sl_no') %></td>
+            <td class="client_name"><%= t('client_name') %></td>
+            <td class="access_token"><%= t('redirect_uri') %></td>
+            <td class="options"></td>
+            <td class="options"></td>
+          </tr>
+          <% @oauth_clients.each_with_index do |client,index| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="sl_no"><%= index + 1 %></td>
+              <td class="client_name">
+                <%= link_to client.name, oauth_client_path(client) %>
+              </td>
+              <td class="access_token">
+                <%= client.redirect_uri %>
+              </td>
+              <td class="options">
+                <%= link_to t('delete'),client, :confirm => t('confirm_text'), :method => :delete %>
+              </td>
+              <td class="options">
+                <%= link_to t('edit_text'),edit_oauth_client_path(client) %>
+              </td>
+
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    <% else %>
+      <div id="flash-box">
+        <p class="flash-msg"><%= t('no_client_text') %></p>
+      </div>
+    <% end %>
+
+  </div>

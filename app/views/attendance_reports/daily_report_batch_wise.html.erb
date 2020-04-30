@@ -1,0 +1,95 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('attendance_report') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('day_wise_report')} - #{t('batch')}" %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="label-field-pair">
+    <label for="trial_date"><%= t('batch') %></label>
+    <label class="bold-text">: <%= @batch.full_name %> </label>
+  </div>
+  <div class="label-field-pair">
+    <label for="trial_date"><%= t('date_text') %></label>
+    <label id="date_label"class="bold-text">: 
+      <% if @date.to_date == Date.today %>
+        <%= "#{t('today')} #{format_date(@date.to_date,:format=>:long)}" %>
+      <% else %>
+        <%= "#{format_date(@date.to_date,:format=>:long)}" %>
+      <% end %>
+    </label>
+    <%= calendar_date_select_tag 'date', I18n.l(@date.to_date,:format=>:default),
+      :year_range => 1.years.ago...5.years.from_now, :popup=>"force",:onChange => "Element.show('loader_date');change_date();" %>
+    <%= link_to t('change_date'),'',:class => 'themed_text',:id => "date_link" %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader_date",
+      :style =>"display: none; margin-bottom:10px;" ) %>
+  </div>
+  <div id="students_list">
+    <%= render :partial => 'list_students' %>
+  </div>
+</div>
+<script type="text/javascript">
+<%= "var today= '#{t('today')}'" %>
+  j(document).ready(function(){
+    j('input[name=date]')[0].type = "hidden";
+    j('input[name=date]')[0].next().hide();
+  });
+  j('.calendar_date_select_popup_icon').click(function(){
+    calendar_click();
+  });
+  j('#date_link').click(function(event){
+    event.preventDefault();
+    j('.calendar_date_select_popup_icon').trigger('onclick');
+    calendar_click();
+  });
+  function change_date()
+  {
+    format = "<%= date_format %>";
+    switch(format){
+      case '2':
+        format_str = 'MM dd, yy';
+        break;
+      case '3':
+        format_str = 'yy MM dd';
+        break;
+      default:
+        format_str = 'dd MM yy';
+        break;
+    }
+    date = j("#date")[0].value;
+    curr_date=j.datepicker.formatDate(format_str, new Date());
+    disp_date = j.datepicker.formatDate(format_str, (j.datepicker.parseDate("yy-mm-dd",date)));
+    if(curr_date==disp_date)
+    {
+      j('#date_label').html(': '+today+' '+disp_date);
+    }
+    else{
+      j('#date_label').html(': '+disp_date);
+    }
+    <%="#{remote_function(:url => {:action => "daily_report_batch_wise"},
+           :with => "'date='+date+'&batch_id='+#{@batch.id}",
+           :before => "Element.show('loader_date')",
+           :success => "Element.hide('loader_date')"
+     )}"%>
+  }
+  function calendar_click()
+  {
+    <% unless rtl? %>
+      var left_pos = j('.calendar_date_select_popup_icon').position().left;
+    <% else %>
+      var right_pos=(j(window).width() - (j('.calendar_date_select_popup_icon').offset().left + j('.calendar_date_select_popup_icon').outerWidth()));
+      var left_pos=(j(window).width() - (right_pos + j('.calendar_date_select').outerWidth()));
+    <% end %>
+    var top_pos = j('.calendar_date_select_popup_icon').position().top + j('.calendar_date_select_popup_icon').height();
+    option = {top: top_pos, left: left_pos};
+    j('.calendar_date_select').offset(option);
+  }
+
+</script>

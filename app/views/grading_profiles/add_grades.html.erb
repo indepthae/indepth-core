@@ -1,0 +1,90 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('grading_profiles_text') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :grading_profiles_add_grades, @grade_set %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <div id ="header"><%= t('add_grades') %></div>
+    <div class="details">
+        <div class="details_strip">
+            <div class="label"><%= t('grading_profile') %></div>
+            <div class="field bold"><%= @grade_set.name %></div>
+            <div class="edit_field"><td><%= link_to_remote t('edit_profile'), :url => edit_grading_profile_path(@grade_set), :method => :get %></div>
+        </div>
+        <div class="details_strip">
+            <div class="label"><%= t('grade_type') %></div>
+            <div class="field"><%= @grade_set.grade_type %></div>
+        </div>
+    </div>
+    <hr>
+    <% form_for @grade_set, :url=>{:controller=>'grading_profiles', :action => 'update_grades', :id => @grade_set.id} do  |form |%>
+      <div class="activities">
+          <div class="activity_strip head">
+              <div class="label"><%= t('grade_name') %></div>
+              <% unless @grade_set.direct_grade? %>
+                <div class="score"><%= "#{t('minimum_score')} %" %></div>
+                <% if @grade_set.enable_credit_points? %>
+                  <div class="score"><%= t('credit_points') %></div>
+                <% end %>
+              <% end %>
+              <div class="pass"><%= t('pass_text') %></div>
+              <% if @grade_set.description_enabled? %>
+                <div class="field"><%= t('description') %></div>
+              <% end %>
+          </div>
+          <%- form.fields_for :grades do |f|%>
+            <%= render :partial=> 'grade_field', :locals=> {:f => f} %>
+          <%  end %>
+          <%= link_to_add_activity_fields  "<div id='add-icon'></div><div id='add-text'>#{t('add_grades')}</div>", form,:grades, 'grade_field'  %>
+      </div>
+      <%= form.submit t('save_grades'),:class=>'submit-button'%>
+      <%= link_to "#{t('cancel')}",grading_profile_path(@grade_set),:class=>'submit-button cancel-button' %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  add_fields = function (link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+  }
+
+  remove_field = function (el) {
+      el.up().up().hide();
+      j(el).prev().val(1); //Setting _destroy to 1
+      if (j('.remove_field:visible').length == 1)
+          j('.remove_field:visible').attr('onclick', 'reset_field(this);');
+  }
+
+  reset_field = function (el) {
+      j(el).closest('.activity_strip').find("input[type='text']").val('');
+      j('.pass:visible input[type=checkbox]').prop('checked', true);
+      j(el).prev().val(1); //Setting _destroy to 1
+  }
+  j(window).load(function () {
+      j(".pass").on("click", function () {
+          var checkbox = j(this).find("input[type='checkbox']");
+
+          if (checkbox.prop("checked") == "") {
+              checkbox.prop("checked", "true");
+          } else {
+              checkbox.prop("checked", "");
+          }
+      });
+
+      j('.pass input[type=checkbox]').click(function (e) {
+          e.stopPropagation();
+      });
+  });
+</script>

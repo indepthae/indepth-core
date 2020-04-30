@@ -1,0 +1,23 @@
+class AddDatabaseLevelUniquenessToFinance < ActiveRecord::Migration
+  def self.up
+    add_index :collection_discounts, [:finance_fee_collection_id, :fee_discount_id], :unique => true, :name => :collection_discount_uniqueness
+    add_index :collection_particulars, [:finance_fee_collection_id, :finance_fee_particular_id], :unique => true, :name => :collection_particular_uniqueness
+    add_index :fee_collection_batches, [:finance_fee_collection_id, :batch_id], :unique => true, :name => :collection_batch_uniqueness
+    add_index :fee_transactions, [:finance_fee_id, :finance_transaction_id], :unique => true, :name => :fee_transaction_uniqueness
+    if (ActiveRecord::Base.connection.execute("SHOW INDEX FROM finance_fees WHERE Key_name = 'finance_fee_uniqueness';").all_hashes.empty?)
+      add_index :finance_fees, [:fee_collection_id, :student_id], :unique => true, :name => :finance_fee_uniqueness
+    end
+    if (ActiveRecord::Base.connection.execute("SHOW INDEX FROM particular_payments WHERE Key_name = 'particular_payment_uniqueness';").all_hashes.empty?)
+      add_index :particular_payments, [:finance_fee_particular_id, :finance_transaction_id], :unique => true, :name => :particular_payment_uniqueness
+    end
+  end
+
+  def self.down
+    remove_index :collection_discounts, :name=>:collection_discount_uniqueness
+    remove_index :collection_particulars,:name=>:collection_particular_uniqueness
+    remove_index :fee_collection_batches,:name=>:collection_batch_uniqueness
+    remove_index :fee_transactions,:name=>:fee_transaction_uniqueness
+    remove_index :finance_fees,:name=>:finance_fee_uniqueness
+    remove_index :particular_payments,:name=>:particular_payment_uniqueness
+  end
+end

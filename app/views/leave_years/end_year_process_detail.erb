@@ -1,0 +1,21 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_year_record') %></h1>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_end_year_process_detail %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="department_details">
+        <div class="department"><%= t('department') %> <div class="name"><%= @department.name %></div></div>
+        <div class="emp_no"><%= t('no_emp') %><div class="emp_count"><%= emp_count(@department) %></div></div>
+        <div class="failed_emp"><%= t('failed') %>  <div class="failed_count"><%= @failed_count %></div></div>
+    </div>
+    <%= render :partial => "failed_employees" %>
+    <%= render :partial => "success_employees" %>
+    <div id="modal-box" style="display:none;"></div>
+</div>

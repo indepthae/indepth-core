@@ -1,0 +1,72 @@
+<%@record_groups.each do |rg|%>
+  <%@record_group=rg%>
+  <div class="rg_name"><%=@record_group.name%></div>
+  <%if @record_group.records.present?%>
+    <%@record_group.records.all(:order=>"priority asc").each do |record|%>
+      <%if record.input_type == 'singleline'%>
+        <div class="block"><span><%=record.name%></span><%=text_field_tag 'record_single_line',{},:disabled => true%> <%=(record.input_type == "singleline"  and record.suffix.present?) ? record.suffix : ""%></div>
+      <%elsif record.input_type == 'multiline'%>
+        <div class="block"><span><%=record.name%></span><%=text_area_tag 'record_multi_line',{},:disabled => true%></div>
+      <%elsif record.input_type == 'single_select' %>
+        <div class="block">
+          <span><%=record.name%></span>
+          <%if record.record_field_options.count > 5%>
+
+            <%if record.record_field_options.collect(&:is_default).include?(true)%>
+              <%options=[]%>
+            <%else%>
+              <%options=["<option selected='selected'>#{t('select_one_option')}</option>"]%>
+            <%end%>
+            <%record.record_field_options.all(:order=>'record_field_options.id asc').each do |option|%>
+              <%options << "<option #{option.is_default.to_s == 'true' ? "selected ='selected'" : ''}>#{option.field_option}</option>"%>
+            <%end%>
+            <%= select_tag "record_single_select_above_5", options,:disabled=>true%>
+          <%else%>
+            <%record.record_field_options.all(:order=>'record_field_options.id asc').each do |option| %>
+              <%=radio_button_tag 'record_single_select_less_than_equal_5','is_default',option.is_default,:disabled=>true%><label><%=option.field_option%></label>
+            <%end%>
+          <%end%>
+        </div>
+      <%elsif record.input_type == 'multi_select' %>
+        <div class="block">
+          <span><%=record.name%></span>
+          <%if record.record_field_options.count > 5%>
+            <div class="fee_category_scroll_preview">
+              <div class="sel-list">
+                <%= t('select') %>: <%= link_to_function t('all'), "",:class=>"default_cursor" %>,
+                <%= link_to_function t('none'), "",:class=>"default_cursor" %>
+              </div>
+              <% record.record_field_options.all(:order=>'record_field_options.id asc').each do |k| %>
+                <div class="each_batch">
+                  <%=check_box_tag "record_multi_select_above_5",'',k.is_default,:disabled=>true%><label><%= k.field_option %></label>
+                </div>
+              <% end %>
+            </div>
+          <%else%>
+            <%record.record_field_options.all(:order=>'record_field_options.id asc').each do |option| %>
+              <%=check_box_tag "record_multi_select_less_than_equal_5",'',option.is_default,:disabled=>true%><label><%= option.field_option %></label>
+            <%end%>
+          <%end%>
+        </div>
+
+      <%elsif record.input_type == "date"%>
+        <div class="block">
+          <span><%=record.name%></span>
+          <%=text_field_tag 'record_date',{},:disabled => true%>
+          <img alt="Calendar" class="calendar_date_select_popup_icon" src="/images/calendar_date_select/calendar.gif" style="border:0px;"/>
+        </div>
+      <%elsif record.input_type == 'attachment'%>
+        <div class="block">
+          <span><%=record.name%></span>
+          <div class='add_button_img'><img alt="Add_image" src="/images/buttons/add_image.png?1411987966"></img> Add Attachment</div>
+        </div>
+      <%end%>
+    <%end%>
+    <div id="submit_link">
+    </div>
+    <div class="hor_line"></div>
+  <%else%>
+    <div class="block"><span class="grey_text"><%=t('no_records')%></span></div>
+    <div class="hor_line"></div>
+  <%end%>
+<%end%>

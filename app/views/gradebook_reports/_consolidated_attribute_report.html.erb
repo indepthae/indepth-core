@@ -1,0 +1,166 @@
+<% roll_num_enabled = Configuration.enabled_roll_number? %>
+<table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+    <tr>
+        <td id="firstTd"></td>
+        <td rowspan="2">
+            <div id="divHeader" style="">
+                <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                    <tr id="main_heading">
+                        <% ind = 0 %>
+                        <% @subjects.each_with_index do |sub,i| %>
+                          <td colspan=<%= @header_hash[sub.id].count %> >
+                              <div class="tableHeader th_<%=i+1%>" title="<%=sub.name%>"><%= truncate(sub.name,:length => 15) %></div>
+                              <% ind = i %>
+                          </td>
+                        <% end %>
+                        <% col_span = 0 %>
+                        <% if params[:consolidated_exam_report][:total] == "1" %>
+                          <% col_span += 2 %>
+                        <% end %>
+                        <% if params[:consolidated_exam_report][:rank] == "1" %>
+                          <% col_span += 1 %>
+                        <% end %>
+                        <% if col_span>0 %>
+                          <td colspan=<%= col_span %>><div class="tableHeader th_<%=ind+2%>"></div></td>
+                        <% end %>
+                    </tr>
+                    <tr id="sub_header">
+                        <% i = 1 %>
+                        <% @subjects.each do |sub| %>
+                          <% claz = "tableSubHeader tsh_#{i}" %>
+                          <% @header_hash[sub.id].each do |attr| %>
+                            <td><div class="<%=claz%>"> <%= "#{attr.name}(#{attr.maximum_marks})" %> </div></td>
+                          <% end %>
+                          <% i = i + 1 %>
+                        <% end %>
+                        <% if params[:consolidated_exam_report][:total] == "1" %>
+                          <td><div class="tableSubHeader tsh_<%=i%>"><%= t('total') %></div></td>   
+                          <td><div class="tableSubHeader tsh_<%=i%>"><%= t('percentage') %></div></td>   
+                        <% end %>
+                        <% if params[:consolidated_exam_report][:rank] == "1" %>
+                          <td><div class="tableSubHeader tsh_<%=i%>"><%= t('rank') %></div></td>   
+                        <% end %>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td id="sl_no"><%= t('no_text') %></td>
+        <td id="student_names"><%= t('single_student') %></td>
+        <% if roll_num_enabled %>
+          <td id="roll_number"><%= t('roll_nos')%>  </td>
+        <% else %>
+          <td id="adn_number"><%=t('admission_no') %> </td>
+        <% end %>
+    </tr>
+    <tr>
+        <td valign="top">
+            <div id="firstcol">
+                <table width="350px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                    <% j=0 %>
+                    <% @students.each do |student| %>
+                      <% j=j+1 %>
+                      <tr>
+                          <td class="tableFirstCol"><div class="sl_no"><%=j%> </div></td>
+                          <td class="tableFirstCol"><div class="student_names" title="<%= student.full_name %> "><%= truncate(student.full_name,:length => 40)  %> </div></td>
+                          <% if roll_num_enabled %>
+                            <td class="tableFirstCol"><div class="roll_number"> <%=student.roll_number%> </div></td>
+                          <% else %>              
+                            <td class="tableFirstCol"><div class="adn_number"> <%=student.admission_no%> </div></td>           
+                          <% end %>
+                      </tr>
+                    <% end %>
+                    <% if params[:consolidated_exam_report][:highest] == "1" %>
+                      <tr>
+                          <td colspan="2"></td>
+                          <td class="tableFirstCol highest">
+                              <%= t('highest') %>
+                          </td>
+                      </tr>
+                    <% end %>
+                    <% if params[:consolidated_exam_report][:average] == "1" %>
+                      <tr>
+                          <td colspan="2"></td>
+                          <td class="tableFirstCol highest">
+                              <%= t('average') %>
+                          </td>
+                      </tr>
+                    <% end %>
+                </table>
+            </div>
+        </td>
+        <td valign="top">
+            <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                    <% @students.each_with_index do |student,i| %>
+                      <tr id="<%= i ==0 ? "firstTr" : "" %>">
+                          <% @subjects.each do |subject| %>
+                            <% @header_hash[subject.id].each do |attr| %>
+                              <td>
+                                  <div class="scores">
+                                      <%= @score_hash[subject.id][student.s_id][attr.id][:mark].present? ? @score_hash[subject.id][student.s_id][attr.id][:mark] : "-" %>
+                                      <% if ([2,3].include? @assessment_group.scoring_type) %>
+                                        <%= @score_hash[subject.id][student.s_id][attr.id][:grade].present? ? "(#{@score_hash[subject.id][student.s_id][attr.id][:grade]})" : '' %>
+                                      <% end %>
+                                  </div>
+                              </td>
+                            <% end %>
+                          <% end %>
+                          <% if params[:consolidated_exam_report][:total] == "1" %>
+                            <td>
+                                <div class="scores" > <%= @aggregate_hash[student.s_id][:total].present? ? @aggregate_hash[student.s_id][:total] : "-" %> </div>
+                            </td>
+                            <td>
+                                <div class="scores" > <%= @aggregate_hash[student.s_id][:percentage].present? ? "#{precision_label(@aggregate_hash[student.s_id][:percentage])}%" : "-" %> </div>
+                            </td>
+                          <% end %>
+                          <% if params[:consolidated_exam_report][:rank] == "1" %>
+                            <td>
+                                <div class="scores" > <%= @rank[student.s_id][:rank].present? ? @rank[student.s_id][:rank] : "-" %> </div>
+                            </td>
+                          <% end %>
+                      </tr>
+                    <% end %>
+                    <% if params[:consolidated_exam_report][:highest] == "1" %>  
+                      <tr>
+                          <% @subjects.each do |subject| %>
+                            <% @header_hash[subject.id].each do |attr| %>
+                              <td>
+                                  <div class="scores">
+                                      <%= @highest[subject.id][attr.id].present? ? @highest[subject.id][attr.id] : "-" %>
+                                      <%= "%"  if params[:consolidated_exam_report][:type] == "percent" and @highest[subject.id][attr.id].present? %>
+                                  </div>
+                              </td>
+                            <% end %>
+                          <% end %>
+                      </tr>
+                    <% end %>
+                    <% if params[:consolidated_exam_report][:average] == "1" %>  
+                      <tr>
+                          <% @subjects.each do |subject| %>
+                            <% @header_hash[subject.id].each do |attr| %>
+                              <td>
+                                  <div class="scores">
+                                      <%= @avg_hash[subject.id][attr.id].present? ? precision_label(@avg_hash[subject.id][attr.id]) : "-" %>
+                                      <%= "%"  if params[:consolidated_exam_report][:type] == "percent" and @avg_hash[subject.id][attr.id].present? %>
+                                  </div>
+                              </td>
+                            <% end %>
+                          <% end %>
+                      </tr>
+                    <% end %>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+<div id="buttons">
+    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+      :csv_report_type => "gradebook_consolidated_reports",:report_format_type => "csv" }.merge(@report_generator.param),:class => "user_button"%>
+</div>
+<script type="text/javascript">
+  j(document).ready(function () {
+      fnAdjustTable();
+  });
+</script>

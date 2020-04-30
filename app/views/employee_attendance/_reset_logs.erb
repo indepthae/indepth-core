@@ -1,0 +1,55 @@
+<table>
+  <tr class="tr-head">
+    <% if @sort_order=="reset_date DESC"%>
+      <td class="reset_date">
+        <%= link_to_remote  "#{t('reset_date')} &#8595;", :url=>{:action=>"reset_logs",:sort_order=>"reset_date ASC"} %>
+      </td>
+    <% elsif @sort_order=="reset_date ASC" %>
+      <td class="reset_date">
+        <%= link_to_remote  "#{ t('reset_date')} &#8593;", :url=>{:action=>"reset_logs",:sort_order=>"reset_date DESC"} %>
+      </td>
+    <% elsif @sort_order=="created_at DESC" %>
+      <td class="reset_date">
+        <%= link_to_remote  "#{ t('reset_date')} &#8593;", :url=>{:action=>"reset_logs",:sort_order=>"reset_date ASC"} %>
+      </td>
+    <% else %>
+      <% if @logs.present?%>
+        <td class="reset_date">
+          <%= link_to_remote  "#{ t('reset_date')}", :url=>{:action=>"reset_logs",:sort_order=>"created_at DESC"} %>
+        </td>
+      <% else %>
+        <td class="reset_date"><%= "#{ t('reset_date')}" %></td>
+      <% end %>
+    <% end %>
+    <td class="employees"><%= t('employee_text') %></td>
+    <td class="remarks"><%= t('remarks') %></td>
+    <td class="resetted_by"><%= t('reset_by') %></td>
+  </tr>
+  <% if @logs.present? %>
+    <% @logs.each do |log| %>
+      <tr>
+        <td class="reset_date">
+          <div class="date">
+            <%if log.status != 1%>
+              <%= link_to "#{format_date(log.reset_date, :short)}", :controller => "employee_attendance", :action => "employee_reset_logs", :id => log.id %>
+            <%else%>
+              <%= "#{format_date(log.reset_date, :short)}" %>
+            <% end %>
+          </div>
+          <% if log.status == 3 %>
+            <div class="status"><%= "#{log.leave_reset_logs.collect{|l| l.status == 3}.count(true)} #{LeaveReset::RESET_STATUS[log.status].titleize}" %></div>
+          <% elsif log.status == 1 %>
+            <div class="status"><%= "#{LeaveReset::RESET_STATUS[log.status].titleize}.." %></div>
+          <% end %>
+        </td>
+        <td class="employees"><%= log.reset_msg %></td>
+        <td class="remarks"><%= log.reset_remark %></td>
+        <td class="resetted_by"><%= log.resetted_user %></td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr><td colspan="4"><%= t('no_reset_logs_present') %></td></tr>
+  <% end %>
+</table>
+
+<%= will_paginate @logs %>

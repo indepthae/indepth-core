@@ -1,0 +1,132 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('instant_fees_transaction_report') %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>
+        </b>
+        <div class="date_align right">
+            <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; 
+            <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %> 
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+                <!-- 
+                < %=  link_to_remote t('change_date'), :url => {:controller => "instant_fees",
+                  :action =>"show_date_filter", :target_action=>@target_action, :id=>params[:id],
+                  :date_tag=>params[:date_tag], :start_date=>@start_date, :end_date=>@end_date}%> -->
+            </span>
+        </div>
+    </div>
+
+    <% unless @instant_fee_transactions_with_category.empty? and  
+        @instant_fee_transactions_by_custom.empty? %>
+
+      <% total_net_amount = 0 %>
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td><%= t('payee') %></td>
+              <td  class="set_border_right"><%= t('date_text') %></td>
+              <td  class="set_border_right"><%= t('reciept') %></td>
+              <td  class="set_border_right"><%= t('amount') %> (<%= currency %>) </td>
+          </tr>
+          <%  unless @instant_fee_transactions_with_category.empty? %>
+            <% total_net_amount = 0 %>
+            <b id="fees_report_title"></b>
+            <% total_net_amount = 0 %>
+
+            <% @instant_fee_transactions_with_category.each do |category,transactions| %>
+
+              <tr class="tr-list_head">
+                  <td colspan="4">
+                      <% # =InstantFeeCategory.find_by_id(category).name%>
+                      <%= transactions.first.try(:category_name) %>
+                  </td>
+              </tr>
+
+              <% transactions.each do |transaction| %>
+                <tr class="row-b">
+                    <td>
+                        <%= link_to shorten_string(transaction.finance.payee_name,20), {:action => 'report_detail',
+                          :id => transaction.finance_id, :start_date => @start_date,:end_date => @end_date}.
+                          merge(url_params) %>
+                    </td>
+                    <td class="set_border_right"> 
+                        <%= format_date(transaction.transaction_date,:long) %> 
+                    </td>
+                    <td class="set_border_right"><%= transaction.receipt_number %></td>
+                    <td class="set_border_right" align="right">
+                        <%= precision_label(transaction.amount) %> 
+                    </td>
+                    <% total_net_amount += transaction.amount %>
+                </tr>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% unless @instant_fee_transactions_by_custom.empty? %>
+            <tr class="tr-list_head"><td colspan="4"><%= t('custom') %></td></tr>
+            <% @instant_fee_transactions_by_custom.each do |transaction| %>
+              <tr class="row-b  ">
+                  <td >
+                      <%= link_to shorten_string(transaction.finance.payee_name,20), {:action => 'report_detail',
+                        :id => transaction.finance_id, :start_date => @start_date, :end_date => @end_date}.
+                        merge(url_params) %>
+                  </td>
+                  <td class="set_border_right"><%= format_date(transaction.transaction_date,:long) %> </td>
+                  <td class="set_border_right"><%= transaction.receipt_number %></td>
+                  <td class="set_border_right" align="right"><%= precision_label(transaction.amount) %> </td>
+
+                  <% total_net_amount += transaction.amount %>
+                  
+              </tr>
+            <% end %>
+          <% end %>
+      </table>
+
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%=precision_label(total_net_amount)%></label>
+      </div>
+
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "instant_fees", 
+                        :action => "instant_fee_report_csv", :id => params[:id],
+                        :csv_report_type => "instant_fee_report", :report_format_type => "csv",
+                        :start_date => @start_date, :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%= t('no_transactions_present') %></div>
+    <% end %>
+</div>
+
+<script>
+
+  j('.date_box').hide();
+
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+
+</script>

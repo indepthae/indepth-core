@@ -1,0 +1,255 @@
+@page {
+    /*margin-bottom: 4cm;*/
+    /*size: 1893px;*/
+    zoom: auto;
+}
+
+body {
+    /*width: 100vw !important;*/
+    width: 100% !important;
+    /*margin: 0 auto;*/
+    margin: 0 auto;
+    font-family: arial;
+    /*max-width: 2480px;*/
+    width:100%;
+    font-size: 13px;
+    /*margin-bottom: 200px;*/
+}
+
+/** report main header area **/
+#report-header {
+    width: 100%;
+    padding-top: 30px;
+    margin: 0;
+    /*overflow: hidden;*/
+    /*margin-top: -2px;*/
+    height: 150px;
+    /*position: fixed;*/
+    /*top: 0px;*/
+}
+.logo {
+    /*height: 120px;*/
+    /*width: 120px;*/
+    height: 15rem;
+    width: 15rem;
+    max-width: 120px;
+    max-height: 120px;
+    float: left;
+}
+.logo img {
+    width: 100%;
+    margin-top: 10px;
+}
+.header-content {
+    color: #97080e;
+    font-family: arial;
+    font-weight: bold;
+    /*font-size: 1.05vw;*/
+    font-size: 20px;
+    float: left;
+    width: calc(100% - 165px);
+    height: 110px;
+    /*    text-align: center;*/
+    word-wrap: break-word;
+    margin-left: 30px;
+}
+.header-content p {
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-right: 10px;
+}
+.header-content p.institution_address {
+    font-weight: normal !important;
+    color: #000 !important;
+    margin-top: 15px !important;
+    line-height: 25px;
+}
+/** report footer **/
+#report-footer {
+    text-align: right;
+    width: calc(100% - 100px);
+    /*padding-right: 100px;*/
+    padding: 50px;
+    margin: 0 auto;
+    color: #999999;
+    font-size: 18px;
+    /*margin-right: 100px;*/
+    /*position: fixed;*/
+    /*bottom: 0px;*/
+}
+
+/** report filters **/
+.hor_line {
+    width: 100%;
+    background: #333333;
+    height: 1px;
+}
+
+.section h2 {
+    text-align: center;
+    margin: 5px;
+    text-align: center;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-size: 15px;
+}
+
+.section {
+    /*page-break-inside: avoid;*/
+    float: left;
+    width: 100%;
+}
+
+.field-label {
+    /*width: 155px;*/
+    width: auto;
+    float: left;
+    word-break: break-word;
+}
+
+.info-left {
+    float: left;
+    width: 50%;
+}
+
+.info-right {
+    float: right;
+    width: 50%;
+}
+
+.info {
+    width: 100%;
+    float: left;
+    margin-bottom: 15px;
+}
+
+.info1 {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #444444;
+    float: left;
+    width: 100%;
+}
+
+.infolbl {
+    color: #000;
+    font-weight: bold;
+    float: left;
+    width: 55%;
+    word-break: break-word;
+}
+
+span.colon{
+    /*float:left;*/
+    margin-right:5px;
+    margin-left:5px;
+}
+#report-filters{
+    margin-bottom: 10px;
+}
+/** report data table **/
+table#report_result{
+    table-layout: auto !important;
+    word-wrap: break-word;
+}
+table#report_result .tr-head {
+    /*display: table-header-group;*/
+}
+
+table tr th {
+    page-break-inside: avoid;
+}
+table#report_result {
+    border-collapse: collapse;
+    font-size: 13px;
+    width: 100%;
+    margin-bottom: 20px;
+    overflow: visible;
+    /*font-size:1vw;*/
+}
+
+tr {
+    /*border-bottom: 1px solid #bfbfbf;*/
+    border-bottom: 1px solid #000;
+    page-break-inside: avoid;
+}
+
+table#report_result td {
+    /*border-right: 1px solid #bfbfbf;*/
+    border-right: 1px solid #000;
+    /*white-space: nowrap;*/
+    text-overflow: ellipsis;
+    height: 20px;
+    padding: 10px;
+    /*text-align: center;*/
+    page-break-inside: avoid;
+}
+
+table#report_result .tr-head {
+    font-weight: bold;
+    background-color: #e8e8e8;
+    /*border-bottom: 1px solid #bfbfbf;*/
+    border-bottom: 1px solid #000;
+    /*border-top: 1px solid #bfbfbf;*/
+    border-top: 1px solid #000;
+    color: black !important;
+    page-break-inside: avoid;
+}
+
+td.header-col {
+    /*border-top: 1px solid #bfbfbf;*/
+    border-top: 1px solid #000;
+}
+
+td.sl_no {
+    width: 50px;
+    /*position: absolute;*/
+    left: 0px;
+    /*border-bottom: 1px solid #bfbfbf;*/
+    border-bottom: 1px solid #000;
+}
+
+.fixed-header {
+    /*border-top: 1px solid #bfbfbf;*/
+    border-top: 1px solid #000;
+    top: 0px;
+    background-color: #e8e8e8;
+}
+
+td.fee_header {
+    /*text-align: center;*/
+}
+
+td.sl_no {
+    /*border-left: 1px solid #bfbfbf;*/
+    border-left: 1px solid #000;
+}
+
+td.name, td.employee_name, td.student_name, td.row_total, td.date_col, td.batch_name, td.particular_name {
+    /*position: absolute;*/
+    max-width: 200px;
+    /*left: 72px;*/
+    min-width: 200px;
+    /*border-bottom: 1px solid #bfbfbf;*/
+    border-bottom: 1px solid #000;
+}
+
+td.date_col {
+    /*left: 72px !important;*/
+    width: 80px !important;
+    min-width: 50px !important;
+}
+
+td.row_total {
+    /*left: 293px !important;*/
+    width: 90px !important;
+    min-width: 50px !important;
+}
+
+td.row_total, td.amount_col {
+    text-align: right !important;
+}
+.grand-total-col {
+    border-left: 1px solid #000;
+}

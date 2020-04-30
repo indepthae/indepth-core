@@ -1,0 +1,263 @@
+<% if transaction_hash.wallet_mode_only.present? %>
+  <!-- wallet mode only -->
+  <section class="particulars-header">
+    <div class="particulars-header-left"><%= t('advance_fee_categories_text') %></div>
+    <div class="particulars-header-right"><%= t('amount') %> (<%= transaction_hash.default_configs.currency_symbol %>)</div>
+  </section>
+  <section class="particulars">
+    <% transaction_hash.transactions.each_with_index do |p, i| %>
+        <div class="particulars-item">
+          <div class="particulars-item-left"><%= i+=1 %>. <%= p.advance_fee_category.name %></div>
+          <div class="particulars-item-right"><%= p.fees_paid.to_f %></div>
+        </div>
+    <% end %>
+  </section>
+<% else %>
+  <section class="particulars-header">
+    <div class="particulars-header-left"><%= t('particular') %></div>
+    <div class="particulars-header-right"><%= t('amount') %> (<%= transaction_hash.currency %>)</div>
+  </section>
+  <% if transaction_hash.is_particular_wise != true %>
+      <section class="particulars">
+        <% transaction_hash.fee_particulars.each_with_index do |particular, i| %>
+            <div class="particulars-item">
+              <div class="particulars-item-left"><%= i+=1 %>. <%= particular.name %></div>
+              <div class="particulars-item-right"><%= particular.amount %></div>
+            </div>
+        <% end %>
+      </section>
+  <% else %>
+      <section class="particular-wise-particulars">
+        <% transaction_hash.fee_particulars.each_with_index do |particular, index| %>
+            <section class="particular_wise_item">
+              <div class="particular_name">
+                <%= "#{index+1}. #{particular.name}" %>
+              </div>
+              <div class="particular_wise_item_details_list">
+                <div class="particular_wise_item_details">
+                  <div class="left">
+                    <%= t('amount') %>
+                  </div>
+                  <div class="right">
+                    <%= particular.amount %>
+                  </div>
+                </div>
+
+                <% unless transaction_hash.finance_type == 'InstantFee' %>
+                    <div class="particular_wise_item_details">
+                      <div class="left">
+                        <%= t('remaining_balance') %>
+                      </div>
+                      <div class="right">
+                        <%= particular.remaining_balance %>
+                      </div>
+                    </div>
+                <% end %>
+                <% if particular_has_discount(particular) %>
+                    <div class="particular_wise_item_details">
+                      <div class="left">
+                        <%= t('discount') %>
+                      </div>
+                      <div class="right">
+                        - <%= particular.discount %>
+                      </div>
+                    </div>
+                <% end %>
+                <% if transaction_hash.finance_type == 'InstantFee' and transaction_hash.tax_enabled %>
+                    <div class="particular_wise_item_details">
+                      <div class="left">
+                        <%= t('tax_text') %>
+                      </div>
+                      <div class="right">
+                        <%= particular.tax_amount %>
+                      </div>
+                    </div>
+                <% end %>
+                <div class="particular_wise_item_details">
+                  <div class="left">
+                    <%= t('amount_paid') %>
+                  </div>
+                  <div class="right">
+                    <%= particular.amount_paid %>
+                  </div>
+                </div>
+                <% unless transaction_hash.finance_type == 'InstantFee' %>
+                    <div class="particular_wise_item_details">
+                      <div class="left">
+                        <%= t('balance') %>
+                      </div>
+                      <div class="right">
+                        <%= particular.balance %>
+                      </div>
+                    </div>
+                <% end %>
+              </div>
+            </section>
+        <% end %>
+      </section>
+  <% end %>
+
+  <% if transaction_hash.total_discount.present? and transaction_hash.discounts.present? %>
+      <section class="discounts">
+        <% transaction_hash.discounts.each_with_index do |d, j| %>
+            <div class="particulars-item">
+              <div class="particulars-item-left"><%= j+1 %>.<%= t('discount') %> <%= d.name %></div>
+              <div class="particulars-item-right">- <%= d.amount %></div>
+            </div>
+        <% end %>
+      </section>
+  <% end %>
+
+  <% i = 0 %>
+  <% if has_tax?(transaction_hash) %>
+      <% if transaction_hash.tax_slab_collections.present? %>
+          <section class="tax">
+            <% transaction_hash.tax_slab_collections.each_pair do |slab_id, slab| %>
+                <div class="particulars-item">
+                  <div class="particulars-item-left"><%= i+=1 %>.<%= slab.display_name %></div>
+                  <div class="particulars-item-right">
+                    <%= FedenaPrecision.set_and_modify_precision(slab.tax_amount.sum.to_f,
+                                                                 transaction_hash.precision) %>
+                  </div>
+                </div>
+            <% end %>
+          </section>
+      <% end %>
+  <% end %>
+
+  <% i = 0 %>
+
+  <% if has_fine?(transaction_hash) %>
+      <section class="fine">
+        <% transaction_hash.fine_list.each_with_index do |fine, j| %>
+            <div class="particulars-item">
+              <div class="particulars-item-left"><%= i += 1 %>.<%= fine.name %></div>
+              <div class="particulars-item-right"><%= fine.amount %></div>
+            </div>
+        <% end %>
+      </section>
+  <% end %>
+  <div class="dont-break">
+    <section class="summary">
+      <div class="left">
+        <% comma = false %>
+        <% if transaction_hash.total_payable.present? %>
+            <%= t('summary') %>: <%= t('fees_text') %>: <%= transaction_hash.total_payable %>
+            <% comma = true %>
+        <% end %>
+
+        <% if has_discount?(transaction_hash) %>
+            <%= "," if comma %>
+            <%= t('discount') %> : - <%= transaction_hash.total_discount %>
+            <% comma = true %>
+        <% end %>
+
+        <% if has_tax?(transaction_hash) or (transaction_hash.collection.present? and transaction_hash.collection.tax_enabled) %>
+            <%= "," if comma %>
+            <%= t('tax_text') %> : <%= transaction_hash.total_tax %>
+            <% comma = true %>
+        <% end %>
+
+        <% if has_fine?(transaction_hash) %>
+            <%= "," if comma %>
+            <%= t('fine') %>: <%= transaction_hash.fine_amount %>
+        <% end %>
+      </div>
+
+      <div class="right">
+        <% unless transaction_hash.finance_type == 'InstantFee' %>
+            <% if transaction_hash.total_amount_to_pay.present? %>
+                <div class="row">
+                  <%= t('total_amount_to_pay') %>:
+                  <span><%= transaction_hash.total_amount_to_pay %></span>
+                </div>
+            <% end %>
+        <% end %>
+
+        <% unless transaction_hash.finance_type == 'InstantFee' %>
+            <% if transaction_hash.total_due_amount.present? %>
+                <div class="row">
+                  <%= t('total_due_amount') %>: <span><%= transaction_hash.total_due_amount %> </span>
+                </div>
+            <% end %>
+        <% end %>
+        <% if transaction_hash.wallet_amount_applied %>
+              <div class="row">
+                <%= t('wallet_amount_applied') %>: <span><%= transaction_hash.wallet_amount %> </span>
+              </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="payment-mode payment_mode">
+      <div class="left">
+        <%= t('payment_mode') %>:
+      </div>
+      <div class="left">
+        <%= transaction_hash.payment_mode %>
+      </div>
+
+      <% if transaction_hash.reference_no.present? %>
+          <div class="left"><%= transaction_hash.reference_label %>:</div>
+          <div class=""><%= transaction_hash.reference_no %></div>
+      <% end %>
+
+      <% if transaction_hash.payment_mode == "Cheque" %>
+          <div class="left"><%= t('cheque_date') %>:</div>
+          <div class="">
+            <%= transaction_hash.cheque_date.present? ? transaction_hash.cheque_date : '-' %>
+          </div>
+          <div class="left"><%= t('bank_name') %>:</div>
+          <div class="">
+            <%= transaction_hash.bank_name.present? ? transaction_hash.bank_name : '-' %>
+          </div>
+      <% end %>
+    </section>
+
+    <div class="receipt-footer">
+      <% if transaction_hash.payment_note.present? %>
+          <span><%= t('notes') %></span>:
+          <%= transaction_hash.payment_note %>
+      <% end %>
+      <% if has_tax?(transaction_hash) %>
+          <% if transaction_hash.default_configs.finance_tax_identification_label.present? %>
+
+              <span><%= transaction_hash.default_configs.finance_tax_identification_label %></span>:
+              <%= transaction_hash.default_configs.finance_tax_identification_number %>
+          <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+
+
+
+<section class="summary words_bottom">
+  <% show_amount_in_words = (transaction_hash.default_configs.pdf_receipt_atow.to_i == 1) %>
+  <div class="left amount_margin">
+    <% if show_amount_in_words %>
+        <span class="amount_in_words"><%= t('amount_in_words') %></span> :
+        <%= NumberToWord.convert(transaction_hash.amount,
+                                 transaction_hash.default_configs.pdf_receipt_nsystem,
+                                 transaction_hash.default_configs.default_currency) %>
+        <br/>
+    <% end %>
+    <% if transaction_hash.invoice_no.present? %>
+        <% if transaction_hash.invoice_enabled %>
+            <span style="font-weight: bold;"><%= t('payment_for_invoice') %></span> :
+            <%= transaction_hash.invoice_no %>
+        <% end %>
+    <% end %>
+  </div>
+
+  <div class="right">
+    <div class="row bold">
+      <% if transaction_hash.wallet_mode_only.present? %>
+        <%= t('amount_paid') %>: <span><%= @advance_fee_collection.fees_paid %></span>
+      <% else %>
+        <%= t('amount_paid') %>: <span><%= transaction_hash.amount %></span>
+      <% end %>
+    </div>
+  </div>
+</section>

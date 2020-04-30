@@ -1,0 +1,7 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= @current_script.name.titleize %></h1>
+  <h4 class="content-head"><%= @current_script.description.titleize %></h4>
+  <%= link_to 'Support Tasks', task_list_support_engine_path(params[:id]),:class => 'button-red float-right', :style=>'margin-left: 20px;'%>
+  <%= link_to 'Task Status', task_status_support_engines_path(:id=>params[:id], :script=>params[:script]),:class => 'button-red float-right'%>
+</fieldset>
+<%= render "support_form" %>

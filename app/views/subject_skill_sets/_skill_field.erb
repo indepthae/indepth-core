@@ -1,0 +1,35 @@
+<div class="activity_strip">
+    <% unless f.object.marked_for_destruction? %>
+      <div class="label">
+          <%=f.text_field :name, :disabled => @set.exam_dependencies_present?%>
+          <div class="max_marks">
+            <%=f.text_field :maximum_marks, :class=>'max_mark_field',:onblur=> "return validate_mark(this)", :onkeypress => "return isNumberKey(event,this)", :disabled => @set.exam_dependencies_present? %>
+          </div>
+          <% unless @skill.present? %>
+            <div class="pull-left w100 mt-20">
+                <div class="label-field-pair">
+                    <div class="grade_type">
+                        <%= f.radio_button :calculate_final, 1, {:checked => (f.object.new_record? ? true : f.object.calculate_final), :disabled => f.object.locked_from_changing_calculation_mode(@set) }%>
+                        <label for="subject_skill_set_calculate_final_1"><%= t('calculate_skill_scores') %></label>
+                    </div>
+                    <% if f.object.new_record? and f.object.locked_from_changing_calculation_mode(@set) %>
+                      <%= f.hidden_field :calculate_final, :value => 1 %>
+                    <% end %>
+                    <div class="grade_type">
+                        <%= f.radio_button :calculate_final, 0, {:checked => (f.object.new_record? ? false : !f.object.calculate_final), :disabled => f.object.locked_from_changing_calculation_mode(@set) }%>
+                        <label for="subject_skill_set_calculate_final_0"><%= t('dont_calculate_skill_scores') %></label>
+                    </div>
+                </div>
+            </div>
+          <% end %>
+      </div>
+      <% unless @set.exam_dependencies_present? %>
+        <div class="field">
+            <%=f.hidden_field :_destroy, :value=> 0 %>
+            <div class="remove_field" onclick="remove_field(this);"></div>
+        </div>
+      <% end %>
+    <% else %>
+      <%=f.hidden_field :_destroy %>
+    <% end %>
+</div>

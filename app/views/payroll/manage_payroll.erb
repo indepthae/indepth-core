@@ -1,0 +1,97 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<%= javascript_include_tag "hr" %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_payroll') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('add_payroll') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :payroll_manage_payroll, @employee %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= t('step_1_add_to_payroll_group') %></h3>
+  <div id="search-form" style="<%= (params[:payroll_group].present? or params[:employee_salary_structure].present?) ? 'display: none' : ''%>" >
+    <% form_for :payroll_group, :url => {:action => "manage_payroll", :id => @employee.id, :from => @prev_action}  do |f| %>
+      <div class="label-field-pair payroll_groups">
+        <label for="payroll_groups"><%= t('payroll_groups') %></label>
+        <div class="text-input-bg">
+          <%= f.select :id, [["#{t('select_payroll_group')}","0"]] + @payroll_groups.map { |c| [c.name, c.id] }, {:selected=>(@payroll_group.present? ? @payroll_group.id : 0)} %>
+        </div>
+        <div class="wrapper" id="payroll_warn"><div class="error-icon"></div><div class="error-msg"><%= t('select_a_payroll_group') %></div></div>
+      </div>
+      <%= submit_tag "#{t('use_this_group')}",:class=>'submit-button', :id => "submit" %>
+    <% end %>
+    <% unless params[:payroll_group].nil? and params[:employee_salary_structure].nil? %>
+      <div class="div_link" id="cancel_div" onclick="hide_form()"><%= t('cancel') %></div>
+    <% end %>
+    <hr/>
+    <% if params[:payroll_group].nil? and params[:employee_salary_structure].nil? %>
+      <h3><%= t('step_2_add_payroll_details') %></h3>
+      <div class="description"><%= t('add_payroll_group_description') %></div>
+      <% if @prev_action == 'employee_admission' %>
+        <%= link_to t('skip_and_proceed'), {:controller => "leave_groups", :action => "manage_leave_group", :id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+      <% else %>
+        <%= link_to t('cancel'), {:controller => "leave_groups", :action => "manage_leave_group", :id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+      <% end %>
+    <% end %>
+  </div>
+  <div data-attrs="<%= Configuration.get_rounding_off_value.config_value.to_i %>" id="rounding_for"></div>
+  <% unless params[:payroll_group].nil? and params[:employee_salary_structure].nil? %>
+    <div id="payroll_form">
+      <%= render :partial => "employee_payroll_form" %>
+    </div>
+  <% end %>
+</div>
+<script type ="text/javascript">
+  var initial_data = JSON.parse('<%= (@dependencies||{}).to_json.gsub("'", %q(\\\')) %>');
+  function hide_form(){
+    j('#search-form').hide();
+    j('#search_details').show();
+  }
+  function isNumberKey(text, evt){
+    var charCode = (evt.which) ? evt.which : evt.keyCode
+    evt = evt || window.event;
+    var txt = text.value;
+    var dotcontainer = txt.split('.');
+    if (charCode > 37 && charCode < 40)
+      return true;
+    else if ((charCode == 46 || charCode == 116) && (dotcontainer.length <= 1))
+      return true;
+    else if (charCode > 31 && (charCode < 48 || charCode > 57))
+      return false;
+    return true;
+  }
+  j('#submit').click(function(){
+    if(j('#payroll_group_id').val() == "0")
+    {
+      j('#payroll_warn').show();
+      return false;
+    }
+    else
+      return true;
+  });
+</script>

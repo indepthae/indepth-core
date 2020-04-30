@@ -1,0 +1,98 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('assignments_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @assignment.subject.name.to_s %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :assignments_show, @assignment %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+
+  <div id="assignment_title">
+    <p><%= "#{@assignment.title}   " %></p>  <p id="assignment_due" class="themed_text" ><%= @assignment.duedate.past??  "#{t('assignment_already_due')}"  : "#{t('due_in')} #{distance_of_time_in_words( Time.now ,@assignment.duedate)}   "%> <%="<small>(#{format_date(@assignment.duedate,:format=>:long_date)})</small>"%></p>
+  </div>
+
+
+  <div id="assignment_content">
+    <p>
+      <%= @assignment.content.to_s%>
+    </p>
+    <% unless @assignment.attachment_file_name.nil? %>  <div id="attachment"> <%= link_to @assignment.attachment_file_name.to_s, @assignment.attachment.url(:default,false) %></div><% end %>
+  </div>
+
+
+  <% if @assignment.employee.present? and @assignment.accessible_for_employee(@current_user.employee_record)%>
+    <div id="employee-options" >
+      <div id="action_buttons">
+        <div>
+          <%= link_to "► #{t('edit_text')}",
+            edit_assignment_path(@assignment), :class => "user_button"%>
+        </div>
+        <div>
+          <%= link_to "► #{t('delete_assignment')}",
+            @assignment, :method => "delete",
+            :confirm => "#{t('delete_this_assignment')}", :class => "user_button" %>
+        </div>
+      </div>
+      <div id="student-list-bg">
+        <div id="loaderbox">     <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %> </div>
+        <div id="quickinfo">  <h5><%= link_to_remote  "#{t('assigned')} (#{@students_assigned_count})",:update=>"assigned_students",:url=>{:action=>:assignment_student_list,:id=>@assignment.id,:status=>"assigned"},   :before => "Element.show('loader')", :success => "Element.hide('loader')"%></h5>
+          <h5> <%= link_to_remote  "#{t('answered')} (#{@answered_count})",:update=>"assigned_students",:url=>{:action=>:assignment_student_list,:id=>@assignment.id,:status=>"answered"},   :before => "Element.show('loader')", :success => "Element.hide('loader')"%></h5>
+          <h5> <%= link_to_remote  "#{t('pending')} (#{@pending_count})",:update=>"assigned_students",:url=>{:action=>:assignment_student_list,:id=>@assignment.id,:status=>"pending"},   :before => "Element.show('loader')", :success => "Element.hide('loader')"%></h5>
+
+        </div>
+
+
+        <div id="student_list"></div>
+      </div>
+    </div>
+    <div class="extender"></div>
+
+  <%elsif @current_user.student? %>
+    <div class="student-options">
+      <%if @assignment.student_list.split(",").include? @current_user.student_record.id.to_s %>
+        <% if @assignment_answers.empty? %>
+          <div class="answer">
+            <%= link_to "#{t('answer_this_assignment')}" , new_assignment_assignment_answer_path(@assignment) ,:class=>"user_button"%>
+          </div>
+        <% else %>
+
+          <% @assignment_answers.each do |answer| %>
+            <%= link_to answer.title , [@assignment,answer] ,:class=>"themed_text"%>
+            <% if answer.status == "REJECTED" %>
+              <%= "#{t('rejected')}"%> <%= link_to "(#{t('resubmit')})" , edit_assignment_assignment_answer_path(@assignment,answer),:class=>"themed_text"%>
+            <% elsif answer.status=="ACCEPTED" %>
+              <%= "#{t('hostel_accepted')}"%>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <%elsif @current_user.parent?%>
+    <div class="student-options">
+      <%if @assignment.student_list.split(",").include? @current_user.parent_record.id.to_s %>
+        <% if @assignment_answers.empty? %>
+          <div class="answer">
+          </div>
+        <% else %>
+          <% @assignment_answers.each do |answer| %>
+            <div class="themed_text">
+              <%= link_to answer.title , [@assignment,answer] ,:class=>"themed_text"%>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  j("#student-list-bg a").click(function(){
+    j("#student-list-bg .themed_text").removeClass("themed_text");
+    j(j(this)).addClass("themed_text");
+  })
+</script>

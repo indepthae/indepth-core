@@ -1,0 +1,10 @@
+<% @sms_messages.each do |sms| %>
+  <div id="message_element-<%= sms.id %>"  class="message_element" onclick="<%= remote_function(:url=> { :action=> 'show_sms_logs', :id=>sms.id} )%>, update_bg(<%= sms.id %>);" >
+      <div class="message_head">
+          <%=sms.body%>
+      </div>
+      <div class="message_timestamp">
+          <%= format_date(change_time_to_local_time(sms.created_at),:format=>:long) %>
+      </div>
+  </div>
+<%end%>

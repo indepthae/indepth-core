@@ -1,0 +1,228 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_details') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_student_details_settings%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="flash-msg"></div>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%= "#{t('certificate_studentdetails_settings')}" %></label>
+        </div>
+    </div>
+    <%remote_form_for :tc_template_student_details,:url => {:action => 'priority_change'} do |f|%>
+      <%=  session_fingerprint_field %> 
+      <div id="form-errors"></div>
+      <div id="reorder_records"></div>
+      <div id="middle_section">
+          <div id="description">
+              <div id="description_text">
+                  <%= "#{t('student_details_description')}" %>
+              </div>
+          </div>
+          <div id="font_description">
+            <div id="font_size_area">
+              <%= t('choose_font_size')%>
+            </div>
+            <div id="font_size_text">
+                <%= "#{t('font_size_description')}" %>
+            </div>
+            <div id="font_val">
+                <% temp = TcTemplateVersion.current.font_value %>
+              <%= select_tag(:font_size, options_for_select(["#{t('select_text_size')}"] + [["Very Small","very_small"],["Small","small"],["Normal","normal"],["Medium","medium"],["Large","large"],["Very Large","very_large"]], :selected=> temp))%>
+            </div>
+              <div class="font_size_style">
+                <div id="font_change" class="submit-button"><%=t('save')%></div>
+            </div>
+          </div>
+      </div>
+      <div id="priority">
+          <div id="priority_text_1">
+              <%= t('reorder') %>
+          </div>              
+      </div>
+      
+      <div class="submit_button class"><%= link_to_remote "#{t('add_field')}", :url => { :action => 'new_field',:sub_field=> false}, :html => { :class  => "submit-button" } %>
+      <div class="sub_label">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li id="drop_header" class='themed_bg themed-dark-hover-background'>
+                      <a href="#" id="drop_header_link" class="submit-button">&#9660;</a>
+                      <ul id="box_1" class="more-menu-div" style="display:none;">
+                          <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_sub_field')}", :url => { :action => 'new_field',:sub_field=> true}, :html => { :class  => "submit-button" } %></li>
+                      </ul>
+                  </li>
+              </ul>
+          </div>
+      </div>
+      </div>
+      <div class="drag_drop_msg hidden_sec"><i></i><%=t('drag_drop_msg')%></div>
+      <div id="save_button_init" class="hidden_sec"><%=f.submit%></div>
+      <div id="cancel_link_init" class="hidden_sec"><%=t('cancel')%></div>
+      <div id="other_details">
+          <%=render :partial=>'reorder'%>
+      </div>
+      <div id="save_button" class="hidden_sec"><%=f.submit%></div>
+      <div id="cancel_link" class="hidden_sec"><%=t('cancel')%></div>
+    <%end%>
+</div>
+
+<div id="modal-box" style="display:none;"></div>
+<script type="text/javascript">
+  function updateSortorder() {
+
+      j('table:visible.student-details_table').each(function (i) {
+          j(this).children().last().children().last().val(i + 1);
+      });
+  }
+
+  function updateSubSortorder(ui) {
+      j(ui.item.parent()).find('tr:visible.sub_list').each(function (i) {
+          j(this).children().last().val(i + 1);
+      });
+  }
+  j('#priority_text_1').click(function () {
+      j('#priority_text_1').hide();
+      j('.drag_drop_msg').show();
+      j('#save_button').show();
+      j('#save_button_init').show();
+      j('.submit_button').hide();
+      j('#cancel_link').show();
+      j('#cancel_link_init').show();
+      j('th#action').hide();
+      j('td.action').hide();
+      j('th.value_criterea').hide();
+      j('td.value_criterea').hide();
+      j('th.sl_no').hide();
+      j('td.sl_no').hide();
+      j('.sub_label').hide();
+      j('th#reorder').show();
+      j('th#reorder').addClass("intro");
+      j('td.reorder_val').css('width', '5px');
+      j('td.reorder_val').show();
+      j('tr.sub_list > td.record_name').addClass("priority_table_sub_list_record_name");
+      j('tr.list > td').css('border-top-width', 1);
+      j('tr.list > td').css('border-top-style', 'solid');
+      j('tr.list > td').css('border-top-color', '#ccc');
+      j('th#name').addClass("priority_table_th_name");
+      j('td.record_name').addClass("priority_table_record_name");
+      j("#student_items").sortable({
+          cursor: 'move',
+          opacity: 0.6,
+          nested: true,
+          start: function (event, ui) {
+          },
+          stop: function (event, ui) {
+              updateSortorder();
+          },
+          items: "table:not(.disable_sort_table)"
+
+      }).disableSelection();
+
+      j(".student-details_table").sortable({
+          cursor: 'move',
+          opacity: 0.6,
+          nested: true,
+          start: function (event, ui) {
+          },
+          stop: function (event, ui) {
+              updateSubSortorder(ui);
+          },
+          items: "tr:not(.list)"
+      }).disableSelection();
+
+
+
+  });
+  j('#cancel_link, #cancel_link_init').click(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/tc_template_student_details/cancel",
+          data: {
+              version_id: <%= @template_id%>
+          }
+      });
+      j('#cancel_link').hide();
+      j('#cancel_link_init').hide();
+      j('#save_button').hide();
+      j('#save_button_init').hide();
+      j('.drag_drop_msg').hide();
+      j('#priority_text_1').show();
+      j('.submit_button').show();
+      j('.sub_label').show();
+  });
+  j('#tc_template_student_details_submit, #save_button').click(function () {
+      j('#cancel_link').hide();
+      j('#cancel_link_init').hide();
+      j('.submit_button').show();
+      j('#save_button').hide();
+      j('#save_button_init').hide();
+      j('.drag_drop_msg').hide();
+      j('#priority_text_1').show();
+      j('th#action').show();
+      j('td.action').show();
+      j('th#reorder').hide();
+      j('td.reorder_val').hide();
+      j('.sub_label').show();
+      j('th#name').removeClass("priority_table_th_name");
+      j('td.record_name').removeClass("priority_table_record_name");
+      j("#student_details_table tbody").sortable("destroy");
+  });
+
+
+  function remove_entry(el) {
+      j(el).parent().remove();
+  }
+
+
+  function create_row() {
+      var rand = +new Date();
+      var inst_details = '<div class="label-field-pair" style="height: 40px;">';
+      var close_and_input = '<span class="cb_value"><%= text_field_tag "tc_template_field_student_details[field_info][additional_field]['+rand+']" %></span><a class="delete_button_img" onclick="remove_entry(this)"></a>';
+      var add_button = '<div class="space" style="height: 17px; width: 8px; float:left;"></div><span class="cb_value"><%= text_field_tag "tc_template_field_student_details[field_info][additional_field]['+rand+']" %></span><a class="add-field" onclick="create_row(1)"><%= "#{t('add')}" %></a>';
+      var tr_td_close = '</div>';
+      j('.select_box').append(inst_details + close_and_input + tr_td_close);
+  }
+
+  j(document).ready(function () {
+      j("#drop_header").hover(
+              function () {
+                  link_off = j("#drop_header").offset();
+                  link_width = j("#drop_header").width();
+                  link_height = j("#drop_header").height();
+                  box_width = j("#box_1").width();
+                  //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                  j("#box_1").css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                  j("#box_1").css("display", "block");
+              },
+              function () {
+                  j("#box_1").css("display", "none");
+              });
+  });
+
+  j('#font_change').click(function () {
+    var font_size = j( "#font_size option:selected" ).val();
+      j.ajax({
+          type: 'POST',
+          url: "/tc_template_student_details/font_size_select",
+          data: {
+              version_id: <%= @template_id%>,
+              font_size: font_size
+          }
+      });
+  });
+</script>

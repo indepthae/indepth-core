@@ -1,0 +1,28 @@
+<% @report_templates.each do |report_template| %>
+  <% template = report_template.template %>
+  <div class="select-template">
+      <div class="preview-thumb-container">
+          <%= preview_thumb_for report_template  %>
+      </div>
+      <div class="preview-buttons-container">
+          <div class="select-btn-container">
+              <label class="select-btn">Select
+                  <%= radio_button :assessment_report_setting,:custom_template, report_template.name,:checked=> @setting[:custom_template]== report_template.name, :onclick => 'get_template_details(this);' %>
+                  <span class="checkmark"></span>
+              </label>
+          </div>
+          <div class="preview-btn-container">
+              <div class="preview-btn" onclick="preview_template(this);">Preview</div>
+          </div>
+      </div>
+      <div class="preview-thumb-header">
+          <%= template.display_name %>
+      </div>
+      <div class="preview-thumb-description">
+          <%= template.description %>
+      </div>
+  </div>
+<% end %>
+<div class="full_width">
+  <%= will_paginate @report_templates, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "assessment_reports",:action => "fetch_templates", :plan_id => @plan.id}%>
+</div>

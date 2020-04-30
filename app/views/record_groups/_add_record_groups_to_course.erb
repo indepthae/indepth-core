@@ -1,0 +1,231 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="page-yield-model" >
+  <div class="box">
+    <% form_remote_for @record_assignment,:url=>{:controller=>"record_groups",:action=>'assign_record_groups_to_course',:id=>@course.id},:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+      <%=hidden_field_tag "record_assignment[course_id]",@course.id%>
+      <%=hidden_field_tag "record_assignment[priority]",@last_priority+1%>
+      <%=hidden_field_tag "from_action",@from_action%>
+      <div id="form-errors"></div>
+      <div id="record_selection_part">
+        <div class="label-field-pair">
+          <label for=""><%= t('record_group') %></label>
+          <div class="text-input-bg">
+            <%= select :record_assignment, :record_group_id, @active_record_groups.map { |s| [s.name, s.id] },
+              {:prompt => "#{t('select_record_group')}"},
+              :before=>"$('loader').show();",:success=>"$('loader').hide();",:onchange=>"update_hidden_record_ids()"%>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+        </div>
+      </div>
+      <div id="add_record_group_label"><%=t('assign_record_group')%></div>
+      <div id="total_batch_selection_part">
+        <div class="label-field-pair">
+          <div class="batches_selection_type">
+            <%=  radio_button_tag 'add_to', 'all_active_batches', true,:class=>"radio_bs",:onclick=>"remove_unassociated_entries();remove_display();" %>
+            <label  for="add_to_all_active_batches" class="bold_text" id="all_active"> <%= t('add_to_all_active_batches') %></label>
+            <div class="selection_desc"><%=t('added_to_all_active_batches_msg')%></div>
+          </div>
+        </div>
+        <div class="label-field-pair reduced_width">
+          <div class="batches_selection_type">
+            <%=  radio_button_tag 'add_to', 'selective_batches',false,:class=>'radio_bs',:onclick=>"handle_display()" %>
+            <label  for="add_to_selective_batches" id="selective"><%= t('add_to_selective_batches') %></label>
+            <div class="selection_desc"><%=t('added_to_selected_batches_msg')%></div>
+            <div class="add_for_future">
+              <%= check_box_tag "record_assignment[add_for_future]",1, true,:onclick=>"handle_value(this);"%>
+              <label  for="record_assignment_add_for_future" class="special_prop"> <%= t('auto_add_for_future_active_batches') %></label>
+            </div>
+          </div>
+        </div>
+        <div id="sel_for_course"><%=t('select_batches_for')%> <%=@course.course_name%></div>
+        <div class="fee_category_scroll">
+          <div class="sel_batches">
+            <%= check_box_tag "all_active_batches",1, true,:onchange=>"handle_active_batch_list(this)",:class=>"check_val"%>
+            <label  for="all_active_batches" class="special_prop no_margin_top"><%= t('active_batches') %><span class="selected_batch_count" id="selected_active_batch_count">&#x200E;(<%=@active_batches.count%>)&#x200E;</span></label>
+          </div>
+          <% @active_batches.each do |b| %>
+            <div class="each_batch">
+              <%= check_box_tag "batch_id[#{b.id}]", b.id, true ,:class=>'batches_box active_batch_list',:onchange=>'set_active_state(this)'%>
+              <label  for="<%="batch_id_#{b.id}"%>" class="special_prop no_margin_top"><%= b.full_name %></label>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][record_group_id]","",:class=>'hidden_record_group_id'%>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][batch_id]","#{b.id}"%>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][_destroy]",0%>
+            </div>
+          <% end %>
+          <div class="sel_batches">
+            <%= check_box_tag "all_inactive_batches",0, false,:onchange=>"handle_inactive_batch_list(this)",:class=>"check_val"%>
+            <label  for="all_inactive_batches" class="special_prop no_margin_top"><%= t('inactive_batches') %><span class="selected_batch_count" id="selected_inactive_batch_count">&#x200E;(0)&#x200E;</span></label>
+          </div>
+          <%@inactive_batches.each do |b|%>
+            <div class="each_batch">
+              <%= check_box_tag "batch_id[#{b.id}]", b.id, false ,:class=>'batches_box inactive_batch_list',:onchange=>'set_inactive_state(this)'%>
+              <label  for="<%="batch_id_#{b.id}"%>" class="special_prop no_margin_top"><%= b.full_name %></label>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][record_group_id]","",:class=>'hidden_record_group_id'%>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][batch_id]","#{b.id}"%>
+              <%=hidden_field_tag "record_assignment[record_batch_assignments_attributes][#{b.id}][_destroy]",1%>
+            </div>
+          <%end%>
+        </div>
+      </div>
+      <div id="total_selected"><span><%=@active_batches.count%> </span><%=t('batches selected')%></div>
+      <div class="hor_line"></div>
+      <%= f.submit "", :value => "#{t('assign_record_group')}", :class => "submit_button", :id => 'submit_button' %>
+    <% end %>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  update_hidden_record_ids = function(){
+    j('.hidden_record_group_id').val(j('#record_assignment_record_group_id').val());
+  }
+  
+  handle_value= function(e){
+    if (j(e).is(":checked") == true){
+      j(e).val(1);
+    }
+    else{
+      j(e).val(0);
+    }
+  }
+  
+  set_active_state = function(elm)
+  {
+    var object_id=j(elm).attr('value');
+    if(elm.checked==true)
+    {
+      if(j("input:visible:checkbox.active_batch_list:not(:checked)").length == 0){
+        j('#all_active_batches').prop('checked',true);
+      }
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+      j('span#selected_active_batch_count').text("("+j("input:visible:checkbox.active_batch_list:checked").length+")");
+      j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length);
+    }
+    else
+    {
+      j('#all_active_batches').prop('checked',false);
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+      j('span#selected_active_batch_count').text("("+j("input:visible:checkbox.active_batch_list:checked").length+")");
+      j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+    }
+  }
+
+  set_inactive_state = function(elm)
+  {
+    var object_id=j(elm).attr('value');
+    if(elm.checked==true)
+    {
+      if(j("input:visible:checkbox.inactive_batch_list:not(:checked)").length == 0){
+        j('#all_inactive_batches').prop('checked',true);
+      }
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+      j('span#selected_inactive_batch_count').text("("+j("input:visible:checkbox.inactive_batch_list:checked").length+")");
+      j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+    }
+    else
+    {
+      j('#all_inactive_batches').prop('checked',false);
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+      j('span#selected_inactive_batch_count').text("("+j("input:visible:checkbox.inactive_batch_list:checked").length+")");
+      j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+    }
+  }
+
+  handle_display = function(){
+    j('#all_active').removeClass('bold_text');
+    j('#selective').addClass('bold_text');
+    j('.add_for_future').css('display','block');
+    j('.fee_category_scroll').css('display','block');
+    j('#sel_for_course').css('display','block');
+    j('#total_selected').css('display','block');
+    j('#add_to_all_active_batches').attr('onclick','remove_unassociated_entries();remove_display();');
+  }
+
+  remove_display = function(){
+    j('#selective').removeClass('bold_text');
+    j('#all_active').addClass('bold_text');
+    j('.add_for_future').css('display','none');
+    j('.fee_category_scroll').css('display','none');
+    j('#sel_for_course').css('display','none');
+    j('#total_selected').css('display','none');
+    j('#add_to_all_active_batches').removeAttr('onclick');
+  }
+
+  handle_active_batch_list = function(e){
+    if (j(e).is(":checked") == true){
+      j('.active_batch_list:visible').each(function(){
+        j(this).prop('checked',true);
+        var object_id=j(this).attr('value');
+        j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+        j('span#selected_active_batch_count').text("("+j("input:visible:checkbox.active_batch_list:checked").length+")");
+        j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+      });
+    }
+    else{
+      j('.active_batch_list:visible').each(function(){
+        j(this).prop('checked',false);
+        var object_id=j(this).attr('value');
+        j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+        j('span#selected_active_batch_count').text("("+j("input:visible:checkbox.active_batch_list:checked").length+")");
+        j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+      });
+    }
+  }
+  handle_inactive_batch_list = function(e){
+    if (j(e).is(":checked") == true){
+      j('.inactive_batch_list:visible').each(function(){
+        j(this).prop('checked',true);
+        var object_id=j(this).attr('value');
+        j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+        j('span#selected_inactive_batch_count').text("("+j("input:visible:checkbox.inactive_batch_list:checked").length+")");
+        j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+      });
+    }
+    else{
+      j('.inactive_batch_list:visible').each(function(){
+        j(this).prop('checked',false);
+        var object_id=j(this).attr('value');
+        j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+        j('span#selected_inactive_batch_count').text("("+j("input:visible:checkbox.inactive_batch_list:checked").length+")");
+        j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+      });
+    }
+  }
+
+  remove_unassociated_entries = function(){
+    j('#record_assignment_add_for_future').prop('checked',true).val(1);
+    j('.inactive_batch_list:visible').each(function(){
+      j(this).prop('checked',false);
+      var object_id=j(this).attr('value');
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',1);
+    });
+    j('.active_batch_list:visible').each(function(){
+      j(this).prop('checked',true);
+      var object_id=j(this).attr('value');
+      j('#record_assignment_record_batch_assignments_attributes_'+object_id+'__destroy').attr('value',0);
+    });
+    j('#all_inactive_batches').prop('checked',false);
+    j('#all_active_batches').prop('checked',true);
+    j('span#selected_active_batch_count').text("("+j("input:visible:checkbox.active_batch_list:checked").length+")");
+    j('span#selected_inactive_batch_count').text("("+j("input:visible:checkbox.inactive_batch_list:checked").length+")");
+    j('#total_selected span').text(j("input:visible:checkbox.active_batch_list:checked").length + j("input:visible:checkbox.inactive_batch_list:checked").length)
+  }
+</script>

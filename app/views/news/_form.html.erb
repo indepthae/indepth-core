@@ -1,0 +1,54 @@
+<!-- TODO remove this  -->
+<%
+ if @controller.action_name == "new" || @controller.action_name == "create"
+   url={:controller=>"news",:action=>"create"}
+ else
+   url={:controller=>"news",:action=>"update",:id=>@news.id}
+ end
+%>
+<% form_for @news,:url=>url,:html => { :multipart => true } do |f| %>
+  <%= error_messages_for :news, :header_message => nil %>
+  <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+  <div id="add_news_form">
+    <div class="news_label_field">
+      <label for="title"><%= t('title') %></label>
+      <div id="news_title_text_field_bg"><%= f.text_field :title %></div>
+    </div>
+    <div class="news_label_field">
+      <label for="news_content"><%= t('content') %></label>
+      <div id="news_content_text_field_bg">
+        <%= f.redactor :content %>
+      </div>
+    </div>
+    <h4 class="attach_files_head"><%= t('attach_files_max_size') %></h4>
+    <% f.fields_for :news_attachments do |builder| %>
+      <%= render 'news_attachment_fields', :c => builder %>
+    <% end %>
+    <div class="add_fields">
+      <%#= link_to_add_fields t('add_another_file'), f, :news_attachments %>
+      <%= link_to_add_fields "#{t('add')}", f, :news_attachments %>
+    </div>
+    <div class="extender">
+    </div>
+    <hr class="separator">
+    <%= submit_tag "", :value => "#{t('publish_news')}", :class => "news_publish_button", :disable_with => "► #{t('please_wait')}" %>
+  </div>
+<% end %>
+<%= load_redactor_script %>
+
+<script type="text/javascript">
+  function remove_fields(link) {
+    j(link).prev("input[type=hidden]").val("1");
+    j(link).closest(".fields").hide();
+  }
+
+  function add_fields(link, association, content) {
+    if (j(".fields:visible").length >=5){
+      alert("<%= t('attachment_maximum_limit_reached') %>")
+    } else {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g")
+      j(link).parent().before(content.replace(regexp, new_id));
+    }
+  }
+</script>

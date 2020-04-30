@@ -1,0 +1,41 @@
+<% unless @exams.blank? %>
+
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td>
+        <%= t('name') %>
+      </td>
+      <td>
+        <%= t('start_date') %>
+      </td>
+      <td>
+        <%= t('end_date') %>
+      </td>
+      <td>
+        <%= t('status') %>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    <tr class="tr-blank"></tr>
+    <% @exams.each do |e| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-3"><%= link_to "#{e.name}",:action=>"exam_details" ,:id=>e.id %></td>
+        <td class="col-1"><%= format_date(e.start_date,:format=>:short_date) %></td>
+        <td class="col-1"><%= format_date(e.end_date,:format=>:short_date) %></td>
+        <% unless e.is_published %>
+          <td class="col-1"><%= link_to_remote "#{t('publish_t')}",:url=>{:action=>"publish_exam" ,:id=>e.id, :batch_id=>batch_id} %></td>
+        <% else %>
+          <td class="col-1"><%= t('published') %></td>
+        <%  end  %>
+        <td class="col-1 normal-font themed_text"><%= link_to "#{t('edit_text')}",{:action=>"edit_exam_group",:id=>e.id}, :class=>"normal-font themed_text"  unless e.has_attendence%> <%= link_to_remote "| #{t('delete_text')}",:url=>{:action=>"delete_exam_group" ,:id=>e.id, :batch_id=>batch_id}, :confirm=>"#{t('are_you_sure_to_delete_this_exam_group')}", :html=>{:class=>"normal-font themed_text"} unless e.is_published%> </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @exams,:renderer => 'RemoteLinkRenderer', :params => {:action=>'show_active_exam',:batch_id=>batch_id},:remote=>{:update=>'exam-list'}%>
+<% else %>
+
+  <p class="flash-msg"> <%= t('no_exam_created_for_selected_batch') %>  </p>
+
+<% end %>

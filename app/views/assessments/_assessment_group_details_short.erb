@@ -1,0 +1,18 @@
+<div class="exam_group_head">
+    <div class="clm">
+        <div class="label"><%="#{t('exam_group')}"%></div>
+        <div class="value"><%=@assessment_group.name_with_code%></div>
+    </div>
+    <div class="clm">
+        <div class="label"><%=t('exam_type')%></div>
+        <div class="value"><%=@assessment_group.exam_mode%></div>
+    </div>
+    <div class="clm">
+        <div class="label"><%=t('course_text')%></div>
+        <div class="value"><%=@course.full_name%></div>
+    </div>
+    <div class="clm">
+        <div class="label"><%=t('batch')%></div>
+        <div class="value"><%=@batch.full_name%></div>
+    </div>
+</div>

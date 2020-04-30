@@ -1,0 +1,51 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('remark_bank') %></div>
+    <% if permitted_to? :new , :remark_banks %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to t('create_remark_bank'), :action => 'new' %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :remark_banks_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('remark_bank') %></div>
+    <div id ="description"><%= t('remark_bank_description') %></div>
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('name') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @remark_banks.present? %>
+              <% @remark_banks.each do |rb|  %>
+                <tr class="tr-<%= cycle('even', 'odd') %>">
+                    <td><%= link_to rb.name, :action => 'show', :id => rb.id %></td>
+                    <td><%= link_to t('view'), :action => 'show', :id => rb.id %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="4"><%= t('create_remark_bank') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @remark_banks.present? %>
+          <%= pagination_status(@remark_banks) %>
+        <% end %>
+        <%= will_paginate @remark_banks %>
+    </div>
+</div>

@@ -1,0 +1,7 @@
+<% if report.attendance_reports.present? or report.exam_attendance_reports.present? %>
+<table class="primary condensed">
+    <%= attedance_report(:type => 'term_and_consolidated') %> 
+    <%= attedance_report(:type => 'full') %> 
+</table> 
+<% end %>
+<%= report_remarks(report.remarks)  %>

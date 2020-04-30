@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.book_detail{
+  @books.each do |book|
+    @book = book
+    @xml.book do
+      @xml.title(@book.title)
+      @xml.author(@book.author)
+      @xml.book_number(@book.book_number)
+      @xml.status(@book.status)
+    end
+  end
+}%>
+
+

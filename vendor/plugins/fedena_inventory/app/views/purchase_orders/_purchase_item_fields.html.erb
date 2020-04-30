@@ -1,0 +1,88 @@
+
+<div id="field" class="fields">
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+    <% if f.object._destroy == true %>
+      <tr class="purchase_item_row" style="display:none">
+      <% else %>
+      <tr class="purchase_item_row">
+      <% end %>
+      <td class="text-input">
+        <%=  f.text_field :user_id, :user_id=> @current_user.id, :value=>@current_user.first_name, :readonly => true %>
+      </td>
+      <td class="text-input" id="person_store_item_id" >
+        <%=  f.text_field :item_name, :class => 'purchase_item_name' %>
+        <%=  f.hidden_field :store_item_id, :class => "store_item_id" %>
+      </td>
+      <td class="text-input"><%= f.text_field :price,:value=> (defined? f.object.price) ? precision_label(f.object.price.to_f): '',:class => "nested_price precision_text" %></td>
+      <td class="text-input"><%= f.text_field :quantity, :class => "quantity" %></td>
+      <td class="text-input" ><%= f.text_field :discount,:value=> (defined? f.object.discount) ? precision_label(f.object.discount.to_f): '', :class=>'precision_text' %></td>
+      <td class="text-input" ><%= f.text_field :tax, :value=> (defined? f.object.tax) ? precision_label(f.object.tax.to_f): '',:class=>'nested_tax precision_text' %></td>
+      <td id="remove"> <%= link_to_remove_fields image_tag("/images/buttons/Delete.png",:border => 0) , f  %>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<script type="text/javascript">
+
+  document.observe('dom:loaded', function () {
+      $('person_store_id').observe('change', StoreSelected);
+  });
+  function StoreSelected(){ 
+    if(val!=""){ 
+      var newVal = j('#person_store_id').val();
+      if(!confirm("All items will be removed. Do you want to continue?")){
+        j('#person_store_id').val(val);
+        return;
+      }
+      val=newVal;
+      r_fields();
+      j('.purchase_item_name').val("");
+      j('.store_item_id').removeAttr("value");
+      j('.quantity').val("");
+      j('.nested_price').val("0.0000"); 
+      j('.precision_text').val("0.0000"); 
+      j('.nested_tax').val("0.0000");  
+    }
+    val=j('#person_store_id').val();
+  }
+  
+  function r_fields(){
+    length=j(".fields").length;
+    j(".fields").each(function(field){
+      if(field===0)
+        $(this).show();
+      if(field > 0 && field < length){
+        $( this ).remove();  
+      }
+    });  
+  }
+
+  
+  j("input.purchase_item_name").click(function(){
+    var ele = j(this);
+    var store_id = j('#person_store_id').val();
+
+    a = j(this).autocompleteAjax({serviceUrl:'/invoices/search_store_item',
+      onSelect: function(value,data){
+        update_store_item(data,ele);
+        j('.autocomplete-w1').hide();
+      },
+      params: {store_id: store_id, po: true}
+    });
+  });
+
+  function update_store_item(data, ele)  {
+    text_input_id = ele.attr('id');
+    element_id = text_input_id.gsub('item_name','store_item_id')
+    element = j('#'+element_id)
+    element.val(data)
+    <%= "#{remote_function(:url => {:action => "update_item" },
+          :with => "'item_id='+data+ '&i='+text_input_id",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')"
+          )}" %>
+  }
+
+</script>

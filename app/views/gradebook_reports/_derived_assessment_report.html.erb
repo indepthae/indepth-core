@@ -1,0 +1,131 @@
+<% roll_num_enabled = Configuration.enabled_roll_number? %>
+<table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+    <tr>
+        <td id="firstTd"></td>
+        <td rowspan="2">
+            <div id="divHeader" style="">
+                <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                    <tr id="main_heading">
+                        <% ind = 0 %>
+                        <% @exam_groups.each_with_index do |eg,i| %>
+                          <td colspan=<%= (eg.scoring_type == 3)? "2" : "1" %>>
+                              <div class="tableHeader th_<%=i+1%>" title="<%=eg.name%>"><%= truncate(eg.name,:length => 15) %></div>
+                              <% ind = i %>
+                          </td>
+                        <% end %>
+                        <td colspan=<%=@grades.present? ? "2" : "1" %>><div class="tableHeader th_<%=ind+2%>"></div></td>
+                    </tr>
+                    <tr id="sub_header">
+                        <% i = 1 %>
+                        <% @exam_groups.each do |eg| %>
+                          <% claz = "tableSubHeader tsh_#{i}" %>
+                          <% if eg.scoring_type == 3 %>
+                            <td><div class="<%=claz%>"><%= eg.maximum_marks %></div></td>
+                            <td><div class="<%=claz%>"><%= t('grade') %></div></td>
+                          <% else %>
+                            <td><div class="<%=claz%>"><%= eg.maximum_marks %></div></td>
+                          <% end %>
+                          <% i = i + 1 %>
+                        <% end %>
+                        <td><div class="tableSubHeader tsh_<%=i%>"><%= t('final_score') %></div></td>  
+                        <% if @assessment_group.scoring_type == 3 %>
+                         <td><div class="tableSubHeader  tsh_<%=i%>"><%= t('grade') %></div></td>   
+                        <% end %>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td id="sl_no"><%= t('no_text') %></td>
+        <td id="firstSubTd"><%= t('single_student') %></td>
+        <% if roll_num_enabled %>
+          <td id="roll_number"><%= t('roll_nos')%>  </td>
+        <% else %>
+          <td id="adn_number"><%=t('admission_no') %> </td>
+        <% end %>
+    </tr>
+    <tr>
+        <td valign="top">
+            <div id="firstcol">
+                <table width="350px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                    <% j=0 %>
+                    <%@students.each do |student|%>
+                      <% j=j+1 %>
+                      <tr>
+                          <td class="tableFirstCol"><div class="sl_no"><%=j%> </div></td>
+                          <td class="tableFirstCol"><div class="student_names" title="<%= student.full_name %> "><%= truncate(student.full_name,:length => 40)  %> </div></td>
+                          <% if roll_num_enabled %>
+                            <td class="tableFirstCol"><div class="roll_number"> <%=student.roll_number%> </<div></td>
+                          <% else %>              
+                            <td class="tableFirstCol"><div class="adn_number"> <%=student.admission_no%> </<div></td>           
+                          <% end %>
+                        </tr>
+                    <%end %>  
+                </table>
+            </div>
+        </td>
+        <td valign="top">
+          <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+            <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+            <% @students.each do |student| %>  
+              <% @report_hash[student.s_id].each_with_index do |s,i| %>
+                <tr id="<%= i ==0 ? "firstTr" : "" %>">
+                  <% if s.actual_mark.present? %>
+                    <% @exam_groups.each do |eg| %>
+                      <td>
+                        <div class="scores">
+                          <%= s.actual_mark[eg.id].present? ? s.actual_mark[eg.id][:mark] : "-"%>
+                        </div>
+                      </td>
+                      <% if eg.scoring_type == 3 %>
+                        <td>
+                          <div class="scores">
+                            <%= s.actual_mark[eg.id].present? ? s.actual_mark[eg.id][:grade] : "-"%>
+                          </div>
+                        </td>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <% @exam_groups.each do |eg| %>
+                        <td>
+                          <div class="scores">
+                              <%=  '-' %>
+                          </div>
+                        </td>
+                        <% if eg.scoring_type == 3 %>
+                          <td>
+                            <div class="scores">
+                              <%= '-' %>
+                            </div>
+                          </td>
+                        <% end %>
+                    <% end %>
+                  <% end %>      
+                  <td>
+                    <div class="scores" > <%= s.mark %> </div>
+                  </td>
+                  <% if @assessment_group.scoring_type == 3 %>
+                    <td>
+                      <div class="scores" > <%= s.grade %> </div>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
+            <% end %>
+            </table>
+          </div>
+        </td>
+    </tr>
+</table>
+<div id="buttons">
+    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+      :csv_report_type => "gradebook_subject_report",:report_format_type => "csv", :course => params[:subject_report][:course], :ac_year_id => params[:academic_year][:year_id],
+      :exam => @assessment_group.id, :batch => params[:subject_report][:batch], :subject => params[:subject_report][:subject],:gender => params[:subject_report][:gender],
+      :student_category=> params[:subject_report][:student_category],:derived_exam=>true},:class => "user_button"%>
+</div>
+<script type="text/javascript">
+    j(document).ready(function () {
+      fnAdjustTable();
+    });
+</script>

@@ -1,0 +1,18 @@
+<div class="label-field-pair">
+  <label for="course"><%= t('course') %></label>
+
+  <div class="text-input-bg">
+    <%= form.select "course_id", courses_options({:prompt => true, :select_all => true}),
+                    {}, {:onchange => "update_batch_list(this)"} %>
+
+    <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader2",
+                  :style => "display: none;") %>
+    <%= error_message_box(t('cant_be_blank')) %>
+  </div>
+</div>
+<div id="list_batches">
+  <%= render :partial => "finance_reports/filters/select_batch" %>
+</div>

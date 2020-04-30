@@ -1,0 +1,37 @@
+<h3> <%= t('inventory_tax_mode') %> </h3>
+<p> <%= t('tax_settings_warining') %></p>
+<% form_remote_tag(:url=>'/inventories/taxable_discount_settings') do |f| %>
+ <div class="label-radio-pair">
+
+   <label for="select_template"><%#= "Inventory tax mode"  %></label>
+
+     <div class="radio-select-options">
+
+       <div class="radio-select">
+
+         <%= radio_button_tag 'inventory_tax_mode', '1',FedenaInventory.new_tax_mode? %>
+
+         <%= label_tag 'inventory_tax_mode_1', 'Discount before Tax' %>
+
+         <p><%= t('new_tax_mode_label') %> </p>
+
+       </div>
+
+       <div class="radio-select">
+
+         <%= radio_button_tag 'inventory_tax_mode', '0',FedenaInventory.old_tax_mode? %>
+
+         <%= label_tag 'inventory_tax_mode_0', 'Discount after Tax' %>
+
+         <p><%= t('old_tax_mode_label') %> </p>
+
+         </div>
+
+       </div>
+
+     </div>
+
+     </div>
+     <%= submit_tag "", :value => "#{t('save_settings')}", :class => "submit-button" ,:disable_with => "Please wait..." %>
+ <% end %>
+<%#= FedenaInventory.tax_mode %>

@@ -1,0 +1,44 @@
+<% remote_form_for :columns, :url => {:action => :fee_collection_selectors}, 
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="report_column_form">
+      <div class="sections">
+          <div class="section_header"><%= t('student_details') %></div>
+          <% [:name, :admission_no, :batch_name].each do |column| %>
+            <div class="fields">
+                <%= check_box_tag "columns[student_details][]", column, (((@selected_columns||{})["student_details"]||[]).include? column.to_s), 
+                  :id => column.to_s + "_col", :text => t(column), :class => "rep_col", :checked => true, :readonly => true %>
+                <label><%= t(column) %></label>
+            </div>
+          <% end %>
+          <% [:student_mobile_phone, :immediate_contact_first_name, :immediate_contact_mobile_phone, 
+            :father_first_name, :father_mobile_phone, :mother_first_name, :mother_mobile_phone].each do |column| %>
+            <div class="fields">
+                <%= check_box_tag "columns[guardian_details][]", column, (((@selected_columns||{})["guardian_details"]||[]).include? column.to_s), 
+                  :id => column.to_s + "_col", :class => "rep_col" %>
+                <label for="<%= column.to_s + "_col" %>"><%= t(column) %></label>
+            </div>
+          <% end %>
+      </div>
+      <div class="sections">
+          <div class="section_header"><%= t('additional_details') %></div>
+          <% @active_fields.each do |addl| %>
+            <div class="fields">
+                <% name = (addl.name.downcase.gsub(" ","_") + "_additional_fields_" + addl.id.to_s) %>
+                <%= check_box_tag "columns[additional_details][]", name, (((@selected_columns||{})["additional_details"]||[]).include? name), 
+                  :id => name, :text => addl.name, :class => "rep_col" %>
+                <label for="<%= name %>"><%= addl.name %></label>
+            </div>
+          <% end %> 
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

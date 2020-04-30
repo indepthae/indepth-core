@@ -1,0 +1,41 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('import_log') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('detail_log') %></div>
+  <div id="inner-tab-menu">
+
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :import_log_details_index,  [@import,Export.find(@import.export_id)]%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+
+  <div class="box">
+    <% form_tag request.path, :method => 'get' do %>
+      <div class="label-field-pair1">
+        <label for="filter"><%= t('filter_by') %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+        </label>
+        <div class="text-input-bg1">
+          <%= select_tag "filter_import_log_details", options_for_select([ [t('all'),"all"], [t('failed'),"failed"], [t('success'),"success"]], params[:filter_import_log_details]), {:onChange => "#{remote_function(:url => {:action => "filter",:import_id => @import.id},:with => "'filter_import_log_details='+value",:before => "Element.show('loader')",:success => "Element.hide('loader')")}"}  %>
+        </div>
+      </div>
+    <% end %>
+    <div id ="list_import_log_details"><%= render :partial => "list_import_log_details" %></div>
+  </div>
+
+</div>

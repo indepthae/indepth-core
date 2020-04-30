@@ -1,0 +1,32 @@
+<% attr_object = c.object %>
+<% subject = attr_object.subject %>
+<% marks_present = @subjects_with_marks.include? attr_object.subject_id %>
+<tr class="tr-<%= cycle('even', 'odd') %>">
+    <td class="label"><%= subject.name_with_elective_group %></td>
+    <td class=<%= marks_present ? 'disabled' : '' %>>
+        <div class="select_profile">
+            <%= c.select :assessment_attribute_profile_id, @attribute_profiles.map{|p| [p.name, p.id]}, 
+              {:include_blank => t('select_attribute_profile')}, {:onchange => "update_profile_info(this, #{subject.id});",:disabled => marks_present} %>
+            <%= c.hidden_field :subject_id, :value => subject.id %>
+            <% if marks_present %>
+              <span id="info-symbol" tooltip="<%= t('mark_entries_associated_to_subjects') %>"></span>
+            <% end %>
+        </div>
+        <div class="profile_details flex">
+            <div class='col'><label><%=t('attributes_text')%></label> :
+                <span id="attributes_view_<%=subject.id%>">
+                    <%=attr_object.assessment_attribute_profile.try(:assessment_attributes).try(:count)%>
+                </span>
+            </div>
+            <div class='col'><label><%=t('formulas')%></label> :
+                <span id="formula_view_<%=subject.id%>">
+                    <%= attr_object.assessment_attribute_profile.try(:formula) %>
+                </span>
+            </div>
+            <div class='col' id='link_view'></div>
+        </div>
+    </td>
+    <td class="max_marks_cont <%=marks_present ? 'disabled' : 'active' %>" id="max_mark_view_<%=subject.id%>">
+        <%= attr_object.assessment_attribute_profile.try(:maximum_marks) %>
+    </td>
+</tr>

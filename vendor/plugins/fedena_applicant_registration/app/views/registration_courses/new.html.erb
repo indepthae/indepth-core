@@ -1,0 +1,116 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('course_registration') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('add_course') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('course_s'), :action=>"index" %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% form_for(@registration_course) do |f| %>
+    <%= f.error_messages %>
+
+    <div class="label-field-pair">
+      <label for="student_grade"><%= t('course') %></label>
+      <div class="text-input-bg">
+        <%= f.select :course_id,@courses.map{|c| [c.full_name,c.id]},{:prompt => "#{t('select_a_course')}"}  %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="student_grade"><%= t('min_score') %></label>
+      <div class="text-input-bg">
+        <%= f.text_field :minimum_score %>
+      </div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="subject_based_registration"><%= t('subject_based_registration') %></label>
+      <div class="text-input-bg">
+        <%= f.select :is_subject_based_registration,
+          [[t('active'),"1"],[t('inactive'),"0"]],
+          {:prompt=>t('set_subject_registration')},
+          {:onchange=>"#{remote_function(
+          :url => { :action => 'settings_load' },
+          :with => "'settings='+value",:before=>"$('loader').show();",:success=>"$('loader').hide();")}"} %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+
+    <div id="extra_settings">
+      <%= render :partial => "extra_settings"  if @registration_course.is_subject_based_registration %>
+    </div>
+
+    <div id="amount">
+      <%= render :partial => "amount" unless @registration_course.subject_based_fee_colletion %>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="student_grade"><%= t('is_active') %></label>
+      <div class="text-input-bg">
+        <%= f.select :is_active,[[t('active'),"1"],[t('inactive'),"0"]] %>
+      </div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="student_grade"><%= t('is_pin_system_enabled') %></label>
+      <div class="text-input-bg">
+        <%= select '',:is_pin_enabled,[[t('active'),"1"],[t('inactive'),"0"]] %>
+      </div>
+    </div>
+
+     <div class="label-field-pair">
+      <label for="enable_approval_system"><%= t('enable_approval_system') %></label>
+      <div class="text-input-bg">
+        <%= f.select :enable_approval_system,[[t('inactive'),"0"],[t('active'),"1"]] %>
+      </div>
+    </div>
+    
+    <div class="label-field-pair">
+      <label for="include_additional_details"><%= t('include_additional_details') %></label>
+      <div class="text-input-bg">
+        <%= f.select :include_additional_details,
+          [[t('active'),"1"],[t('inactive'),"0"]],
+          {:prompt=>t('select_additional_fields')},
+          {:onChange => "#{remote_function(
+          :url => { :action => 'populate_additional_field_list',:registration_course_id => @registration_course.id },
+          :with => "'settings='+value",
+          :before => "Element.show('loader1')",
+          :success => "Element.hide('loader1')"
+          )}"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader1",
+          :style =>"display: none;" ) %>
+      </div>
+    </div>
+
+    <div id="additional_fields">
+      <% if @registration_course.include_additional_details == true %>
+        <%= render :partial => "student_additional_fields" %>
+      <% end %>
+    </div>
+    <div class="label-field-pair">
+      <label for="transfer_documents"><%= t('transfer_documents_while_allotting') %></label>
+      <div class="text-input-bg">
+        <%= f.check_box :transfer_documents %>
+      </div>
+    </div>
+    <%= f.submit "#{t('cre_ate')}" ,:class=>"submit_button", :disable_with => "#{t('please_wait')}"%>
+
+  <% end %>
+
+</div>

@@ -1,0 +1,54 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+        <table id="tc_data" style="background: yellow;">
+            <% @tc_data["StudentDetailsData"]["student_details_ids"].each do |id| %>
+            <%  code = cycle('even', 'odd') %>
+              <tr class="name_slots <%= code %>">
+                  <td class="tc_field_labels"><div class="tc_field_label"><%=@tc_data["StudentDetailsField"][id][:field_name]%></div></td>
+                  <% if @tc_data["StudentDetailsField"][id][:field_format] == "text_field_numeric" or @tc_data["StudentDetailsField"][id][:field_format] == "date"%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:field_value][:value_1] %></div></td>
+                  <%elsif @tc_data["StudentDetailsField"][id][:field_format] == "text_area"%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:field_value][:value_1] %></div></td>
+                  <% elsif @tc_data["StudentDetailsField"][id][:field_format] == "multiple_type" || @tc_data["StudentDetailsField"][id][:field_format] == "admission_date"%>
+                    <td class="tc_field_values">
+                        <div class="tc_field_value">
+                            <%- if @tc_data["StudentDetailsField"][id][:is_in_figures_enabled]%><span class="in_figures"><%= format_date(@tc_data["StudentDetailsField"][id][:field_value][:value_1])%> </span><p>(in figures)</p><%- end %>
+                            <%- if @tc_data["StudentDetailsField"][id][:is_in_words_enabled]%><span class="words"><%= @tc_data["StudentDetailsField"][id][:field_value][:value_2] %> </span><p>(in words)</p><%- end %>
+                            <%- unless @tc_data["StudentDetailsField"][id][:is_in_figures_enabled] || @tc_data["StudentDetailsField"][id][:is_in_words_enabled] %><span class="in_figures"><%= format_date(@tc_data["StudentDetailsField"][id][:field_value][:value_1])  %></span><%- end %>
+                        </div>
+                    </td>
+                  <%else%>
+                    <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:field_value][:value_1] %></div></td>
+                  <% end %>
+              </tr>
+              <%  keys = get_child_field_ids(id) %>
+              <% for key in keys do %>
+                <% value = @tc_data["StudentDetailsField"][id][:sub_fields][key]%>
+                <tr class="name_slots sub_field <%= code %> ">
+                    <td class="tc_field_labels"><div class="tc_field_label"><%= value[:field_name] %></div></td>
+                    <% if @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "text_field_numeric" or @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "date"%>
+                      <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                    <%elsif @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "text_area"%>
+                      <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                    <% elsif @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "multiple_type" || @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "admission_date"%>
+                      <td class="tc_field_values">
+                          <div class="tc_field_value">
+                              <%- if @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_figures_enabled]%><span class="in_figures"><%= format_date(@tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_1])%> </span><p>(in figures)</p><%- end %>
+                              <%- if @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_words_enabled]%><span class="words"><%= @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_2]%> </span><p>(in words)</p><%- end %>
+                              <%- unless @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_figures_enabled] || @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_words_enabled] %><span class="in_figures"><%= format_date(@tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_1])  %></span><%- end %>
+                          </div>
+                      </td>
+                    <%else%>
+                      <td class="tc_field_values"><div class="tc_field_value"><%= @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_value][:value_1] %></div></td>
+                    <% end %>
+                </tr>
+              <% end %>
+       <%end%>
+        </table>  
+  
+
+

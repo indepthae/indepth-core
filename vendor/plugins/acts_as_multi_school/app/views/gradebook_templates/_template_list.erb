@@ -1,0 +1,16 @@
+<% if template.present? %>
+  <h4><%= link_to template.display_name, '#'  %></h4>
+  <label><%= link_to_function template.loaded? ? 'Reload' : 'Add', "add_reset_template('#{template.name}');" %></label> 
+  <% if template.loaded? and template.changed? %>
+    <label>(Changed)</label> 
+  <% end %>
+  <% if template.loaded? %>
+    <p class="seperator">|</p><label>
+      <%= link_to_function template.is_active? ? 'Deactivate' : 'Activate', "activate_template(#{!template.is_active?}, '#{template.name}')" %>
+    </label> 
+  <% end %>
+  <div class="float-right" id="add-loader-<%= template.name %>" style="display:none; margin-right: 10px;margin-top:2px; ">Loading..</div>
+<% else %>
+  <h4>Template Load Error</h4>
+  <label><%= link_to 'Reload' , gradebook_templates_path %></label> 
+<% end %>

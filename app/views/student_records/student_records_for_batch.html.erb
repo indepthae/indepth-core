@@ -1,0 +1,37 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('student_records_for_batch') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%if params[:rg_id]%>
+      <% breadcrumb :student_records_show_rg, [@batch,RecordGroup.find(params[:rg_id])]%>
+    <%else%>
+      <% breadcrumb :student_records_show, @batch %>
+    <%end%>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="hider">
+    <% unless flash[:notice].nil? %>
+      <p id="flash-msg"class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div id="course_batches_section">
+    <%=render :partial=>'links_for_change'%>
+  </div>
+  <div id="batch_informer">
+    <%=render :partial=>'batch_info'%>
+  </div>
+  <div class="content_student_record">
+    <div id="student_list">
+      <%= render  :partial=>"student_list" %>
+    </div>
+    <div id="student_record">
+      <%=render :partial=> 'individual_student_record'%>
+    </div>
+  </div>
+</div>
+

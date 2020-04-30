@@ -1,0 +1,47 @@
+<div id="MB_frame">
+  <div id="MB_header">
+    <div id="MB_caption"></div>
+    <div id="MB_close"><span>x</span></div>
+  </div>
+
+  <div id="MB_content">
+    <div class="label-field-pair">
+      <label for="if"><%= t('name') %></label>
+      <div class="text-input-bg">
+        <input class="input" id="category_name" maxlength="40"></input><div class="errors"></div>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="if"><%= t('amount') %></label>
+      <div class="text-input-bg">
+        <input class="precision_text input" id="amount"></input>
+        <span class="currency-type"><%= currency %></span>
+        <div class="errors"></div></div>
+    </div>
+
+    <div class="submit-button" id="ok"><%= t('ok') %></div>
+    <div class="submit-button" id="cancel-link"><%= t('cancel') %></div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  j("#modalMsg input").val("");
+ 
+  j("#MB_close, #MB_content #cancel-link").click(function(){
+    j(".errors").html("");
+    return removeModalBox();
+  })
+
+  j("#ok").click(function(){
+    j(".errors").html("");
+    var name = j("#category_name").val();
+    var amount = j("#amount").val();
+    
+    validateIndividualCategory(name, amount);
+
+  })
+
+
+ 
+</script>

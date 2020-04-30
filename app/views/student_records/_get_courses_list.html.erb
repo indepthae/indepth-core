@@ -1,0 +1,14 @@
+<% form_for :course,:url=>{:action=>'manage_student_records_for_course'},:html=>{:method=>:get} do |f| %>
+  <%=hidden_field_tag :rg_id, params[:rg_id]%>
+  <label for="course"><%=t('course_text')%></label>
+  <%= f.select :id ,@courses_list.map{|m| [m.cname,m.id]},:selected=>@current_course_id.to_i%>
+  <%= f.submit t('submit'), :class => 'submit_button', :disable_with => "Please Wait..." %>
+  <div id="cancel_link"><%=t('cancel')%></div>
+<% end %>
+<script type="text/javascript">
+  j('#cancel_link').click(function(){
+    j(this).parent().remove();
+    j('#default_class_timing_set_name').children().first().show();
+    j('#edit_link').show();
+  })
+</script>

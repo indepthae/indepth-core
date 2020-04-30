@@ -1,0 +1,22 @@
+<% fields_for :leave_credit_slabs do |f| %>
+  <% if @action == "edit" and @credit_frequency == 4 and @credit_type == "Slab" %>
+    <% half_year_count1 = half_year_count(@leave_type, 1) %>
+    <% half_year_count2 = half_year_count(@leave_type, 2) %>
+  <% end %>
+  <div class="up-side">
+      <div class="half">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('half1') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(half1)", :value => half_year_count1.present? ? half_year_count1 : nil  %></div>
+          </div>
+      </div>
+  </div>
+  <div class="down-side">
+      <div class="half">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('half2') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(half2)", :value => half_year_count2.present? ? half_year_count2 : nil  %></div>
+          </div>
+      </div>
+  </div>
+<% end %>

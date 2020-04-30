@@ -1,0 +1,47 @@
+<div class="col">
+    <div class='label'><%= t('course_text') %></div>
+    <div class='value'><%= @course.full_name %></div>
+</div>
+<% if report_type == 'exam_report' %>
+  <div class="col">
+      <div class='label'><%= t('exam_group') %></div>
+      <div class='value'><%= @assessment_group.name %></div>
+  </div>
+  <div class="col">
+      <div class='label'><%= t('exam_type') %></div>
+      <div class='value'><%= @assessment_group.exam_mode %></div>
+  </div>
+  <% unless @assessment_group.exam_type.activity %>
+    <div class="col">
+        <div class='label'><%= t('max_mark') %></div>
+        <div class='value'><%= @assessment_group.maximum_marks.to_f %></div>
+    </div>
+  <% end %>
+  <div class="col">
+      <div class='label'><%= t('term_text') %></div>
+      <div class='value'><%= @term.name %></div>
+  </div>
+<% elsif report_type == 'term_report' %>
+  <div class="col">
+      <div class='label'><%= t('exam_planner') %></div>
+      <div class='value'><%= @plan.name %></div>
+  </div>
+  <div class="col">
+      <div class='label'><%= t('term_text') %></div>
+      <div class='value'><%= @term.term_name_with_span %></div>
+  </div>
+  <div class="col">
+      <div class='label'><%= t('exam_groups_text') %></div>
+      <div class='value'><%= @term.assessment_groups.without_final.count %></div>
+  </div>
+<% else %>
+  <div class="col planner">
+      <div class='label'><%= t('exam_planner') %></div>
+      <div class='value'><%= @plan.name %></div>
+  </div>
+  
+<% end %>
+<!--<div class="col">
+    <div class='label'><%#= t('report_status') %></div>
+    <div class='value'><%#= @generated_report. %></div>
+</div>-->

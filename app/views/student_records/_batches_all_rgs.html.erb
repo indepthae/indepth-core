@@ -1,0 +1,50 @@
+<%if @batches_list.present?%>
+  <table id="student_details_table">
+    <tr>
+      <th id="name"><%=t('batch')%></th>
+      <th id="grade"><%=t('students')%></th>
+      <th id="action"></th>
+    </tr>
+    <%if params[:rg_id].present?%>
+      <%@batches_list.each do |key,value|%>
+        <tr><td colspan="4" class="highlighter"><%=key== "1" ? "#{t('active')}" : "#{t('inactive')}"%></td></tr>
+        <%value.each do |v|%>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=v["name"]%></td>
+            <td><%= key== "1" ? v.students.count : v.graduated_students.count %></td>
+            <%if v.student_records.all(:conditions=>["additional_field_id in (?)",@record_group.records.collect(&:id)]).present?%>
+              <td>
+                  <%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"],:rg_id=>@record_group.id%>
+                  <%=link_to "#{t('view_records')}",:controller=>'student_records',:action=>'student_records_for_batch',:id=>v["id"],:rg_id=>@record_group.id%>
+                  <%=link_to "#{t('download_csv')}",:controller=>'student_records',:action=>'student_record_csv_export',:id=>v["id"],:rg_id=>@record_group.id%>
+              </td>
+            <%else%>
+              <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"],:rg_id=>@record_group.id%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      <%end%>
+    <%else%>
+      <%@batches_list.each do |key,value|%>
+        <tr><td colspan="4" class="highlighter"><%=key== "1" ? "#{t('active')}" : "#{t('inactive')}"%></td></tr>
+        <%value.each do |v|%>
+          <tr class="list_<%=cycle('odd', 'even')%>">
+            <td><%=v["name"]%></td>
+            <td><%= key=="1" ? v.students.count : v.graduated_students.count %></td>
+            <%if v.student_records.present?%>
+              <td>
+                  <%=link_to "#{t('edit_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"]%>
+                  <%=link_to "#{t('view_records')}",:controller=>'student_records',:action=>'student_records_for_batch',:id=>v["id"]%>
+                  <%=link_to "#{t('download_csv')}",:controller=>'student_records', :action=>'student_record_csv_export',:id=>v["id"]%>
+              </td>
+            <%else%>
+              <td><%=link_to "#{t('add_records')}",:controller=>'student_records',:action=>'list_students',:id=>v["id"]%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      <%end%>
+    <%end%>
+  </table>
+<%else%>
+  <div class="no_entries"><%=t('no_batches_assigned')%></div>
+<%end%>

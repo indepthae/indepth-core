@@ -1,0 +1,53 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.0.2/jszip-utils.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_report') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessments_generate_term_reports, [@report, @academic_year, @course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="header">
+        <%= t('student_term_reports') %>
+    </div>
+    <div class="assessments_box">
+        <div class="assessments_details">
+            <div class="field_details">
+                <div class="field_name"><%= t('course_text') %></div>
+                <div class="field_val"><%= @course.full_name %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t('report_type_text') %></div>
+                <div class="field_val"><%= t('term_report') %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t(:term_text) %></div>
+                <div class="field_val"><%= @report.name %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t(:exam_groups_text) %></div>
+                <div class="field_val"><%= @report.assessment_groups.without_final.length %></div>
+            </div>
+        </div>
+        <%if @is_privilaged%>
+          <% batches = @course.batches_in_academic_year(@academic_year.id) %>
+        <%elsif @current_user.employee? and @current_user.is_a_batch_tutor? %>
+          <%employee = @current_user.employee_record%>
+          <% batch_ids = employee.batches.collect(&:id)%>
+          <% batches = @course.batches_in_academic_year(@academic_year.id).all(:conditions=>["batches.id in (?)",batch_ids])%>
+        <%end%>
+        <% if batches.present? %>
+          <%= render :partial => 'report_form' %>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_batches_in_the_acedemic_year') %> </p>
+        <% end %>
+    </div>
+</div>

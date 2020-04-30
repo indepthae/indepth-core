@@ -1,0 +1,27 @@
+<div id="live_stats-box" class="bg-light grey-border shadow">
+  <% form_for :live_stats, :url=>{:controller=>"school_stats", :action=>"modify_user_live_entities"}, :html=>{:method=>"post"} do|f| %>
+    <% @available_entities.each do|entity| %>
+      <div class="palette-box">
+        <%= check_box_tag "live_stats[selected_stats][]",entity,@user_stats.include?(entity.to_s),:id=>"#{entity}_check"%>
+        <label for="<%= entity %>_check"><%= read_live_entity(entity.to_s) %></label>
+      </div>
+    <% end %>
+    <div class = "palette-buttons">
+      <%= link_to t('cancel'), "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list(); return false;'}%>
+      <%= f.submit t('save'), :id => 'palette-list-submit',:disable_with=>"Please wait.."  %>
+    </div>
+    <div class="box-border"></div>
+  <% end %>
+</div>
+
+<script>
+  var q = jQuery.noConflict();
+  function hide_list()
+  {
+    q("#live_stats-box").remove();
+    q("#add-loader").hide();
+    q("#stats-head").show();
+  }
+
+</script>
+

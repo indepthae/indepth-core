@@ -1,0 +1,127 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('subject') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('import_subjects') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=  breadcrumb :subjects_import_subjects ,@batch %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div class="box">
+    <% if @previous_batch.present? and @importable_subjects.present? %>
+      <div class="heading">
+        <%= t('import_subjects') %>
+      </div>
+
+      <div class="import-header">
+        <%= @batch.full_name %>
+      </div>
+
+      <div class="subjects_electives" id="subjects_electives">
+        <div class="subjects_label">
+          <%= t('subjects_elective_groups') %>
+        </div>
+        <div class="subjects_description">
+          <%= t('subjects_elective_groups_description', :batch_name => @previous_batch.name) %>
+        </div>
+
+        <div class="subjects_list">
+          <%= render :partial => "subjects_table"  %>
+        </div>
+
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  var disabled_subjects = [];
+  j(document).delegate('.checkall','change',function(){
+    var status = j(this).is(':checked');
+    if(status){
+      subjects = j('input[data_type=subject]:enabled');
+      j.each(subjects,function(a,b){
+        j(b).prop('checked',true);
+        elective_group_id = j(b).attr('elective_group_id');
+        if(j('input[elective_group_id='+elective_group_id+']').length == j('input[elective_group_id='+elective_group_id+']:checked').length && status == true){
+          j('#'+elective_group_id).prop('checked',status);
+        }else{
+          j('#'+elective_group_id).prop('checked',false);
+        }
+      });
+    }else{
+      j('input[type=checkbox]').prop('checked',false);
+      j('#selected_subjects_count').text(j('input[data_type=subject]:checked').length);
+      selected_subjects = j('input[type=checkbox]:enabled:checked').length;
+      j('.submit_button').prop('disabled', selected_subjects == 0);
+    }
+  });
+  j(document).delegate('input[type=checkbox]','change',function(){
+    var obj_type = j(this).attr('data_type');
+    var status = j(this).is(':checked');
+    if(obj_type == 'elective_group'){
+      var id = j(this).attr('id');
+      j('input[elective_group_id='+id+']:enabled').prop('checked',status);
+    }else if(obj_type == 'subject'){
+      if(j.inArray(j(this).attr('id'),disabled_subjects) == -1){
+        var elective_group_id = j(this).attr('elective_group_id');
+        if(elective_group_id !== undefined){
+          if(j('input[elective_group_id='+elective_group_id+']').length == j('input[elective_group_id='+elective_group_id+']:enabled:checked').length && status == true){
+            j('#'+elective_group_id).prop('checked',status);
+          }else{
+            j('#'+elective_group_id).prop('checked',false);
+          }
+        }
+      }else{
+        j(this).prop('disabled',true).prop('checked',false);
+      }
+    }
+    selected_subjects = j('input[data_type=subject]:enabled:checked').length;
+    j('.submit_button').prop('disabled', selected_subjects == 0);
+    selected_subjects == 0 ? j('.submit_button').addClass('disabled') : j('.submit_button').removeClass('disabled');
+    j('#selected_subjects_count').text(j('input[data_type=subject]:checked').length);
+    disabled_subjects = j('input[data_type=subject]:disabled').length;
+    j('.checkall').prop('checked',j('input[data_type=subject]:enabled').length == j('input[data_type=subject]:checked').length);
+  });
+  j(document).delegate('.not_eligible','mouseover mouseout',function(){
+    j(this).children('.notifier').toggle();
+  })
+  function show_batches(){
+    j('#selected_batches').show();
+    j('#delete_warning').hide();
+    if(j('input[type=checkbox]:checked').length == 0){
+      j('.submit_button').prop('disabled',true).addClass('disabled');
+    }
+  }
+  function hide_batches(){
+    j('#selected_batches').hide();
+    j('.submit_button').prop('disabled',false).removeClass('disabled');
+    j('#delete_warning').show();
+  }
+</script>

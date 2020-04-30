@@ -1,0 +1,50 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('app_frames_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @app_frame.name %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :app_frames_app_frame, @app_frame %>
+    <%= render_breadcrumbs  %>
+  </div>
+</div>
+<iframe id ="frame" frameborder="0" src=<%= "#{@app_frame.link}" %>></iframe>
+
+<%
+uri = URI.parse(@app_frame.link)
+origin_host = uri.to_s.match(/^(.*)#{uri.path}.*$/)[1]
+%>
+
+<script type="text/javascript">
+                
+  var origin_host = '<%= origin_host %>';
+  function resize(height) {
+    height = parseInt(height)
+    if(height != NaN){
+      height += 20;
+      document.getElementById('frame').style.height = height + 'px';
+    }
+  }
+
+  var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+  var eventer = window[eventMethod];
+  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+  eventer(messageEvent, function (e) {
+    if(e.origin==origin_host) resize(e.data);
+  }, false);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

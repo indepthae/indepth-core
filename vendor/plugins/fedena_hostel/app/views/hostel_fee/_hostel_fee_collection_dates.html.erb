@@ -1,0 +1,5 @@
+<%= select("id",:id,@hostel_fee_collection.map { |n| [n.name, n.id] },
+  {:prompt => "#{t('select_collection_dates')}"},
+  {:onChange => "#{remote_function(:url => 
+    {:action => "hostel_fee_collection_details"},:complete=>'show_fee_details();', 
+    :with => "'date='+value+'&batch_id='+#{params[:batch_id]}")}"})%>

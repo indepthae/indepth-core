@@ -1,0 +1,38 @@
+ supplier:
+    primary_keys:
+      contact_no: "Contact no"
+      supplier_type_id: "Supplier type code"
+    overrides:
+      supplier_type_id: "Supplier Type Code"
+    associations:
+     - :supplier_type
+    associated_columns:
+      supplier_type: "code"
+    filters:
+     - :school_id
+     - :is_deleted
+    mandatory_columns:
+     - :supplier_type_id
+     - :name
+    instructions:
+       Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""  
+       Contact no:
+          Type: "Numeric."
+          Input Instruction and example: "1234512345"
+       Address:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+       Tin no:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+       Region:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+       Help desk:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+       Supplier Type Code:
+          Type: "An active Supplier Type Code."
+          Input Instruction and example: ""

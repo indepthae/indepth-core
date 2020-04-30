@@ -1,0 +1,339 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 14 Mar, 2019, 11:06:50 AM
+    Author     : foradian
+*/
+.description{
+    font-size: 13px;
+    color: grey;
+    margin-bottom: 30px;
+    margin-top: 15px;
+}
+.leave-group-container{
+    width: 100%;
+    float: right;
+}
+.check-box-blank-column{
+    width: 5%;
+    float: right;
+    height: 1px;
+}
+.leave-group-heading{
+    width: 100%;
+    float: right;
+    margin-bottom: 10px;
+}
+.leave-group-main{
+    width: 100%;
+    float: right;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+}
+.leave-group-sub{
+    width: 100%;
+    float: right;
+    min-height: 60px;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+.leave-group-sub-centered:hover{ background-color: #eee; }
+.leave-group-sub-centered{
+    width: 100%;
+    float: right;
+    min-height: 60px;
+}
+.leave-type-main{
+    width: 100%;
+    float: right;
+}
+.check-box-column{
+    width: 5%;
+    float: right;
+}
+.check-box-column-header{
+    width: 5%;
+    float: right;
+    margin-top: 20px;
+}
+.leave-group-name-column{
+    width: 30%;
+    float: right;
+}
+.leave-group-status-column{
+    width: 20%;
+    float: right;
+}
+.employee-count-column{
+    width: 10%;
+    float: right;
+}
+.leave-types-count-column{
+    width: 12.5%;
+    float: right;
+}
+.select-leave-types-column{
+   width: 45%;
+    float: left;
+}
+.leave-group-sub-centered label{
+    font-size: 13px;
+}
+.check-box-style{
+    margin-right: 20%;
+    cursor: pointer;
+}
+.leave-group-heading label{
+    font-size: 13px;
+    color: grey;
+}
+.select-leave-types-label{
+    float: left;
+    margin-left: 20%;
+}
+.label-text-align-center{
+    text-align: center;
+}
+.leave-type-main{
+    float: right;
+    width: 100%;
+}
+.leave-type-heading{
+    float: right;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+.leave-type-code-sub{
+    float:left;
+    width: 50%;
+    text-align: center;
+}
+.leave-type-heading label{
+    font-size: 13px;
+    color: grey;
+}
+.leave-type-content{
+    float: right;
+    width: 100%;
+    padding-top: 5px;
+    margin-bottom: 5px;
+    border-top-width: 1px;
+    border-top-color: #eee;
+    border-top-style: solid;
+}
+.leave-type-content label{
+    font-size: 13px;
+}
+.employee-count-blank-column{
+    width: 10%;
+    float: right;
+    height: 1px;
+}
+.leave-types-count-blank-column{
+    width: 10%;
+    float: right;
+    height: 1px;
+}
+.select-label:hover{
+    cursor: pointer;
+}
+.select-label{
+    text-decoration: underline;
+}
+#submit_button{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    margin: 0px !important;
+    margin-top:20px !important;
+    padding:7px 10px;
+    border:none;
+    cursor:pointer;
+}
+.cancel-button{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    color:#FFFFFF;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    margin-top:20px !important;
+    padding:7px 10px;
+    border:none;
+    cursor:pointer;
+    float: right;
+    margin-right: 10px;
+    text-decoration: none;
+}
+.each-leave-group-main{
+    float: right;
+    width: 100%;
+}
+.leave-group-sub-content{
+    width: 90%;
+    min-height: 40px;
+    float: right;
+    padding-top: 20px;
+}
+.leave-group-name-column-header{
+    width: 32.5%;
+    float: right;
+}
+.employee-count-column-header{
+    width: 13.5%;
+    float: right;
+}
+.leave-types-count-column-header{
+    width: 12.5%;
+    float: right;
+}
+.select-leave-types-column-header{
+    width: 41.5%;
+    float: right;
+}
+.text-area-bg{
+    background: transparent none repeat scroll 0 0;
+    float: right;
+    width: 250px;
+}
+.label-field-pair label {
+    display: block;
+    margin: 0 0 0px 0;
+    float: right;
+    width: 200px;
+    padding-top: 10px;
+    color: grey;
+    font-weight: normal;
+    font-size: 13px;
+}
+.text-input-bg {
+    width: 260px;
+}
+#MB_frame .text-input-bg {
+    padding-top: 10px;
+    font-size: 13px;
+    font-weight: bold;
+}
+.label-field-pair textarea {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -webkit-border-radius: 10px;
+    background: #EEEEEE none repeat scroll 0 0;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+    width: 205px;
+}
+.remark-label-pair{
+    height: auto;
+    min-height: 88px;
+}
+#MB_frame .label-field-pair {
+    width: 93% !important;
+    padding-right: 20px;
+}
+.label-field-pair input {
+    margin: 4px 0px 0 0 !important;
+}
+#MB_frame .text-input-bg {
+    padding-top: 0px !important;
+}
+#submit-button {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    background: #27292B none repeat scroll 0 0;
+    color: #FFFFFF;
+    font-family: arial;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 30px;
+    padding: 7px 10px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    margin-right: 220px;
+}
+.reset-leave-hint-label {
+    word-wrap: break-word;
+    padding-top: 35px !important;
+    width: 440px !important;
+    text-justify: inter-word;
+}
+.margin-top-30{
+    margin-top: 30px !important;
+}
+#MB_content{
+    padding:0 !important;
+}
+#MB_window{
+    min-width:540px !important;
+}
+#MB_frame #MB_caption{
+    padding: 20px 15px 0 0;
+}
+.modal-description{
+    font-size: 13px;
+    color: grey;
+    margin-bottom: 30px;
+    margin-top: 15px;
+    margin-right: 20px;
+}
+#MB_window[id] {
+    position: absolute !important;
+}
+.error{
+    width:100%;
+    float:right;
+    margin-top: 10px;
+}
+#error-box{ width: 510px; }
+.error-font-size { font-size: 13px; }
+.wrapper {
+    float: right;
+    width: 100%;
+    line-height: 15px;
+}
+.error-msg{
+    color: red;
+    font-size: 13px;
+    font-weight: 100;
+}
+.error-icon {
+    width: 15px;
+    height: 12px;
+    background: url(/images/iconsprite-1.png);
+    background-position: -42px -344px;
+    margin: 1px 0px 0px 2px;
+    float: right;
+}
+.reset-by-group-hint{
+    float: left;
+    margin-top: 30px;
+    width: 100%;
+}
+.reset-leave-label{
+    font-size: 13px;
+    color: grey;
+}
+#buttons-div{
+    float: right;
+    width: 100%;
+}
+#page-yield a.cancel-button:hover {
+    color: #fff !important;
+}
+

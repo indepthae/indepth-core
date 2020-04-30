@@ -1,0 +1,19 @@
+<div class="label-field-pair">
+  <label><%= t('students') %>:
+  </label>
+  <div class="text-input-bg">
+    <%= select :exam_report, :student_id,
+      @students.map {|b| [b.full_name, b.id]},
+      {:prompt => "#{t('select_a_student')}"},
+      {:onChange => "#{remote_function(:url => {:action => "list_custom_remarks"},
+      :with => "'student_id='+value",
+      :before => "Element.show('loader2')",
+      :success => "Element.hide('loader2')"
+      )}"} %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader2",
+      :style =>"display: none;" ) %>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<% remote_form_for group_question,:url=>{:action=>"save_imported_question"},:before=>"show_loader();",:complete=>"hide_loader();" do|f| %>
+  <%= error_messages_for 'group_question',:header_message => nil %>
+  <div class="top-div">
+    <div class="question-text"><%= t('question') %></div>
+    <div class="marks-div input-marks"><label><%= t("marks") %> : </label><%= f.text_field :mark %></div>
+    <div class="format-text"><%= question.question_format=="descriptive" ? t("descriptive") : t("objective") %></div>
+  </div>
+  <%= f.hidden_field :online_exam_group_id %>
+  <%= f.hidden_field :online_exam_question_id %>
+  <div class="question-div"><%= question.question %></div>
+  <% unless question.question_format == "descriptive" %>
+    <div class="answer-text"><%= t("options") %> </div>
+    <% answers.each do|opt| %>
+      <div class="option-main">
+        <div class="option-div">
+          <%= opt.option %>
+        </div>
+        <% if opt.is_answer==true %>
+          <div class="correct-text"></div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+  <div id="submit-button">
+    <%=f.submit("#{t('import')}", :disable_with => "► #{t('please_wait')}" )%>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  MathJax.Hub.Typeset();
+  <%#*MathJax.Hub.Queue(["Typeset",MathJax.Hub,"right-panel"]);%>
+  j("#right-panel").find('iframe').attr("width","340px");
+  j("#right-panel").find('iframe').attr("height","191px");
+</script>

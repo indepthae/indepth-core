@@ -1,0 +1,183 @@
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<%= javascript_include_tag("receipt_printer") %>
+<script type="text/javascript">
+  var part_count = 0;
+  j(document).delegate(".query", "input", function () {
+      var j = jQuery.noConflict();
+      var a;
+      jQuery(function () {
+          a = j('.query').autocompleteAjax({serviceUrl: '/finance/get_collection_list',
+              onSelect: function (value, data) {
+                  update_text_field(value, data);
+              }});
+      });
+      j('.autocomplete-w1').first().parent().css('z-index', 10000);
+
+  });
+  function update_text_field(value, data)
+  {
+      j('#query').val(data);
+      j('#search_collection_name_type_equals').val(data);
+  }
+</script>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('finance_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('fee_receipts') %></div>
+    <%if @fee_receipts.present?%>
+      <div id="inner-tab-menu">
+          <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pdf_report')}",
+                    {:controller => "finance",
+                    :action => "fee_reciepts_export_pdf",
+                    :start_date_as=>params[:start_date_as],
+                    :end_date_as=>params[:end_date_as],
+                    :search=>params[:search],
+                    :query=>params[:query],
+                    :payee_type=>params[:payee_type]},
+                    :target => '_blank'%></li>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('csv_report')}",
+                    {:controller => "finance", :action => "fee_reciepts_export_csv",:start_date_as=>params[:start_date_as],:end_date_as=>params[:end_date_as],:search=>params[:search]},:target => '_blank'%></li>
+          </ul>
+      </div>
+    <%end%>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="modal-box" style="display:none;"></div>
+    <div class="fleft max_width" id="advance_time"></div>
+    <div class="hor_line"></div>
+    <div class="fleft max_width margin_bottom_20">
+        <div id="left_side" class="fleft half_width">
+            <%=render :partial=>'normal_receipt_search'%>
+        </div>
+        <div class="search-sep"></div>
+
+        <div id="right_side" class="fright half_width">
+            <%=render :partial=>'date_selection_basic'%>
+        </div>
+    </div>
+
+    <%if @fee_receipts.present?%>
+      <div id="other_details">
+          <div id="student_items">
+              <table id="student_details_table">
+                  <thead>
+                  <th id="receipt_no"><%=t('receipt')%></th>
+                  <th class="width_max"><%=t('payee_name')%></th>
+                  <th class="width_min"><%=t('payee_type')%></th>
+                  <th class="width_max"><%="#{t('batch')} / #{t('department')}"%></th>
+                  <th class="width_max"><%="#{t('collection')}"%></th>
+                  <th class="width_min"><%="#{t('payment_date')}"%></th>
+                  <th class="width_min"><%="#{t('amount')}"%> (<%=currency%>)</th>
+                  <th class="width_min"><%="#{t('payment_mode')}"%></th>
+                  <th class="width_max"><%="#{t('cashier')}"%> &#x200E;(<%="#{t('employee_text')}"%>)&#x200E;</th>
+                  </thead>
+                  <%@fee_receipts.each do |fr|%>
+                    <tr class="list_<%=cycle('odd', 'even')%>">
+                        <td class="receipt_no_column">
+                            <span class="receipt_no">
+                                <%= fr.receipt_no %>
+                            </span>
+                            <div class="icons">
+                                <div class="icon_img_container  pdf_icon_img_container'">
+                                    <%if fr.trans_type=="collection_wise"%>
+                                      <%=link_to "<span class='pdf_icon_img'></span>",{ :action => "generate_fee_receipt_pdf",:transaction_id=>fr.ftid},{:target => '_blank',:tooltip=>"View PDF receipt"}%>
+                                    <% elsif fr.trans_type=="AdvanceFeesCollection"%>
+                                    <%=link_to "<span class='pdf_icon_img'></span>",{ :controller => "advance_payment_fees", :action => "advance_fees_receipt_pdf", :advance_fee_collection_id => fr.adfcid},{:target => '_blank',:tooltip=>"View PDF receipt"}%>
+                                    <%else%>
+                                      <%=link_to "<span class='pdf_icon_img'></span>",{ :action => "generate_fee_receipt_pdf",:particular_wise=>true,:transaction_id=>fr.ftid},{:target => '_blank',:tooltip=>"View PDF receipt"}%>
+                                    <%end%>
+                                </div>
+                                <%if fr.trans_type=="AdvanceFeesCollection"%>
+                                  <div class="icon_img_container  print_icon_img_container'">
+                                      <%= link_to_function "<span class='print_icon_img'></span>", "show_advance_fee_print_receipt(#{fr.adfcid})",{:tooltip=>"Print Receipt"} %>
+                                  </div>
+                                <% else %>
+                                  <div class="icon_img_container  print_icon_img_container'">
+                                      <%= link_to_function "<span class='print_icon_img'></span>", "show_print_dialog(#{fr.ftid})",{:tooltip=>"Print Receipt"} %>
+                                  </div>
+                                <% end %>
+                            </div>
+    <%#= link_to "<span class='print_icon_img'></span>" ,{ :action => "generate_fee_receipt",:transaction_id=>fr.ftid},:target => '_blank'  %>
+                        </td>
+                        <%if fr.payer_no.present?%>
+                          <td><%=fr.payer_name%> &#x200E;(<%=fr.payer_no%>)&#x200E;</td>
+                        <%else%>
+                          <td><%=fr.payer_name%></td>
+                        <%end%>
+                        <td><%=fr.payer_type_info %></td>
+                        <td><%=fr.payer_batch_dept.present? ? fr.payer_batch_dept : "-" %></td>
+                        <%if fr.fin_type=="FinanceFee"%>
+                          <% if (permitted_to? :pay_fees_defaulters,:finance) %>
+                            <td><%= link_to "#{fr.collection_name}", {:controller=>:finance,:action=>:pay_fees_defaulters, :payer_type=>fr.payer_type_info,:id=>fr.payer_id, :batch_id=>fr.batchid,:date=>fr.collection_id}, :class=>"themed_hover_text",:target=>:_blank %></td>
+                          <% else %>
+                            <td><%=fr.collection_name %></td>
+                          <% end %>
+                        <%elsif fr.fin_type=="TransportFee"%>
+                          <% if (permitted_to? :fees_student_dates,:transport_fee) %>
+                            <%if fr.payer_type_info == "Student" or fr.payer_type_info == "Archived Student"%>
+                              <td> <%= link_to "#{fr.collection_name}", {:controller=>:transport_fee,:action=>:fees_student_dates, :payer_type=>fr.payer_type_info,:id=>fr.payer_id, :collection_id=>fr.collection_id}, :class=>"themed_hover_text",:target=>:_blank %></td>
+                            <%else%>
+                              <td> <%= link_to "#{fr.collection_name}", {:controller=>:transport_fee,:action=>:fees_employee_dates, :payer_type=>fr.payer_type_info,:id=>fr.payer_id, :collection_id=>fr.collection_id}, :class=>"themed_hover_text",:target=>:_blank %></td>
+                            <%end%>
+                          <% else %>
+                            <td><%= fr.collection_name %></td>
+                          <% end %>
+                        <%elsif fr.fin_type=="InstantFee"%>
+                          <% if permitted_to? :instant_fee_created_detail ,:instant_fees %>
+                            <td><%= link_to fr.collection_name, {:controller=>:instant_fees,:action=>:instant_fee_created_detail, :id=>fr.fin_id},{:class=>:themed_hover_text,:target=>:_blank} %></td>
+                          <% else %>
+                            <td><%= fr.collection_name %></td>
+                          <% end %>
+                        <%elsif fr.fin_type=="HostelFee"%>
+                          <% if (permitted_to? :student_hostel_fee,:hostel_fee) %>
+                            <td> <%= link_to "#{fr.collection_name}", {:controller=>:hostel_fee,:action=>:student_hostel_fee, :payer_type=>fr.payer_type_info,:id=>fr.payer_id, :collection_id=>fr.collection_id}, :class=>"themed_hover_text",:target=>:_blank %></td>
+                          <% else %>
+                            <td>  <%= fr.collection_name %></td>
+                          <% end %>
+                        <% elsif fr.fin_type=="AdvanceFees"%>
+                          <td><%= fr.collection_name %></td>
+                        <%end%>
+                        <td><%=format_date(fr.transaction_date)%></td>
+                        <td><%=precision_label fr.amount%></td>
+                        <%if fr.reference_no.present?%>
+                          <td><%=fr.payment_mode%> - <%=fr.reference_no%></td>
+                        <%else%>
+                          <td><%=fr.payment_mode%></td>
+                        <%end%>
+                        <td><%= fr.payment_mode=='Online Payment' ? fr.get_cashier_name : fr.cashier_name %></td>
+                    </tr>
+                  <%end%>
+              </table>
+
+          </div>
+          <div class="total_amount_div">
+              <label><%= t('total_amount') %></label>
+              <label class="amount_label"><%=precision_label(@grand_total)%></label>
+          </div>
+          <%=will_paginate @fee_receipts,:params=>{:search=>@search_params}%>
+      </div>
+    <%else%>
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <%end%>
+</div>
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>
+<script type="text/javascript">
+  function show_advance_fee_print_receipt(adf_id) {
+      var iframe = document.getElementById('receipt_printer_template_container');
+
+      j('#receipt_printer_template_container').unbind();
+
+      j('#receipt_printer_template_container').load(function () {
+          var iframe_window = (iframe.contentWindow || iframe.contentDocument);
+          result = iframe_window.document.execCommand('print', false, null) || iframe_window.print();
+      });
+      var obj = {advance_fee_collection_id: adf_id};
+      iframe.src = window.location.origin + "/advance_payment_fees/generate_fee_receipt?" + j.param(obj);
+  }
+</script>

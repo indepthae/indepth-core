@@ -1,0 +1,94 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="signature_and_clauses_box">
+    <div class = "institution_details_form">
+        <div class ="template_clause">
+            <div class ="institution_details_row">
+                <div class = "additional_institution_details_label">
+                    <span class="cb_value"><%= text_area_tag "footer_config[clause][value][text]", @footer["Clause"].value %></span>
+                </div>
+                <div class = "additional_institution_details_fields">
+                    <span class="text_size_select">
+                        <%= select_tag "footer_config[clause][value][text_size]", options_for_select(["#{t('select_text_size')}"] + [["Large","large"],["Small","small"],["Normal","normal"],["Medium","medium"],["Very Small","very_small"]],  @footer["Clause"].text_size) %>
+                    </span>
+                    <span class="text_color_select">
+                        <%= select_tag "footer_config[clause][value][text_color]", options_for_select(["#{t('select_text_color')}"] + [["Grey","grey"],["Black","black"]],  @footer["Clause"].text_color) %>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="added_signature">
+            <% i = 0 %>
+            <% @footer["Signature"].additional_field.sort_by{|sig| sig.priority.to_i}.each do |signature| %>
+              <% i = i+1 %>
+              <div class = "institution_details_row signature" id="priority_<%= signature.priority%> ">
+                  <div class = "row_sub_head">Signature <%= i%>  </div>
+                     <%= text_field_tag "footer_config[signature][value][#{signature.priority}][value]", signature.value %>
+                      <% if signature.field_type == "add_sign" %>
+                        <a class="delete_button_img" href="#" onclick="remove_signature(this);;return false;"></a>
+                     <% end %>
+                     <%= hidden_field_tag "footer_config[signature][value][#{signature.priority}][type]", signature.field_type %>
+                     <%= hidden_field_tag "footer_config[signature][value][#{signature.priority}][priority]", signature.priority %>
+              </div>
+            <% end %>
+        </div>
+        <div class="new_signatures"></div>
+
+
+        <div class ="institution_details_row last">
+            <%= link_to_function "+ Add signature", "create_signature(#{i})" %>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  
+  sign_count = j(".added_signature .institution_details_row.signature").length;
+  if (sign_count == 4){
+    j('.institution_details_row.last').hide();
+  }
+
+  function create_signature(i) {
+      if(sign_count > 0){
+        a = j(".institution_details_row.signature").last();
+        var priority_str = a.attr("id").match(/\d+/);
+        var priority = parseInt(priority_str)
+        ++priority
+        
+      }else{
+        priority = i+1;
+      }
+        
+      //sign_count = j(".added_signature .institution_details_row.signature").length
+      if (sign_count < 4) {
+          if (sign_count >= 3){
+            j('.institution_details_row.last').hide();
+          }
+          var rand = +new Date();
+          var row = '<div class ="institution_details_row signature" id= "priority_' + priority + '">'
+          var sub_head = '<div class = "row_sub_head">Signature </div>'
+          var close = '<a class="delete_button_img" href="#" onclick="remove_signature(this);; return false;"></a>'
+          var signature_field = '<input id="footer_config_signature" name="footer_config[signature][value][' + priority + '][value]" size="30" type="text">'
+          var hidden_field = '<input id="footer_config_signature_value' + rand + '_is_deleted" name="footer_config[signature][value][' + priority + '][type]" type="hidden" value="add_sign">'
+          var hidden_priority = '<input id="footer_config_signature_value' + rand + '_is_deleted" name="footer_config[signature][value][' + priority + '][priority]" type="hidden" value=' + priority + '></div>'
+          j(".new_signatures").append(row + sub_head + signature_field + close + hidden_field + hidden_priority);
+          ++sign_count;
+      }
+  }
+
+  function remove_signature(el) {
+      var a = j(el).parent()
+      var priority_str = a.attr("id").match(/\d+/);
+      var priority = parseInt(priority_str)
+
+      var hidden_field = '<input id="footer_config_signature_value' + priority + '_is_deleted" name="footer_config[signature][value][' + priority + '][is_deleted]" type="hidden" value="true">'
+      j(".added_signature").append(hidden_field);
+      j(el).parent().hide();
+      j('.institution_details_row.last').show();
+      --sign_count;
+  }
+  ;
+</script>

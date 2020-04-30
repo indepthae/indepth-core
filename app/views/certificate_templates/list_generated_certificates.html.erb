@@ -1,0 +1,54 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('view_certificates') %></div>
+  <div id="inner-tab-menu">
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :certificate_templates_list_generated_certificates, @certificate_template %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+    <div class="academic_year_container">
+      <div class="academic_year_switcher">
+        <label class="normal"><%= t('academic_year') %></label>
+        <%= select '', :academic_year , @academic_years.map{|a| [a.name,a.id]}, {:include_blank=>t('all')}, :class=>"academic_year_selector", :id=>"academic_year",
+        :onchange => "#{remote_function(:url => {:action => "generated_certificates_list"},:with => "'academic_year_id='+value+'&certificate_template_id=#{@certificate_template.id}' " )}" %>
+      </div>
+    </div>
+    <div class="head">
+      <%= "#{t('certificate_template')}: #{@certificate_template.name } "%>
+    </div>
+    
+    <div class="sub_head">
+      <%= t('individual_certifcates') %>
+    </div>
+    <div class="sub_head_desc">
+      <%= t('individual_certifcates_desc') %>
+    </div>
+    <div class="list" id="generated_certificates_list">
+      <%= render "certificate_templates/generated_certificates_list.html.erb" %>
+    </div>
+    
+    <div class="sub_head">
+      <%= t('bulk_generated_certificates') %>
+    </div>
+    <div class="sub_head_desc">
+      <%= t('bulk_generated_certificates_desc') %>
+    </div>
+    <div class="list" id="bulk_generated_certificates_list">
+      <%= render "certificate_templates/bulk_generated_certificates_list.html.erb" %>
+    </div>
+    
+    
+
+  </div>
+</div>

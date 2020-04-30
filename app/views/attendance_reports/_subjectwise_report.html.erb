@@ -1,0 +1,97 @@
+<div class="detail">
+    <div class="detail1"> 
+        <%=t('course_name')%><%=":"%>
+        <%="#{@batch.course.course_name}"%></div>
+       <div class="detail2"> 
+ <%=t('total_students')%>
+           <%=":"%>
+        <%="#{@batch.students.count}"%><br>
+       </div> </div>
+<div class="some">
+    
+    <table id="custom_attendance_table" class="over" align="center" >    
+       <% if @type == t('both')%>
+    <tr class="tr-head" >
+        <td  rowspan="2"><%= t('sl_no') %></td>
+        <td  rowspan="2"><%= t('admission_no') %></td>
+        <td  rowspan="2"><%=  t('student_name') %></td>
+        <% @sub.each do |s|%>
+        <td class="cent" colspan="2"> <%= s.code %></td>
+<%end%></tr>
+      <tr class="tr-head">               
+  <% @sub.each do |s|%>
+        <td><%=t('classes')+ "(" + "#{@batch.subject_hours(@start_date, @end_date,s.id).values.flatten.compact.count}"+")"%></td>  
+        <td><%=t('percentage')%></td>             
+<%end%>
+            </tr>
+<%else%>
+        <tr class="tr-head">
+        <td><%= t('sl_no') %></td>
+        <td><%= t('admission_no') %></td>
+        <td><%=  t('student_name') %></td>
+        <% @sub.each do |s|%>
+          <td>
+              <% if @type == t('percentage')%>
+                <%= s.code %>
+              <%  else %>
+                <%= s.code + "("+t('classes') + "-" + "#{@batch.subject_hours(@start_date, @end_date,s.id).values.flatten.compact.count}"+")"%>
+              <%end%>
+          </td>
+        <%end%>
+    </tr>
+
+
+<%end%>
+            
+    <tr class="blank"></tr>
+    <% @students.each_with_index do |student,index| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="pad"> <%="#{index+1}"%></td>
+          <td class="pad"> <%= student.admission_no %></td>
+          <td class="pad"><%= student.full_name  %></td>
+          <%@sub.each do|s|%>  
+            <%if @type == t('both') %>
+              <td class="pad" >
+<%= @subject_wise_leave[s.id][student.id]['total'] %></td>
+                                <td class="pad">
+                                    
+                    <%if @subject_wise_leave[s.id][student.id]['percent']==nil%>
+               <%="0.00"%>
+                    <%elsif @subject_wise_leave[s.id][student.id]['percent']=='-'%>
+               <%="-"%>
+             <%else%>
+
+                                    
+                  <%= @subject_wise_leave[s.id][student.id]['percent'].round(2)%>
+                                                                        <%end%>
+
+              </td>
+            <%elsif @type == t('percentage')%>   
+              <td class="pad" >
+                   <%if @subject_wise_leave[s.id][student.id]['percent']==nil%>
+                   <%="0.00"%>
+                  <%elsif @subject_wise_leave[s.id][student.id]['percent']=='-'%>
+                   <%="-"%>
+             <%else%>
+
+       <%= @subject_wise_leave[s.id][student.id]['percent'].round(2)%> 
+                              <%end%>
+
+              </td>
+            <%else%>
+              <td class="pad"><%= @subject_wise_leave[s.id][student.id]['total'] %> </td>
+            <%end%>          
+          <%end%>             
+        <%end%>
+</table>
+</div>
+<div id="button11">
+    <%= link_to "►#{t('csv_report')}", {:controller => 'csv_export', :action => 'generate_csv', :csv_report_type => 'consolidated_subjectwise_attendance_report',:report_format_type => "csv", :batch => @batch.id,:start_date => @start_date, :end_date => @end_date, :type => @type},:class => 'user_button button_align'%>
+</div>
+
+
+
+
+
+
+

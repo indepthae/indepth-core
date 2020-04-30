@@ -1,0 +1,34 @@
+<%if @errors.present?%>
+<div class="error_listing">
+  <ul>
+  <% @errors.each do |error| %>
+    <li> <%= error %> </li>
+  <% end %>
+  </ul>
+</div>
+
+<%else%>
+
+  <div class="label-field-pair2">
+  <div  class="text-input-bg2" id="exam-group-select">
+    <div class="label-field-pair">
+      <label for="select_batch"><%= t('select_batch') %></label>
+    </div>
+      <div class="fee_category_scroll">
+        <div class="sel-list">
+        <%= @inactive_batches ? t('inactive') : t('active') %>
+          : <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>
+          ,
+          <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; })" %>
+        </div>
+        <% @batches.each_with_index do |batch , index| %>
+        <div class="each_batch">
+          <%= check_box_tag "b[]", batch.id, true, :class => 'batches_box',:id=>"batch" + index.to_s %>
+          &#x200E;<label class="batch_tag" for="<%= 'batch' + index.to_s %>"><%= batch.full_name %></label>&#x200E;
+        </div>
+        <% end %>
+      </div>
+  </div>
+</div>
+
+<%end%>

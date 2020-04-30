@@ -1,0 +1,117 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('reports_text') %></h1>
+
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('siblings')} #{t('report')}" %></div>
+    <%= report_job_status('csv_siblings_report', 'student') %>
+</div>
+
+<div id="page-yield">
+
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="radio_button">
+        <label><input type="radio" name="setopt" id="school_wise_radio" checked="checked" class="radio_button_alignment" /><%= t('school_wise') %></label>
+        <label><input type="radio" name="setopt" id ="course_wise_radio" class="radio_button_alignment"/><%= t('course_wise') %></label> 
+    </div>
+      <div id="reveal-inactive"></div>  
+
+    <div id="siblings-table">
+
+        <%#=  render :partial => "siblings_report" %>
+
+    </div>
+
+
+
+
+</div>
+
+
+
+<script type="text/javascript">
+  
+  if(j("#school_wise_radio").is(":checked"))
+  {
+     j.ajax(
+                          {
+                              url: "/reports/siblings_report",
+                              type: "GET",
+                              data: {type: "school"},
+                              error: function (xhr, status) {
+                                  alert("Sorry, there was a problem!");
+                              }
+                          });
+  }
+  
+  j("#school_wise_radio") // select the radio by its id
+          .change(function () { // bind a function to the change event
+              if (j(this).is(":checked")) { // check if the radio is checked
+                  j.ajax(
+                          {
+                              url: "/reports/siblings_report",
+                              type: "GET",
+                              data: {type: "school"},
+                              error: function (xhr, status) {
+                                  alert("Sorry, there was a problem!");
+                              }
+                          });
+              }
+          });
+
+  j("#course_wise_radio") // select the radio by its id
+          .change(function () { // bind a function to the change event
+              if (j(this).is(":checked")) { // check if the radio is checked
+                  j.ajax(
+                          {
+                              url: "/reports/siblings_course_select",
+                              type: "GET",
+                              data: {type: "course"},
+                              error: function (xhr, status) {
+                                  alert("Sorry, there was a problem!");
+                              }
+                          });
+
+              }
+          });
+          
+         function form_submission() {
+        if (j('#loader').is(':hidden')) {
+            Element.show('loader')
+            j(".form_submit").submit(function (e) {
+                var postData = j(this).serializeArray();
+                var formURL = j(this).attr("action");
+                j(".submit_button").text('<%=t('please_wait') %>')
+                j(".submit_button").css({"cursor":"no-drop"});
+                j.ajax(
+                        {
+                            url: formURL,
+                            type: "POST",
+                            data: postData,
+                            success: function (data, textStatus, jqXHR) {
+                                Element.hide('loader')
+                                j(".submit_button").text('<%="► #{t('search_text')}" %>')
+                                j(".submit_button").css({"cursor":"pointer"});
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                //if fails
+                            }
+                        });
+                e.preventDefault(); //STOP default action
+//          e.unbind(); //unbind. to stop multiple form submit.
+            });
+
+            j('.form_submit').submit()
+
+
+        }
+    }
+</script>

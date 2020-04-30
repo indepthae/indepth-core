@@ -1,0 +1,32 @@
+<div id="main_section"> 
+    <div class="label-field-pair session_sub">
+        <label for="configuration_session_time_limit"><%= t('logout_after') %></label>
+        <div class="text-input-bg">
+            <%= select :configuration, :session_time_limit, [["15 Minutes",900000],["30 Minutes",1800000],["1 hour",3600000],["2 hours",7200000],["3 Hours",10800000]],:selected =>@config[:session_time_limit].to_i  %>
+        </div>
+    </div>
+    <div id="info_text"></div>
+    <div class="grades">
+        <div class="label-field-pair session_sub">
+            <label for="configuration_applicable_for"><%= t('applicable_for') %></label>
+        </div>
+        <div class="fee_category_scroll">
+            <div class="sel-list">
+                <%= t('select') %>: <%= link_to_function t('all'), "$$('input.roles_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+                <%= link_to_function t('none'), "$$('input.roles_box_others').each(function(checkbox) { checkbox.checked = false; });" %>
+            </div>
+            <div class="each_batch">
+                <%= check_box "configuration", "enable_admin_session_timeout" , :checked => true,:class=>'roles_box',:disabled => "disabled" %> <label for="configuration_admin">Admin</label>
+            </div>
+            <% ["Employee","Parent","Student"].each do |role| %>
+              <div class="each_batch">
+                  <% if @config[:"enable_#{role.downcase}_session_timeout"] == '1' %>
+                    <%= check_box "configuration", "enable_#{role.downcase}_session_timeout" , :checked => true,:class=>'roles_box roles_box_others' %> <label for="configuration_<%= role %>"><%= role %></label>
+                  <%else%>
+                    <%= check_box "configuration", "enable_#{role.downcase}_session_timeout" , :checked => false,:class=>'roles_box roles_box_others' %> <label for="configuration_<%= role %>"><%= role %></label>
+                  <%end%>
+              </div>
+            <% end %>
+        </div>
+    </div>
+</div>

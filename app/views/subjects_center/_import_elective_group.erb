@@ -1,0 +1,21 @@
+<tbody class="<%= (klass == 'level-1') ? 'disable_sort' : ''%>">
+  <tr class="<%= klass %> disable_sort">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <% if enable_selection and !@imported_components[:course_elective_groups].include? e_group.id%>
+              <div class="pull-left inner_select">
+                <%= check_box_tag "import_subjects[#{e_group.class.name.underscore}_ids][]", e_group.id, false, 
+                              :class => "select_subject" %>
+              </div>
+          <% end %>
+          <div class="pull-left bold"><%= e_group.name %></div>
+          <div class="component_link component_type">
+              <%= t('elective_group').titleize %>
+          </div>
+      </td>
+  </tr>
+  <% enable_sub_selection = (enable_selection and @imported_components[:course_elective_groups].include? e_group.id) %>
+  <% e_group.course_subjects.each do |sub| %>
+      <%= render :partial => 'import_subject', :locals => {:subject => sub, :klass =>(klass == 'level-1' ) ? 'level-2' : 'level-3', :tbody_required => false, :enable_selection => enable_sub_selection } %>
+  <% end %>
+</tbody>

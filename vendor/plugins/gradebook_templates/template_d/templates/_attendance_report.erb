@@ -1,0 +1,20 @@
+<table class="primary condensed invert">
+    <tr>
+        <th>Attendance</th>
+        <%report.attendance_reports.to_a.each do |attendance_report| %>
+          <th><%= attendance_report.parent_name %></th>
+        <%end%>
+    </tr>
+    <tr>
+        <td>Number of Working Days</td>
+        <%report.attendance_reports.to_a.each do |attendance_report| %>
+          <td><%= attendance_report.total %></td>
+        <%end%>
+    </tr>  
+    <tr>
+        <td>Number of Days Present</td>
+        <%report.attendance_reports.to_a.each do |attendance_report| %>
+          <td><%= attendance_report.attended %></td>
+        <%end%>
+    </tr>  
+</table>

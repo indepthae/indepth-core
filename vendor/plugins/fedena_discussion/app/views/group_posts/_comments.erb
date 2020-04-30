@@ -1,0 +1,61 @@
+<table> <tr>
+    <td id="cmnt" colspan="3" >
+      <table><tr><td><h3><a name="comments" class="themed_text"><%= t('comments') %></a></h3></td>
+          <td><div id="load"> <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader",
+                :style =>"display: none;" ) %>
+            </div></td></tr></table>
+    </td>
+  </tr>
+  <% unless group_post_comments.blank? %>
+  <% group_post_comments.each_with_index do |group_post_comment,i| %>
+    <tr>
+      <% if  group_post_comment.user.present? %>
+
+        <td><div id="cmnt_name">
+            <%=group_post_comment.user.first_name %>
+          </div></td>
+      <% else %>
+        <td><div id="cmnt_name">
+            <%= t('deleted_user') %>
+          </div></td>
+      <% end %>
+      <td >
+        <div id="time">
+          <%=time_ago_in_words(group_post_comment.created_at)+ " #{t('ago')}" %>
+        </div>
+
+      </td>
+      <%# if @current_user.id==group_post_comment.user_id or @current_user.admin? or @current_user.privileges.map(&:name).include? "GroupCreate" or group_post.group.admin_members.include?(@current_user) %>
+      <% if permitted_to? :destroy ,group_post_comment %>
+        <td>
+          <div id="commentdel">
+            <%= link_to_remote "#{t('delete_text')}", :update=>"group_post_comments", :url=>group_group_post_group_post_comment_path(:group_id=>group_post.group,:group_post_id=>group_post_comment.group_post, :id=>group_post_comment ), :confirm => "#{t('confirm_comment')}",:method=>:delete, :action=>"destroy"%>
+          </div>
+        </td>
+      <%end%>
+      <% i=i+1 %>
+    </tr>
+    <tr>
+      <td colspan="3" >
+        <div id="commentbody">
+          <%=  group_post_comment.comment_body.gsub( /(\A|\s)((https?:\/\/|www\.)[^\s<]+)/, '<a target="blank" href="\2">\2</a>' ) %>
+        </div>
+        <hr class="hrline1" />
+      </td>
+    </tr>
+    <tr>
+
+    </tr>
+  <%end%>
+  <% else %>
+    <tr><td><%= t('no_comment') %></td></tr>
+    <%end%>
+
+
+</table>
+<div id="see">
+  <%= will_paginate group_post_comments, :previous_label=>"<", :next_label=>">", :renderer => 'RemoteLinkRenderer' , :remote => { :loading =>  "$('loader').show();",:complete =>"$('loader').hide();"  }, :params => {:controller=>:group_posts,:action => "list_post_comments",:id=>group_post} %>
+</div>

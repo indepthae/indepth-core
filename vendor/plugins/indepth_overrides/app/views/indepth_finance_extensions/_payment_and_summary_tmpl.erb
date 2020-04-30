@@ -1,0 +1,151 @@
+<tr class="row-b height-26">
+
+    <td colspan="<%= fee_head_col_span + 1 %>">
+        <div class="fright"> <%= "#{t('total')} #{t('amount')}" %></div>
+    </td>
+
+    <td class="set_border_right total_amount">
+        <% unless precision_label(@total_fees).to_f == 0 %>
+          <%= precision_label(@total_fees.to_f) %>
+        <% else %>
+          <%= precision_label(0) %>
+        <% end %>
+    </td>
+</tr>
+
+<tr class="row-b height-26">
+    <td colspan="<%= fee_head_col_span + 1 %>">
+        <div class="fright"><%= "#{t('balance')} #{t('amount')}" %></div>
+    </td>
+
+    <td class="set_border_right col-6 total-pay balance_amount">
+        <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+          <%= precision_label(@total_amount_to_pay.to_f) %>
+        <% else %>
+          <%= precision_label(0) %>
+        <% end %>
+    </td>
+</tr>
+<% if @student.advance_fee_wallet.present? and @advance_fee_used.to_f > 0 %>
+  <tr class="row-b height-26">
+      <td colspan="<%= fee_head_col_span + 1 %>">
+          <div class="fright"><%= "#{t('advance_applied')}" %></div>
+      </td>
+
+      <td class="set_border_right col-6 balance_amount" id="adf_applied">
+          <%= @advance_fee_used.to_f %>
+      </td>
+  </tr>
+<% end %>
+
+<tr class="row-b tr-list_head">
+    <td colspan="<%= fee_head_col_span + 2 %>">
+        <% if @student.advance_fee_wallet.present? and @student.advance_fee_wallet.amount > 0 and @total_amount_to_pay != 0.0 %>
+        <div class="wallet-section">
+              <div class="wallet-amount-block">
+                  <label><%= t('advance_applied') %> </label>
+                  <div class="text-input-bg4">
+                      <%= text_field_tag :wallet_amount,' ', {:value => 0.00, :class => "wallet-amount-applied"} %>
+                  </div>
+              </div>
+              <div class="wallet-info-block">
+                <label><%= t('advance_fees_collected')%></label>
+                <div class="text-input-bg4">
+                    <%= text_field :student_wallet_amount,'', {:value => precision_label(@student.advance_fee_wallet.amount),
+                      :class => "wallet-amount-field", :readonly => true} %>
+                </div>
+                <%= label_tag '', t('apply_advance'), {:class => "wallet-link user_button1"} %>
+                <div class="" style="display: none;">
+                  <%= hidden_field_tag :wallet_amount_applied , '', :value => false %>
+                </div>
+
+
+              </div>
+        </div>
+        <% end %>
+
+        <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+          <div class="payment_details">
+              <div class="payment_mode_block">
+                  <label><%= t('payment_mode') %>
+                      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1",
+                        :style => "display: none;") %>
+                  </label>
+
+                  <div class="text-input-bg3">
+                      <!--
+                      < % select :multi_fees_transaction, :payment_mode,
+                        [["#{t('cash')}", "Cash"], ["#{t('online_payment')}", "Online Payment"],
+                        ["#{t('cheque')}", "Cheque"], ["#{t('dd')}", "DD"], ["#{t('others')}", "Others"]],
+                        {:selected => params[:payment_mode]},
+                        {:onChange => "#{remote_function(:url => {:controller => "finance",
+                        :action => "select_payment_mode"},
+                        :with => "'payment_mode='+value", :before => "$('loader1').show();",
+                        :success => "$('loader1').hide();")}"} %> -->
+                      <%= render :partial => "finance/fees_payment/payment_modes",
+                        :locals => {:form_obj => :multi_fees_transaction} %>
+                  </div>
+              </div>
+              <div id="payment_mode">
+                  <div id="payment_mode_details">
+                      <% if params[:payment_mode]=='Others' %>
+                        <%= render :partial => 'finance/fees_payment/select_payment_mode', :locals => 
+                          {:mode => params[:others_payment_mode], :form_obj => :multi_fees_transaction } %>
+                      <% end %>
+                  </div>
+              </div>
+              <div class="reference_no">
+                  <label><%= t('reference_no') %> </label>
+
+                  <div class="text-input-bg4">
+                      <%= form.text_field :reference_no, :value => params[:reference_no] %>
+                  </div>
+              </div>
+              <div class="amount_to_pay_block">
+                  <label><%= t('amount_to_pay') %> </label>
+
+                  <div class="text-input-bg4">
+                      <%= hidden_field_tag 'multi_fees_transaction[payee_id]', @student.id %>
+                      <%= hidden_field_tag 'multi_fees_transaction[payee_type]', 'Student' %>
+                      <%= hidden_field_tag 'multi_fees_transaction[transaction_date]',
+                        @transaction_date, options={:class => 'fee_transaction_date'} %>
+                      <%= form.hidden_field :fees_paid, :value => 0, :class => 'precision_text payment',
+                        :readonly => true, :disabled => "disabled" %>
+                        <%= text_field_tag :fees_paid_t, '', {:value => 0, :class => 'precision_text payment_t',
+                          :readonly => true, :disabled => "disabled"} %>
+                  </div>
+              </div>
+          </div>
+        <% end %>
+        <!--
+    </td>
+</tr>
+<tr class="row-b tr-list_head">
+  <td colspan="< %= fee_head_col_span + 2 %>"> -->
+        <div class="pay_fees">
+            <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+              <div class="payment_notes">
+                  <label><%= t('payment_notes') %> </label>
+                  <div class="textarea-input-bg3">
+                      <%= form.text_area :payment_note, :cols => 50, :rows => 1, :maxlength=>80,
+                        :value => params[:payment_note] %>
+                  </div>
+              </div>
+              <%= hidden_field_tag :session_fingerprint, session_fingerprint %>
+            <% end %>
+            <div class="pay_fees_buttons <%= precision_label(@total_amount_to_pay).to_f != 0 ? '' : 'no_top_margin' %>">
+                <% unless @total_amount_to_pay == 0 %>
+                  <% if @financial_year_enabled %>
+                    <%= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'submit_button' %>
+                  <% end %>
+                <% else %>
+                  <h4><%= t('fees_paid') %></h4>
+                <% end %>
+                <%= link_to "► #{t('print_summary')}",
+                  {:controller => "finance_extensions", :action => "pay_all_fees_receipt_pdf",:id => @student.id, :batch_id => @current_batch.id}, :target => '_blank',:class => 'user_button' %>
+                <%= link_to "► #{t('single_statement')}",
+                  {:controller => "student", :action => "single_statement", :id => @student.id}, :target => '_blank', :class => 'user_button give_space' %>
+            </div>
+        </div>
+    </td>
+</tr>

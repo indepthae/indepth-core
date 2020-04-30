@@ -1,0 +1,128 @@
+<div class="list_table_div">
+    <% unless @transactions.empty? %>
+      <% total = 0 %>
+      <div class="main_head_label">
+          <b id="fees_report_title">
+              <%= t('transaction_report') %>               
+              <% if @accounts_enabled %>
+                <%= "#{t('for')}: #{@account_name}" %>
+                <% url_params = {:fee_account_id => @account_id} %>
+              <% else %>
+                <% url_params = {} %>
+              <% end %>
+          </b>
+      </div>
+
+      <div class="main_head_label"style="margin-top: 0px">
+          <label><%= t('fee_collection') %></label>
+          <span>:</span>
+          <label class="head_label_value"><%= @fee_collection.name %></label>
+      </div>
+
+      <div class="main_head_label" style="margin-top: 0px">
+          <label><%= t('batch') %></label>
+          <span>:</span>
+          <label class="head_label_value" ><%= @batch.full_name %></label>
+          <div class="date_align right">
+              <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+              <%= format_date(@start_date) %> &nbsp; 
+              <label class="to_date"><%= t('small_to') %></label> &nbsp; 
+              <%= format_date(@end_date) %> 
+              <span id="show_date" class="themed_hover_text" >
+                  <%= t('change_date') %>
+                  <!-- < %=link_to_remote t('change_date'),:url => {:controller => "finance", 
+                  :action =>"show_date_filter",:target_action=>@target_action,:id=>params[:id],
+                  :batch_id=>params[:batch_id],:date_tag=>params[:date_tag],:start_date=>@start_date,
+                  :end_date=>@end_date}.merge(url_params)%> -->
+              </span>
+          </div>
+      </div>
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td ><%= t('student_name') %></td>
+              <td class="set_border_right"> <%= t('amount') %> (<%= currency %>) </td>
+              <td class="set_border_right"> <%= t('receipt_no') %> </td>
+              <td class="set_border_right"> <%= t('date_text') %> </td>
+              <td class="set_border_right"> <%= t('payment_mode') %> </td>
+              <td class="set_border_right"> <%= t('payment_notes') %> </td>
+          </tr>
+          <% @transactions.each do |f| %>
+            <tr class="row-b">
+                <% student = f.student_payee %>
+                <td><%= "#{student.full_name}(#{student.admission_no})"%></td>
+                <td class="set_border_right" align="right">
+                    <%= precision_label(f.amount) %>
+                </td>
+                <td class="set_border_right"> <%= f.receipt_number %> </td>
+                <td class="set_border_right"> <%= format_date(f.transaction_date) %> </td>
+                <% if f.reference_no.present? %>
+                  <td class="set_border_right"> <%= f.payment_mode %> - <%= f.reference_no %></td>
+                <% else %>
+                  <td class="set_border_right"> <%= f.payment_mode %></td>
+                <% end %>
+                <td class="set_border_right"><p> <%= f.payment_note %></p> </td>
+            </tr>
+
+            <% total += f.amount %>
+
+          <% end %>
+      </table>
+
+      <%= will_paginate @transactions, :params => { :id => params[:id], :batch_id => params[:batch_id],
+        :start_date => @start_date, :end_date => @end_date, :date_tag => params[:date_tag]}.
+        merge(url_params), :renderer => 'RemoteLinkRenderer'  %>
+
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%= precision_label(@grand_total) %></label>
+      </div>
+
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                        :id => params[:id], :batch_id => params[:batch_id], 
+                        :csv_report_type => "finance_fee_batch_fee_report", :report_format_type => "csv",
+                        :start_date => @start_date, :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="main_head_label"><div class="date_align right">
+              <%=format_date(@start_date)%> <%= t('to') %> <%=format_date(@end_date)%> 
+              <span id="show_date"><%= t('change_date') %></span>
+          </div>
+      </div>
+
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <% end %>
+</div>
+
+<script>
+
+  j('.date_box').hide();
+
+  var inc = j("#h_income").val();
+  var exp = j("#h_expense").val();
+
+  j("#inc_amount").html(inc);
+  j("#exp_amount").html(exp);
+
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+
+</script>

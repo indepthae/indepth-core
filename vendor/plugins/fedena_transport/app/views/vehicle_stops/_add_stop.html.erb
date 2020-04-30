@@ -1,0 +1,36 @@
+<% remote_form_for @vehicle_stop, :url => fetch_path(@vehicle_stop), 
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="vehicle_stop_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('academic_year') %></label>
+          <%= s.hidden_field :academic_year_id %>
+          <div class="text-input-bg"><span><%= @academic_year.try(:name) %></span></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('name') %></label>
+          <div class="text-input-bg"><%= s.text_field :name %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="landmark"><%= t('landmark') %></label>
+          <div class="text-input-bg"><%= s.text_field :landmark %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="latitude"><%= t('latitude') %></label>
+          <div class="text-input-bg"><%= s.text_field :latitude %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="longitude"><%= t('longitude') %></label>
+          <div class="text-input-bg"><%= s.text_field :longitude %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@vehicle_stop.new_record? ? t('save') : t('save'))}", 
+        :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

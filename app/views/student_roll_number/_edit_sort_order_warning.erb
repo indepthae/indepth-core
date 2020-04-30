@@ -1,0 +1,6 @@
+<b><%= t('edit_sort_order_warning_text_1') %></b><br><br>
+
+<div id="buttons">
+  <%= link_to_remote "#{t('edit')}",:url => {:controller => "student_roll_number",:action => "edit_sort_order", :id => params[:id]} ,:update => "sort_order",:html =>{ :class => "submit_button",:onclick=>"Modalbox.hide();"} %>
+  <%= link_to_remote "Cancel", :url => {:controller => "student_roll_number",:action => "edit_sort_order", :id => params[:id]} , :html => {:class => "submit_button", :id => "cancel",:onclick=>"Modalbox.hide();"}%>
+</div>

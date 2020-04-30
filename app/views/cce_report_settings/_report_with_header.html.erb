@@ -1,0 +1,9 @@
+<div class="label-field-pair">
+  <label  class ="general_label" for="configuration_currency_type">CBSE institution affiliation no.</label>
+  <div class="text-input-bg">
+    <%= text_field :cce_report_setting, :affiliation_no, :value => @setting[:affiliation_no] %>
+  </div>
+</div>
+<div class="com_block">
+  <p class="messages no_bottom_margin">The report headers will include your institution address, email, phone, institution logo and website that you’ve entered in General Settings.<%= link_to 'General Settings',{:controller=>"configuration",:action=>"settings"},:target=>'_blank' if permitted_to? :settings, :configuration%></p>
+</div>

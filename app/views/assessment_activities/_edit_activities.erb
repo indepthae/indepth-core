@@ -1,0 +1,14 @@
+<table>
+    <tr class="tr-head">
+        <td class="col-1"></td>
+        <td class="col-1"><%= t('activities') %></td>
+        <td class="col-2"><%= t('description') %></td>
+    </tr>
+    <% activities.each_with_index do |i,activity| %>
+      <tr>
+          <td><%= i+1 %></td>
+          <td><%= activity.name %></td>
+          <td><%= activity.description %></td>
+      </tr>
+    <% end %>
+</table>

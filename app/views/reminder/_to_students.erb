@@ -1,0 +1,56 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<% if @to_students.present? %>
+  <% string = @to_students.inject('') { |arr, u| arr + u.to_s + ',' }.chomp(',') %>
+  <% add = "<span class='add-span'>#{t('add')}</span>" %>
+  <div class="label-field-pair_column">
+    <!-- <label for="student_grade"><%#= t('select_recipient') %></label> -->
+    <div class ="scrolable" >
+      <div class="scroll-inside">
+        <div class="hover">
+          <%= link_to "#{t('select_all')}", '#',
+          :onClick => "add_all_recipient1('#{string}')",
+          :class=> 'all' %>
+        </div>
+        <% @to_students.each do |t| %>
+          <% user = User.active.find(t) %>
+          <% student = user.student_record %>
+          <div class="hover">
+            <%= link_to shorten_string(user.full_name,22)+add  , '#',
+              :onClick => "add_recipient1(#{t})",
+              :class=>'individual',
+              :before => "Element.show('loader')",
+              :success => "Element.hide('loader')"
+              %>
+            <span class="id-span"><%= "("+student.admission_no+")&#x200E;" %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="label-field-pair_column">
+    <div class ="scrolable" >
+      <div class="scroll-inside">
+        <span class="message"><%= t('no_students_found')%></span>
+      </div>
+    </div>
+  </div>
+<% end %>

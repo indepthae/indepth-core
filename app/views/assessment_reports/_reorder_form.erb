@@ -1,0 +1,42 @@
+<div id="reorder_container">
+    <div id="description"><%= t('record_group_reorder_description') %></div>
+    <% remote_form_for @plan, :url=>{:action=>'reorder_record_groups', :assessment_plan_id=>@plan.id}, :html=>{:method=>:post} do |f|%>
+      <table class="sort_table">
+          <tbody>
+              <% f.fields_for :gradebook_record_groups, @plan.gradebook_record_groups.all(:order=>'priority') do |field| %>
+                <tr class="list" parent_name="<%= field.object.name %>">
+                    <td class="reorder_val"><i></i></td>
+                    <td class="name"><%= field.object.name %></td>
+                    <%= field.hidden_field :priority %>
+                </tr>
+              <% end %>
+          </tbody>
+      </table>
+      <div id='submit_area'>
+          <%= f.submit t('save_order') , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button", :onclick=>'close_modal_box();', :disabled=>true %>
+          <%= link_to "#{t('cancel')}","#",:onclick=>'close_modal_box();',:class=>'modal-box-cancel_button submit-button' %>
+      </div>
+    <% end %>
+</div>
+<script type="text/javascript">
+  window.scrollTo(0, 0);
+  updateSortorder = function() {
+    j('.sort_table tr.list').each(function (i) {
+      j(this).children().last().val(i + 1);
+    });
+    j('#submit_button').attr('disabled',false);
+  };
+  
+  j('.sort_table tbody').sortable({
+      cursor: 'move',
+      opacity: 0.8,
+      nested: true,
+      start: function (event, ui) {
+      },
+      stop: function (event, ui) {
+          updateSortorder();
+      },
+      items: "tr:not(.disable_sort)"
+
+  }).disableSelection();
+</script>

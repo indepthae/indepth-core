@@ -1,0 +1,9 @@
+if @error.nil?
+	page.replace_html 'form-errors', :text => ''
+  page << "Modalbox.hide();"
+  page.replace_html 'exam-list', :partial => 'active_exam_list'
+  page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('exam_group_successfully_updated')}</p>"
+else
+	page.replace_html 'form-errors', :partial => 'errors', :object => @exam_group
+  page.visual_effect(:highlight, 'form-errors')
+end

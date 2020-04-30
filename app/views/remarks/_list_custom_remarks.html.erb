@@ -1,0 +1,63 @@
+<% unless @remarks.empty? %>
+  <%@remarks.each do |val|%>
+    <div id="custom_remarks_section" class="custom_remarks_section">
+        <div id="add_remark_link_for_<%=val.id%>">
+            <%unless @current_user.parent? or @current_user.student?%>
+              <% if (@current_user.has_required_custom_remarks_privileges? or @current_user.employee_record.batch_ids.include?(@student.batch_id)) and val.submitted_by == @current_user.id %>
+                <%=link_to_remote "",:url  => {:controller=>"remarks",:action=>"destroy_custom_remarks",:object_id=>val.id,:student_id=>@student.id, :method => :delete},:html => { :class  => "cross_button" }, :confirm =>"#{t('delete_confirm_msg')}"%>
+                <%=link_to "","javascript:void(0);",:class=>"themed_text add_link edit_button",:student_id=>@student.id,:target_id=>@target.id,:object_id=>val.id,:onclick=>"edit_custom_remark(this)"%>
+              <% end %>
+            <%end%>
+            <div id="remarked_by_section"><%= val.remarked_by.present? ? val.remarked_by : '-' %></div>
+            <div id="remark_subject_section"><%=val.remark_subject.present? ? val.remark_subject : '-'%></div>
+            <div id="remark_body_section"><%=val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div>
+            <div id="submitted_by_section">
+                <!--span dir="-->
+                <% # =(rtl?) ? 'rtl' : 'ltr'%>
+                <!--"-->
+                <% # =val.user.present? ?  val.user.first_name : t('deleted_user')%>
+                <!--on&nbsp;</span>
+                <!--span dir="ltr"-->
+                <% # =format_date(val.updated_at,:format=>:long_date)%>
+                <!--/span-->
+                <%=val.user.present? ?  val.user.first_name : t('deleted_user')%> on <%=format_date(val.updated_at,:format=>:long_date)%>
+            </div>
+        </div>
+    </div>
+  <%end%>
+  <div id="paginate" class="<%=@remarks.total_entries > @remarks.per_page ? "remarks_pagination" : ""%>">
+      <%= will_paginate @remarks, :renderer => 'RemoteLinkRenderer',  :params => {:controller=>"remarks",:action => "list_custom_remarks",:student_id=>@student.id}%>
+  </div>
+  <%= link_to t('pdf_report'), {:action => "remarks_pdf",:page_height => 680, :report_format_type => "pdf", :student_id => @student.id}, :class => "submit-button", :target => '_blank'  %>
+  <%= link_to t('csv_report'), {:action => "remarks_csv", :csv_report_type => "student_remarks",:report_format_type => "csv", :student_id => @student.id},:class => "submit-button"%>
+<% else %>
+  <p class='flash-msg'><%= t('no_remarks_added_yet') %></p>
+<% end %>
+<script type="text/javascript">
+  function edit_custom_remark(elm){
+      j(elm).removeAttr('onclick');
+<%= "var student_id = j(elm).attr('student_id')" %>
+<%="var object_id = j(elm).attr('object_id')"%>
+    var parametrs={student_id:student_id,object_id:object_id}
+    new Ajax.Request('/remarks/edit_custom_remarks',{
+      parameters:j(this).serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+              j(elm).parent().hide();
+              j(elm).parents('#custom_remarks_section').append(resp.responseText);
+
+          }
+      });
+  }
+  function confirm_delete()
+  {
+    var response=confirm('are you sure?');
+    if (response==true){
+          return true;
+      }
+      else
+          return false;
+  }
+</script>

@@ -1,0 +1,81 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('course_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('show') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", new_course_batch_path(@course) %> </li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "Group Batches", {:controller=>"courses", :action=>"grouped_batches", :id=>@course.id} %> </li>
+      <% if permitted_to? :edit, :course %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_text')}", edit_course_path(@course) if permitted_to? :edit, :course %></li>
+      <%  end %>
+      <% if permitted_to? :destroy, :course %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to("#{t('delete_text')}", course_path(@course), :method => 'delete', :confirm => "#{t('delete_confirm_msg')}") %></li>
+      <%  end %>
+
+      <% if permitted_to? :assign_subject_amount, :courses %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('assign_subject_amount')}", assign_subject_amount_courses_path(:id => @course.id) %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :courses_show, @course %>
+    <%=  render_breadcrumbs %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @batches.empty? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="listing">
+      <tr class="tr-head">
+        <td><%= t('sl_no') %></td>
+        <td><%= t('batch') %></td>
+        <td><%=t('actions')%></td>
+      </tr>
+      <% @batches.each_with_index do |batch,i| %>
+        <% if params[:page].present? %>
+          <% if params[:page].to_i >= 1 %>
+            <% i = i  + (params[:page].to_i - 1) * 20 %>
+          <% end %> <%else %> <% i = i %> <% end %>
+        <tr class="tr-<%= cycle('odd', 'even')%>">
+          <td class="col-1">
+            <%= i+1 %>
+          </td>
+          <td class="col-2">
+            <%= link_to batch.full_name, [@course, batch] %>
+          </td>
+          <td class="col-3">
+            <span> <%= link_to "#{t('edit_text')}", edit_course_batch_path(@course, batch) if permitted_to? :edit, :batches %></span> |
+            <span><%= link_to("#{t('delete_text')}", [@course, batch], :method => 'delete', :confirm => "#{t('delete_confirm_msg')}")  if permitted_to? :destroy, :batches %></span>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+    <%=will_paginate @batches%>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_batches_in_this_course') %></p>
+  <% end %>
+  <div class="extender"></div>
+</div>

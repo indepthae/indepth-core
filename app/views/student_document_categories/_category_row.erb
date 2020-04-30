@@ -1,0 +1,18 @@
+<% category ||= @category %>
+<% category_name = category.attachment_category_name %>
+<td class="col-1">
+    <%= category_name %>
+</td>
+<td class="col-2">
+    <% unless category.new_record? %>
+      <%= link_to_remote "#{t('edit_text')}", :url => {:action => "edit", :id => category.id}, :method => :get  %>
+      <% if category.has_documents? %>
+        <%= link_to_remote "#{t('delete_text')}", :url => {:action => 'confirm_destroy', :id => category.id } %>
+      <% else %>
+        <%= link_to_remote "#{t('delete_text')}", :url => student_document_category_path(category),:method => 'delete', :confirm => t('delete_confirm_msg',:category_name => category_name) %>
+      <% end %>
+    <% else %>
+      <div class="disabled_link"><%= t('edit_text') %></div>
+      <div class="disabled_link"><%= t('delete_text')%></div>
+    <% end %>
+</td>

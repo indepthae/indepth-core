@@ -1,0 +1,60 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(true) %>
+  <h1><%= "#{t('employee_payslip_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('approve_payslips') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= t('approve_payslips') %></h3>
+
+  <div class="description">
+    <%= t('approve_payslip_desc') %>
+  </div>
+
+  <div id="approve_list">
+
+    <table>
+      <tr class="tr-head">
+        <td class="period"><%= t('pay_period')%></td>
+        <td class="status"><%= t('payslip_status') %></td>
+        <td class="cost"><%= t('total_cost') + " &#x200E;(#{currency})&#x200E;" %></td>
+      </tr>
+      <% if @payslips_date_ranges.present? %>
+        <% @ranges.each do |year, val| %>
+          <tr class="tr-sub-head">
+            <td colspan="3"><%= "#{year} - #{year.next}" %></td>
+          </tr>
+          <% val.each do |v| %>
+            <tr>
+              <td><%= link_to v.date_range, {:action => 'approve_payslips_range', :end_date => v.end_date, :start_date => v.start_date} %></td>
+              <% employees_count = @employees_count.detect{|c| c.date_range_text == v.date_range_text}  %>
+              <td>
+                <span class="generated"><%= "#{t('generated')} : #{v.generated}" %>
+                  <span class="of_text"><%= "#{t('of')} #{(employees_count.present? ? employees_count.employees : 0)} " %></span>
+                </span>
+                <span class="approved"><%= "#{t('approved')} : #{v.approved}" %></span>
+                <span class="pending"><%= "#{t('pending')} : #{v.pending}" %></span>
+                <% unless v.rejected.to_i == 0 %>
+                  <span class="rejected"><%= "#{t('rejected')} : #{v.rejected}" %></span>
+                <% end %>
+              </td>
+              <td class="t_cost"><%= precision_label(v.total_cost) %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      <% else %>
+        <tr><td colspan="3"><%= t('nothing_to_list') %></td></tr>
+      <% end %>
+    </table>
+  </div>
+  <%= pagination_status(@payslips_date_ranges) %>
+  <%= will_paginate @payslips_date_ranges %>
+</div>

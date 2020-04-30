@@ -1,0 +1,131 @@
+<% is_invoice_enabled = transactions.first.overall_invoice_enabled %>
+<% is_tax_enabled = transactions.first.overall_tax_enabled %>
+<% transaction_date = @transactions_data.transaction_date || @transaction_ledger.transaction_date %>
+<div id="overall-receipt-box">
+    <div class="top">
+
+        <span class="title_top"><%= t('overall_receipt') %></span>
+        <span class="receipt_no">
+            <%= t('receipt_no') %>:<%= receipt_no %>
+        </span>
+        <span class="date_top">
+          <%= t('date_text') %> <%= ": #{format_date(transaction_date, :format => :short_date)}" %>
+        </span>
+
+    </div>
+
+    <hr class="hor_line"/>
+
+    <div class="extender"></div>
+
+    <%= render :partial => "finance_extensions/receipts/common/receipt_student_info", 
+      :locals => {:payee => payee, :default_configs => default_configs} %>
+
+    <div class="extender"></div>
+    <table class="width800 margin-top30">        
+<%# @tax_config = Configuration.get_multiple_configs_as_hash(['FinanceTaxIdentificationLabel',
+'FinanceTaxIdentificationNumber']) if is_tax_enabled %>
+        <tr class="main_section">
+
+            <% if is_invoice_enabled %>
+              <td class="border-left-none"><%= t('invoice_no') %></td>
+            <% end %>
+            <td class="width250 border-left-none"><%= t('fee_collection') %></td>                  
+            <td><%= t('due_date') %></td>
+            <td><%= t('amount') %></td>
+            <td><%= t('fine') %></td>
+            <td><%= "#{t('actual_amount_with_fine')} &#x200E;(#{default_configs.currency || default_configs.default_currency}) &#x200E;" %></td>
+            <% if is_tax_enabled %>
+              <td><%= "#{t('tax_text')} &#x200E;(#{default_configs.currency || default_configs.default_currency}) &#x200E;" %></td>
+            <% end %>
+            <td> <%= "#{t('paid_amount')}  &#x200E;(#{default_configs.currency}) &#x200E;" %></td>
+            <td class="border-right-none"> <%= "#{t('due_amount')} &#x200E;(#{default_configs.currency || default_configs.default_currency}) &#x200E;" %></td>
+        </tr>
+        <% total_amount_to_pay=0 %>
+        <% total_due_after_payment=0 %>
+        <% total_amount_paid = 0 %>
+        <% wallet_amount = 0 %>
+        <% transactions.each_with_index do |collection_detail, i| %>
+          <% if (i+1) == transactions.length %>
+
+            <tr class="td-border-top-none">
+              <% else %>
+            <tr class="td-border-none">
+              <% end %>
+
+
+              <% if is_invoice_enabled %>
+                <td class="border-left-none">
+                    <%= (collection_detail.invoice_enabled.to_i == 1) ? collection_detail.invoice_number : "" %>
+                </td>
+              <% end %>
+              <td class="width250 border-left-none"><%= collection_detail.fee_collection_name %></td>
+
+
+              <td class="width90"><%= format_date(collection_detail.due_date, :format => :short_date) %></td>
+
+  <%# fine_details = @overall_receipt.automatic_finance_fee_fine(@current_batch.id,collection_detail.finance_id,collection_detail.transaction_id,collection_detail.transaction_date) %>                  
+
+  <%#  manual_fine_amount = fine_details.try(:all_paid_fine_amount).to_f - fine_details.try(:auto_paid_fine).to_f%>
+
+  <%# actual_amount = collection_detail.balance.to_f + collection_detail.balance_addition_actual_amount.to_f + fine_details.try(:fine_amount).to_f + manual_fine_amount.to_f %> 
+
+              <%# actual_amount = collection_detail.balance.to_f +
+                collection_detail.balance_addition_actual_amount.to_f %>
+              
+              <%# actual_amount -= collection_detail.tax_amount.to_f if collection_detail.tax_enabled %>
+              
+              <%# fine_amount = calculate_fine collection_detail %>
+              <%# actual_amount += collection_detail.paid_manual_fine.to_f + fine_amount.to_f %>
+              <% fine_amount = 0 %>
+              <% tax_amount = 0 %>
+              <% if is_tax_enabled %>
+                <% tax_amount = collection_detail.tax_amount.to_f  %>
+              <% end %>
+              <% if collection_detail.fine_amount.to_f %>
+                <% fine_amount += collection_detail.fine_amount.to_f %>
+                <% fine_amount += collection_detail.paid_manual_fine.to_f if collection_detail.paid_manual_fine.present? %>
+              <% end %>
+              <td class="amount-alignment-style"><%= collection_detail.actual_amount.to_f - fine_amount.to_f - tax_amount.to_f %></td>
+              <td class="amount-alignment-style"><%= fine_amount.to_f  %></td>
+              <td class="amount-alignment-style"><%= collection_detail.actual_amount.to_f - tax_amount.to_f %></td>
+
+              <% if is_tax_enabled %>
+                <td class="amount-alignment-style">
+                    <%= collection_detail.tax_amount %>
+                </td>                  
+              <% end %>
+
+              <% total_amount_to_pay+= collection_detail.actual_amount.to_f %>
+
+              <td class="bold amount-alignment-style">
+                  <%= collection_detail.transaction_amount %>
+              </td>
+
+              <% total_amount_paid += collection_detail.transaction_amount.to_f %>
+              <% wallet_amount += collection_detail.wallet_amount.to_f if collection_detail.wallet_amount_applied %>
+              <%# due_amount = collection_detail.balance.to_f +
+                collection_detail.balance_addition_due_amount.to_f %>
+              <%# due_amount -= collection_detail.paid_manual_fine.to_f %>
+              <%# due_amount -= collection_detail.paid_auto_fine.to_f %>
+              <%# due_amount += fine_amount.to_f %>
+
+  <%#  fine_details.try(:fine_amount).to_f - 
+  fine_details.try(:auto_paid_fine).to_f %>
+
+              <td class="border-right-none amount-alignment-style">
+                  <%= collection_detail.due_amount %>
+              </td>
+
+              <%# total_due_after_payment += due_amount %>
+          </tr>
+        <% end %>
+    </table>
+
+    <div class="extender"></div>
+
+    <%= render :partial => "finance_extensions/receipts/overall/receipt_summary", 
+      :locals => {:total_amount_paid => total_amount_paid, :payment_summary => transactions.first,
+      :default_configs => default_configs, :wallet_amount => wallet_amount} %>
+</div>
+

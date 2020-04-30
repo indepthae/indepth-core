@@ -1,0 +1,29 @@
+<div class="sub-head"><%= t('batches_text') %></div>
+<div class="select_batches" id="all_batches" style="display:block">
+    <div class="header"><%= "#{t('all_batches')} &#x200E;(#{@batches.length})&#x200E;" %></div>
+    <div class="div_link" onclick="showBatches();"><%= t('select_batches_capital') %></div>
+    <div id="batch_names"><%= @batches.collect(&:full_name).join(', ') %></div>
+    <% @batches.each do |batch| %>
+      <%= hidden_field_tag "exam_dates[batch_ids][]", batch.id %>
+    <% end %>
+</div>
+<div class="select_batches" id="each_batches" style="display:none">
+    <div class="header"><%= "#{t('specific_batches')}" %></div>
+    <div class="div_link" onclick="hideBatches();"><%= t('select_all_batches') %></div>
+    <% if @batches.present? %>
+    <div id="description"><%= t('specific_batches_description') %></div>
+    <div id="list_batches">
+        <div id="list_header"><%= check_box_tag :batches,'',true ,{:class=>'check_all', :onclick=>'select_all()'} %><%= t('select_batches') %></div>
+        <div id="batches_list">
+            <% @batches.each do |batch| %>
+              <div class="each_batch">
+                  <%= check_box_tag "exam_dates[batch_ids][]",batch.id,'',{:class=>'check_batch',:id=>"exam_dates_batch_ids_"+"#{batch.id}", :onclick=>'check_batch()'} %>
+                  <label for="assessment_schedule_batch_ids_<%= batch.id %>"><%= "#{batch.full_name}" %></label>
+              </div>
+            <% end %>
+        </div>
+    </div>
+    <% else %>
+      <div id="description"><%= t('no_batches_msg') %></div>
+    <% end %>
+</div>

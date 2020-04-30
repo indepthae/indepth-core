@@ -1,0 +1,106 @@
+<script type="text/javascript">
+  function validate_comment(){
+    if ($('task_comment_description').value.trim()=="")
+    {
+      alert("<%="#{t('discription_cant_be_blank')}"%>");
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('task_management') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_task') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% unless @current_user.parent? or @current_user.student?%>
+         <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('assigned_to')}", {:controller=>"tasks",:action => "assigned_to", :id => @task.id} %></li>
+      <%end%>
+      <% if @task.task_can_be_edited_by?(@current_user)%>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_text')}", edit_task_path(:id=>@task)%></li>
+      <% end %>
+      <% if @task.task_can_be_deleted_by?(@current_user)%>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('delete_text')}", {:controller=>"tasks",:action=>"destroy",:id=>@task}, :method => :delete, :confirm => "#{t('delete_confirmation')}" %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :tasks_show,@task%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+
+  <div id="news_title">
+    <%= @task.title %> <span id="task_creator"> <%= t('by') %> <%= @task.user.present? ? @task.user_first_name : "#{t('deleted_user')}" %> </span>
+    <div id="task_status">
+      <% if @task.status == "Assigned" %>
+        <% if @task.task_can_be_edited_by?(@current_user)%>
+          <div id ="status-toggle">
+            <%=link_to "#{t('mark_as_completed')}", {:controller => "tasks",  :action => "toggle_status", :id => @task.id },:class=>"themed_text"%>
+          </div>
+        <% end %>
+        <div id="task-status-assigned"><%=t("#{@task.status.downcase}") %></div>
+      <% elsif @task.status == "Completed" %>
+        <% if @task.task_can_be_edited_by?(@current_user)%>
+          <div id ="status-toggle">
+            <%=link_to "#{t('mark_as_assigned')}", {:controller => "tasks",  :action => "toggle_status", :id => @task.id },:class=>"themed_text"%>
+          </div>
+        <% end %>
+        <div id="task-status-completed"><%=  t("#{@task.status.downcase}") %></div>
+      <% end %>
+    </div>
+  </div>
+  <div id="create_date" class="themed_text">
+    <%= t('start_date') %> : <%= @task.start_date.nil? ? nil : format_date(@task.start_date,:format=>:long) %>
+  </div>
+  <% if @task.due? %>
+    <div id="due_date1" class="themed_text">
+      <%= t('due_date') %> :<%= format_date(@task.due_date,:format=>:long) %>
+    </div>
+  <% else %>
+    <div id="due_date" class="themed_text">
+      <%= t('due_date') %> :<%= format_date(@task.due_date,:format=>:long) %>
+    </div>
+  <% end %>
+  <div id="news_content">
+    <%= sanitize @task.description , :tags => %w[b i a h1 h2 h3 u strike p img font span sup sub], :attributes => %w[href src style]%>
+  </div>
+  <% if @task.attachment_file_name.nil? %>
+    <div id="attachment" class="themed_text"><%= t('no_file_attached') %></div>
+  <%  else %>
+    <div id="attachment"><%= link_to "#{t('download_attachment')}", @task.attachment.url(:original, false) , :target => '_blank',:class=>"themed_text"%> </div>
+  <% end %>
+  <div class="extender"></div>
+  <%unless @current_user.parent?%>
+  <% form_for(:task_comment, :id => 'comments-form', :url => { :controller => 'task_comments', :action => 'create', :task_id=>@task.id},:html=> {:onsubmit => "return validate_comment()",:multipart=>true}) do |f| %>
+    <%= error_messages_for :task_comment %>
+    <h3 id="leave-a-comment"><%= t('post_an_update') %></h3>
+    <div class="comment-content"> <%= f.text_area :description %> </div>
+    <%= f.hidden_field :task_id, :value => @task.id %>
+    <div id="file_attachment"> <label for="task_comment_attachment" class="comment_attachment"><%= t('attach_a_file') %> </label>
+      <div class="text-input-bg">
+        <%= paperclip_file_field_tag 'task_comment','attachment', :size=>12, :direct => false, :object=>@task_comment %>
+      </div>
+    </div>
+    <div id="submit_button"><%= submit_tag '', :value =>"►#{t('submit')}",:class=>'submit-button', :disable_with => "►#{t('please_wait')}" %></div>
+  <% end %>
+    
+ <%end%> 
+  <h3 id="comments-heading" class="themed_text"><%= t('updates') %></h3>
+
+
+  <span id="comments-count"><% if @comments.empty? %><%= t('no_updates') %><% end %></span>
+
+
+  <ul id="comments-list">
+    <%= render @comments.reverse %>
+  </ul>
+
+</div>

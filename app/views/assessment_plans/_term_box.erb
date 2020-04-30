@@ -1,0 +1,93 @@
+<div class="head">
+    <div class="left">
+        <% if permitted_to? :set_assessment_term_name %>
+          <% @assessment_term = term %>
+          <div id="<%="assessment_term_name_#{term.id}_edit" %>">
+              <%= in_place_editor_field :assessment_term, :name,{},{:cols=>3} %>
+          </div>
+        <% else %>
+          <%= term.name %>
+        <% end %>
+    </div>
+    <div class="right">
+        <div class="duration">
+            <%= term_duration(term) %>
+        </div>
+        <% if assessment_groups.present? %>
+          <div class="add_link">
+              <%= link_to "#{t('add_exams')}", new_assessment_group_path({:parent_id => term.id, :parent_type => term.class.to_s}),:class=>'submit-button' %>
+          </div>
+        <%end%>
+        <div class="actions">
+            <div class="label-field-pair" id="status_filter">
+                <div class="text-input-bg">
+                    <div class="dropbtn submit-button" drop_id = '<%= term.id %>' onclick="showDrop(this)"><%= "#{t('actions')} &#9660;" %></div>
+                </div>
+                <div id="actionDropdown_<%=term.id%>" class="dropdown-content">
+                    <% final_assessment = term.final_assessment %>
+                    <% if !final_assessment.new_record? %>
+                      <%= link_to t('edit_final_term_assessment'), edit_final_term_assessment_group_path(final_assessment)  %>
+                    <% else %>
+                      <%= link_to t('add_final_term_assessment'), {:controller => 'assessment_groups',:action => 'final_term_assessment', :parent_id => term.id, :parent_type => 'AssessmentTerm'}  %>
+                    <% end %>
+                    <%= link_to "#{t('edit_term')}", '#', :onclick=>'open_form(this)', :assessment_term_id => term.id %>
+                    <% unless term.has_dependencies? %>
+                      <%= link_to t('delete_term'), '#' , :onclick => "make_popup_box(this, 'confirm', '#{t('delete_term_confirmation',
+                        {:name => term.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_term')}'}); return load_term_delete_method(#{term.id});" %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="desc <%='with_eg' if assessment_groups.present?%>">
+    <% if assessment_groups.present? or (final_assessment.present? and !final_assessment.new_record?) %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="col-2"><%= t('exams_text') %></td>
+              <td class="col-1"><%= t('exam_mode') %></td>
+              <td class="col-1"><%= t('scoring') %></td>
+              <td class="col-1 actions"><%= t('actions') %></td>
+          </tr>
+          <% assessment_groups.each do |ag|  %>
+            <tr class="tr-<%= cycle('even', 'odd') %>">
+                <td><%= ag.name %></td>
+                <td><%= ag.exam_mode %></td>
+                <td><%= ag.score_type %></td>
+                <td class="action_td">
+                    <%= link_to "#{t('edit_exam')}", edit_assessment_group_path(ag) %> 
+                    <div class="dropbtn options-dropbutton morebtn" drop_id = '<%= ag.id %>' onclick="showDropdown(this)"><%= "#{t('more')} &#9660;" %></div>
+                    <div id="optionDropdown_<%=ag.id%>" class="dropdown-content options-dropdown" >
+                        <%= link_to "#{t('delete_exam_group')}", '#', :onclick=>'show_confirm(this)', :assessment_group_id => ag.id %>
+                    </div>
+                </td>
+            </tr>
+          <% end %>
+          <% if !final_assessment.new_record? %>
+            <tr class="empty_row"><td colspan="4"></td></tr>
+            <tr class="tr-<%= cycle('even', 'odd') %> final_term">
+                <td class="col-2"><%= final_assessment.name %></td>
+                <td class="col-1"><%= final_assessment.exam_mode %></td>
+                <td class="col-1"><%= final_assessment.score_type %></td>
+                <td class="col-1 actions action_td">
+                    <%= link_to "#{t('edit_exam')}", edit_final_term_assessment_group_path(final_assessment) %> 
+    <%#= select_tag :group_action, options_for_select([["#{t('more')}",''],[t('delete_exam_group'),'delete']]),:onchange =>'show_confirm(this)', :assessment_group_id => final_assessment.id, :id => "select_#{final_assessment.id}"%>
+                    <div class="dropbtn options-dropbutton morebtn" drop_id = '<%= final_assessment.id %>' onclick="showDropdown(this)"><%= "#{t('more')} &#9660;" %></div>
+                    <div id="optionDropdown_<%=final_assessment.id%>" class="dropdown-content options-dropdown" >
+                        <%= link_to "#{t('delete_exam_group')}", '#', :onclick=>'show_confirm(this)', :assessment_group_id => final_assessment.id %>
+                    </div>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+    <%else%>
+      <div class="empty_terms">
+          <div class="empty_msg">
+              <%= t('add_exam_desc') %>
+          </div>
+          <div class="add_link">
+              <%= link_to "#{t('add_exams')}", new_assessment_group_path({:parent_id => term.id, :parent_type => term.class.to_s}),:class=>'submit-button' %>
+          </div>
+      </div>
+    <%end%>
+</div>

@@ -1,0 +1,68 @@
+<% unless @paid_fees.empty? %>
+
+  <div id="payments_details">
+
+      <div class="label-field-pair3">
+          <label><%= t('payment_history') %> </label>
+      </div>
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main-head tr-list_head">
+              <td><%= t('receipt_no') %></td>
+              <td class="set_border_right"><%= t('payment_date') %></td>
+              <td class="set_border_right"><%= t('payment_mode') %></td>
+              <td class="set_border_right"><%= t('payment_notes') %></td>
+              <% unless @current_user.student? %>
+                <td class="set_border_right"><%= t('cashier') %></td>
+              <% end %>
+              <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+              <%unless @payer_type.present? and @payer_type=="Archived Student"%>
+                <td class="set_border_right col-3" ></td>
+              <%end%>
+          </tr>
+
+          <% @paid_fees.each_with_index do |f , i| %>
+            <tr class="row-b">
+                <td class="col-3">
+                    <% if permitted_to? :generate_fee_receipt_pdf,:finance %>
+                      <% if f.trans_type=="collection_wise" %>
+                        <%= link_to f.receipt_number, { :controller => "finance", :action => "generate_fee_receipt_pdf",
+                          :transaction_id => f.id}, :target => '_blank'%>
+                      <% else %>
+                        <%= link_to f.receipt_number, { :controller=> "finance", :action => "generate_fee_receipt_pdf",
+                          :particular_wise => true, :transaction_id => f.id}, :target => '_blank' %>
+                      <% end %>
+                    <% else %>
+                      <%= f.receipt_number %>
+                    <% end %>
+                </td>
+
+                <td class="set_border_right col-3">
+                    <%= format_date(f.transaction_date) %>
+                </td>
+
+                <td class="set_border_right col-3">
+                    <%= "#{f.payment_mode} #{ f.reference_no.present? ? '- ' + f.reference_no : ''}" %>
+                </td>
+
+                <td class="set_border_right col-2"><%= f.payment_note %></td>
+
+                <% unless @current_user.student? %>
+                  <td class="set_border_right col-3">
+                      <%= f.payment_mode=='Online Payment' ? f.get_cashier_name : f.cashier_name %>
+                  </td>
+                <% end %>
+
+                <td class="set_border_right col-3 align_right">
+                    <%= precision_label(f.amount.to_f) %>
+                </td>
+
+                <td class="set_border_right col-3 receipt-actions">
+                    <%=pdf_button(f.id)%>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+
+  </div>
+<% end %>

@@ -1,0 +1,39 @@
+<div class="span-sub-heading">
+  <div class="themed_text themed_text_doc">
+    <%= @folder.new_record? ? t('make_userspecific_folder') : t('edit_userspecific_folder') %>
+  </div>
+  <div class="label-field-pair">
+    <label for="folder_name"><%= t('folder_name') %><span class="necessary-field">*</span></label>
+    <div class="text-input-bg"><%= s.text_field :name %></div>
+  </div>
+  <div class="extender"></div>
+  <div class="label-field-pair4">
+    <label for="folder_category"><%= t('folder_category') %><span class="necessary-field">*</span></label>
+    <div class="scroll-inside2">      
+      <% @categories.each do |c| %>
+        <div class="label-category-pair">
+          <% if @folder.new_record? %>
+            <%= check_box_tag "category[]",c.id,params[:category].present? ? params[:category].include?(c.id.to_s) : false %>
+          <% else %>
+            <%= check_box_tag "category[]",c.id,@folder.category_ids.include?(c.id) %>
+          <% end %>
+          <div class="label_for_category"><%= c.name %></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="extender"></div>
+  <div class="label-checkbox-pair">
+    <label class="status" for="status"><%= t('status') %></label>
+    <div id="radio-buttons">
+      <%= s.radio_button  "is_active", "true", :checked => "checked" %>
+      <label class="label_for_status" for="add_grade_status_true"><%= t('active') %></label>
+      <%= s.radio_button  "is_active", "false" %>
+      <label class="label_for_status" for="add_grade_status_false"><%= t('inactive') %></label>
+    </div>
+  </div>
+</div>
+<div class="extender"></div>
+<div>
+  <%= submit_tag "", :value => "#{t('submit_button')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+</div>

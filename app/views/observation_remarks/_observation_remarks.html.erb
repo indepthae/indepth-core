@@ -1,0 +1,57 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="remarks_block_title">Remarks</div>
+<div id="remarks_block_desc">Add remarks that best explain the different grades for this observation. After entering marks for the descriptive indicators, based on the final grade, choose the most appropriate remark to be shown in the report card of the particular student.</div>
+
+<div id="add_observation_remark"><%= link_to_remote "Add Remark", :url => { :controller=>:observation_remarks,:action => 'new', :id => @observation.id },:method=>:get %></div>
+<% unless @observation_remarks.empty?  %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td>Sl.No</td>
+          <td>Remark</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <% @observation_remarks.each_with_index do |obs_rem,i| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-1">
+                <%=  i+1  %>
+            </td>
+            <td class="col-2">
+                <%= obs_rem.remark %>
+            </td>
+            <td class="col-3">
+                <div class="category-edit">
+                    <%= link_to_remote "#{t("edit_text")}", :url => { :controller=>:observation_remarks,:action => 'edit', :id => obs_rem.id },:method=>:get %>  |
+                    <%= link_to_remote "#{t("delete_text")}", :url => { :controller=>:observation_remarks,:action => 'destroy', :id => obs_rem.id,:observation_id=>@observation.id},:confirm=>"Delete remark?"  %>
+                </div>
+            </td>
+        </tr>
+      <% end %>
+  </table>
+<% else %>
+  <div id="flash-box">
+      <p class="flash-msg">No remarks present</p>
+  </div>
+<% end %>

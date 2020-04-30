@@ -1,0 +1,48 @@
+<tr class="title">
+    <% if f.object.name.present? %>
+      <td class="term_name"><%= t('name_of_record').titleize %></td>
+      <td class="record_name"><%= f.object.name %></td>
+      <td class="unlink manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %> ">
+            <%= link_to_remote t('manage_links'),:url=>{:action=>'manage_links',:assessment_plan_id=>@plan.id,:type=>@type,:gradebook_record_group_id=>f.object.id},:method=>:get %>
+        </td>
+      <td class="last_col unlink manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %> ">
+            <% unless f.object.gradebook_records.present? %>  
+              <%= link_to_remote t('delete'),:url=>{:gradebook_record_group_id => f.object.id,:assessment_plan_id => @plan.id},:confirm=>t('are_you_sure_want_to_delete_record_group'),:method=>:delete %>
+            <% else %>
+              <span class="disabled_delete">
+                  <%= t('delete') %>
+              </span>
+            <% end %>
+      </td>
+      <td class="unlink disabled_link <%= 'show_link' if (@setting[:enable_student_records]== "0") %>">
+          <%= t('manage_links') %>
+      </td>
+      <td class="last_col unlink disabled_link <%= 'show_link' if (@setting[:enable_student_records]== "0") %>">
+          <%= t('delete') %>
+      </td>
+      
+      <% end %>
+</tr>
+<%- f.fields_for :gradebook_records,f.object.build_records(@type,true) do |field| %>
+  <%= field.hidden_field :linkable_id %>
+  <%= field.hidden_field :linkable_type %>
+  <%= field.hidden_field :gradebook_record_group_id %>
+  <%= field.hidden_field :record_group_id %>
+
+  <% if field.object.id.present? %>
+    <tr class="row">
+        <td class="term_name"><%= field.object.item_name %></td>
+        <% if field.object.record_group.present? %>
+          <td class="record_name"><%= field.object.record_group.name %></td>
+          <td class="unlink manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %>"><%= link_to t('enter_records'), {:controller=>'student_records',:action=>'handle_record_groups',:id=>field.object.record_group, :flash=>"#{t('msg_from_record_settings')}"}, {:target => '_blank'} %></td>
+          <td class="last_col unlink manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %>">
+              <%= link_to_remote t('unlink_text'),:url=>{:action=>'unlink_record',:gradebook_record_id => field.object.id,:assessment_plan_id => @plan.id},:confirm=>t('are_you_sure_want_to_unlink'),:method=>:delete %>
+          </td>
+          <td class="unlink disabled_link <%= 'show_link' if (@setting[:enable_student_records]== "0") %>"><%= t('enter_records') %></td>
+          <td class="last_col unlink disabled_link <%= 'show_link' if (@setting[:enable_student_records]== "0") %>">
+              <%= t('unlink_text') %>
+          </td>
+          <% end %>
+    </tr>
+  <% end %>
+<% end %>

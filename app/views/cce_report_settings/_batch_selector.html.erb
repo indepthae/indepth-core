@@ -1,0 +1,16 @@
+<div id="batches_list">
+  <div class="label-field-pair">
+    <label for="batch_id">Batch</label>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader1",
+      :style =>"display: none; margin-top:10px;margin-left: -21px;" ) %>
+    <div class="text-input-bg margin-left-10">
+      <%= select :batch, :id,
+        @batches.map {|b| [b.name, b.id]},
+        {:selected => @batches.first}
+    %>
+    </div>
+  </div>
+</div>

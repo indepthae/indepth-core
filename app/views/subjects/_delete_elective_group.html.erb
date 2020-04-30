@@ -1,0 +1,14 @@
+<% unless e.subjects.active.present? %>
+  <%= link_to_remote(t('delete'),
+    :url => {:controller=>'subjects',:action=>'destroy_elective_group',:id=>e.batch_id,:id2=>e.id},
+    :html => { :class  => "themed_text" },
+    :method => 'delete',
+    :confirm => t('delete_confirm_msg'),
+    :update => "header_links-#{e.id}",
+
+    :success => "j('.header_links-#{e.id}').remove();")
+
+%>
+<% else %>
+  <del id="new_themed_text" class="themed_text"><%= t('delete')%></del>
+<% end %>

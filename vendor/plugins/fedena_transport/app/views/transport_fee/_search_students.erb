@@ -1,0 +1,79 @@
+<div class="extender"></div>
+<div class="label-field-pair" style="margin-top: -1px;">
+
+  <% if action_name=='render_collection_assign_form' %>
+      <label for="reason"><%= "#{t('search_text')} #{t('student_text')} " %> :</label>
+      <div class="text-input-bg">
+        <%= text_field_tag("query2", params['query2'], :autocomplete => 'off', :class => 'query', :action => 'list_students_for_collection') %>
+      </div>
+  <% else %>
+      <label for="reason"><%= "#{t('search_text')} #{t('student_text')} / #{t('employee_text')}" %> :</label>
+      <div class="text-input-bg">
+        <%= text_field_tag("query1", params['query1'], :autocomplete => 'off', :class => 'query', :action => 'search_student') %>
+      </div>
+  <% end %>
+</div>
+</div>
+
+
+
+
+<div id="batchs">
+  <div class="left-area"></div>
+  <div class="batch_select_box">
+
+    <div class="fee_category_scroll">
+
+      <div class="each_batch">
+        <ul id="list-receivers">
+          <% i=0 %>
+          <% unless action_name=='render_collection_assign_form' %>
+              <% form.fields_for(:transport_fees) do |tf| %>
+                  <% i=i+1 %>
+                  <li class="listodd">
+                    <div class="list_parent">
+                      <div class="list_c">
+                        <%= tf.object.receiver.full_name %>
+                        <%= hidden_field_tag "receiver[#{tf.object.receiver_type}]['#{i}'][receiver_type]", tf.object.receiver_type %>
+                        <%= hidden_field_tag "receiver[#{tf.object.receiver_type}]['#{i}'][receiver_id]", tf.object.receiver_id ,{:class=>tf.object.receiver_type}%>
+                        <%= hidden_field_tag "receiver[#{tf.object.receiver_type}]['#{i}'][bus_fare]", tf.object.bus_fare %>
+                        <%= hidden_field_tag "event[#{tf.object.receiver_type}][#{i}][user_id]", tf.object.receiver.user_id %>
+                      </div>
+                      <a class="list_btn" style="cursor:pointer;" onclick="remove_entry(this);">x</a>
+                    </div>
+                  </li>
+              <% end %>
+          <% end %>
+        </ul>
+
+      </div>
+
+    </div>
+  </div>
+
+  <%# unless params[:fee_collection].nil? %>
+  <%#= render :partial=>'fee_collection_batchs' if params[:fee_collection][:category_ids].present? %>
+  <%# end %>
+</div>
+
+
+<script type="text/javascript">
+
+    j('#form').submit(function (e) {
+        j('.submit_button').attr('disabled',true)
+
+        j('.submit_button').val('<%="► #{t('please_wait')}"%>')
+        if (j('.list_parent').children().length == 0) {
+            alert('<%="#{t('collection')} #{t('should_have')} #{t('atleast_one_recepient')}"%>')
+            j('.submit_button').attr('disabled',false)
+            j('.submit_button').val('<%="► #{t('create_text')}"%>')
+            e.preventDefault();
+            return false
+        }
+        else {
+            return true
+        }
+
+    })
+
+</script>

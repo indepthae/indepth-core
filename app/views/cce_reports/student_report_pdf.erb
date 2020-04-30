@@ -1,0 +1,235 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/cce_reports/student_report_pdf.css' ,:media=>"all"%>
+  <%else %>
+    <%= stylesheet_link_tag 'cce_reports/student_report_pdf.css' ,:media=>"all"%>
+  <% end %>
+<% end %>
+<% scholastic = @data_hash[:report].scholastic %>
+<% cgpa=0.0 %>
+<% count=0 %>
+<% e = 'even' %>
+<div id="page-yield" class="available_sections">
+<%#=render :partial => 'cce_reports/pdf_header.html.erb'%>
+    <%if @general_records["NormalReportHeader"] == "0"%>
+      <div class="header">
+          <span class="logo header_parts">
+              <%if current_school_detail.logo.present?%>
+                <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+              <%else%>
+                <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+              <%end%>
+          </span>
+          <span class="header-content header_parts">
+              <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+              <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+          </span>
+      </div>
+    <%else%>
+      <div style="height:<%=@general_records["HeaderSpace"].to_i%>mm"></div>
+    <%end%>
+    <div class="section">
+        <div class="hor_line"></div>
+        <h2>STUDENT REPORT</h2>
+        <div class="hor_line"></div>
+        <div class="extender"> </div>
+        <div class="info">
+            <div class="info-left">
+                <%[1,3,5,7].each do |i|%>
+                  <%display_text = CceReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= CceReportSetting.fetch_display_value(display_text, @data_hash[:batch], @general_records["StudentDetail#{i}"], @data_hash[:student]) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+            <div class="info-right">
+                <%[2,4,6,8].each do |i|%>
+                  <%display_text = CceReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= CceReportSetting.fetch_display_value(display_text, @data_hash[:batch], @general_records["StudentDetail#{i}"], @data_hash[:student]) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+        </div>
+    </div>
+    <div  class="section">
+        <div id="score-table">
+            <div class="custom_header">
+                <h3>
+                    Scholastic Areas
+                </h3>
+            </div>
+            <table id="pdf-table" width="100%" cellspacing="0" class="additional_margin">
+                <% if @data_hash[:exam_groups].empty? %>
+                  <tr class="tr-head">
+                      <td>No reports to show </td></tr>
+                <% else %>
+                  <tr class="table-header">
+                      <td class="sl_no" rowspan="2">Sl No.</td>
+                      <td rowspan="2">Subjects</td>
+                      <% @data_hash[:exam_groups].each do |eg| %>
+                        <td colspan="4"><%= eg.cce_exam_category.name %></td>
+                      <% end %>
+                      <% if @data_hash[:exam_groups].count==2 %>
+                        <td colspan="4">Overall</td>
+                      <% end %>
+                  </tr>
+                  <tr class="table-header">
+                      <% @data_hash[:exam_groups].each_with_index do |eg,i| %>
+
+                        <%if @check_term=="second_term"%>
+                          <%i=1%>
+                        <%end%>
+                        <td><%= "FA#{2*i+1}" %></td>
+                        <td><%= "FA#{2*i+2}" %></td>
+                        <td><%= "SA#{i+1}" %></td>
+                        <td>Total</td>
+                      <% end %>
+                      <% if @data_hash[:exam_groups].count==2 %>
+                        <td>FA Total</td>
+                        <td>SA Total</td>
+                        <td>Overall</td>
+                        <td>Grade Point</td>
+                      <% end %>
+                  </tr>
+                  <%overall_list=[]%>
+                  <% @data_hash[:subjects].each_with_index do |s,i| %>
+                    <tr class="<%= cycle(e,(["even","odd"]-[e]).first) %>">
+                        <td class="sl_no"><%= i+1 %></td>
+                        <td class="subject"><%= s.name %></td>
+                        <% sub=scholastic.find{|c| c.subject_id==s.id} %>
+                        <% @data_hash[:exam_groups].each_with_index do |eg,j|
+                          se=sub.exams.find{|g| g.exam_group_id==eg.id} if sub  %>
+                          <% if se %>
+
+                            <%if @check_term=="second_term"%>
+                              <%j=1%>
+                            <%end%>
+                            <td><%= se.fa[se.fa_names["FA#{2*j+1}"]]["grade"] if se.fa_names["FA#{2*j+1}"] %></td>
+                            <td><%= se.fa[se.fa_names["FA#{2*j+2}"]]["grade"] if se.fa_names["FA#{2*j+2}"] %></td>
+                            <td><%= se.sa["grade"] %></td>
+                            <td><%= se.overall %></td>
+                          <% else %>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                          <% end %>
+                        <% end %>
+                        <% if @data_hash[:exam_groups].count==2 %>
+                          <% if sub %>
+                            <td><%= sub.fa %></td>
+                            <td><%= sub.sa %></td>
+                            <td><%= sub.upscaled == 'true' ? "#{sub.overall}**" : sub.overall %></td>
+                            <%overall_list << sub.grade_point%>
+                            <td><%= sub.grade_point %></td>
+                            <% if s.elective_group_id.nil? and !s.is_sixth_subject %>
+                              <% cgpa += sub.grade_point.to_f %>
+                              <% count += 1 %>
+                            <%elsif !s.elective_group_id.nil? and !s.elective_group.is_sixth_subject%>
+                              <% cgpa += sub.grade_point.to_f %>
+                              <% count += 1 %>
+                            <% end %>
+                          <% else %>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                          <% end %>
+                        <% end %>
+                    </tr>
+                  <% end %>
+                  <% if @data_hash[:exam_groups].count==2 %>
+                    <tr class="table-footer">
+                        <td colspan="<%= 6+@data_hash[:exam_groups].count*4 %>">
+                            <%if @data_hash[:batch].asl_subject.present?%>
+                              <span class="asl_block">Grade in Assessment of Speaking and Listening Skills in <%=@data_hash[:batch].asl_subject.name%> (ASL) : <%=@data_hash[:report][:asl]%></span>
+                            <%end%>
+                            Cumulative Grade Point Average(CGPA)  :   <%="%.2f" % (cgpa.to_f/count.to_f) unless count==0 %></td>
+                    </tr>
+                  <% end %>
+                <% end %>
+            </table>
+        </div>
+    </div>
+    <%if @check_term=="all"%>
+      <% @data_hash[:co_hashi].keys.sort.each do |kind| %>
+        <% i = 0; @data_hash[:co_hashi][kind].each{|el| i+=1; el.sort_order ||= i} %>
+        <% @data_hash[:co_hashi][kind].sort_by(&:sort_order).each_with_index do |ob_grp,j| %>
+          <div class="score-table">
+              <%reset_cycle%>
+              <% code = "even"%>
+              <table id="pdf-table_init" width="100%" cellspacing="0">
+                  <tr>
+                      <td colspan="3" class="kind_header"><%= j==0 ? ObservationGroup::OBSERVATION_KINDS[kind] : ""%></td>
+                  </tr>
+                  <tr class="table-header">
+                      <td colspan="3" class="spl_case"><%= @data_hash[:obs_groups].find{|o| o.id == ob_grp.observation_group_id}.try(:name) %></td>
+                  </tr>
+                  <tr class="table-header">
+                      <td class="observation_text">Observation</td>
+                      <td class="di_text">Descriptive Indicators</td>
+                      <td class="grade">Grade</td>
+                  </tr>
+                  <tr class="<%= cycle(code,(["even","odd"]-[code]).first) %>">
+                      <%first_observation = ob_grp.observations.sort_by(&:sort_order)[0]%>
+                      <td class="subject"><%= first_observation.observation_name %></td>
+                      <td class="indicators"><%= @data_hash[:student].get_descriptive_indicators(first_observation.observation_id) %></td>
+                      <td class="grade"><%= first_observation.grade %></td>
+                  </tr>
+              </table>
+              <table id="pdf-table" width="100%" cellspacing="0" class="additional_margin">
+                  <% ob_grp.observations.sort_by(&:sort_order)[1..-1].each do |o| %>
+                    <tr class="<%= cycle(code,(["even","odd"]-[code]).first) %>">
+                        <td class="subject"><%= o.observation_name %></td>
+                        <td class="indicators"><%= @data_hash[:student].get_descriptive_indicators(o.observation_id) %></td>
+                        <td class="grade"><%= o.grade %></td>
+                    </tr>
+                  <% end %>
+              </table>
+              <%reset_cycle%>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+    <% if @data_hash[:exam_groups].count==2 %>
+      <%cgp= to_grade_point(@eiop_eligibily_grade['grade'],@grading_levels)%>
+      <div class="result">
+          <div id="res_text">Result<span>:</span> </div>
+          <div id="res_value"><%=overall_list.present? ? overall_list.select{|k| k.to_f < cgp.to_f}.count > 0 ? @eiop_text['eiop_text'] : @pass_text["pass_text"] : @eiop_text['eiop_text'] %></div>
+      </div>
+    <%end%>
+    <%if @general_records["Signature"] == "0"%>
+      <div class="wrapper">
+          <div class="footer">
+              <div id="pdf-footer">
+                  <span class="signature push_left"><%= @general_records["SignLeftText"] %></span>
+                  <span class="signature"><%= @general_records["SignCenterText"] %></span>
+                  <span class="signature push_right"><%= @general_records["SignRightText"] %></span>
+              </div>
+          </div>
+      </div>
+    <%end%>
+</div>

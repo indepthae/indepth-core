@@ -1,0 +1,32 @@
+
+<div id="back">
+  <%if @group_members.present?%>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="col-1"><%= t('sl_no') %></td>
+        <td class="col-1"><%= t('name') %></td>
+        <td class="col-1"><%= t('emp_no') %></td>
+        <td class="col-1"><%= t('dept_name') %></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% i=1 %>
+      <% @group_members.each do |member| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <% if member.admin? or member.employee? %>
+            <td class="col-1"><%= i %></td>
+            <td class="col-1"><%=  "#{member.first_name}"%></td>
+            <% employee_record=member.employee_record %>
+            <td class="col-1"><%="#{employee_record.employee_number if employee_record.present?}" %></td>
+            <td class="col-1"><%="#{employee_record.employee_department.name if employee_record.present?}"%></td>
+
+          <% else %>
+            <td class="col-1"><%= i %></td><td class="col-1"><%=  "#{member.first_name}"%></td><td class="col-1"><%= "#{member.username}"%></td><td class="col-1"><%="#{member.student_record.batch.full_name}"%></td>
+          <% end %>
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+    </table>
+  <%else%>
+    <p class="flash-msg"><%=flash[:notice]%></p>
+  <%end%>
+</div>

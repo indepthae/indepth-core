@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.fee_due_detail{
+  @finance_fee_collections.each do |finance_fee_collection|
+    @finance_fee_collection = finance_fee_collection
+    unless @student.check_fee_pay(@finance_fee_collection)
+      @xml.finance_fee_collection do
+        @xml.name(@finance_fee_collection.name)
+        @xml.due_date(@finance_fee_collection.due_date)
+        @xml.amount(precision_label(@student.finance_fee_by_date(@finance_fee_collection).balance.to_f+@finance_fee_collection.fine_to_pay(@student).to_f))
+      end
+    end
+  end
+
+  @hostel_fee_collections.each do |hostel_fee_collection|
+    @hostel_fee_collection = hostel_fee_collection
+    @xml.hostel_fee_collection do
+      @xml.name(@hostel_fee_collection.name)
+      @xml.due_date(@hostel_fee_collection.due_date)
+      @xml.amount(precision_label(@student.hostel_fee_balance(@hostel_fee_collection.id)))
+    end
+  end if @hostel_fee_collections.present?
+  
+  @transport_fee_collections.each do |transport_fee_collection|
+    @transport_fee_collection = transport_fee_collection
+    @xml.transport_fee_collection do
+      @xml.name(@transport_fee_collection.name)
+      @xml.due_date(@transport_fee_collection.due_date)
+      @xml.amount(precision_label(@student.transport_fee_balance(@transport_fee_collection.id)))
+    end
+  end if @transport_fee_collections.present?
+}%>
+
+

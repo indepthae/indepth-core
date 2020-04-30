@@ -1,0 +1,115 @@
+<%# content_for :head do %>
+  <!-- <%= stylesheet_link_tag 'jquery-ui_1.css',:media => "all" %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/student/student_wise_report' %>
+  <%else %>
+    <%= stylesheet_link_tag 'student/student_wise_report' %>
+  <% end %> -->
+<%# end %>
+<!-- <link rel="stylesheet" type="text/css" href='/stylesheets/jquery-ui_1.css' media="all" /> -->
+<% if params[:d].present? %>
+  <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% end %>
+
+<%#= javascript_include_tag 'jquery/jquery-ui.min.js' %>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<script type="text/javascript">
+    var j = jQuery.noConflict();
+</script>
+<div id="page-yield">
+  <hr class="hor_line"></hr>
+  <h2 class="pdf_title"><%= t('fees_report') %> </h2>
+  <hr class="hor_line"></hr>
+  <div class="pdf-header">
+    <div class="row_head">
+      <% if roll_number_enabled? && @student.roll_number.present? %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('student_name')}" %> </div>
+          <div class="label2"><strong><%= "#{@student.full_name}&#x200E; (#{@student.admission_no})&#x200E;" %></strong></div>
+        </div>
+      <% else %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('student_name')}" %> </div>
+          <div class="label2"><strong><%= "#{@student.full_name}" %></strong></div>
+        </div>
+      <% end %>
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('batch_name')}" %> </div>
+        <div class="label2"><%= "#{@student.batch.complete_name}" %> </div>
+      </div>
+      <% if roll_number_enabled? && @student.roll_number.present? %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('roll_no')}" %> </div>
+          <div class="label2"><%= "#{@student.roll_number}" %></div>
+        </div>
+      <% else %>
+        <div class="field_pair">
+          <div class="label1"><%= "#{t('admission_no')}" %> </div>
+          <div class="label2"><%= "#{@student.admission_no}" %></div>
+        </div>
+      <% end %>
+    </div>
+    <div class="row_head">
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('total_paid')}" %> </div>
+        <div class="label2" id="total_paid"><%= currency %><%= " " %></div>
+      </div>
+
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('total_balance')}" %> </div>
+        <div class="label2" id="total_balance"><%= currency %><%= " " %></div>
+      </div>
+    </div>
+  </div>
+  <%= render :partial=> "student/student_wise_report_pdf" ,:locals=>{:batches=>@batches}%>
+</div>
+<script type="text/javascript">
+  function set_precision_count(number) {
+    precision_count= <%= precision_count %>
+    number=number.toFixed(precision_count);
+    return number;
+  }
+  function hide_header_from_non_first_pages () {
+    var x=document.location.search.substring(1).split('&');
+    for (var i in x) {
+      if(x[i] != "page=1")
+        document.getElementsById("pdf-header").style.display = "none";
+     }
+  }
+  j(function() {
+    var total_paid=0;
+    var balance_amount=0;
+    var total_partial_amount=0;
+    function update_fees_status_information() {
+      var collection_count=j(".item").length;
+      j(".item").each( function( index, value ){
+        amount_field=j(value).children()[2];
+        amount_value=j(amount_field).html();
+        status_field=j(value).children()[1];
+        if (j(status_field).data("status") == "unpaid") {
+          if (isNaN(Number(amount_value))) {
+            amount_value=j(status_field).data("amount-to-pay")
+          } else {
+            amount_value=Number(amount_value);
+          }
+          balance_amount+=Number(amount_value);
+        }else{
+          total_paid+=Number(amount_value);
+        }
+        partial_amount=Number(j(status_field).data("partialy-paid-amount"));
+        total_partial_amount+=(isNaN(partial_amount) ) ? 0 : partial_amount;
+      });
+      var collection_count=j(".item").length;
+      total_paid+=total_partial_amount;
+      total_paid=set_precision_count(total_paid);
+      balance_amount=set_precision_count(balance_amount);
+      j("#total_paid").append(total_paid);
+      j("#total_balance").append(balance_amount);
+      j("#collection_count").append(collection_count);
+
+    }
+    update_fees_status_information();
+    // hide_header_from_non_first_pages ();
+  });
+</script>

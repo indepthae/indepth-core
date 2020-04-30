@@ -1,0 +1,35 @@
+<% category_id = @category.category_id %>
+<div id="form-errors_<%= category_id.present? ? category_id : 'nil' %>"></div>
+<% if (@document.present? and @document.new_record?) %>
+  <%= hidden_field_tag :id, @student.id %>
+  <%= form.hidden_field :category, :value => category_id %>
+<% end %>
+<% if @categories.present? %>
+  <div class="label-field-pair categories_list">
+      <div class="label-container">
+          <%= form.label :category,"#{t('document_category')}" %>
+      </div>
+      <div class="input-container"> 
+          <%= form.select :category, @categories.collect {|category| [category.attachment_category_name, category.category_id]}, {:prompt => t('select_category')}%>
+      </div>
+  </div>  
+<% end %>
+<% if @document.present? and @document.new_record? %>
+  <div class="label-field-pair document_file_field">
+      <div class="label-container">
+          <%= form.label :attachment,"#{t('document_file',:file_size => StudentAttachment.file_size_message)}" %>
+      </div>
+      <div class="input-container"> 
+          <%= form.paperclip_file_field :attachment, :size=>12, :direct => false %>
+          <div class="reject_file"></div>
+      </div>
+  </div>  
+<% end %>
+<div class="label-field-pair document_name_field<%= @document.new_record? ? '' : '_edit'%>">
+    <div class="label-container">
+        <%= form.label :attachment_name,"#{t('document_name')}" %>
+    </div>
+    <div class="input-container"> 
+        <%= form.text_field :attachment_name %>
+    </div>
+</div>  

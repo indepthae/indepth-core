@@ -1,0 +1,86 @@
+<fieldset class="margin-bottom-20">
+    <h1 class="content-head">Payment Gateway Details</h1>
+    <% owner_object = nil %>
+    <% unless @owner.nil? %>
+      <% owner_object = @owner.class.name.underscore %>
+      <% edit_path = "edit_#{owner_object}_payment_gateway_path" %>
+    <% else %>
+      <% edit_path = "edit_payment_gateway_path" %>
+    <% end %>
+    <% unless owner_object=="school" or @assigned_gateway.is_owner==false %>
+      <%= link_to 'Edit Gateway', @owner.nil? ? send(edit_path,@gateway) : send(edit_path,@owner,@gateway), :class  => 'button-red float-right' if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :payment_gateways  %>
+    <% end %>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow padding-top-20 padding-left-20 padding-bottom-10">
+    <fieldset class="label-field-pair">
+        <label>Name : <%= @gateway.name %></label>
+    </fieldset>
+    <% unless @gateway.gateway_parameters.nil? %>
+      <div id="config-fields">
+          <div class="config-header">Configuration Fields</div>
+          <div id="con-fields">
+              <% @gateway.gateway_parameters[:config_fields].each_pair do|k,v| %>
+                <div class="config-field-set">
+                    <fieldset class="label-field-pair">
+                        <label><%= k %> : <%= v %></label>
+                    </fieldset>
+                </div>
+              <% end %>
+          </div>
+      </div>
+      <div id="variable-fields">
+          <div class="config-header">Variable Fields</div>
+          <div id="var-fields">
+              <% @gateway.gateway_parameters[:variable_fields].each_pair do|k,v| %>
+                <% unless k == "student_additional_fields" %>
+                  <div class="variable-field-set">
+                      <fieldset class="label-field-pair">
+                          <label><%= k %> : <%= v %></label>
+                      </fieldset>
+                  </div>
+                <% end %>
+              <% end %>
+              <% if @gateway.gateway_parameters[:variable_fields][:student_additional_fields].present? %>
+                <div class="variable-field-set">
+                    <fieldset class="label-field-pair">
+                        <label><b>Student Additional Fields</b></label>
+                    </fieldset>
+                </div>
+                <% @gateway.gateway_parameters[:variable_fields][:student_additional_fields].each_pair do|k,v| %>
+                  <div class="variable-field-set">
+                      <fieldset class="label-field-pair">
+                          <label><%= k %> : <%= v %></label>
+                      </fieldset>
+                  </div>
+                <% end %>
+              <% end %>
+          </div>
+      </div>
+      <div id="response-fields">
+          <div class="config-header">Response Parameters</div>
+          <div id="resp-fields">
+              <% @gateway.gateway_parameters[:response_parameters].each_pair do|k,v| %>
+                <div class="response-field-set">
+                    <fieldset class="label-field-pair">
+                        <label><%= k %> : <%= v %></label>
+                    </fieldset>
+                </div>
+              <% end %>
+          </div>
+      </div>
+      <% if @gateway.enable_account_wise_split == true %>
+        <div id="gateway-split-fields">
+            <div class="config-header">Account-wise Parameters</div>
+            <div id="split-fields">
+                <% @gateway.account_wise_parameters.each do|k| %>
+                  <div class="response-field-set">
+                      <fieldset class="label-field-pair">
+                          <label>Parameter Name : <%= k %></label>
+                      </fieldset>
+                  </div>
+                <% end %>
+            </div>
+        </div>
+      <% end %>
+    <% end %>
+</div>

@@ -1,0 +1,87 @@
+<div class="top">
+  <hr class="hor_line"/>
+  <span class="title"><%= t('fee_receipt') %></span>
+  <span class="receipt_no"><%= t('receipt_no') %>:<%= transaction_hash.receipt_no %></span>
+  <span class="date"><%= t('date_text') %>:<%= transaction_hash.formated_date %></span>
+  <hr class="hor_line"/>
+</div>
+
+<div id="basic_info_section">
+
+  <% if transaction_hash.payee.payee_type == "Student" %>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('student_name') %></div>
+          <div class="value_span" style="font-weight:bold;"><%= transaction_hash.payee.full_name %></div>
+        </div>
+        <div class="label_part label_right">
+          <div class="label_name label_right_value"><%= t('course_text') %></div>
+          <div class="value_span"><%= transaction_hash.payee.full_course_name %></div>
+        </div>
+      </div>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('admission_no') %></div>
+          <div class="value_span"><%= transaction_hash.payee.admission_no %></div>
+        </div>
+        <div class="label_part label_right">
+          <div class="label_name label_right_value"><%= t('parent') %></div>
+          <div class="value_span"><%= transaction_hash.payee.guardian_name %></div>
+        </div>
+      </div>
+
+  <% elsif transaction_hash.payee.payee_type == "Employee" %>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('employee_text') %></div>
+          <div class="value_span" style="font-weight:bold;"><%= transaction_hash.payee.full_name %></div>
+        </div>
+        <div class="label_part label_right">
+          <div class="label_name label_right_value"><%= t('department') %></div>
+          <div class="value_span"><%= transaction_hash.payee.employee_department_name %></div>
+        </div>
+      </div>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('employee_number') %></div>
+          <div class="value_span"><%= transaction_hash.payee.employee_number %></div>
+        </div>
+      </div>
+
+  <% else %>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('guest_text') %></div>
+          <div class="value_span"><%= transaction_hash.payee.full_name %></div>
+        </div>
+      </div>
+
+  <% end %>
+
+  <div class="label_collection_part">
+    <% if transaction_hash.collection.present? %>
+        <div class="label_part">
+          <div class="label_name"><%= transaction_hash.collection.title %></div>
+          <div class="value_span"><%= transaction_hash.collection.name %></div>
+        </div>
+    <% end %>
+    <% unless transaction_hash.finance_type == 'InstantFee' %>
+        <% if transaction_hash.due_date.present? %>
+            <div class="label_part label_right">
+              <div class="label_name label_right_value"><%= t('due_date') %></div>
+              <div class="value_span"><%= format_date(transaction_hash.due_date, :format => :short_date) %></div>
+            </div>
+        <% end %>
+    <% end %>
+  </div>
+
+  <% if roll_number_enabled? and transaction_hash.payee.roll_number.present? %>
+      <div class="label_collection_part">
+        <div class="label_part">
+          <div class="label_name"><%= t('roll_no') %></div>
+          <div class="value_span"><%= transaction_hash.payee.roll_number %></div>
+        </div>
+      </div>
+  <% end %>
+
+</div>

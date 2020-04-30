@@ -1,0 +1,7 @@
+<%= select("id",:id,@transport_fee_collections.map { |n| [n.name, n.id] },
+  {:prompt => "#{t('select_fee_collection_date')}"},
+  {:onChange => "#{remote_function(:url => 
+    {:action => "transport_fee_collection_details"}, 
+    :with =>  "'date='+value+'&batch_id='+#{params[:batch_id]}",
+    :before => "Element.show('loader')",:success => "Element.hide('loader')",
+    :complete => "show_fee_details();")}"})%>

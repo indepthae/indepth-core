@@ -1,0 +1,21 @@
+<div class="fields label-field-pair">
+  <div class="label-field-pair">
+    <div class="label-container"><%= f.label :field_name, "#{t('field_name')}" %></div>
+    <%= link_to_remove_fields " ", f %>
+    <div class="input-container">  <%= f.text_field :field_name, :size => 50 %></div>
+  </div>
+  <div class="label-field-pair">
+    <div class="label-container"> <%= f.label :field_type,"#{t('input_method')}" %></div>
+    <div class="text-input-bg"><%= f.select :field_type, [["#{t('text_box')}","text"],["#{t('select_box')}","belongs_to"],["#{t('check_box')}","has_many"]] ,{},:onChange=>"toggle_custom(value)",:class=>"input-type-select"%>
+    </div>
+  </div>
+  <div class="custom" style="display: none" >
+    <% f.fields_for :asset_field_options do |builder| %>
+      <%= render "asset_field_option_fields" ,:f=>builder%>
+    <% end %>
+    <div>
+      <%= link_to_add_fields "#{image_tag("/images/buttons/add_2.png",:border => 0)} #{t('add_option')}", f, :asset_field_options %>
+    </div>
+  </div>
+  <hr/>
+</div>

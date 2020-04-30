@@ -1,0 +1,8 @@
+<div class="label-field-pair">
+      <label for="batch_id"><%= t('student_text') %></label>
+      <span class="student_selector">
+          <%= select :student_report,:student, @students.map{|s| [s.full_name, s.s_id]},
+            {:include_blank => t('select_student')}
+           %>
+      </span>
+</div>

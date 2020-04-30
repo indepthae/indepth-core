@@ -1,0 +1,54 @@
+<% if !@room_details.empty? %>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <tr class="tr-head">
+    <td>
+      <%= "#{t('sl_no')}"%>
+    </td>
+    <td>
+      <%= "#{t('room_number')}"%>
+    </td>
+    <td>
+      <%= "#{t('students_per_room')}"%>
+    </td>
+    <td>
+      <%= "#{t('availability')}"%>
+    </td>
+    <td>
+      <%= "#{t('rent')}"%>
+    </td>
+
+    <td></td>
+  </tr>
+  <tr class="tr-blank"></tr>
+  <% @room_details.each_with_index do |r,i| %>
+   <% @availability = r.students_per_room - r.get_room_allocation.size %>
+
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-1">
+        <%= i+1 %>
+      </td>
+      <td class="col-3">
+        <%=  link_to r.room_number, r %>
+      </td>
+      <td class="col-3">
+        <%= r.students_per_room %>
+      </td>
+      <td class="col-1">
+        <%= @availability %>
+      </td>
+      <td class="col-3">
+        <%= precision_label r.rent %>
+      </td>
+
+      <td class="col-3">
+      <%if @availability > 0 %>
+                  <%= link_to "#{t('allocate')}",:action=>'allocate', :id => r.id, :student_id=>@student.id %>
+                <% else %>
+                <h4><%= "#{t('no_availability')}"%></h4>
+      <% end %>
+      </td></tr>
+     <% end %>
+</table>
+<% else %>
+ <div class="msg"><p class = "flash-msg"><%= t('no_room_details') %></p></div>
+<% end %>

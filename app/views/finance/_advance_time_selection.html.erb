@@ -1,0 +1,45 @@
+<div class="fleft right_20_margin common_detail" id="days_30">Last 30 days</div>
+<div class="fleft right_20_margin common_detail" id="months_3">Last 3 Months</div>
+<div class="fleft right_20_margin common_detail" id="months_6">Last 6 Months</div>
+<div class="small_vertical_line"></div>
+<%form_for @search,:url=>{:action=>'fee_receipts'},:html=>{:method=> :post} do |f|%>
+  <div class="text-input-bg-admission fleft right_20_margin">
+    <%= calendar_date_select_tag 'search[start_date_as]', I18n.l(@start_date || Date.today),
+      :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force",:class=>'date_val1' %>
+  </div>
+  <div class="text-input-bg-admission fleft right_20_margin">
+    <%= calendar_date_select_tag 'search[end_date_as]', I18n.l(@end_date || Date.today),
+      :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force",:class=>'date_val1' %>
+  </div>
+  <%=f.submit "#{t('search_receipts')}",:class=>'fleft right_30_margin margin_top_4'%>
+<%end%>
+<div class="fleft common_detail" id="cancel">Cancel</div>
+<script type="text/javascript">
+  j('#search_submit').click(function(){
+    j('#search_start_date_as').val(j('.date_val1')[0].value);
+    j('#search_end_date_as').val(j('.date_val1')[2].value);
+  });
+  j('#cancel').click(function(){
+    j('#advance_time').empty();
+    j('#advance_time').removeClass('margin_bottom_30');
+    j('.hor_line').css('display','none');
+  });
+  j('#months_3').click(function(){
+    var three_mnts="<%=Date.today-3.months%>"
+    var long_three_mnts="<%=format_date(Date.today-3.months,:format=>:long)%>"
+    j('.date_val1')[0].value=three_mnts;
+    j('.date_val1')[1].value=long_three_mnts;
+  });
+  j('#months_6').click(function(){
+    var six_mnts="<%=Date.today-6.months%>"
+    var long_six_mnts="<%=format_date(Date.today-6.months,:format=>:long)%>"
+    j('.date_val1')[0].value=six_mnts;
+    j('.date_val1')[1].value=long_six_mnts;
+  });
+  j('#days_30').click(function(){
+    var days_30="<%=Date.today-30.days%>"
+    var long_days_30="<%=format_date(Date.today-30.days,:format=>:long)%>"
+    j('.date_val1')[0].value=days_30;
+    j('.date_val1')[1].value=long_days_30;
+  }); 
+</script>

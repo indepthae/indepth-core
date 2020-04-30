@@ -1,0 +1,20 @@
+<tr class="row-a">
+    <td class="col-1" ></td>
+    <td class="col-1 bold_font" colspan="2"><span><%= t('discount') %></span></td>
+</tr>
+<% if @transport_fee_discounts.present? %>
+  <% i=0 %>  
+  <% @transport_fee_discounts.each do |tfd| %>
+    <% tfd.is_amount ?  discount_amt = tfd.discount : discount_amt = (@fee.bus_fare.to_f*(tfd.discount/100)) %>
+
+    <tr class="tr-<%= cycle("odd", "even") %>">
+        <td class="col-1 normal_font particular_index"><%= i+=1 %></td>
+        <td class="set_border_right particular-col normal_font">
+            <%= "#{tfd.name}" %><%= tfd.is_amount ? "" : " - #{tfd.discount}%" %>
+        </td>
+        <td class="set_border_right amount-col amount-cols normal_font align_right">
+            <%= precision_label discount_amt %>
+        </td>
+    </tr>
+  <% end %>
+<% end %>

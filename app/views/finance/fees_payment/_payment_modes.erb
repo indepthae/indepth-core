@@ -1,0 +1,37 @@
+<%= select form_obj, :payment_mode, 
+  [["#{t('cash')}", "Cash"], ["#{t('online_payment')}", "Online Payment"],
+  ["#{t('cheque')}", "Cheque"], ["#{t('card_payment')}", "Card Payment"],["#{t('dd')}","DD"],
+  ["#{t('advance_fees_text')}", "Advance Fees"], ["#{t('others')}", "Others"]], 
+  {:selected=>params[:payment_mode]}, 
+  {:onChange => "#{remote_function(:url => {:controller => "finance",
+  :action => "select_payment_mode"}, 
+  :with => "'payment_mode='+ value +'&form_obj=#{form_obj.to_s}'", :before => "$('loader1').show();", 
+  :success => "$('loader1').hide();")}"} %>
+<script>
+  j(document).delegate("#<%= form_obj.to_s %>_payment_mode", 'change', function () {
+      j('#payment_mode_details').removeClass('cheque_details');
+      j('.reference_no').removeClass('cheque_no');
+      switch (j(this).val()) {
+          case 'Online Payment' :
+          case 'Card Payment' :
+              j('.reference_no').find('label').text("<%=t('transaction_id')%>");
+              break;
+          case 'Cheque' :
+              j('.reference_no').find('label').text("<%=t('cheque_no')%>");
+              j('#payment_mode_details').addClass('cheque_details');
+              j('.reference_no').addClass('cheque_no');
+              break;
+          case 'DD' :
+              j('.reference_no').find('label').text("<%=t('dd_no')%>");
+              break;
+          default :
+              j('.reference_no').find('label').text("<%=t('reference_no')%>");
+              break;
+      }
+  });
+  j(function(){
+    if (<%= (@employee.present? or (@student.advance_fee_wallet.nil? or @student.advance_fee_wallet.amount <= 0)) %>){
+      j("#fees_payment_mode option[value='Advance Fees']").remove()
+    }
+  });
+</script>

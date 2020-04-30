@@ -1,0 +1,6 @@
+unless @available_batches.empty?
+  page.replace_html 'modal-box', :partial => 'new_batch_form',:object=>@available_batches
+  page << "Modalbox.show($('modal-box'), {title: '  '});"
+else
+  page.replace_html 'show_error_flash_messages', :text => "<p class='flash-msg'> #{t('all_batch_selected')} </p>"
+end

@@ -1,0 +1,247 @@
+<% content_for :head do  %>
+  <%= stylesheet_link_tag("select_list.css") %>
+<% end %>
+<div class="content-div  bg-light grey-border shadow">
+  <% form_for @additional_setting,:url=>additional_setting_path(@owner_type,@owner_id,@additional_setting.class.name.underscore),:html=>{:class=>'form'}  do |f| %>
+    <% setting_fields = @additional_setting.class::SETTING_FIELDS %>
+    <% if setting_fields.is_a? Array %>
+      <% setting_fields.each do|s| %>
+        <fieldset>
+          <%= f.label s %>
+          <% if s.to_s=="password" %>
+            <%= password_field_tag "#{child_class}[settings][#{s}]", @additional_setting.settings.nil? ? "" : @additional_setting.settings["#{s}"] %>
+          <% else %>
+            <%= text_field_tag "#{child_class}[settings][#{s}]", @additional_setting.settings.nil? ? "" : @additional_setting.settings["#{s}"] %>
+          <% end %>
+        </fieldset>
+      <% end %>
+    <% elsif setting_fields.is_a? Hash %>
+      <% setting_fields.each do|k,val| %>
+        <% if val.count > 0 %>
+          <% unless k.to_s == "select" or k.to_s == "text" or k.to_s == "drop_down"%>
+            <fieldset>
+              <%= k.to_s.titleize %>
+            </fieldset>
+          <% end %>
+          <% val.each do|v| %>
+            <% if k.to_s == "select" %>
+              <fieldset>
+                <%= f.label v %>
+                <%= select_tag "#{child_class}[settings][#{k}][#{v}]", options_for_select([["Select a #{v.to_s.humanize}",""]]+@additional_setting.send("fetch_#{v.to_s}"),(@additional_setting.settings.nil? ? nil : @additional_setting.settings["#{k}"]["#{v}"])) %>
+              </fieldset>
+            <% elsif k.to_s == "drop_down" %>
+              <fieldset>
+                <%= f.label v %>
+                <% settings_option = @additional_setting.send("fetch_#{v.to_s}") %>
+                <% if settings_option.is_a? Array %>
+                  <%= select_tag "#{child_class}[settings][#{k}][#{v}]", options_for_select([["Select a #{v.to_s.humanize}",""]]+settings_option,(@additional_setting.settings.nil? ? nil :@additional_setting.settings["#{k}"].nil? ? nil : @additional_setting.settings["#{k}"]["#{v}"])) %>
+                <% else %>
+                  <div id="text_input">
+                    <% value = @additional_setting.send("get_#{v.to_s}_value") %>
+                    <% if v.to_s == "font" %>
+                      <div id ="font-field" class="jsDropDown" style="font-family:<%= value %>"><span id="f_value"><%= value %></span><i id="icon"></i></div>
+                      <ul id ="font-list" class="drop_down_list" style="display: none;">
+                        <%  settings_option.sort_by{|key,fo| fo[:text]}.each do |key,fo| %>
+                          <%= "<li style='font-family: #{fo[:value]} !important' class='#{fo[:text] == value ? 'selected' : ''}' value=#{key}>#{fo[:text]}</li>" %>
+                        <% end %>
+                      </ul>
+                    <% elsif v.to_s == "theme" %>
+                      <div id="color-field" class="jsDropDown">
+                        <div id="fill-color" style="background-color: <%= value %> "></div>
+                        <i id="icon1"></i></div>
+                      <div id="c-list" style="display: none;">
+                        <ul id="color-list" class="drop_down_list" >
+                          <% settings_option.sort_by{|sort_key,sort_v| sort_key}[0..15].each do |key,color_set| %>
+                            <% if key%8 == 0 and key > 8 %>
+                              <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='row_end column_end'></li>" %>
+                            <% elsif key%8 == 0 %>
+                              <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='row_end'></li>" %>
+                            <% elsif key > 8 %>
+                              <%= "<li style='background-color:#{color_set[:color]}' color='#{color_set[:color]}' key='#{key}' class='column_end'></li>" %>
+                            <% else %>
+                              <%= "<li style='background-color:#{color_set[:color]}'color='#{color_set[:color]}' key='#{key}'></li>" %>
+                            <% end %>
+                          <% end %>
+                        </ul>
+                        <div id="more-option">
+                          <%= link_to t('more_colors'),"#" ,:class => "themed_text", :id => "color-box"%>
+                        </div>
+                      </div>
+                    <% end %>
+                    <%= hidden_field_tag "#{child_class}[settings][#{k}][#{v}]",@additional_setting.send("get_#{v.to_s}"), :id => "sel-#{v.to_s}" %>
+                  </div>
+                <% end %>
+              </fieldset>
+            <% else %>
+              <fieldset>
+                <%= f.label v %>
+                <% if v.to_s=="password" %>
+                  <%= password_field_tag "#{child_class}[settings][#{k}][#{v}]", @additional_setting.settings.nil? ? "" : @additional_setting.settings["#{k}"]["#{v}"] %>
+                <% else %>
+                  <%= text_field_tag "#{child_class}[settings][#{k}][#{v}]", @additional_setting.settings.nil? ? "" : @additional_setting.settings["#{k}"]["#{v}"] %>
+                <% end %>
+              </fieldset>
+            <% end %>
+          <% end %>
+        <% else %>
+          <fieldset>
+            <%= f.label k %>
+            <%= text_field_tag "#{child_class}[settings][#{k}]", @additional_setting.settings.nil? ? "" : @additional_setting.settings["#{k}"] %>
+          </fieldset>
+        <% end %>
+      <% end %>
+    <% end %>
+    <fieldset>
+      <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    </fieldset>
+  <% end %>
+  <div id="MB_overlay" style="display:none;"></div>
+  <div id="MB_window" style="display:none;"></div>
+</div>
+<script type="text/javascript">
+<%
+  if SchoolGroup.all_plugins.include?("fedena_theme")
+    @color_hsh = FedenaTheme::COLORS.sort_by{|k,v| v[:sort_order]}
+  else
+    @color_hsh = []
+  end
+  %>
+var hsh = <%= @color_hsh.to_json %>
+<%= "var b_value= '#{t('choose_color')}'" %>
+<%= "var select_color= '#{t('no_color_selected')}'" %>
+<%= "var cancel_text= '#{t('cancel')}'" %>
+  j('.jsDropDown').click(function(){
+    j(this).css('border-color','rgba(217, 19, 20, 0.8)');
+    this.next().toggle();
+    if(j(this).prop('id')=='color-field')
+    {
+      j('ul#color-list li').each(function(){
+        j(this).removeClass('c-selected');
+      });
+      j("ul#color-list li[key="+j('#sel-theme').val()+"]").addClass('c-selected');
+    }
+  });
+  j('ul#color-list li').mouseover(function(){
+    j('ul#color-list li').each(function(){
+      j(this).removeClass('c-selected');
+    });
+    j(this).addClass('c-selected');
+  });
+  j('ul#font-list li').mouseover(function(){
+    j('ul#font-list li').each(function(){
+      j(this).removeClass('selected');
+    });
+    j(this).addClass('selected');
+  });
+  j('ul#color-list li').click(function(){
+    j('#sel-theme').val(j(this).attr('key'));
+    j('#fill-color').css('background-color',j(this).attr('color'));
+    j('link[rel=stylesheet][href*="theme_css.css"]').remove();
+    j('#c-list').hide();
+  });
+  j('ul#font-list li').click(function(){
+    j('#font-field span').text(j(this).text());
+    j('#sel-font').val(j(this).attr('value'));
+    j('#font-field').css('font-family',j(this).css('font-family'));
+    j('#font-list').hide();
+  });
+  j('#color-box').click(function(){
+    j('#MB_overlay').show();
+    j('#MB_overlay').css('opacity',0.75);
+    create_modal();
+    j('#MB_window').show();
+  });
+  j(document).click(function(event){
+    if(j.inArray(j(event.target).prop("id"),["font-field","f_value","icon"]) == -1)
+    {
+      j('#font-list').hide();
+      j('#font-field').css('border-color','#cccccc');
+    }
+    if(j.inArray(j(event.target).prop("id"),["color-field","fill-color","icon1"]) == -1)
+    {
+      j('#c-list').hide();
+      j('#color-field').css('border-color','#cccccc');
+    }
+  });
+
+  function create_modal()
+  {
+    var MB_window=document.getElementById('MB_window');
+    var frame=document.createElement('div');
+    frame.id='MB_frame';
+    var content=document.createElement('ul');
+    var sel_theme=document.getElementById('sel-theme').value;
+    content.id='MB_content';
+    for(i=1;i<=hsh.length;i++)
+    {
+      var content_li=document.createElement('li');
+      content_li.style.setProperty('background-color', hsh[i-1][1]['color']);
+      content_li.setAttribute('key', hsh[i-1][0]);
+      content_li.setAttribute('color', hsh[i-1][1]['color']);
+      if (i%7 == 0 && i > 42)
+      {
+        content_li.className='row_end column_end';
+      }
+      else if(i%7 == 0)
+      {
+        content_li.className='row_end';
+      }
+      else if(i > 42)
+      {
+        content_li.className='column_end';
+      }
+      else
+      {}
+      content_li.setAttribute('onclick','active_box(this)');
+      content.appendChild(content_li);
+      if(content_li.getAttribute('key') == sel_theme)
+      {
+        content_li.addClassName('co-selected');
+      }
+    }
+    frame.appendChild(content);
+    var footer=document.createElement('div');
+    footer.id='MB_footer';
+    var footer_button=document.createElement('input');
+    footer_button.type='button';
+    footer_button.id='f_button';
+    footer_button.value=b_value;
+    footer_button.setAttribute('onclick','set_color()');
+    footer.appendChild(footer_button);
+    var cancel=document.createElement('a');
+    cancel.className='themed_text';
+    cancel.href="#";
+    cancel.setAttribute('onclick', 'close_modal()');
+    cancel.innerHTML=cancel_text;
+    footer.appendChild(cancel);
+    frame.appendChild(footer);
+    MB_window.appendChild(frame);
+  }
+  function active_box(elm)
+  {
+    j('ul#MB_content li').each(function(){
+      j(this).removeClass('co-selected');
+    });
+    j(elm).addClass('co-selected');
+  }
+  function set_color()
+  {
+    var selectd=j('.co-selected');
+    if (selectd.length == 0)
+    {
+      alert(select_color);
+    }
+    else
+    {
+      j('#fill-color').css('background-color',selectd.attr('color'));
+      j('#sel-theme').val(selectd.attr('key'));
+      j('#MB_frame').remove();
+      j('#MB_overlay').hide();
+    }
+  }
+  function close_modal()
+  {
+    j('#MB_frame').remove();
+    j('#MB_overlay').hide();
+  }
+</script>

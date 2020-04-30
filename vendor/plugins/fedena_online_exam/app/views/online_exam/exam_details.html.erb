@@ -1,0 +1,120 @@
+<script>
+  j(document).ready(function() {
+    j("#drop_header").hover(
+    function () {
+      link_off = j("#drop_header").offset();
+      link_width = j("#drop_header").width();
+      link_height = j("#drop_header").height();
+      box_width = j("#box_1").width();
+      //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+      j("#box_1").css({top: (link_off.top + link_height),left: ((link_off.left + link_width) - box_width)});
+      j("#box_1").css("display","block");
+    },
+    function () {
+      j("#box_1").css("display","none");
+    });
+  });
+</script>
+<%= load_latex_preview %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_details') %></div>
+
+  <% unless @attendance %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_question')}", :action=>'new_question', :id=>@exam_group.id %></li>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('import_questions')}", :action=>'import_questions', :id=>@exam_group.id %></li>
+        <% unless @exam_questions.blank? %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('rearrange_questions')}", :action=>'rearrange_questions', :id=>@exam_group.id %></li>
+        <% end %>
+        <li id="drop_header" class='themed_bg themed-dark-hover-background'>
+          <a href="#" id="drop_header_link"><%= t('more') %> &#9660;</a>
+          <ul id="box_1" class="more-menu-div" style="display:none;">
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_exam')}", :controller => 'online_exam',:action => 'edit_exam_group', :id => @exam_group.id %></li>
+            <% unless @exam_questions.blank? or @exam_group.is_published==true %>
+              <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('publish_exam')}", :action=>'publish', :id=>@exam_group.id %></li>
+            <%end%>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_exam_details, @exam_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% if @exam_group.exam_format=="hybrid" %>
+    <div class="evaluators-div">
+      <div class="evaluator-text"><%= t('evaluators') %> : </div>
+      <% unless @evaluators.empty? %>
+        <div class="evaluator-list">
+          <% @evaluators.each do|evaluator| %>
+            <%= link_to "#{evaluator.full_name} - #{evaluator.employee_number}",{:controller=>"employee",:action=>"profile",:id=>evaluator.id}, :class=>"themed_text" %>
+            <% unless evaluator == @evaluators.last %>
+              <label>,</label>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <% unless @exam_questions.blank? %>
+
+    <div class="questions_text"><%= t("questions") %></div>
+    <% i=params[:page].present? ? (params[:page].to_i - 1)*5 : 0 %>
+    <% @exam_questions.each do |q|%>
+      <% e = q.online_exam_question %>
+      <div class="q-table">
+        <div id="q-no"><%= i=i+1 %>)</div>
+        <div id="question"> <%= e.question %></div>
+        <div id="mark"><%= q.mark.to_f %> <%= t('marks') %></div>
+        <% unless @attendance %>
+          <% unless e.has_other_exams? %>
+            <%= link_to "<div class='edit_icon'></div>", {:action=>'edit_question', :id=>e.id, :group_id=>@exam_group.id} %>
+          <% else %>
+            <%= link_to "<div class='edit_icon'></div>", {:action=>'new_question', :ref_id=>e.id, :id=>@exam_group.id} %>
+          <% end %>
+          <%= link_to "<div class='delete_icon'></div>", {:action=>'delete_question', :id=>e.id, :group_id=>@exam_group.id},:confirm=>"#{t('this_will_delete_the_question_and_associated_answers_are_you_sure')}" %>
+        <% end %>
+        <% unless e.question_format=="descriptive" %>
+          <div class="option">
+            <div id="option-label"><%= t('options') %><span>&nbsp;&nbsp;:</span></div>
+            <% j="a" %>
+            <% assigned_options = OnlineExamOption.find_all_by_id(q.answer_ids) %>
+            <% assigned_options.each do |o| %>
+              <div id="option-content">
+                <div id="o-no"><%= j %>.</div>
+                <% if o.is_answer %>
+                  <div class="is-answer"><%= o.option %></div>
+                <% else  %>
+                  <div class="not-answer"><%= o.option %></div>
+                <% end %>
+                <% unless @attendance %>
+                  <% unless o.assigned_to_other_exams(@exam_group.id) %>
+                    <%= link_to "<div class='edit_icon'></div>",{:action=>"edit_exam_option" ,:id=>o.id, :group_id=>@exam_group.id} unless @attendance  %>
+                  <% end %>
+                  <% unless (o.is_answer) or (assigned_options.count <= 2) %>
+                    <%= link_to "<div class='delete_option_icon'></div>", {:action=>'delete_exam_option', :id=>o.id, :group_id=>@exam_group.id},:confirm=>"#{t('are_you_sure_you_want_to_remove_this_option')}" %>
+                  <% end %>
+                <% end %>
+              </div>
+              <% j=j.next %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    <%= will_paginate @exam_questions %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_question_added_to_this_exam_group') %> </p>
+  <% end %>
+</div>

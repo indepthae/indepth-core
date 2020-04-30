@@ -1,0 +1,11 @@
+<div id="send_from">
+    <% form_for  :notification ,:url=>"/assessments/send_notification", :html=>{ :method=>:post, :id=>"notification_selector"} do |f| %>
+      <%= f.hidden_field :assessment_group_id, :value => @assessment_group.id,  :id=> "destroy_background_image" %>
+      <%= f.hidden_field :batch, :value => @batch %>
+      <%= session_fingerprint_field %>
+      <div class="confirmation_rext"><%= " #{t('delete_confirm_msg')}" %></div>
+    
+      <%=  f.submit t("send"), :class=>"solid_button lite_button" %>
+        <%= link_to "#{t('cancel')}", :back, :class => 'solid_button lite_button' %>   
+    <%end%>
+</div>

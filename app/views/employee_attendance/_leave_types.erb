@@ -1,0 +1,57 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<h4><%= t('active_leave') %></h4>
+<table>
+  <tr class="tr-head">
+    <td class="name"><%= t('leave_type') %></td>
+    <td class="code"><%= t('code') %></td>
+    <td class="actions"><%= t('actions') %></td>
+  </tr>
+  <% if @leave_types.present? %>
+    <% @leave_types.each do |lt| %>
+      <tr class="bg_light_grey">
+        <td class="name">
+          <div class="leave_name"><%= lt.name %></div>
+          <% if lt.status != 2 %>
+            <div class="leave_status_<%= lt.status %>"><%= EmployeeLeaveType::LEAVE_STATUS[lt.status] %></div>
+          <% end %>
+        </td>
+        <td class="code"><%= lt.code %></td>
+        <td class="actions">
+          <% if lt.status == 1 %>
+            <div id="edit_inactive"><%=  t('edit') %></div>
+            <div id="delete_inactive"><%= t('delete')%></div>
+          <% elsif lt.status == 2 %>
+            <div id="edit"><%= link_to t('edit'), {:action => "edit_leave_types", :id => lt.id} %></div>
+            <div id="delete"><%= link_to t('delete') , {:action => "delete_leave_types", :id => lt.id}, :confirm=>"Are you sure?"%></div>
+          <% elsif lt.status == 3 %>
+            <div id="edit"><%= link_to t('retry'), {:action => "retry_leave_creation", :id => lt.id}, :confirm=>"Are you sure?" %></div>
+            <div id="delete"><%= link_to t('discard') , {:action => "delete_leave_types", :id => lt.id}, :confirm=>"Are you sure?"%></div>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+
+<%= pagination_status(@leave_types) %>
+<%= will_paginate @leave_types %>

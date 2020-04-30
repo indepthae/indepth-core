@@ -1,0 +1,332 @@
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<script type="text/javascript">
+  var part_count = 0;
+  document.observe("dom:loaded", function(){
+    var j = jQuery.noConflict();
+    var a,b,c,d;
+    jQuery(function(){
+      a = j('#query').autocompleteAjax({serviceUrl:'/discipline_complaints/search_users',
+        onSelect: function(value,data){update_complainee(value,data);}});
+      b = j('#query1').autocompleteAjax({serviceUrl:'/discipline_complaints/search_users',
+        onSelect: function(value,data){update_accused(value,data);} });
+      c = j('#query2').autocompleteAjax({serviceUrl:'/discipline_complaints/search_juries',
+        onSelect: function(value,data){update_jury(value,data);} });
+      d = j('#query3').autocompleteAjax({serviceUrl:'/discipline_complaints/search_users',
+        onSelect: function(value,data){update_others(value,data);}});
+
+    });
+    
+  })
+  function update_others(value,data)
+  {
+      
+    var part_type= "discipline_members_attributes";
+    var ul=$("category-list_members")
+    var flag=0;
+    flag=list_duplicate(data);
+    if(flag==0)
+    {
+      insert_element(ul,part_type,data,value);
+      $("query3").value= "";
+    }
+    else
+    {
+      alert(value+' Already in the list');
+      $("query3").value= "";
+    }
+          
+  }
+  function update_jury(value,data)
+  {
+    var part_type= "discipline_juries_attributes";
+    var ul=$("category-list_jury");
+    var flag=0;
+    flag=list_duplicate(data);
+    if(flag==0)
+    {
+      insert_element(ul,part_type,data,value);
+      $("query2").value= "";
+    }
+    else
+    {
+      alert(value+' Already in the list');
+      $("query2").value= "";
+    }
+  }
+  function update_accused(value,data)
+  {
+    var part_type= "discipline_accusations_attributes";
+    var ul=$("category-list_accused");
+    var flag=0;
+    flag=list_duplicate(data);
+    if(flag==0)
+    {
+      insert_element(ul,part_type,data,value);
+      $("query1").value= "";
+    }
+    else
+    {
+      alert(value+' Already in the list');
+      $("query1").value= "";
+    }
+  }
+  function update_complainee(value,data)
+  {
+
+    var part_type= "discipline_complainees_attributes";
+    var ul=$("category-list_complainee");
+    var flag=0;
+    flag=list_duplicate(data);
+    if(flag==0)
+    {
+      insert_element(ul,part_type,data,value);
+      $("query").value= "";
+    }
+    else
+    {
+      alert(value+' Already in the list');
+      $("query").value= "";
+    }
+      
+  }
+  function list_duplicate(data)
+  {
+    var flag=0;
+    var cm=$("category-list_complainee").select('li');
+    var ac=$("category-list_accused").select('li');
+    var jr=$("category-list_jury").select('li');
+    var mr=$("category-list_members").select('li');
+    var aa=cm.concat(ac);
+    var bb=aa.concat(jr);
+    var a=bb.concat(mr);
+    var n=a.length;
+    for(var i=0;i<n;i++)
+    {
+      if(a[i].select('input')[0].value==data)
+      {
+
+        flag=1;
+
+      }
+
+    }
+    if(flag==1)
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  function insert_element(ul,part_type,data,value)
+  {
+    var ls=new Element('li',{'class':'listodd'});
+    var element=new Element('div');
+    element=make_participant(part_type,data,value);
+    ls.appendChild(element);
+    ul.appendChild(ls);
+  }
+  function make_participant(part_type,id,name)
+  {
+      
+    part_count++;
+    var participant_wi =new Element('div');
+    var participant_name = new Element('div',{'class':'list_c'}).update(name);
+    var participant_id =new Element('input' , {'type':'hidden','name':'discipline_complaint['+part_type+']['+part_count+'][user_id]','value':id});
+    var delete_btn=new Element('a',{'onClick':'remove_entry(this);','class':'list_btn'}).update(' ');
+    delete_btn.style.cursor='pointer'
+    participant_wi.update(participant_name);
+    participant_wi.appendChild(delete_btn);
+    var p_div = new Element('div');
+    p_div.update(participant_id);
+    p_div.appendChild(participant_wi);
+    return p_div
+  }
+  function remove_entry(element)
+  {
+    element.up().up().up().remove();
+  }
+  function update_entry(element)
+  {
+    element.up().remove();
+  }
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('discipline') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('add_complaint') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%form_for @discipline_complaint, :html=> {:multipart=>true} do |f|%>
+    <%= error_messages_for :discipline_complaint %>
+    <div class="label-field-pair">
+      <label for="complaint_no"><%= t('complaint_no')%> <span class="necessary-field">*</span> </label>
+      <div class="text-input-bg">
+
+        <%= f.text_field :complaint_no , :value=> @last_registered_complaint%>
+      </div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="discipline_subject"><%= t('title') %><span class="necessary-field">*</span> </label>
+      <div class="text-input-bg"><%= f.text_field :subject %></div>
+    </div>
+
+    <div class="label-field-pair-text-area">
+      <label for="discipline_discription"><%= t('description') %><span class="necessary-field">*</span></label>
+      <div class="textarea-input-bg"><%= f.text_area :body,:cols => 30, :rows => 5,:class => 'new_complaint-textarea' %></div>
+    </div>
+    <div class="label-field-pair">
+      <label for="trial_date"><%= t('trial_date') %><span class="necessary-field">*</span></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'discipline_complaint[trial_date]', I18n.l(@date.to_date,:format=>:default),
+          :year_range => 0.years.ago...5.years.from_now, :popup=>"force" %></div>
+    </div>
+    <div class="extender"></div>
+    <div class="label-field-pair">
+      <label for="persons"><%= t('persons') %><span class="necessary-field">*</span></label>
+
+    </div>
+    <div class="extender"></div>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="col-11">
+          <%= t('complained_by') %>
+          <div id="search_box_bg">
+            <label for="user_name">
+            </label>
+            <div id="search_textbox">
+              <%= text_field_tag("query", params['query'], :autocomplete => 'off',:placeholder => "#{t('students_and_employees')}") %>
+
+            </div>
+
+
+            <div class="extender"></div>
+          </div>
+        </td>
+        <td class="col-11">
+          <%= t('complained_against') %>
+          <div id="search_box_bg">
+
+            <label for="user_name">
+            </label>
+            <div id="search_textbox">
+              <%= text_field_tag("query1", params['query1'], :autocomplete => 'off',:placeholder => "#{t('students_and_employees')}") %>
+            </div>
+
+            <div class="extender"></div>
+
+          </div>
+
+        </td>
+        <td class="col-11">
+          <%= t('jury') %>
+          <div id="search_box_bg">
+
+            <label for="user_name">
+            </label>
+            <div id="search_textbox">
+              <%= text_field_tag("query2", params['query2'], :autocomplete => 'off',:placeholder => "#{t('employees')}") %>
+
+            </div>
+
+            <div class="extender"></div>
+
+          </div>
+        </td>
+        <td class="col-11">
+          <%= t('responsible_officials') %>
+          <div id="search_box_bg">
+
+            <label for="user_name">
+            </label>
+            <div id="search_textbox">
+              <%= text_field_tag("query3", params['query3'], :autocomplete => 'off',:placeholder => "#{t('students_and_employees')}") %>
+
+            </div>
+
+            <div class="extender"></div>
+
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div id="participants">
+      <div class="participants1">
+        <div id="complainee">
+          <ul id="category-list_complainee">
+            <% f.fields_for(:discipline_complainees) do |c| %>
+              <% obj = c.object %>
+              <li class="listodd" >
+                <div class="list_c">
+                  <%= c.hidden_field :user_id %>
+                  <%=obj.user.full_name.length+obj.user.username.length > 40 ? obj.user.full_name[0..(38-obj.user.username.length)]+".. "+" - "+obj.user.username : obj.user.full_name+" - "+obj.user.username  %>
+                </div>
+                <%=link_to_function "",  "update_entry(this);", {:class => 'list_btn'}%>
+              </li>
+            <% end %>
+          </ul>
+            </div>
+        <div id="accused">
+          <ul id="category-list_accused">
+            <% f.fields_for(:discipline_accusations) do |c| %>
+              <% obj = c.object %>
+              <li class="listodd" >
+                <div class="list_c">
+                  <%= c.hidden_field :user_id %>
+                  <%=obj.user.full_name.length+obj.user.username.length > 40 ? obj.user.full_name[0..(38-obj.user.username.length)]+".. "+" - "+obj.user.username : obj.user.full_name+" - "+obj.user.username  %>
+                </div>
+                <%=link_to_function "",  "update_entry(this);", {:class => 'list_btn'}%>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div id="jury">
+          <ul id="category-list_jury">
+            <% f.fields_for(:discipline_juries) do |c| %>
+              <% obj = c.object %>
+              <li class="listodd" >
+                <div class="list_c">
+                  <%= c.hidden_field :user_id %>
+                  <%=obj.user.full_name.length+obj.user.username.length > 40 ? obj.user.full_name[0..(38-obj.user.username.length)]+".. "+" - "+obj.user.username : obj.user.full_name+" - "+obj.user.username  %>
+                </div>
+                <%=link_to_function "",  "update_entry(this);", {:class => 'list_btn'}%>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div id="members">
+          <ul id="category-list_members">
+            <% f.fields_for(:discipline_members) do |c| %>
+              <% obj = c.object %>
+              <li class="listodd" >
+                <div class="list_c">
+                  <%= c.hidden_field :user_id %>
+                  <%=obj.user.full_name.length+obj.user.username.length > 40 ? obj.user.full_name[0..(38-obj.user.username.length)]+".. "+" - "+obj.user.username : obj.user.full_name+" - "+obj.user.username  %>
+                </div>
+                <%=link_to_function "",  "update_entry(this);", {:class => 'list_btn'}%>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="extender"></div>
+    <div class="label-field-pair" id="label-field-pair_browse">
+      <label for="discipline_attachment"><%= t('attachments') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</label>
+      <div class="text-input-bg"><%= paperclip_file_field_tag 'discipline_attachment','attachment', :size=>12, :direct => false, :object=>@discipline_attachment %></div>
+
+    </div>
+  </div>
+  <div class="buttons">
+    <%=submit_tag "► #{t('submit')}", :class => "submit_button", :disable_with=> "► #{t('please_wait')}" %>
+    <div class="cancel_btn">    <%= link_to"► #{t('cancel')}",:controller=>"discipline_complaints",:action=>"index" %> </div>
+  </div>
+<%end%>

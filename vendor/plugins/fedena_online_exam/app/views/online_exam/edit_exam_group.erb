@@ -1,0 +1,231 @@
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<script type="text/javascript">
+  var part_count = 0;
+  document.observe("dom:loaded", function(){
+    var j = jQuery.noConflict();
+    var a,b,c,d;
+    jQuery(function(){
+      a = j('#query').autocompleteAjax({serviceUrl:'/online_exam/search_evaluator',
+        onSelect: function(value,data){update_complainee(value,data);}});
+
+    });
+
+  })
+
+  function toggle_evaluator_selection(val)
+  {
+    if(val == "objective"){
+      j("#evaluator_selection").hide();
+    }
+    else {
+      j("#evaluator_selection").show();
+    }
+  }
+
+  function get_deselected_students()
+  {
+    var deselected_students = [];
+    j('.students_box:not(:checked)').each(function(){
+      deselected_students.push(j(this).val());
+    })
+    return deselected_students;
+  }
+
+  function get_batch_ids()
+  {
+    var batch_ids = [];
+    j('.batches_box:checked').each(function(){
+      batch_ids.push(j(this).val());
+    })
+    return batch_ids;
+  }
+
+  function get_subject_ids()
+  {
+    var subject_ids = [];
+    j('.subjects_box:checked').each(function(){
+      subject_ids.push(j(this).val());
+    })
+    return subject_ids;
+  }
+
+  function update_complainee(value,data)
+  {
+
+    var part_type= "discipline_complainees_attributes";
+    var ul=$("category-list_complainee");
+    var flag=0;
+    flag=list_duplicate(data);
+    if(flag==0)
+    {
+      insert_element(ul,part_type,data,value);
+      $("query").value= "";
+    }
+    else
+    {
+      alert(value+' Already in the list');
+      $("query").value= "";
+    }
+
+  }
+  function list_duplicate(data)
+  {
+    var flag=0;
+    var cm=$("category-list_complainee").select('li');
+    var n=cm.length;
+    for(var i=0;i<n;i++)
+    {
+      if(cm[i].select('input')[0].value==data)
+      {
+
+        flag=1;
+
+      }
+
+    }
+    if(flag==1)
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  function insert_element(ul,part_type,data,value)
+  {
+    var ls=new Element('li',{'class':'listodd'});
+    var element=new Element('div');
+    element=make_participant(part_type,data,value);
+    ls.appendChild(element);
+    ul.appendChild(ls);
+  }
+  function make_participant(part_type,id,name)
+  {
+
+    part_count++;
+    var participant_wi =new Element('div');
+    var participant_name = new Element('div',{'class':'list_c'}).update(name);
+    var participant_id =new Element('input' , {'type':'hidden','name':'employee_ids[]','value':id});
+    var delete_btn=new Element('a',{'onClick':'remove_entry(this);','class':'list_btn'}).update(' ');
+    delete_btn.style.cursor='pointer'
+    participant_wi.update(participant_name);
+    participant_wi.appendChild(delete_btn);
+    var p_div = new Element('div');
+    p_div.update(participant_id);
+    p_div.appendChild(participant_wi);
+    return p_div
+  }
+  function remove_entry(element)
+  {
+    element.up().up().up().remove();
+  }
+  function update_entry(element)
+  {
+    element.up().remove();
+  }
+</script>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t("edit_exam_group") %></div>
+  <div id="inner-tab-menu">
+    <ul>
+<%# if permitted_to? :new, :additional_exam_groups %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('view')}", :action=>'view_online_exam' %></li>
+<%# end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_edit_exam_group, @online_exam_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <%= error_messages_for 'online_exam_group',:header_message=>nil %>
+    <%form_for :online_exam_group,@online_exam_group, :url => {:action => :edit_exam_group} do |form| %>
+      <div id="student_selection">
+        <% if @students.present? %>
+          <%= render :partial=>"multiple_student_selector", :locals=>{:students=>@students,:deselected_students=>(@deselected_students.present? ? @deselected_students : [])} %>
+        <% end %>
+      </div>
+
+      <div class="label-field-pair">
+        <label><%= t('name') %><span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= form.text_field :name %></div>
+      </div>
+      <div class="label-field-pair">
+        <label><%= t('start_date') %><span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= form.calendar_date_select :start_date ,:readonly=>true,:popup=>:force%></div>
+      </div>
+      <div class="label-field-pair">
+        <label><%= t('end_date') %><span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= form.calendar_date_select :end_date,:readonly=>true,:popup=>:force%></div>
+      </div>
+      <div class="label-field-pair">
+        <label><%= t('maximum_time_minutes') %><span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= form.text_field :maximum_time %></div>
+      </div>
+      <div class="label-field-pair">
+        <label><%= t('pass_percentage') %><span class="necessary-field">*</span></label>
+        <div class="text-input-bg"><%= form.text_field :pass_percentage %></div>
+      </div>
+      <div class="label-field-pair">
+        <label>Exam Type</label>
+        <div class="select_exam_type">
+          <%= form.radio_button  "exam_type", "general", :checked => "checked",:onChange=>"#{remote_function(:url => {:action => "modify_batch_selection"}, :with => "'select_value='+value")}" %>
+          <label class="label_for_exam_type" for="exam_type_true">General</label>
+          <%= form.radio_button  "exam_type", "subject_specific",:onChange=>"#{remote_function(:url => {:action => "modify_batch_selection"}, :with => "'select_value='+value")}" %>
+          <label class="label_for_exam_type" for="exam_type_false">Subject Specific</label>
+        </div>
+      </div>
+      <div id="batch_selection">
+        <% if @online_exam_group.exam_type=="subject_specific" %>
+          <%= render :partial=>"single_batch_selector", :locals=>{:batches=>@batches, :batch_id=>@batch_id, :subjects=>@subjects, :subject_ids=>@subject_ids} %>
+        <% else %>
+          <%= render :partial=>"multiple_batch_selector", :locals=>{:batches=>@batches, :batch_ids=>@batch_ids} %>
+        <% end %>
+      </div>
+      <div class="label-field-pair">
+        <label>Exam Format</label>
+        <div class="select_exam_type">
+          <%= form.radio_button  "exam_format", "objective", :checked => "checked",:onChange=>"toggle_evaluator_selection('objective'); return false;" %>
+          <label class="label_for_exam_type" for="exam_type_true">Objective</label>
+          <%= form.radio_button  "exam_format", "hybrid",:onChange=>"toggle_evaluator_selection('hybrid'); return false;" %>
+          <label class="label_for_exam_type" for="exam_type_false">Hybrid</label>
+        </div>
+      </div>
+      <div id="evaluator_selection" class="evaluator-<%= @online_exam_group.exam_format == "hybrid" %>">
+        <div class="label-field-pair">
+          <label>Assign Evaluators<span class="necessary-field">*</span></label>
+          <div class="text-input-bg"><%= text_field_tag("query", params['query'], :autocomplete => 'off') %></div>
+        </div>
+        <div id="complainee">
+          <ul id="category-list_complainee">
+            <% @assigned_employees.each do |c| %>
+              <li class="listodd" >
+                <div class="list_c">
+                  <%= hidden_field_tag 'employee_ids[]', c.id %>
+                  <%= c.full_name.length+c.username.length > 18 ? c.full_name[0..(15-c.username.length)]+".. "+"-"+c.username : c.full_name+"-"+c.username  %>
+                </div>
+                <%=link_to_function "",  "update_entry(this);", {:class => 'list_btn'}%>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+      <% FedenaPlugin.deliver_registered_hook(:event_alert_form).each do |mod| %>
+        <%= render :partial=>mod.camelize.constantize.send("event_alert_form"), :locals => {:f => form} %>
+      <% end %>
+      <div id="submit-button">
+        <%=form.submit("► #{t('update')}", :disable_with => "► #{t('please_wait')}" )%>
+      </div>
+    <% end %>
+  </div>
+</div>

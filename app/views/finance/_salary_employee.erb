@@ -1,0 +1,114 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('department') %> - <%= @department.name %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>
+        </b>
+        <div class="date_align right">
+            <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; 
+            <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %> 
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+                <!--
+                < %=link_to_remote t('change_date'),:url => {:controller => "finance",:action =>"show_date_filter",
+                  :target_action=>@target_action,:id=>params[:id],:date_tag=>params[:date_tag],
+                  :start_date=>@start_date,:end_date=>@end_date}%> -->
+            </span>
+        </div>
+    </div>
+
+    <% unless @employees_salary.empty? %>
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td><%= t('sl_no') %></td>
+              <td class="set_border_right"><%= t('employee_name') %></td>
+              <td class="set_border_right"><%= t('transaction_date') %></td>
+              <td class="set_border_right"><%= t('pay_frequency') %></td>
+              <td class="set_border_right"><%= t('pay_period') %></td>
+              <td class="set_border_right" style="width: 20%"><%= t('amount') %> (<%= currency %>)</td>
+          </tr>
+
+          <% @employees_salary.each do |salary_month,employee| %>
+            <tr class="tr-list_head">
+                <td colspan="6"><%= format_date(employee.first.transaction_date, :format => :month_year) %></td>
+            </tr>
+            <% i = 1 %>
+            <% employee.each do |employee| %>
+              <tr class="row-b">
+                  <td><%= i %></td>
+                  <% salary_date = "#{employee.start_date} - #{employee.end_date}" %>
+                  <td class="set_border_right">
+                      <%= link_to "#{employee.employee_name} ( #{employee.employee_num} )", 
+                        {:action => :view_employee_payslip, :id => employee.payslip_id, :from => "finance_report", 
+                        :end_date => @end_date, :start_date => @start_date, :dept_id => @department.id}.
+                        merge(url_params), :target => "_blank" %>
+                  </td>
+                  <td class="set_border_right"> 
+                      <%= format_date(employee.transaction_date) %> 
+                  </td>
+                  <td class="set_border_right"> 
+                      <%= PayrollGroup.payment_period_translation(employee.payment_period) %> 
+                  </td>
+                  <td class="set_border_right"> 
+                      <%= payslip_range(nil, employee.start_date, employee.end_date, employee.payment_period.to_i) %> 
+                  </td>
+                  <td class="set_border_right" align="right"> 
+                      <%= precision_label(employee.amount) %> 
+                  </td>
+              </tr>
+              <% i = i + 1 %>
+            <% end %>
+          <% end %>
+      </table>
+
+      <%= will_paginate @employees_salary_payslip, :params => {:id => params[:id], 
+        :start_date => @start_date, :end_date => @end_date}.merge(url_params),
+        :renderer => 'RemoteLinkRenderer' %>
+
+      <div class="total_amount_div">
+          <label><%= t('net_expenses') %></label>
+          <label class="amount_label"><%=precision_label(@grand_total)%></label>
+      </div>
+
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "finance", :action => "salary_employee_csv",
+                        :id => params[:id], :date_tag => params[:date_tag], :start_date => @start_date, 
+                        :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%= t('no_transactions_present') %></div>
+    <% end %>
+</div>
+
+<script>
+  
+  j('.date_box').hide();
+  
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+  
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+  
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+  
+</script>

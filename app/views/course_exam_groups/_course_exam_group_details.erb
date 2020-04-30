@@ -1,0 +1,24 @@
+
+<div class="discription_div set_width_high">
+  <div class="item_input">
+    <p  class="set_text_bold"><%=t('exam_group')%>:</p>
+    <p><%=t('exam_type')%>:</p>
+  </div>
+  <div class="item_input">
+    <p class="set_text_bold"><%=@course_exam_group.name%></p>
+    <p><%=t("#{@course_exam_group.exam_type.underscore}")%></p>
+  </div>
+</div>
+<div  class="discription_div">
+  <div class="item_input">
+    <p class="set_text_bold small_width_text"><%=t('course_text')%>:</p>
+    <p><%=t('assosiated_batches')%>:</p>
+  </div>
+  <div class="item_input">
+    <p class="set_text_bold"><%=@course_exam_group.course.course_name%></p>
+    <% count_text = '<strong>' + @course_exam_group.exam_groups.count.to_s + '</strong> ' %>
+    <% count_text << (t(:of)+ ' ' + @course_exam_group.course.batches.active.count.to_s) if @course_exam_group.exam_groups_mode == :active %>
+
+    <p><%= count_text %></p>
+  </div>
+</div>

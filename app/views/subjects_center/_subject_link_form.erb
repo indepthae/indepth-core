@@ -1,0 +1,138 @@
+<% if @subjects.present? %>
+<div class="accordion-courses-table">
+    <div class="accordion-courses-heading">
+        <div class="accordion-column-1">
+            <%= t('multiple_subjects') %>
+        </div>
+        <div class="accordion-column-2">
+            <%= t('batches_assigned_text').titleize %>
+        </div>
+        <div class="accordion-column-3">
+            <%= t('allocation_status') %>
+        </div>
+    </div>
+    <% form_for @course,:url => {:action => 'link_batches', :course_id => @course.id } do |c| %>
+      <%= session_fingerprint_field %>
+      <div id="accordion-courses">
+          <% c.fields_for :all_course_subjects, @subjects do |s| %>
+          <% subject = s.object %>
+          <div class="accordion-course-heading" data-course-subject-id="<%= s.object.id %>">
+                <%= s.hidden_field :id %> 
+                
+                <div class="accordion-column-1">
+                    <%= subject.name_with_code %>
+                    <% if subject.errors.present? %>
+                      <div class="batch_error_note"></div>
+                    <% end %>
+                </div>
+                <% subjects_activated  =  subject.subjects.active_batch_subjects.select{|p| !p.new_record? and !p.is_deleted } %>
+                <div class="accordion-column-2" id="subject-allocation-count-<%=subject.id%>">
+                    <%= subjects_activated.group_by(&:batch_id).count %>
+                </div>
+                <% subjects_not_activated  =  subject.subjects.select{|p| p.new_record? } %>
+                <div class="accordion-column-3" id="subject-allocation-status-<%=subject.id%>">
+                    <% if subjects_not_activated.present? and !subjects_activated.present? %>
+                      <span class="not_allocated"><%= t('not_allocated') %></span>
+                    <% elsif subjects_not_activated.present? and subjects_activated.present? %>
+                      <span class="partial"><%= t('partially_allocated') %></span>
+                    <% elsif !subjects_not_activated.present? and subjects_activated.present? %>
+                      <span class="full"><%= t('completely_allocated') %></span>                
+                    <% else %>
+                      <span class="not_eligible"><%= t('not_eligible') %></span>                
+                    <% end %>
+                </div>
+              <div class="accordion-column-4" id="subject-status-<%=subject.id%>">
+                
+            </div>
+            </div>
+          <div id="subject_link_sub_form_<%=s.object.id%>" data-course-subject-id="<%= s.object.id %>"></div>
+          <% end %>
+      </div>
+      <div id="submit_button">
+          <%= submit_tag t('save').titleize ,:id=>'submit-button', :class => 'submit-button' %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader_1",:style => "display: none;") %>
+      </div>
+    <% end %>
+</div>
+<% else %>
+  <p class="flash-msg"> <%= t('no_course_subjects') %> </p>
+<% end %>
+<script>
+  var icons = {header: "down-arrow-img",activeHeader: "up-arrow-img" };
+  j('#accordion-courses').accordion({
+    icons: icons,
+    collapsible: true,
+    active: true, // enable it to prevent first loaded accordion from uncollapsing
+    heightStyle: "content"
+  });
+  j('.accordion-course-heading').click(function(e){
+    var cs_id = j(this).data("course-subject-id");
+    if (j('#subject_link_sub_form_'+cs_id).children().length == 0){
+      new Ajax.Request('/subjects_center/subject_link_sub_form', {
+                parameters: {'course_id': '<%= @course.id %>', 'course_subject_id': cs_id},
+                asynchronous: true,
+                evalScripts: true,
+                method: 'get'
+            });
+    }
+  });
+  
+  var form_stack = [];
+  
+  j('.submit-button').click(function(e){
+    
+    j('.ui-accordion-content').each( (index, element) => {
+    var form_input = j('#'+element.id + ' input').serialize();
+    var subject_id = j('#'+element.id).data('course-subject-id')
+    
+    
+    form_stack.push({subject_id: subject_id, form_input: form_input});
+    
+    });
+    
+    form_stack.reverse();
+    request_one();
+    
+    return false;
+  
+  });
+  
+  function request_one() {
+    
+    if(form_stack.length == 0)
+        return false;
+    
+    data = form_stack.pop();
+    
+    if (data.form_input.length > 0){
+      
+      new Ajax.Request('/subjects_center/link_batches_submission?course_id=<%= @course.id %>&subject_id=' + data.subject_id , {
+                parameters: data.form_input,
+                asynchronous: true,
+                evalScripts: true,
+                method: 'post',
+                onLoading: function () {
+                    j('#subject-status-'+ data.subject_id).text('Updating');
+                    j('#loader_1').show();
+                    j('.submit-button').attr("disabled", true); 
+                    j('.submit-button').val("Please wait"); 
+                },
+                onFailure: function(){
+                  j('#subject-status-'+ data.subject_id).text('Linking failed');
+                  request_one();
+                },
+                onComplete: function(){
+                  request_one();
+                  j('#loader_1').hide();
+                  j('.submit-button').attr("disabled", false); 
+                    j('.submit-button').val("Save"); 
+                }
+            });
+    }
+    else{
+      request_one();
+    }
+  }
+  
+  
+</script>

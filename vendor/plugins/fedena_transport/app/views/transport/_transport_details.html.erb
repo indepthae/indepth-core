@@ -1,0 +1,56 @@
+<% common_route = (@different_route.nil? ? false : (@different_route.to_i == 0)) %>
+<div class="label-field-pair pickup <%= ('common' if common_route) %>" style="display:<%= (@mode.to_i == 3 && !common_route) ? 'none' : 'block' %>" >
+    <label for="pickup_route"><%= common_route ? t('route') : t('pickup_route') %></label>
+    <div class="text-input-bg">
+        <%= select_tag "#{@receiver_type}[transport_attributes][pickup_route_id]", options_for_select(
+          [["#{t((common_route ? 'select_a_route' : 'select_a_pickup_route'))}",""]] + @routes.map{|r| [r.name, r.id]}, @transport.pickup_route_id),
+          {:id => "pickup_route", :onchange => "#{remote_function(:url => {:controller => "transport", :action => "fetch_stops"},
+          :with => "'route_id='+value+'&receiver_id='+'#{transport.receiver_id}'+'&receiver_type='+'#{transport.receiver_type}'+'&mode='+'#{@mode}'+'&route_type='+'#{(common_route ? 'common' : 'pickup')}'",
+          :before => "Element.show('loader5');j('#bus_fare').val('')",
+          :success => "Element.hide('loader5')")}"} %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader5",
+          :style =>"display: none;" ) %>
+        <% if common_route %>
+          <%= hidden_field_tag "#{@receiver_type}[transport_attributes][common_route]", 0 %>
+        <% end %>
+    </div>
+</div>
+<div class="<%= ('common' if common_route) %>">
+    <div id="pickup_stops">
+        <%= render :partial => 'transport/route_stops', :locals => {:mode => @mode, :route_type => 'pickup'} %>
+    </div>
+    <% unless common_route %>
+      <div class="label-field-pair drop" style="display:<%= (@mode.to_i == 2) ? 'none' : 'block' %>" >
+          <label for="drop_route"><%= t('drop_route') %></label>
+          <div class="text-input-bg">
+              <%= select_tag "#{@receiver_type}[transport_attributes][drop_route_id]", options_for_select(
+                [["#{t('select_a_drop_route')}",""]] + @routes.map{|r| [r.name, r.id]}, @transport.drop_route_id),
+                {:id => "drop_route", :onchange => "#{remote_function(:url => {:controller => "transport", :action => "fetch_stops"},
+                :with => "'route_id='+value+'&receiver_id='+'#{transport.receiver_id}'+'&receiver_type='+'#{transport.receiver_type}'+'&mode='+'#{@mode}'+'&route_type='+'drop'",
+                :before => "Element.show('loader4');j('#bus_fare').val('')",
+                :success => "Element.hide('loader4')")}"} %>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader4",
+                :style =>"display: none;" ) %>
+          </div>
+      </div>
+    <% end %>
+    <div id="drop_stops">
+        <%= render :partial => 'transport/route_stops', :locals => {:mode => @mode, :route_type => 'drop'} %>
+    </div>
+</div>
+<div id="transport_fare">
+    <%= render :partial => 'transport/transport_fare', :locals => {:transport => @transport} %>
+</div>
+<div class="label-field-pair pickup update_fare">
+    <div class="input-container">
+        <%= check_box_tag "#{@receiver_type}[transport_attributes][auto_update_fare]", "1", @transport.auto_update_fare.present? %>
+        <label for="auto_update_fare"><%= t('auto_update_fare') %></label>
+    </div>
+</div>
+

@@ -1,0 +1,22 @@
+<label class="head_label"><%= t('transport.select_stop') %></label>
+<%= select "", :template , @stops.map{|s| [s.name,s.id] }, {:include_blank=>t('transport.select_stop')}, :class=>"drop_select", :id=>"stops_selector" %>
+
+<script>
+j("#stops_selector").change(function(){
+  j.ajax({
+    url: "load_stop_recievers",
+    type: 'POST',
+    data: {
+      route_id: j("#route_selector").val(),
+      vehicle_stop_id: j(this).val(),
+      stop_type: j("input[name='stop_type']:checked").val()
+    },
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+});
+</script>

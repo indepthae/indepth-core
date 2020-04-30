@@ -1,0 +1,90 @@
+
+<div id="page-yield">
+  <div class="hor_line"></div>
+  <div id ="main_info">
+    <h2><%= t('purchase_order') %>  </h2>
+  </div>
+  <div class="hor_line"></div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('po_no')}" %></div>
+    <div class="label-output">:  <%=h @purchase_order.po_no  %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('store')}" %></div>
+    <div class="label-output">:  <%=h  @purchase_order.store.name%></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('supplier_type')}" %></div>
+    <div class="label-output">:  <%=h  @purchase_order.supplier_type.name unless @purchase_order.supplier_type.nil? %></div>
+  </div>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('supplier')}" %></div>
+    <div class="label-output">:  <%=h  @purchase_order.supplier.name unless @purchase_order.supplier.nil?  %></div>
+  </div>
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('po_date')}" %></div>
+    <div class="label-output">:  <%=h format_date(@purchase_order.po_date,:format=>:long_date) %></div>
+  </div>
+
+
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('reference')}" %></div>
+    <div class="label-output">:  <%=h @purchase_order.reference %></div>
+  </div>
+
+  <div class="label-container1"></div>
+
+  <table id="pdf-table" width="100%" cellspacing="0">
+    <tr class="table-header">
+      <td class="col-pdf"><%= t('sl_no') %></td>
+      <td class="col-pdf"><%= t('item') %></td>
+      <td class="col-pdf"> <%= t('quantity') %></td>
+      <td class="col-pdf"> <%= t('price') %></td>
+      <td class="col-pdf"> <%= t('discount') %> (%)</td>
+      <td class="col-pdf"><%= t('tax') %> (%)</td>
+      <td class="col-pdf"><%= t('total') %></td>
+    </tr>
+    <% p = 0  %>
+    <% c= 'even' %>
+
+    <% @purchase_order.purchase_items.each_with_index do |i, p| %>
+      <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+        <td class="col-pdf"><%= p+=1 %></td>
+        <td class="col-pdf"> <%=h  i.store_item.item_name unless i.store_item.nil? %></td>
+        <td class="col-pdf">  <%=h  i.quantity %></td>
+        <td class="col-pdf"> <%=h precision_label i.price %></td>
+        <td class="col-pdf"> <%=h  precision_label(i.discount) unless i.discount.nil? %></td>
+        <td class="col-pdf"> <%=h precision_label(i.tax) unless i.tax.nil? %></td>
+        <td class="col-pdf"> <%=h precision_label(i.total_amount)  %></td>
+      </tr>
+    <% end %>
+
+    <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+      <td colspan="6" class="col-8"><%= t('grand_total') %></td>
+      <td class="col-pdf"><%=h precision_label @total %></td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+
+
+

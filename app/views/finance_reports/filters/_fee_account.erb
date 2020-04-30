@@ -1,0 +1,18 @@
+<div id="list_accounts">
+    <div class="label-field-pair section">
+        <label for="fee_account"><%= t('fee_account_text') %></label>
+        <div class="text-input-bg">
+            <%= select_tag "transaction_report[fee_account_ids]", options_from_collection_for_select_account(@fee_accounts, "id", "name"),
+              :multiple => true, :id => 'account_filter' %>
+            <%= error_message_box(t('cant_be_blank')) %>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  j('#account_filter').multipleSelect({
+      placeholder: '<%= t('fee_account_text') %>',
+      countSelected: '# <%= t('fee_account_text') %>',
+      noMatchesFound: '<%= t('no_fee_accounts_present') %>'
+  });
+  j('#account_filter').multipleSelect('checkAll');
+</script>

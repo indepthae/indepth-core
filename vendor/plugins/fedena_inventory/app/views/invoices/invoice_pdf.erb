@@ -1,0 +1,159 @@
+<div id="page-yield" class="available_sections">
+    <div class="section">
+        <center>
+            <div class="hor_line"></div>
+
+            <h2><%= t('invoice') %></h2>
+            <div class="hor_line"></div>
+            <div class="extender"> </div>
+        </center>
+        <div id ="main_info">
+            <div class="col-a">
+                <h4 style="width:505px;"><%= t('billed_to') %></h4>
+                <h4 style="width:505px;"> <%= @invoice.sales_user_details.first.username %>
+                    <%  user_details = @invoice.sales_user_details.first.user_details %>
+                    <%if user_details.present?%>
+                      <%if user_details.present?%>
+                        <%if user_details.kind_of? Student or user_details.kind_of? ArchivedStudent %>
+                          <%= "(#{user_details.admission_no})"%>
+                        <%elsif user_details.kind_of? Employee %>
+                          <%= "(#{user_details.employee_number})"%>
+                        <%end%>
+                      <%end%>
+                    <%end%>
+                </h4>
+                <%  @invoice.sales_user_details.first.address.split("\r\n").each do |address| %>
+                  <% unless address.empty? %>
+                    <h4 style="width:505px;"> <%= address  %></h4>
+                  <% end %>
+                <% end %>
+            </div>
+            <div class="col-b" >
+                <h2><%= @store_name %></h2>
+                <h4 > <div class="title"><%= "#{t('invoice_no')}" %></div><div class="title_text"><%= ": " + @invoice.invoice_no %></div> </h4>
+                <h4 > <div class="title"><%= "Invoice Date" %></div><div class="title_text"> <%= ": " + format_date(@invoice.date) %> </div></h4>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section" >
+        <table id="pdf-table" width="100%" cellspacing="0">
+            <tr class="table-header">
+                <td class="sl-td"><%= t('sl_no') %></td>
+                <td class="note-td"><%= t('item_description') %></td>
+                <td class="rec-td"> <%= "#{t('rate')}" %></td>
+                <td class="rec-td"> <%= "#{t('quantity')}" %></td>
+                <td class="rec-td"> <%= "#{t('amount')} (#{@currency})" %></td>
+            </tr>
+            <% c= 'even' %>
+            <% i = 0 %>
+            <% @invoice.sold_items.each do |item| %>
+              <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+                  <td class="sl-td"><%= i+=1 %></td>
+                  <td class="note-td"><%= item.store_item.item_name %></td>
+                  <td class="rec-td"><%= precision_label(item.store_item.unit_price) %></td>
+                  <td class="rec-td"><%= item.quantity %></td>
+                  <td class="rec-td"><%= precision_label(item.rate)  %></td>
+              </tr>
+            <% end %>
+        </table>
+
+        <div class ="subtotal_fields">
+            <div class="label-field-show1">
+                <div class="label-container1"><%= "#{t('subtotal')}" %></div>
+                <div class="label-output1">:  <%= @currency + @invoice.gross_amount.to_s %></div>
+            </div>
+        </div>
+        <% unless @invoice.tax.nil? %>
+          <div class="subtotal_fields">
+
+              <div class="label-field-show1">
+                  <div class="label-container1"><%= "#{t('tax')} (%)" %></div>
+                  <div class="label-output1">:  <%=h precision_label(@invoice.tax) %></div>
+              </div>
+          </div>
+        <% end %>
+    </div>
+    <% total_charges = 0 %>
+
+    <% unless @invoice.additional_charges.empty?  %>
+      <div class="section">
+          <h4 class="heading">Additional Charges</h4>
+          <table id="pdf-table" width="70%" cellspacing="0" class="sub_charges">
+              <tr class="table-header">
+                  <td class="sl-td"><%= t('sl_no') %></td>
+                  <td class="note-td"><%= t('name') %></td>
+                  <td class="rec-td"><%= "#{t('amount')}  (#{@currency})" %></td>
+              </tr>
+              <% c= 'even' %>
+              <% i = 0 %>
+              <% @invoice.additional_charges.each do |charge| %>
+                <tr class="<%= cycle('even','odd ') %>">
+                    <td class="sl-td"><%= i+=1 %></td>
+                    <td class="note-td"><%= charge.name %></td>
+                    <td class="rec-td"><%= precision_label(charge.amount) %></td>
+                </tr>
+              <% end %>
+          </table>
+
+
+      </div>
+    <% end %>
+
+    <% total_discounts = 0 %>
+    <% unless @invoice.discounts.empty? %>
+      <div class="section">
+          <h4 class="heading">Discounts</h4>
+          <table id="pdf-table" width="70%" cellspacing="0" class="sub_charges">
+              <tr class="table-header">
+                  <td class="sl-td"><%= t('sl_no') %></td>
+                  <td class="note-td"><%= t('name') %></td>
+                  <td class="rec-td"><%= "#{t('amount')} (#{@currency})" %></td>
+              </tr>
+              <% c= 'even' %>
+              <% i = 0 %>
+              <% @invoice.discounts.each do |dis| %>
+                <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+                    <td class="sl-td"><%= i+=1 %></td>
+                    <td class="note-td"><%= dis.name %></td>
+                    <td class="rec-td"><%= precision_label(dis.amount) %></td>
+                </tr>
+              <% end %>
+          </table>
+
+
+      </div>
+    <% end %>
+
+    <div class="section page-break-avoid">
+        <div class ="subtotal_fields">
+            <div class="label-field-show1">
+                <div class="label-container1"><%= "#{t('grandtotal')}" %></div>
+                <div class="label-output1">:  <%= @currency + precision_label(@invoice.payable_amount) %></div>
+            </div>
+
+        </div>
+    </div>
+
+    <% if @invoice.is_paid %>
+      <div class="section">
+          <div class="hor_line"></div>
+          <div class="page-break-avoid">
+              <h4>Payment Details</h4>
+              <table id="pdf-table" width="100%" cellspacing="0">
+                  <tr class="table-header">
+                      <td class="sl-td"><%= "Transaction date" %></td>
+                      <td class="sl-td"><%= "Transaction id" %></td>
+                      <td class="rec-td"><%= "#{t('amount')} (#{@currency})" %></td>
+                  </tr>
+                  <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+                      <td class="sl-td"><%= format_date(@transaction_date) %></td>
+                      <td class="note-td"><%= @reciept_no %></td>
+                      <td class="note-td"><%= @amount %></td>
+                  </tr>
+              </table>
+          </div>
+      </div>
+    <% end %>
+</div>

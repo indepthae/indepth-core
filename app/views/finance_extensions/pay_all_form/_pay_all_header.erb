@@ -1,0 +1,66 @@
+<div class="details">
+    <div class="name">
+        <%= t('student_name') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+
+        <div class="val-align">
+            <div class= "student-name-div" ><%= @student.full_name %></div>
+            <% if can_access_request? :student_search_autocomplete, :finance_extensions %>
+              <div class="change-student">
+                  <a href="#" id="change-student" onclick="show_student_search();" style="color:black;margin:0px 10px 0px 10px">
+                      <%= t('change_student') %>
+                  </a>
+              </div>
+            <% end %>
+        </div>
+    </div>
+    <div class="name">
+        <%= t('admission_no') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+
+        <div class="val-align">
+            <%= @student.admission_no %>
+        </div>
+    </div>
+
+    <% if roll_number_enabled? %>
+      <div class="name">
+          <%= t('roll_no') %>
+      </div>
+      <div class="val">
+          <span>:</span>
+
+          <div class="val-align">
+              <%= @student.roll_number %>
+          </div>
+      </div>
+    <% end %>
+
+
+    <div class="name">
+        <%= t('current_batch') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+
+        <div class="val-align">
+            <%= @student.batch.full_name %>
+        </div>
+
+    </div>
+    <div class="name">
+        <%= t('student_category') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+
+        <div class="val-align">
+            <%= @student.student_category.present? ? @student.student_category.name : "-" %>
+        </div>
+
+    </div>
+</div>

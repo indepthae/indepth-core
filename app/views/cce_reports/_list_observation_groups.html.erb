@@ -1,0 +1,17 @@
+<%if @observation_groups.present?%>
+  <div class="label-field-pair">
+    <label for="observation_groups">Observation Group</label>
+    <div  class="text-input-bg" id="exam-group-select">
+      <%=select :subject_report,:observation_group_id, grouped_options_for_select([['Co-Scholastic Area',@observation_groups.all(:conditions=>{:observation_kind=>"1"}).map{|a| [a.name,a.id]}],
+          ['Co-Scholastic Activity', @observation_groups.all(:conditions=>{:observation_kind=>"3"}).map{|a| [a.name,a.id]}]],{},"Select an observation group") %>
+    </div>
+  </div>
+<%else%>
+  <div class="label-field-pair2">
+    <label for="observation_group">Observation Group</label>
+    <div  class="text-input-bg2" id="exam-group-select">
+      <%= select :subject_report,:observation_group_id, @observation_groups.map{|og| [og.name,og.id]},:prompt=> "Select an observation group" %>
+    </div>
+  </div>
+
+<%end%>

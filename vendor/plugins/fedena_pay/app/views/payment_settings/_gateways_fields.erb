@@ -1,0 +1,6 @@
+<% @gateway_fields.each do |field| %>
+  <div class="label-field-pair">
+    <label for=<%= "#{field}" %>><%= field %></label>
+    <div class="text-input-bg"><%= text_field_tag "payment_settings",field %></div>
+  </div>
+<% end %>

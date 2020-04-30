@@ -1,0 +1,19 @@
+<% if @attendance_dates.present? %>
+  <table id="date-table" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="sl_no"><%= t('no_text') %></td>
+          <td class="name"><%= t('batch') %></td>
+          <td class="date"><%= t('start_date') %></td>
+          <td class="date"><%= t('end_date') %></td>
+      </tr>
+      <% i=0 %>
+      <% @attendance_dates.each do |date| %>
+        <tr>
+            <td class="sl_no"><%= i+=1 %></td>
+            <td class="name"><%= @batches.find{|b| b.id == date.batch_id}.full_name %></td>
+            <td class="date"><%= format_date(date.start_date) %></td>
+            <td class="date"><%= format_date(date.end_date) %></td>
+        </tr>
+      <% end %>
+  </table>
+<% end %>

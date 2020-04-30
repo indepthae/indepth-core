@@ -1,0 +1,35 @@
+<% if params[:mode] == 'Overall' %>
+  <% remote_form_for :column_names, :url => {:controller => 'attendance_reports', :action => 'show', :subject_id => params[:subject_id], :batch_id => params[:batch], :end_date => params[:end_date],  :start_date => params[:start_date], :year => params[:year], :month => params[:month], :mode => params[:mode]},
+    :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+    <%= session_fingerprint_field %> 
+    <div id="report_column_form">
+        <%= render :partial => "customize_columns_fields", :locals => {:s => s, :selected_columns  => @selected_columns } %>
+    </div>
+    <div id="popup_footer">
+        <div class="view_button">
+        <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+        <div class="submit-button" onclick="remove_popup_box();"><%= t('cancel') %></div>
+         </div>
+    </div>
+  <% end %>
+<% else %>
+<% remote_form_for :column_names, :url => {:controller => 'attendance_reports', :action => 'report', :batch_id => params[:batch],  :end_date => params[:end_date],  :start_date => params[:start_date], :year => params[:year], :month => params[:month], :subject_id => params[:subject_id], :mode => params[:mode]},
+    :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |s| %>
+    <%= session_fingerprint_field %> 
+    <div id="report_column_form">
+        <%= render :partial => "customize_columns_fields", :locals => {:s => s,:selected_columns  => @selected_columns  } %>
+    </div>
+    <div id="popup_footer">
+        <div class="view_button">
+        <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+        <div class="submit-button" onclick="remove_popup_box();"><%= t('cancel') %></div>
+        </div>
+    </div>
+  <% end %>
+<% end %>
+
+
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

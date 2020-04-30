@@ -1,0 +1,299 @@
+<%- # Fedena #Copyright 2010 Foradian Technologies Private Limited #
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/ #
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at # # http://www.apache.org/licenses/LICENSE-2.0 #
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY #KIND, either express or implied. See the License for the
+#specific language governing permissions and limitations #under the License.
+-%>
+
+<div class="extender"></div>
+<div id="feecategory_name" style="display: none">
+    <%= @fee_category.name %>
+</div>
+<div class="each-detail">
+    <div id="hide1">
+        <label class="name"><%= t('student_text') %></label>
+        <div class="val">
+            <div class="text-input-bg val-align">
+                <%= select :fees_submission, :batch_id, @students.map { |c| [c.full_name, c.id] }, 
+                  {:prompt => "#{t('switch_student')}", :selected => @student.id}, 
+                  {:onChange => "#{remote_function(:url => {:action => "load_fees_submission_batch"}, 
+                  :with => "'student='+value+'&batch_id='+#{@batch.id}+'&date='+#{@date.id}", 
+                  :before => "Element.show('s_loader')", :success => "Element.hide('s_loader')")}" } %>
+            </div>
+        </div>
+        <div class="loader_div">
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "s_loader",
+              :style =>"display: none; " ) %>
+        </div>
+<%#=link_to_function "show inactive batches","show_inactive_batches()",{:class=>'user_button'}%>
+    </div>
+</div>
+<div class="each-detail ">
+    <div class="name">
+        <%= "#{t('student_text')} #{t('admission_no')}" %>
+    </div>
+    <div class="val">
+        <div class="val-align"><%= @student.admission_no %></div>
+    </div>
+</div>
+<% if roll_number_enabled? %>
+  <div class="each-detail ">
+      <div class="name">
+          <%= "#{t('student_text')} #{t('roll_no')}" %>
+      </div>
+      <div class="val">
+          <div class="val-align"><%= @student.roll_number %></div>
+      </div>
+  </div>
+<% end %>
+<div class="each-detail">
+    <% unless @student.student_category.nil? %>
+      <div class="name">
+          <%= t('student_category') %>
+      </div>
+      <div class="val">
+          <div class="val-align">
+              <%= @student.student_category.name %>
+          </div>
+      </div>
+    <% end %>
+</div>
+
+<div class="height-fixer"></div>
+<div class="extender"></div>
+
+<div id="flash"></div>
+
+<%= error_messages_for "financefee", :header_message => nil %>
+<% if @particular_wise_paid or !@financial_year_enabled %>
+  <%= render :partial => "finance_extensions/flash_notice" %>
+<% end %>
+
+<div class="extender"></div>
+
+<div id="register">
+    <div class="header">
+        <% if @prev_student.present? %>
+          <div class="prev stu" next_or_prev_name="<%= @prev_student.full_name %>" 
+               student_name="<%= @student.full_name %>" side="left">
+                   <%= link_to_remote '◄', :url => {:action => 'load_fees_submission_batch', 
+                     :batch_id => @batch.id, :student => @prev_student.id, :date => @date.id} %>
+          </div>
+        <% end %>
+        <div class="month">
+            <%= @student.full_name %>
+            <%= "(#{t('transfered_to_batch')}:#{@student.batch.full_name})" unless @batch==@student.batch %>
+        </div>
+
+        <% if @next_student.present? %>
+          <div class="next stu" next_or_prev_name="<%= @next_student.full_name %>" 
+               student_name="<%= @student.full_name %>" side="right">
+                   <%= link_to_remote '►', :url => {:action => 'load_fees_submission_batch', :batch_id => 
+                       @batch.id, :student => @next_student.id, :date => @date.id} %>
+          </div>
+        <% end %>
+        <div class="hover-text">
+            <label class="next_or_previous"></label>
+
+            <div class="hover_student_name"></div>
+            <div class="hover_arrow_down"></div>
+        </div>
+        <div class="extender"></div>
+    </div>
+</div>
+
+<% total_fees =0 %>
+<% @total_fine = 0 %>
+<% total_fees1 = 0 %>
+
+<% form_remote_for :fees, :url => {:action => 'update_ajax', :student => @student.id, :batch_id => @batch.id,
+    :date => @date.id, :fine => @fine, :special_fine => @fine_amount, :disabled => !@financial_year_enabled},
+    :html => {:id => "fees_form"}, :before => "prev_double()", :success => "set_back()" do |form| %>
+  <% locals = {:form => form} %>
+
+  <% unless @fee_particulars.nil? %>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+        <tr class="main_head tr-list_head">
+            <td class="sl-col"><%= t('sl_no') %></td>
+            <td class="set_border_right"><%= t('particulars') %></td>
+            <td class="set_border_right" colspan="2">
+                <%= t('amount') %>
+                (<%= currency %>)
+            </td>
+        </tr>
+        <% i = 0 %>
+        <%= render :partial => 'finance/fees_payment/particular_list' %>
+        <%= render :partial => 'finance/fees_payment/discount_list', 
+          :locals => {:i => i, :total_fees => total_fees} %>
+
+        <% if @financefee.tax_enabled? and @financefee.tax_collections.present? %>            
+          <%= render :partial => 'finance/fees_payment/tax_list', 
+            :locals => {:i => i, :total_tax => total_fees } %>
+        <% end %>
+        <%= render :partial => 'finance/fees_payment/student_fine_list', :locals =>  {:i => i, 
+          :total_fees => total_fees, :payment_date => @payment_date} %>
+        <%= render :partial => "finance/fees_payment/add_fine_due_date_exceeded" %>
+
+        <% balance = @financefee.balance.to_f + @fine.to_f %>
+
+        <%= render :partial => 'finance/fees_payment/summary', 
+          :locals =>  {:i => i, :total_fine => @total_fine.to_f} %>
+
+        <%= render :partial => "finance/fees_payment/payment_block", 
+          :locals =>  locals.merge({:balance => balance,:total_fees1 => total_fees1, :defaulter_flag => false}) %>
+      <% end %>
+  </table>
+<% end %>
+
+<%= render :partial => 'finance/fees_payment/paid_fees', :locals => {:batch_id => @batch.id, 
+  :delete_action => "delete_transaction_by_batch"} %>
+
+<script type="text/javascript">
+  /*
+   j('#fees_payment_mode').change(function () {
+   switch (j(this).val()) {
+   case 'Online Payment':
+   j('.reference_no').find('label').text("<%=t('transaction_id')%>");
+   break;
+   case 'Cheque':
+   j('.reference_no').find('label').text("<%=t('cheque_no')%>");
+   break;
+   case 'DD':
+   j('.reference_no').find('label').text("<%=t('dd_no')%>");
+   break;
+   default:
+   j('.reference_no').find('label').text("<%=t('reference_no')%>");
+   break;
+   }
+   });
+   */
+  j(document).undelegate(".fine-deletion", "click");
+  j(document).undelegate(".auto-fine-deletion", "click");
+  j("form").submit(function () {
+      j('#submit_button').attr('disabled', 'disabled')
+      j('#submit_button').val('<%=t('please_wait') %>');
+  });
+
+  j("form").bind('ajax:complete', function () {
+      j('#submit_button').removeAttr('disabled')
+      j('#submit_button').val('<%="► #{t('pay_fees')}" %>');
+  });
+
+  j(document).click(function (e) {
+      j('div#revert-pop-up').hide();
+  });
+
+  j(function () {
+      j('.inactive-delete').hover(function (e) {
+          var moveLeft = 0;
+          var moveDown = 0;
+          var moveLeft = ((j(this).position().left) + (j(this).width()) / 2);
+          var moveDown = (j(this).position().top) - 35;
+          trans_details_show(moveLeft, moveDown, this);
+      }, function () {
+          j('div#revert-pop-up').hide();
+      });
+  });
+
+  function trans_details_show(moveLeft, moveDown, e) {
+      var rtl = "<%= (rtl?) ? 'rtl' : 'ltr'  %>";
+      if (rtl == 'rtl') {
+          left_index = -40;
+      } else {
+          left_index = -285;
+      }
+      moveLeft = moveLeft + left_index;
+      j('div#revert-pop-up').delay(350).show(0);
+      moveDown = moveDown - (j('div#revert-pop-up').height());
+      j("div#revert-pop-up").css('top', moveDown).css('left', moveLeft);
+  }
+
+  j(function () {
+      j('.stu').hover(function (e) {
+          var left_or_right = "<%= (rtl?) ? 'right' : 'left'  %>"
+          j('.hover_student_name').text(j(this).attr('next_or_prev_name'));
+          if (j(this).attr('side') == 'left') {
+              j('.hover-text').css('margin-' + left_or_right, '0px');
+              j('.next_or_previous').text('<%="#{t('previous')} #{t('student_text')}" %>');
+          } else {
+              j('.hover-text').css('margin-' + left_or_right, '445px');
+              j('.next_or_previous').text('<%="#{t('next')} #{t('student_text')}" %>');
+          }
+          j('.hover-text').show();
+      }, function () {
+          j('.hover-text').hide();
+      });
+  });
+
+  j(document).ready(function () {
+      j('.due_date_message').css('width', (410 - j('.text-input-bg1').width()));
+  });
+
+  j("#submit_button").click(function (e) {
+      var precision = parseInt("<%= @precision %>");
+      amount_paying = parseFloat(j("#fees_fees_paid").val());
+      payment_done = parseFloat(j(".payment_done").text());
+      amount_to_pay = parseFloat(j(".amount_to_pay").text());
+      total_fees = parseFloat(j(".total_fees").text());
+      if ((amount_paying > (total_fees - payment_done)) && amount_paying != amount_to_pay) {
+          alert("can't do partial payment for fine");
+          j("#fees_fees_paid").val(amount_to_pay.toFixed(precision));
+          e.preventDefault();
+      }
+  });
+
+  j(document).delegate('.fine-deletion', 'click', function (e) {
+      if (j(this).hasClass('fine-deletion')) {
+          student = j(this).attr('student');
+          batch_id = j(this).attr('batch_id');
+          date = j(this).attr('date');
+          proceed = confirm('<%=t('delete_confirm_msg') %>');
+          if (proceed) {
+              j.ajax({
+                  method: "post",
+                  url: '/finance/update_fine_ajax',
+                  data: {
+                      "fine[student]": student,
+                      "fine[batch_id]": batch_id,
+                      "fine[date]": date
+                  }
+              });
+          }
+      }
+  });
+  
+  j(document).delegate('.auto-fine-deletion', 'click', function (e) {
+      if (j(this).hasClass('auto-fine-deletion')) {
+          student = j(this).attr('student');
+          batch_id = j(this).attr('batch_id');
+          date = j(this).attr('date');
+          proceed = confirm('<%=t('delete_confirm_msg') %>');
+          if (proceed) {
+              j.ajax({
+                  method: "post",
+                  url: '/finance/update_fine_ajax',
+                  data: {
+                      "fine[student]": student,
+                      "fine[batch_id]": batch_id,
+                      "fine[date]": date,
+                      "fine[is_fine_waiver]": "true"
+                  }
+              });
+          }
+      }
+  });
+  
+
+  if (j('.flash-msg').length > 0) {
+      j('#fees_detail').css('padding-top:0px');
+  }
+
+</script>

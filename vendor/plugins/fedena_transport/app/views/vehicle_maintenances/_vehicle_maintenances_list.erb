@@ -1,0 +1,36 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="vehicle_listing">
+    <tr class="tr-head">
+        <td class="vehicle_no"><%= t('name') %></td>
+        <td class="seats_no"><%= t('maintenance_date') %></td>
+        <td class="vehicle_type"><%= t('next_maintenance_date') %></td>
+        <td class="vehicle_model"><%= "#{t('amount')} &#x200E;(#{@currency})&#x200E;" %></td>
+        <td class="actions"></td>
+    </tr>
+    <%if @maintenance_records.present?%>
+      <% @grouped_records.each do |vehicle_no, maintenance_records| %>
+        <tr><td colspan="5" class="sub-head"><%= vehicle_no %></td></tr>
+        <% maintenance_records.each do |v| %>
+          <tr>
+              <td><%= link_to v.name,vehicle_maintenance_path(v.id) %></td>
+              <td> <%= format_date(v.maintenance_date) %></td>
+              <td> <%= format_date(v.next_maintenance_date) %></td>
+              <td> <%= precision_label(v.amount) %></td>
+              <td>
+                  <%= link_to "#{t('edit_text')}", edit_vehicle_maintenance_path(v) %>
+                  <%= link_to t('delete'), delete_record_vehicle_maintenance_path(v), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_maintenance_record_confirmation', {:name => v.name})}',
+      {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_maintenance_record')}', 'popup_class' : 'delete_confirmation'}); " %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="5"><%= t('no_maintenance_records_added') %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @maintenance_records.present? %>
+  <%= pagination_status(@maintenance_records) %>
+<% end %>
+<%= will_paginate @maintenance_records %>

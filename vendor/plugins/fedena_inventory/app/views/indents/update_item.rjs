@@ -1,0 +1,3 @@
+page << "$('#{@i}').up(parseInt('#{@up_by}')).select('.nested_batch_no').first().value = '#{@batch_no}'"
+page << "$('#{@i}').up(parseInt('#{@up_by}')).select('.nested_price').first().value = '#{precision_label(@price)}'"
+page << "$('#{@i}').up(parseInt('#{@up_by}')).select('.nested_qty').first().value = #{@qty}"

@@ -1,0 +1,33 @@
+<% preview ||= false %>
+<div class="receipt-container">
+  <%= render :partial => "finance_extensions/receipts/common/receipt_header",
+             :locals => {:template_id => transaction_hash.template_id,
+                         :default_configs => transaction_hash.default_configs, :printer => true, :preview => preview} %>
+  <!--
+  < %= render :partial => "finance_extensions/receipts/print/a4/header",
+    :locals => {:template_id => transaction_hash.template_id,
+    :default_configs => transaction_hash.default_configs} %> -->
+  <%= render :partial => "finance_extensions/receipts/print/a4/basic_info",
+             :locals => {:transaction_hash => transaction_hash} %>
+
+  <%= render :partial => "finance_extensions/receipts/print/a4/receipt_data",
+             :locals => {:transaction_hash => transaction_hash} %>
+
+  <div class="small_hor_line"></div>
+
+  <%= render :partial => "finance_extensions/receipts/common/receipt_footer",
+             :locals => {:template_id => transaction_hash.template_id,
+                         :default_configs => transaction_hash.default_configs, 
+                         :transaction_status => transaction_hash.transaction_status} %>
+
+</div>
+
+<div class="page-break"></div>
+
+<script type="text/javascript">
+    // var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+    // if (isFirefox) {
+    //   j(".receipt-container").css("width","185mm");
+    // }
+    set_width_in_firefox("185mm");
+</script>

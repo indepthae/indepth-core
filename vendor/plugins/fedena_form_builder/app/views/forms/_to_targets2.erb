@@ -1,0 +1,26 @@
+
+
+<% string = @to_targets.inject('') { |arr, u| arr + u.user_id.to_s + ',' }.chomp(',') %>
+<% add = "<span>#{t('add')}</span>" %>
+<div class="label-field-pair-form">
+  <label for="student_grade"><%= t('select_recipient') %></label>
+  <div class ="scrolable" >
+    <div class="scroll-inside">
+      <div class="hover">
+        <%= link_to "#{t('select_all')}", '#', :onClick => "add_all_target('#{string}');", :class=> 'all' %>
+        <%= link_to "#{t('none')}", '#', :onClick => "remove_all_target('#{string}');", :class=> 'all' %>
+      </div>
+      <% @to_targets.each do |t| %>
+        <% user_name = "<span>(#{t.user.username})&#x200E;</span><span>#{t('add')}</span>" %>
+        <div class="hover"><%= link_to shorten_string(t.full_name,18)+user_name  , '#', :onClick => "add_target(#{t.user_id});", :class=>'individual',
+            :before => "Element.show('loader2')",
+            :success => "Element.hide('loader2')" %>
+
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+

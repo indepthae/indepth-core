@@ -1,0 +1,25 @@
+<% if batch.present? %>
+  <% fine_list= student.library_fines_by_batch_id(batch.id)%>
+<% else %>
+  <% fine_list= student.library_fines_by_batch_id(nil)%>
+<% end %>
+<% unless fine_list.empty? %>
+  <tr class="table_subtitle">
+    <td colspan="4"><%= t('library_text') %></td>
+  </tr>
+  <% fine_list.each do | fine | %>
+    <tr class="item">
+      <td >
+        <%= t('due_fine') %>
+      </td>
+      <td class="status_cell" data-status="paid"><%=  t('paid')  %></td>
+      <td>
+        <%= precision_label(fine.amount.to_f) %>
+      </td>
+      <td class="due-date">
+        <%= t('paid_on') %>
+        <%= format_date(fine.date.to_date) %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>

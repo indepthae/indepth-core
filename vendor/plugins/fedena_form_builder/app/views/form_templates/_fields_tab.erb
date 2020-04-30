@@ -1,0 +1,5 @@
+<ul>  
+  <% @form_template.class::FieldList[:fields].each do |field| %>
+    <li class="drag_me" attr-data="<%= field.second["field_type"] %>"><%= t(field.second["show_label"]) %></li>
+  <% end %>
+</ul>

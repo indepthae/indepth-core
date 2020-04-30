@@ -1,0 +1,89 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% content_for :head do %>
+  <% if (rtl?) %>
+    <%= stylesheet_link_tag "rtl/gray_table_design" %>
+    <%= stylesheet_link_tag "rtl/finance/monthly_report" %>
+  <% else%>
+    <%= stylesheet_link_tag "gray_table_design" %>
+    <%= stylesheet_link_tag "finance/monthly_report" %>
+  <% end %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('income') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('income_list') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% _params = [@start_date, @end_date] %>
+        <% _params += @accounts_enabled ? [@account_id] : [] %>
+        <% breadcrumb :finance_income_details, [@income_category, _params] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless @incomes.empty? %>
+      <div class="main_head_label" style="margin-bottom: 30px">
+          <b id="fees_report_title"><%=@income_category.name%></b>
+      </div>
+      <div class="list_table_div">
+          <% grand_total=0%>
+          <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+              <tr class="main_head">
+                  <td><%= t('name') %></td>
+                  <td class="set_border_right"><%= t('description') %></td>
+                  <td class="set_border_right" ><%= t('amount') %> (<%= currency %>)</td>
+                  <td class="set_border_right"><%= t('transaction_date') %></td>
+                  <td class="set_border_right"><%= t('receipt_no') %></td>
+              </tr>
+              <% @incomes.each do |i| %>
+                <tr class="row-b">
+                    <td><%= i.title %></td>
+                    <td class="set_border_right"><%= i.description %></td>
+                    <td class="set_border_right" align="right">
+                        <%=precision_label(i.amount)%>
+                        <%grand_total+=i.amount.to_f%>
+                    </td>
+                    <td class="set_border_right"><%= format_date(i.transaction_date) %></td>
+                    <td class="set_border_right"><%= i.receipt_number %></td>
+                </tr>
+              <% end %>
+          </table>
+          <div class="total_amount_div">
+              <label><%= t('net_income') %></label>
+              <label class="amount_label"><%=precision_label(grand_total)%></label>
+          </div>
+          <div class="seprater_div_bottom">
+              <div id="inner-tab-menu">
+                  <ul>
+                      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('csv_report')}", { 
+                            :controller => "csv_export", :action => "generate_csv",:id=>params[:id],
+                            :csv_report_type => "custom_category-#{@income_category.name}", 
+                            :report_format_type => "csv",:start_date => @start_date, :end_date=>@end_date}%>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <% end %>
+</div>
+

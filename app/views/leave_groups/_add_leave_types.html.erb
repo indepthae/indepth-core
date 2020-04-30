@@ -1,0 +1,51 @@
+<% remote_form_for @leave_group, :url => add_leave_types_leave_group_path(@leave_group), :method => :put, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |lg| %>
+  <%= session_fingerprint_field %>
+  <div id="leave_group_form">
+      <div id ="description"><%= t('select_leave_types_for_group') %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="check_all"><input type="checkbox" class="select_all" onclick="checkAll()"/></td>
+              <td class="lev_name"><%= t('leave_type') %></td>
+              <td class="lev_count"><%= t('leave_count').titleize %></td>
+          </tr>
+          <% lg.fields_for :leave_group_leave_types, @leave_group.leave_group_leave_types do |type| %>
+            <% l_obj = type.object %>
+            <% if l_obj.type_name.present? %>
+              <tr>
+                  <td class="check_all">
+                      <%= type.check_box :selected, :id => l_obj.employee_leave_type_id, :class => "select_leave", :onclick => "selectLeaveType(this)" %>
+                      <%= type.hidden_field :employee_leave_type_id %>
+                  </td>
+                  <td class="lev_name"><%= l_obj.type_name %></td>
+                  <td class="lev_count">
+                      <% config = leave_reset_configuration %>
+                      <% leave_credit_type = leave_credit_type(l_obj.employee_leave_type_id) %>
+                      <% if  config == "1"  and leave_credit_type == "Slab" %><div class="tooltip_info2" tooltip ="<%= t('slab_leave_count') %>"></div><% end %>
+                      <%= type.text_field :leave_count, :value => l_obj.display_leave_count, :readonly => !l_obj.selected, :class => "leave_count" %>
+                  </td>
+              </tr>
+            <% else %>
+              <%= type.hidden_field :selected, :value => "0" %>
+              <%= type.hidden_field :employee_leave_type_id %>
+            <% end %>
+         <% end %>
+       </table>
+      <% if @config == '1' %>
+      <div class="update_credit_checkbox"> <%= check_box_tag :update_credit %><span class="update_credit_lebal"><%=t('credit_label_value')%></span></div>
+      <div class="update_credit_hint"><%=t('msg_for_credit')%></div>
+      <% end %>
+  </div>
+  <div id="popup_footer">
+      <%=  submit_tag "#{t('add_to_group')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('.error-icon').each(function () {
+      j(this).attr('tooltip', (j(this).next('.error-msg').html()));
+      j(this).next('.error-msg').remove();
+  });
+  j('#popup_box_overlay').click(remove_popup_box);
+  allLeaves()
+</script>

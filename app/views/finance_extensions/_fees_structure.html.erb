@@ -1,0 +1,110 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div class="info">
+    <div class="set_align_div">
+        <div class="name"><%= t('fee_collection_name') %></div>
+        <div class="val "><span>:</span><%= @date.name %></div>
+    </div>
+    <% if @fee_category.present? %>
+      <div class="set_align_div">
+          <div class="name"><%= t('fee_category_name') %></div>
+          <div class="val "><span>:</span><%= @fee_category.name %></div>
+      </div>
+    <% end %>
+    <div class="set_align_div">
+        <div class="name"><%= t('start_date') %></div>
+        <div class="val"><span>:</span><%= format_date(@date.start_date) %></div>
+    </div>
+    <div class="set_align_div">
+        <div class="name"><%= t('due_date') %></div>
+        <div class="val "><span>:</span><%= format_date(@date.due_date) %></div>
+        <div class="extender"></div>
+    </div>
+</div>
+<% total_fees =0 %>
+
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1" style="float: left;">
+    <tr class="tr-head">
+        <td>Sl no.</td>
+        <td><%= t('particulars') %></td>
+        <td><%= t('amount') %>  (<%= currency %>)</td>
+    </tr>
+    <% i = 0 %>
+    <% total_fees = precision_label(@total_payable).to_f  %>
+    <% if @fee.is_a?(FinanceFee) %>
+      <%= render :partial => 'finance/particular_list_show_only' %>
+      <% unless @total_discount == 0 %>
+        <tr class="tr-blank"></tr>
+        <tr class="tr-head" cellpadding="1" cellspacing="1">
+            <td class="col-1" ></td>
+            <td class="col-1" colspan="2"><span><%= t('discount') %></span></td>
+        </tr>
+        <%= render :partial => 'finance/discount_list_show_only', :locals => {:i => i, :total_fees => total_fees} %>
+      <% end %>
+      <% total_fees = (precision_label(@total_payable).to_f-precision_label(@total_discount.to_f).to_f).to_f  %>
+    <% elsif @fee.is_a?(TransportFee) %>
+      <%= render :partial => 'transport_fee_particulars_list' %>
+      <% unless @total_discount == 0 %>
+        <tr class="tr-blank"></tr>
+        <tr class="tr-head" cellpadding="1" cellspacing="1">
+            <td class="col-1"></td>
+            <td class="col-1" colspan="2"><span><%= t('discount') %></span></td>
+        </tr>
+        <%= render :partial => 'transport_discount_list_show_only', :locals => {:i => i, :total_fees => total_fees} %>
+      <% end %>
+    <% elsif @fee.is_a?(HostelFee) %>
+      <%= render :partial => 'hostel_fee_particulars_list' %>
+    <% end %>
+
+    <% unless @fee.is_a?(TransportFee) %>
+      <% if @fee.tax_enabled? and @fee.tax_collections.present? %>
+        <tr class="tr-blank"></tr>
+        <% total_fees += @total_tax %>
+        <%= render :partial => 'finance/tax_list', :locals => {:i => i, :total_tax => total_fees } %>          
+      <% end %>
+    <% else %>
+      <% if @fee.tax_enabled? and @fee.tax_collections.present? and @fee.tax_amount.present? %>
+        <tr class="tr-blank"></tr>
+        <% total_fees += precision_label(@fee.tax_amount).to_f %>
+        <%= render :partial => 'finance/tax_list', :locals => {:i => i, :total_tax => total_fees } %>
+      <% end %>
+    <% end %>
+
+    <% if @fee.is_a?(FinanceFee) %>
+      <% @total_fine = 0 %>
+      <%= render :partial => 'finance/student_fine_list', :locals => {:i => i, :total_fees => total_fees,:payment_date=> @transaction_date} %>
+    <% elsif @fee.is_a?(TransportFee)%>
+      <%=  render :partial => 'transport_fine_list', :locals => {:i => i, :total_fees => total_fees,:payment_date=> @transaction_date}  %>
+    <% else %>
+      <%= render :partial => 'other_fee_fine', :locals => {:i => i, :total_fees => total_fees} %>
+    <% end %>
+    <tr class="tr-blank"></tr>
+    <% @show_due_amount = true %>
+    <% @financefee = @fee %>
+    <%= render :partial => 'fee_structure_summary' ,:locals => {:total_fine=>@total_fine}%>
+
+</table>
+<div class="align_center">
+    <%= link_to t("#{@invoice_enabled ? 'view_invoice' : 'view_pdf'}"), { :action => 
+        "fee_structure_pdf", :id => @student.id, :id2 => @date.id,  :fee_type => 
+        @fee.class.name.underscore.pluralize}, :target => '_blank', :class => 'user_button'%>          
+</div>
+
+

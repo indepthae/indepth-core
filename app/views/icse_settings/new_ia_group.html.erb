@@ -1,0 +1,24 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>ICSE Settings</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>IA Group</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% form_for(@ia_group, :url => {:action=> 'create_ia_group'}, :html=> {:multipart=>true}) do |ia| %>
+    <%= error_messages_for 'ia_group', :header_message => nil %>
+    <%= render :partial=>"ia_form",:locals=>{:ia=>ia} %>
+    <div id="submit-button">
+      <%=  submit_tag "► #{t('create_text')}",:class=>'submit_button',:disable_with => "► Please Wait.." %>
+    </div>
+  <%end%>
+</div>

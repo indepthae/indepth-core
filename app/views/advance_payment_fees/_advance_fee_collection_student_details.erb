@@ -1,0 +1,33 @@
+<div class="details">
+    <div class="name normal_font">
+        <%= t('student_name') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+        <div class="val-align">
+            <%= @student.full_name %>
+        </div>
+    </div>
+</div>
+<div class="details">
+    <div class="name normal_font">
+        <%= t('admission_no') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+        <div class="val-align">
+            <%= @student.admission_no %>
+        </div>
+    </div>
+</div>
+<div class="details">
+    <div class="name normal_font">
+        <%= t('batch_name') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+        <div class="val-align">
+            <%= @student.batch.full_name %>
+        </div>
+    </div>
+</div>

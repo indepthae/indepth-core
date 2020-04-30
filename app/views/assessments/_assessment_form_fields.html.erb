@@ -1,0 +1,14 @@
+<tr>
+    <td class="date"><%= c.calendar_date_select :exam_date,:popup=>"force", :id => "exam_date", :onchange => "checkOverlap(); checkExamDate(this);" %></td>
+    <td class="time"><%= c.text_field :start_time, :class => "start_time", :onchange => "checkStartTime(this); checkOverlap();" %></td>
+    <td class="time"><%= c.text_field :end_time, :class => "end_time", :onchange => "checkEndTime(this); checkOverlap();" %></td>
+    <% if [1, 3].include? @assessment_group.scoring_type %>
+      <td class="max_marks"><%= c.text_field :maximum_marks, :class => "max_marks", :onchange => "checkMaxMarks(this);" %></td>
+    <% end %>
+    <% if @assessment_group.scoring_type == 1 %>
+      <td class="max_marks"><%= c.text_field :minimum_marks, :class => "min_marks", :onchange => "checkMinMarks(this);" %></td>
+    <% end %>
+    <td class="batch">
+        <%= c.select :subject_list, grouped_options_for_select_with_option_edit(@subjects, "#{c.object.subject_id}-#{c.object.elective_group_id}", [],t('select_subject_exam')), {}, {:class => 'select-list'} %>
+    </td>
+</tr>

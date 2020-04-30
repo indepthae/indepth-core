@@ -1,0 +1,13 @@
+<table class="block_table"><td class="key_sub_heads"> <%= "#{t("template_keys_set.common_keys")}" %></td>
+</table>
+<div class="key_set_container">
+  <table class="block_table">
+    <%@common_keys.each do |key,value| %>
+    <tr>
+      <td><%= value %></td>
+      <td class="center_text"><%= " {{#{key.to_s}}} "%></td>
+    </tr>
+    <%end%>
+  </table>
+</div>
+

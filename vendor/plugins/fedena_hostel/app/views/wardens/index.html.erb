@@ -1,0 +1,39 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('hostel_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_wardens') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_warden')}", new_hostel_warden_path(@hostel.id)%></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :wardens_index,  @hostel%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="name"><%= t('hostel_text') %> </div><span id="colon_seperator">:</span><div class="val themed_text"><%= @hostel.name %></div>
+  <%if @warden.present?%>
+    <table align="center" width="100%" cellpadding="1" cellspacing="0" id="listing">
+      <!--<tr class="tr-head"><td>Warden</td><td></td> </tr>-->
+      <% @warden.each do |w| %>
+        <tr class="tr-<%= cycle('odd', 'even')%>">
+
+          <td class="col-1">
+            <% if w.employee_details.present? %>
+              <%= w.employee_details.full_name %></td>
+          <% end %>
+          <td class="col-2 "><%#= link_to 'edit', edit_warden_path(h) %>
+            <%= link_to "#{t('remove')}", hostel_warden_path(@hostel.id,w.id), :confirm => "#{t('delete_confirm_msg')}", :method => :delete,:class=>"themed_text" %></td>
+        </tr>
+      <% end %>
+    </table>
+  <%else%>
+    <p class="flash-msg"> <%=t('no_warden')%> </p>
+  <%end%>
+</div>

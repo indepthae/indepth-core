@@ -1,0 +1,73 @@
+<div class="subsection">
+    <hr class="light_hor_line"/>
+    <div id="sub_text_left"><%=t('particular')%></div>
+    <div id="sub_text_right" class="">
+        <%=t('amount')%> (<%= transaction_hash.default_configs.default_currency %>)
+    </div>
+    <hr class="light_hor_line"/>
+    <div class="extender"></div>
+</div>
+<% i = 1 %>
+<div class="particulars_list">
+    <div class="slno"><%= i %>.</div>
+    <div class="particalar_name"><%="#{t('applicants.application_fee')}"%></div>
+    <div class="particalar_amount"><%= transaction_hash.application_fee %></div>
+</div>
+<% if transaction_hash.subject_amounts.present? %>
+  <%  unless  transaction_hash.normal_subject_amount.to_f == 0 %>
+    <% i = i+1 %>
+    <div class="particulars_list">
+        <div class="slno"><%= i %>.</div>
+        <div class="particalar_name"><%="#{t('subject_fees')}"%></div>
+        <div class="particalar_amount"><%= transaction_hash.normal_subject_amount %></div>
+    </div>
+  <% end %>
+  <%  if transaction_hash.elective_subjects.present?  %>
+    <% i = i+1 %>
+    <div class="particulars_list">
+        <div class="slno"><%= i %>.</div>
+        <div class="particalar_name">
+            &#x200E;<%="#{t('elective_subject_fees')} ("%><%= transaction_hash.elective_subjects %>)&#x200E;
+        </div>
+        <div class="particalar_amount"><%= transaction_hash.elective_subject_amount %></div>
+    </div>
+  <%  end %>
+<% end %>
+
+<div id="payment_info_section">
+    <div class="label_collection_part">
+        <div class="label_part">
+            <div class="label_name"><%="#{t('payment_mode')} :"%></div>
+            <div class="value_span" style="font-weight:bold;"><%= @online_transaction_id.present? ? t('online') : t('offline') %></div>
+        </div>   
+    </div>
+    <% if transaction_hash.online_transaction_id.present? %>
+      <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%="#{t('transaction_id')} :"%></div>
+              <div class="value_span" style="font-weight:bold;"><%= transaction_hash.online_transaction_id %></div>
+          </div>   
+      </div>
+    <% end %>
+</div>
+<% show_amount_in_words = (transaction_hash.default_configs.pdf_receipt_atow.to_i == 1) %>
+<div class="receipt-footer-bottom words_bottom" style="border: 1px solid #999999;">
+    <div class="left_info amount_margin">
+        <% if show_amount_in_words %>
+          <span style="font-weight: bold;" class="float-left">
+              <%= "#{ t('amount_in_words')}: "%>&nbsp;&nbsp;
+          </span>
+          <span class="float-left">
+              <%= NumberToWord.convert(transaction_hash.amount, 
+                transaction_hash.default_configs.pdf_receipt_nsystem,
+                transaction_hash.default_configs.default_currency) %>
+          </span>
+        <% end %>
+    </div>    
+    <div class="right_total amount_paid">
+        <b>
+            <div class="right_total_label"><%= "#{t('total_amount_paid')}" %></div>
+            <div class="right_total_amount"><%= transaction_hash.amount %></div>
+        </b>
+    </div>
+</div>

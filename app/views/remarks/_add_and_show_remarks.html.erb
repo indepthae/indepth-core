@@ -1,0 +1,21 @@
+<% check_for_gradebook =  ['AssessmentTerm', 'AssessmentGroup', 'AssessmentPlan'].include? @load_model.class_name %>
+<% unless check_for_gradebook %>
+  <div id="all-remarks">
+      <div id="remarks_bold_label"><%= t('remarks_text') %></div>
+      <% if (@current_user.admin? or (@current_user.employee? and @load_model.find(@load_object_id).has_employee_privilege)) and (@stud.present? ? @load_model=='Subject'.constantize ? ((@stud.batch_id==Subject.find(@load_object_id).batch_id)) : (check_for_gradebook ? true : @stud.batch_id==@load_object_id.to_i) : false)%>
+        <%=render :partial=>"remarks/adding_remark1"%>
+      <% end %>
+      <div id="remarks_list">
+          <%=render :partial=>"remarks/show_common_remarks"%>
+      </div>
+  </div>
+<% else %>
+  <% if @ret_val.present? %>
+    <div id="all-remarks">
+        <div id="remarks_bold_label"><%= t('remarks_text') %></div>
+        <div id="remarks_list">
+            <%=render :partial=>"remarks/show_common_remarks"%>
+        </div>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,49 @@
+<div class="unlock_subject_list_popup" id='subjects_scroll'>
+    <div class="description"><%= t('change_subject_status_desc') %></div>
+    <div class="details">
+        <div class="field_details_left">
+            <div class="field_name"><%= t('batch') %></div>
+            <div class="field_val"><%= @batch.name %></div>
+        </div>
+        <div class="field_details_right">
+            <div class="field_name"><%= t('mark_entry_last_date') %></div>
+            <div class="field_val"><%= @agb.mark_entry_last_date.present? ? format_date(@agb.mark_entry_last_date) : t('no_last_date') %></div>
+        </div>
+    </div>
+    <% if @subject_assessments.present? %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td class="col1"><%= t('no_text') %></td>
+              <td class="col4"><%= t('subject_name').titleize %></td>
+              <td class="col5"><%= t('status') %></td>
+              <td class="col5"></td>
+          </tr>
+          <% @subject_assessments.each_with_index do |sa,i| %>
+            <% subject = (sa.class.to_s == "ActivityAssessment")? sa.assessment_activity : sa.subject %>
+            <tr>
+                <td><%= i+1 %></td>
+                <td><%= subject.name%></td>
+                <td><%= sa.submission_status_text %></td>
+                <% if sa.submission_status.nil? and sa.mark_entry_locked == false %>
+                  <td><%= link_to t('unlock'),'#',{:disabled=>true, :class=>'disabled'} %></td>
+                <% else %>
+                  <td>
+                      <%= link_to t('unlock'), '#', :onclick =>"unlock_subject(this)", :id=>'unlock_'+subject.id.to_s, :subject_id=>subject.id %>
+                      <span class="reset_<%= subject.id %> reset" value="<%= subject.id %>" onclick="reset_subject(this);"></span>
+                  </td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+    <% end %>
+</div>
+<div class="actions">
+    <div class="left_actions">
+        <%= link_to  t('save').titleize, '#', :onclick => "unlockSubjects(#{@agb.id});", :class => 'submit-button' %>
+        <%= link_to  t('cancel').titleize, '#', :onclick => "remove_popup_box();", :class => 'submit-button' %>
+    </div>
+</div>
+
+<script type="text/javascript">
+  window.scrollTo(0, 0);
+</script>

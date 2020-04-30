@@ -1,0 +1,12 @@
+<div id="collection_receipients_data">
+      <div class="extender"></div>
+      <ul class="tabrow">
+        <li class="selected" type="batch"><%=link_to_remote "#{t('courses_text')}",'#',:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li style="width: 10px;"><%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "tab_loader", :style =>"display: none;" ) %></li>
+      </ul>
+      <div id="questions-main">
+        <div id="right-panel">
+          <%= render :partial => "list_courses" %>
+        </div>
+      </div>
+</div>

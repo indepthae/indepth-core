@@ -1,0 +1,32 @@
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('online_payment') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('home') %></div>
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %><p class="flash-msg"><%= flash[:notice] %></p><% end %>
+
+  <div class="box">
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('settings')}", settings_online_payments_path %> </div>
+      <div class="link-descr"><%= t('manage_settings') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('transactions')}", transactions_online_payments_path %> </div>
+      <div class="link-descr"><%= t('list_online_transaction') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('custom_gateways')}", custom_gateways_path %> </div>
+      <div class="link-descr"><%= t('manage_custom gateways') %></div>
+    </div>
+  </div>
+</div>

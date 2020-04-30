@@ -1,0 +1,9 @@
+<%all_records_count = @record_group.records.count%>
+<%student_records_other_than_attachments=@record_group.student_records.all(:conditions=>["additional_info <> ?  and batch_id = ? and student_id = ?","",@batch.id,@student.id]).count%>
+<%student_records_attachments = 0%>
+<%if @record_group.student_records.count(:joins=>:record_addl_attachments,:conditions=>["batch_id = ? and student_id = ?",@batch.id,@student.id]) > 0%>
+  <%student_records_attachments = @record_group.student_records.all(:joins=>:record,:conditions=>["batch_id = ? and student_id = ? and records.input_type=?",@batch.id,@student.id,"attachment"]).count%>
+<%end%>
+<%unless all_records_count == 0%>
+  <span class=' form_status unfilled'> <%= "#{(student_records_other_than_attachments + student_records_attachments)} / #{all_records_count} #{t('form_filled')} "%> </span>
+<%end%>

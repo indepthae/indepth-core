@@ -1,0 +1,56 @@
+<div id="page-yield">
+  
+  
+  <h4><%= t('attendance_report')%></h4>
+
+  <div class="employee_name">
+    <div class="label">
+      <%= t('employee_name')  %>
+    </div>
+    <div class="text"><%= @employee.full_name + "(" + @employee.employee_number + ")" %></div>
+  </div>
+
+  <div class="reset_date">
+    <div class="label">
+      <%= t('recent_leave_reset') %>
+    </div>
+    <div class="text"><%= format_date(@recent_reset_date, :format => :short_date) %></div>
+  </div>
+
+  <div class="dpt_name">
+    <div class="label">
+      <%= t('employee_department')  %>
+    </div>
+    <div class="text"><%= @employee.employee_department.name %></div>
+  </div>
+
+
+
+  <div id ="date_filters" style="display:none;">
+    <div class="label-field-pair">
+      <label for="leave_type"><%= t('date_text') %></label>
+      <div class="text-input-bg start_date">
+        <%= @start_date  %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="end_date"><%= t('to') %></label>
+      <div class="text-input-bg end_date">
+        <%= @end_date  %></div>
+    </div>
+   
+    <hr></hr>
+
+  </div>
+
+  
+
+  
+
+  <div id="leave_summary">
+    <%= render :partial => 'leave_summary'  %>
+  </div>
+  <div id="report">
+    <%= render :partial => 'leave_detailed_report'  %>
+  </div>
+</div>

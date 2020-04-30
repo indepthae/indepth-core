@@ -1,0 +1,63 @@
+<% if @failed_employee_logs.present? %>
+  <div class="description"><%= "#{t('employee_reset_logs_desc', {:failed => @failed})}" %></div>
+  <table>
+    <tr class="tr-head">
+      <td class="employees"><%= t('employees') %></td>
+      <td class="department"><%= t('department') %></td>
+      <% if @log.leave_reset_logs.collect{|x| x.status}.include? 3%>
+        <td><%= t('reason') %></td>
+      <% end %>
+      <%if  (@log.leave_reset_logs.collect{|x| x.retry_status}.include? true)%>
+        <td></td>
+      <% end %>
+    </tr>
+    <% @failed_employee_logs.each do |log| %>
+      <tr>
+        <td class="employees"><%= "#{log.first_name} (#{log.employee_number})" %></td>
+        <td class="remarks"><%= log.name %></td>
+        <% if @log.leave_reset_logs.collect{|x| x.status}.include? 3 %>
+          <% ignore_lop = Configuration.ignore_lop.config_value %>
+          <% failure_reason = [] %>
+          <% if log.reason.present? %>
+            <% log.reason.each do |r| %>
+              <% failure_reason << t(r) %>
+            <% end %>
+          <% end %>
+          <% if failure_reason.count > 1 %>
+            <td>
+              <% failure_reason.each do |r| %>
+                <%= "-  #{r} <br>" %>
+              <% end %>
+            </td>
+          <% else %>
+            <td><%= failure_reason.join("<br>") %></td>
+          <% end %>
+          <% if (log.retry_status && ignore_lop == "true" ) %>
+            <td><%= link_to_remote "#{t('retry_reset')}",:url => {:controller => "employee_attendance", :action => "retry_reset", :employee_id => log.emp_id, :id => @log.id} %></td>
+          <% elsif log.retry_status && ignore_lop == "false" %>
+            <td><%= link_to_remote "#{t('retry_reset')}",:url => {:controller => "employee_attendance", :action => "retry_employee_reset", :employee_id => log.emp_id, :id => @log.id} %></td>
+          <%elsif (@log.leave_reset_logs.collect{|x| x.retry_status}.include? true)%>
+            <td></td>
+          <% end %>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @failed_employee_logs, :renderer => "RemoteLinkRenderer", :params => {:id => params[:id], :flag => "failed"} %>
+<% end %>
+<% if @employee_logs.present? %>
+  <div class="description"><%= "#{t('employee_reset_success_logs_desc', {:success => @success})}" %></div>
+  <table>
+    <tr class="tr-head">
+      <td class="employees"><%= t('employees') %></td>
+      <td class="department"><%= t('department') %></td>
+    </tr>
+    <% @employee_logs.each do |log| %>
+      <tr>
+        <td class="employees"><%= "#{log.first_name} (#{log.employee_number})" %></td>
+        <td class="remarks"><%= log.name %></td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @employee_logs, :renderer => "RemoteLinkRenderer", :params => {:id => params[:id], :flag => "success"} %>
+<% end %>

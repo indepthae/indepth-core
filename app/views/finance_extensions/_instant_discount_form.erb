@@ -1,0 +1,90 @@
+<label class="head_label"><%= "#{t('create_text')} #{t('discount')}" %><span></span></label>
+
+<div id="grading-levels-form">
+
+  <% form_remote_for :fee_discount,
+    :url => {:action => 'create_instant_discount',
+    :id => @financefee.id,:target_action=>@target_action,:target_controller=>@target_controller} do |form| %>
+    <%=form.hidden_field :receiver_type,:value=>'Student'%>
+    <%=form.hidden_field :receiver_id,:value=>@financefee.student_id,:id=>"student_id"%>
+    <%=form.hidden_field :batch_id,:value=>@financefee.batch_id,:id=>"batch_id"%>
+    <%=form.hidden_field :finance_fee_category_id ,:value=> @finance_fee_category.id %>
+    <%=form.hidden_field :is_deleted,:value=>true%>
+    <%=form.hidden_field :is_instant,:value=>true%>
+    <%=hidden_field_tag :financefee_id,@financefee.id,:id=>"financefeeid"%>
+
+    <div id="form-errors"></div>
+
+    <div class="label-field-pair">
+      <div class="label-container"><label><%= "#{t('name')}" %><span class="necessary-field">*</span></label></div>
+      <div class="input-container">
+        <%= form.select :master_fee_discount_id, options_for_select(@master_discounts.map { |x| [x.name, x.id] }),
+                        :include_blank => t('select_a_discount') %>
+      </div>
+    </div>
+    <%if permitted_to? :fetch_waiver_amount_collection_wise, :finance_extensions%>
+    <div class="label-field-pair">
+        <div class="label-container">
+            <label ><%= t('waiver_discount_text') %></label></div>
+        <div class="input-container">
+            <%= form.check_box  :waiver_check, :checked => "false", :id => "change_disable" ,:onchange => "fetch_max_discount(j(this).val())"%>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "waiver_loader",
+              :style =>"display: none;" ) %>
+        </div>
+    </div>
+    <%end%>
+    <div class="label-field-pair">
+      <div class="label-container">
+        <label ><%= t('discount_type') %></label></div>
+      <div class="input-container">
+        <label class="label_for_gender" for="is_amount_false"> <%= t('percentage') %></label>
+        <%= form.radio_button  :is_amount, false, :checked => "checked" ,:class=>"mode_radio amount_radio readonly_divs is_waiver"%>
+        <label class="label_for_gender" for="is_amount_true"><%= t('amount') %></label>
+        <%= form.radio_button  :is_amount, true ,:class=>"mode_radio percentage_radio readonly_divs",:id => "amount_check"%>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <div class="label-container"><label><%= "#{t('amount')}" %><span class="necessary-field">*</span></label></div>
+      <div class="input-container"><%= form.text_field :discount , :class => 'precision_text width-50 readonly_divs',:id => 'discount_amount'%><div class="post-symbol">%</div></div>
+    </div>
+    <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+    <% if @particular_payment.present? %>
+      <%=hidden_field_tag :particular_payment, @particular_payment%>
+    <% end %>
+    <div class="extender"></div>
+    <div id="submit-button">
+      <%= submit_tag "► #{t('create_text')}", :class => 'modal-box-submit_button',:id => 'submit_button_discount', :disable_with => "► #{t('create_text')}" %>
+    </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  j(document).delegate("#change_disable",'click',function(){
+  if(j('#change_disable').prop('checked') == true){
+    j(".readonly_divs").prop("readonly",true);
+    j(".is_waiver").attr("disabled", true); 
+    j("#amount_check").prop("checked", true);
+  }else{
+    j(".readonly_divs").prop("readonly",false);   
+    j(".is_waiver").attr("disabled", false);   
+  }
+  })
+  
+  j(document).delegate('.percentage_radio', 'click', function () {
+    j('#discount_amount').removeClass('width-50')
+    j('.post-symbol').text('<%=currency %>')
+    j('#discount_amount').addClass('width-130')
+    j('#all_students').html()
+  })
+  j(document).delegate('.amount_radio', 'click', function () {
+    j('#discount_amount').removeClass('width-130')
+    j('.post-symbol').text('%')
+    j('#discount_amount').addClass('width-50')
+    j('#all_students').html()
+  })
+  j(document).delegate('.modal-box-submit_button', 'click', function () {
+    j(this).attr('disabled',true)
+    j('.modal-box-submit_button').val('<%=t('please_wait') %>')
+  })
+    
+</script>

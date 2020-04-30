@@ -1,0 +1,191 @@
+<% if @finance_fee_collection.present? %>
+    <% pop_up_message = [] %>
+    <div id="fees_list">
+      <div class="top-div">
+        <% if @particulars.present? %>
+            <div class="question-text">
+              <div class="select_all_main">
+                <input type="checkbox" class='select_all'
+                       <%= (@particulars.map(&:id) - @discounted_particular_ids.map(&:to_i)).present? ? '' : 'disabled' %>
+                       onclick="$$('input.collection_box').each(function (checkbox) {
+                               checkbox.checked = $$('.select_all').first().checked
+                               });">
+              </div>
+              <div class="att_list_names"><%= "#{t('particular')} #{t('name_text').underscore}" %></div>
+              <div class="collection_box_main"><%= t('amount') %></div>
+              <div class="collection_box_main">
+                <%= params[:type]!='Batch' ? params[:type].underscore.humanize() : '' %>
+              </div>
+              <% if @finance_fee_collection.tax_enabled? %>
+                  <div class="collection_box_main tax_slabs"><%= t('tax_slab_text') %></div>
+              <% end %>
+            </div>
+        <% end %>
+      </div>
+      <div id="right-panel-loader" style="display:none"><label>Loading ...</label></div>
+      <div id="right-panel-bottom">
+        <% remote_form_for :fees_list, :url => {:controller => 'finance_extensions', :action => 'update_collection_particular'},
+                           :html => {:method => :post, :id => 'allocation_form'} do |form1| %>
+            <% if @particulars.present? %>
+                <%= form1.hidden_field :batch_id, :value => params[:batch_id] %>
+                <%= form1.hidden_field :collection_id, :value => params[:collection_id] %>
+                <%= form1.hidden_field :type, :value => params[:type] %>
+                <%= hidden_field_tag :session_fingerprint, session_fingerprint %>
+
+                <% @particulars.each do |particular| %>
+                    <% discount_disabled = @discounted_particular_ids.include?(particular.id) %>
+                    <div class="option-main">
+                      <div class="option-div">
+                        <label class="collection_check">
+                          <% pop_up_message << 'normal' %>
+                          <% disable_particular_wise_discount=(@finance_fee_collection.fee_discounts &
+                                  particular.particular_wise_discounts).present? %>
+                          <% if disable_particular_wise_discount %>
+                              <% pop_up_message << 'particular_wise_pop_up' %>
+                          <% end %>
+
+                          <div class="collection_box_main">
+                            <div class="checkbox-hover">
+                              <% if discount_disabled %>
+                                  <% pop_up_message << 'pay_all_discount_exists' %>
+                              <% end %>
+                              <%= check_box_tag 'fees_list[particular_ids][]', particular.id,
+                                                (@collection_particular_ids.include? particular.id),
+                                                {:class => 'collection_box', :pop_up_message => pop_up_message,
+                                                 :disabled => (particular.disabled? or disable_particular_wise_discount or
+                                                         discount_disabled)} %>
+                            </div>
+                          </div>
+                          <div class="att_list_names"> <%= particular.name %></div>
+                          <div class="collection_box_main"><%= precision_label(particular.amount) %></div>
+                          <div class="collection_box_main"><%= particular.receiver_name %></div>
+                          <% if @finance_fee_collection.tax_enabled? %>
+                              <div class="collection_box_main tax_slabs">
+                                <%= @collection_particular_ids.include?(particular.id) ?
+                                            particular.try(:slab_name) || '-' : particular.tax_slabs.try(:last).try(:name) || '-' %>
+                              </div>
+                          <% end %>
+                        </label>
+                      </div>
+                    </div>
+                <% end %>
+            <% else %>
+                <div id="blank_message">
+                  <div class="msg"> <%= "#{params[:type].underscore.humanize}-#{t('wise')} #{t('particulars').downcase} #{t('does_not_exist')}" %></div>
+                </div>
+            <% end %>
+            <%#= form1.submit "#{t('assign_fees')}", :class => "submit_button" %>
+        <% end %>
+
+      </div>
+      <div class="bottom-panel">
+        <% if @particulars.present? %>
+            <button class="submit_button" onclick="submit_form('<%=params[:type] %>');"><%= t('update') %></button>
+        <% end %>
+        <div class="right-part">
+          <div class="fixer"></div>
+          <div class="total-count">
+            <div class="text fleft"> <%= "#{t('total')} #{t('assigned').downcase}" %>:</div>
+            <div class="total fleft margin_left_1px"><%= @particular_details.total %></div>
+
+          </div>
+          <div class="extender"></div>
+          <ul class="count-details">
+            <li>
+              <div class="batch-count">
+                <div class="text fleft"> <%= "#{t('batch')}-#{t('wise')}" %>:</div>
+                <div class="Batch fleft margin_left_1px">
+                  <%= @particular_details.batch_wise %>
+                </div>
+              </div>
+              <div class="student-category-count">
+                <div class="text fleft"><%= "#{t('student_category')}-#{t('wise')}" %>:</div>
+                <div class="StudentCategory fleft margin_left_1px">
+                  <%= @particular_details.category_wise %>
+                </div>
+              </div>
+              <div class="student-count">
+                <div class="text fleft"> <%= "#{t('student_text')}-#{t('wise')}" %>:</div>
+                <div class="Student fleft margin_left_1px">
+                  <%= @particular_details.student_wise %>
+                </div>
+              </div>
+
+            </li>
+          </ul>
+        </div>
+      </div>
+      <% pop_up_message.uniq! %>
+      <div id="revert-pop-up">
+        <div id="popup-message">
+          <% if pop_up_message.include?('pay_all_discount_exists') %>
+              <%= t('pay_all_discount_exists') %>
+          <% elsif pop_up_message.include?('particular_wise_pop_up') %>
+              <%= "#{t('discount')} #{t('for')} #{t('this')} #{t('particular')} #{t('has_been')} #{t('assigned')}. #{t('please')} #{t('uncheck')} #{t('it')} #{t('and')} #{t('continue')}" %>
+          <% else %>
+              <%= t('please_revert_transactions_and_try_again') %>
+          <% end %>
+        </div>
+
+        <br/>
+
+        <div class="revert_arrow_down"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+
+        j('.submit_button').click(function () {
+
+        });
+
+        j(document).ready(function () {
+            check_box_selection();
+            if (j('.collection').length >= 1) {
+                j('.sel-list').show();
+            }
+        });
+
+        function set_active(el) {
+            $$('.selected').each(function (e) {
+                e.removeClassName('selected');
+            });
+            el.addClassName('selected');
+        }
+
+        j(function () {
+            j('.collection_box:disabled').parent().hover(function (e) {
+                var moveLeft = 0;
+                var moveDown = 0;
+                var moveLeft = ((j(this).position().left) + (j(this).width()) / 2);
+                var moveDown = (j(this).position().top) - 25;
+                trans_details_show(moveLeft, moveDown, this);
+            }, function () {
+                j('div#revert-pop-up').hide();
+            });
+        });
+
+        function trans_details_show(moveLeft, moveDown, e) {
+            var rtl = "<%= (rtl?) ? 'rtl' : 'ltr'  %>";
+
+            if (rtl == 'rtl') {
+                left_index = -300;
+            } else {
+                left_index = -188;
+            }
+
+            moveLeft = moveLeft + left_index;
+
+            j('div#revert-pop-up').delay(350).show(0);
+
+            moveDown = moveDown - (j('div#revert-pop-up').height());
+
+            j("div#revert-pop-up").css('top', moveDown).css('left', moveLeft);
+        }
+
+        j(document).on('click', function (e) {
+            j('div#revert-pop-up').hide();
+        });
+
+    </script>
+<% end %>

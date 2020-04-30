@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.attendance_detail{
+  @attendances.each do |attendance|
+    @attendance = attendance
+    @xml.attendance do
+      if @attendance.class.name == "Attendance"
+        @xml.student_admission_no(@attendance.student.nil? ? ArchivedStudent.find_by_former_id(@attendance.student_id).try(:admission_no) : @attendance.student.admission_no)
+        if Configuration.enabled_roll_number?
+          @xml.roll_number(@attendance.student.nil? ? ArchivedStudent.find_by_former_id(@attendance.student_id).try(:roll_number) : @attendance.student.roll_number)
+        end
+        config = Configuration.get_config_value('CustomAttendanceType')||"0"
+        if config == '1'
+          type =  AttendanceLabel.find_by_id(@attendance.attendance_label_id) unless @attendance.attendance_label_id == nil
+          @xml.status_name(type.present? ? type.name : '-')
+          @xml.attendance_type(type.present? ? type.attendance_type : '-')
+        end
+        @xml.forenoon(@attendance.forenoon)
+        @xml.afternoon(@attendance.afternoon)
+        @xml.date(@attendance.month_date.to_s)
+        @xml.batch_name(@attendance.batch.nil? ? "Deleted Batch" : @attendance.batch.full_name)
+        @xml.reason(@attendance.reason)
+        elsif @attendance.class.name == "SubjectLeave"
+        @xml.student_admission_no(@attendance.student.nil? ? "Deleted Student" : @attendance.student.admission_no)
+        if Configuration.enabled_roll_number?
+          @xml.roll_number(@attendance.student.nil? ? ArchivedStudent.find_by_former_id(@attendance.student_id).try(:roll_number) : @attendance.student.roll_number)
+        end
+        config = Configuration.get_config_value('CustomAttendanceType') || "0"
+        if config == '1'
+          type =  AttendanceLabel.find_by_id(@attendance.attendance_label_id) unless @attendance.attendance_label_id == nil
+          @xml.status_name(type.present? ? type.name : '-')
+          @xml.attendance_type(type.present? ? type.attendance_type : '-')
+        end
+        @xml.subject_name(@attendance.subject.code)
+        @xml.class_timing_name(@attendance.class_timing.try(:name))
+        @xml.batch_name(@attendance.batch.nil? ? "Deleted Batch" : @attendance.batch.full_name)
+        @xml.reason(@attendance.reason)
+        @xml.date(@attendance.month_date.to_s)
+      end
+    end
+  end
+}%>

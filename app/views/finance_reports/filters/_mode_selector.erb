@@ -1,0 +1,11 @@
+<div class="label-field-pair section">
+  <label for="academic_year"><%= t('finance_reports.report_mode') %></label>
+  <div class="text-input-bg text-input-bg-large">
+    <%= form.radio_button :mode, 'particular_wise', :checked => true %>
+    <%= form.label :mode, t('finance_reports.particular_wise') %>
+
+
+    <%= form.radio_button :mode, 'batch_wise'%>
+    <%= form.label :mode, t('finance_reports.batch_wise') %>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="tutor_list">
+  <%= render :partial => "tutor_list" if @batch.present? and @courses.present? %>
+</div>
+<div class="weekly_details">
+  <label>
+    <%= t('no_weekly_classes') %>
+  </label>
+  <div class="weekly_classes">
+    <%= @batch_weekly_classes %>
+  </div>
+</div>

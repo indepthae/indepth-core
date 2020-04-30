@@ -1,0 +1,25 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_info') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('activities') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%breadcrumb :student_activities,@student%>
+    <%= render_breadcrumbs  %>
+  </div>
+   <div class="label-field-pair">
+     <div class="text-input-bg">
+       <%= calendar_date_select_tag 'student[admission_date]', I18n.l(Date.today,:format=>:default),
+      :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force",:onchange => remote_function(
+        :method => :get,
+        :url => {:action => "update_activities", :id => @student.id},
+        :with => "'date='+value") %>
+     </div>
+   </div>
+
+  <div id ="list">
+    <%= render :partial => 'list_activities' %>
+  </div>
+</div>

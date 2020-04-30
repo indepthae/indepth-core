@@ -1,0 +1,33 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="route_listing">
+    <tr class="tr-head">
+        <td class="col-1"><%= t('routes.stop') %></td>  
+        <td class="col-1"><%= t('vehicle_stops.landmark') %></td>  
+        <td class="col-2"><%= t('pickup_time') %></td>  
+        <td class="col-2"><%= t('drop_time') %></td>  
+        <td class="col-2"><%= t('distance') %></td>  
+        <td class="col-2"><%= t('fare') %></td>  
+    </tr>
+
+    <% if @stops.present? %>
+      <% @stops.each do |s| %>
+        <tr>
+            <td><%= s.name %></td>
+            <td><%= s.landmark %></td>
+            <td><%= s.get_pickup_time %></td>
+            <td><%= s.get_drop_time %></td>
+            <td><%= s.distance.to_f %></td>
+            <td><%= precision_label s.fare %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="6">  <%=t('no_stops_in_this_route')%> </td></tr>
+    <% end %>
+</table>
+<% if @stops.present? %>
+  <%= pagination_status(@stops) %>
+<% end %>
+<%= will_paginate @stops, :renderer => 'RemoteLinkRenderer', :remote => {:method => :get}, 
+  :params=>{:controller => "routes", :action => "show", :id => @route.id} %>
+<% if params[:from].present? %>
+  <%= link_to "#{t('csv_report')}", route_details_csv_route_path(@route.id), :class => "submit-button", :id => "cancel-link" %>
+<% end %>

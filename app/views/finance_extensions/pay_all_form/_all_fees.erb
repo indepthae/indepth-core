@@ -1,0 +1,144 @@
+<%= render :partial => "finance_extensions/pay_all_form/pay_all_form_header" %>
+
+<% i = 0 %>
+<% @finance_fees_count = 0 %>
+<% @finance_fees.group_by(&:fee_type).each do |fees| %>
+  <% fee_type = fees.first %>
+  <tr class="row-a">
+      <td class="sl-col col-1"></td>
+      <td class="padding_right_0 check_col">
+          <%= check_box_tag 'fees_type', '', true, options={:tabindex => -1, :id => fee_type, 
+            :onclick => "amount_field_updation_by_fee_type(this,'#{fee_type}')"} %>
+      </td>
+      <td colspan="<%= fee_head_col_span %>" class="padding_left_10 particular_heading">
+          <label for=<%= fee_type %>> 
+              <% fee_type = fee_type.underscore %>
+              <%= fee_type.humanize() %>
+          </label>
+      </td>
+  </tr>
+
+  <% fees.last.each_with_index do |finance_fee, k| %>  
+    <% is_particular_disabled = (@disabled_fee_ids.present? and 
+        finance_fee.is_a?(FinanceFee) and
+        @disabled_fee_ids.include?(finance_fee.id.to_i)) %>
+
+
+    <tr class="row-b" id="mft<%= finance_fee.id %>">
+        <% i=i+1 %>
+        <td class="sl-col"><%= k+=1 %></td>
+        <td class="set_border_right padding_right_0 check_col">
+            <% unless finance_fee.is_paid %>
+              <%= check_box_tag 'collection', '', !is_particular_disabled, 
+                options={:tabindex => -1, :fee_type => fees.first, 
+                :id => finance_fee.id, :class => 
+                  "#{fees.first} #{(is_particular_disabled ? 
+                'particular_disabled':'')}", 
+                :disabled => is_particular_disabled,
+                :onclick => "amount_field_updation(this,#{finance_fee.id})"} %>
+            <% end %>
+        </td>
+        <td class="padding_left_10 particular_col">
+            <label for= <%= finance_fee.id %>> <%= finance_fee.collection_name %></label>
+        </td>
+
+        <td class="set_border_right align_right"> 
+            <%= precision_label(finance_fee.actual_amount.to_f) %>                        
+        </td>
+        <% paid_fine = (finance_fee.paid_fine.to_f > 0 ? finance_fee.paid_fine.to_f : 0) %>
+        <%#*========set fine amount to 0 if fine waiver flag set=========%>
+        <%if finance_fee.is_fine_waiver || (@fine_fee_id.present? && (@fine_fee_id == "Overall" || (finance_fee.id == @fine_fee_id.to_i))) %>
+          <%fine_amount = precision_label(0).to_f%>
+        <% elsif Configuration.is_fine_settings_enabled? && finance_fee.balance<=0 && !finance_fee.is_paid? && finance_fee.balance_fine.present?%>
+          <%fine_amount = precision_label(finance_fee.balance_fine).to_f%>
+        <%else%>    
+          <% fine_amount =  (finance_fee.is_amount? ? 
+                finance_fee.fine_amount.to_f : ((finance_fee.actual_amount.to_f) * (finance_fee.fine_amount.to_f / 100).to_f )) %>
+          <% fine_amount = precision_label(finance_fee.is_paid? ? 0 : ((fine_amount - paid_fine) > 0 ?  (fine_amount - paid_fine) : 0)).to_f %>        
+        <%end%>
+        <% if @temporary_manual_fines.present? and @temporary_manual_fines["#{fee_type}"].present? %>            
+          <% manual_fine = precision_label(@temporary_manual_fines["#{fee_type}"]["#{finance_fee.id}"].to_f).to_f %>
+          <% fine_amount += manual_fine %>
+        <% end %>
+
+        <% @total_fees += precision_label(finance_fee.actual_amount.to_f).to_f + fine_amount unless 
+        is_particular_disabled %>
+
+        <% if @is_tax_present %> 
+      <%# excluding check on particular wise paid fee as taxed fees are disabled for particular wise payment page %>
+          <td class="set_border_right align_right">
+              <% if finance_fee.tax_enabled %>
+                <%= preci_tax = precision_label(finance_fee.tax_amount.to_f) %>
+                <% @total_fees += preci_tax.to_f %>
+              <% else %>
+                <%= '-' %>
+              <% end %>
+          </td>
+        <% end %>
+
+        <td class="set_border_right amount_to_pay align_right">
+            <%= total_c_amount = precision_label(precision_label(finance_fee.balance.to_f).to_f + fine_amount) %>
+            <% @total_amount_to_pay += total_c_amount.to_f unless is_particular_disabled %>
+        </td>
+
+        <% @total_fees += finance_fee.manual_paid_fine.to_f unless is_particular_disabled %>
+        <% @total_fees += finance_fee.paid_fine.to_f unless is_particular_disabled %>
+
+        <% if ((finance_fee.is_paid) or (total_c_amount == precision_label(0))) %>
+          <td class="set_border_right align_right paid_col">
+              <%= "#{t('paid')}" %>
+          </td>
+        <% else %>
+          <td class="set_border_right center_align width30">
+              <% @unpaid_collections += 1 if !@current_user.student? and 
+                finance_fee.collection_due_date.to_date < @transaction_date.to_date %>
+              <%= hidden_field_tag 'max_amount', total_c_amount.to_f, 
+                options={:disabled => "disabled", :class => "#{finance_fee.fee_type} max_amount_#{i}"} %>
+
+              <%= hidden_field_tag "transactions[#{i}][amount]", 
+                value=(!is_particular_disabled ? total_c_amount:''), 
+                options={:check_box_id => finance_fee.id, :disabled => is_particular_disabled,
+                :'data-index' => i, :class => "amount#{finance_fee.id} precision_text payment_box input_amount 
+        #{(is_particular_disabled ? 'particular_disabled':'')}", 
+                :onchange => "this.value = minmax(this.value, 0, #{total_c_amount.to_f})"} %>
+
+                <%= text_field_tag "transactions[#{i}][amountt]", 
+                value=(!is_particular_disabled ? precision_label(total_c_amount):''), 
+                options={:check_box_id => finance_fee.id, :disabled => is_particular_disabled,
+                :'data-index' => i, :class => "amount_t#{finance_fee.id} precision_text payment_box_t input_amount_t
+        #{(is_particular_disabled ? 'particular_disabled':'')}"} %>
+
+              <% if manual_fine.present? and manual_fine.to_f > 0 %>
+                <%= hidden_field_tag "transactions[#{i}][fine_amount]", manual_fine %>
+              <% end %>
+              <%= hidden_field_tag "transactions[#{i}][finance_id]", finance_fee.id %>
+              <%= hidden_field_tag "transactions[#{i}][finance_type]", finance_fee.fee_type %>
+              <%= hidden_field_tag "transactions[#{i}][payee_type]", "Student" %>
+              <%= hidden_field_tag "transactions[#{i}][payee_id]", @student.id %>
+              <%= hidden_field_tag "transactions[#{i}][category_id]", finance_fee.transaction_category_id %>
+
+              <%= hidden_field_tag "transactions[#{i}][title]", "#{t('receipt_no')}. 
+      (#{t('multiple_fees')}) F#{finance_fee.id}" %>
+
+              <%= hidden_field_tag "transactions[#{i}][transaction_date]", 
+                @transaction_date, options ={:class => 'fee_transaction_date'} %>
+
+              <%= hidden_field_tag "transactions[#{i}][payment_mode]", '', options ={:class => 'mode'} %>
+              <%= hidden_field_tag "transactions[#{i}][payment_note]", '', options ={:class => 'note'} %>
+              <%= hidden_field_tag "transactions[#{i}][reference_no]", '', :class => 'ref_no' %>
+              <%= hidden_field_tag "transactions[#{i}][transaction_date]", @transaction_date %>
+              <%= if (@fine_fee_id.present? && (@fine_fee_id == "Overall" || (finance_fee.id == @fine_fee_id.to_i)))
+                 hidden_field_tag "transactions[#{i}][fine_waiver]", true
+              end %>
+              <%= hidden_field_tag "transactions[#{i}][wallet_amount_applied]", '', {:value => false, :class => "collection-wallet-mode"} %>
+              <% if @student.advance_fee_wallet.present? and @student.advance_fee_wallet.amount > 0 and @total_amount_to_pay != 0.0 %>
+                <%= text_field_tag "transactions[#{i}][wallet_amount]", '', {:value => 0.00, 
+                  :'data-index' => i, :class => "wallet_amount#{finance_fee.id} collection-wallet-amount advance-fee-field precision_text", :style => "width: 75px; display: none;"} %>
+              <% end %>
+          </td>
+        <% end %>
+
+    </tr>
+  <% end %>
+  <% @finance_fees_count = i %>
+<% end %>

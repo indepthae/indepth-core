@@ -1,0 +1,15 @@
+if (@status.present? && !@fee_category.present?)
+  page << "remove_popup_box()"
+  page.replace_html 'flash_box', "<p class='flash-msg'>#{flash[:notice]}</p>"
+else
+  if @multi_configs.present? or (@fee_category.present? and @categories.present?)  
+    page << "build_modal_box({'title': 'Configure Category : #{@transaction_category.name}', 
+                                             'popup_class' : 'configure_category_form' })" unless params[:configure_category].present?
+    page.replace_html 'popup_content', :partial => 'finance_settings/configurations/configure_category_form'
+    page << "j('#flash-notice').remove()" unless flash[:notice].present?
+  else
+    page << "build_page_refresh(#{flash[:notice]})"
+  end
+end
+
+

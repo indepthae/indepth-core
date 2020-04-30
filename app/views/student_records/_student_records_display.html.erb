@@ -1,0 +1,116 @@
+<div id="main_section_full">
+  <div class="record_group_wise">
+    <%i=0%>
+    <%@grouped_student_records[@record_group.name].each do |student_record|%>
+      <div class="record_detail_set">
+        <div class="sl_no"><%=i+=1%>.</div>
+        <div class="record_name"><%=student_record.record.name%></div>
+      </div>
+      <%if ["singleline","multiline"].include? student_record.record.input_type%>
+        <div class="data_list"><%=student_record.additional_info.blank? ? "<span>#{t('not_data_added_yet')}</span>" : student_record.additional_info.strip.gsub(/\n/, "<br/>")%> <%=(student_record.additional_info.present? and student_record.record.input_type == "singleline"  and student_record.record.suffix.present?) ? student_record.record.suffix : ""%></div>
+      <%elsif student_record.record.input_type == "date"%>
+        <div class="data_list"><%=student_record.additional_info.blank? ? "<span>#{t('not_data_added_yet')}</span>" : format_date(student_record.additional_info.to_date)%></div>
+      <%elsif student_record.record.input_type == "multi_select"%>
+        <%unless student_record.additional_info.blank?%>
+          <%datas = student_record.additional_info.split(", ")%>
+          <%datas.each do |data|%>
+            <div class="data_list"><span>-</span> <%=data.nil? ? "<span>#{t('not_data_added_yet')}</span>" : data%></div>
+          <%end%>
+        <%else%>
+          <div class="data_list"><span>-</span> <%="<span>#{t('not_data_added_yet')}</span>"%></div>
+        <%end%>
+      <%elsif student_record.record.input_type == "single_select"%>
+        <div class="data_list"><span>-</span> <%=student_record.additional_info.blank? ? "<span>#{t('not_data_added_yet')}</span>" : student_record.additional_info%></div>
+      <%else%>
+        <%attachments=student_record.record_addl_attachments%>
+        <%if attachments.present?%>
+          <% attachments.each do |att| %>
+            <div class="data_list"><%= link_to truncate(att.attachment_file_name, :length => 15,:ommision => '...'),att.attachment.url(:original, false),:target=>"blank" %></div>
+          <% end %>
+        <%else%>
+          <div class="data_list"><%="<span>#{t('not_attachments_added_yet')}</span>"%></div>
+        <%end%>
+      <%end%>
+    <%end%>
+  </div>
+</div>
+<div  class="sr_delete" id="student_record_delete_<%=@record_group.id%>"><%=t('delete_student_records')%></div>
+<div class="edit_buttons" id="edit_link_<%=@record_group.id%>"><%=t('edit_records')%></div>
+<script type="text/javascript">
+  j( "div#edit_link_"+<%=@record_group.id%>).click(function() {
+    j.ajax({
+      type: 'GET' ,
+      url: "/student_records/get_edit_form",
+      data : {
+        student_id : <%=@student.id%>,
+        batch_id: <%=@batch.id%>,
+        record_group_id:  <%=@record_group.id%>
+      },
+      success : function(data) {
+        j('#individual_student_<%=@record_group.id%>').html(data);
+        j(".edit_student").submit(function (event) {
+          event.preventDefault();
+          formdata = new FormData(this);
+          j.ajax({
+            url: '/student_records/create',
+            type: 'POST',
+            data: formdata,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function () {
+            },
+            error: function(){
+            }
+          });
+        });
+      }
+    });
+  });
+  j( "div#student_record_delete_"+<%=@record_group.id%>).click(function() {
+    resp = confirm("<%=t('student_record_delete_confirm')%>");
+    function form_type(){
+      if (j('#record_group_id').val() == "")
+      {
+        form_type: 'general'
+      }
+      else
+      {
+        form_type: 'specific'
+      }
+    }
+    if (resp ==true){
+      j.ajax({
+        type: 'GET' ,
+        url: "/student_records/destroy",
+        data : {
+          student_id : <%=@student.id%>,
+          batch_id: <%=@batch.id%>,
+          record_group_id:  <%=@record_group.id%>,
+          form_type: (j('#record_group_id').val() == "") ? "general" : "specific"
+        },
+        success : function() {
+          j(".edit_student").submit(function (event) {
+            event.preventDefault();
+            formdata = new FormData(this);
+            j.ajax({
+              url: '/student_records/create',
+              type: 'POST',
+              data: formdata,
+              async: false,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function () {
+              },
+              error: function(){
+              }
+            });
+          });
+        }
+      });
+    }
+  });
+</script>
+

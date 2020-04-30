@@ -1,0 +1,10 @@
+if @errors.nil?
+  page.replace_html 'form-errors', :text => ''
+  page << "Modalbox.hide();"
+  page.replace_html 'show_error_flash_messages', :text => "<p class='flash-msg'> #{t('new_batch_added_succesfully')} </p>"
+  page << "window.location = '/course_exam_groups/show/#{params[:id]}'"
+  page.replace_html 'show_error_flash_messages', :text => "<p class='flash-msg'> #{t('no_subject_present')} </p>" if  @check_subjects.empty?
+else
+  page.replace_html 'form-errors', :partial => 'errors', :object => @errors
+  page.visual_effect(:highlight, 'form-errors')
+end

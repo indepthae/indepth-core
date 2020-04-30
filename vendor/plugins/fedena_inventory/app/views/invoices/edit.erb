@@ -1,0 +1,410 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "invoices" %>
+  <%= javascript_include_tag :defaults, :cache => true %>
+  <%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('invoice') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :invoices_edit, @invoice %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for @invoice do |invoice_form| %>
+      <%= invoice_form.error_messages  %>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('store')}" %></div>
+        <div class="text-input-bg"><%= invoice_form.select :store_id, @stores.map{|st| [st.name,st.id]} %></div>
+      </div>
+
+      <% invoice_form.fields_for :sales_user_details do |user| %>
+
+        <div class="label-field-pair">
+          <div class="label-container1"><%= "#{t('issued_to')}" %></div>
+          <div class="input-container"><%= user.text_field :issuer_name, :id => "issued_to" , :value => @username,:placeholder=>"#{t('admission_no')}/#{t('employee_number')}"%>
+            <%= user.hidden_field :user_id , :id => "issuer_id"%>
+
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+
+        </div>
+
+        <div class="label-field-pair">
+          <div class="label-container1"><%= "#{t('name')}" %><span class="necessary-field">*</span></div>
+          <div class="text-input-bg"><%= user.text_field :username , :id => "name", :placeholder=>"#{t('name')}"%></div>
+        </div>
+
+        <div class="label-field-pair6">
+          <div class="label-container1"><%= "#{t('address')}" %></div>
+          <div class="text-input-bg"><%= user.text_area :address, :id => "address"  %></div>
+        </div>
+      <% end %>
+
+      <div id="invoice_details">
+        <div class="label-field-pair1">
+          <div class="label-container1" id="invoice_no_label"><%= "#{t('invoice_no')}" %></div>
+          <div class="input-container" id="invoice_no"><%= invoice_form.text_field :invoice_no, :value => @invoice_no, :readonly => true %></div>
+        </div>
+
+        <div class="label-field-pair1" id ="inv_date">
+          <div class="label-container1" id ="invoice_date"><%= "#{t('invoice_date')}" %></div>
+          <div class="text-input-bg" id="calender">
+            <%= calendar_date_select_tag 'invoice[date]', I18n.localize(@invoice.date, :format=>:default), :year_range => 30.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h5>Billing Details</h5>
+
+      </div>
+
+      <table id="listing_theme" class="sold_items">
+        <tr class="tr-head">
+          <td><%= "#{t('code')}" %></td>
+          <td><%= "#{t('item')}" %></td>
+          <td><%= "#{t('quantity')}" %></td>
+          <td><%= "#{t('rate')}" %></td>
+          <td><%= "#{t('total')}" %></td>
+          <td></td>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <% invoice_form.fields_for :sold_items do |item| %>
+
+          <%= render 'sold_item_fields', :c => item %>
+        <% end %></table>
+      <%= link_to_add_fields "#{image_tag("/images/buttons/icon-add.png",:border => 0)} #{t('add_new_item')}", invoice_form, :sold_items %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+
+
+
+      <div id="subtotal_details">
+        <div id="subtotal_fields">
+          <div class="label-container1" ><%= "#{t('subtotal')}" %></div>
+          <div class="label-field-pair7">
+            <div class="text-input-bg"><%= invoice_form.text_field :subtotal , :id => 'subtotal',:readonly => true %></div>
+          </div>
+
+          <div class="label-container1" id ="tax"><%= "#{t('tax')} (%)" %></div>
+
+          <div class="label-field-pair7">
+            <div class="text-input-bg"><%= invoice_form.text_field :tax, :id => 'tax' %></div>
+          </div></div></div>
+
+
+
+      <div id="additional_fields">
+        <h5>Additional Charges</h5>
+
+        <table id="listing_theme" class ="additional_charges">
+          <tr class="tr-head">
+            <td><%= "#{t('name')}" %></td>
+            <td><%= "#{t('amount')}" %></td>
+            <td></td>
+          </tr>
+          <tr class="tr-blank"></tr>
+          <% invoice_form.fields_for :additional_charges do |add_charge| %>
+            <%= render 'additional_charge_fields', :c => add_charge %>
+
+          <% end %>
+
+        </table>
+        <%= link_to_add_fields "#{image_tag("/images/buttons/icon-add.png",:border => 0)} #{t('add')}", invoice_form, :additional_charges %>
+      </div>
+
+      <div id ="discount_fields">
+        <h5>Discounts</h5>
+        <table id="listing_theme" class="discounts">
+          <tr class="tr-head">
+            <td><%= "#{t('name')}" %></td>
+            <td><%= "#{t('amount')}" %></td>
+            <td></td>
+          </tr>
+          <tr class="tr-blank"></tr>
+          <% invoice_form.fields_for :discounts do |dis| %>
+            <%= render 'discount_fields', :c => dis %>
+
+          <%end%></table>
+        <%= link_to_add_fields "#{image_tag("/images/buttons/icon-add.png",:border => 0)} #{t('add')}", invoice_form, :discounts %>
+      </div>
+      <div id="grandtotal_details">      <div id="grandtotal_fields">
+
+          <div class="label-container1" id ="total"><%= "#{t('total')}" %></div>
+          <div class="label-field-pair7">
+            <div class="text-input-bg"><%= invoice_form.text_field :grandtotal , :id => 'grandtotal',:readonly => true %></div>
+          </div>
+          <div class="label-container1" id ="is_paid"><%= "Is Paid" %></div>
+
+          <div class="label-field-pair7">
+            <div class="text-input-bg"><%= invoice_form.check_box :is_paid%></div>
+          </div>
+        </div></div>
+      <div id="buttons">
+        <%= invoice_form.submit "#{t('save')}", :class=>"submit-button", :id => "submit_button", :button_type => "save" %>
+
+      </div>
+
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  calculate_subtotal();
+  calculate_grandtotal();
+
+  function update_loader(){
+    j('#loader').hide();
+  }
+  
+  j("input#name").click(function(){
+    update_loader();
+  })
+  
+  var tax_amount,subtotal;
+  j("input#issued_to").click(function(){
+    a = j(this).autocompleteAjax({
+      serviceUrl:'/invoices/search_username',
+      onChange: function(value,data){update_loader();},
+      onSelect: function(value,data){update_username(value,data);}
+    });
+  })
+  
+  j("input#code").click(function(){
+    var ele = j(this).parents('tr');
+    var store_id = j('#invoice_store_id').val();
+    b = j(this).autocompleteAjax({serviceUrl:'/invoices/search_code',
+      onSelect: function(value,data){
+        update_item_name(value,data,ele);},
+      params: {store_id: store_id}
+    });
+
+  })
+
+
+  j("input.store_item").click(function(){
+
+    var ele = j(this).parents('tr');
+    var store_id = j('#invoice_store_id').val();
+    c = j(this).autocompleteAjax({serviceUrl:'/invoices/search_store_item',
+      onSelect: function(value,data){
+        update_item_name(value,data,ele);},
+      params: {store_id: store_id}
+    });
+
+  })
+
+
+  function update_item_name(value,data,ele){
+    j.get('/invoices/search_store_item',{id: data}, function(result) {
+      j(ele).find('.item_id').val(parseInt(data));
+      j(ele).find('#code').val(result.code);
+      j(ele).find('.store_item').val(result.item_name);
+      j(ele).find('#quantity').val(1);
+      j(ele).find('#rate').val(precision('<%= precision_count %>', result.unit_price));
+      j(ele).find('#tax').val(result.tax);
+      var total = 1 * result.unit_price;
+      j(ele).find('#total').val(precision('<%= precision_count %>', total));
+      calculate_subtotal();
+      calculate_grandtotal();
+      j('#loader1').hide();
+    });
+  }
+
+  function calculate_subtotal(){
+    subtotal = 0;
+    j.each(j('table.sold_items').find('input#total:visible'), function(i, v){
+      if (j(v).val() != ''){
+
+        subtotal = subtotal + parseFloat(j(v).val());
+      }
+    });
+    j('#subtotal').val(precision('<%= precision_count %>', subtotal));
+  }
+  function calculate_grandtotal(){
+    var grandtotal = 0;
+
+
+    calculate_tax();
+    j.each(j('table.sold_items').find('input#total:visible'), function(i, v){
+      if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0 ){
+
+        grandtotal = grandtotal + parseFloat(j(v).val());
+      }
+    })
+    j.each(j('table.additional_charges').find('input#add_amount:visible'), function(i, v){
+      if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0 ){
+        grandtotal = grandtotal + parseFloat(j(v).val());
+      }
+    })
+
+    j.each(j('table.discounts').find('input#dis_amount:visible'), function(i, v){
+      if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0){
+        grandtotal = grandtotal - parseFloat(j(v).val());
+      }
+    })
+    grandtotal = grandtotal + tax_amount
+    if (grandtotal >= 0){
+      j('#grandtotal').val(precision('<%= precision_count %>', grandtotal));
+    } 
+   else{
+     j("input#tax").val("");
+     j("#add_amount").val("");
+     j("#dis_amount").val("");
+     calculate_grandtotal();
+    }
+  }
+  
+  
+  function update_username(value,data){
+    j.get('/invoices/search_user_details',{id: data}, function(result) {
+      j('.autocomplete').hide();
+      j('#issuer_id').val(result.user_id)
+      j('#name').val(result.name);
+      j('#address').val(result.address);
+      j('#loader').hide();
+    });
+
+  }
+
+  j(j('table.sold_items tr')[2]).find(".delete_button_img").click(function(){
+    var ele = j(this).parents('tr');
+    j(j(ele).find("#code")).val("");
+    j(j(ele).find(".store_item")).val("");
+    j(j(ele).find("#quantity")).val("");
+    j(j(ele).find("#rate")).val("");
+    j(j(ele).find("#total")).val("");
+    calculate_subtotal();
+    calculate_grandtotal();
+  });
+
+  j(j('table.additional_charges tr')[2]).find(".delete_button_img").click(function(){
+    var ele = j(this).parents('tr');
+    j(j(ele).find("#add_name")).val("");
+    j(j(ele).find("#add_amount")).val("");
+    calculate_subtotal();
+    calculate_grandtotal();
+  });
+
+  j(j('table.discounts tr')[2]).find(".delete_button_img").click(function(){
+    var ele = j(this).parents('tr');
+    j(j(ele).find("#dis_name")).val("");
+    j(j(ele).find("#dis_amount")).val("");
+    calculate_subtotal();
+    calculate_grandtotal();
+  });
+
+  j("input#tax").change(function(){
+    if (isNaN(j('input#tax').val())){ j("input#tax").val("")}
+    calculate_grandtotal();
+  });
+
+  j("input#tax").keyup(function(){
+    if (isNaN(j('input#tax').val())){ j("input#tax").val("")}
+  });
+
+  function calculate_tax(){
+    tax_amount = 0;
+    if (j("input#tax").val() != '' && !isNaN(j("input#tax").val()) && subtotal >= 0 ){
+      var tax_percentage = j("input#tax").val();
+      <% if FedenaInventory.new_tax_mode? %>
+        tax_amount = (net_amount() * tax_percentage) / 100;
+      <% else %>
+         tax_amount = (gross_amount() * tax_percentage) / 100;
+      <% end %>
+
+    }
+    console.log(tax_amount);
+  }
+function gross_amount() {
+    var gross_amount = 0;
+    j.each(j('table.sold_items').find('input#total:visible'), function(i, v){
+      if (j(v).val() != ''){
+
+        gross_amount = gross_amount + parseFloat(j(v).val());
+      }
+    });
+    return gross_amount;
+  }
+
+function additional_charges() {
+   var additional_charges = 0;
+   j.each(j('table.additional_charges').find('input#add_amount:visible'), function(i, v){
+      if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0 ){
+        additional_charges = additional_charges + parseFloat(j(v).val());
+      }
+    });
+     return additional_charges;
+}
+
+function discounts() {
+  var discounts =0;
+   j.each(j('table.discounts').find('input#dis_amount:visible'), function(i, v){
+      if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0){
+        discounts = discounts + parseFloat(j(v).val());
+      }
+    });
+  return discounts;
+
+}
+  function net_amount() {
+    return gross_amount() + additional_charges() - discounts();
+  }
+
+
+  j('#invoice_store_id').change(function(){
+    var store_id = j(this).val();
+    j.get('/invoices/find_invoice_prefix',{id: store_id}, function(result) {
+      j('#invoice_invoice_no').val(result.invoice_no);
+    })
+  })
+
+  j("input#quantity").change(function(){
+    if (j("input#quantity").val() == ''){ j("input#quantity").val(1)}
+    var parent = j(this).parents('tr');
+    var rate = j(parent).find("#rate").val();
+    var total = parseFloat(rate) * parseFloat(j(this).val());
+    j(parent).find("#total").val(total);
+    calculate_subtotal();
+    calculate_grandtotal();
+
+  })
+
+  j("input#quantity").keyup(function(){
+    if (isNaN(j('input#quantity').val())){ j("input#quantity").val("")}
+  });
+
+  j.each(j('.store_item'),function(i,val){
+    var item_id = j(val).parents('.text-input-bg').siblings().val();
+    j.get('/invoices/find_item_name',{id: item_id}, function(result) {
+      j(val).val(result.item_name);
+    })
+  })
+
+  j('a.delete_button_img').click(function(){
+    calculate_grandtotal();
+    calculate_subtotal();
+  })
+    
+  j("input.store_item").keypress(function(){
+    j('#loader1').show();
+  })
+
+  j("input#code").keypress(function(){
+    j('#loader1').show();
+  })
+  j("input#issued_to").keypress(function(){
+    j('#loader').show();
+  })
+  
+  j('#store_item_fields').find('#remove-field').first().html("");
+  j('#additional_charge_fields').find('#remove-field').first().html("");
+  j('#discount_fields').find('#remove-field').first().html("");
+</script>

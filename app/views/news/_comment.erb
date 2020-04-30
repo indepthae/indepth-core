@@ -1,0 +1,88 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<% unless @approved_comments.empty? %>
+  <% @approved_comments.each do |cmnt| %>
+    <% if cmnt.content.present? %>
+      <% if @config && @config.config_value == '1' %> 
+        <% is_author = (@current_user == cmnt.author) %>
+        <% if cmnt.is_approved%>
+          <div class="comment_box">
+            <div class="first_row">
+              <div class="commenter_name">
+                <%= cmnt.author.present? ? cmnt.author.first_name : "#{t('user_deleted')}" %>
+              </div>
+              <% if is_author || @is_moderator %>
+              <div class="comment_actions">
+                <div class="hide_comment">
+                  <%= link_to_remote "#{t('discard')}",  {:url => {:controller => "news", :action=>"delete_comment", :id=>cmnt.id} , :confirm => t('are_you_sure_want_to_discard')}, :class => "themed_text" %>
+                </div>
+              </div>
+              <% end %>
+            </div>
+            <div class="comment-content-text">
+              <%= cmnt.content.strip.gsub(/\n/, "<br/>") %>
+            </div>
+            <div class="comment-posted-at">
+                <%#= FedenaTimeSet.current_time_to_local_time(cmnt.created_at)  %>
+                <% created_time =  cmnt.created_at.present? ? (time_ago_in_words(cmnt.created_at)): " "  %>
+                <%= t('posted') %> <%= created_time.present? ? (created_time == '1 minute' ? "just now" : created_time.to_s + " " +t('ago')) : "" %>
+            </div>
+          </div>
+        <% elsif  is_author && !@is_moderator %>
+          <div class="comment_box">
+            <div class="first_row">
+              <div class="commenter_name">
+                <%= cmnt.author.present? ? cmnt.author.first_name : "#{t('user_deleted')}" %>
+              </div>
+              <div class="comment_actions">
+              <% unless cmnt.is_approved %>
+                <div class="approve_comment">
+                  <%= "#{t('waiting_to_approve')}" %>
+                </div>
+              <% end %>
+                <div class="hide_comment">
+                  <%= link_to_remote "#{t('discard')}", {:url => {:controller => "news", :action=>"delete_comment", :id=>cmnt.id}, :confirm => t('are_you_sure_want_to_discard')}, :class => "themed_text" %>
+                </div>
+              </div>
+            </div>
+            <div class="comment-content-text">
+              <%= cmnt.content.strip.gsub(/\n/, "<br/>") %>
+            </div>
+            <div class="comment-posted-at">
+                <% created_time =  cmnt.created_at.present? ? (time_ago_in_words(cmnt.created_at)): " "  %>
+                <%= t('posted') %> <%= created_time.present? ? (created_time == '1 minute' ? "just now" : created_time.to_s + " " + t('ago')) : "" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div class="pagination-div">
+    <%= will_paginate @approved_comments,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "news",:action => "load_comments",:id=>@news.id,:is_approved=>true} %>
+  </div>
+<% else %>
+<% end %>
+  
+  <script>
+    var j = jQuery.noConflict();
+    j(".pending").removeClass('active');
+    j(".approved").addClass('active');
+  </script>

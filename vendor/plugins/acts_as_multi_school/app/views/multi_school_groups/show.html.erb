@@ -1,0 +1,42 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= @multi_school_group.name %></h1>
+  <%= link_to 'Delete Group', @multi_school_group, :confirm => 'Delete group and all of its schools?', :method => :delete ,:class => 'button-red float-right' if permitted_to? :destroy,@multi_school_group,:context=>:multi_school_groups%>
+</fieldset>
+
+<div class="content-div">
+  <div class="nav-vertical width-15-pc">
+    <ul >
+      <% if permitted_to? :profile, @multi_school_group, :context=>:multi_school_groups %>
+        <li><%= link_to 'Profile',profile_multi_school_group_path(@multi_school_group),:class=>"active" %></li>
+      <% end %>
+      <% if permitted_to? :plugin_list, :available_plugins %>
+        <li><%= link_to 'Plugins',plugin_list_multi_school_group_available_plugin_path(@multi_school_group) %></li>
+      <% end %>
+      <% if permitted_to? :domain, @multi_school_group, :context=>:multi_school_groups %>
+        <li><%= link_to 'Domain',domain_multi_school_group_path(@multi_school_group) %></li>
+      <% end %>
+      <% if permitted_to? :settings_list, @multi_school_group.smtp_setting, :context=>:additional_settings %>
+        <li><%= link_to 'Email',settings_list_additional_setting_path(@multi_school_group.class.name.underscore,@multi_school_group.id,"smtp_setting") %></li>
+        <li><%= link_to 'SMS',package_list_multi_school_group_sms_packages_path(@multi_school_group) %></li>
+        <% if @multi_school_group.whitelabel_enabled %>
+          <li><%= link_to 'WhiteLabel',settings_list_additional_setting_path(@multi_school_group.class.name.underscore,@multi_school_group.id,"whitelabel_setting") %></li>
+        <% end %>
+      <% end %>
+      <% if @multi_school_group == admin_user_session.school_group and permitted_to? :settings, :plugin_settings %>
+        <% if (@multi_school_group.allowed_plugins.include?("fedena_google_sso") or @multi_school_group.allowed_plugins.include?("fedena_azure")) %>
+          <li><%= link_to 'Plugin Settings',settings_plugin_setting_path, :class=>"non-partial" %></li>
+        <% end %>
+      <% end %>
+      <% if permitted_to? :list_schools, :schools %>
+        <li><%= link_to 'Schools',list_schools_multi_school_group_schools_path(@multi_school_group), :class=>"non-partial" %></li>
+      <% end %>
+      <% if @multi_school_group != admin_user_session.school_group and @multi_school_group.allowed_plugins.include?("fedena_pay") and permitted_to? :index,@multi_school_group,:context=>:payment_gateways %>
+        <li><%= link_to 'Gateways',multi_school_group_payment_gateways_path(@multi_school_group), :class=>"non-partial" %></li>
+      <% end %>
+      <li><%= link_to 'Local Settings',settings_list_additional_setting_path(@multi_school_group.class.name.underscore,@multi_school_group.id,"local_setting") %></li>
+    </ul>
+  </div>
+  <div id="detail_list" class="detail-list width-80-pc bg-light shadow grey-border">
+    <%= render "profile.html" %>
+  </div>
+</div>

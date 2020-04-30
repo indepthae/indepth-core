@@ -1,0 +1,17 @@
+<div class="user_selector" id="user_selector"></div>
+<div class="group_selector"><div class="sms_creation"><%=render "sms/sms_creation.html.erb"%></div></div>
+<div class="group_sms_notes"><%= t('sms_notes') %></div>
+<script>
+  user_list = <%= raw @user_list.to_json %>;
+  user_selector.generate_select("group", user_list, [], ["user_selector"], 0, ["<%=t('user_text')%>"], []);
+</script>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,16 @@
+<div id="filter_label"><label for="end_date"><%= t('filter') %></label>
+  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+</div>
+
+<div class="label-field-pair"><div class="text-input-bg">
+    <label for="leave_type"><%= t('leave_category') %></label>
+    <%= select :filter, :category, ["All"]+ (@leaves.nil? ? [] : @leaves.map {|c| [c.name, c.id]}),{}, :onchange => "#{remote_function(:url => {:action => "additional_leave_detailed"},
+    :with => "'category='+value+'&lop_status='+j('#filter_lop_status').val()+'&start_date='+j('#start_date').val()+'&end_date='+j('#end_date').val()",:before => "Element.show('loader1')",
+  :success => "Element.hide('loader1')" )}" %></div>
+</div>
+<div class="label-field-pair"><div class="text-input-bg">
+    <label for="leave_type"><%= t('lop_status') %></label>
+    <%= select :filter, :lop_status, {"All" => "All", "Deducted" => 1, "Not deducted" => 0}.sort,{}, :onchange => "#{remote_function(:url => {:action => "additional_leave_detailed"},
+    :with => "'lop_status='+value+'&category='+j('#filter_category').val()+'&start_date='+j('#start_date').val()+'&end_date='+j('#end_date').val()",:before => "Element.show('loader1')",
+  :success => "Element.hide('loader1')" )}"%></div>
+</div>

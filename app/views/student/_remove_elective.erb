@@ -1,0 +1,7 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+  <div class="category-edit"> <%= link_to_remote "#{t('remove_elective')}",{:url=>{:controller=>"student",:action=>"remove_elective",:id=>@student.id,:id2=>@elective_subject.id}}, :before=>"this.style.display='none'" %>
+      </div>

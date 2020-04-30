@@ -1,0 +1,39 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_attendance') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('employee_leaves').titleize %></div>
+  <% if @current_user == @employee.user %>
+    <div id="inner-tab-menu">
+      <ul>
+        <% if @total_leave_count > 0 && (can_access_request? :pending_leave_applications,@employee.user,:context => :employee_attendance)%>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pending_leave_applications')} (#{@total_leave_count})", :controller=>"employee_attendance", :action=>"pending_leave_applications", :id=> @employee.id, :status => "pending",:from => "manager" %></li>
+        <% end %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('apply_leave')}", :controller=>"employee_attendance", :action=>"leaves", :id => @employee.id %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :employee_attendance_employee_leaves, @employee %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div id="box">
+    <% if permitted_to? :my_leaves,@employee.user,:context => :employee_attendance%>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('my_leaves').titleize}", :controller=>"employee_attendance", :action=>"my_leaves", :id => @employee.id, :from => "profile" %></div>
+        <div class="link-descr"><%= t('view_all_your_leave_details') %></div>
+      </div>
+    <% end %>
+
+    <% if (can_access_request? :reportees_leaves,@employee.user,:context => :employee_attendance) && @reporting_employees.present? && @current_user == @employee.user %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('reportees_leaves').titleize}", :controller=>"employee_attendance", :action=>"reportees_leaves", :id => @employee.id, :from => "reportees_leaves"%></div>
+        <div class="link-descr"><%= t('manage_reportees_leaves') %></div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

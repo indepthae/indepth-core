@@ -1,0 +1,38 @@
+<tr class="row-a">
+    <td class="col-1" ></td>
+    <td class="col-1 bold_font" colspan="2"><span><%= t('discount') %></span></td>
+</tr>
+<div id="discounts-list">
+    <% student_discount_link=false %>
+    <% @categorized_discounts.each do |discount_type| %>      
+      <tr class="row-a <%= discount_type.first %>head">
+          <td class="sl-col"></td>
+          <td class="bold_font" colspan="2">
+              <span><%= "#{discount_type.first.underscore.humanize}-#{t('wise')}" %></span>
+          </td>
+      </tr>
+      <% discount_type.last.each do |fee| %>
+        <tr class="row-b particular" id="particular<%= fee.id %>">
+            <td class="sl-col normal_font particular_index"><%= i+=1 %></td>
+            <% discount_text = fee.is_amount == true ? "#{fee.name}" : "#{fee.name}-#{fee.discount}% " %>
+
+            <% if fee.master_receiver_type=='FinanceFeeParticular' %>
+              <% particular=fee.master_receiver %>
+              <td class="set_border_right particular-col normal_font">
+                  <%= "#{discount_text}  &#x200E;(#{particular.name}) &#x200E;" %>
+              </td>
+              <td class="set_border_right amount-col normal_font align_right"> 
+                  <%= precision_label(particular.amount * fee.discount.to_f/ (fee.is_amount? ? particular.amount : 100)) %>
+              </td>
+            <% else %>
+              <td class="set_border_right particular-col normal_font">
+                  <%= discount_text %>
+              </td>
+              <td class="set_border_right amount-col amount-cols normal_font align_right">
+                  <%= precision_label(@total_payable * fee.discount.to_f/ (fee.is_amount? ? @total_payable : 100)) %>
+              </td>
+            <% end %>
+        </tr>
+      <% end %>
+    <% end %>
+</div>

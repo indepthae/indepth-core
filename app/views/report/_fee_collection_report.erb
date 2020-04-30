@@ -1,0 +1,131 @@
+<% if @start_date <= @end_date%>
+<% if !@students.blank? && @fee_collection_present %>
+  <div class="info">
+      <div class="field_pair">
+          <div class="label1"><%= "#{t('total')} #{t('students')}" %></div>
+          <div class="label2"><%= ": #{@students_count}" %></div>
+      </div>
+  </div>
+  <div class="float_right export_spacing">
+      <% batch_ids=params[:b].present? ? params[:b] : [] %>
+      <%= link_to "#{t('export_as_csv')}", {:action => 'collection_report_csv',
+        :session_fingerprint=>session_fingerprint, :b => batch_ids, :start_date=> params[:start_date], :end_date=>params[:end_date], :active=>params[:active]},:class => 'solid_button', :target => '_blank'%>
+  </div>
+  <div class="extender"></div>
+  <div>
+
+
+    <div class="whole_table">
+      <div class="fixed_portion">
+        <table class="report">
+          <tr class="sub-heading">
+            <th><%= "#{t('no_text')}"%></th>
+            <th><%= "#{t('name')}"%></th>
+          </tr>
+          <%@i =  params[:page].present? ? (params[:page].to_i-1) * @per_page : 0 %>
+            <%@table.each do |col| %>
+            <tr>
+              <% @i = @i + 1%>
+              <td class="center_text"><%=@i%></td>
+              <td class="left_text"><%=col[:name]%></td>
+            </tr>
+            <%end%>
+        </table>
+      </div>
+        <div class="table_overflow">
+        <table class="report">
+          <tr class="sub-heading">
+            <th><%= "#{t('admission_no')}"%></th>
+            <th><%= "#{t('batch_name')}"%></th>
+            <th><%= "#{t('total_fees')}"%> <span class="info_tool tooltip"> <span class="tooltiptext"><%= t('sum_of_fee_particulars') %></span></span> </th>
+            <th><%= "#{t('total_discount')}"%></th>
+            <%if @total_tax_enabled%>
+            <th><%= "#{t('total_tax_amount')}"%></th>
+            <th><%= "#{t('total_tax_paid')}"%></th>
+            <%end%>
+            <th><%= "#{t('fees_paid')}"%> <span class="info_tool tooltip"> <span class="tooltiptext"><%= t('doesnt_include_fine') %></span></span></th>
+            <th><%= "#{t('fees_due')}"%> <span class="info_tool tooltip"> <span class="tooltiptext"><%= t('doesnt_include_fine') %></span></span></th>
+            <th><%= "#{t('expected_fine')}"%> <span class="info_tool tooltip"> <span class="tooltiptext"><%= t('sum_of_applicable_fines') %></span></span></th>
+            <th><%= "#{t('total_fine_paid')}"%><span class="info_tool tooltip"> <span class="tooltiptext"><%= t('sum_of_all_paid_fines') %></span></span></th>
+
+            <%@collection_names.each do |collection_name|%>
+            <th><%=collection_name[:name] + " #{t('fees_text')}"%></th>
+            <th><%=collection_name[:name] + " #{t('discount')}"%></th>
+            <%if collection_name[:tax_enabled]%>
+            <th><%=collection_name[:name] + " #{t('tax_amount')}"%></th>
+            <th><%=collection_name[:name] + " #{t('tax_paid')}"%></th>
+            <%end%>
+            <th><%=collection_name[:name] + " #{t('paid')}"%></th>
+            <th><%=collection_name[:name] + " #{t('due')}"%></th>
+            <th><%=collection_name[:name] + " #{t('expected_fine')}"%></th>
+            <th><%=collection_name[:name] + " #{t('fine_paid')}"%></th>
+            <%end%>
+          </tr>
+
+        <%@table.each do |col| %>
+        <tr>
+          <td class="left_text"><%=col[:admn_no]%></td>
+          <td class="left_text"><%=col[:batch_name]%></td>
+          <td class="right_text"><%=precision_label(col[:total_fees])%></td>
+          <td class="right_text"><%=precision_label(col[:total_discount_given])%></td>
+          <%if @total_tax_enabled%>
+          <td class="right_text"><%=precision_label(col[:total_tax_amount])%></td>
+          <td class="right_text"><%=precision_label(col[:total_tax_paid])%></td>
+          <%end%>
+          <td class="right_text"><%=precision_label(col[:fees_paid])%></td>
+          <td class="right_text"><%=precision_label(col[:fees_due])%></td>
+          <td class="right_text"><%=precision_label(col[:total_expected_fine])%></td>
+          <td class="right_text"><%=precision_label(col[:total_fine_paid])%></td>
+
+          <%@collection_names.each do |collection_name|%>
+
+            <%if  col[collection_name[:collection_type]][collection_name[:id]].present? %>
+              <%collection_values=col[collection_name[:collection_type]][collection_name[:id]]  %>
+              <td class="right_text"><%=precision_label(collection_values[:fees]) %></td>
+              <td class="right_text"><%=precision_label(collection_values[:discount]) %></td>
+              <%if collection_name[:tax_enabled]%>
+              <td class="right_text"><%=precision_label(collection_values[:tax_amount]) %></td>
+              <td class="right_text"><%=precision_label(collection_values[:tax_paid]) %></td>
+              <%end%>
+              <td class="right_text"><%=precision_label(collection_values[:paid])%></td>
+              <td class="right_text"><%=precision_label(collection_values[:due]) %></td>
+              <td class="right_text"><%=precision_label(collection_values[:fine]) %></td>
+              <td class="right_text"><%=precision_label(collection_values[:fine_paid]) %></td>
+            <%else%>
+            <td class="center_text"> - </td>
+            <td class="center_text"> - </td>
+            <%if collection_name[:tax_enabled]%>
+            <td class="center_text"> - </td>
+            <td class="center_text"> - </td>
+            <%end%>
+            <td class="center_text"> - </td>
+            <td class="center_text"> - </td>
+            <td class="center_text"> - </td>
+            <td class="center_text"> - </td>
+
+            <%end%>
+          <%end%>
+        </tr>
+        <%end%>
+      </table>
+    </div>
+    </div>
+
+
+
+      <% unless @students.per_page.to_i > @students.total_entries.to_i %>
+        <div class="pagination_list">
+            <div class="pagination_text">
+                <%= "#{t('showing')} #{@i+1-(@students.count)}-#{@i} #{t('of')} #{@students_count}" %>
+            </div>
+            <%= will_paginate @students, :renderer => 'RemoteLinkRenderer', :page_links => false, :params => {:b => (params[:b].present? ? params[:b] : @active_batches_ids) , :start_date=>@start_date,:end_date=>@end_date, :active => params[:active] } %>
+        </div>
+      <% end %>
+<% else %>
+  <p class="flash-msg"> <%= "#{t('no_fee_collection_present')}" %></p>
+<% end %>
+<%else%>
+  <p class="flash-msg"> <%= "#{t('start_date_cant_be_after_end_date')}" %></p>
+<%end%>
+
+</div>

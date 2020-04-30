@@ -1,0 +1,2 @@
+sql="UPDATE multi_fees_transactions INNER JOIN `multi_fees_transactions_finance_transactions` ON `multi_fees_transactions_finance_transactions`.multi_fees_transaction_id = `multi_fees_transactions`.id INNER JOIN `finance_transactions` ON `finance_transactions`.id = `multi_fees_transactions_finance_transactions`.finance_transaction_id set multi_fees_transactions.transaction_date=finance_transactions.transaction_date WHERE (finance_transactions.transaction_date != multi_fees_transactions.transaction_date)"
+MultiFeesTransaction.connection.execute(sql)

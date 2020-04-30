@@ -1,0 +1,105 @@
+<% additional_params ||= {} %>
+<% remote_form_for :report, :url => {:action => @target_action, :id => params[:id], :date_tag => params[:date_tag],
+                                     :batch_id => params[:batch_id]}.merge(additional_params.except(:fee_account_id)),
+                   :html => {:id => "form_id"} do |form| %>
+
+    <div class="float-box width50p">
+      <div class="fields-label">
+        <%= t('select_a_date_range') %>
+      </div>
+      <div class="fields">
+        <div class="date">
+          <%= calendar_date_select_tag 'start_date', I18n.l(@start_date.try(:to_date) || Date.today,
+                                                            :format => :default), :popup => :force %>
+        </div>
+
+        <div class="date end_date">
+          <label><%= t('to') %></label>
+          <%= calendar_date_select_tag 'end_date', I18n.l(@end_date.try(:to_date) || Date.today,
+                                                          :format => :default), :popup => :force %>
+        </div>
+
+        <div id="date_error_div">
+          <% unless flash[:warn_notice].nil? %>
+              <%= render :partial => "date_error" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="float-box width50p">
+      <div class="fields-label">
+        <% if @accounts_enabled %>
+            <%= t('fee_account_text') %>
+        <% end %>
+      </div>
+      <div class="fields">
+        <% if @accounts_enabled %>
+            <div class="text-input-bg accounts_list">
+              <% selected = @account_id.present? ? @account_id : nil %>
+              <%= select_tag :fee_account_id, options_for_select(@accounts.map { |a| [a.name, a.id] }.
+                                                                         unshift([t("default_account"), 0]).unshift([t("all_accounts"), nil]), :selected => selected) %>
+            </div>
+        <% end %>
+
+        <div class="view_report">
+          <%= submit_tag "#{t('view_report')}", {:class => 'user_button1'} %>
+          <% if @target_action.present? %>
+              <span class="themed_hover_text" id="hide_date_filter"><%= t('cancel') %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+<% end %>
+
+<%
+
+   #<div class="date_box">
+   #    <div class="set_fixed_range">
+   #       < %=link_to_remote t('last_30_days'),:url => {:controller => "finance",:action =>@target_action,:id=>params[:id],:batch_id=>params[:batch_id],:date_tag=>t('last_30_days'),:start_date=>I18n.l(30.day.ago.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >
+   #        < %=link_to_remote t('last_3_months'),:url => {:controller => "finance",:action =>@target_action,:id=>params[:id],:batch_id=>params[:batch_id],:date_tag=>t('last_3_months'),:start_date=>I18n.l(3.month.ago.beginning_of_month.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >
+   #        < %=link_to_remote t('last_6_months'),:url => {:controller => "finance",:action =>@target_action,:id=>params[:id],:batch_id=>params[:batch_id],:date_tag=>t('last_6_months'),:start_date=>I18n.l(6.month.ago.beginning_of_month.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >
+   #    </div>
+
+   #    <div class="set_border"></div>
+
+   #    <div class="user_set_date">
+   #        < % remote_form_for :report, :url => {:action => @target_action, :id => params[:id],
+   #          :batch_id => params[:batch_id]}, :html=>{:id=>"form_id"} do |form| % >
+   #          <div>
+   #              < %= calendar_date_select_tag 'start_date', I18n.l(@start_date,:format=>:default) ,:popup=>:force% >
+   #          </div>
+   #          <div> <label>< %= t('to') % ></label>
+   #              < %= calendar_date_select_tag 'end_date', I18n.l(@end_date,:format=>:default) ,:popup=>:force% >
+   #              < %= submit_tag "#{t('view_report')}",:class=>'user_button1' % >
+   #              <span class="themed_hover_text" id="hide_date_filter">< %=t('cancel')% ></span>
+   #          </div>
+   #        < % end % >
+   #        <div id="date_error_div"></div>
+   #    </div>
+   #</div>
+
+%>
+
+<script type="text/javascript">
+
+    j('.calendar_label').on('click', function () {
+        var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+        new CalendarDateSelect(this.previous(), {
+            date_format: "<%= date_format %>",
+            locale_months: month_names,
+            popup: 'force', year_range: 10
+        });
+    });
+
+    j("#hide_date_filter").click(function () {
+        j(".date_box").hide();
+        j("#show_date").show();
+    });
+
+    j("#show_date").click(function () {
+        j(".date_box").show();
+        j("#show_date").hide();
+    });
+
+</script>

@@ -1,0 +1,115 @@
+<div id="signature_section">
+    <div id="left_side">
+        <div class="imag_thumb" id="image_left">
+          <% if @setting[:sign_left_img].present? %>
+              <%= image_tag @setting[:sign_left_img].url(:original, false) %>
+          <% end %>
+        </div>
+        <%  if @setting[:sign_left_img].present? %>
+          <div class="remove-field"><a onclick="remove_uploaded_file('left')"><%= t('remove') %></a></div>
+        <% end %>
+        <%= paperclip_file_field_tag 'assessment_report_setting[sign_left_img]','signature', :size=>12, :direct => false, :object => AssessmentReportSetting.new,
+         :side => 'left', :btn_type => (@setting[:sign_left_img].present? ? 'change_image' : 'upload_image') %>
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :assessment_report_setting, :sign_left_text, :value => @setting[:sign_left_text] %>
+            </div>
+        </div>
+    </div>
+    <div id="center_side">
+        <div class="imag_thumb" id="image_center">
+          <% if @setting[:sign_center_img].present? %>
+              <%= image_tag @setting[:sign_center_img].url(:original, false) %>
+          <% end %>
+        </div>
+        <%  if @setting[:sign_center_img].present? %>
+          <div class="remove-field"><a onclick="remove_uploaded_file('center')"><%= t('remove') %></a></div>
+        <% end %>
+          
+        <%= paperclip_file_field_tag 'assessment_report_setting[sign_center_img]','signature', :size=>12, :direct => false, :object => AssessmentReportSetting.new,
+         :side=>'center' , :btn_type => (@setting[:sign_center_img].present? ? 'change_image' : 'upload_image')%>
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :assessment_report_setting, :sign_center_text, :value => @setting[:sign_center_text] %>
+            </div>
+        </div>
+    </div>
+    <div id="right_side">
+        <div class="imag_thumb" id="image_right">
+          <% if @setting[:sign_right_img].present? %>
+            <%= image_tag @setting[:sign_right_img].url(:original, false) %>
+          <% end %>
+        </div>
+        <%  if @setting[:sign_right_img].present? %>
+          <div class="remove-field"><a onclick="remove_uploaded_file('right')"><%= t('remove') %></a></div>
+        <% end %>
+          
+        <%= paperclip_file_field_tag 'assessment_report_setting[sign_right_img]','signature', :size=>12, :direct => false, :object => AssessmentReportSetting.new,
+         :side => 'right', :btn_type => (@setting[:sign_right_img].present? ? 'change_image' : 'upload_image') %>
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :assessment_report_setting, :sign_right_text, :value => @setting[:sign_right_text] %>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+  j('.style input').change(function () {
+        displayThumbnail(this);
+        side = j(this).attr('side')
+        removeHidden(side)
+        showRemoveButton(side)
+  });
+  
+  function displayThumbnail(input) {
+        for( var i = 0;i<input.files.length;i++){
+            if (input.files && input.files[i]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                  var $newImageThumbnail = makeElement('img',{ class: "image-frame",src: e.target.result});
+                  j(input).parents().eq(2).find('div.imag_thumb').html($newImageThumbnail);
+                };
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+
+    }
+
+    function makeElement(element, options) {
+        var $elem = document.createElement(element);
+        j.each(options, function (key, value) {
+            $elem.setAttribute(key, value);
+        });
+        return $elem;
+    }
+    j( "input[btn_type='change_image']" ).each(function(){
+      j(this).parent().addClass('change_image_style')
+    })
+    
+    remove_uploaded_file = function(side){
+      resetFileElement(j('#field_assessment_report_setting_sign_'+ side +'_img_signature'))
+      resetFileElement(j('#assessment_report_setting_sign_'+ side +'_img_signature'))
+      j('#image_'+side).html('');
+      j('form').append(j('<input></input>',{'type': 'hidden', 'name': 'assessment_report_setting[sign_'+side+'_img]','id': 'hidden_'+side, 'value': ''}))
+      j('#'+side+'_side').find('div.remove-field').remove();
+      j('#'+side+'_side').find('div.style').removeClass('change_image_style');
+    }
+    
+    function resetFileElement(e) {
+        e.val('');
+        e.wrap('<form>').closest('form').get(0).reset();
+        reset_values();
+        e.unwrap();
+    }
+    
+    function removeHidden(side){
+       j('#hidden_'+side).remove();
+    }
+    
+    function showRemoveButton(side){
+      remove_field = j('<div></div>', {'class': 'remove-field'})
+      remove_field = j(remove_field).append(j('<a></a>', {'onclick': "remove_uploaded_file('"+ side +"');", 'text': '<%=t('remove')%>'}))
+      j('#'+side+'_side').append(remove_field)
+      j('#assessment_report_setting_sign_'+side+'_img_signature').parent().addClass('change_image_style');
+    }
+</script>

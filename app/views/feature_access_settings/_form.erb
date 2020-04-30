@@ -1,0 +1,146 @@
+<div class="student_items">
+    <% form_remote_for :feature_access_settings,:url=>{:controller=>"feature_access_settings",:action=>'create'}, :html => { :method => :post } do |f| %>
+      <div id="form-errors"></div>
+      <%= error_messages_for :tc_template_field_student_details %>
+      <%if @features.present?%>
+        <table id="student_details_table">
+            <tr class="disable_sort">
+                <th id="action"><%= f.check_box :feature_access_settings,{:onclick=>'select_all_box()'} %></th>
+                <th id="name"><%=t('parent_features')%></th>
+            </tr>
+            <%@features.each_with_index do |feature,i|%>
+              <%if feature.feature_name == "Student Documents"%>
+                <tr class="list">
+                    <td class="action">
+                        <div class="check_box">
+                            <div class="label-field-pair">
+                                <% if feature.parent_can_access == true %>
+                                  <div class="input-container">  <%= f.check_box "[field_info][#{feature.id}]",:checked=>true %></div>
+                                <%else%>
+                                  <div class="input-container">  <%= f.check_box "[field_info][#{feature.id}]" %></div>
+                                <%end%>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="record_name"><label for="feature_access_settings_[field_info][#{feature.id}]"><%=feature.feature_name%></label></td>
+                </tr>
+              <%else%>
+                <%if feature.feature_name == "Gallery"%>
+                  <%plugin = "fedena_gallery"%>
+                <%elsif feature.feature_name == "Transport"%>
+                  <%plugin = "fedena_transport"%>
+                <%elsif feature.feature_name == "Hostel"%>
+                  <%plugin = "fedena_hostel"%>
+                <%elsif feature.feature_name == "Assignment"%>
+                  <%plugin = "fedena_assignment"%>
+                <%elsif feature.feature_name == "Tasks"%>
+                  <%plugin = "fedena_task"%>
+                <%end%>
+                <%if FedenaPlugin.can_access_plugin?(plugin)%>
+                  <tr class="list">
+                      <td class="action">
+                          <div class="check_box">
+                              <div class="label-field-pair">
+                                  <% if feature.parent_can_access == true %>
+                                    <div class="input-container">  <%= f.check_box "[field_info][#{feature.id}]",:checked=>true %></div>
+                                  <%else%>
+                                    <div class="input-container">  <%= f.check_box "[field_info][#{feature.id}]" %></div>
+                                  <%end%>
+                              </div>
+                          </div>
+                      </td>
+                      <td class="record_name"><label for="feature_access_settings_[field_info][#{feature.id}]"><%=feature.feature_name%></label></td>
+                  </tr>
+                <%end%>
+              <%end%>
+            <%end%>
+        </table>
+      <%else%>
+        <div class="no_entries"><%=t('no_records_yet')%></div>
+      <%end%>
+      <div class="submit_button new">
+          <%= button_to "#{t('save_settings')}",{}, {:value => "save", :class => "submit-button", :id=>"submit_button"} %>
+      </div>
+    <%end%>
+</div>
+<script type="text/javascript">
+
+    flag = 0;
+    j(':checkbox').each(function() {
+    if(this.checked == true)	
+    {
+    if(this.id != "feature_access_settings_feature_access_settings")
+    {
+    flag++;
+    }
+    else
+    {
+    console.log(true);
+    }
+    } 
+    console.log(flag)
+    });
+    console.log(flag);
+    if(flag == j(':checkbox').length-1)
+    {
+    j(':checkbox:first').each(function(){this.checked = true});
+    }
+    else
+    {
+    j(':checkbox:first').each(function(){this.checked = false});
+    }
+
+
+
+
+    function select_all_box() {
+    if(j("input[name='feature_access_settings[feature_access_settings]']:checked").val() == "1"){
+    j(':checkbox').each(function() {
+    this.checked = true;                        
+    });
+    }
+    else{
+    j(':checkbox').each(function() {
+    this.checked = false;                        
+    });
+    }
+    }
+
+    j('#submit_button').click(function(){
+    formdata = new FormData(j('form')[0]);
+    j.ajax({
+    type: 'POST' ,
+    url: "/feature_access_settings/create",
+    data: formdata,
+    cache: false,
+    processData: false,
+    contentType: false,
+    success : function() {
+    flag = 0;
+    j(':checkbox').each(function() {
+    if(this.checked == true)	
+    {
+    if(this.id != "feature_access_settings_feature_access_settings")
+    {
+    flag++;
+    }
+    else
+    {
+    console.log(true);
+    }
+    } 
+    console.log(flag)
+    });
+    console.log(flag);
+    if(flag == j(':checkbox').length-1)
+    {
+    j(':checkbox:first').each(function(){this.checked = true});
+    }
+    else
+    {
+    j(':checkbox:first').each(function(){this.checked = false});
+    }
+    }
+    });
+    });
+</script>

@@ -1,0 +1,8 @@
+<div class="year-detail">
+      <span class="label">
+        <%= t('financial_year_name') %>:
+      </span>
+      <span class="value">
+        <%= (financial_year_name rescue nil) || @current_financial_year_name %>
+      </span>
+</div>

@@ -1,0 +1,133 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('header') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_header_settings%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+    <% end %>
+
+<%#=  @field.errors.full_messages %>
+
+    <div class="box">
+        <div class="page_header_box">
+            <div class="page_header"><%= t('tc_header_settings')%> </div>
+            <div class="page_header_desc"><%= t('tc_header_settings_desc')%> </div>
+        </div>
+        <%- form_for :header_config  do |f| -%>
+          <div id="form-content">
+              <div class="label-radio-pair">
+                  <div class="radio-select-options">
+                      <div class="radio-select">
+                          <%= f.radio_button 'enabled[value]', "true", :checked => @current_template.header_enabled? %>
+                          <label for="header_config_enabled[value]_true"><%= t('use_header_template_for_certificate')%></label>
+                          <p><%= t('enable_header_descr') %> </p>
+                      </div>
+                      <div class="radio-select">
+                          <%= f.radio_button 'enabled[value]', "false", :checked => !@current_template.header_enabled? %>
+                          <label for="header_config_enabled[value]_false"><%= t('do_not_generate_header_leave_blank_space')%> </label>
+                          <p><%= t('disable_header_descr') %> </p>
+                          <div class="reveal-if-active">
+                              <hr>
+                              <%= render :partial => "institution_settings", :locals=>{:f=>f} %>
+                              <%= render :partial => "logo_settings", :locals=> {:f=>f} %>
+
+                          </div>
+                          <div class="reveal-if-inactive">
+                              <hr>
+                              <%= render :partial => "header_disabled_settings", :locals=>{:f=>f} %>
+                              <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+                          </div>
+                          <%= hidden_field_tag  "header_config[certificate_name][is_enabled]" %>
+                      </div>
+                      <%= render :partial => "certificate_headline_settings", :locals=> {:f=>f} %>
+                      <div class="submit_form">
+                          <div id="submit-button">
+                              <%=submit_tag " #{t('save_header_preferences')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+                          </div>
+                      </div>
+                       <%= render :partial => "preview_box" %>
+
+                  </div>
+              </div>
+          </div>  
+        <%- end -%>
+    </div>
+</div>
+<script type="text/javascript">
+  if (j('.logo_to_left').length == 1) {
+      j('.institution_details_to_center').css('float', 'left');
+  } else {
+      j('.institution_details_to_center').css('float', 'left');
+  }
+  if ("<%= @current_template.header_enabled?%>" == "true") {
+      j(".reveal-if-active").show();
+      j(".reveal-if-inactive").hide();
+      j("input[name='certificate_name_enabled']").attr('disabled',true)
+      j("input[name='certificate_name_enabled']").attr('hidden',true)
+      <%#*j("input[name='certificate_name_enabled']").prop('checked',true)%>
+  } else {
+      j(".reveal-if-active").hide();
+      j(".reveal-if-inactive").show();
+      j("input[name='certificate_name_enabled']").attr('disabled',false)
+      j("input[name='certificate_name_enabled']").attr('hidden',false)
+  }
+  if(j('.institution_contact_preview').children().length == 0){
+    j('.institution_contact_preview').css('display', 'none');
+  }
+  else{
+    j('.institution_contact_preview').css('display', 'inline-block');
+  }
+  j("input[name='header_config[enabled[value]]']:radio").change(function () {
+      if (this.value == "true") {
+          j(".reveal-if-active").show();
+          j(".reveal-if-inactive").hide();
+          j("input[name='certificate_name_enabled']").attr('disabled',true)
+          j("input[name='certificate_name_enabled']").attr('hidden',true)
+          j("input[name='certificate_name_enabled']").prop('checked',true)
+      }
+      if (this.value == "false") {
+          j(".reveal-if-active").hide();
+          j(".reveal-if-inactive").show();
+          j("input[name='certificate_name_enabled']").attr('disabled',false)
+          j("input[name='certificate_name_enabled']").attr('hidden',false)
+      }
+  });
+  
+  
+  if(j("input[name='certificate_name_enabled']").prop("checked") == true){
+      
+      j("input[name='header_config[certificate_name][is_enabled]']").prop("value",1);
+    }
+    else{
+      j("input[name='header_config[certificate_name][is_enabled]']").prop("value",0);
+    }
+  
+  j("input[name='certificate_name_enabled']").on('change', function(){
+    
+    if(j("input[name='certificate_name_enabled']").prop("checked") == true){
+      j("input[name='header_config[certificate_name][is_enabled]']").prop("value",1);
+    }
+    else{
+      j("input[name='header_config[certificate_name][is_enabled]']").prop("value",0);
+    }
+        
+        
+     });   
+
+</script>

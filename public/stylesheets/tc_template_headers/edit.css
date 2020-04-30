@@ -1,0 +1,810 @@
+/**/
+.page_header{
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.page_header_desc{
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+hr.faded{
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid rgb(226, 226, 226);
+    padding: 0; 
+}
+input[type="text"]{
+    width: 454px;
+}
+
+.radio-select input {
+    float: left;
+    margin-top: 3px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+    margin-right: 7px;
+    margin-top: 1px;
+
+}
+.radio-select label {
+    font-weight: normal;
+    font-size: 14px;
+    /*margin-top: 5px;*/
+}
+
+.label-radio-pair {
+    width: 100%;
+    float: left;
+}
+.label-radio-pair label {
+    color: #333333;
+    font-size: 13px;
+    float: left !important;
+    /*    width: 500px;*/
+    /*    padding-top: 10px;*/
+    margin-right: 10px;
+}
+@-moz-document url-prefix() {
+    .label-radio-pair label {
+        padding-top: 5px;
+    } 
+}
+input[type="radio"] {
+    cursor: pointer;
+    margin-top: 1px;
+}
+.radio_button_pair{
+    margin-right: 20px;
+}
+input[type="checkbox"] {
+    cursor: pointer;
+}
+.label-radio-pair p {
+    clear: both;
+    margin-left: 20px;
+    color: #666;
+    font-size: 13px;
+    /*  padding-top: 10px;*/
+    width: 800px;
+    margin: 6px;
+    padding-left: 20px;
+}
+.radio-select-options {
+    float: left;
+    width: 100%;
+}
+.radio-select-options .radio-select:last-child{
+    margin-top: 25px;
+}
+.radio-select-options .radio-select:last-child > p {
+    margin-bottom: 30px;
+}
+.buttons {
+    float: left;
+    margin-top: 10px;
+}
+
+
+hr {
+    float: left;
+    width: 100%;
+    margin-top: 30px;
+}
+
+
+.reveal-if-active input {
+    padding-left: 5px;
+    -webkit-border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+
+}
+
+
+.reveal-if-active{
+    display: none;
+}
+
+.reveal-if-inactive{
+    display: none;
+}
+
+.label-field-pair {
+    float: left;
+}
+
+p.info {
+    float: left;
+    background-color: #F0F0F0;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #999999;
+    line-height: 17px;
+    margin-left: 202px;
+    margin-bottom: 30px;
+}
+.title {
+    font-size: 17px;
+    font-weight: bold;
+}
+.label-radios-pair label {
+    line-height: 30px;
+    color: #333333;
+    font: 400 14px / 30px Arial;
+}
+.left_label {
+    float: left;
+    width: 200px;
+}
+.label-field-pair label {
+    line-height: 30px;
+    color: #333333;
+    font: 400 14px / 30px Arial;
+}
+.label_options label {
+    margin-right: 20px;
+}
+.header_settings_header{
+    font-weight: bold;
+    margin-bottom: 35px;
+}
+.header_settings_desc{
+    margin-bottom: 25px;
+    color: #666;
+    font-size: 15px;
+}
+hr{
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+hr:first-child{
+    margin-top: 0 !important;
+}
+.template_settings_sub_head{
+    /*color: rgb(113, 113, 113);*/
+    font-weight: bold;
+    font-size: 15px;
+}
+.institution_details_form{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    border-bottom: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    float: left;
+    width: 100%;
+}
+
+.institution_details_row{
+    min-height: 32px;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding: 20px;
+    vertical-align: middle;
+    overflow: auto;
+}
+
+/*.institution_details_row:last-child{
+    border: none;
+}*/
+
+.last, .last > a{
+    border: none;
+    /*display:table-cell;*/
+    vertical-align:middle;
+    font-size: 13px;
+    color: #333;
+}
+.last{
+    padding: 10px;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding-left: 20px;
+    line-height: 28px;
+}
+/*.last, .last > a:hover {
+    text-decoration: underline;
+}*/
+#page-yield .last a:hover{
+    text-decoration: underline !important;
+    color: black !important;
+}
+.institution_details_label {
+    height: 20px;
+    margin-top: 6px;
+    /*margin-bottom: 15px;*/
+    float: left;
+    min-width: 250px;
+    font-size: 13px;
+}
+.institution_details_field{
+    float: left;
+    /*    margin-top: 15px;
+        margin-bottom: 15px;*/
+    margin-left: 20px;
+}
+
+.institution_details_field > input[type="text"]{
+    width: 465px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+
+}
+.institution_details_field > textarea{
+    height: 50px;
+    width: 465px;
+    max-width: 465px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+
+}
+.short_details_field > input[type="text"]{
+    width: 240px !important;
+}
+.close-field{
+    float: left;
+    margin: 2px 5px 0px 5px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.delete_button_img{
+    margin-top: 10px;
+    margin-left: 25px;
+}
+.additional_institution_details_label{
+    width: 492px;
+    overflow: overlay;
+    float: left;
+    /*    margin-top: 15px;
+        margin-bottom: 15px;*/
+}
+
+.cb_value > input#additional_field{
+    width: 300px;
+}
+.additional_institution_details_fields{
+    float:left;
+    /*    margin-left: 50px;*/
+    /*    margin-top: 15px;
+        margin-bottom: 15px;*/
+}
+
+.text_size_select > select{
+    background: none;
+    max-width: 200px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}
+.text_color_select > select{
+    background: none;
+    max-width: 200px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}
+span.text_size_select{
+    margin-right: 20px;
+}
+.align_institution_details_label{
+    margin-left: 10px;
+    font-size: 13px;
+}
+.align_institution_details  {
+    height:40px;
+    padding-top:3px;
+    padding:10px 0 0 0px;
+    float: left;
+    width: 100%;
+}
+.align_institution_details_label{
+    float: left;
+    margin:0 0 10px;
+    /*padding-top: 3px;*/
+}
+#radio-buttons{
+    margin-left: 40px;
+    float: left;
+    display: inline-flex;
+    display: -webkit-inline-box;
+}
+#radio-buttons > .radio_button_pair:last-child{
+    margin-right: 0px;
+}
+#radio-buttons > input,label{
+    float: none !important;
+}
+.institution_logo_box{
+    margin-top: 7px;
+    float: left;
+    width: 100%;
+}
+.certificate_headline_box{
+    margin-top: 28px;
+    float: left;
+    width: 100%;
+}
+.align_institution_logo_label{
+    margin-top: 15px;
+    float: left;
+    font-size: 13px;
+    padding-top: 2px;
+}
+.logo-align {
+    margin-top: 15px;
+}
+#radio-buttons-logo{
+    margin-left: 50px;
+    float: left;
+    margin-top: 15px;
+    display: inline-flex;
+    display: -webkit-inline-box;
+}
+#radio-buttons-logo > input,label{
+    float: none !important;
+}
+.logo{
+    height: auto;
+    width: auto;
+    /* margin-top: 27px; */
+    float: left;
+
+}
+.logo img{
+    width: 100%;
+}
+.row_sub_head{
+    color: black;
+    font-size: 13px;
+    font-weight: normal;
+    float: left;
+    padding-right: 30px;
+    padding-top: 5px;
+}
+.radio_serial_number{
+    /*margin: 13px;*/
+    margin-left: 7px !important;
+    margin-top: 8px;
+}
+.auto_generate_data{
+    float: left;
+    width: 368px;
+}
+.reveal-if-auto{
+    /*width: 370px;*/
+    float: left;
+    /*    padding-top: 4px;*/
+
+}
+.prefix{
+    margin-left: 14px;
+    float: left;
+}
+
+.starting_count{
+    margin-left: 14px;
+    float: left;
+}
+
+
+.label_for_serial_prefix{
+    float: left !important;
+    /*width:50px !important;*/
+    padding-top: 7px !important;
+    width:auto !important;
+}
+
+.label_for_serial_starting_count{
+    float: left !important;
+    /*width:100px !important;*/
+    width:auto !important;
+    padding-top: 7px !important;
+}
+#header_config_serial_prefix, #header_config_serial_starting_count{
+    width:100px;
+}
+.doi_labels{
+    float: left;
+    padding-top: 12px;
+    font-size: 13px;
+
+}
+.doi_labels span{
+    margin-right: 20px;
+}
+.doi_labels a{
+    color: black;
+    text-decoration: underline;
+}
+.rename_doi {
+    width: auto;
+    float: left;
+    margin-left: 20px;
+    margin-top: 4px
+        /*    display: none;*/
+}
+
+.rename_doi > span:first-child{
+    float: left;
+    margin-right: 10px;
+    margin-top: 8px;
+    font-size: 13px;
+}
+.rename_doi > input[type="text"]{
+    width: 100px !important;
+}
+.close_btn{
+    float: left;
+    margin-right: 10px;
+    margin-top: 8px;
+    font-weight: 600;
+}
+#close_rename_label{
+    margin-left: 10px;
+    color: #E26C37 !important;
+    text-decoration: none;
+}
+.save_preference{
+    background: #27292B !important;
+    color: white;
+    /*    height: 30px;*/
+    font-size: 16px;
+    font-weight: bold;
+    -webkit-border-radius: 10px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+}
+.save_preference:focus{
+    outline:none;
+}
+.submit-button{
+    background: #27292B !important;
+    padding: 7px 9px !important;
+    float: left !important;
+    -webkit-border-radius: 12px !important;
+    border-radius: 12px !important;
+    border: none;
+    margin: 0px;
+}
+.submit-button:focus{
+    outline: none !important;
+}
+
+/*Preview settings*/
+
+.header_preview_box{
+    float: left;
+    width: 100%;
+}
+
+
+.header_preview{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    margin-top: 20px;
+    /*    margin-bottom: 20px; */
+
+
+}
+.header_head{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding: 30px 30px 10px 30px;
+    text-align: center;
+    overflow: auto;
+    position: relative;
+}
+.header_bottom{
+    padding: 10px 30px;
+}
+.institution_details_field_logo{
+    margin-top: 27px;
+}
+.logo_to_left{
+    float: left;
+    margin-right: 2%;
+    width: 13%;
+}
+.logo_to_right{
+    float: right;
+    margin-left: 2%;
+    width: 13%;
+}
+.institution_details_to_left{
+    width: 80%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_to_center{
+    display: inline-block;
+
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 69%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_to_right{
+    width: 80%;
+    margin: 0 auto;
+    text-align: right;
+    float: right;
+    overflow: overlay;
+}
+
+.institution_details_with_no_logo_to_left{
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_center{
+    display: inline-block;
+
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_right{
+    width: 100%;
+    margin: 0 auto;
+    text-align: right;
+    float: left;
+    overflow: overlay;
+}
+.preview_institution_name{
+    font-weight: 600;
+    font-size: 25px;
+}
+.preview_institution_address, .preview_institution_email, .preview_institution_website{
+    font-weight: normal;
+    font-size: 13px;
+}
+.preview_certificate_name{
+    font-weight: 600;
+    font-size: 20px;
+    /*    margin-top: 20px;*/
+    margin-bottom: 20px;
+    width:100%;
+    text-align: center;
+
+}
+.preview_certificate_date_and_serial{
+    font-size: 15px;
+    height:20px;
+}
+.certificate_serial{
+    float: left;
+}
+.certificate_date{
+    float:right;
+}
+.date_format{
+    /*    color:rgb(226, 226, 226);*/
+}
+.date_placeholder{
+    color:#999;  
+}
+
+
+.preview_additional_large{
+    font-size: 15px;
+}
+.preview_additional_small{
+    font-size: 12px;
+}
+.preview_additional_medium{
+    font-size: 14px;
+}
+.preview_additional_very_small{
+    font-size: 11px;
+}
+.preview_additional_normal{
+    font-size: 13px;
+}
+.preview_additional_black{
+    color: black;
+}
+.preview_additional_grey{
+    color: grey;
+}
+.disabled_header{
+    width: 100%;
+    overflow: auto;
+    padding: 20px;
+}
+.disabled_header_note{
+    font-size: 13px;
+    color: #333;
+    margin-right: 10px;
+    /*    margin: 8px 0 8px 0;*/
+}
+.disabled_header_label{
+    font-size: 13px;
+    color: #333;
+    float: left;
+    margin-right: 10px;
+    margin-top: 6px;
+    /*    margin: 8px 0 8px 0;*/
+}
+.disabled_header_field{
+    margin-top: 10px;
+}
+.disabled_header_field input{
+    width:100px;
+}
+.disabled_header_measure{
+    font-size: 13px;
+    color: #666;
+    margin-left: 10px;
+    padding-top: 6px;
+}
+span.cb_value{
+    padding-left: 10px;
+}
+a.close-field{
+    color: #E26C37;
+    padding: 6px;
+    padding-left: 0px;
+    margin-right: 13px;
+}
+.institution_details_field_img{
+    float: left;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.certificate_name{
+    margin: 7px;
+    float: left;
+}
+.label_for_align_institution_logo{
+    margin-right: 20px;
+}
+.prefix input{
+    width: 75px;
+    margin-top: 2px;
+}
+.starting_count input{
+    width: 75px;
+    margin-top: 2px;
+}
+
+.not_enabled_message{
+    margin: 20px;
+    font-size: 22px;
+    color: grey;
+    text-align: center;
+}
+
+.sub_head_td > .row_sub_head{
+    padding-top: 0px;
+}
+@-moz-document url-prefix() {
+    .doi_labels a {
+        float: left;
+        margin-top: 5px;
+    }
+    .doi_labels {
+        padding-top: 7px;
+    }
+    .align_institution_details_label{
+        padding-top: 3px;
+    }
+}
+.align_institution_logo{
+    float: left;
+    width: 100%;
+}
+.institution_details_to_right span{
+    display: inline-block;
+}
+.institution_details_to_left span{
+    display: inline-block;
+}
+.institution_details_to_center span{
+    display: inline-block;
+}
+
+.institution_details_with_no_logo_to_right span{
+    margin-left: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_left span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_center span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.institution_address_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}
+.institution_contact_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+.institution_additional_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}
+td.sub_head_td{
+    padding: 10px;
+}
+.com_block{
+    float: left;
+    width: 100%;
+    font-size: 13px;
+    line-height: 25px;
+}
+.message_link a {
+    margin-left: 30px;
+    color: #666;
+}
+p.inst_message{
+    padding: 0 !important;
+    margin: 0;
+    margin-top: 5px !important;
+    width: auto;
+    max-width: 750px;
+    min-width: 750px;
+    float: left;
+    word-wrap: break-word;
+}
+.message_link{
+    float: left;
+    margin-top: 5px;
+    margin-left: 30px;
+}
+.institution_details_box{
+    float: left;
+    width: 100%;
+}
+input{
+    font-size: 13.3333px;
+}
+textarea{
+    font-size: 13.3333px;
+}
+.disabled_header_label_hint{
+    float: left;
+    width: 100%;
+    font-size: 13px;
+    color: grey;
+    margin-top: 5px;
+}

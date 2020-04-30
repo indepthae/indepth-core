@@ -1,0 +1,30 @@
+<div class="list">
+  <table class="primary">
+    <tr>
+      <th> <span id="all" class="select_link"><%=t('all')%></span>, <span id="none" class="select_link"> <%=t('none')%></span> </th>
+      <th> <%= t('employee_name')%> </th>
+      <th> <%= t('employee_no')%> </th>
+    </tr>
+    <%if @employees.present?%>
+    <% @employees.each do |employee| %>
+    <tr>
+      <td class="center_text"> <%= check_box "", "employee[#{employee.id}]",:checked=>false, :class=>"bulk_check" %></th>
+      <td> <%= employee.full_name %> </td>
+      <td class="center_text"> <%= employee.employee_number %>  </td>
+    </tr>
+    <%end%>
+    <%else%>
+      <td class="center_text" colspan="3"> <%= t('no_employees_in_this_dept') %>  </th>
+    <%end%>
+  </table>
+</div>
+
+<script>
+j("#all").click(function(){
+  j(".bulk_check").each(function(){this.checked=true;});
+});
+
+j("#none").click(function(){
+  j(".bulk_check").each(function(){this.checked=false;});
+});
+</script>

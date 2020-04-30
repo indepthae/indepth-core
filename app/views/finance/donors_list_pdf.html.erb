@@ -1,0 +1,21 @@
+<center>
+  <h4> <%= t('list_of_donors') %> </h4>
+</center>
+<table id="pdf-table" width="100%">
+  <tr class="table-header">
+    <td class="col-pdf1"><%= t('name') %></td>
+    <td class="col-pdf1"><%= t('description') %></td>
+    <td class="col-pdf1"><%= t('amount') %></td>
+    <td class="col-pdf1"><%= t('created_at') %></td>
+    <td></td>
+  </tr>
+  <% c ='even' %>
+  <% @donations.each do |d| %>
+    <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+      <td class="col-pdf1"><%=  d.donor %></td>
+      <td class="col-pdf1"><%= d.description %></td>
+      <td class="col-pdf1"><%= precision_label(d.amount) %></td>
+      <td class="col-pdf1"><%= format_date(d.transaction_date,:format=>:short_date) unless d.transaction_date.nil?%></td>
+    </tr>
+  <% end %>
+</table>

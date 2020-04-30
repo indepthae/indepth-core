@@ -1,0 +1,16 @@
+<% if @active_year.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" id="act_year">
+      <tr class="tr-head">
+          <td class="name"><%= t('leave_year_name_text') %></td>
+          <td class="start_date"><%= t('start_date') %></td>
+          <td class="end_date"><%= t('end_date') %></td>
+          <td class="duration"><%= t('duration') %></td>
+      </tr>
+      <tr>
+          <td><%= @active_year.name %></td>
+          <td><%= format_date(@active_year.start_date) %></td>
+          <td><%= format_date(@active_year.end_date) %></td>
+          <td><%= distance_of_time_in_words(@active_year.start_date.to_time, @active_year.end_date.to_time, true) %></td>
+      </tr>
+  </table>
+<% end %>

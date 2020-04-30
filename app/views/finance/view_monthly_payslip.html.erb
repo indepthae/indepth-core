@@ -1,0 +1,163 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div id="content-header">
+  <%= payslip_management_header_icon(!params[:hr].present?) %>
+  <% if params[:hr] %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('employee_payslip_report') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:hr].nil? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% breadcrumb :hr_payslip_report %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash_box">
+    <% unless flash[:notice].nil? %><p class="flash-msg"><%= flash[:notice] %></p><% end %>
+  </div>
+  <div id="search-form" style="<%= params[:payslip].present? ? 'display: none' : ''%>" >
+    <% form_for :payslip, :url => {:controller => "finance", :action => "view_monthly_payslip", :hr => params[:hr]}  do |f| %>
+      <div class="label-field-pair dept_name">
+        <label for="department"><%= t('department') %></label>
+        <div class="text-input-bg">
+          <%= f.select :department_id, [["#{t('all_departments')}","All"]] + @departments.map { |c| [c.name, c.id] }, {:selected=>@payslip_query[:department_id].to_i} %>
+        </div>
+      </div>
+      <div class="label-field-pair payslip_dates">
+        <label for="from"><%= t('from') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'payslip[start_date]', I18n.l(@payslip_query[:start_date].to_date,:format=>:default),
+            :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair payslip_dates">
+        <label for="to"><%= t('to') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'payslip[end_date]', I18n.l(@payslip_query[:end_date].to_date,:format=>:default),
+            :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+        </div>
+      </div>
+      <%= submit_tag "#{t('view_payslips')}",:class=>'submit_button' %>
+    <% end %>
+    <% if params[:payslip].nil? %>
+      <div class="div_link" id="temp_link" onclick="showModalBox()"><%= t('advanced_search_text') %></div>
+    <% end %>
+    <% unless params[:payslip].nil? %>
+      <div class="div_link" onclick="j('#search-form').hide()"><%= t('cancel') %></div>
+    <% end %>
+    <% unless params[:payslip].nil? %><hr/><% end %>
+  </div>
+  <% unless params[:payslip].nil? %>
+    <div id="search_details" >
+      <div class="label-field-pair dept_name">
+        <label for="department_name"><%= t('department') %></label>
+        <div class="text-input-bg">
+          <label><b><%= @department_name %></b></label>
+        </div>
+      </div>
+      <div class="label-field-pair dept_name">
+        <label for="date"><%= t('date_text') %></label>
+        <div class="text-input-bg">
+          <label><%= "<b>#{format_date(@payslip_query[:start_date], :short)}</b> #{t('to_text')} <b>#{format_date(@payslip_query[:end_date], :short)}</b>" %></label>
+        </div>
+      </div>
+      <div class="div_link" id="change_date" onclick="j('#search-form').show()"><%= t('change') %></div>
+      <div class="div_link" id="advnc_search" onclick="showModalBox()"><%= t('advanced_search_text') %></div>
+      <div class="label-field-pair payslip_field">
+        <label for="payslip_period"><%= t('payslip_period') %></label>
+        <div class="text-input-bg">
+          <%= select_tag "payslip[payslip_period]", options_for_select([["#{t('all')}","All"]] + @pay_period.map{|k,v| [t(v), k]}, @payslip_query[:payslip_period].to_i), {:onchange => "filter_payslips()"} %>
+        </div>
+      </div>
+      <div class="label-field-pair payslip_field">
+        <label for="payslip_status"><%= t('payslip_status') %></label>
+        <div class="text-input-bg">
+          <%= select_tag "payslip[payslip_status]", options_for_select([["#{t('all')}","All"]] + @payslip_status.map{|k,v| [t(v), k]}, @payslip_query[:payslip_status].to_i),{:onchange => "filter_payslips()"} %>
+        </div>
+      </div>
+      <div id="loader_div">
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+      </div>
+      <label for="filter"><%= t('filters_text') %></label>
+
+      <div id="divider"></div>
+    </div>
+    <div id="list_payslips">
+      <%= render :partial => "list_payslips" %>
+    </div>
+  <% end %>
+  <div id="MB_overlay" style="display:none;"></div>
+  <div id="MB_window" style="display:none;">
+    <%= render :partial => "payslips_advanced_search" %>
+  </div>
+</div>
+<script type="text/javascript">
+  function showModalBox()
+  {
+    j('#MB_overlay').show();
+    j('#MB_overlay').css('opacity',0.75);
+    j('#MB_window').show();
+    if(j('html').attr('dir') == 'ltr')
+      j('#MB_window').css({left : (j('body').width() - j('#MB_window').width())/2});
+    else
+      j('#MB_window').css({right : (j('body').width() - j('#MB_window').width())/2});
+  }
+  function hideModalBox()
+  {
+    j('#MB_overlay').hide();
+    j('#MB_window').hide();
+    j('#advnc_form')[0].reset();
+  }
+  function filter_payslips()
+  {
+    var queries = {}
+    queries = <%= @payslip_query.except(:payslip_period, :payslip_status).to_json %>;
+    queries['payslip_status'] = j('#payslip_payslip_status').val();
+    queries['payslip_period'] = j('#payslip_payslip_period').val();
+    new Ajax.Request('/finance/view_monthly_payslip',{
+      parameters: {'payslip' : JSON.stringify(queries), filter : 1, 'hr' : '<%= params[:hr] %>'},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j('#loader').show();
+      },
+      onComplete:function(resp){
+        j('#loader').hide();
+        j('#list_payslips').html(resp.responseText);
+      }
+    });
+  }
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+</script>

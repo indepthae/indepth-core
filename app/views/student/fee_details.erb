@@ -1,0 +1,148 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+  <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+  <%= stylesheet_link_tag "finance/_payment_form" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('student_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_fees') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <% path = @student.class.name == 'ArchivedStudent'? 'archived_student' : 'student' %>
+                <%= link_to "#{t('fees_text')}", :controller => path, :action => 'fees', :id => @student.id %>
+            </li>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to "#{t('student_profile')}", :controller => path, :action => 'profile', :id => @student.id %>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :student_fee_details, [@student,@date] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+    <% unless flash[:error].nil? %> <p class="errorExplanation"> <%= flash[:error] %> </p> <% end %>
+
+    <div id="student_profile_heading1">
+        <div id="student_main_info1">
+            <span class="name"><%=t('student_name')%> : <b> <%= @student.full_name %> </b> </span>
+            <span class="course"><%= t('course_and_batch') %>: <%= @student.batch.complete_name %> </span>
+            <span class="adm"><%= t('adm_no') %>: <%= @student.admission_no %> </span>
+        </div>
+
+        <div class="extender"> </div>
+    </div>
+
+    <% unless @fee_particulars.nil? %>
+      <% total_fees = 0  %>
+      <% @total_fine = 0 %>
+      <% total_fees1 = 0 %>
+      <% @prevent_instant = @hide_print_options = true %>
+
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head tr-list_head">
+              <td class="sl-col"><%= t('sl_no') %></td>
+              <td class="set_border_right"><%= t('particulars') %></td>
+              <td class="set_border_right" colspan="2">
+                  <%= t('amount') %>
+                  (<%= currency %>)
+              </td>
+          </tr>
+
+          <% i = 0 %>
+          <%= render :partial => 'finance/fees_payment/particular_list' %>
+          <%= render :partial => 'finance/fees_payment/discount_list', :locals => {:i => i} %>
+          <% if @financefee.tax_enabled? and @financefee.tax_collections.present? %>
+            <%= render :partial => 'finance/fees_payment/tax_list', :locals => {:i => i} %>          
+          <% end %>
+          <% @date = @fee_collection  %>
+          <%= render :partial => 'finance/fees_payment/student_fine_list', :locals => {:i => i, :total_fees => total_fees,
+            :payment_date=> @transaction_date} %>
+          <% balance = @financefee.balance.to_f + @fine.to_f %>
+          <%= render :partial => 'finance/fees_payment/summary', :locals => {:i => i, :total_fine => @total_fine.to_f} %>
+          <!--%= render :partial => 'gateway_payments/paypal/payment_block', :locals => {:total_fees => balance } %>-->
+
+
+          <% unless (@current_user.admin? or @current_user.employee?) %>
+            <tr class="row-a">
+                <td colspan="4">
+                    <div class="pay_fees">
+                        <div class="pay_fees_buttons margin-top-0">
+                            <% if total_fees == 0 %>
+                              <%= link_to "► #{t('print_summary')}", {:controller => 
+                                  "finance", :action => "student_fee_receipt_pdf", 
+                                :id => @student.id, :id2=>@date.id},:target => '_blank', 
+                                :class=> 'user_button margin-right-0' %>
+
+                            <% else %>
+                              <% if(FedenaPlugin.can_access_plugin?("fedena_pay") and 
+                                    PaymentConfiguration.config_value("enabled_fees").present? and 
+                                    PaymentConfiguration.is_student_fee_enabled?) %>
+
+                                <% return_url = url_for(:controller => "student", 
+                                  :action => "fee_details", :id => params[:id], 
+                                  :id2 => params[:id2], :create_transaction => 1, 
+                                  :only_path => false) %>
+
+                                <% if @active_gateway == "Paypal" %>
+
+                                  <%= paypal_pay_button(@certificate, @merchant_id,
+                                    @currency_code, "FEE #{@fee_collection.name}",
+                                    total_fees, return_url,@paid_fees,"float: right;margin: 18px 0 0;") %>
+
+                                <% elsif @active_gateway == "Authorize.net" %>
+
+                                  <%= authorize_net_pay_button(@merchant_id,
+                                    @certificate, total_fees,
+                                    "Fee (#{@student.full_name}-#{@student.admission_no}-#{@fee_collection.name})",
+                                    return_url, @paid_fees,"float: right;margin: 18px 0 0;") %>
+
+                                <% elsif @active_gateway == "Webpay" %>
+
+                                  <%= webpay_pay_button(rand(Time.now.utc.
+                                        strftime("%Y%m%d%H%M%S")), @product_id,
+                                    @item_id, total_fees,return_url, @merchant_id,
+                                    @paid_fees,"float: right;margin: 18px 0 0;") %>
+
+                                <% end %>
+
+                              <% end %>
+                            <% end %>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+    <% end %>
+    <%= render :partial => 'finance/fees_payment/paid_fees', :locals => 
+      {:batch_id => @batch.id} unless @paid_fees.empty? %>
+
+</div>

@@ -1,0 +1,13 @@
+if @creation
+  if !@student.has_paid_fees and !@student.has_paid_fees_for_batch
+    page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t(@flash_msg)}</p>"
+    page.replace_html 'student_preferences_link', :text=>"#{link_to_remote t('student_fees_preferences'),:url=>{:action=>"student_fees_preference",:id=>@student.id},:method=>:get}"
+  else
+    page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t(@flash_msg)}-#{link_to_remote t('student_fees_preferences'),:url=>{:action=>"student_fees_preference",:id=>@student.id},:method=>:get}</p>"
+    page.replace_html 'student_preferences_link', :text=>""
+  end
+  page << "Modalbox.hide();"
+else
+  page.replace_html 'modal-box', :partial => 'student_fees_preference'
+  page << "Modalbox.show($('modal-box'), {title: ''});"
+end

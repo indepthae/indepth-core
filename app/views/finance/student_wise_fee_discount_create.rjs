@@ -1,0 +1,9 @@
+if @error
+  page << "j('#session_fingerprint').val('#{session_fingerprint}');"
+  page.replace_html 'form-errors', :partial => 'errors', :object => @fee_category
+else
+	page.replace_html 'form-errors', :text => "<p class='flash-msg'>#{t('discount')} #{t('creation')} #{t('is')} #{t('in_queue')}. <a href='/scheduled_jobs'>Click Here</a> to view the scheduled job.</p>"
+	page.replace_html 'form-box', :text => ''
+
+#  page << "Modalbox.hide();"
+end

@@ -1,0 +1,55 @@
+<script type="text/javascript">
+  function publish_confirmation(){
+    return confirm('<%=t('publish_confirmation')%>');
+  }
+</script>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('evaluate_online_exam') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= t('exam_name') %></td>
+      <td><%= t('start_date') %></td>
+      <td><%= t('end_date') %></td>
+      <td></td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @online_exam_groups.each do |e| %>
+      <tr  class="tr-<%= cycle('odd', 'even') %>" id="tr-<%=e.id%>">
+        <td class="col-6"><%= e.name %></td>
+        <td class="col-1"><%= format_date(e.start_date) %></td>
+        <td class="col-1"><%= format_date(e.end_date) %></td>
+        <td class="col-3">
+          <div class="edit"><%= link_to "#{t('evaluate_text')}",{:action => 'evaluation_student_select', :id => e.id}, :class=>"themed_text" %></div>
+          <div class="edit" id="publish">
+            <% unless e.result_published %>
+            <% if e.online_exam_attendances.collect(&:answers_evaluated).include?(false) %>
+              <%= link_to "#{t('publish_result')}" ,{:action=>'publish_result',:id=>e.id},{:class=>"themed_text",:onclick => 'return publish_confirmation();'}%>
+            <% else %>
+              <%= link_to "#{t('publish_result')}" ,{:action=>'publish_result',:id=>e.id}, :class=>"themed_text"%>
+            <% end %>
+            <% else %>
+              <label><%= t('result_published') %></label>
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  </div>
+</div>

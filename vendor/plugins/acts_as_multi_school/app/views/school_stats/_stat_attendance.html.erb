@@ -1,0 +1,40 @@
+<div id="stat-attendance-live_<%=@entity%>">
+  <div id="stat-attendnace-loader" class="loader-<%=@entity%>">Loading...</div>
+  <%@stats_hash[@entity.to_sym].data_entity.fields.keys.each do |field| %>
+    <div class="label-box">
+      <% if field.to_s=="percentage" %>
+        <div class="big-text margin-bottom-20 label-big-text stat-attendance"><%=  "#{@stats_hash[@entity.to_sym].read(field)}" %></div>
+      <% elsif field.to_s=="absentees"%>
+        <div class="big-text margin-bottom-20 label-big-text stat-attendance"><%=  "#{@stats_hash[@entity.to_sym].read(field)}" %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+<%= link_to_function "More..","#",:class=>"float-right margin-right-20 small-text-link  attendance-more-link"  %>
+
+<script>
+  var q = jQuery.noConflict();
+  var start_date=j("#attendance_date-<%=@entity%>").val()
+  q('.attendance-more-link').click(function(e){
+    console.log(j(this).parent().children().find(".child-entity")[0].id)
+    window.location = "/schools/statistics/live/"+j(this).parent().children().find(".child-entity")[0].id+"?start_date="+start_date+"&end_date="+start_date
+    e.stopPropagation();
+  });
+  
+  q(document).ready(function(){
+    var entity='<%=@entity%>';
+    q(".loader-"+entity).hide();
+    q(".datepicker").datepicker({
+      showOn: "button",
+      buttonImage: "/images/transparent.png",
+      buttonImageOnly: true,
+      changeMonth: true,
+      changeYear: true,
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      buttonText: 'Select Date',
+      dateFormat: "yy-mm-dd",
+      maxDate: new Date()
+    });});
+  
+</script>

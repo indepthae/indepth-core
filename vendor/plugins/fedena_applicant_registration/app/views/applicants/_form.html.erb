@@ -1,0 +1,452 @@
+<% form_for(@applicant, :html=> {:multipart=>true})  do |s| %>
+  <%= s.error_messages :header_message => nil %>
+
+  <div id="admission1_form">
+
+      <div id="necessary-field-notification"> <%= t('legend1') %> <span class="necessary-field">*</span> <%= t('legend2') %></div>
+
+
+      <span class="span-sub-heading"><%= t('personal_details') %></span>
+      <hr class="sub-heading"></hr>
+
+      <div class="row">
+          <div class="label-field-pair">
+              <label for="student_grade"><%= t('first_name') %><span class="necessary-field">*</span> </label>
+              <div class="text-input-bg"><%= s.text_field :first_name %></div>
+          </div>
+
+          <div class="label-field-pair">
+              <label for="student_grade"><%= t('middle_name') %></label>
+              <div class="text-input-bg"><%= s.text_field :middle_name %></div>
+          </div>
+
+          <div class="label-field-pair">
+              <label for="student_grade"><%= t('last_name') %><span class="necessary-field">*</span></label>
+              <div class="text-input-bg"><%= s.text_field :last_name %></div>
+          </div>
+      </div>
+      <%= s.hidden_field :pin_number,:value => @pin_number unless @pin_number.nil? %>
+      <div class="row">
+          <%= s.hidden_field :registration_course_id, :value=>@course.id %>
+
+          <div class="label-field-pair">
+              <label for="student_date_of_birth"><%= t('date_of_birth') %> <span class="necessary-field">*</span> </label>
+              <div class="text-input-bg w198">
+                  <%= calendar_date_select_tag 'applicant[date_of_birth]',(@applicant.date_of_birth.blank? ?  I18n.l(Date.today-5.years,:format=>:default): @applicant.date_of_birth),
+                    :year_range => 72.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+              </div>
+          </div>
+
+          <div class="label_field_pair">
+              <label class="label_for_student_gender" for="student_gender"><%= t('gender') %></label>
+              <div class="student_gender_value">
+                  <label class="label_for_gender" for="student_gender_true"> <%= t('male') %></label>
+                  <%= s.radio_button  "gender", "m", :checked => "checked" %>
+                  <label class="label_for_gender" for="student_gender_false"><%= t('female') %></label>
+                  <%= s.radio_button  "gender", "f" %>
+              </div>
+          </div>
+
+          <div class="label-field-pair">
+              <label for="student_country"><%= t('nationality') %></label>
+              <div class="text-input-bg_form"> <%= s.select  :nationality_id, Country.all.map {|c| [c.full_name, c.id]}, :selected=> @applicant.nationality_id || @selected_value %> </div>
+          </div>
+
+      </div>
+
+      <div class="row">
+          <span class="span-sub-heading"><%= t('contact_details') %></span>
+          <hr class="sub-heading"></hr>
+          <div class="label-field-pair">
+              <label for="student_city"><%= t('address_line') %>1</label>
+              <div class="text-input-bg"><%= s.text_field :address_line1 %></div>
+          </div>
+
+
+          <div class="label-field-pair">
+              <label for="student_city"><%= t('address_line') %>2</label>
+              <div class="text-input-bg"><%= s.text_field :address_line2 %></div>
+          </div>
+
+
+          <div class="label-field-pair">
+              <label for="student_city"><%= t('city') %></label>
+              <div class="text-input-bg"><%= s.text_field :city %></div>
+          </div>
+
+      </div>
+      <div class="row">
+          <div class="label-field-pair">
+              <label for="student_state"><%= t('state') %></label>
+              <div class="text-input-bg"><%= s.text_field :state %></div>
+          </div>
+
+
+          <div class="label-field-pair">
+              <label for="student_pin_code"><%= t('zip') %></label>
+              <div class="text-input-bg"><%= s.text_field :pin_code %></div>
+          </div>
+
+
+          <div class="label-field-pair">
+              <label for="student_country"><%= t('country') %></label>
+              <div class="text-input-bg_form"> <%= s.select  :country_id, Country.all.map {|c| [c.full_name, c.id]}, :selected=>@applicant.country_id || @selected_value %> </div>
+          </div>
+
+      </div>
+      <div class="row">
+          <div class="label-field-pair">
+              <label for="student_phone1"><%= t('phone') %></label>
+              <div class="text-input-bg"><%= s.text_field :phone1 %></div>
+          </div>
+
+          <div class="label-field-pair">
+              <label for="student_phone2"><%= t('mobile') %></label>
+              <div class="text-input-bg"><%= s.text_field :phone2 %></div>
+          </div>
+
+          <div class="label-field-pair">
+              <label for="student_email"><%= t('email') %></label>
+              <div class="text-input-bg"><%= s.text_field :email %></div>
+          </div>
+      </div>
+      <% if @course.is_subject_based_registration == true %>
+        <div class="row">
+            <span class="span-sub-heading"><%= t('choose_electives') %></span>
+            <hr class="sub-heading"></hr>
+            <div class="label-field-pair">
+                <label for="elective_subjects"><%= "#{t('minimum')}: <b class='number'>#{@course.min_electives}</b> #{t('maximum')}: <b class='number'>#{@course.max_electives}</b>" %></label>
+            </div>
+            <div class="fee_category_scroll">
+                <div class="sel-list">
+                    <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box_elective').each(function(checkbox) { checkbox.checked = true; });calculate_amount();" %>,
+                    <%= link_to_function t('none'), "$$('input.batches_box_elective').each(function(checkbox) { checkbox.checked = false; }); calculate_amount();" %>
+                </div>
+                <% @ele_subjects.each do |subject,val| %>
+                  <div class="each_batch">
+                      <%= check_box_tag "applicant[subject_ids][]",subject.to_s+" "+val.to_s , @selected_subject_ids.include?(subject),:class=>'batches_box batches_box_elective',:onchange =>'calculate_amount();'%>
+                      <label for="choose_<%= subject %>"><%= latest_subject_name(subject.to_s) %></label>
+                  </div>
+                <% end %>
+            </div>
+            <div id ="amount_details">
+                <span><%= t('total_payable') %> :</span><span class="themed_text"> <%= @currency %> &#x200E;(<%= precision_label(@normal_subject_amount) %> + </span> <span class="themed_text"> <%= @ele_subject_amount==nil ? precision_label(0) : precision_label(@ele_subject_amount) %></span><span class="themed_text">)&#x200E;</span>
+            </div>
+        </div>
+
+        <% unless @applicant.new_record? %>
+          <div class="row">
+              <span class="span-sub-heading"><%= t('choose_normal_subjects') %></span>
+              <hr class="sub-heading"></hr>
+              <div class="label-field-pair">
+                  <label for="elective_subjects"><%= t('choose_normal_subjects') %></label>
+              </div>
+              <div class="fee_category_scroll">
+                  <div class="sel-list">
+                      <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box1').each(function(checkbox) { checkbox.checked = true; });" %>,
+                      <%= link_to_function t('none'), "$$('input.batches_box1').each(function(checkbox) { checkbox.checked = false; });" %>
+                  </div>
+                  <% @normal_subjects.each do |subject| %>
+                    <div class="each_batch">
+                        <%= check_box_tag "applicant[normal_subject_ids][]",subject.to_s , @normal_selected_subject_ids.include?(subject),:class=>'batches_box1' %> <label for="choose_<%= subject %>"><%= latest_subject_name(subject.to_s) %></label>
+                    </div>
+                  <% end %>
+              </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <div class="row">
+          <span class="span-sub-heading"><%= t('upload_students_photo') %></span>
+          <hr class="sub-heading"></hr>
+          <div class="label-field-pair-photo">
+              <label  for="student_image_file"><%= t('upload_students_photo') %> (<%= t('max_size') %>)</label>
+              <div class="text-input-bg"><%= s.paperclip_file_field :photo, :size=>12, :direct => false, :style=>"width:200px;" %></div>
+          </div>
+      </div>
+      <div class="row">
+          <span class="span-sub-heading"><%= t('last_attended_institution_details') %></span>
+          <hr class="sub-heading"></hr>
+
+          <% fields_for :applicant_previous_data do |pd| %>
+
+            <div class="label-field-pair">
+                <label for="student_last_attended_school"><%= t('institution_name') %></label>
+                <div class="text-input-bg"><%= pd.text_field :last_attended_school %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="student_qualifying_exam"><%= t('qualifying_exam_name') %></label>
+                <div class="text-input-bg"><%= pd.text_field :qualifying_exam %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="student_qualifying_exam_roll"><%= t('exam_roll_no') %></label>
+                <div class="text-input-bg"><%= pd.text_field :qualifying_exam_roll %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="label-field-pair">
+                <label for="student_qualifying_exam_final_score"><%= t('final_score') %></label>
+                <div class="text-input-bg"><%= pd.text_field :qualifying_exam_final_score %></div>
+            </div>
+        </div>
+      <% end %>
+
+
+      <% fields_for :applicant_guardian do |p| %>
+        <div class="row">
+            <div id="admission1_form_vertical_block_right">
+                <span class="span-sub-heading"><%= t('parent_personal_details') %></span>
+                <hr class="sub-heading"></hr>
+                <div class="label-field-pair">
+                    <label for="parent_detail_name"><%= t('first_name') %><span class="necessary-field">*</span></label>
+                    <div class="text-input-bg"><%= p.text_field :first_name %></div>
+                </div>
+                <div class="label-field-pair">
+                    <label for="parent_detail_name"><%= t('last_name') %></label>
+                    <div class="text-input-bg"><%= p.text_field :last_name %></div>
+                </div>
+
+                <div class="label-field-pair ">
+                    <label for="parent_detail_dob"><%= t('date_of_birth') %></label>
+                    <div class="text-input-bg w198">
+                        <%= calendar_date_select_tag "applicant_guardian[dob]",(@applicant_guardian.blank? ? "" : @applicant_guardian.dob),:year_range => 100.years.ago..20.years.ago,:readonly=>true,:popup=>"force" %>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="label-field-pair">
+                <label for="parent_detail_email"><%= t('email') %></label>
+                <div class="text-input-bg"><%= p.text_field :email %></div>
+            </div>
+            <% if (@applicant_guardian.relation.present? and !["father","mother"].include?(@applicant_guardian.relation)) or (@applicant_guardian.relation_type.present? and @applicant_guardian.relation_type == "other") %>
+                <div class="label-field-pair relation-div">
+                    <label for="parent_detail_relation"><%= t('relation') %><span class="necessary-field">*</span></label>
+                    <div class="text-input-bg_form relation-select"> <%= select :applicant_guardian, :relation_type, [["#{t('father')}","father"],["#{t('mother')}","mother"],["#{t('other')}","other"]], {:selected => "other"},{:id=>"relation-select",:onchange=>"toggle_relation_box(); return false;"} %> </div>
+                    <div id="parent-relation" class="left-float">
+                        <div class="text-input-bg"><%= p.text_field :relation %></div>
+                    </div>
+                </div>
+              <% else %>
+                <div class="label-field-pair relation-div">
+                    <label for="parent_detail_relation"><%= t('relation') %><span class="necessary-field">*</span></label>
+                    <div class="text-input-bg_form relation-select"> <%= select :applicant_guardian, :relation, [["#{t('father')}","father"],["#{t('mother')}","mother"],["#{t('other')}","other"]], {:selected => @applicant_guardian.relation}, {:id=>"relation-select",:onchange=>"toggle_relation_box(); return false;"} %> </div>
+                    <div id="parent-relation" class="left-float"></div>
+                </div>
+              <% end %>
+            
+        </div>
+
+        <div class="row">
+            <div class="label-field-pair">
+                <label for="parent_detail_income"><%= t('income') %></label>
+                <div class="text-input-bg"><%= p.text_field :income %></div>
+            </div>
+            <div class="label-field-pair">
+                <label for="parent_detail_education"><%= t('education') %></label>
+                <div class="text-input-bg"><%= p.text_field :education %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="parent_detail_occupation"><%= t('occupation') %></label>
+                <div class="text-input-bg"><%= p.text_field :occupation %></div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <span class="span-sub-heading"><%= t('parent_contact_details') %></span>
+            <hr class="sub-heading"></hr>
+            <div class="label-field-pair">
+                <label for="master_student_city"><%= t('office_address_line1') %></label>
+                <div class="text-input-bg"><%= p.text_field :office_address_line1 %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="master_student_city"><%= t('office_address_line2') %></label>
+                <div class="text-input-bg"><%= p.text_field :office_address_line2 %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="parent_detail_city"><%= t('city') %></label>
+                <div class="text-input-bg"><%=  p.text_field :city %></div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="label-field-pair">
+                <label for="parent_detail_state"><%= t('state') %></label>
+                <div class="text-input-bg"><%= p.text_field :state %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="parent_detail_country"><%= t('country') %></label>
+                <div class="text-input-bg_form"> <%= p.select :country_id, @countries.map {|c| [c.full_name, c.id]}, :selected=>(@applicant_guardian.present? and @applicant_guardian.country_id) || @selected_value %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="parent_detail_office_phone1"><%= t('office_phone1') %></label>
+                <div class="text-input-bg"><%= p.text_field :office_phone1 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="label-field-pair">
+                <label for="parent_detail_office_phone2"><%= t('office_phone2') %></label>
+                <div class="text-input-bg"><%= p.text_field :office_phone2 %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="parent_detail_mob_phone"><%= t('mobile_phone_no') %></label>
+                <div class="text-input-bg"><%= p.text_field :mobile_phone %></div>
+            </div>
+        </div>
+      <% end %>
+      <div class="extender">
+
+      </div>
+      <% if @course.include_additional_details == true and @additional_fields.present?%>
+        <% fields_for :applicant_additional_details do |a| %>
+          <% i=0 %>
+          <div id="form-contents">
+              <span class="span-sub-heading"><%= t('additional_detail') %></span>
+              <hr class="sub-heading"></hr>
+              <% @additional_fields.each do |additional| %>
+                <% prev_record = @applicant_additional_details.find_by_additional_field_id(additional.id) %>
+                <% unless prev_record.nil? %>
+                  <% if additional.input_type=="has_many" %>
+                    <% prev_value = prev_record.additional_info.split(", ") %>
+                  <% else %>
+                    <% prev_value = prev_record.additional_info %>
+                  <% end %>
+                <% end %>
+                <% input_val = ((params[:applicant_additional_details].present? and params[:applicant_additional_details][additional.id.to_s.to_sym].present? and params[:applicant_additional_details][additional.id.to_s.to_sym][:additional_info].present?) ? (params[:applicant_additional_details][additional.id.to_s.to_sym][:additional_info]) : (prev_value.present? ? prev_value : nil))%>
+                <% if additional.input_type=="belongs_to" %>
+                  <div class="label-field-pair12">
+                      <label><%= additional.name %>
+                          <% if additional.is_mandatory %>
+                            <span class="necessary-field">*</span>
+                          <% end %>
+                      </label>
+                      <div class="text-input-bg12">
+                          <%= select("applicant_additional_details[#{additional.id}]", "additional_info", options_for_select(additional.student_additional_field_options.map{|b| [b.field_option,b.field_option]}, input_val), { :selected=>input_val,:include_blank=>t('select_an_option') },{}) %>
+                      </div>
+                  </div>
+                <% elsif additional.input_type=="has_many" %>
+                  <div class="grades">
+                      <div class="label-field-pair scroll">
+                          <label><%= additional.name %>
+                              <% if additional.is_mandatory %>
+                                <span class="necessary-field">*</span>
+                              <% end %></label>
+                      </div>
+                      <div class="fee_category_scroll1">
+                          <div class="sel-list">
+                              <%= t('select') %>: <%= link_to_function t('all'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = true; });" %>,
+                              <%= link_to_function t('none'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = false; });" %>
+                          </div>
+                          <% additional.student_additional_field_options.each do |k| %>
+                            <div class="each_batch">
+                                <%= check_box_tag "applicant_additional_details[#{additional.id}][additional_info][]", k.field_option,(!(input_val.nil?) and input_val.include?(k.field_option)), :class=>"batches_box check#{i}" %> <label><%= k.field_option %></label>
+                            </div>
+                          <% end %>
+                      </div>
+                  </div>
+                  <% i+=1 %>
+                <% elsif additional.input_type=="text_area" %>
+                  <div class="label-field-pair12-text-area adjust">
+                      <label><%= additional.name %>
+                          <% if additional.is_mandatory %>
+                            <span class="necessary-field">*</span>
+                          <% end %></label>
+
+                      <div class="textarea12-input-bg"><%= text_area_tag "applicant_additional_details[#{additional.id}][additional_info]", input_val %></div>
+                  </div>
+                <% else %>
+                  <div class="label-field-pair12">
+                      <label><%= additional.name %>
+                          <% if additional.is_mandatory %>
+                            <span class="necessary-field">*</span>
+                          <% end %></label>
+
+                      <div class="text-input-bg12"><%= text_field_tag "applicant_additional_details[#{additional.id}][additional_info]", input_val %></div>
+                  </div>
+                <% end %>
+                <div class="extender"></div>
+
+              <% end %>
+
+          </div>
+        <% end %>
+        <br /><br />
+      <% end %>
+
+      <% @addl_field_groups.each do |fg| %>
+        <span class="span-sub-heading"><%= fg.name %></span>
+        <hr class="sub-heading"></hr>
+        <% fg.applicant_addl_fields.active.each do |adl| %>
+          <div class="row">
+              <div class="label-field-pair-addl">
+                  <label for="parent_detail_mob_phone"> <%= adl.field_name %>
+                      <% if adl.is_mandatory? %>
+                        <span class="necessary-field">*</span>
+                      <% end %>
+                  </label>
+                  <% unless adl.field_type=="has_many" %>
+                    <div class="text-input-bg"><%= generate_input(s,adl,adl.applicant_addl_field_values) %></div>
+                  <% else %>
+                    <div class="text-input-bg21"><%= generate_input(s,adl,adl.applicant_addl_field_values) %></div>
+                    <div class="extender"></div>
+                  <% end %>
+              </div>
+          </div>
+        <% end %>
+      <% end %>
+      <div>
+          <span class="span-sub-heading"><%= t('additional_attachments') %></span>
+          <hr class="sub-heading"></hr>
+          <div class="all_additional_items">
+              <div id="additional_label" >
+                  <label for="attachment" ><%= t('attachment') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</label>
+              </div>
+              <div id="additional_right">
+                  <div class="addl_attachments">
+                      <% s.fields_for :applicant_addl_attachments do |a| %>
+                        <%= render "applicant_addl_attachment_fields",:f=>a  %>
+                      <% end %>
+                  </div>
+                  <div class="add_addl_attachment">
+                      <%= link_to_add_addl_attachment "#{image_tag "buttons/add_2.png" } #{t('add_txt')}", s, :applicant_addl_attachments %>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div id="submit_link">
+          <% if (@course.is_subject_based_registration == false) %>
+            <div class="default_amount">
+                <div class="span_text"><%= t('total_payable') %> :</div><div id="total_amount" class="themed_text"> <%= @currency %> <%= precision_label(@course.amount) %></div>
+            </div>
+          <% end %>
+          <%= submit_tag "", :value => "► #{t('save_and_proceed')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  function remove_fields(link) {
+      delete_confirm = confirm('<%=t('delete_confirm_msg')%>');
+      if (delete_confirm === true) {
+          $(link).previous("input[type=hidden]").value = '1';
+          $(link).up(".fields").hide();
+          j(link.up(".fields")).attr('class', "new_class")
+      }
+  }
+  
+  
+
+</script>
+

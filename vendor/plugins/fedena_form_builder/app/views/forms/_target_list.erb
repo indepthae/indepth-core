@@ -1,0 +1,24 @@
+
+<% unless @targets.empty? %>
+  <div class="target-list">
+    <div class="label_text">
+      <%= t('selected_people') %>
+    </div>
+    <div class="label-field-pair-document-small">
+      <div class ="scrolable" >
+        <% x = '<span> x </span>' %>
+        <div class="scroll-inside">
+          <% @targets.each do |m|  %>
+            <div class="hover">
+              <%user_name = "<span>(#{m.username})&#x200E;</span><span> x </span>"%>
+              <%=  %> <%= link_to shorten_string(m.full_name,18) + user_name, "#", :onClick => "remove_target(#{m.id})", :id=> "target_#{m.id}", :class=> 'individual',
+                :before => "Element.show('loader2')",
+                :success => "Element.hide('loader2')" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="extender"></div>
+<% end %>

@@ -1,0 +1,95 @@
+<div id="MB_frame">
+  <div id="MB_header">
+    <div id="MB_caption"></div>
+    <div id="MB_close" onclick="removeModalBox">X</div>
+  </div>
+  <div id="MB_content">
+    <div class="label-field-pair">
+      <label for="if"><%= t('name') %></label>
+      <input class="input" id="category_name"  maxlength="40" ></input>
+      <div class="wrapper">
+        <div class="error-icon"></div>
+        <div class="error-msg"><%= t('category_name_is_required') %></div>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="if"><%= t('amount') %></label>
+      <input class="input" id="ind_amount"></input>
+      <span class="currency-type"><%= currency %></span>
+      <div class="wrapper">
+        <div class="error-icon"></div>
+        <div class="error-msg"></div>
+      </div>
+    </div>
+
+    <div class="submit-button" id="ok">OK</div>
+    <div class="submit-button" id="cancel-link"><%= t('cancel') %></div>
+  </div>
+</div>
+<script type="text/javascript">
+  var precision = <%= FedenaPrecision.get_precision_count %>;
+  j("#MB_close, #MB_content #cancel-link").click(function(){
+    return removeModalBox();
+  })
+  j("#ok").click(function(){
+    var name = j("#category_name").val();
+    var amount_val = j("#ind_amount").val();
+    var is_deduction = j("#modalMsg").attr("is_deduction");
+    if(name.length > 0 && amount_val.length > 0 &&!isNaN(amount_val) && parseInt(amount_val) >= 0)
+    {
+      var amount = parseFloat(amount_val).toFixed(precision).toString();
+      var parent_attr_name = j("#modalMsg").attr("parent_attr_name");
+      //count = j('.individual_category').length;
+      par_div = j('<div></div>', {'class' : 'label-field-pair individual_category'})
+      label = j('<label></label>', {'for' : 'category-name', 'text' : name});
+      text_div = j('<div></div>', {'class' : 'text-input-bg'})
+      amount_input = j('<input></input>', {'class' : 'amount', 'id' : 'individual_category_'+ count + '_amount', 'name' : parent_attr_name+'['+count+'][amount]', 'type' : 'text', 'value' : amount, 'onchange' : 'calculate_net_pay()'})
+      live_val = j('<div></div>', {'class' : 'wrapper', 'id' : 'live-val'})
+      text_div.append(amount_input);
+      text_div.append(live_val);
+      name_input = j('<input></input>', {'id' : 'individual_category_'+ count + '_name', 'name' : parent_attr_name+'['+count+'][name]', 'type' : 'hidden', 'value' : name});
+      if(is_deduction == 0)
+        deduction_input = j('<input></input>', {'id' : 'individual_category_'+ count + '_deduction', 'name' : parent_attr_name+'['+count+'][is_deduction]', 'type' : 'hidden', 'value' : 'false'});
+      else
+        deduction_input = j('<input></input>', {'id' : 'individual_category_'+ count + '_deduction', 'name' : parent_attr_name+'['+count+'][is_deduction]', 'type' : 'hidden', 'value' : 'true'});
+      currency_type = j('<span></span>', {'class' : 'currency-type', 'text' : j('.currency-type').first().text()});
+      remove_link = j('<a></a>', {'class': 'cross_button', 'href' : '#/', 'onclick' : 'remove_fields(this)'});
+      par_div.append(label);
+      par_div.append(text_div);
+      par_div.append(name_input);
+      par_div.append(deduction_input);
+      par_div.append(currency_type);
+      par_div.append(remove_link);
+      if(is_deduction == 0)
+        j('#individual_earnings').append(par_div);
+      else
+        j('#individual_deductions').append(par_div);
+      calculate_net_pay();
+      count += 1;
+      removeModalBox();
+    }
+    else
+    {
+      if(name.length > 0)
+        j('#MB_content .wrapper').first().children().hide();
+      else
+        j('#MB_content .wrapper').first().children().show();
+      if(is_deduction == 0)
+        flag = '<%= "#{t('earnings')} " %>';
+      else
+        flag = '<%= "#{t('deductions')} " %>';
+      if(isNaN(amount_val))
+        msg = flag + '<%= t('must_be_a_number') %>';
+      else if(parseInt(amount_val) < 0)
+        msg = flag + '<%= t('cannot_be_a_negative_amount') %>';
+      else
+        msg = "<%= t('please_enter_an_amount') %>";
+      if(amount_val.length > 0 &&!isNaN(amount_val) && parseInt(amount_val) >= 0)
+        j('#MB_content .wrapper').last().children().hide();
+      else
+        j('#MB_content .wrapper').last().children().show();
+      j('#MB_content .wrapper').last().children('.error-msg').text(msg);
+    }
+  })
+</script>
+

@@ -1,0 +1,26 @@
+<div class="float_left" style="width:43%;">
+    <label class="desc-label"><%= t('select_fee_collections') %></label>
+</div>
+<div id="list" class="float_left" style="width:57%;">
+    <div class="current_financial_year_info">
+      <span class="label">
+        <%= t('financial_year_name') %>:
+      </span>
+      <span class="value">
+        <%= financial_year_name %>
+      </span>
+    </div>
+    <div class="fee_category_scroll1">
+        <div class="sel_batches">
+            <%= check_box_tag "select_all", "", false, {:class=>'batches_box select_all_check subject_select_all',:onclick=>"select_all_fields(this);"}%>
+            <label for="all_active_batches" class="special_prop"><%= t('fee_collections') %></label>
+        </div>
+        <%finance_fee_collections.each do |fee_collection| %>
+          <div class="each_batch">
+              <%= check_box_tag 'collection_ids[]', fee_collection[0], false , {:class=>'batches_box active_batch_list subject_select', :onclick=>"toggle_field_selector(this);"}%>
+              <label class="special_prop no_margin_top" id="subject-name-label"><%= fee_collection[1] %></label>
+          </div>
+        <% end %>
+    </div>
+</div>
+

@@ -1,0 +1,13 @@
+<tbody class="disable_sort">
+  <tr class="disable_sort">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= subject_group.name %></div>
+          <div class="component_link component_type">
+              <%= t('subject_group') %>
+          </div>
+      </td>
+  </tr>
+</tbody>
+<%= render :partial => 'import_subjects_with_elective_groups', :locals => {:obj => subject_group, :enable_selection => enable_selection} %>
+

@@ -1,0 +1,53 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('course_registration') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('enabled_courses') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('settings'), {:controller=>"applicants_admins",:action=>"show"} %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('add_course'), new_registration_course_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><span><%= flash[:warn_notice] %></  span> </div>
+  <% end %>
+  <% unless @registration_courses.empty? %>
+    <table id="listing" width="100%">
+      <tr class="tr-head">
+        <td><%= t('course_name') %></td>
+        <td><%=  t('code') %></td>
+        <td><%= t('cutoff') %></td>
+        <td><%= t('active') %></td>
+        <td><%= t('actions') %></td>
+      </tr>
+
+      <% @registration_courses.each do |registration_course| %>
+        <tr class="tr-<%=cycle('even','odd')%>">
+          <td class="col-1"><%= registration_course.course.try(:course_name) %></td>
+          <td class="col-1"><%= registration_course.course.code %></td>
+          <td class="col-1"><%= registration_course.minimum_score %></td>
+          <td class="col-1"><%= registration_course.is_active ? t('y_es') : t('n_o') %></td>
+          <td class="col-1"><%= link_to registration_course.is_active ? t('inactivate') : t('activate'), :action=>:toggle,:id=>registration_course.id %> &nbsp;|
+            <%= link_to t('edit'), :action=>:edit,:id=>registration_course.id %> &nbsp;&nbsp;|
+            <%= link_to t('delete'), registration_course_path(:action=>:show,:id=>registration_course.id), :confirm => t('sure'), :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+    <%= will_paginate @registration_courses %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_registration_courses') %> </p>
+  <% end %>
+</div>

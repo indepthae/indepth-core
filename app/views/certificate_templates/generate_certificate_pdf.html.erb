@@ -1,0 +1,16 @@
+<div class="css_container">
+  <%= wicked_pdf_stylesheet_link_tag "pdf_normalize" -%>
+  <%=@generated_certificate.get_pdf_html%>
+</div>
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<%if @generated_certificate.certificate_template.background_image.present? %>
+<% img_url = FedenaSetting.s3_enabled? ? @generated_certificate.certificate_template.background_image.url(:original,false) : File.join(RAILS_ROOT,@generated_certificate.certificate_template.background_image.path) %>
+<style type="text/css">
+#preview{
+  background-image: url('<%=img_url%>') !important;
+  box-sizing: border-box;
+  background-size: contain;
+  line-height: 1.5;
+}
+</style>
+<%end%>

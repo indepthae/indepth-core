@@ -1,0 +1,109 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('generated_payslips') %></div>
+  <% if @payroll_group and params[:finance].nil? and permitted_to? :generate_employee_payslip, :employee_payslips and !params[:archived].present? %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to t('generate_payslip').capitalize, {:action => "generate_employee_payslip", :employee_id => @employee.id} %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if !params[:finance].present? and !params[:archived].present? %>
+      <% breadcrumb :employee_payslips_view_employee_past_payslips, @employee %>
+    <% elsif params[:finance].present? and !params[:archived].present? %>
+      <% breadcrumb :employee_payslips_view_employee_past_payslips_finance, @employee %>
+    <% elsif !params[:finance].present? and params[:archived].present? %>
+      <% breadcrumb :employee_payslips_view_employee_past_payslips_archived, @employee %>
+    <% else %>
+      <% breadcrumb :employee_payslips_view_employee_past_payslips_finance_archived, @employee %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= "#{t('generated_payslips')} - #{@employee.full_name}" %></h3>
+  <div class="fields-details" id="name">
+    <div class="field-label"><%= t('name') %></div>
+    <div class="fields-val">: <%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('department') %></div>
+    <div class="fields-val">: <%= @employee.employee_department.name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('position') %></div>
+    <div class="fields-val">: <%= @employee.employee_position.name %></div>
+  </div>
+  <% unless @employee.employee_grade.nil? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('grade') %></div>
+      <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+    </div>
+  <% end %>
+
+  <% if @payroll_group %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('payroll_group') %></div>
+      <div class="fields-val">: <%= @payroll_group.name %></div>
+      <% if permitted_to? :show, :payroll %>
+        <% unless params[:archived].present? %>
+          <% unless params[:finance].present? %>
+            <%= link_to t('view_payroll'), {:controller => "payroll", :action => "show", :id => @employee.employee_salary_structure.id, :emp_id => @employee.id, :from => 'past_payslips'} %>
+          <% else %>
+            <%= link_to t('view_payroll'), {:controller => "payroll", :action => "show", :id => @employee.employee_salary_structure.id, :emp_id => @employee.id, :from => 'past_payslips_finance', :finance => 1} %>
+          <% end %>
+        <% else %>
+          <% unless params[:finance].present? %>
+            <%= link_to t('view_payroll'), {:controller => "payroll", :action => "show", :id => @employee.archived_employee_salary_structure.id, :emp_id => @employee.id, :from => 'past_payslips_archived', :archived => 1} %>
+          <% else %>
+            <%= link_to t('view_payroll'), {:controller => "payroll", :action => "show", :id => @employee.archived_employee_salary_structure.id, :emp_id => @employee.id, :from => 'past_payslips_finance_archived', :finance => 1, :archived => 1} %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="label-field-pair" id="filter">
+    <label for="payslip_status"><%= t('payslip_status') %></label>
+    <div id="loader_div">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </div>
+    <div class="text-input-bg">
+      <%= select_tag "payslip[payslip_status]", options_for_select([["#{t('all')}","approved_and_pending"],[t('approved'), "approved"], [t('pending'), "pending"]], "All"),{:onchange => "filter_payslips()"} %>
+    </div>
+  </div>
+  <div id="past_payslips">
+    <%= render :partial => 'employee_past_payslips' %>
+  </div>
+</div>
+<script type="text/javascript">
+  function filter_payslips()
+  {
+    new Ajax.Request('/employee_payslips/view_employee_past_payslips',{
+      parameters: {'status' : j('#payslip_payslip_status').val(), employee_id : <%= @employee.id %>, finance : '<%= params[:finance] %>', archived : '<%= params[:archived] %>'},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j('#loader').show();
+      },
+      onComplete:function(resp){
+        j('#loader').hide();
+      }
+    });
+  }
+</script>

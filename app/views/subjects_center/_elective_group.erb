@@ -1,0 +1,27 @@
+<tbody class="<%= (klass == 'level-1') ? 'disable_sort' : ''%>">
+  <tr class="<%= klass %> disable_sort">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= e_group.name %></div>
+          <div class="component_link component_type">
+              <%= t('elective_group').titleize %>
+          </div>
+          <div class="col-37 pull-right">
+              <div class="link_button pull-left">
+                  <%= component_edit_link(t('edit_text'), 'course_elective_group', @course.id, e_group.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_add_link(t('subject'), 'course_subject', @course.id, 'CourseElectiveGroup', e_group.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_delete_link(t('delete_text'), 'course_elective_group', @course.id, e_group) %>
+              </div>
+          </div>
+      </td>
+      <%#= hidden_field_tag "course_subjects[e_group][#{e_group.id}]", e_group.priority, :class => "#{(klass == 'level-1') ? 'component_field' : 'e_group_field'}", :component_type => 'e_group', :component_id => e_group.id%>  
+      <%= hidden_field_tag "course_subjects[e_group][#{e_group.id}]", e_group.priority, :class => "priority_field", :component_type => 'e_group', :component_id => e_group.id%>  
+  </tr>
+  <% e_group.course_subjects.each do |sub| %>
+      <%= render :partial => 'subject', :locals => {:subject => sub, :klass =>(klass == 'level-1' ) ? 'level-2' : 'level-3', :tbody_required => false} %>
+  <% end %>
+</tbody>

@@ -1,0 +1,7 @@
+<div class="label-field-pair">
+    <label><%= att_field.name %><% if [true,"true","default_true"].include?(fld[:mandatory]) %><% @mandatory_attachment_attributes.push att_field.id %><span class="necessary-field">*</span><% end %> </label>
+    <% f.fields_for :applicant_addl_attachments, @applicant.applicant_addl_attachments.build do|build| %>
+      <%= build.hidden_field :applicant_addl_attachment_field_id, :value=>att_field.id %>
+        <div class="text-input-bg"><%= build.paperclip_file_field :attachment, :size=>12, :direct => false, :style=>"width:200px;" %></div>
+    <% end %>
+</div>

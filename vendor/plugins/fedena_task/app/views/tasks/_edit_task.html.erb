@@ -1,0 +1,121 @@
+<script>
+  function add_recipient(recipient) {
+    var recipient_list = new Array();
+    if($('recipients').value != '')
+      recipient_list = $('recipients').value.split(',');
+    else
+      recipient_list = [];
+
+    var recipient_exists = false;
+
+    for(i=0; i<recipient_list.length; i++)
+      if(recipient_list[i] == recipient)
+        recipient_exists = true;
+
+    if(!recipient_exists) {
+      recipient_list.push(recipient);
+    }
+    $('recipients').value = recipient_list.join();
+    recipients = $('recipients').value;
+<%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients='+recipients" ) %>
+  }
+
+  function add_all_recipient(recipient) {
+    var recipient_list = new Array();
+    if($('recipients').value != '')
+      recipient_list = $('recipients').value.split(',');
+    else
+      recipient_list = [];
+
+    var new_list = recipient.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var recipient_exists = false;
+      for(j=0; j<recipient_list.length; j++)
+        if(recipient_list[j] == new_list[i])
+          recipient_exists = true;
+      if(!recipient_exists) recipient_list.push(new_list[i]);
+    }
+
+    $('recipients').value = recipient_list.join();
+    recipients = $('recipients').value;
+<%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients='+recipients" ) %>
+  }
+
+
+  function remove_recipient(recipient) {
+    recipients = $('recipients').value;
+    var recipient_list = new Array();
+    recipient_list = $('recipients').value.split(',');
+
+    for(i=0; i<recipient_list.length; i++)
+      if (recipient_list[i] == recipient)
+    {
+      recipient_list.splice(i,1);
+      break;
+    }
+
+    $('recipients').value = recipient_list.join();
+    recipients = $('recipients').value;
+<%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients='+recipients" ) %>
+
+
+
+  }
+</script>
+
+<% form_for(@task,:url=>{:action=>"update"} ,:html=> {:multipart=>true}) do |s| %>
+  <div id="recipient-list">
+    <%= render :partial => "recipient_list"  %>
+  </div>
+  <div id="necessary-field-notification"> <%= t('legend1') %> <span class="necessary-field">*</span><%= t('legend2') %></div>
+  <div id ="form">
+    <div class="label-field-pair">
+      <label for="task_title" id="label-member1"><%= t('title') %><span class="necessary-field">*</span> </label>
+      <div class="text-input-bg"><%= s.text_field :title %></div>
+    </div>
+
+    <div class="label-field-pair-text-area">
+      <label for="task_description" id="label-member2"><%= t('description') %><span class="necessary-field">*</span></label>
+      <div class="textarea-input-bg"><%= s.text_area :description,:cols => 27, :rows => 5,:class => 'admission1-textarea' %></div>
+    </div>
+
+
+    <div class="label-field-pair">
+      <label for="task_attachment" id="label-member3"><%= t('attach_a_file') %></label>
+      <div class="text-input-bg">
+        <%= s.paperclip_file_field :attachment, :size=>14, :direct => false %>
+      </div>
+    </div>
+    <%= hidden_field_tag :recipients,@task.assignee_ids.join(",") %>
+    <div class="extender"></div>
+
+    <div class="extender"></div>
+    <div class="label-field-to">
+      <div id="depts_and_courses">
+        <%=   render :partial=>"depts_and_courses" %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="student_grade" id="label-member6"><%= t('task_status') %></label>
+      <div class="text-input-bg">
+        <%= s.select "status", options_for_select([[t('assigned'),"Assigned"], [t('completed'),"Completed"]],@task.status) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="extender"></div>
+  <div class="label-field-pair">
+    <label for="start_date"><%= t('start_date') %></label>
+    <div class="text-input-bg"><%= calendar_date_select_tag 'task[start_date]', I18n.l(@task.start_date,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="due_date"><%= t('end_date') %></label>
+    <div class="text-input-bg"><%= calendar_date_select_tag 'task[due_date]', I18n.l(@task.due_date,:format=>:default),:readonly=>true,:popup=>"force" %></div>
+  </div>
+
+  <div class="extender"></div>
+<% end %>
+

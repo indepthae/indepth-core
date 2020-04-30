@@ -1,0 +1,14 @@
+<tr style="display : <%= (a.object.marked_for_destruction? ? 'none' : '') %>" class="fields">
+    <td><%= a.text_field :name %></td>
+    <td>
+        <%= a.paperclip_file_field :attachment, :size=>12, :direct => false %>
+        <%= a.hidden_field :attachment_file_size, :disabld => true %>
+        <%= a.hidden_field :attachment_content_type, :disabld => true %>
+        <%= a.hidden_field :attachment_present %>
+        <% if !(a.object.new_record?) and a.object.attachment.present? and a.object.delete_attachment.to_s != "true" %>
+          <label class="prev-certificate"><%=link_to a.object.attachment_file_name, a.object.attachment.url(:original,false),:target => "_blank"  %></label>
+          <%= a.hidden_field :delete_attachment, :value=>false, :class=>"delete-attachment-field" %>
+        <% end %>
+    </td>
+    <td><%= link_to_remove_fields "", a %></td>
+</tr>

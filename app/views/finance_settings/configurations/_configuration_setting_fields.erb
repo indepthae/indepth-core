@@ -1,0 +1,36 @@
+<%# fee accounts if enabled %>
+<% prompt = [[t('select'), nil]] %>
+<% if @multi_configs[:account].present? %>
+    <%# selected = @multi_configs[:account].is_a?(FeeAccount) ? {:selected => @multi_configs[:account].id} : {} %>
+    <% selected = selected_multi_config @multi_configs, :account %>
+    <div class="label-field-pair">
+      <%= label_tag :configure_category_account, t('fee_account_text') %>
+      <div class="text-input-bg">
+        <%= select_tag "configure_category[account]",
+                       options_for_select(prompt + @accounts.map { |a| [a.name, a.id] }, selected) %>
+      </div>
+    </div>
+<% end %>
+<%# fee receipt templates if enabled %>
+<% if @multi_configs[:template].present? %>
+    <% selected = selected_multi_config @multi_configs, :template %>
+    <div class="label-field-pair">
+      <%= label_tag :configure_category_template, t('receipt_template_text') %>
+      <div class="text-input-bg">
+        <%= select_tag "configure_category[template]",
+                       options_for_select(prompt + @templates.map { |t| [t.name, t.id] }, selected) %>
+      </div>
+    </div>
+<% end %>
+<%# fee receipt series if enabled  %>
+<% if @multi_configs[:receipt_set].present? %>
+    <%# selected = @multi_configs[:receipt_set].is_a?(ReceiptNumberSet) ? {:selected => @multi_configs[:receipt_set].id} : {} %>
+    <% selected = selected_multi_config @multi_configs, :receipt_set %>
+    <div class="label-field-pair">
+      <%= label_tag :configure_category_receipt_set, t('receipt_set_text') %>
+      <div class="text-input-bg">
+        <%= select_tag "configure_category[receipt_set]",
+                       options_for_select(prompt + @receipt_sets.map { |rs| [rs.name, rs.id] }, selected) %>
+      </div>
+    </div>
+<% end %>

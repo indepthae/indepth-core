@@ -1,0 +1,64 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>ICSE Reports</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Previous Batch Exam Report</div>
+  <div id="inner-tab-menu">
+    <ul>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="hider">
+    <% unless flash[:notice].nil? %>
+      <p id="flash-msg"class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% remote_form_for :subject_report ,:url=>{:action=>'generate_previous_batch_exam_reports'} ,:loading => "$('loading').show();", :loaded => "$('loading').hide();" do |f| %>
+    <div class="label-field-pair1">
+      <div class="label-field-pair">
+        <label for="batch_id">Class</label>
+        <div class="text-input-bg">
+          <%= select :subject_report, :course_id,
+            @courses.map {|c| [c.full_name, c.id]},
+            {:prompt => "Select a class"},
+            {:onChange => "#{remote_function(:url => {:action => "list_previous_batches"},
+            :with => "'course_id='+ value",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"
+            )}"} %><%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+        </div>
+      </div>
+      <div id ="batch_select">
+        <div class="label-field-pair2">
+          <label for="batch_id">Batch</label>
+          <div  class="text-input-bg2" id="exam-group-select">
+            <%= f.select :batch_id, @batches.map{|exam| [exam.name,exam.id]},:prompt=> "Select a batch" %>
+          </div>
+        </div>
+      </div>
+      <div class="submit_btn">
+        <%= submit_tag "", :value => "► #{t('view')}", :class => "submit-button", :disable_with => "► #{t('please_wait')}" %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loading",
+          :style =>"display: none;" ) %>
+      </div>
+    </div>
+  <% end %>
+  <div class="content_student_report">
+    <div id="student_list">
+      <%= render  :partial=>"graduated_student_list" %>
+    </div>
+    <div id="report"></div>
+  </div>
+</div>

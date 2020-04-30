@@ -1,0 +1,89 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('notifications') %></h1>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="notification_box">
+        <% if @notifications.present? %>
+          <div id="notifications_container">
+              <div id="filter">
+                  <div class="heading"><%= t('filter') %>
+                      <%= image_tag("Loader-transparant.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+                  </div>
+
+                  <div class="label-field-pair" id="status_filter">
+                      <div class="text-input-bg"><%= select_tag :notification_filter, options_for_select([["#{t('all')}",'all']] + @filters.map {|f| [f, f]},:selected=>@filter), :onchange =>"#{remote_function(:url => {:action => "apply_filter"},
+                          :with => "'filter='+value",
+                          :before => "Element.show('loader1')",
+                          :success => "Element.hide('loader1')")}"%></div>
+                  </div>
+              </div>
+              <% @notifications.each do |notification| %>
+                <div class="notifications_strip">
+                    <div class="notification_header">
+                        <%=show_notification_icon(notification.initiator)%>
+                        <div class="notification_intiator"><%= notification.initiator %></div>
+                        <div class="notification_date">
+                            <% date = notification.created_at %>
+                            <% if date < Date.today.beginning_of_year %>
+                              <%= format_date(date,:format => :short)  %>
+                            <% elsif(date.to_date - Date.today).to_i < 0 %>
+                              <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M %p")  %>
+                            <% else %>
+                              <%=  change_time_to_local_time(date).strftime("%I:%M %p")  %>
+                            <% end %>
+                        </div>
+                    </div>
+                    <div class="notification_content">
+                        <span><%=notification.content%></span>
+                        <%# unless @current_user.parent? %>
+                          <span class="ref_links"><%= notification_reference_link(notification.payload) %></span>
+                        <%# end %>
+                    </div>
+                </div>
+              <% end %>
+              <% @notifications.total_pages.to_i.times do |i| %>
+                <div id="infinite_thread_<%=i+2%>"></div>
+              <% end %>
+              <div id="notification_scroll"><%= will_paginate @notifications %></div>
+          </div>
+        <%else%>
+          <p class="flash-msg"> <%= t('no_notifications') %> </p>
+        <%end%>     
+    </div>
+</div>
+<script>
+  j(document).ready(function () {
+      j('html').animate({scrollTop: 0}, 1);
+      j('body').animate({scrollTop: 0}, 1);
+  });
+  jQuery(function () {
+      j(window).on('scroll', function () {
+          if (j('#notifications_container').size() > 0) {
+              var more_posts_url;
+              url = j('#notification_scroll .pagination .next_page').attr('href');
+              update_url = '/notifications'
+              if (url != undefined) {
+                  page = url.substring(url.lastIndexOf('?') + 1, url.length);
+              }
+              if (page != undefined) {
+                  more_posts_url = update_url + '?' + page
+              }
+              filter = '&filter=<%=@filter if @filter%>'
+              if (more_posts_url && j(window).scrollTop() > j(document).height() - j(window).height() - 60) {
+                  j('#notification_scroll .pagination').html('<img src="/images/filler_ring_loader.gif" alt="Loading..." title="Loading..." />');
+                  j('#notification_scroll .pagination').css('display', 'block');
+                  j.getScript(more_posts_url + filter);
+              }
+          }
+      });
+  });
+
+</script>

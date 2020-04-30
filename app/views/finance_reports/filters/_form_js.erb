@@ -1,0 +1,175 @@
+<script>
+    var valid;
+    function validate_search_form() {
+        valid = true;
+        j('.wrapper').hide();
+        check_validation("search_mode");
+        check_validation("search_academic_year_id");
+        if (j('#search_mode').val() == "monthly") {
+            check_validation("search_month");
+            check_validation("search_year");
+        } else {
+            current_date = new Date();
+            start_date = new Date(j('#start_date').val());
+            end_date = new Date(j('#end_date').val());
+            if (start_date > current_date)
+                check_date_validation("start_date", '<%= t("future_date_error") %>');
+            if (end_date > current_date)
+                check_date_validation("end_date", '<%= t("future_date_error") %>');
+            if (start_date > end_date)
+                check_date_validation("start_date", "<%= t("start_date_cant_be_after_end_date") %>");
+        }
+        return valid;
+    }
+    function check_validation(id) {
+        if ((j('#' + id).val() == "") || (j('#' + id).val() == null)) {
+            valid = false;
+            j('#' + id).siblings('.wrapper').show();
+        }
+    }
+    function check_date_validation(id, msg) {
+        valid = false;
+        wrapper = j('#' + id).siblings('.wrapper');
+        wrapper.find('.error-msg').html(msg);
+        wrapper.show();
+    }
+
+    j('#search-form').find("#submit_button").click(function (event) {
+        submit_form(event);
+    });
+
+    update_batch_list = function (obj) {
+        course_id = j(obj).val();
+        if (course_id == 'all' || course_id == '') {
+            j('#list_batches').hide();
+            //if(course_id j(obj).val() == 'all'){
+            if(course_id == 'all'){
+                j('#batch_filter').multipleSelect('checkAll');
+            }else{
+                j('#batch_filter').multipleSelect('uncheckAll');
+            }
+        } else {
+            // ajax request
+            j.ajax({
+                url: '/finance_reports/load_batches',
+                data: {course_id: course_id},
+                beforeSend: function () {
+                    // add loader
+                }
+            }).done(function () {
+                // hide loader
+                j('#list_batches').show();
+                j('#batch_filter').multipleSelect('checkAll');
+            })
+        }
+    }
+
+    update_dates = function (obj) {
+        v = j(obj).val();
+        if (v == '') {
+            j('#date_range_section').hide();
+            reset_dates();
+        } else {
+            // ajax request
+            j.ajax({
+                url: '/finance_reports/update_dates',
+                data: {financial_year: v},
+                success: function () {
+                    j('#date_range_section').show();
+                }
+            })
+        }
+    }
+
+    reset_dates = function () {
+        j('#start_date').val('');
+        j('#end_date').val('');
+    }
+
+    enable_disable_submit = function (disable) {
+        j('#fetch_report input[type=submit]').attr('disabled', disable);
+    }
+
+    function submit_form(e) {
+        e.preventDefault();
+    }
+    j(document).ready(function () {
+        update_dates(j('select[id*=_financial_year_id]'));
+//      update_batch_list(j('select[id*=_course_id]'));
+//      enable_disable_submit(true);
+        validate_form();
+    })
+
+//    j('#transaction_report_course_id').on('change', function(){
+//        if(j(this).val() == 'all'){
+//            j('#batch_filter').multipleSelect('checkAll');
+//        }else{
+//            j('#batch_filter').multipleSelect('uncheckAll');
+//        }
+//    })
+
+    j(document).delegate('#transaction_report_financial_year_id, #transaction_report_course_id, #account_filter, #batch_filter, input[id^=transaction_report_mode_]','change', function () {
+        validate_form();
+    })
+
+    // validate financial year selection
+    // validate course selection
+    // validate batch selection
+
+    validate_form = function () {
+        enable_disable_submit(!(validate_account() && validate_fy() && validate_course() && validate_batch() && validate_summary_mode()));
+    }
+    
+    validate_account = function () {
+        return (j('#account_filter').val() != null);
+    }
+    
+    validate_fy = function () {
+        return (j('#transaction_report_financial_year_id').val() != "")
+    }
+
+    validate_course = function () {
+        return (j('#transaction_report_course_id').val() != "")
+    }
+
+    validate_batch = function () {
+        cvalue = j('#transaction_report_course_id').val();
+        if (cvalue == 'all') {
+            return true
+        } else {
+            return (j('#batch_filter').val() != null);
+        }
+    }
+
+    validate_summary_mode = function(){
+        if(j('input[id^=transaction_report_mode_]').length == 2){
+            return (j('input[id^=transaction_report_mode_]:checked').val() !== undefined);
+        }else{
+            return true;
+        }
+    }
+
+    j(document).delegate('#search-form', 'submit', function (e) {
+        e.preventDefault();
+        j.ajax({
+            url: j(this).attr('action'),
+            method: 'post',
+            data: j(this).serialize(),
+            beforeSend: function () {
+                enable_disable_submit(true);
+//                $('submit_button').disable();
+                j('#report_results').hide();
+                j('#loading').show()
+            },
+            success: function () {
+                j('#loading').hide();
+                j('#report_results').show();
+                j('.fixed-header').height(j('.tr-head .amount_col').height());
+//                enable_disable_submit(false);
+            }
+        })
+//        :before => "$('submit_button').disable(); j('#report_results').hide(); j('#loading').show()",
+//        :complete => "setTimeout(function(){$('submit_button').enable();},2000); j('#loading').hide(); j('#report_results').show()",
+    })
+
+</script>

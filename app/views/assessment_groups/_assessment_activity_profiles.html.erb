@@ -1,0 +1,16 @@
+<% if @assessment_activity_profiles.assessment_activities.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="col1"><%= "#{t('activities')} &#x200E;(#{@assessment_activity_profiles.assessment_activities.length})&#x200E;" %></td>
+          <td class="col3"><%= t('description') %></td>
+      </tr>
+      <% @assessment_activity_profiles.assessment_activities.each do |activity|  %>
+        <tr>
+            <td><%= activity.name %></td>
+            <td><%= activity.description %></td>
+        </tr>
+      <% end %>
+  </table>
+<% else %>
+  <div id="description"><%= t('no_activities_added') %></div>
+<% end %>

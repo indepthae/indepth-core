@@ -1,0 +1,130 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 5 Oct, 2018, 3:31:04 PM
+    Author     : nidhin
+*/
+
+.import-container{
+    /*display: flex;*/
+}
+.panel{
+    padding: 20px 10px 20px 0px;
+    float: left;
+    width: 350px;
+}
+table{
+    border-collapse: collapse;
+}
+tr.tr-head td{
+    border-bottom: 1px solid #b9b9b9;
+}
+td{
+    padding: 5px 0px 5px 0px;
+}
+.w60{
+    width:60%;
+}
+.pull-left{
+    float:left;
+}
+.pull-right{
+    float: right;
+}
+.subject_table{
+    max-height: 500px;
+    overflow-x: auto;
+    overflow-y: scroll;
+    float: left;
+    clear: both;
+    margin-top: 20px;
+    width: 100%;
+    border-top: solid 1px #ccc;
+    border-bottom: 1px solid #ccc;
+}
+.table_actions{
+    float: left;
+    width: 100%;
+}
+table{
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+td{
+    padding: 10px;
+    border-right: 1px solid #bfbfbf;
+}
+tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+.check_all{
+    width: 10%;
+}
+.table_actions a{
+    color: #969696;
+}
+#page-yield #subject_list .panel .table_actions a:hover {
+    color: black !important;
+}
+#page-yield #subject_list .panel a:hover {
+    color: white !important;
+}
+#submit_like_link{
+    margin-left: 0px;
+    color: white;
+    background: black;
+    border: 1px solid black;
+    margin-top: 30px !important;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 0 0px;
+    padding: 7px 9px;
+    float: right;
+    cursor: pointer;
+    text-decoration: none;
+}
+#course_list{
+    float: right;
+}
+table{
+    border-top: none;
+    border-bottom: none;
+}
+table tr:last-child{
+    border-bottom: none;
+}
+
+#page-yield ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+
+}
+#page-yield ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+    border-left: 1px solid #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#page-yield ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#page-yield ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#page-yield ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}

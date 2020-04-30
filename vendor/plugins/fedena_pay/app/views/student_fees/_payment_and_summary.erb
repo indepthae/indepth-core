@@ -1,0 +1,110 @@
+<tr class="row-b height-26">
+  <td colspan="<%= fee_head_col_span + 1 %>">
+    <div class="fright"> <%= "#{t('total')} #{t('amount')}" %></div>
+  </td>
+  <td class="set_border_right total_amount">
+    <% unless precision_label(@total_fees).to_f == 0 %>
+        <%= precision_label(@total_fees.to_f) %>
+    <% else %>
+        <%= precision_label(0) %>
+    <% end %>
+  </td>
+</tr>
+
+<tr class="row-b height-26">
+  <td colspan="<%= fee_head_col_span + 1 %>">
+    <div class="fright"><%= "#{t('balance')} #{t('amount')}" %></div>
+  </td>
+
+  <td class="set_border_right col-6 total-pay balance_amount">
+    <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+        <%= precision_label(@total_amount_to_pay.to_f) %>
+    <% else %>
+        <%= precision_label(0) %>
+    <% end %>
+  </td>
+</tr>
+
+<% if @student.advance_fee_wallet.present? and @advance_fee_used.to_f > 0 %>
+  <tr class="row-b height-26">
+    <td colspan="<%= fee_head_col_span + 1 %>">
+      <div class="fright"><%= "#{t('advance_applied')}" %></div>
+    </td>
+
+    <td class="set_border_right col-6 balance_amount" id="adf_applied">
+      <%= @advance_fee_used.to_f %>
+    </td>
+  </tr>
+<% end %>
+
+<% unless @total_fees == 0 %>
+    <tr class="row-b tr-list_head">
+      <td colspan="<%= fee_head_col_span + 2 %>">
+        <% if @student.advance_fee_wallet.present? and @total_amount_to_pay > 0 %>
+        <div class="wallet-section">
+              <div class="wallet-amount-block" style="margin: 0 -58px 0 4px;">
+                  <label style="    margin: 0 82px 0 -12px;"><%= t('advance_applied') %> </label>
+                  <div class="text-input-bg4">
+                      <%= text_field_tag :wallet_amount,' ', {:value => 0.00, :class => "wallet-amount-applied"} %>
+                  </div>
+              </div>
+              <div class="wallet-info-block">
+                <label><%= t('advance_fees_collected')%></label>
+                <div class="text-input-bg4">
+                    <%= text_field :student_wallet_amount,'', {:value => precision_label(@student.advance_fee_wallet.amount),
+                      :class => "wallet-amount-field", :readonly => true} %>
+                </div>
+                <%= label_tag '', t('apply_advance'), {:class => "wallet-link user_button1"} %>
+                <div class="" style="display: none;">
+                  <%= hidden_field_tag :wallet_amount_applied, '', {:value => false} %>
+                </div>
+              </div>
+        </div>
+        <% end %>
+
+        <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+            <div class="payment_details">
+              <div class="amount_to_pay_block">
+                <label><%= t('amount_to_pay') %> </label>
+
+                <div class="text-input-bg4">
+                  <%= hidden_field_tag 'multi_fees_transaction[student_id]', @student.id %>
+                  <%= hidden_field_tag 'multi_fees_transaction[transaction_date]',
+                                       FedenaTimeSet.current_time_to_local_time(Time.now).to_date,
+                                       options={:class => 'fee_transaction_date'} %>
+                  <%= form.hidden_field :fees_paid, :value => precision_label(@total_amount_to_pay.to_f),
+                                      :class => 'precision_text payment', :readonly => true, :disabled => "disabled" %>
+                  <%= text_field_tag :fees_paid_t, '', {:value => 0, :class => 'precision_text payment_t',
+                          :readonly => true, :disabled => "disabled"} %>                   
+                  <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+                      <% total_amount = precision_label(@total_amount_to_pay.to_f) %>
+                  <% else %>
+                      <%= total_amount = precision_label(0) %>
+                  <% end %>
+                  <%= hidden_field_tag 'transaction_extra[total_amount]', total_amount %>
+                </div>
+              </div>
+            </div>
+        <% end %>
+        <div id="gateway_error"></div> 
+        <div class="pay_fees">
+          <div class="pay_fees_buttons <%= precision_label(@total_amount_to_pay).to_f != 0 ? '' : 'no_top_margin' %>">
+            <% unless precision_label(@total_amount_to_pay).to_f == 0 %>
+                <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and @financial_year_enabled and
+                        @available_gateways.present? and PaymentConfiguration.config_value("enabled_fees").present? and
+                        PaymentConfiguration.op_enabled? and @active_gateway.present?) %>
+                    <%= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'submit_button' %>
+                <% end %>
+            <% else %>
+                <h4><%= t('fees_paid') %></h4>
+            <% end %>
+            <%= link_to "► #{t('print_summary')}",
+                        {:controller => "finance_extensions", :action => "pay_all_fees_receipt_pdf",
+                         :id => @student.id, :batch_id => @current_batch.id}, :target => '_blank',
+                        :class => 'user_button' %>
+          </div>
+        </div>
+
+      </td>
+    </tr>
+<% end %>

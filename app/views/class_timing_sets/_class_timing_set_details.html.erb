@@ -1,0 +1,17 @@
+<% form_for @class_timing_set do |f| %>
+<%#=error_messages_for 'class_timing_set', :header_message => nil %>
+  <div class="cts"><%= f.text_field :name ,:id=>"class_timing_set_text_field"%></div>
+  <div  class="cts" id="submit_link">
+    <%= f.submit t('submit'), :id => 'class_timing_set_submit', :disable_with => "Please Wait..." %>
+  </div>
+  <div class="cts" id="cancel_link">Cancel</div>
+<% end %>
+
+
+<script type="text/javascript">
+  j('#cancel_link').click(function(){
+    j(this).parent().remove();
+    j('#default_class_timing_set_name').children().first().show();
+    j('#edit_link').show();
+  })
+</script>

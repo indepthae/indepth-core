@@ -1,0 +1,133 @@
+<% form_for :assessment_report_setting,:url => {:action => 'advanced_report_settings', :assessment_plan_id => @plan.id } do |c| %>
+  <div class="box">
+      <div class="label_field_pair block">
+          <div class="label_pair">
+            <%= check_box :assessment_report_setting, :enable_aggregate , :checked =>@setting[:enable_aggregate]== "1" %>
+            <label class="core_label sub-header"><%= t('final_score').titleize %></label>
+          </div>
+          <div class="nested_block">
+              <div class="com_block"><%= t('final_score_settings_desc') %></div>
+              <div class="ind_block">
+                  <%= radio_button :assessment_report_setting, :all_exam_score ,"0", :checked =>@setting[:all_exam_score]== "0" %>
+                  <label class="general_label" for="assessment_report_setting_all_exam_score_0"><%=t('all_exams').titleize%></label>
+                  <%= radio_button :assessment_report_setting, :all_exam_score ,"1", :checked =>@setting[:all_exam_score]== "1" %>
+                  <label class="general_label" for="assessment_report_setting_all_exam_score_1"><%=t('final_score').titleize%></label>
+              </div>
+              <div class="com_block"><%= t('final_score_settings_desc_2') %></div>
+              <div class="ind_block">
+                  <%= check_box :assessment_report_setting, :show_total_score , :checked =>@setting[:show_total_score]== "1" %>
+                  <label class="general_label" for="assessment_report_setting_show_total_score"><%=t('total_score')%></label>
+                  <%= check_box :assessment_report_setting, :show_final_grade , :checked =>@setting[:show_final_grade]== "1", :onChange => "toggle_grade_set(this);" %>
+                  <label class="general_label" for="assessment_report_setting_show_final_grade"><%=t('overrall_grade').titleize%></label>
+                  <%= check_box :assessment_report_setting, :show_final_percentage , :checked =>@setting[:show_final_percentage]== "1" %>
+                  <label class="general_label" for="assessment_report_setting_show_final_percentage"><%=t('final_percentage').titleize%></label>
+              </div>
+              <div class="ind_block">
+                <%= check_box :assessment_report_setting, :show_final_rank , :checked =>@setting[:show_final_rank]== "1" %>
+                  <label class="general_label" for="assessment_report_setting_show_final_rank"><%=t('total_batch_position')%></label>
+                  <%= check_box :assessment_report_setting, :show_final_average , :checked =>@setting[:show_final_average]== "1"%>
+                  <label class="general_label" for="assessment_report_setting_show_final_average"><%=t('total_batch_average').titleize%></label>
+                  <%= check_box :assessment_report_setting, :show_final_highest , :checked =>@setting[:show_final_highest]== "1" %>
+                  <label class="general_label" for="assessment_report_setting_show_final_highest"><%=t('total_batch_highest').titleize%></label>
+                <%= check_box :assessment_report_setting, :show_final_lowest , :checked =>@setting[:show_final_lowest]== "1" %>
+                <label class="general_label" for="assessment_report_setting_show_final_lowest"><%=t('total_batch_lowest').titleize%></label>
+              </div>
+              <div id="set_grade" style="display: <%= @setting[:show_final_grade]== "1" ? 'block' : 'none' %>">
+                  <div class="com_block"><%= t('select_final_grading_profile_in_report') %></div>
+                  <label for="grading_profile"><%= t('grading_profile') %></label>
+                  <div class="text-input-bg">
+                      <%= select :assessment_report_setting, :grade_set_id, options_for_select(@mark_grades.map{|p| [p.name, p.id]}, @setting[:grade_set_id].try(:to_i) ),
+                        {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_profile_details(this, 'GradeSet');",:class => 'core_field'} %>
+                  </div>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader",
+                    :style =>"display: none;" ) %>
+                  <div id="profile_details">
+                      <% if @grade_sets.present? %>
+                        <%= render :partial => 'assessment_groups/grade_sets' %>
+                      <% end %>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="extender"></div>
+
+        <div class="label_pair">
+          <%= check_box :assessment_report_setting, :enable_rounding , :checked =>@setting[:enable_rounding]== "1" %>
+          <label class="core_label sub-header"><%= t('enable_rounding').titleize %></label>
+        </div>
+        <div class="nested_block">
+          <div class="com_block"><%= t('rounding_score_settings_desc') %></div>
+          <div class="ind_block">
+            <div class="text-input-bg">
+              <%= select :assessment_report_setting, :rounding_size, options_for_select([0,1,2], @setting[:rounding_size].try(:to_i) ),
+                         {:include_blank => t('choose_rounding_size')}, {:class => 'core_field'} %>
+            </div>
+          </div>
+        </div>
+
+
+          <div class="extender"></div>
+
+          <div class="label_pair">
+            <%= check_box :assessment_report_setting, :enable_grade_scale , :checked =>@setting[:enable_grade_scale]== "1" %>
+            <label class="core_label sub-header "><%= t('grade_scale_in_reports').titleize %></label>
+          </div>
+          <div class="nested_block">
+              <div class="com_block"><%= t('final_grading_profile_desc') %></div>
+              <div class="pull_left half-block">
+                    <div class="ind_block">
+                        <%= check_box :assessment_report_setting, :enable_scholastic_grade_scale, :checked =>@setting[:enable_scholastic_grade_scale]== "1", :onChange => "toggle_report_grade_set(this, 'scholastic');" %>
+                        <label class="general_label" for="assessment_report_setting_enable_scholastic_grade_scale"><%=t('scholastic_grades').titleize%></label>
+                    </div>
+                    <div id="scholastic_grade" style="display: <%= @setting[:enable_scholastic_grade_scale]== "1" ? 'block' : 'none' %>">
+                        <div class="text-input-bg">
+                            <%= select :assessment_report_setting, :scholastic_grade_scale, options_for_select(@grades.map{|p| [p.name, p.id]}, @setting[:scholastic_grade_scale].try(:to_i) ),
+                              {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_gradeset_details(this, 'scholastic');",:class => 'core_field'} %>
+                        </div>
+                        <%= image_tag("loader.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "loader",
+                          :style =>"display: none;" ) %>
+                        <div id="scholastic_profile_details">
+                            <% if @setting[:scholastic_grade_scale].present? %>
+                              <%= render :partial => 'assessment_reports/report_grades', :locals => {:grade_set => @grades.to_a.find{|g| g.id == @setting[:scholastic_grade_scale].try(:to_i)}} %>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+              <div class="pull_right half-block">
+                <div class="ind_block">
+                  <%= check_box :assessment_report_setting, :enable_co_scholastic_grade_scale , :checked =>@setting[:enable_co_scholastic_grade_scale]== "1", :onChange => "toggle_report_grade_set(this, 'co_scholastic');" %>
+                  <label class="general_label" for="assessment_report_setting_enable_co_scholastic_grade_scale"><%=t('co_scholastic_grades').titleize%></label>
+                </div>
+                <div id="co_scholastic_grade" style="display: <%= @setting[:enable_co_scholastic_grade_scale]== "1" ? 'block' : 'none' %>">
+                    <div class="text-input-bg">
+                        <%= select :assessment_report_setting, :co_scholastic_grade_scale, options_for_select(@grades.map{|p| [p.name, p.id]}, @setting[:co_scholastic_grade_scale].try(:to_i) ),
+                          {:include_blank => t('choose_an_grading_profile')}, {:onchange => "get_gradeset_details(this, 'co_scholastic');",:class => 'core_field'} %>
+                    </div>
+                    <%= image_tag("loader.gif",
+                      :align => "absmiddle",
+                      :border => 0,
+                      :id => "loader",
+                      :style =>"display: none;" ) %>
+                    <div id="co_scholastic_profile_details">
+                        <% if @setting[:co_scholastic_grade_scale].present? %>
+                          <%= render :partial => 'assessment_reports/report_grades', :locals => {:grade_set => @grades.to_a.find{|g| g.id == @setting[:co_scholastic_grade_scale].try(:to_i)}} %>
+                        <% end %>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="hor_line"></div>
+
+      <div id="submit_button">
+          <%= submit_tag t('save_settings').titleize ,:id=>'submit-button'%>
+      </div>
+  </div>
+<% end %>

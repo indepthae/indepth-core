@@ -1,0 +1,260 @@
+ employee:
+    primary_keys:
+      employee_number: "Employee Number"
+    overrides:
+      employee_category_id: "Employee Category Name"
+      employee_position_id: "Employee Position Name"
+      employee_department_id: "Employee Department Name"
+      reporting_manager_id: "Reporting Manager Number"
+      employee_grade_id: "Employee Grade Name"
+      nationality_id: "Nationality Name"
+      leave_group_id: "Leave Group"
+      home_country_id: "Home Country Name"
+      office_country_id: "Office Country Name"
+      privileges: "User Privilege"
+      husband_name: "Spouse Name"
+      biometric_id: "Biometric ID"
+    associations:
+     - :employee_category
+     - :employee_position
+     - :employee_grade
+     - :employee_department
+     - :home_country
+     - :office_country
+     - :nationality
+     - :leave_group
+     - :reporting_manager
+     - :user
+    associated_columns:
+      employee_category: "name"
+      employee_position: "name"
+      employee_grade: "name"
+      employee_department: "name"
+      home_country: "name_as"
+      office_country: "name_as"
+      reporting_manager: "username"
+      nationality: "name_as"
+      leave_group: "name"
+    filters:
+     - :status
+     - :status_description
+     - :photo_file_name
+     - :photo_content_type
+     - :photo_data
+     - :photo_file_size
+     - :library_card
+     - :user_id
+     - :school_id
+     - :last_reset_date
+    joins:
+      privileges: "users"
+    join_column_search:
+      privileges: "name"
+    associates:
+     employee_bank_detail: "bank_field"
+     employee_additional_detail: "additional_field"
+    associate_columns:
+      employee_additional_detail: "additional_info"
+      employee_bank_detail: "bank_info"
+    associate_column_search:
+      bank_field: "name"
+      additional_field: "name"
+    dependent:  "user"
+    attr_accessor_list:
+      - :biometric_id
+    mandatory_columns:
+      - :employee_category_id
+      - :employee_number
+      - :first_name 
+      - :employee_position_id
+      - :employee_department_id
+      - :date_of_birth 
+      - :joining_date
+      - :nationality_id
+      - :gender
+    associate_primary_keys:
+      employee_bank_detail:
+        bank_field_id:
+      employee_additional_detail:
+        additional_field_id:
+    additional_join: 
+       - :AdditionalField
+    options_join:
+       - :additional_field_options
+
+    instructions:
+        Employee Category Name:
+          Type: "An active employee category."
+          Input Instruction and example: "System admin etc."
+        Employee number:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "AYS/2018/S001"
+        Joining date:
+          Type: "mm/dd/yyyy or dd-mm-yyyy"   
+          Input Instruction and example: "03/13/2016 or 13-03-2016"  
+        First name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Middle name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Last name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""  
+        Gender:
+          Type: "m or f"
+          Input Instruction and example: ""
+        Job title:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Employee Position Name:
+          Type: "An active employee position."
+          Input Instruction and example: "System admin etc."
+        Employee Department Name:
+          Type: "An active employee department."
+          Input Instruction and example: "System admin etc."
+        Reporting Manager Number:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "Type the reporting manager's employee number. eg:- AYS/2018/S001."
+        Employee Grade Name:
+          Type: "An active employee grade."
+          Input Instruction and example: ""
+        Qualification:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Experience detail:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Experience year:
+          Type: "Numeric."
+          Input Instruction and example: "Enter the no. of years of experience."
+        Experience month:
+          Type: "Numeric."
+          Input Instruction and example: "Enter the no. of months of experience."
+        Date of birth:
+          Type: "mm/dd/yyyy or dd-mm-yyyy"
+          Input Instruction and example: "03/13/2016 or 13-03-2016"  
+        Marital status:
+          Type: " married, single, widowed, divorced."
+          Input Instruction and example: ""
+        Children count:
+          Type: "Numeric."
+          Input Instruction and example: ""
+        Father name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Mother name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Spouse Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Blood group:
+          Type: "A+, A-, A1+, A1-, A1B+, A1B-, A2-, A2+, A2B+, A2B-, B+, B-, B1+, O+, O-, AB+, AB-."
+          Input Instruction and example: ""
+        Nationality Name:
+          Type: "Country Name."
+          Input Instruction and example: " eg. For an employee from India, enter nationality as India."
+        Home address line1:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""  
+        Home address line2:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Home city:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Home state:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Home Country Name:
+          Type: "Country name."
+          Input Instruction and example: ""
+        Home pin code:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Office address line1:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Office address line2:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""  
+        Office city:
+          Type: "Alphanumeric."
+          Input Instruction and example: "" 
+        Office state:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Office Country Name:
+          Type: "Country name."
+          Input Instruction and example: 
+        Office pin code:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Office phone1:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+        Office phone2:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+        Mobile phone:
+          Type: "Numeric."
+          Input Instruction and example: "1234512345"
+        Home phone:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+        Email:
+          Type: ""
+          Input Instruction and example: " Valid email address."
+        Fax:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Biometric ID:
+           Type: "Alphanumeric."
+           Input Instruction and example: "" 
+        Fax:
+           Type: "Alphanumeric."
+           Input Instruction and example: ""
+        Leave Group:
+           Type: "Alphanumeric."
+           Input Instruction and example: ""
+
+
+
+
+
+
+      
+# every YAML file should contain all the content inside model_name.underscore hash.
+
+# If database columns names needed to be modfied then it should be placed in overrides hash.
+
+# Mention all the associations those arec needed in CSV upload inside associations_array.
+
+# Assoicated columns needs a field that will be searched for getting an ID to place.For example
+# nationality_id needs to be searched in country table by name which will be present in CSV.All those
+# required field to be placed in associated_columns hash.Association name is the key and field will be value.
+
+# Mention all those database columns which u dont want to appear in CSV inside filters array.Note that
+#  id,created_at,updated_at does not needs any mention inside filters.
+
+# If there is any join table data to be uploaded with CSV.Please mention that join name as key
+# and table name as value in joins hash.In this case privilege is the privileges_users is the table.So
+# entry will be privileges: users
+
+# This concept also same as the associated data.Mention the column by which join column names will be searched.
+# In this case privilege table will be searched by name.
+
+# There can be many additional data to upload while uploading a model data.Place all those additional
+# association names and parent names in associates hash.For example we have to upload employee bank detail,
+# so all the values from bank detail to be fetched,thats why the entry is like employee_bank_details: "bank_field".
+# All the current active bank fields will be appearing then to save in the structure.
+
+# The data user will be entering needed to be saved somewhere in the assoiated model.Mention those column names
+# inside associate_columns hash.For example someone entered his passport number as an additional detail.
+# This passport_number column to be get from additional_field table,then have to save the id in
+# employee_additional_detail table with a value for that in additional_info column.So the enry should be
+# employee_additional_detail: "additional_info"
+
+# Every associated parent model value to be searched by a column.For example,all the bank fields to be
+# searched by name from the bank_field table.Mention all those values inside associate_column_search hash.

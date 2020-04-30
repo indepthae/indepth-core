@@ -1,0 +1,157 @@
+<% total_fees =0 %>
+<% net_total_fees = 0 %>
+<% if @tax_enabled %>
+    <% discount_tax_field = "col-4-2" %>
+    <% tax_slab_amounts = {} %>
+    <% col_span = 7 %>
+<% else %>
+    <% col_span = 6 %>
+    <% discount_tax_field = "col-4" %>
+<% end %>
+
+<%= hidden_field_tag :category_id, @instant_category.id %>
+<%= hidden_field_tag :tax_enabled, @tax_enabled %>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <tr class="tr-head">
+    <td class="col-head"><%= t('sl_no') %> </td>
+    <td class="col-head"><%= t('particulars') %></td>
+    <td class="col-head"><%= t('amount') %> </td>
+    <td class="col-head"><%= "#{t('discount')} (%)" %> </td>
+    <% if @tax_enabled %>
+        <td class="col-head"><%= "#{t('tax_text')} (%)" %> </td>
+    <% end %>
+    <td class="col-head" colspan="2"><%= t('total_amount') %> </td>
+  </tr>
+  <tr class="tr-blank"></tr>
+  <% i = 0 %>
+  <% unless @instant_fee_particulars.nil? %>
+      <% @instant_fee_particulars.each do |fee| %>
+          <% tax_slab = fee.tax_slabs.try(:last) %>
+          <tr class="tr-<%= cycle("odd", "even") %> tr-data-rows">
+            <td class="col-1"><%= i+=1 %></td>
+            <td class="col-2"><%= shorten_string(fee.name, 20) %></td>
+            <td class="col-3">
+              <div class="text-input-bg1"><%= text_field_tag 'amount[]', fee.amount, :id => "amount_#{i}", :onchange => "update_total_by_amount(this)", :class => 'amount precision_text' %></div>
+            </td>
+            <td class="<%= discount_tax_field %>">
+              <div class="text-input-bg1"><%= text_field_tag 'discount[]', 0, :id => "discount_#{i}", :onchange => "update_total_by_discount(this)", :class => 'precision_text' %></div>
+            </td>
+            <% if @tax_enabled %>
+                <td class="<%= discount_tax_field %>">
+                  <div class="text-input-bg1">
+                    <%= tax_slab.present? ? precision_label(tax_slab.rate) : "-" %>
+                    <%= hidden_field_tag 'tax_rate[]', 0, :id => "tax_rate_#{i}", :value => (tax_slab.present? ? tax_slab.rate : 0) %>
+                    <% fee_tax = (tax_slab.present? ? (fee.amount.to_f * tax_slab.rate * 0.01) : 0) %>
+                    <%= hidden_field_tag 'tax_amount[]', 0, :id => "tax_amount_#{i}", :value => fee_tax %>
+                    <% tax_slab_amounts[tax_slab.id] = tax_slab_amounts[tax_slab.id].to_f + fee_tax %>
+                  </div>
+                </td>
+            <% end %>
+            <td class="col-5">
+              <div class="text-input-bg1"><%= text_field_tag 'total[]', fee.amount, :id => "total_check_#{i}", :class => 'particular_total', :readonly => true %></div>
+            </td>
+            <td class="col-select"><%= check_box_tag 'particular_ids[]', fee.id, true, :class => 'par_check', :id => "check_#{i}", :onclick => "assign_amt(this)" %></td>
+          </tr>
+          <% total_fees += fee.amount %>
+          <% net_total_fees += fee.amount + fee_tax.to_f %>
+      <% end %>
+  <% end %>
+  <!--<tr class="tr-blank"></tr>
+  <tr class="tr-blank"></tr>-->
+
+  <tr>
+    <td colspan="<%= col_span %>">
+      <div class="pay_fees">
+        <div class="options-pay">
+          <a id="addrow" href="#" onclick="insRow()">
+            + <%= t('add_particular') %>
+          </a>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <% locals_hash = {:total_fees => total_fees, :total_discounts => 0, :col_span => col_span} %>
+  <% locals_hash.merge!({:tax_slab_amounts => tax_slab_amounts}) if @tax_enabled %>
+  <%= render :partial => 'summary', :locals => locals_hash %>
+  <tr class="tr-even" cellpadding="1" cellspacing="1">
+    <td class="col-1"></td>
+
+    <td class="col-pay" colspan="<%= @tax_enabled ? 4 : 3 %>"><%= t('amount_to_pay') %>:</td>
+    <td id="total" class="col-2" colspan="2">
+      <%= precision_label(net_total_fees) %>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="<%= col_span %>">
+      <div class="payment_details">
+        <div class="label-field-pair3">
+          <label><%= t('payment_mode') %>  <%= image_tag("loader.gif",
+                                                         :align => "absmiddle",
+                                                         :border => 0,
+                                                         :id => "loader1",
+                                                         :style => "display: none;") %></label>
+
+          <div class="text-input-bg3"><%= select :fees, :payment_mode, [["#{t('cash')}", "Cash"], ["#{t('online_payment')}", "Online Payment"], ["#{t('cheque')}", "Cheque"], ["#{t('dd')}", "DD"], ["#{t('others')}", "Others"]], {}, {:onChange => "#{remote_function(:url => {:action => "select_payment_mode"},
+                                                                                                                                                                                                                                                                        :with => "'payment_mode='+value", :before => "$('loader1').show();",
+                                                                                                                                                                                                                                                                        :success => "$('loader1').hide();")}"} %>
+          </div>
+        </div>
+
+      </div>
+      <div id="payment_mode"></div>
+      <div class="label-field-pair5">
+        <label><%= t('reference_no') %> </label>
+
+        <div class="text-input-bg4">
+          <%= text_field_tag "fees[reference_no]" %>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="<%= col_span %>">
+      <%= transaction_date_field %>
+      <div class="label-field-pair3-text-area">
+        <label><%= t('payment_notes') %> </label>
+
+        <div class="textarea-input-bg3">
+          <%= text_area :fees, :payment_note, :cols => 50, :rows => 1 %>
+        </div>
+      </div>
+      <div class="pay_fees">
+        <%= hidden_field_tag :total_fees, total_fees %>
+        <div class="options-pay">
+          <% if @financial_year_enabled %>
+              <%= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'pay_button',
+                             :disable_with => "#{t('please_wait')}" %>
+          <% end %>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+<div id="master_discounts">
+  <%= render :partial => "select_master_discounts" %>
+</div>
+<div id="master_particulars">
+  <%= render :partial => "select_master_particulars" %>
+</div>
+<script type="text/javascript">
+    j('#fees_payment_mode').change(function () {
+        switch (j(this).val()) {
+            case 'Online Payment' :
+                j('.label-field-pair5').children().first().text("<%=t('transaction_id')%>");
+                break;
+            case 'Cheque' :
+                j('.label-field-pair5').children().first().text("<%=t('cheque_no')%>");
+                break;
+            case 'DD' :
+                j('.label-field-pair5').children().first().text("<%=t('dd_no')%>");
+                break;
+            default :
+                j('.label-field-pair5').children().first().text("<%=t('reference_no')%>");
+                break;
+        }
+    });
+</script>

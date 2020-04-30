@@ -1,0 +1,28 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Plugin Settings</h1>
+</fieldset>
+<div class="content-div">
+  <div class="nav-vertical width-15-pc">
+    <ul>
+      <% a=0 %>
+      <% FedenaPlugin::ADDITIONAL_LINKS[:multi_school_settings_hook].each do |hook| %>
+        <% if @av_plugin.include?(hook[:plugin_name]) %>
+          <% if a==0 %>
+            <li><%= link_to "#{hook[:title]}",hook[:destination],:class=>"active" %></li>
+            <% a=1 %>
+          <% else %>
+            <li><%= link_to "#{hook[:title]}",hook[:destination],:class=>"" %></li>
+          <% end %>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+  <div class="detail-list width-80-pc bg-light shadow grey-border" id="content_div">
+    <%= %>
+  </div>
+</div>
+<script>
+  j(document).ready(function(){
+    j(".active").click();
+  })
+</script>

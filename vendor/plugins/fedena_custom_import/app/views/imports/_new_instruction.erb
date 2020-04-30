@@ -1,0 +1,176 @@
+<div>
+    <div>
+        <span class = "i_heading"><%=t('instruction')%></span>
+        <ul>   
+            <li class="instrctn_msg"><%=t('i1')%></li>
+            <li class="instrctn_msg"><%=t('i2')%></li>
+            <li class="instrctn_msg"><%=t('i3')%></li>
+            <li class="instrctn_msg"><%=t('i4')%></li>
+        </ul>
+    </div>
+    <h4 > 
+        <%= @export.get_model_name %>
+    </h4>
+    <table>
+        <tr class="tr-header">
+            <td><%=t('columns')%></td>
+            <td><%=t('type')%></td>
+            <td><%=t('instructions')%></td>
+        </tr>
+        <%unless @main_columns.blank?%>
+        <%@main_columns.each do |m|%>
+          <tr class="tr-body">
+              <td class="not_last">
+                  <%=  m.gsub(m,m.split('|').first) %>
+              </td>
+              <%if m.first == "*"%>
+                <%m.gsub!(m,m.split('*').second)%>
+              <%end%>
+              <% @temp.each do |t| %>
+                <% if t[0] == m.gsub(m,m.split('|').first) %>
+                  <td >
+                      <%=t[1]["Type"]%>
+                  </td>
+                  <td>
+                      <%=t[1]["Input Instruction and example"]%>
+                  </td> 
+                <%elsif t[0] == m.gsub(m,m.split('|').second)%>
+                  <td class="not_last">
+                      <%=t[1]["Type"]%>
+                  </td>
+                  <td>
+                      <%=t[1]["Input Instruction and example"]%>
+                  </td>
+                <%end%>
+              <%end%>
+          </tr>
+        <% end %>
+          <%end%>
+    </table>
+</div>
+<div>
+    <div>
+        <%if @guardian_temp.present?%>
+          <h4 > 
+              <%= t('guardian_details')%>
+          </h4>
+          <table>
+              <tr class="tr-header">
+                  <td><%=t('columns')%></td>
+                  <td><%=t('type')%></td>
+                  <td><%=t('instructions')%></td>
+              </tr>
+              <%unless @guardian_columns.blank?%>
+              <%@guardian_columns.each do |c|%>
+                <tr class="tr-body">
+                    <td class="not_last">
+                        <%= c.gsub(c,c.split('|').first) %>
+                    </td>
+                    <%if c.first == "*"%>
+                      <%c.gsub!(c,c.split('*').second)%>
+                    <%end%>
+                    <% @guardian_temp.each do |g| %>          
+                      <% if g[0] == c.gsub(c,c.split('|').first) %> 
+                        <td class="not_last">
+                            <%= g[1]["Type"] %>
+                        </td>
+                        <td>
+                            <%= g[1]["Input Instruction and example"] %>
+                        </td>
+                      <%end%>
+                    <%end%>
+                </tr>
+              <%end%>
+                <%end%>
+          </table>
+        <%end%>
+    </div>
+    <div>
+        <%if @additional_detail.present?%>
+          <h4> <%= "Additional Details for #{@export.get_model_name}" %></h4>
+          <table>
+              <tr class="tr-header">
+                  <td><%=t('columns')%></td>
+                  <td><%=t('type')%></td>
+                  <td><%=t('instructions')%></td>              
+              </tr>
+              <%@additional_detail.each_with_index do |a,index|%>
+                <tr class = "tr-body">
+                    <td class="not_last">
+                        <%if @mandatory[index] == true%>
+                          <%="*#{a.split('|').first}"%>
+                        <%else%>
+                          <%=a.split('|').first%>
+                        <%end%>
+                    </td>
+                    <%if @values[index].present? && (@additional_fields[index].input_type == "belongs_to" ||@additional_fields[index].input_type == "has_many") %>
+                      <td >  
+                          <%=@values[index].map{|p| p.field_option}.join(", ")%>
+                      </td>           
+                    <%else%>
+                      <td class="not_last">
+                          <%=t('alpha')%>
+                      </td>
+                    <%end%>
+                    <td>
+                        <%=""%>
+                    </td>
+                </tr>
+              <%end%>
+          </table>
+        <%end%>      
+
+        <%if @bank_detail.present?%>
+          <h4> <%= "Bank Details for #{@export.get_model_name}" %></h4>
+          <table>
+              <tr class="tr-header">
+                  <td><%=t('columns')%></td>
+                  <td><%=t('type')%></td>
+                  <td><%=t('instructions')%></td>              
+              </tr>
+              <%@bank_detail.each do |a|%>
+                <tr class = "tr-body">
+                    <td class="not_last">
+                        <%=a.split('|').first%>
+                    </td>
+                    <td class="not_last">
+                        <%=t('text_message')%>
+                    </td>
+                    <td>
+                        <%=""%>
+                    </td>
+                </tr>
+              <%end%>
+          </table>
+        <%end%>
+
+        <%if @privilege.present?%>
+          <h4> <%= "Pivileges for #{@export.get_model_name}" %></h4>
+          <div class="privilege_msg"><%="Enter ‘Y’ against the privilege to enable the privilege. Enter ‘NULL’ to keep it disabled."%></div>
+        <%end%>   
+        <%if @tags.present?%>
+          <h4> <%= "Tags for #{@export.get_model_name}" %></h4>
+          <table>
+              <tr class="tr-header">
+                  <td><%=t('columns')%></td>
+                  <td><%=t('type')%></td>
+                  <td><%=t('instructions')%></td>              
+              </tr>
+              <%@tags.each  do |a|%>
+                <tr class = "tr-body">
+                    <td class="not_last">
+                        <%=a.split('|').first%>
+                    </td>
+                    <td class="not_last">
+                        <%= "Y, Blank" %>
+                    </td>     
+                    <td>
+                        <%=""%>
+                    </td>
+                </tr>
+              <%end%>
+          </table>
+        <%end%>   
+    </div>
+</div>
+

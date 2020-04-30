@@ -1,0 +1,66 @@
+<% remote_form_for :search, :url => fetch_report_transport_reports_path(:type => @type), :before=>"$('submit_button').disable(); j('#report_results').hide(); j('#loading').show()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},2000); j('#loading').hide(); j('#report_results').show()", :html => {:id => 'search-form'} do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="addl_detail_form">
+      <div class="label-field-pair section">
+          <label class="status" for="passenger_type"><%= t('transport.passenger') %></label>
+          <div id="radio-buttons">
+              <%= s.radio_button  "passenger", "Student", :checked => "checked", :onchange => 'show_passengers()' %>
+              <label class="label_for_status" for="passenger_student"><%= t('student_text') %></label>
+
+              <%= s.radio_button  "passenger", "Employee", :onchange => 'show_passengers()' %>
+              <label class="label_for_status" for="passenger_employee"><%= t('employee_text') %></label>
+          </div>
+      </div>
+      <div id="search_options">
+          <%= render :partial => 'select_course' %>
+      </div>
+      <div class="label-field-pair">
+          <label class="status" for="selection_type"><%= t('selection_type') %></label>
+          <div class="text-input-bg">
+              <%= s.select :selection_type, [[t('allocated_passengers'), "allocated"], [t('all_passengers'), 'all']] %>
+              <%= error_message_box(t('cant_be_blank')) %>
+          </div>
+      </div>
+      <%= render :partial => 'academic_year', :locals => {:s => s} %>
+      <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  var valid;
+  function validate_search_form() {
+      valid = true;
+      j('.wrapper').hide();
+      if (j('#search_passenger_student').is(':checked')) {
+          check_validation("search_course_id");
+          check_validation("batch_filter");
+      } else {
+          check_validation("search_employee_department_id");
+      }
+      check_validation("search_selection_type");
+      check_validation("search_academic_year_id");
+      return valid;
+  }
+  function check_validation(id) {
+      if ((j('#' + id).val() == "") || (j('#' + id).val() == null)) {
+          valid = false;
+          j('#' + id).siblings('.wrapper').show();
+      }
+  }
+
+  function show_passengers()
+  {
+      var passenger = j("[name='search[passenger]']:checked").val();
+      j.ajax({
+          method: 'get',
+          url: "/transport_reports/passenger_type_search",
+          data: {passenger: passenger},
+          beforeSend: function () {
+              j("#loader1").show();
+          },
+          success: function (data) {
+              j("#loader1").hide();
+          }
+      });
+  }
+</script>

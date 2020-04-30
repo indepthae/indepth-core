@@ -1,0 +1,126 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'link_style_fixer' %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reminder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('back_to_inbox')}", :controller=>"reminder", :action=>"index"%></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('mark_as_unread')}" ,:controller=> "reminder", :action=>"mark_unread", :id2=>@new_reminder.id%></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('delete_text')}", {:controller=>"reminder", :action=>"delete_reminder_by_recipient", :id2=>@new_reminder.id}, :confirm=>"#{t('delete_confirm_msg')}" %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :reminder_view_reminder, @new_reminder%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:error].nil? %>
+    <div class=flash-msg>
+      <ul>
+        <%= flash[:error] %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div id="reminder-body">
+    <div id="reminder-from"><%= t('from') %>: <%= @sender.nil? ? "#{t('user_unavailable')}" : @sender.full_name %></div>
+    <div id="reminder-date"><%= t('sent_on') %>: <%= format_date(FedenaTimeSet.current_time_to_local_time(@new_reminder.created_at).to_date,:format=>:long_date) %></div>
+    <div id="reminder-subject" class="themed_text"><%= t('subject_messages') %>: <%= @new_reminder.subject %></div>
+    <div id="reminder-message">
+      <strong><%= t('message') %>:</strong>
+      <div class="reminder-body">
+        <%=simple_format_without_p @new_reminder.body %>
+      </div>
+    </div>
+    <div class="downloads">
+      <p id="attachments_title"><%#= t('attachments') %></p>
+      <ul id="attachments_list">
+        <% @reminder_attachments.each do |reminder_attachment| %>
+          <li>
+            <span class="attachment_icon_img"></span>
+            <%=link_to reminder_attachment.attachment_file_name ,reminder_attachment.attachment.url(:original,false),:target => "_blank"  %>
+          </li>
+        <%end%>
+      </ul>
+    </div>
+    <div id="reminder-reply">
+
+      <%#= link_to_function "►#{t('reply')}", :class=>'button user_button' do |page|
+        page.visual_effect :toggle_blind, "reply-form"
+      end  unless @sender.nil? %>
+
+    </div>
+    <div id="reply-form" style="display:none;">
+      <% form_for @reply_reminder, :url=>{:id2 =>@new_reminder.id},:html => { :multipart => true }  do |l| %>
+        <%= error_messages_for :reminder %>
+        <div class="message">
+          <div class="label-field-pair">
+            <label for="subject"><%= t('subject_messages') %> <span class="necessary-field">*</span></label>
+            <div class="text-input-bg"><%= l.text_field :subject %></div>
+          </div>
+          <div class="label-field-pair">
+            <label for="start_date"><%= t('message') %> <span class="necessary-field">*</span></label>
+            <div class="text-area-bg"><%= l.text_area :body, :cols=>25, :rows=>10 %></div>
+          </div>
+          <% l.fields_for :reminder_attachments do |builder| %>
+            <div class="label-field-pair attachment-field">
+              <label for=""><%= t('attach_file') %> (<%= t('maxi_size') %>) </label>
+              <div class="text-input-bg" id="browse-style">
+                <%= builder.paperclip_file_field :attachment %>
+              </div>
+              <div class="remove-field">
+                <a onclick="reset_file_field()">
+                <%#= t('remove') %>
+                  <%= '' %>
+                </a>
+              </div>
+            </div>
+          <% end %>
+          <div class="extender"></div>
+          <div id="submit-button">
+            <%=submit_tag "► #{t('send')}", :class=> 'button', :disable_with => "► #{t('please_wait')}" %>
+          </div>
+        </div>
+
+      <% end %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function resetFormElement(e) {
+    e.wrap('<form>').closest('form').get(0).reset();
+    e.unwrap();
+  }
+  function reset_file_field () {
+    resetFormElement(j("#field_reminder_reminder_attachments_attributes_0_attachment"));
+    resetFormElement(j("#reminder_reminder_attachments_attributes_0_attachment"));
+  }
+</script>

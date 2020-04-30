@@ -1,0 +1,54 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%= stylesheet_link_tag 'jquery-ui_1.css' %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_student_records_for_course') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%if params[:rg_id].present?%>
+      <% breadcrumb :student_records_manage_record_groups_courses, [@course,@record_group],@current_user %>
+    <%else%>
+      <% breadcrumb :student_records_manage_student_records_for_course, @course,@current_user %>
+    <%end%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%if params[:rg_id].present?%>
+    <div id="rg_text"><%=@record_group.name%></div>
+    <div id="rg_desc"><%=t('record_assignment_desc_batch')%></div>
+    <div class="hor_line"></div>
+  <%end%>
+  <div id="show_course_select"></div>
+  <div id="record_group_courses_details"><%=render :partial => 'show_course_details'%></div>
+  <div id="course_details">
+    <div class="list"><span><%=t('batches_text')%> : </span><%=@course.batches.usable.count%></div>
+    <div class="list"><span><%=t('grading_system')%> : </span><%=Batch::GRADINGTYPES[@course.grading_type].nil? ? 'Normal' : Batch::GRADINGTYPES[@course.grading_type]%></div>
+    <div class="list"><span><%=t('students_text')%> : </span><%=@course.students.count%></div>
+    <%unless params[:rg_id].present?%>
+      <div class="rt_list"><%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %><span><%=t('show_batches_with')%></span><%=render :partial=>'rg_filter'%></div>
+    <%end%>
+  </div>
+  <div id="batches_list">
+    <%=render :partial=>'batches_all_rgs'%>
+  </div>
+</div>

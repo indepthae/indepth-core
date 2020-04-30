@@ -1,0 +1,275 @@
+<% s3_enabled =  FedenaSetting.s3_enabled? %>
+
+<%archived_student = nil%>
+<%if @student.attributes["former_id"].present?%>
+  <% # partial - used in bulk export -- if code moved to controller-- make changes to bulk export also %>
+  <% archived_student = ArchivedStudent.find_by_former_id(@student.attributes["former_id"]) %>
+<%end%>
+
+<%if @keys[:full_name].present?%>
+  template_app.full_name = <%= @student.full_name.to_json%>;
+<%end%>
+
+<%if @keys[:first_name].present?%>
+  template_app.first_name = <%= @student.first_name.to_json%>;
+<%end%>
+
+<%if @keys[:middle_name].present?%>
+  template_app.middle_name = <%= @student.middle_name.to_json%>;
+<%end%>
+
+<%if @keys[:last_name].present?%>
+  template_app.last_name = <%= @student.last_name.to_json%>;
+<%end%>
+
+<%if @keys[:date_of_birth].present?%>
+  template_app.date_of_birth = <%= (format_date(@student.date_of_birth)).to_s.to_json %>;
+<%end%>
+
+<%if @keys[:dob_in_words].present?%>
+  template_app.dob_in_words = <%= get_date_in_words(@student.date_of_birth).to_json %>;
+<%end%>
+
+<%if @keys[:admission_no].present?%>
+  template_app.admission_no = <%= @student.admission_no.to_json%>;
+<%end%>
+
+
+<%if @keys[:course].present?%>
+  <%if @student.batch.present? && @student.batch.course.present?%>
+    template_app.course = <%= @student.batch.course.course_name.to_json%>;
+  <%end%>
+<%end%>
+
+<%if @keys[:batch].present?%>
+  <%if @student.batch.present?%>
+    template_app.batch = <%= @student.batch.name.to_json%>;
+  <%end%>
+<%end%>
+
+<%if @keys[:batch_full_name].present?%>
+  <% if @student.batch.present? %>
+    template_app.batch_full_name = <%= @student.batch.full_name.to_json%>;
+  <%end%>
+<%end%>
+
+<%if @keys[:roll_number].present?%>
+  template_app.roll_number = <%= @student.roll_number.to_json%>;
+<%end%>
+
+<%if @keys[:admission_date].present?%>
+  template_app.admission_date = <%= (format_date(@student.admission_date)).to_s.to_json %>;
+<%end%>
+
+<%if @keys[:admission_date_in_words].present?%>
+  template_app.admission_date_in_words = <%= get_date_in_words(@student.admission_date).to_json %>;
+<%end%>
+
+<%if @keys[:blood_group].present?%>
+  template_app.blood_group = <%= @student.blood_group.to_json%>;
+<%end%>
+
+<%if @keys[:gender].present?%>
+  template_app.gender = <%= @student.gender_as_text.to_json %>;
+<%end%>
+
+<%if @keys[:fathers_name].present?%>
+  <%if @student.ef_father.present?%>
+    template_app.fathers_name = <%= @student.ef_father.full_name.to_json%>;
+  <%end%>
+<%end%>
+<%if @keys[:fathers_contact_no].present?%>
+  <%if @student.ef_father.present?%>
+    template_app.fathers_contact_no = <%= @student.ef_father.mobile_phone.to_json%>;
+  <%end%>
+<%end%>
+
+<%if @keys[:mothers_name].present?%>
+  <%if @student.ef_mother.present? %>
+    template_app.mothers_name = <%= @student.ef_mother.full_name.to_json %>;
+  <%end%>
+<%end%>
+<%if @keys[:mothers_contact_no].present?%>
+  <%if @student.ef_mother.present? %>
+    template_app.mothers_contact_no = <%= @student.ef_mother.mobile_phone.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:nationality].present?%>
+  <%if @student.nationality.present?%>
+    template_app.nationality = <%= @student.nationality.name.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:mother_tongue].present?%>
+  template_app.mother_tongue = <%= @student.language.to_json%>;
+<%end%>
+
+<%if @keys[:category].present?%>
+  <%if @student.student_category.present?%>
+    template_app.category = <%= @student.student_category.name.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:religion].present?%>
+  template_app.religion = <%= @student.religion.to_json%>;
+<%end%>
+
+<%if @keys[:address].present?%>
+  template_app.address = <%= @student.full_address.to_json%>;
+<%end%>
+
+<%if @keys[:city].present?%>
+  template_app.city = <%= @student.city.to_json%>;
+<%end%>
+
+<%if @keys[:state].present?%>
+  template_app.state = <%= @student.state.to_json%>;
+<%end%>
+
+<%if @keys[:pin_code].present?%>
+  template_app.pin_code = <%= @student.pin_code.to_json%>;
+<%end%>
+
+<%if @keys[:birth_place].present?%>
+  template_app.birth_place = <%= @student.birth_place.to_json%>;
+<%end%>
+
+<%if @keys[:phone].present?%>
+  template_app.phone = <%= @student.phone1.to_json%>;
+<%end%>
+
+<%if @keys[:mobile].present?%>
+  template_app.mobile = <%= @student.phone2.to_json%>;
+<%end%>
+
+<%if @keys[:email].present?%>
+  template_app.email = <%= @student.email.to_json%>;
+<%end%>
+
+<%if @keys[:biometric_id].present?%>
+  <% @biometric_id = BiometricInformation.find_by_user_id(@student.user_id).try(:biometric_id) %>
+  template_app.biometric_id = <%= @biometric_id.to_json%>;
+<%end%>
+
+<%if @keys[:date_of_leaving].present?%>
+  <%if @student.attributes["date_of_leaving"].present?%>
+    template_app.date_of_leaving = <%= (format_date(@student.date_of_leaving)).to_s.to_json  %>;
+  <%end%>
+<%end%>
+<%if @keys[:date_of_leaving_in_words].present?%>
+  <%if @student.attributes["date_of_leaving"].present?%>
+    template_app.date_of_leaving_in_words = <%= get_date_in_words(@student.date_of_leaving).to_s.to_json  %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:leaving_reason].present?%>
+  <%if @student.attributes["status_description"].present?%>
+    template_app.leaving_reason = <%= @student.status_description.to_json  %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:student_photo].present?%>
+  <%if @pdf_mode.present? && @pdf_mode == true  && !s3_enabled %>
+    <%if archived_student.present?%>
+      <%if archived_student.photo.present? %>
+        template_app.student_photo = <%= File.join(RAILS_ROOT, archived_student.photo.path).to_json%>;
+      <%end%>
+    <%else%>
+      <%if @student.photo.present? %>
+        template_app.student_photo = <%= File.join(RAILS_ROOT, @student.photo.path).to_json%>;
+      <%end%>
+    <%end%>
+  <%else%>
+   <%if archived_student.present?%>
+      template_app.student_photo = <%= archived_student.photo.url(:original,false).to_json %>;
+    <%else%>
+      template_app.student_photo = <%= @student.photo.url(:original,false).to_json %>;
+    <%end%>
+  <%end%>
+<%end%>
+
+<%if @keys[:fathers_photo].present?%>
+  <%if @student.ef_father.present?%>
+    <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled %>
+      <%if @student.ef_father.photo.present? %>
+        template_app.fathers_photo = <%= File.join(RAILS_ROOT, @student.ef_father.photo.path).to_json %>;
+      <%end%>
+    <%else%>
+      template_app.fathers_photo = <%= @student.ef_father.photo.url(:original,false).to_json %>;
+    <%end%>
+  <%else%>
+    <% #reset photo  %>
+  <%end%>
+<%end%>
+
+<%if @keys[:mothers_photo].present?%>
+  <%if @student.ef_mother.present?%>
+    <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled %>
+      <%if @student.ef_mother.photo.present?%>
+        template_app.mothers_photo = <%= File.join(RAILS_ROOT, @student.ef_mother.photo.path).to_json %>;
+      <%end%>
+    <%else%>
+      template_app.mothers_photo = <%= @student.ef_mother.photo.url(:original,false).to_json %>;
+    <%end%>
+  <%else%>
+    <% #reset photo  %>
+  <%end%>
+<%end%>
+
+<%if @keys[:immediate_contacts_photo].present?%>
+  <%if @student.ef_immediate_contact.present?%>
+    <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled %>
+      <%if @student.ef_immediate_contact.photo.present?%>
+        template_app.immediate_contacts_photo = <%= File.join(RAILS_ROOT, @student.ef_immediate_contact.photo.path).to_json  %>;
+      <%end%>
+    <%else%>
+      template_app.immediate_contacts_photo = <%= @student.ef_immediate_contact.photo.url(:original,false).to_json %>;
+    <%end%>
+  <%else%>
+    <% #reset photo  %>
+  <%end%>
+<%end%>
+
+<%if @keys[:immediate_contact].present?%>
+  <%if @student.ef_immediate_contact.present?%>
+    template_app.immediate_contact = <%= @student.ef_immediate_contact.mobile_phone.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:immediate_contact_name].present?%>
+  <%if @student.ef_immediate_contact.present?%>
+    template_app.immediate_contact_name = <%= @student.ef_immediate_contact.full_name.to_json %>;
+  <%end%>
+<%end%>
+
+<% if @keys[:barcode].present?%>
+  <% # linked_to = -1 indicates linked to admission_no %>
+  <%if @base_template.barcode_property.present? && @base_template.barcode_property.linked_to != "-1" %>
+    <%barcode_property = @base_template.barcode_property %>
+    template_app.barcode.barcode_value = <%= @additional_field_values[barcode_property.linked_to.to_s].present? ? @additional_field_values[barcode_property.linked_to.to_s].to_json : "barcode".to_json  %>;
+    template_app.barcode.compute_barcode();
+  <%else%>
+    template_app.barcode.barcode_value = <%= @student.admission_no.to_json%>;
+    template_app.barcode.compute_barcode();
+  <%end%>
+<%end%>
+
+<% #ADDITIONAL FIELDS FOR STUDENT %>
+<%@additional_field_values.each do |key, value|%>
+  <%if @keys[key.to_sym].present?%>
+    template_app.<%= key.to_s %> = <%= value.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:joining_course].present?%>
+  template_app.joining_course = <%= @student.joining_course.to_json %>;
+<%end%>
+
+<%if @keys[:last_course].present?%>
+  template_app.last_course = <%= @student.batch.course.full_name.to_json %>;
+<%end%>
+
+<%if @keys[:subjects_studied].present?%>
+  template_app.subjects_studied = <%= @student.batch.subjects.collect(&:name).join(", ").to_json %>;
+<%end%>

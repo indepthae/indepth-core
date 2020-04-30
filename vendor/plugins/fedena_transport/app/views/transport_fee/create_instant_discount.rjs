@@ -1,0 +1,3 @@
+page << "if($('modal-box') == null){x = new Element('div',{id: 'modal-box', style: 'display:none;'}); document.body.appendChild(x)}"
+page.replace_html 'modal-box', :partial => 'instant_discount_form'
+page << "Modalbox.show($('modal-box'),  {title: ''});"

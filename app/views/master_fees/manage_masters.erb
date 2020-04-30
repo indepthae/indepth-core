@@ -1,0 +1,173 @@
+<% content_for :head do %>
+    <%= stylesheet_link_tag "#{rtl? ? 'rtl/' : ''}gray_table_design" %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('master_fees_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_master_fees_text') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :master_fees_manage_masters %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="section-header">
+    <span><%= t('manage_masters_text') %></span>
+  </div>
+  <div class="section-description"><%= t('master_particulars_desc') %></div>
+
+  <%= render :partial => @fee_type.present? ? "selective_master_linking" : "general_master_linking" %>
+
+</div>
+
+<script>
+    // add fee category for updation
+    add_category = function (obj, status) {
+        console.log(obj);
+        console.log(j(obj));
+        console.log(j(obj).val());
+        v = j(obj).val();
+        j('input[id^=manage_masters_master_fee_particular_id_]').remove();
+        if (v != '') {
+            if (v == 'hostel' || v == 'transport' || v == 'registration') {
+                inp = j("input#manage_masters_master_fee_particular_id_" + v);
+                if (inp.length == 0) {
+                    inp = j('<input>', {
+                        type: 'hidden', name: "manage_masters[particulars][" + v + "][]",
+                        id: "manage_masters_master_fee_particular_id_" + v
+                    });
+                    j('form.manage_masters_form #masters_data').append(inp);
+                }
+            }
+        } else {
+//            j('input[id^=manage_masters_master_fee_particular_id_]').remove();
+        }
+    }
+    // add on focus set previous value
+    set_linking = function (obj_type, cat_type, cat_id, particular_name, obj) {
+        // obj_type => discount, particular_name is discount name
+        // obj_type => particular, particular_name is particular name
+        console.log("obj_type: " + cat_type);
+        console.log("cat_type: " + cat_type);
+        console.log("cat_id: " + cat_id);
+        console.log("particular_name: " + particular_name);
+//        console.log("last_value: " + last_value);
+        v = j(obj).val();
+        lv = j(obj).attr('lv'); //last_value;
+        j(obj).attr('lv', v);
+        console.log(v);
+        console.log(lv);
+
+        set_ids = j("input[name='manage_masters_" + obj_type + "[" + cat_type + "_" + cat_id + "_" + particular_name + "]']").val().split(',');
+
+        if (lv != '' && lv != undefined) {
+            console.log("last_inp");
+            console.log("input#manage_masters_" + obj_type + "_" + cat_type + "_" + cat_id + "_" + lv);
+
+            last_inp = j("input#manage_masters_master_fee_" + obj_type + "_id_" + cat_type + "_" + cat_id + "_" + lv);
+            data = last_inp.val().split(",");
+            // remove
+            j(last_inp).val(j(data).not(set_ids).get());
+            if (j(last_inp).val() == '') {
+                j(last_inp).remove();
+            }
+        }
+
+        if (v != '') {
+            inp = j("input#manage_masters_master_fee_" + obj_type + "_id_" + cat_type + "_" + cat_id + "_" + v);
+        }
+
+
+        if (inp === undefined || inp.length == 0) {
+            inp = j('<input>', {
+                type: 'hidden', name: "manage_masters[" + obj_type + "][" + cat_type + "][" + cat_id + "][" + v + "]",
+                id: "manage_masters_master_fee_" + obj_type + "_id_" + cat_type + "_" + cat_id + "_" + v
+            });
+            j('form.manage_masters_form #masters_data').append(inp);
+            j(inp).val(set_ids.join(','));
+        } else {
+            assigned_ids = j(inp).val().split(',');
+            // add
+            j(inp).val(assigned_ids.concat(set_ids).uniq().join(','));
+        }
+    }
+
+    enable_disable_submit = function (status) {
+        status ? j('#submit_button').hide() : j('#submit_button').show(); //attr('disabled', status);
+    }
+
+    j(document).delegate('#manage_masters_fee_type', 'change', function () {
+        validate_form();
+        add_category(this, true);
+    })
+
+    validate_fee_type = function () {
+        var v = j('#manage_masters_fee_type').val();
+        return ((v == '') ? true : !(['core', 'instant'].includes(v)));
+    }
+
+    validate_fee_categories = function () {
+        var v = j('#manage_masters_fee_categories').val();
+        if (v === undefined) {
+            return false;
+        } else {
+            return (v == '');
+        }
+    }
+
+    validate_form = function () {
+//        j('form.manage_masters_form')
+        enable_disable_submit(validate_fee_type() && validate_fee_categories());
+    }
+
+    load_fee_categories = function (obj) {
+        v = j(obj).val();
+        if (v == 'core' || v == 'instant') {
+            j.ajax({
+                url: '/master_fees/load_categories',
+                data: {type: v},
+                success: function (response) {
+                    console.log('do something');
+                }
+            });
+        } else {
+
+        }
+        j('#fee_categories').text('');
+    }
+
+    load_fee_particulars = function (obj) {
+        v = j(obj).val();
+        if (v != '') {
+            j.ajax({
+                url: '/master_fees/load_fee_particulars',
+                data: {id: v, type: j('#manage_masters_fee_type').val()},
+                success: function (response) {
+                    console.log('do something');
+                }
+            });
+        }
+    }
+    j(document).delegate('#manage_masters_form', 'submit', function (e) {
+        j.ajax({
+            url: '/master_fees/manage_masters',
+            data: j(this).serialize(),
+            success: function (response) {
+                console.log('do something');
+            }
+        });
+    });
+
+    j(document).ready(function () {
+        validate_form();
+    })
+</script>

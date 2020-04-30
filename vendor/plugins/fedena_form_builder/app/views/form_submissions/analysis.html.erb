@@ -1,0 +1,32 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form_responses') %></div>
+
+</div>
+<div id="page-yield">
+  <%= javascript_include_tag "form_submissions/jquery.dataTables" %>
+  <%= stylesheet_link_tag 'simplePagination' %>
+  <div class="bread_crumb">
+    <% breadcrumb :form_submissions_analysis, @form %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%= render :partial => "analysis_report" %>
+</div>
+<script>
+  j(document).delegate('.toggle','click',function(){
+    id = j(this).attr('attr_href');
+    if(j(this).attr('data-toggle') === undefined){
+      j(this).attr('data-toggle',0)
+    }
+    if(j(this).attr('data-toggle') % 2 == 0){
+      j('#'+id).css('display','block');
+    }else{
+      j('#'+id).css('display','');
+    }
+    j(this).attr('data-toggle',(parseInt(j(this).attr('data-toggle'))+1)%2)
+  });  
+  var submission_check;
+</script>

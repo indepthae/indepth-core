@@ -1,0 +1,6 @@
+if @errors.nil?
+	page.replace_html 'form-errors', :text => ''
+  page.replace_html 'other_details',:partial=>'archived_student_list', :object => @students  
+else
+  page.replace_html 'other_details',:text=>"<p class='flash-msg'> #{t('select_a_batch')}</p>"
+end

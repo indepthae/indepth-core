@@ -1,0 +1,20 @@
+<% if type == 'normal' %>
+  <div class="select_message_parent">
+      <%=radio_button_tag  "message_thread[send_to]", "student", :checked => "checked" %>
+      <label class="" for="message_thread_send_to_student"><%="#{t('message_only_student')}"%></label>
+      <%= radio_button_tag  "message_thread[send_to]", "guardian" %>
+      <label class="" for="message_thread_send_to_guardian"><%="#{t('message_only_guardian')}"%></label>
+      <%= radio_button_tag  "message_thread[send_to]", "both" %>
+      <label class="" for="message_thread_send_to_both"><%="#{t('message_both')}"%></label>
+  </div>
+<% elsif type == 'only_parent' %>
+  <div class="select_message_parent">
+      <%#= hidden_field_tag "message_thread[send_to]","guardian" %>
+      <%=radio_button_tag  "message_thread[send_to]", "student" ,false,:disabled => true%>
+      <label class="" for="message_thread_send_to_student"><%="#{t('message_only_student')}"%></label>
+      <%= radio_button_tag  "message_thread[send_to]", "guardian",:checked => "checked" %>
+      <label class="" for="message_thread_send_to_guardian"><%="#{t('message_only_guardian')}"%></label>
+      <%= radio_button_tag  "message_thread[send_to]", "both",false,:disabled => true %>
+      <label class="" for="message_thread_send_to_both"><%="#{t('message_both')}"%></label>
+  </div>
+<%end%>

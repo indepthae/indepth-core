@@ -1,0 +1,64 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+    <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%=  read_live_entity(@statistics.entity.name.to_s) %></h1>
+</fieldset>
+<ul class="bread_crumb">
+  <li><%= link_to "Statistics",school_statistics_live_path %></li> » <li><%=  read_live_entity(@statistics.entity.name.to_s) %></li>
+</ul>
+<div class="container-height">
+  <div class="content-div container-width ">
+    <div class='content-list school-stats-content-list'>
+      <% unless @statistics.empty? %>
+        <% @statistics.each do |row| %>
+          <div class="bg-light float-left big-box grey-border shadow margin-right-30 container-box-live">
+            <% if @statistics.entity.type.to_s=="attendance_live" %>
+              <% @statistics.entity.fields.keys.each do |field| %>
+                <% if field.to_s=="school_name" %>
+                  <h4 class="dashboard-heading margin-top-20"><%= "#{row.read(field)}" %></h4>
+                <% else %>
+                  <div class="label-box">
+                    <div class="big-text margin-bottom-20 label-big-text stat-attendance"><%= "#{row.read(field)}" %></div>
+                  </div>
+                <% end %>
+              <% end %>
+            <% else %>
+              <% @statistics.entity.fields.keys.each do |field| %>
+                <% if field.to_s=="school_name" %>
+                  <h4 class="dashboard-heading margin-top-20"><%= "#{row.read(field)}" %></h4>
+                <% else %>
+                  <div class="label-box">
+                    <h5 class="label-heading"><%=  "#{read_live_entity(field.to_s)}" %></h5>
+                    <div class="big-text margin-bottom-20 label-big-text"><%= "#{row.read(field)}" %></div>
+                  </div>
+                <% end %>
+
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="extender"></div>
+        <div class="stats-paginate">
+          <%= will_paginate @statistics %>
+        </div>
+      <% else %>
+        <div class="alert alert-warning warn-notice pagination-centered" id="bookmark_alert"> <span>Sorry there is no record found.</span></div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  j(document).ready(function(){
+    set_link_active();
+  })
+  function set_link_active(){
+    j('.ul-nav a').each(function(i,el){
+      arr=el.pathname.split("/")
+      if(el.pathname == "/schools/statistics/live_statistics")
+        el.classList.add("active")
+    });
+  }
+</script>

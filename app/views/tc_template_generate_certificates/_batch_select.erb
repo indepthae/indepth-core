@@ -1,0 +1,7 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<%= select :generated_student_tc,:batch_id, @batches.map{|b| [b.name,b.id]},:prompt=>"#{t('select_a_batch')}" %>

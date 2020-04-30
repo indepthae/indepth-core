@@ -1,0 +1,340 @@
+#fields{
+    float: left;
+}
+.text-area-bg textarea{
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    width: 250px;
+    height: 60px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    padding: 5px;
+    resize: none;
+}
+.formula_condition_section, .default_value_section{
+    border: 1px solid #bfbfbf;
+    width: 450px;
+    margin-bottom: 20px;
+    float: left;
+    height: auto;
+    padding-bottom: 20px;
+}
+.formula_condition_section .label-field-pair, .default_value_section .label-field-pair{
+    width: 450px;
+    height: auto;
+    float: left;
+    margin-top: 20px;
+}
+.formula_condition_section .label-field-pair label, .default_value_section .label-field-pair label{
+    padding: 20px 0 0 50px;
+    width: 50px;
+}
+.header{
+    font-size: 13px;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-bottom:  1px solid #bfbfbf;
+    float: left;
+    width: 420px;
+}
+.formula_condition_section textarea, .default_value_section textarea
+{
+    resize: none;
+    width: 240px;
+}
+.formula_condition_section select, .default_value_section select
+{
+    margin-top: 0px;
+}
+#then-sec
+{
+    border-top: 1px solid #E8E8E8;
+}
+.formula_help{
+    float:right;
+    width: 378px;
+    height: 300px;
+    border: 1px solid grey;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.tabs {
+    width:100%;
+    display:inline-block;
+}
+
+
+.tab-links li {
+    float:left;
+    list-style:none;
+}
+
+.tab-links a {
+    padding:9px 15px;
+    display:inline-block;
+    font-size:13px;
+    color: #4c4c4c;
+    text-decoration:none;
+    font-weight: bold;
+
+}
+#page-yield .formula_help .tabs .tab-links a:hover { color: #4c4c4c !important; }
+.tab-links .active a{
+    background: #bfbfbf;
+}
+.tab-links a:hover {
+    color: #4c4c4c;
+}
+
+
+li.active a, li.active a:hover {
+    color:#f0f0f0;
+    text-decoration:none;
+}
+
+.tab-content {
+    border-radius:3px;
+    background:#fff;
+    width: 100%;
+    font-size: 13px;
+}
+
+.tab {
+    display:none;
+}
+
+.tab.active {
+    display:block;
+}
+#link_tab1{
+    width: 227px;
+    float: left;
+    text-align: center;
+    border-right:  1px solid grey;
+}
+#link_tab2
+{
+    float: left;
+    width: 150px;
+    text-align: center;
+}
+.tab-content .name{
+    width: 70%;
+    float: left;
+}
+
+.tab-content .row{
+    padding: 10px;
+    border-bottom : 1px solid #f0f0f0;
+    float: left;
+    width: 100%;
+}
+
+.tab-content .section_header{
+    padding: 10px;
+    border-bottom : 1px solid #bfbfbf;
+    font-weight:bold;
+
+    float: left;
+    width: 100%;
+}
+
+.tab-content #tab2{
+    height: 246px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left:1px solid grey;
+}
+#cat-val-sec
+{
+    float: left;
+}
+.tab-active
+{
+    background-color: #E2E2E2;
+    color: #666;
+    border-bottom: 1px solid grey;
+
+}
+.tab-active a
+{
+    color: #818181;
+}
+#tab1
+{
+    width: inherit;
+    height: 246px;
+    overflow-y: auto;
+}
+#tab1 ul
+{
+    padding-left: 30px;
+    margin-right: 20px;
+}
+#tab1 ul li{
+    margin-bottom: 5px;
+    line-height: 20px;
+}
+.code
+{
+    width: 30%;
+    float:left;
+}
+#form_cond
+{
+    display: none;
+}
+div#add-icon {
+    background-image: url(/images/iconsprite-1.png);
+    background-position: -105px 55px;
+    float: left;
+    height: 10px;
+    width: 10px;
+    margin: 2px 4px 0 0;
+}
+.add_button_img {
+    text-decoration: none;
+    font-size: 13px;
+    color: #00830C;
+    float: left;
+    margin-bottom: 20px;
+}
+div#add-text, div#add-text:hover {
+    float: left;
+    color: #00830C !important;
+}
+.header div
+{
+    float:left;
+}
+a#close-link
+{
+    background-image: url("/images/iconsprite-1.png");
+    background-position: -31px 1px;
+    float: right;
+    height: 15px;
+    width: 16px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+    text-indent: -99999px;
+}
+a#close-link:hover {
+    background-position: -31px -15px;
+}
+.formula_section .text-area-bg
+{
+    float: left;
+    width: 325px;
+}
+.formula_section .text-input-bg
+{
+    height: auto;
+}
+
+
+
+div#MyText {
+    height: 37px;
+    padding: 9px;
+    margin: 0;
+    border: 1px solid #dcdcdc;
+    overflow: hidden;
+    resize: none;
+    font-family: Arial;
+    font-size: 13px;
+    line-height: 17px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-height: 25px;
+    width: 100%;
+}
+.tick_symbol{
+    background-position: 0 -360px !important;
+}
+.cross_button{
+    float: left !important;
+    margin: 2px 2px 0px 0px;
+}
+.validate_result .success-msg
+{
+    margin-top: 5px;
+    color: green !important;
+    width: 91% !important;
+}
+#formula-fields .fieldWithErrors{
+    float: left;
+    width: 84%;
+}
+#loader{
+    float: left;
+    margin-top: 10px;
+}
+div.div_link {
+    float: right;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #555;
+}
+div.div_link:hover{
+    text-decoration: underline;
+    color: black;
+}
+.formula_fields
+{
+    height:auto;
+    float: left;
+}
+.formula_fields textarea
+{
+    float: left;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+.formula_fields #loader{
+    margin: 10px 0 0 10px;
+}
+.validate_result .error-msg, .formula_fields .error-msg
+{
+    width: 240px;
+    margin-top: 0px;
+    float: right;
+    margin-right: 14px;
+}
+.validate_result{
+    float: left;
+    margin-left: 10px;
+    margin-top: 5px;
+    width: 260px;
+}
+.validate {
+    width: 50px;
+    word-break: break-all;
+}
+.formula_and_conditions_fields{
+    float: left;
+    padding-right: 148px;
+    width: 452px;
+}
+#formula-fields{ float:  left; position: relative; width: 100%;}
+#default_formula{ min-height: 320px;}
+
+.add_button_img{
+    background: none;
+    height: auto;
+    width: auto;
+}
+.default_condition_desc{
+    font-size: 13px;
+    color: grey;
+    width: 100%;
+    font-weight: normal;
+    float: left;
+    margin-top: 5px;
+}
+.operations_field .error-msg{ width: 193px;margin-right: 0px;}
+.operations_field .wrapper{margin-top:0px;}

@@ -1,0 +1,26 @@
+<% remote_form_for @tax_slab, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |slab| %>
+  <%= session_fingerprint_field %> 
+  <div id="tax_slab_form">
+      <div id ="description"><%= t('tax_slab_create_description') %></div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('name') %></label>
+          <div class="text-input-bg"><%= slab.text_field :name %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('rate') %></label>
+          <div class="text-input-bg"><%= slab.text_field :rate, :value => precision_label(@tax_slab.rate), :class => 'precision_text' %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="description"><%= t('description') %></label>
+          <div class="text-input-bg"><%= slab.text_area :description %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@tax_slab.new_record? ? t('create_tax_slab') : t('update_tax_slab'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

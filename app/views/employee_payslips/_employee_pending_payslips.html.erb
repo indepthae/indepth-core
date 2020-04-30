@@ -1,0 +1,40 @@
+<table>
+  <tr class="tr-head">
+    <td><%= t('pay_period') %></td>
+    <td><%= t('salary') %></td>
+    <td><%= t('status') %></td>
+    <td></td>
+  </tr>
+  <% if @payslips.present? %>
+    <% @payslips.each do |year, payslips| %>
+      <tr class="tr-head bg_light_grey">
+        <td><%= "#{year} - #{year.next}" %></td>
+        <td colspan="3"><%= "#{t('total_cost')}: #{precision_label(payslips.map(&:net_pay).sum(&:to_f))}" %></td>
+      </tr>
+      <% payslips.each do |payslip| %>
+        <tr>
+          <% date_range = payslip.date_range %>
+          <td class="range"><%= date_range %></td>
+          <td class="amount"><%= precision_label(payslip.net_pay) %></td>
+          <td class="status"><%= payslip.payslip_status %></td>
+          <td class="actions">
+            <% if payslip.is_rejected %>
+              <%= link_to t('edit_payslip'), {:action => "edit_payslip", :id => payslip.id, :from => params[:from]} %>
+              <%= link_to t('delete_payslip'), {:action => 'revert_employee_payslip', :id => payslip.id, :from => params[:from]}, :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => @employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+            <% else %>
+              <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => payslip.id, :from => params[:from]} %>
+              <%= link_to t('delete_payslip'), {:action => 'revert_employee_payslip', :id => payslip.id, :from => params[:from]}, :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => @employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+            <% end %>
+            <%= link_to t('pdf_report'), {:action => 'view_payslip_pdf', :id => payslip.id}, :target => "_blank" %>
+          </td>
+        </tr>
+      <% end  %>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+<% if @payslips_list.present? %>
+  <%= pagination_status(@payslips_list) %>
+  <%= will_paginate @payslips_list,:renderer => 'RemoteLinkRenderer', :params => {:employee_id => @employee.id, :remove => params[:remove]} %>
+<% end %>

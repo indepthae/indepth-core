@@ -1,0 +1,39 @@
+<div class="fields">
+    <%= s.check_box  :name , :checked => "checked", :disabled => true %>
+    <span class="custom_columns" ><%= t('name') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :admission_no , :checked => "checked", :disabled => true%>
+    <span class="custom_columns" ><%= t('admission_no') %></span>
+</div>
+<% if roll_number_enabled?  %>
+<div class="fields">
+      <%= s.check_box  :roll_number ,:checked =>(@selected_columns.present? ? @selected_columns.include?("roll_number") : false)%>
+      <span class="custom_columns" ><%= t('roll_no') %></span>
+  </div>
+
+<% end %>
+<div class="fields">
+    <%= s.check_box  :batch_name, :checked => (@selected_columns.present? ? @selected_columns.include?("batch_name") : false)%>
+    <span class="custom_columns"><%= t('batch') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :gender_as_text, :checked => (@selected_columns.present? ? @selected_columns.include?("gender_as_text") : false)%>
+    <span class="custom_columns"><%= t('gender') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :father_name, :checked => (@selected_columns.present? ? @selected_columns.include?("father_name") : false)%>
+    <span class="custom_columns"><%= t('father_name') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :father_no, :checked => (@selected_columns.present? ? @selected_columns.include?("father_no") : false)%>
+    <span class="custom_columns"><%= t('father_no') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :mother_name, :checked => (@selected_columns.present? ? @selected_columns.include?("mother_name") : false)%>
+    <span class="custom_columns"><%= t('mother_name') %></span>
+</div>
+<div class="fields">
+    <%= s.check_box  :mother_no, :checked => (@selected_columns.present? ? @selected_columns.include?("mother_no") : false)%>
+    <span class="custom_columns"><%= t('mother_no') %></span>
+</div>

@@ -1,0 +1,196 @@
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<script type="text/javascript">
+    var part_count = 0;
+    j(document).delegate(".query","input", function () {
+        var j = jQuery.noConflict();
+        var a
+        action='/transport_fee/'+(j(this).attr('action')+'')
+        if ((j(this).attr('action')+'')=='list_students_for_collection'){
+            parameters={batch_id:j('#fees_submission_batch_id').val(),date_id:j('#fees_submission_dates_id').val()}
+        }
+        else
+        {
+            parameters={}
+        }
+
+        jQuery(function () {
+            a = j('.query').autocompleteAjax({serviceUrl: action, params: parameters,
+                onSelect: function (value, data) {
+                    data=data.replace(/'/g, '"')
+                    data=jQuery.parseJSON(data)
+                    if (data.receiver==false)
+                    {
+                        j('.autocomplete').hide();
+                        j('.query').val("")
+                    }
+                    else {
+                        duplicate_check(data, value)
+                    }
+
+                } });
+
+        });
+
+    })
+
+
+    function duplicate_check(data,value) {
+        if (j.inArray(data.id, receiver_ids(data.receiver)) > -1) {
+            alert("Already selected")
+            j('.query').val("")
+
+        }
+        else {
+            update_students(value, data);
+        }
+    }
+
+    function receiver_ids(receipient) {
+
+        var arr = []
+        j('.' + receipient).each(function (e) {
+            arr.push(parseInt((this.value)))
+        })
+        return arr
+    }
+
+    function update_students(value, data) {
+
+        var part_type = "transport_fees_attributes";
+        var ul = $("list-receivers");
+
+        insert_element(ul, part_type, data, value);
+        j(".query").val("")
+        j('.autocomplete-w1').hide()
+
+    }
+
+
+    function insert_element(ul, part_type, data, value) {
+        var ls = new Element('li', {'class': 'listodd'});
+        var element = new Element('div');
+        element = make_receiver(part_type, data, value);
+        ls.appendChild(element);
+        ul.appendChild(ls);
+    }
+
+
+    function make_receiver(part_type, data, name) {
+
+
+        part_count++;
+        var receiver_wi = new Element('div');
+        var parent = new Element('div', {'class': 'list_parent'})
+        var receiver_name = new Element('div', {'class': 'list_c'}).update(name);
+        var receiver_id = new Element('input', {'class': data.receiver, 'type': 'hidden', 'name': 'receiver['+data.receiver+'][' + part_count + '][receiver_id]', 'value': data.id});
+        var receiver_type = new Element('input', {'type': 'hidden', 'name': 'receiver['+data.receiver+'][' + part_count + '][receiver_type]', 'value': data.receiver});
+        var bus_fare = new Element('input', {'type': 'hidden', 'name': 'receiver['+data.receiver+'][' + part_count + '][bus_fare]', 'value': data.bus_fare});
+        var user_event = new Element('input', {'type': 'hidden', 'name': 'event['+data.receiver+'][' + part_count + '][user_id]', 'value': data.user_id});
+        var delete_btn = new Element('a', {'onClick': 'remove_entry(this);', 'class': 'list_btn'}).update(' ');
+        var groupable_id = new Element('input', {'type': 'hidden', 'name': 'receiver['+data.receiver+'][' + part_count + '][groupable_id]', 'value': data.groupable_id});
+        var groupable_type = new Element('input', {'type': 'hidden', 'name': 'receiver['+data.receiver+'][' + part_count + '][groupable_type]', 'value': data.groupable_type});
+        delete_btn.style.cursor = 'pointer'
+        receiver_wi.update(receiver_name);
+        receiver_wi.appendChild(receiver_id,receiver_type,bus_fare,delete_btn);
+        receiver_wi.appendChild(receiver_type);
+        receiver_wi.appendChild(bus_fare);
+        receiver_wi.appendChild(groupable_id);
+        receiver_wi.appendChild(groupable_type);
+        receiver_wi.appendChild(user_event);
+        receiver_wi.appendChild(delete_btn);
+        parent.update(receiver_wi)
+        var p_div = new Element('div');
+        p_div.appendChild(parent);
+        return p_div
+    }
+    function remove_entry(e) {
+
+        j(e).parents('.list_parent').remove()
+    }
+
+
+
+
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('transport_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('user_wise_fee_collections')}" %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="page-extender"></div>
+  <div class="select-type">
+  <div class="collection-select">
+    <div class="collection_operation_select">
+      <label class="label_for_student" for="student_gender">
+        <%= "#{t('create_text')} #{t('new_text')} #{t('fee_collection')}"%>
+      </label>
+    </div>
+  </div>
+  </div>
+
+  <div id="collection-details">
+  <%=render :partial=>'receiver_wise_collection_new' %>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+
+    function collection_type_change(){
+        if (j('#collection_type').prop("checked")==true)
+        {
+            show_new_collection_details()
+        }
+        else{
+
+            show_choose_collection_details()
+
+        }
+    }
+
+    j('.radio_btn_select').change(function(){
+        j(this).next().show();
+        collection_type_change()
+    })
+        function show_choose_collection_details(){
+
+            j.ajax({url: '<%= url_for :action => "choose_collection_and_assign"%>',
+                data: {},
+                dataType: 'script',
+                success: function () {
+                    j('.loader_radio').hide()
+                }
+            })
+
+        }
+
+        function show_new_collection_details(){
+
+
+            j.ajax({url: '<%= url_for :action => "receiver_wise_collection_new"%>',
+                data: {},
+                dataType: 'script',
+                success: function () {
+                    j('.loader_radio').hide()
+                }
+            })
+        }
+
+
+
+</script>

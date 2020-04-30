@@ -1,0 +1,95 @@
+<% assessment_groups = term.assessment_groups.without_final %>
+<div class="term_box" id="term_<%= term.id %>">
+    <%= render :partial => 'term_box', :locals => {:term => term, :assessment_groups => assessment_groups} %>
+</div>
+<script type="text/javascript">
+    function showDropdown(el){
+      hideOptions();
+      drop_id = j(el).attr('drop_id')
+      
+      document.getElementById('optionDropdown_'+drop_id).classList.toggle("show");
+    }
+    
+    show_confirm = function(el){
+    if(el.value == 'delete')
+    j(el).prop('selectedIndex',0);
+    make_popup_box(el, 'confirm', '<%= t('deleting_assessment_group_notice') %>'  ,{'ok' : '<%=t('delete_exam')%>', 'cancel' : '<%=t('cancel')%>', 'title' : '<%=t('delete_exam')%>', 'return_status' : true, 'popup_class' : 'remove_lt'}); return load_delete_method(el);
+    }
+    
+    open_form = function(el){
+      j.ajax({
+        type: 'POST',
+        url: '/assessment_plans/edit_assessment_term',
+        data: {
+          assessment_term_id: j(el).attr('assessment_term_id')
+        },
+        success: function (resp) {
+          console.log(resp);
+        }
+      });
+    }
+
+    load_delete_method = function (el) {
+    j('.submit-button#yes').on('click', function () {
+    j.ajax({
+    type: 'POST',
+    url: '/assessment_plans/delete_assessment_group',
+    data: {
+    assessment_group_id: j(el).attr('assessment_group_id'),
+    assessment_plan_id: <%= @plan.id %>
+    },
+    success: function (resp) {
+    console.log(resp);
+    }
+    });
+    })
+    }
+
+    show_warning_popup = function(ag_id){
+    remove_popup_box();
+    build_modal_box({title: '<%=t('delete_exam')%>', popup_class: 'deletion_warning'})
+    j('.deletion_warning #popup_content').html("<%=t('cant_delete_assessment_group')%>");
+    footer = j('.deletion_warning #popup_footer');
+    ok = j('<div></div>', {
+    'id' : 'yes',
+    'class' : 'submit-button',
+    'text' : '<%=t('ok')%>',
+    'onclick' : 'remove_popup_box()'
+    });
+
+    footer.append(ok);
+    }
+
+    term_actions = function(el){
+    switch(el.value) {
+    case 'add_final_term':
+    term_id = j(el).attr('term_id')
+
+    break;
+    }
+    }
+
+    function showDrop(el){
+      hideOptions();
+      drop_id = j(el).attr('drop_id')
+      console.log(drop_id)
+      document.getElementById('actionDropdown_'+drop_id).classList.toggle("show");
+    }
+        
+    function hideOptions(){
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+          if (dropdowns[i].classList.contains('show')) {
+                  dropdowns[i].classList.remove('show');
+          }
+      }
+    }
+    
+    window.onclick = function(event) {  
+      if (!event.target.matches('.dropbtn')) {
+        hideOptions();   
+      }
+    }
+
+</script>

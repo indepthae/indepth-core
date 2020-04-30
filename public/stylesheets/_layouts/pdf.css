@@ -1,0 +1,145 @@
+body{
+    width: 800px;
+    margin: 0;
+}
+table{
+    border-collapse: collapse;
+}
+tr{
+    page-break-inside: avoid;
+}
+td, th{
+    border: 1px solid #ADACAB;
+}
+.no-break{
+    page-break-inside: avoid !important;
+    display: block;
+}
+.break-before{
+    display: block;
+    page-break-before: auto;
+}
+#pdf-header{
+    width:800px;
+    padding-top: 30px;
+    margin: 0;
+    overflow: hidden;
+    margin-top: -2px;
+    height: 150px;
+}
+
+.logo{
+    height: 120px;
+    width:120px;
+    float: left;
+}
+.logo img{
+    width: 100%;
+    margin-top: 10px;
+}
+
+.header-content{
+    color: #97080e;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 20px;
+    float: left;
+    width: 635px;
+    height: 110px;
+    /*    text-align: center;*/
+    word-wrap:break-word;
+    margin-left:30px;
+}
+
+.header-content p{
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-right: 10px;
+}
+.header-content p.institution_address{
+    font-weight: normal !important;
+    color: #000 !important;
+    margin-top: 15px !important;
+    line-height: 25px;
+}
+#pdf-footer{
+    text-align: right;
+    width: 700px;
+    padding-right: 100px;
+    padding: 50px;
+    margin: 0 auto;
+    color: #999999;
+    font-size: 18px;
+    margin-right: 0;
+}
+
+#page-yield {
+    margin-top: 30px !important;
+}
+
+.page {
+    page-break-after: auto;
+    page-break-inside: avoid;
+    overflow: hidden;
+
+}
+.section{
+    margin-top:20px;
+}
+.row-break{
+    /*       display: table-row; */
+    /*       clear:both; */
+    page-break-before:always;
+}
+.top-padding-20{
+    padding-top:20px;
+    background-color:#ccf;
+}
+
+#main_info{
+    text-align: left !important;
+}
+#remarked_by_section{
+    float:left;
+    width:30%;
+    margin-right: 25px;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+#remark_body_section{
+    float:left;
+    width:90%;;
+    margin-right: 25px;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+#submitted_by_section{
+    float:right;
+    font-size: 13px;
+    width: 40%;
+    text-align: right;
+    color:#666666;
+    word-break: break-word;
+}
+#remarks_bold_label{
+    font-weight: bold;
+    float:left;
+    margin-top:15px;
+    margin-bottom: 15px;
+    width:100%;
+}
+table.remarks_table{
+    width:100%;
+    border-collapse: collapse;
+}
+table.remarks_table tr{
+    border-top:1px solid #ADACAB;
+}
+
+table.remarks_table tr td{
+    border:none;
+    padding-bottom:15px;
+    padding-top:15px;
+}

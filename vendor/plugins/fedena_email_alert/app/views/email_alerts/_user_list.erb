@@ -1,0 +1,47 @@
+<% add = "<span>#{t('add')}</span>" %>
+<% if ['student', 'guardian'].include? @recipient_type %>
+    <div class="label-field-pair">
+      <label><%= t('select_recipient') %><span class="necessary-field">*</span></label>
+      <div class ="scrollable" >
+        <div class="scroll-inside">
+            <div class="hover">
+              <% if @students.present? %>
+                  <%= link_to "#{t('select_all')}  <span>#{t('add')}</span>", '#', :onClick => "add_all_recipient()", :class=> 'all' %>
+              <% else %>
+                  <div class="empty-list-message"><%= t('no_students_for_this_batch') %></div>
+              <% end %>
+            </div>
+          <% @students.each do |t| %>
+              <div class="hover">
+                <%= link_to shorten_string(t.full_name,15) + add  , '#',
+                     :onClick => "add_recipient(this)", :class=>'individual',
+                     'data-recipient-id' => t.id, 'data-recipient-name' => shorten_string(t.full_name, 15)%>
+
+              </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+<% else %>
+    <div class="label-field-pair">
+      <label><%= t('select_recipient') %><span class="necessary-field">*</span></label>
+      <div class ="scrollable" >
+        <div class="scroll-inside">
+          <div class="hover">
+            <% if @employees.present? %>
+                <%= link_to "#{t('select_all')}  <span>#{t('add')}</span>", '#', :onClick => "add_all_recipient()", :class=> 'all' %>
+            <% else %>
+                <div class="empty-list-message"><%= t('no_employees_in_this_dept') %></div>
+            <% end %>
+          </div>
+          <% @employees.each do |t| %>
+              <div class="hover"><%= link_to shorten_string(t.full_name,15) + add  , '#',
+                                             :onClick => "add_recipient(this)", :class=>'individual',
+                                             'data-recipient-id' => t.id, 'data-recipient-name' => shorten_string(t.full_name, 15)%>
+
+              </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+<% end %>

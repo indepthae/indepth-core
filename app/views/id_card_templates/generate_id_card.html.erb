@@ -1,0 +1,161 @@
+<link href="https://fonts.googleapis.com/css?family=Courgette|Lato|Lora|Playball" rel="stylesheet">
+<link href="/stylesheets/pdf_normalize.css" rel="stylesheet">
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('id_cards') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('generate_individual_id_card') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+    
+  <div class="error_messages" id="error_messages">
+  </div>
+  <div id="box">
+    <div class="head">
+      <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+      <script src="/javascripts/JsBarcode.all.min.js"></script>
+    </div>
+    <div class="academic_year_container">
+      <div class="academic_year_switcher">
+        <label class="normal"><%= t('academic_year') %></label>
+        <%= select '', :academic_year , @academic_years.map{|a| [a.name,a.id]}, {:include_blank=>t('all')}, :class=>"academic_year_selector", :id=>"academic_year" %>
+      </div>
+    </div>
+    <div class="initial_values">
+      <div class="id_card_template">
+        <div class="field_section">
+          <div class="field_head">
+            <%= t('id_card_type')%>
+          </div>
+          <div class="field">
+            <%= select "", "id_card_template",
+            options_for_select(@id_card_templates.map{|c| [c.name,c.id]}) ,{:include_blank=>t('id_card_type_placeholder')}, :class=>"input_box", :id=>"template_selector" %>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="select_key_values">
+      <div class="template_keys" id="template_key_form">
+      </div>
+      <div class="id_cards_keys" id="id_card_key_form">
+      </div>
+    </div>
+
+    <div id="id_card_preview" class="id_card_preview exclude_font">
+      <div class="layouts" id="layouts">
+      </div>
+    </div>
+
+
+    <div class="line">
+    </div>
+
+
+    <div class="submit_controls">
+      <button id="generate_id_card" class="solid_button"><%=t('generate_id_card')%></button>
+      <%=link_to t('cancel'), id_card_templates_path ,:class=>"solid_button cancel"  %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+
+
+  </div>
+</div>
+<script>
+  var template_app;
+
+  j("#academic_year").change(function(){
+    //reset everything
+    load_template();
+  });
+
+  function load_template(){
+    j.ajax({
+      url: "id_card_template_for_generation",
+      type: 'POST',
+      data:  {id_card_template: j('#template_selector').val()},
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  }
+
+  j("#template_selector").change(function(){
+    load_template();
+  });
+
+  function get_user_id(){
+    var user_id = j("#user_selector").find(':selected').val();
+    if (user_id != undefined && user_id != ""){
+      return user_id;
+    }
+    return false;
+  }
+
+  function check_if_number(){
+    var flag = !isNaN(j("#user_selector").val()) ; 
+    if (flag == true){
+      return flag;
+    }
+    return false;
+  }
+  
+  function get_user_type(){
+    var user_id = j("#user_selector").find(':selected').data("type");
+    if (user_id != undefined && user_id != ""){
+      return user_id;
+    }
+    return false;
+  }
+
+  function get_id_card_id(){
+    if (j("#template_selector").val()!= undefined && j("#template_selector").val()!=""){
+      return j("#template_selector").val();
+    }
+    return false;
+  }
+
+  j("#generate_id_card,#generate_id_card_full").click(function(){
+    var user_id = get_user_id();
+    var id_card_id = get_id_card_id();
+    var user_type = get_user_type();
+    var is_a_number = check_if_number();
+    if(user_id != false && id_card_id !=false && is_a_number){
+      Element.show('loader1');
+      j.ajax({
+        url: "save_generated_id_card",
+        type: 'POST',
+        data: {
+          id_card_html_front: j("#front_preview_container").html(),
+          id_card_html_back: j("#back_preview_container").html(),
+          user_id: user_id,
+          id_card_template_id: id_card_id,
+          user_type: user_type,
+          single_page_enabled: j(this).val()
+        },
+        success: function(data, textStatus, jqXHR)
+        {
+          Element.hide('loader1');
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+        }
+      });
+    }
+  });
+
+
+
+</script>

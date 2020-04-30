@@ -1,0 +1,24 @@
+<%total_paid_fine=0%>
+<% @hostel_fee.finance_transactions_with_fine.each do |ft| %>
+    <tr class="tr-blank"></tr>
+    <tr class="tr-<%= cycle("odd", "even") %>" cellpadding="1" cellspacing="1">
+      <td class="col-2"><%= "#{t('fine')}" %></td>
+      <td class="col-6" id="paid-fine">
+        <%paid_fine= [ft.fine_amount.to_f, ft.amount.to_f].min %>
+        <%= precision_label [ft.fine_amount.to_f, ft.amount.to_f].min %>
+      </td>
+      <td style="width: 1%;background: #c3d9ff"></td>
+    </tr>
+    <%total_paid_fine +=paid_fine%>
+<% end %>
+
+<tr class="tr-blank"></tr>
+<tr class="tr-<%= cycle("odd", "even") %>" cellpadding="1" cellspacing="1">
+  <td class="col-2"><%= "#{t('total_fees')}" %></td>
+  <td class="col-6" id="total-fees">
+    <%= precision_label total_fees+total_paid_fine %>
+    <% # = precision_label @hostel_fee.rent+total_paid_fine %>
+  </td>
+  <td style="width: 1%;background: #c3d9ff"></td>
+</tr>
+

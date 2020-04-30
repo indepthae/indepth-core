@@ -1,0 +1,48 @@
+<div class="fields" >
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <% if f.object._destroy == true %>
+      <tr class="indent_item_row" style="display:none">
+      <% else %>
+      <tr class="indent_item_row">
+      <% end %>
+      <td class="text-input-bg1" id="person_store_item_id" >
+         <div class="search_textbox">
+             <%= text_field_tag("query_#{rand 100}",params['query'] ,:autocomplete => 'off',:placeholder => "#{t('select_item')}",:class=>'selector',:value=>f.object.store_item.nil? ? f.object.store_item : f.object.store_item.item_name)  %>
+             <%= f.hidden_field :store_item_id  %>
+         </div>
+      </td>
+      
+      <td class="text-input"><%= f.text_field :required,:onchange => "update_pending_value(this)"  %></td>
+      <td class="text-input"><%= f.text_field :pending, :value=>f.object.pending.nil? ? "0" : "#{f.object.pending}",:readonly => true %></td>
+      <td class="text-input">  <%= f.text_field :quantity, :class => "nested_qty",:readonly => true %></td>
+      <td class="text-input"><%= f.text_field :issued,:value => f.object.issued.nil? ? "0" : "#{f.object.issued}",:readonly => true %></td>
+      <td class="text-input-bg1"><%= f.select :issued_type, %w{Temporary Permanent} %></td>
+      <td class="text-input" ><%= f.text_field :price ,:value=> (defined? f.object.price) ? precision_label(f.object.price.to_f): '', :class => "nested_price",:readonly => true %></td>
+      <td class="text-input"><%= f.text_field :batch_no, :class => "nested_batch_no",:readonly => true %></td>
+      <td id="remove"> <%= link_to_remove_fields image_tag("/images/buttons/Delete.png",:border => 0) , f %>
+      </td>
+    </tr>
+  </table>
+</div>
+<script type="text/javascript">
+  
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

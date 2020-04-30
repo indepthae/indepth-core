@@ -1,0 +1,217 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_regi_label') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('course_settings') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('customize_form'), customize_form_registration_course_path(@registration_course) %></li>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('print_form'), print_application_form_applicants_admin_path(@registration_course), :target=>"_blank" %></li>
+            <% if @registration_course.can_be_deleted? %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to t('registration_courses.delete'), @registration_course, :method=>:delete, :confirm=>"#{t('course_delete_confirm')}" %></li>
+            <% end %>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :registration_courses_registration_settings ,@registration_course%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="flash-box">
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+    </div>
+    <% form_for @registration_course,:url=>registration_settings_registration_course_path(@registration_course), :method=>:put do|f| %>
+
+      <%= error_messages_for 'registration_course', :header_message => nil %>
+
+      <div class="page-heading">
+          <%= t('settings') %>
+      </div>
+      <div class="label-field-pair width-100 margin-top-35">
+          <label><%= t('course') %></label>
+          <label class="margin-left-10" style="width:auto;"><b><%= @registration_course.course.full_name %></b></label>
+      </div>
+      <div class="label-field-pair width-100">
+          <label><%= t('display_name') %></label>
+          <div class="text-input-bg"><%= f.text_field :display_name %></div>
+      </div>
+      <div class="label-field-pair width-100">
+        <label><%= t('printable_form_header') %></label>
+        <div class="text-input-bg"><%= f.text_field :form_header %></div>
+      </div>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= t('applicant_registration_status') %>
+      </div>
+      <div class="radio-text-pair">
+          <%= f.radio_button  :is_active, true %>
+          <label><%= "#{t('active')}" %></label>
+      </div>
+      <div class="desc-text option-desc">
+          <%= t('active_desc') %>
+      </div>
+      <div class="radio-text-pair">
+          <%= f.radio_button  :is_active, false %>
+          <label><%= "#{t('inactive')}" %></label>
+      </div>
+      <div class="desc-text option-desc" style="margin-bottom:0 !important;">
+          <%= t('inactive_desc') %>
+      </div>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= t('applicants.application_fee') %> (<%= @currency %>)
+      </div>
+      <div class="desc-text margin-bottom-10">
+          <%= t('application_fee_desc') %>
+      </div>
+      <div class="label-field-pair width-100">
+          <label><%= t('amount') %></label>
+          <div class="text-input-bg"><%= f.text_field :amount %></div>
+      </div>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= t('application_filling_instructions') %>
+      </div>
+      <div class="desc-text">
+          <%= t('instruction_desc') %>
+      </div>
+      <%  f.fields_for :application_instruction do |i| %>
+        <% if @registration_course.application_instruction.present? and @registration_course.application_instruction.skip_instructions == true %>
+          <div id="instruction_desc_text_field_bg" style="display:none;">
+              <%= i.redactor :description %>
+          </div>
+        <% else %>
+          <div id="instruction_desc_text_field_bg">
+              <%= i.redactor :description %>
+          </div>
+        <% end %>
+        <%= i.hidden_field :skip_instructions %>
+        <div class="update-links">
+            <% if @registration_course.application_instruction.present? and @registration_course.application_instruction.skip_instructions == true %>
+              <%= link_to "#{t('skip_application_instructions')}","#",:id=>"skip_instructions",:class=>"instruction_link",:style=>"display:none;",:onclick=>"skip_i(); return false;" %>
+              <%= link_to "#{t('show_application_instructions')}","#",:id=>"show_instructions",:class=>"instruction_link",:onclick=>"show_i(); return false;" %>
+            <% else %>
+              <%= link_to "#{t('skip_application_instructions')}","#",:id=>"skip_instructions",:class=>"instruction_link",:onclick=>"skip_i(); return false;" %>
+              <%= link_to "#{t('show_application_instructions')}","#",:id=>"show_instructions",:class=>"instruction_link",:style=>"display:none;",:onclick=>"show_i(); return false;" %>
+            <% end %>
+        </div>
+      <% end %>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= "#{t('access_pass_code')}" %>
+      </div>
+      <div class="checkbox-text-pair">
+          <%= check_box '', :is_pin_enabled, :checked => @registration_course.pin_enabled_status %>
+          <label><%= t('enable_pass_code')  %></label>
+      </div>
+      <div class="desc-text option-desc margin-bottom-0">
+          <%= t('restrict_the_access') %>
+      </div>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= t('elective_subjects_selection') %>
+      </div>
+      <div class="checkbox-text-pair">
+          <%= f.check_box :is_subject_based_registration,:onchange=>"toggle_elective_space(); return false;" %>
+          <label><%= t('enable_elective_selection') %></label>
+      </div>
+      <div class="desc-text option-desc margin-bottom-0">
+          <%= t('elective_desc') %>
+      </div>
+      <% if @registration_course.is_subject_based_registration == true %>
+        <div id="subject-count-space">
+            <div class="label-field-pair">
+                <label class="auto-width margin-right-100"><%= t('elective_count') %></label>
+            </div>
+            <div class="label-field-pair">
+                <label class="auto-width"><%= t("minimum") %></label>
+                <div class="text-input-bg">
+                    <%= f.select :min_electives, (0..@subject_count.to_i).step(1) %>
+                </div>
+            </div>
+            <div class="label-field-pair">
+                <label class="auto-width"><%= t("maximum") %></label>
+                <div class="text-input-bg">
+                    <%= f.select :max_electives, (0..@subject_count.to_i).step(1) %>
+                </div>
+            </div>
+            
+            <div class="checkbox-text-pair">
+              <%= f.check_box :subject_based_fee_colletion %>
+              <label><%= "#{t('enable_subject_based_fee')}"  %></label>
+            </div>
+            <div class="desc-text option-desc margin-bottom-0">
+              <%= "#{t('enable_or_disable_subject_based')}" %>
+            </div>
+            
+        </div>
+      <% else %>
+        <div id="subject-count-space" style="display:none;">
+            <div class="label-field-pair">
+                <label class="auto-width margin-right-100"><%= t('elective_count') %></label>
+            </div>
+            <div class="label-field-pair">
+                <label class="auto-width"><%= t("minimum") %></label>
+                <div class="text-input-bg">
+                    <%= f.select :min_electives, (0..@subject_count.to_i).step(1) %>
+                </div>
+            </div>
+            <div class="label-field-pair">
+                <label class="auto-width"><%= t("maximum") %></label>
+                <div class="text-input-bg">
+                    <%= f.select :max_electives, (0..@subject_count.to_i).step(1) %>
+                </div>
+            </div>
+            <div class="checkbox-text-pair">
+              <%= f.check_box :subject_based_fee_colletion %>
+              <label><%= "#{t('enable_subject_based_fee')}"  %></label>
+            </div>
+            <div class="desc-text option-desc margin-bottom-0">
+              <%= "#{t('enable_or_disable_subject_based')}" %>
+            </div>
+        </div>
+      <% end %>
+      <div class="hor-line"></div>
+      <div class="page-subheading">
+          <%= t('archive_applications') %>
+      </div>
+      <div class="desc-text">
+          <%= t('archive_instructions') %>
+      </div>
+      <div class="archive-link">
+          <%= link_to "#{t('archive_all_applications')}",archive_all_applicants_registration_course_path(@registration_course),:confirm => t('delete_confirm_msg') %>
+      </div>
+      <div class="hor-line"></div>
+      <%= f.submit "", :value => "#{t('save_settings')}", :class => "submit_button", :id => 'submit_button' %>
+    <% end %>
+    <%= load_redactor_script %>
+</div>
+<script>
+  function skip_i() {
+      j("#registration_course_application_instruction_attributes_skip_instructions").val(true);
+      j("#instruction_desc_text_field_bg").hide();
+      j("#skip_instructions").hide();
+      j("#show_instructions").show();
+  }
+  function show_i() {
+      j("#registration_course_application_instruction_attributes_skip_instructions").val(false);
+      j("#instruction_desc_text_field_bg").show();
+      j("#show_instructions").hide();
+      j("#skip_instructions").show();
+  }
+  function toggle_elective_space() {
+      if (j('#registration_course_is_subject_based_registration').is(":checked") == true) {
+          j('#subject-count-space').show();
+          j("#registration_course_subject_based_fee_colletion").prop("checked",'checked');
+      }
+      else {
+          j('#subject-count-space').hide();
+          j("#registration_course_subject_based_fee_colletion").prop("checked",false);
+      }
+  }
+</script>

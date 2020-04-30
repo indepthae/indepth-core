@@ -1,0 +1,17 @@
+<td class="col-2"><div class="category-name"><%= truncate(subject.name, :length => 30)  %></div></td>
+<td class="col-3"><div class="category-code"><%= truncate(subject.code, :length => 13) %></div></td>
+<td class="col-5"><div class="category-code" id="subject_hour-<%= subject.id %>"><%= subject.max_weekly_classes %></div></td>
+<td class="col-4" id="operations">
+  <div id ="edit" class="links"><%= link_to_remote "#{t('edit_text')}",:url => { :controller=>"subjects",:action => 'edit', :id =>subject,:id2=>@elective_group},:method => 'get', :html => {:class => ''} %></div>  
+  <div id="delete" class="links">
+    <% if subject.exams.blank? and subject.timetable_entries.blank? and subject.has_no_assessments %>
+      <%= link_to_remote(t('delete_text'),:url => subject_path(subject),:method => 'delete',
+        :confirm => t('delete_confirm_msg'),:update => "subject-#{subject.id}",:complete =>"hide_normal_table();", :success => "$('subject-#{subject.id}').remove();") %>
+    <% else %>
+      <s><%= t('delete_text') %></s>
+    <% end %>
+    <% unless subject.elective_group_id.nil? %>
+      <div id ="assign"><%= link_to "#{ t('assign_student')}", {:controller=>"student", :action=>"electives",:id=>@batch,:id2=>subject.id},:class => ''%></div>
+    <% end %>
+  </div>
+</td>

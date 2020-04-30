@@ -1,0 +1,115 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}" %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('create_hostel_fee_collection_date')} : #{t('batch')}-#{t('wise')}" %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('fee_collection_text')}", :action => "hostel_fee_collection_view" %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "finance/financial_year_info" %>
+    </div>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% form_for @hostel_fee_collection,
+              :url => {:action => 'hostel_fee_collection_create'} do |form| %>
+      <%= form.hidden_field :tax_enabled, :value => @tax_enabled %>
+      <div id="form-errors"><%= error_messages_for 'hostel_fee_collection' %></div>
+      <div id="left-side-inputs">
+        <div class="label-field-pair">
+          <label for="financial_year"><%= t('financial_year_name') %>:</label>
+
+          <div class="text-input-bg">
+            <span>
+                <%= current_financial_year_name %>
+            </span>
+            <%= form.hidden_field :financial_year_id, :value => current_financial_year_id || '0' %>
+          </div>
+        </div>
+        <div class="label-field-pair">
+          <label><%= "#{t('name')}" %><span class="necessary-field">*</span> :</label>
+
+          <div class="text-input-bg"><%= form.text_field :name %></div>
+        </div>
+        <div class="label-field-pair">
+          <label><%= "#{t('start_date')}" %><span class="necessary-field">*</span>:</label>
+
+          <div class="text-input-bg">
+            <%= calendar_date_select_tag 'hostel_fee_collection[start_date]',
+                                         I18n.l(@hostel_fee_collection.end_date || @start_date || Date.today_with_timezone,
+                                                :format => :default), :readonly => true, :popup => "force" %>
+          </div>
+        </div>
+        <div class="label-field-pair">
+          <label for="reason">  <%= t('due_date') %>:</label>
+
+          <div class="text-input-bg">
+            <%= calendar_date_select_tag 'hostel_fee_collection[due_date]',
+                                         I18n.l(@hostel_fee_collection.due_date || @end_date || Date.today_with_timezone,
+                                                :format => :default), :readonly => true, :popup => "force" %>
+          </div>
+        </div>
+
+        <% if @tax_enabled %>
+            <div class="label-field-pair">
+              <label>  <%= t('tax_slab_text') %>:</label>
+
+              <div class="text-input-bg">
+                <%= form.select :tax_slab_id, @tax_slabs.map { |slab| ["#{slab.name}-(#{precision_label(slab.rate)}%)", slab.id] },
+                                {:include_blank => t('select_a_tax_slab')} %>
+              </div>
+            </div>
+        <% end %>
+      </div>
+
+
+      <div id="batchs">
+        <div class="batch_select_box">
+          <div class="label-field-pair">
+            <label> <%= t('select_batch') %>:
+              <b class="sel-list">
+                <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>
+                ,
+                <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+              </b>
+            </label>
+          </div>
+          <div class="fee_category_scroll">
+            <% @batches.each_with_index do |f, i| %>
+                <div class="each_batch">
+                  <% unless @batch.blank? %>
+                      <%= check_box_tag "hostel_fee_collection[batch_id][]", f.id, @batch.include?(f.id.to_s),
+                                        :class => 'batches_box' %> <%= f.full_name %>
+                  <% else %>
+                      <%= check_box_tag "hostel_fee_collection[batch_id][]", f.id, false,
+                                        :class => 'batches_box' %> <%= f.full_name %>
+                  <% end %>
+                </div>
+            <% end %>
+          </div>
+        </div>
+
+        <%# unless params[:fee_collection].nil? %>
+        <%#= render :partial=>'fee_collection_batchs' if params[:fee_collection][:category_ids].present? %>
+        <%# end %>
+      </div>
+      <div id="submit-button">
+        <%= submit_tag "► #{t('create_text')}", :class => 'submit_button', :disable_with => "► #{t('please_wait')}" %>
+      </div>
+  <% end %>
+</div>

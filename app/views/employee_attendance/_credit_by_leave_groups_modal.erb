@@ -1,0 +1,33 @@
+<div id="form-errors">
+    <% if @errors.present? %>
+      <div id="error-box">
+          <ul>
+              <% @errors.each do |msg| %>
+                <li class="error-font-size"> <%= msg %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div class="modal-description">&#x200E;<%= t('credit_description_new1') %>&#x200E;</div>
+<% remote_form_for :log , :url=>{:action=>'credit_by_leave_groups_modal'} ,:before =>"$('submit-button').disable();",:complete=>"$('submit-button').enable();" do |f| %>
+  <%= session_fingerprint_field %>
+  <div class="label-field-pair remark-label-pair" id="remarks">
+      <label><%= t("credit_remarks") %></label>
+      <div class="text-area-bg"><%= f.text_area :remarks , :cols => 30, :rows => 5%>
+      </div>
+  </div>
+  <div class="label-field-pair margin-top-30">
+      <label class="margin-top-100"><%= t("credit_date") %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag "log[credited_date]" , @credit_date.present? ? @credit_date : "" , :id => "reset_date",:readonly=>true, :errors => @log.errors[:credited_date],:popup=>"force"%>
+      </div>
+  </div>
+  <%= f.hidden_field :credit_type, :value => @credit_type %>
+  <%  @group_leave_type_ids.each_pair do |leave_group, v| %>
+    <% v.each do |leave_type| %>
+      <%=  f.hidden_field "leave_group[#{leave_group}]", :multiple => true, :value => leave_type %>
+    <% end %>
+  <% end %>
+  <%= f.submit  "", :value => "#{t('credit_leaves')}", :class => "submit_button",:id => "submit-button" %>
+
+<% end %>

@@ -1,0 +1,275 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.      -%>
+<% content_for :head do  %>
+  <% unless rtl? %>
+    <%= stylesheet_link_tag("indepth_finance_extensions/pay_all_fees_with_tmpl.css") %>
+  <% else %>
+    <%= stylesheet_link_tag("rtl/indepth_finance_extensions/pay_all_fees_with_tmpl.css") %>
+  <% end %>
+<% end %>
+<%= javascript_include_tag("receipt_printer") %>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+  <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+  <%= stylesheet_link_tag "finance/_payment_form" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('fees_submission') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_fees_submission') %></div>
+    <div id="inner-tab-menu"></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :finance_fees_student_dates_pay_all_fees, @student %>
+        <%= render_breadcrumbs %>
+    </div>
+    <%= render :partial => "search_student" %>
+    <div id="student">
+        <%= render :partial => "finance_extensions/pay_all_form/pay_all_header" %>
+        <br/>
+        <div class="seprate_div"></div>
+
+        <%= error_messages_for "financefee", :header_message => nil %>
+<%# if @finance_fees.present? %>
+        <div class="each-detail">
+            <div id="hide1" class="batch-selector">
+                <% if @student.previous_batches.present? %>
+                  <label class="common-label"><%= t('batch') %></label>
+                  <div class="text-input-bg margin-set-batch"> 
+                      <%= select :fees_submission, :batch_id, @all_batches.map { |c| [c.full_name, c.id] },
+                        {:prompt => "#{t('select_a_batch')}", :selected => @current_batch.id},
+                        {:onChange => "redirectToIndex(this.value)"} %>
+                  </div>
+                  <% if @not_paid_batch.present? %>
+                    <div id="pending_fees_info"><%= t('info_to_cashier') %></div>
+                  <% end %>
+                  <div class="loader_div">
+                      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader",
+                        :style => "display: none; ") %>
+                  </div>
+                <% end %>
+            </div>
+
+            <div class="payment-date">
+                <div class='date-input-bg'>
+                    <%= calendar_date_select_tag 'transaction_date', I18n.l(@transaction_date, :format => :default), 
+                      {:popup => 'force', :class => 'start_date',:onchange => "change_transaction_date();"} %>
+                </div>
+                <label  class="common-label"><%=t('payment_date') %></label>
+            </div>
+
+        </div>
+        <div class="extender"></div>
+<%# else %>
+        <!-- <div class="extender padding-top-10"></div> -->
+<%# end %>
+        <div id="flash-message">
+            <% unless flash[:notice].nil? %>
+              <p class="flash-msg"> <%= flash[:notice] %> </p>
+            <% end %>
+        </div>
+        <div class="extender"></div>
+        <div id="pay_fees">
+            <%#= render :partial => 'finance_extensions/pay_all_form/pay_fees_form' %>
+            <%= render :partial => 'indepth_finance_extensions/pay_fees_form_tmpl' %>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+  var selected_fee_type, selected_fee_lbl, selected_fee_id;
+
+  function reset_selected_fee() {
+      selected_fee_type = selected_fee_lbl = selected_fee_id = undefined;
+  }
+
+  function redirectToIndex(val) {
+      window.location = '<%=@student.id %>?batch_id=' + val;
+  }
+
+  function show_student_search() {
+      j('#search_box_bg').show();
+      j('#change-student').hide();
+  }
+
+  j(function () {
+      // if (updatedChromeVersion()) {
+
+      if (<%= rtl?%>) {
+          j('.receipt-box').css('margin-right', '-20px');
+      } else {
+          j('.receipt-box').css('margin-left', '-20px');
+      }
+      // }
+  });
+
+  function updatedChromeVersion() {
+      var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+      return (raw && parseInt(raw[2], 10) > 54);
+  }
+
+  //function set_collection(fee_type_lbl, fee_type, fee_id){
+  function set_discount_collection() {
+      j('#multi_fee_discount_collections').find('optgroup[label="' + selected_fee_lbl + '"]').
+              find('option[value=' + selected_fee_id + ']').attr('selected', 'selected');
+      j('#multi_fee_discount_fee_type').val(selected_fee_type);
+  }
+
+  function set_fine_collection() {
+      j('#multi_transaction_fine_fee_id').find('optgroup[label="' + selected_fee_lbl + '"]').
+              find('option[value=' + selected_fee_id + ']').attr('selected', 'selected');
+      j('#fee_type').val(selected_fee_type);
+  }
+
+  function fetch_max_dis(f_id) {
+      var f_ids = j('.finance_fee_ids').map(function() { 
+          return j(this).val();
+      })
+              .get();
+
+      var t_ids = j('.transport_fee_ids').map(function() { 
+          return j(this).val();
+      })
+              .get();
+
+      j("#waiver_loader").show();
+      j("#submit_button_discount").attr("disabled", true);
+      j.ajax({
+          type: 'GET',
+          url: "/finance_extensions/fetch_waiver_amount_pay_all",
+          data: {
+              id: f_id,
+              student_id: j("#student_id").val(),
+              batch_id: j("#batch_id").val(),
+              collection: j("#multi_fee_discount_collections").val(),
+              particular: j("#multi_fee_discount_particulars").val(),
+              fee_type: j("#multi_fee_discount_fee_type").val(),
+              fee_finance_ids: f_ids,
+              fee_transport_ids: t_ids
+          },
+          success: function (data) {
+              j("#waiver_loader").hide();
+              j("#submit_button_discount").attr("disabled", false);
+              j('#discount_amount').val(data.attributes);
+          }
+      });
+  }
+
+  j(document).delegate('#multi_transaction_fine_fee_id', 'change', function () {
+      opt_grp = j(this.options[this.selectedIndex]).closest('optgroup');
+
+      if (opt_grp.length == 0) {
+          fee_type = '';
+      } else {
+          fee_type = opt_grp.prop('label').replace(' ', '_').toLowerCase();
+      }
+      j('#fee_type').val(fee_type);
+  });
+
+  j(document).delegate('#multi_fee_discount_collections', 'change', function () {
+
+      opt_grp = j(this.options[this.selectedIndex]).closest('optgroup');
+
+      if (opt_grp.length == 0) {
+          fee_type = '';
+      } else {
+          fee_type = opt_grp.prop('label').replace(' ', '_').toLowerCase();
+      }
+
+      j('#multi_fee_discount_fee_type').val(fee_type);
+
+      if (fee_type == 'finance_fee') {
+          j.ajax({
+              url: '/finance_extensions/load_fee_particulars',
+              data: {student_id: "<%= @student.id %>", fee_id: j(this).val(), fee_type: fee_type},
+              beforeSend: (function () {
+                  j('img#loader').show();
+              }),
+              complete: (function () {
+                  j('img#loader').hide();
+              })
+
+          });
+      } else {
+          j('#particulars_list').text('');
+      }
+  });
+
+  calculate_total_fine = function(f_id){
+    var fin_ids = j('.finance_fee_ids').map(function() { 
+          return j(this).val();
+      })
+              .get();
+
+      var trans_ids = j('.transport_fee_ids').map(function() { 
+          return j(this).val();
+      })
+              .get();
+      j("#loader").show();
+      j("#submit_button_fine").attr("disabled", true);
+      j(document).delegate('#fine_transaction_fee_id', 'change', function () {
+          opt_grp = j(this.options[this.selectedIndex]).closest('optgroup');
+          if (opt_grp.length == 0) {
+              fee_type = '';
+              j('#fine_transaction_fee_type').val(fee_type);
+          } else {
+              fee_type = opt_grp.prop('label').replace(' ', '_').toLowerCase();
+              j('#fine_transaction_fee_type').val(fee_type);
+          }
+          j.ajax({
+              type: 'GET',
+              url: "/finance_extensions/fetch_total_fine_amount_for_pay_all",
+              data: {
+                  id: f_id,
+                  student_id: j("#student_id").val(),
+                  batch_id: j("#batch_id").val(),
+                  collection: j("#fine_transaction_fee_id").val(),
+                  fee_type_name: j("#fine_transaction_fee_type").val(),
+                  fee_finance_ids: fin_ids,
+                  fee_transport_ids: trans_ids,
+                  transaction_date: j("#transaction_date").val()
+              },
+              success: function (data) {
+                  j("#loader").hide();
+                  j("#submit_button_fine").attr("disabled", false);
+                  j('#fine_amt_res').val(data.attributes);
+              }
+          });
+      });
+  };
+  j(document).ready(function () {
+    var not_paid = new Array();
+    <% for batch in @not_paid_batch -%>
+    not_paid.push(<%= batch %>);
+<% end -%>
+    j('#fees_submission_batch_id option').each(function(){
+     if((j.inArray(parseInt(j(this).val()), not_paid)) != -1){
+       var batch_name = j(this).text();
+       j(this).html(batch_name + "<span>&nbsp;&nbsp;&nbsp;&nbsp;(*)</span>")
+     }
+  });
+  })
+</script>

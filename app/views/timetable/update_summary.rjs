@@ -1,0 +1,11 @@
+if @summary_update_progress or !@timetable_summary.present?
+  page.replace_html 'flash-msg', :text => ''
+  page.replace_html 'update-flash', :partial => "update_summary_progress"
+  page << 'setTimeout(function(){poll_summary()},30000)'
+else
+  page << "j('#summary').show()"
+  page.replace_html 'main_summary', :partial => "summary_data"
+  page.replace_html 'batch_wise_summary', :partial => "batch_wise_summary"
+  page.replace_html 'update-flash', :text => ""
+  page.replace_html 'update_summary', :text => ""
+end

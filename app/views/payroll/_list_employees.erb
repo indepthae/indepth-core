@@ -1,0 +1,47 @@
+<table>
+  <tr class="tr-head">
+    <td class="emp_name"><%= t('employee_name') %></td>
+    <% if params[:action] == 'assigned_employees' or params[:value] == "All" %>
+      <td class="dept_name"><%= t('department') %></td>
+    <% end %>
+    <td class="cat_name"><%= t('employee_category') %></td>
+    <% if params[:action] == 'assign_employees' or params[:is_assigned] == "false" %>
+      <td class="pg_name"><%= t('payroll_group') %></td>
+    <% else %>
+      <td class="recent_date"><%= t('recent_payslip') %></td>
+    <% end %>
+    <td class="actions">
+      <% if params[:action] == 'assigned_employees' or params[:is_assigned] == "true" %>
+        <span class='substitute'></span>
+      <% end %>
+    </td>
+  </tr>
+  <% if @employees.present? %>
+    <% @employees.each do |e| %>
+      <tr>
+        <td class="emp_name"><%= e.full_name + " &#x200E;(" + e.employee_number + ")&#x200E;" %></td>
+        <% if params[:action] == 'assigned_employees' or params[:value] == "All" %>
+          <td class="dept_name"><%= e.employee_department.name %></td>
+        <% end %>
+        <td class="cat_name"><%= e.employee_category.name %></td>
+        <% if params[:action] == 'assign_employees' or params[:is_assigned] == "false" %>
+          <td class="pg_name"><%= e.payroll_group.nil? ? t("not_assigned") : "#{e.payroll_group.name} - #{e.payroll_group.salary_type_value}" %></td>
+        <% else %>
+          <td class="recent_date"><%= format_date(e.rec_payslip, :short) || '-' %></td>
+        <% end %>
+        <td class="actions">
+          <% assigned ||= params[:assigned] %>
+          <% action_num = e.payroll_group.nil? ? 0 : e.payroll_group.id == @payroll_group.id ? 1 : 2 %>
+          <%= link_to_actions(e, assigned, action_num, e.employee_salary_structure.try(:current_group), params[:finance], e.first_and_last_name, e.payroll_group.try(:name)) %>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('assign_employees_to_this_payroll_group') %></td></tr>
+  <% end %>
+</table>
+<% if @employees.present? %>
+  <%= pagination_status(@employees) %>
+  <%= will_paginate @employees,:renderer => 'RemoteLinkRenderer', :params => {:id => params[:id], :is_assigned => params[:is_assigned], :value => params[:value], :finance => params[:finance]} %>
+<% end %>
+<div id="modal-box" style="display:none;"></div>

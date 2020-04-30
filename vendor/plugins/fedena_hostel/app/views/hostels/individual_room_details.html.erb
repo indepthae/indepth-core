@@ -1,0 +1,60 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%="#{t('room_details')}" %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :hostels_individual_room_details,[@room_details,@room_details.hostel_id] %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="information">
+  <% unless @room_details.nil? %>
+    <div class="info">
+      <div class="field_pair">
+        <div class="label1"><%= t('hostel_name') %></div>
+        <div class="label2"><%=": #{@room_details.name}" %></div>
+      </div>
+      <div class="field_pair">
+        <div class="label1"><%= t('room_number') %></div>
+        <div class="label2"><%=": #{@room_details.room_number}" %></div>
+      </div>
+      <div class="field_pair">
+        <div class="label1"><%= "#{t('total')} #{t('capacity')}" %></div>
+        <div class="label2"><%=": #{@room_details.students_per_room}" %></div>
+      </div>
+    </div>
+  <% end %>
+  <div class="extender"></div>
+  <% unless @students.blank? %>
+    <div id="page-yield">
+      <div class="extender"></div>
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head sub-heading">
+          <td><%= t('no_text') %></td>
+          <td><%= t('name') %></td>
+          <td><%= t('admission_no') %></td>
+          <td><%= t('course_name') %></td>
+          <td><%= t('batch_name') %></td>
+        </tr>
+        <% @students.each_with_index do |r,@i| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-5"> <%=@i+1 %></td>
+            <td class="col-2"><%=link_to "#{r.first_name} #{r.middle_name} #{r.last_name}" ,{:controller=>'student',:action=>'profile',:id=>r.student_id}%></td>
+            <td class="col-3"><%= r.admission_no %></td>
+            <td class="col-3"><%= r.course_name %></td>
+            <td class="col-3"><%= "#{r.course_code} #{r.batch_name}"%></td>
+          </tr>
+        <% end %>
+      </table>
+    <% else %>
+      <p class="flash-msg"> <%= t('no_students_found') %></p>
+    <% end %>
+  </div>
+</div>
+</div>

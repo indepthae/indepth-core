@@ -1,0 +1,338 @@
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% if field_group.description.present? %>
+    <div class="desc-section"><%= field_group.description %></div>
+  <% end %>
+<% else %>
+
+  <% if a[:section_description].present? %>
+    <% unless a[:section_name] == "attachments" %>
+      <div class="desc-section">
+        &#x200E;<%= t("#{a[:section_description]}") %>&#x200E;
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each do|fld| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type]=="applicant_additional" %>
+        <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+        <% if addl_field.present? %>
+          <div class='attr_pair'>
+              <% unless addl_field.field_type == "multi_select" or addl_field.field_type == "single_select" or addl_field.field_type == "multiline" %>
+              <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+              <% end %>
+              <% if addl_field.field_type == "attachment" %>
+                <div class='attr_value margin_top_line'></div>
+              <% elsif addl_field.field_type == "date" %>
+                <div class='attr_value margin_top_line'></div>
+              <% elsif addl_field.field_type == "single_select" %>
+                
+                <% field_options = addl_field.applicant_addl_field_values %>
+                
+                  <% if field_options.count < 7 %>
+                <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_any_one') %>)&#x200E;</div>
+                    <div class='attr_value' style="word-break: break-all;">
+                    <% field_options.each do|o| %>
+                      <div class="width_each_checkbox">
+                        <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.option, :class => "label_for_style" %>
+                      </div>
+                    <% end %>
+                  <% else %>
+                        <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                    </div>
+                  <% end %>
+                </div>
+                <% elsif addl_field.field_type == "multi_select" %>
+                  
+                  <% field_options = addl_field.applicant_addl_field_values %>
+                  
+                    <% if field_options.count < 7 %>
+                        <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_one_or_more') %>)&#x200E;</div>
+                      <div class='attr_value' style="word-break: break-all;">
+                      <% field_options.each do |o| %>
+                        <div class="width_each_checkbox">
+                          <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.option, :class => "label_for_style" %>
+                        </div>
+                      <% end %>
+                    <% else %>
+                          <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                      <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                      </div>
+                    <% end %>
+                  </div>
+                <% elsif addl_field.field_type == "multiline" %>
+                          <div class="attr_label multiline_label"><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;">
+
+                        </div>
+                  
+                <% else %>
+                  <div class='attr_value margin_top_line' style="word-break: break-all;">
+                      <span class="float-right-suffix"><%= (addl_field.field_type == "singleline" and addl_field.suffix.present?) ? addl_field.suffix : "" %></span>
+                  </div>
+                <% end %>
+          </div>
+        <% end %>
+      <% elsif fld[:field_type]=="student_additional" %>
+        <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+        <% if st_addl_field.present? %>
+          <% student_ad_field = st_addl_field.student_additional_field %>
+          <% if student_ad_field.present? %>
+            <div class='attr_pair'>
+                <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                <div class='attr_value margin_top_line'></div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% default_section = @default_fields[a[:section_name].to_sym] %>
+  <% photo_present = 0 %>
+  <% if a[:section_name] == "student_personal_details" %>
+    <% photo_field = a[:fields].find{|af| af[:field_name] == "student_photo"} %>
+    <% if (photo_field.present? and ["true",true,"default_true"].include?(photo_field[:show_field])) %>
+      <div id="photo-field"><span class = "photo_text"><%= t('affix_photo') %></span></div>
+      <% photo_present = 1 %>
+      <% a[:fields].delete(photo_field) %>
+    <% end %>
+  <% end %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each_with_index do|fld,ind| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type] == "default" %>
+        <% if default_section.present? %>
+          <% field_details = default_section[:fields][fld[:field_name].to_sym] %>
+          <% f_attr = (field_details[:field_attr].present? ? field_details[:field_attr] : fld[:field_name]) %>
+          <% fld_type = field_details[:field_type].present? ? field_details[:field_type] : "" %>
+          <div class="attr_pair<%= (photo_present == 1 and ind<=4) ? " adjust-for-photo" : "" %>">
+              <% unless fld[:field_name]=="choose_electives" or fld_type == "radio_button" or field_details[:field_type] == "select" %>
+              <div class='attr_label'><%=  t("#{fld[:field_name]}") %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+              <% end %>
+              <% if fld[:field_name] == "choose_electives" %>
+              <div class='attr_label'><%= t('choose_electives')%><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= "#{t('minimum')} : #{@registration_course.present? ? @registration_course.min_electives : ""}" %>, <%= "#{t('maximum')} : #{@registration_course.present? ? @registration_course.max_electives : ""}" %>)&#x200E;</div>
+                <div class='attr_value' style="word-break: break-all;">
+                    <div class="width_checkbox">
+                        <% if @registration_course.is_subject_based_registration %>
+                          <% @subjects.each do |subject,val| %>
+                            <div class="width_each_checkbox">
+                                <div id = "elective_checkbox"></div> <%= label_tag 'elective_checkbox',"#{latest_subject_name(subject.to_s,@registration_course.course_id)} &#x200E;(#{@currency}#{precision_label(val)})&#x200E;", :class => "label_for_style" %>
+                            </div>
+                          <% end %>
+                        <%end%>
+                    </div>
+                </div>
+              <% elsif field_details[:field_type].present? %>
+                <% if field_details[:field_type] == "select" %>
+                  
+                  <% field_options = eval(field_details[:field_options]) %>
+                  <% if field_options.count < 7 %>
+              <div class='attr_label'><%=  t("#{fld[:field_name]}") %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_any_one') %>)&#x200E;</div>
+                    <div class='attr_value' style="word-break: break-all;">
+                      <div class="width_checkbox">
+                        <% field_options.each do |category,val| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',"#{category}", :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% else %>
+              <div class='attr_label'><%=  t("#{fld[:field_name]}") %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                    </div>
+                  <% end %>
+                <% elsif field_details[:field_type] == "radio_button" %>
+              <div class='attr_label'><%=  t("#{fld[:field_name]}") %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                  <% field_options = eval(field_details[:field_options]) %>
+                  <div class='attr_value' style="word-break: break-all;">
+                    <% if fld[:field_name] == 'gender' %>
+                      <div class="width_checkbox">
+                        <% field_options.each do |category,val| %>
+                          <div class="width_each_checkbox_photo">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',"#{t(val)}", :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <div class="width_checkbox">
+                        <% field_options.each do |category,val| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',"#{t(val)}", :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      </div>
+                    <%end%>
+                  </div>
+                <% else %>
+                  <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                  </div>
+                <% end %>
+              <%end%>
+          </div>
+        <% end %>
+      <% else %>
+        <% if fld[:field_type]=="applicant_additional" %>
+          <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if addl_field.present? %>
+            <div class='attr_pair'>
+                <% unless addl_field.field_type == "multi_select" or addl_field.field_type == "single_select" or addl_field.field_type == "multiline" %>
+                <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                <% end %>
+                <% unless ["guardian_personal_details","guardian_communication_details"].include?(a[:section_name]) %>
+                  <% if addl_field.field_type == "singleline" %>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">  
+                        <span class="float-right-suffix"><%= (addl_field.field_type == "singleline" and addl_field.suffix.present?) ? addl_field.suffix : "" %></span>
+                    </div>
+                  <% elsif addl_field.field_type == "single_select" %>
+                    
+                    <% field_options = addl_field.applicant_addl_field_values %>
+                    
+                      <% if field_options.count < 7 %>
+                <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_any_one') %>)&#x200E;</div>
+                        <div class='attr_value' style="word-break: break-all;">
+                        <% field_options.each do|o| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.option, :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      <% else %>
+                            <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                        <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                        </div>
+                      <% end %>
+                    </div>
+                  <% elsif addl_field.field_type == "multi_select" %>
+                    
+                    <% field_options = addl_field.applicant_addl_field_values %>
+                    
+                      <% if field_options.count < 7 %>
+                            <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_one_or_more') %>)&#x200E;</div>
+                        <div class='attr_value' style="word-break: break-all;">
+                        <% field_options.each do |o| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.option, :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      <% else %>
+                            <div class='attr_label'><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                        <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                        </div>
+                      <% end %>
+                    </div>
+                  <% elsif addl_field.field_type == "multiline" %>
+                            <div class="attr_label multiline_label"><%= addl_field.field_name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all; margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;">
+
+                        </div>
+                    
+                  <% elsif addl_field.field_type == "date" %>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                    </div>
+                  <% elsif addl_field.field_type == "attachment" %>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">
+
+                    </div>
+                  <% else %>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;">
+                        
+                    </div>
+                  <% end %>
+                <% end %>
+            </div>
+          <% end %>
+        <% elsif fld[:field_type]=="student_additional" %>
+          <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+          <% if st_addl_field.present? %>
+            <% student_ad_field = st_addl_field.student_additional_field %>
+            <% if student_ad_field.present? %>
+              <div class='attr_pair'>
+                  <% unless student_ad_field.input_type == "belongs_to" or student_ad_field.input_type == "has_many" or student_ad_field.input_type == "text_area" %>
+                  <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                  <% end %>
+                  <% if student_ad_field.input_type == "text_area" %>
+                  <div class="attr_label multiline_label"><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all; margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;margin-bottom: 30px;">
+
+                        </div>
+                        <div class="attr_value margin_top_line" style="word-break: break-all;">
+
+                        </div>
+                  <% elsif student_ad_field.input_type == "belongs_to" %>
+                    
+                    <% field_options = student_ad_field.student_additional_field_options %>
+                    
+                      <% if field_options.count < 7 %>
+                        <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_any_one') %>)&#x200E;</div>
+                        <div class='attr_value' style="word-break: break-all;">
+                        <% field_options.each do|o| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.field_option, :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      <% else %>
+                            <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                        <div class='attr_value margin_top_line' style="word-break: break-all;"></div>
+                      <% end %>
+                    </div>
+                  <% elsif student_ad_field.input_type == "has_many" %>
+                    
+                    <% field_options = student_ad_field.student_additional_field_options %>
+                    
+                      <% if field_options.count < 7 %>
+                            <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span><br>&#x200E;(<%= t('select_one_or_more') %>)&#x200E;</div>
+                        <div class='attr_value' style="word-break: break-all;">
+                        <% field_options.each do |o| %>
+                          <div class="width_each_checkbox">
+                            <div id = "elective_checkbox"></div><%= label_tag 'elective_checkbox',o.field_option, :class => "label_for_style" %>
+                          </div>
+                        <% end %>
+                      <% else %>
+                            <div class='attr_label'><%= student_ad_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span>
+                        <div class='attr_value margin_top_line' style="word-break: break-all;"></div>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <div class='attr_value margin_top_line' style="word-break: break-all;"></div>
+                  <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        <% elsif fld[:field_type]=="applicant_attachment" %>
+          <% att_field = @addl_attachment_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if att_field.present? %>
+            <div class='attr_pair'>
+                <div class='attr_label'><%= att_field.name %><span class="mandatory_asterisk"><%= ["true",true,"default_true"].include?(fld[:mandatory]) ? "*" : "" %></span></div>
+                <div class='attr_value margin_top_line'></div>
+              <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

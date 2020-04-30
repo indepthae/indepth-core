@@ -1,0 +1,17 @@
+<% if @registration_course.present? %>
+  <%if @registration_course.pin_enabled_status %>
+    <div class="label-field-pair w400">
+        <%= label_tag :pin_number,t('pin_number') %>
+        <%= text_field '', :pin_number %>
+    </div>
+  <%end%>
+<% end %>
+<% if @registration_settings.present? and @registration_settings.skip_instructions == false and @registration_settings.description.present? %>
+  <div class="in-box">
+      <%= @registration_settings.description %>
+  </div>
+<% end %>
+<% if @registration_course.present? %>
+  <%=submit_tag("#{t('apply')}",:id=>'submit_button',:class=>"submit_button") %>
+  <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader1", :style =>"display: none;margin-top:10px; margin-left:5px" ) %>
+<% end %>

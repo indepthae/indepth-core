@@ -1,0 +1,216 @@
+<script type="text/javascript">
+  j(document).ready(function() {
+    j(".exam_checkbox").click(function(e){
+      e.stopPropagation();
+    })
+    j("#left-bottom-panel").scroll(function() {
+      if(j(".pagination").length > 0){
+        if(j("#last_page").attr("value")==0){
+          l_page = j(".pagination").find('a:not([class])').last().html();
+          j("#last_page").attr("value",l_page);
+        }
+        if(j("#loaders-div").is[":visible"]){
+
+        }
+        else{
+          page_no = j("#page_number").attr("value");
+          last_page = j("#last_page").attr("value");
+          if(parseInt(last_page)>parseInt(page_no)){
+            exam_id = j("#examination_id").attr("value")
+            if((j("#left-bottom-panel").height() + j("#left-bottom-panel").scrollTop()) > j("#left-bottom-panel")[0].scrollHeight - 1){
+              j.ajax({
+                type: 'POST' ,
+                url: "/online_exam/load_more_questions",
+                data : {
+                  page_no : page_no,
+                  exam_id : exam_id,
+                  question_format : j("#online_exam_question_format").val(),
+                  course_id : get_course_id(),
+                  subject_code : get_subject_code()
+                },
+                beforeSend : function() {
+                  j("#loaders-div").attr("display","block");
+                  j("#page_number").attr("value",(parseInt(page_no) + 1).toString());
+                },
+                success : function(data) {
+                  j("#question-list").append(data);
+                  j("#loaders-div").attr("display","none");
+                }
+              })
+            }
+          }
+        }
+      }
+    })
+  });
+  function show_question_details(question){
+    question_div = j(question);
+    question_id=question_div.attr("id");
+    j.ajax({
+      type: 'POST' ,
+      url: "/online_exam/view_question_details",
+      data : {
+        question_id : question_id,
+        exam_id : j("#examination_id").attr("value")
+      },
+      beforeSend : function() {
+        j(".each-question").removeClass("selected");
+        question_div.addClass("selected");
+        show_loader();
+      },
+      success : function(data) {
+        j("#right-panel").html(data);
+        hide_loader();
+      }
+    })
+  }
+  function load_import_form(question_checkbox){
+    qn_chbox = j(question_checkbox);
+    question_id=qn_chbox.attr("value");
+    if(qn_chbox.is(":checked")==true){
+      qn_checked = "checked";
+    }
+    else{
+      qn_checked = "unchecked";
+    }
+    j.ajax({
+      type: 'POST' ,
+      url: "/online_exam/load_importing_form",
+      data : {
+        question_id : question_id,
+        exam_id : j("#examination_id").attr("value"),
+        box_checked : qn_checked
+      },
+      beforeSend : function() {
+        j(".each-question").removeClass("selected");
+        qn_chbox.parent().addClass("selected");
+      },
+      success : function(data) {
+        j("#right-panel").html(data);
+        j.ajax({
+          type: 'POST' ,
+          url: "/online_exam/reload_stats",
+          data : {
+            exam_id : j("#examination_id").attr("value")
+          },
+          success : function(data) {
+            j("#exam-stats").html(data);
+
+          }
+        })
+      }
+    })
+  }
+  function get_question_format(){
+    return j("#online_exam_question_format").val();
+  }
+  function get_exam_id(){
+    return j("#examination_id").val();
+  }
+  function get_course_id(){
+    if(j("#online_exam_select_course").length>0){
+      return j("#online_exam_select_course").val();
+    }
+    else{
+      return "0";
+    }
+  }
+  function get_subject_code(){
+    if(j("#online_exam_select_subject_code").length>0){
+      return j("#online_exam_select_subject_code").val();
+    }
+    else{
+      return "0";
+    }
+  }
+  function show_loader(){
+    j("#right-panel").hide();
+    j("#right-panel-loader").show();
+  }
+  function hide_loader(){
+    j("#right-panel-loader").hide();
+    j("#right-panel").show();
+  }
+</script>
+<%= load_latex_preview %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('import_questions') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_exam_import_questions, @exam_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%= hidden_field_tag "examination_id",@exam_group.id %>
+  <% unless @exam_group.exam_type == "subject_specific" %>
+    <div class="input-boundary">
+      <div class="label-field-pair">
+        <label class="exam-label">Question Type</label>
+        <div class="select_exam_type">
+          <%= radio_button "online_exam", "exam_type", "general", :checked => "checked",:onChange=>"#{remote_function(:url => {:action => "show_course_list",:exam_id=>@exam_group.id}, :with => "'select_value='+value+'&question_format='+get_question_format()")}" %>
+          <label class="label_for_exam_type" for="exam_type_true">General</label>
+          <%= radio_button "online_exam", "exam_type", "subject_specific", :checked=>false,:onChange=>"#{remote_function(:url => {:action => "show_course_list",:exam_id=>@exam_group.id}, :with => "'select_value='+value+'&question_format='+get_question_format()")}" %>
+          <label class="label_for_exam_type" for="exam_type_false">Subject Specific</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="course-selection"></div>
+  <% else %>
+    <div id="course-selection"><%= render :partial=>"course_select", :locals=>{:courses=>@courses}%></div>
+  <% end %>
+  <div id="questions-main">
+    <div id="left-panel">
+      <div id="left-top-panel">
+        <% if @exam_group.exam_format == "hybrid" %>
+          <%= select "online_exam", "question_format", [["#{t('objective')}","objective"],["#{t('descriptive')}","descriptive"]],{},:onChange=>"#{remote_function(:url => {:action => "update_question_list"},
+          :with => "'question_format='+value+'&exam_id='+get_exam_id()+'&subject_code='+get_subject_code()+'&course_id='+get_course_id()",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')"
+          )}"  %>
+        <% else %>
+          <%= select "online_exam", "question_format", [["#{t('objective')}","objective"]]  %>
+        <% end %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+      </div>
+      <div id="left-bottom-panel">
+        <div id="question-list">
+          <% if @questions.present? %>
+            <%= render :partial=>"questions_to_import", :locals=>{:questions=>@questions, :assigned_questions=>@assigned_questions} %>
+          <% end %>
+        </div>
+
+        <div id="loaders-div">
+          <div class="loading-text">
+            Loading ...
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="right-panel-loader" style="display:none"><label>Loading ...</label></div>
+    <div id="right-panel">
+      <% if @questions.present? %>
+        <% if @assigned_questions.include?(@questions.first.id) %>
+          <%= render :partial=>"question_details", :locals=>{:question=>@questions.first,:answers=>@questions.first.assigned_answers(@exam_group.id),:marks=>@questions.first.marks_assigned(@exam_group.id),:exam_group=>@exam_group} %>
+        <% else %>
+          <%= render :partial=>"import_form", :locals=>{:question=>@questions.first,:answers=>@questions.first.assigned_answers(@exam_group.id),:group_question=>OnlineExamGroupsQuestion.new(:online_exam_group_id=>@exam_group.id,:online_exam_question_id=>@questions.first.id)} %>
+        <% end %>
+      <% end %>
+    </div>
+    <div id="hidden-fields">
+      <%= hidden_field_tag "page_number", "1" %>
+      <%= hidden_field_tag "last_page", 0 %>
+    </div>
+
+  </div>
+  <div id="exam-stats"><%= render :partial=>"exam_stats", :locals=>{:exam_group=>@exam_group}%></div>
+  <div id="finish"><%=link_to ("#{t('finish')}"),{:action=>"exam_details",:id=>@exam_group.id},:class => "user_button"%></div>
+
+</div>

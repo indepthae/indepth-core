@@ -1,0 +1,126 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%= javascript_include_tag("receipt_printer") %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('instant_fees_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('view_created_instant_fee')}" %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <%= p @student %>
+            <% if @student.present? %>
+              <li id="particular"><%= link_to "#{t('new_text')}", :controller => 'instant_fees',:action => 'new_instant_fees' %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :instant_fees_instant_fee_created_detail,@instant_fee %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="flash_box">
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="list_transactions">
+        <div class="extender"></div>
+        <div class="details_fee">
+            <div class="info"><label><%= t('payee_name') %></label><span class="colon">:</span><div class="detail_describe themed_text"><%= @instant_fee.payee_name %></div></div>
+            <div class="info"><label><%= t('category_name') %></label><span class="colon">:</span><div class="detail_describe themed_text"><%= @instant_fee.category_name %></div></div>
+            <div class="info"><label><%= t('category_description') %></label><span class="colon">:</span><div class="detail_describe themed_text"><%= @instant_fee.category_description %></div></div>
+            <% if @instant_fee.finance_transaction.present? %>
+              <div class="info">
+                  <label><%= t('receipt_no') %></label>
+                  <span class="colon">:</span>
+                  <div class="detail_describe themed_text">
+                      <%= @instant_fee.finance_transaction.receipt_number %>
+                  </div>
+              </div>
+            <% end %>
+        </div>
+        <% total_amount = 0 %>
+        <% total_net_amount = 0 %>
+        <table class="sortable" id="listing" width="100%">
+            <tr class="tr-head">
+                <th class="col-sl"><%= t('sl_no') %></th>
+                <th class="col-2"><%= t('particular_name') %></th>
+                <th class="col-2"><%= t('amount') %></th>
+                <th class="col-2"><%= t('discount') %>(%)</th>
+                <% if @instant_fee.tax_enabled %>
+                  <% col_span = 6 %>
+                  <th class="col-2-2"><%= t('tax_text') %>(%)</th>                
+                <% else %>
+                  <% col_span = 5 %>
+                <% end %>
+                <th class="col-total"><%= t('total_amount') %></th>
+            </tr>
+            <tr class="tr-blank"></tr>
+            <% @instant_fee_details.each_with_index do |detail,index| %>
+              <tr class="tr-<%= cycle('odd','even') %>">
+                  <td class="col-sl"><%= index +=1 %></td>
+                  <td class="col-2"><%= detail.particular_name %></td>
+                  <td class="col-2">
+                      <%= precision_label(detail.amount) %>
+                  </td>
+                  <td class="col-2">
+                      <%= precision_label(detail.discount) %>
+                  </td>
+                  <% if @instant_fee.tax_enabled %>
+                    <td class="col-2-2"><%= precision_label(detail.tax) %></th>                
+                      <% end %>
+                  <td class="col-total">
+                      <%= precision_label(detail.net_amount) %>
+                  </td>
+                  <% total_amount += detail.amount  unless detail.amount.nil?%>
+                  <% total_net_amount += detail.net_amount unless detail.net_amount.nil?%>
+              </tr>
+            <% end %>
+            <tr class="tr-<%= cycle('odd','even') %>">
+                <td class="total themed_text" colspan ="2"><b><%= t('total') %></b></td>
+                <td class="col-2">
+                    <%= precision_label(total_amount) %>
+                </td>
+                <td class="col-2"></td>
+                <% if @instant_fee.tax_enabled %>
+                  <td class="col-2-2"></td>
+                <% end %>
+                <td class="col-total">
+                    <%= precision_label(total_net_amount) %>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="<%= col_span %>">
+                    <div class="pay_fees">
+                        <div class="options-pay">
+                            <div class="print_reciept">
+                                <%= receipt_buttons(@instant_fee.finance_transaction.id) %>
+<%#= link_to "#{t('download_pdf')}", {:controller=> "finance",:action => "generate_fee_receipt_pdf" ,:transaction_id=>@instant_fee.finance_transaction.id,:particular_wise=>true}, :target => "_blank", :class=>"user_button"%>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>

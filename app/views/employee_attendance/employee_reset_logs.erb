@@ -1,0 +1,44 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_attendance') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('leave_reset_status') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h4><%=  t('leave_reset_status') %></h4>
+  <% flash_msg = "#{t('leave_reset_status_detailed', {:total => @total, :success => @success, :failed => @failed})}" %>
+
+  <p class="flash-msg"><%= flash_msg %></p>
+  <div class="info">
+    <div class="info_date">
+      <label><%= t('reset_date') %></label>
+      <div class="value"><%= "#{format_date(@log.reset_date, :short)}"%></div>
+    </div>
+    <div class="info_by">
+      <label><%= t('reset_by') %></label>
+      <div class="value"><%= @log.resetted_user%></div>
+    </div>
+    <div class="info_remarks">
+      <label><%= t('remarks') %></label>
+      <div class="value"><%= @log.reset_remark%></div>
+    </div>
+  </div>
+  <hr></hr>
+  <div id="failed">
+    <% if @failed_employee_logs.present? %>
+      <%= render :partial => "failed_employees" %>
+    <% end %>
+  </div>
+  <div id="success">
+    <% if @employee_logs.present? %>
+      <%= render :partial => "success_employees" %>
+    <% end %>
+  </div>
+</div>
+<div id="modal-box" style="display:none;"></div>

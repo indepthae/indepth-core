@@ -1,0 +1,99 @@
+<%css_path = (rtl?) ? "#{Rails.root}/public/stylesheets/rtl/finance/fee_reciepts_export_pdf" : "#{Rails.root}/public/stylesheets/finance/fee_reciepts_export_pdf" %>
+<%= wicked_pdf_stylesheet_link_tag(css_path) %>
+<div id="page-yield">
+  <div class="extender"> </div>
+  <div class="section1 row" >
+      <center>
+          <h2><%=t('fee_receipts_report') %></h2>
+      </center>
+  </div>
+
+  <div class="section1 row">
+    <center>
+      <div id="main_info">
+          <div class="info-left">
+            <div class="filter-content"><%=t('start_date')%> : <%=format_date(@start_date)%></div>
+          </div>
+          <div class="info-right">
+            <div class="filter-content"><%=t('end_date')%> : <%=format_date(@end_date)%></div>
+          </div>
+      </div>
+    </center>
+  </div>
+
+  <div class="section1 row">
+    <center>
+        <div id="main_info">
+          <div class="info-left-filter">
+            <%if @query.present?%>
+            <div class="filter-content"><%="#{t('collection')} : #{@query}"%></div>
+            <%end%>
+            <%if @payment_mode_equals.present? || @reference_no_like.present? %>
+              <% pay_detail="#{t('payment_details')}"%>
+              <% pay_detail << " : #{@payment_mode_equals}" if @payment_mode_equals.present? %>
+              <% pay_detail << " : #{@reference_no_like}" if @reference_no_like.present? %>
+              <div class="filter-content"><%=pay_detail%></div>
+            <%end%>
+            <div class="filter-content"><%="#{t('cashier')} &#58; #{@name}" if @name.present?%></div>
+            <%if @payee_type.present? || @student_info.present?%>
+              <% payee="" %>
+              <% payee << "#{t('payee_type')} : #{@payee_type.capitalize}" if @payee_type.present? %>
+              <% payee << " : #{@student_info}" if @student_info.present? %>
+              <div class="filter-content"><%=payee %></div>
+            <%end%>
+          </div>
+        </div>
+      </center>
+    </div>
+
+  <div class="section1 row" id="table-headers" >
+    <center>
+      <table id="pdf-table" width="100%" cellspacing="0">
+        <thead>
+          <tr class="odd">
+            <th class="col-pdf1 reciept-td"><%=t('receipt')%></th>
+            <th class="col-pdf1 name-td"><%=t('payee_name')%></th>
+            <th class="col-pdf1 payer-type-td"><%=t('payee_type')%></th>
+            <th class="col-pdf1 name-td"><%="#{t('batch_capital_terminology')} / #{t('department')}"%></th>
+            <th class="col-pdf1 extend-name-td"><%="#{t('collection')}"%></th>
+            <th class="col-pdf1 name-td"><%="#{t('payment_date')}"%></th>
+            <th class="col-pdf1 name-td"><%="#{t('payment_mode')}"%></th>
+            <th class="col-pdf1 name-td"><%="#{t('cashier')}"%> &#x200E;(<%="#{t('employee_text')}"%>)&#x200E;</th>
+            <th class="col-pdf1 reciept-td"><%="#{t('amount')}"%> (<%=Configuration.currency%>) </th>
+          </tr>
+        </thead>
+        <%@fee_receipts.each do |fr|%>
+          <% c =cycle('even','odd ') %>
+          <tr class="<%= "#{c}" %>">
+            <td><%=fr.receipt_no%></td>
+            <%if fr.payer_no.present?%>
+              <td><%=fr.payer_name%> &#x200E;(<%=fr.payer_no%>)&#x200E;</td>
+            <%else%>
+              <td><%=fr.payer_name%></td>
+            <%end%>
+            <td><%=fr.payer_type_info%></td>
+            <%if fr.payer_batch_dept.present?%>
+              <td>&#x200E;<%=fr.payer_batch_dept%>&#x200E;</td>
+            <%else%>
+              <td>&#45;</td>
+            <%end%>
+            <td><%=fr.collection_name%></td>
+            <td><%=format_date(fr.transaction_date)%></td>
+            <%if fr.reference_no.present?%>
+              <td><%=fr.payment_mode%>&#45;<%=fr.reference_no%></td>
+            <%else%>
+              <td><%=fr.payment_mode%></td>
+            <%end%>
+            <td><%= fr.payment_mode=='Online Payment' ? fr.get_cashier_name : fr.cashier_name %></td>
+            <td><%=precision_label(fr.amount)%></td>
+          </tr>
+        <%end%>
+        <tr class="even">
+          <td colspan="9">
+                <div class="amount-right"><%="#{t('amount')}"%> &#x200E;&#x200E;(<%=Configuration.currency%>): <span class="info_center"><%=precision_label(@grand_total)%></span></div>
+          </td>
+        </tr>
+      </table>
+    </center>
+  </div>
+</div>

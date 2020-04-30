@@ -1,0 +1,14 @@
+<% content_for :head do %>
+    <%# stylesheet_link_tag "#{@direction}finance_reports/report", :media => 'all' %>
+    <%= stylesheet_link_tag "#{@direction}finance_reports/report_print", :media => 'all' %>
+<% end %>
+
+<%= render :partial => "finance_reports/reports/report_header" %>
+<%= render :partial => "finance_reports/reports/#{@report_type}_pdf" %>
+<%= render :partial => "finance_reports/reports/report_footer" %>
+
+<script>
+  j(document).ready(function(){
+      window.print();
+  })
+</script>

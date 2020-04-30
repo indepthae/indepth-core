@@ -1,0 +1,15 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+      <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+
+<div class="content-div container-width">
+    <div class='content-list'>
+        <fieldset class="bg-light grey-border shadow">
+            <label><%#= @task_log.log.gsub(/\n/, '<br/>').html_safe if @task_log.log.present? %></label>
+            <label><%= @logs.gsub(/\n/, '<br/>').html_safe %></label>
+        </fieldset>
+    </div>
+</div>
+

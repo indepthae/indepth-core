@@ -1,0 +1,188 @@
+<% unless @grn.blank? %>
+  <div class="info">
+    <div class="field_pair">
+      <div class="label1"><%= "#{t('total')} #{t('grn')}" %></div>
+      <div class="label2"><%=": #{@grn.total_entries}" %></div>
+    </div>
+  </div>
+  <div class="submit-button">
+    <%= link_to "#{t('export_as_csv')}" ,{:controller=>'inventories',:action=>'grn_report_csv',:sort_order=>@sort_order,:status=>params[:status]},:target=>'_blank' %>
+  </div>
+  <div class="extender"></div>
+  <div id="page-yield">
+    <div class="extender"></div>
+    <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head sub-heading">
+        <td><%= t('no_text') %></td>
+
+        <% if @sort_order=="grn_no DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.grn_no')} &#8595;", :url=>{:action=>"reports",:sort_order=>"grn_no ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="grn_no ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.grn_no')} &#8593;", :url=>{:action=>"reports",:sort_order=>"grn_no DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('grns.grn_no')}", :url=>{:action=>"reports",:sort_order=>"grn_no DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+
+        <% if @sort_order=="supplier DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('supplier')} &#8595;", :url=>{:action=>"reports",:sort_order=>"supplier ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="supplier ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('supplier')} &#8593;", :url=>{:action=>"reports",:sort_order=>"supplier DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('supplier')}", :url=>{:action=>"reports",:sort_order=>"supplier DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="po_no DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('purchase_order_no')} &#8595;", :url=>{:action=>"reports",:sort_order=>"po_no ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="po_no ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('purchase_order_no')} &#8593;", :url=>{:action=>"reports",:sort_order=>"po_no DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('purchase_order_no')}", :url=>{:action=>"reports",:sort_order=>"po_no DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="store DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('store')} &#8595;", :url=>{:action=>"reports",:sort_order=>"store ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="store ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('store')} &#8593;", :url=>{:action=>"reports",:sort_order=>"store DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('store')}", :url=>{:action=>"reports",:sort_order=>"store DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="invoice_no DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('invoice_no')} &#8595;", :url=>{:action=>"reports",:sort_order=>"invoice_no ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="invoice_no ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('invoice_no')} &#8593;", :url=>{:action=>"reports",:sort_order=>"invoice_no DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('invoice_no')}", :url=>{:action=>"reports",:sort_order=>"invoice_no DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="grn_date DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.grn_date')} &#8595;", :url=>{:action=>"reports",:sort_order=>"grn_date ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="grn_date ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.grn_date')} &#8593;", :url=>{:action=>"reports",:sort_order=>"grn_date DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('grns.grn_date')}", :url=>{:action=>"reports",:sort_order=>"grn_date DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="invoice_date DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('invoice_date')} &#8595;", :url=>{:action=>"reports",:sort_order=>"invoice_date ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="invoice_date ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('invoice_date')} &#8593;", :url=>{:action=>"reports",:sort_order=>"invoice_date DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('invoice_date')}", :url=>{:action=>"reports",:sort_order=>"invoice_date DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+        <% if @sort_order=="other_charges DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.other_charges')} &#8595;", :url=>{:action=>"reports",:sort_order=>"other_charges ASC",:status=>params[:status]} %>
+          </td>
+        <% elsif @sort_order=="other_charges ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('grns.other_charges')} &#8593;", :url=>{:action=>"reports",:sort_order=>"other_charges DESC",:status=>params[:status]} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('grns.other_charges')}", :url=>{:action=>"reports",:sort_order=>"other_charges DESC",:status=>params[:status]} %>
+          </td>
+        <% end %>
+      </tr>
+      <%j=0 %>
+      <% @grn.each_with_index do |r,@i| %>
+        <% if params[:page].present? %>
+          <% if params[:page].to_i >= 1 %>
+            <% @i = @i  + (params[:page].to_i - 1) * @grn.per_page.to_i %>
+          <% end %> <%else %> <% @i = @i %>
+        <% end %>
+        <% j+=1 %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-5"> <%=@i+1 %></td>
+          <% if @sort_order=="grn_no ASC" or @sort_order=="grn_no DESC" %>
+            <td class="col-3 batch_order_select"><%=r.grn_no%></td>
+          <% else %>
+            <td class="col-3"><%=r.grn_no%></td>
+          <% end %>
+          <% if @sort_order=="supplier ASC" or @sort_order=="supplier DESC" %>
+            <td class="col-3 batch_order_select"><%=r.supplier%></td>
+          <% else %>
+            <td class="col-3"><%=r.supplier%></td>
+          <% end %>
+          <% if @sort_order=="po_no ASC" or @sort_order=="po_no DESC" %>
+            <td class="col-3 batch_order_select"><%= r.po_no %></td>
+          <% else %>
+            <td class="col-3"><%= r.po_no %></td>
+          <% end %>
+          <% if @sort_order=="store ASC" or @sort_order=="store DESC" %>
+            <td class="col-3 batch_order_select"><%= r.store %></td>
+          <% else %>
+            <td class="col-3"><%= r.store %></td>
+          <% end %>
+          <% if @sort_order=="invoice_no ASC" or @sort_order=="invoice_no DESC" %>
+            <td class="col-3 batch_order_select"><%= r.invoice_no %></td>
+          <% else %>
+            <td class="col-3"><%= r.invoice_no %></td>
+          <% end %>
+          <% if @sort_order=="grn_date ASC" or @sort_order=="grn_date DESC" %>
+            <td class="col-3 batch_order_select"><%= format_date(r.grn_date.to_date) %></td>
+          <% else %>
+            <td class="col-3"><%= format_date(r.grn_date.to_date) %></td>
+          <% end %>
+          <% if @sort_order=="invoice_date ASC" or @sort_order=="invoice_date DESC" %>
+            <td class="col-3 batch_order_select"><%= format_date(r.invoice_date.to_date) %></td>
+          <% else %>
+            <td class="col-3"><%= format_date(r.invoice_date.to_date) %></td>
+          <% end %>
+          <% if @sort_order=="other_charges ASC" or @sort_order=="other_charges DESC" %>
+            <td class="col-3 batch_order_select"><%= precision_label(r.other_charges) %></td>
+          <% else %>
+            <td class="col-3"><%= precision_label(r.other_charges) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    <% unless @grn.per_page.to_i >= @grn.total_entries.to_i %>
+      <div class="pagination_list">
+        <div class="pagination_text">
+          <%= "#{t('showing')} #{@i+1-(j-1)}-#{@i+1} #{t('of')} #{@grn.total_entries}" %>
+        </div>
+        <%= will_paginate @grn,:renderer => 'RemoteLinkRenderer' ,:page_links=>false ,:params=>{:sort_order=>@sort_order,:status=>params[:status]}%>
+      </div>
+    <% end %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_record_found') %></p>
+  <% end %>
+</div>

@@ -1,0 +1,24 @@
+<% unless @students.empty? %>
+    <% @students.each do |receiver| %>
+        <div id="qn-<%= receiver.id %>">
+
+
+          <div class="each-question student-link" id="<%= receiver.id %>" batch_id="<%= @batch.id %>">
+            <div class="question-box">
+              <%= "#{receiver.full_name} -&#x200E; (#{receiver.user.present? ? receiver.user.username : '' })&#x200E;" %>
+            </div>
+          </div>
+
+        </div>
+    <% end %>
+<% else %>
+    <div class="no-questions"><%= t("no_students_for_this_batch") %></div>
+<% end %>
+<script type="text/javascript">
+    if (j("#question-list").find(".selected").length == 0) {
+        j("#question-list").find(".each-question").first().addClass("selected");
+    }
+
+//    $$('.student-link').invoke('observe', 'click', draw_report);
+//    $$('.student-link').invoke('observe', 'click', set_active);
+</script>

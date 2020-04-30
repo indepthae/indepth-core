@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <%= stylesheet_link_tag(['application', '_styles/ui.all'])%>
+    <%= stylesheet_link_tag(*get_stylesheets) %>
+    <%= javascript_include_tag :defaults, :cache => 'cache/javascripts/all' %>
+  </head>
+  <body>
+    <div id="header_bg">
+      <div id="header">
+
+      </div>
+    </div>
+    <div id="page-yield">
+      <div id="box">
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+        <div class="exam-result">
+          <% if @exam_attendance.online_exam_group.exam_format == "hybrid" %>
+          <div class="exam-completion">
+            <%= t('exam_completion_text') %>
+          </div>
+          <% else %>
+            <h3><%= t('exam_result_text') %></h3>
+            <div class="result-box">
+              <div class="info">
+                <div class="label"><%= t('student_name') %> </div><div class="record themed_text"><span>:</span> <%= @exam_attendance.student.full_name %></div>
+              </div>
+              <div class="info">
+                <div class="label"><%= t('total_score') %> </div><div class="record themed_text"><span>:</span> <%= @exam_attendance.total_score %> / <%= @total_score  %></div>
+              </div>
+              <div class="info">
+                <%  if @exam_attendance.is_passed %>
+                  <div class="label"><%= t('result') %> </div><div class="record themed_text"><span>: </span><%= t('passed') %></div>
+                <% else %>
+                  <div class="label"><%= t('result') %> </div><div class="record themed_text"><span>: </span><%= t('failed') %></div>
+                <%end %>
+              </div>
+
+            </div>
+          <% end %>
+          <div>
+            <%=link_to_function " ► #{t('finish')}",:onclick => "self.close()" ,:class=>"user_button" %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="footer">
+      <div id="footer_logo">
+        <div id="powered_by">
+          <%= t('powered_by') %> <a href=<%= "#{FedenaSetting.company_details[:company_url]}" %> target="_blank"><%= FedenaSetting.company_details[:company_name] %></a>
+        </div>
+        <div class="footer-logo"></div>
+      </div>
+    </div>
+  </body>
+</html>
+

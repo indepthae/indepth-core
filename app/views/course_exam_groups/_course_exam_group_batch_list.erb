@@ -1,0 +1,67 @@
+<%if @inactive_count%>
+  <div class="exam_group_count">
+    <div class="item_count_div">
+      <%= radio_button_tag 'status','active',(params[:status]=='active'||true)%>
+      <label for='status_active'> <%=t('active_exam_groups')%> </label>
+    </div>
+    <div class="item_count_div">
+      <%= radio_button_tag 'status','inactive',params[:status]=='inactive'%>
+      <label for='status_inactive'> <%=t('inactive_exam_groups')%> </label>
+    </div>
+    <div class="item_count_div for_loader">
+      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_select_loader", :style =>"display: none;" ) %>
+    </div>
+  </div>
+<%end%>
+
+<table id="listing" width="100%">
+  <tr class="tr-head">
+    <td><%= t('batch') %></td>
+    <td><%= t('exams_text') %></td>
+    <td><%= t('subjects_text') %></td>
+    <td><%= t('status') %></td>
+    <td></td>
+  </tr>
+  <%@batches.each do |batch|%>
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-3"><%= batch.batch_name %></td>
+      <td class="col-1"><%= batch.exams_count %></td>
+      <td class="col-1"><%= batch.subject_count%></td>
+      <td class="col-3">
+        <% unless batch.is_published%>
+          <% if batch.exams_count=='0'%>
+            <%= t('no_exams_created')%>
+          <%else%>
+            <%= t('schedule_not_published')%>
+          <%end%>
+        <% else  %>
+          <%  unless  batch.result_published%>
+            <%= t('schedule_published') %><br />
+          <% else %>
+            <%= t('result_published') %>
+          <% end  %>
+        <% end  %>
+      </td>
+      <td class="col-2">
+        <%if @course_exam_group.exam_groups_mode == :active%>
+          <%= link_to t("manage_exams"), {:controller=>"exam_groups",:action=>"show",:batch_id=>batch.batch_id,:id=>batch.exam_group_id,:from=>"course_exam_group"} %>
+        <%else%>
+          <%= link_to t("manage_exams"),previous_marks_entry_path(batch.batch_id,batch.exam_group_id,:from=>"course_exam_group")%>
+        <%end%>
+      </td>
+    </tr>
+  <%end%>
+</table>
+<%= will_paginate @batches,:params=>{:action=>"show",:id=>params[:id],:status=>params[:status]}%>
+<script type="text/javascript">
+  j("input[name='status']:radio").change(function () {
+    var params='?status='+j(this).val();
+    j('#batch_select_loader').show();
+    j.get('/course_exam_groups/show/'+<%=params[:id]%>+''+params, function( data,status ) {
+      if (status=='success'){
+        j('#batch_select_loader').hide();
+        window.location = '/course_exam_groups/show/'+<%=params[:id]%>+''+params
+      }
+    })
+  });
+</script>

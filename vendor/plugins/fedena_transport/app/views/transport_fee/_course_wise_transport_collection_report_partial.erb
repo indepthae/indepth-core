@@ -1,0 +1,37 @@
+<div id="page-yield">
+  <div class="bread_crumb">
+    <div class="bread_crumb">
+      <% breadcrumb :transport_fee_transport_fees_report, [@start_date,@end_date] %>
+      <%= render_breadcrumbs  %>
+    </div>
+  </div>
+  <% total =0 %>
+  <% total =0 %>
+  <b id="fees_report_title"><%= t('fees_transaction_course_wise') %></b>
+  <div id="fees-table">
+    <div class="fees-th">
+      <div class="fees-table-head-desc"><%= t('batch') %></div>
+      <div class="fees-table-expenses1"><%= t('income') %></div>
+    </div>
+        <%j=0%>
+        <% @course_ids.each do |course,batches| %>
+          <div class="listodd">
+            <div class="fees-table-description"><%="#{j=j+1}. "%><%=batches.first.course.course_name%></div>
+            </div>
+            <%i=0%>
+            <% batches.each do |b| %>
+              <div class="listeven">
+                <div class="fees-table-description"><%="#{i=i+1}. "%><%= link_to batches.first.full_name, :action => 'batch_transport_fees_report',:id =>params[:id],:start_date => @start_date,:end_date => @end_date,:batch_id=>b.id %></div>
+                <%amount=@fee_collection.batch_transaction_total(@start_date,@end_date,b.id).to_f%>
+                <div class="fees-table-income"> <%= precision_label(amount) %></div>
+              </div>
+              <% total += amount %>
+            <%end%>
+          <%end%>
+      <br/>
+      <div class="fees-th">
+        <div class="fees-table-description"><%= t('total_fees') %></div>
+        <div class="fees-table-expenses"><%= precision_label(total) %></div>
+      </div>
+  </div>
+  </div>

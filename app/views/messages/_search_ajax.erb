@@ -1,0 +1,48 @@
+<% if @students.present? or @employees.present? or @admins.present? %>
+  <% @students.each do |student| %>
+    <div class="rec-list" onclick="insert_element_and_check_parent(this);">
+        <div class="data_cont" data-id="<%=student.user_id%>" data-receiver="student" style="display: none;"></div>
+        <div class='name_board'>
+            <div class='name_label student_label'>S</div>
+            <div class='name_and_tag'>
+                <div class='entity_name'><%=student.full_name%></div>
+                <div class='tag_line'>
+                    <%="#{t('batch')}: #{student.batch.full_name} (#{student.admission_no})&#x200E;"%>
+                </div>
+            </div>
+        </div>
+    </div>
+  <%end%>
+  <% @employees.each do |employee| %>
+    <div class="rec-list" onclick="insert_element_and_check_parent(this);">
+        <div class="data_cont" data-id="<%=employee.user_id%>" data-receiver="employee" style="display: none;"></div>
+        <div class='name_board'>
+            <div class='name_label employee_label'>E</div>
+            <div class='name_and_tag'>
+                <div class='entity_name'><%=employee.full_name%></div>
+                <div class='tag_line'>
+                    <%="#{t('department')}: #{employee.department} (#{employee.employee_number})&#x200E;"%>
+                </div>
+            </div>
+        </div>
+    </div>
+  <%end%>
+  <% @admins.each do |admin| %>
+    <div class="rec-list" onclick="insert_element_and_check_parent(this);">
+        <div class="data_cont" data-id="<%=admin.id%>" data-receiver="admin" style="display: none;"></div>
+        <div class='name_board'>
+            <div class='name_label employee_label'>U</div>
+            <div class='name_and_tag'>
+                <div class='entity_name'><%=admin.full_name%></div>
+                <div class='tag_line'>
+                    <%="#{admin.user_type}"%>
+                </div>
+            </div>
+        </div>
+    </div>
+  <% end %>
+<%else%>
+  <div class="no_users">
+      <%= t('no_users') %>
+  </div>
+<%end%>

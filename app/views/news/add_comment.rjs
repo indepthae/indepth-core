@@ -1,0 +1,14 @@
+if Configuration.get_config_value("EnableNewsCommentModeration") == "0"
+  page.replace_html 'comments-list', :partial => 'all_comments'
+  page.replace_html "comments", :text => "#{t('comments')}(#{@news.comments.count})"
+else
+page.replace_html 'comments-list', :partial => 'comment'
+page.select('form').each { |f| f.reset }
+if @is_moderator
+  page.replace_html "approve_text", :text => "#{t('approved_comments')}(#{@news.comments.approved_comments.count})"
+  #page<<""
+else
+  page.replace_html "comments", :partial => 'viewable_comments'
+end
+#page.replace_html "comment_text", :text => "#{t('comments')}(#{@news.comments.viewable_comments.count})"
+end

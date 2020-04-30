@@ -1,0 +1,45 @@
+   <% unless @report_data.empty? %>
+
+<table id="listing_theme" class="sold_items" width="100%">
+    <tr class="tr-head">
+      <td><%= "#{t('report_date')}" %></td>
+      <td><%= "#{t('no_of_sales')}" %></td>
+      <td><%= "#{t('total_income')}  (#{@currency})" %></td>
+      <td><%= "#{t('total_discount')}  (#{@currency})" %></td>
+      <td><%= "#{t('total_charges')}  (#{@currency})" %></td>
+      <td><%= "#{t('total_tax')} (%)" %></td>
+    </tr>
+   <tr class="tr-blank"></tr>
+
+   <% @report_data.group_by(&:date).each do |date, invoices| %>
+
+   <tr class="tr-<%= cycle('odd', 'even') %>" id="store_item_fields">
+     <td class="col-1"><%= format_date(date) %></td>
+     <td class="col-3"><%= invoices.count %></td>
+     <% tot_dis = 0 %>
+     <% invoices.each do |inv| %>
+       <% tot_dis += inv.discounts.map{|x| x.amount}.sum %>
+     <% end %>
+     <% tot_charges = 0 %>
+     <% invoices.each do |invoice| %>
+       <% tot_charges += invoice.additional_charges.map{|x| x.amount}.sum %>
+     <% end %>
+     <% tot_tax = invoices.map{|v| v.tax }.compact.sum %>
+     <% tot_sub = 0 %>
+     <% invoices.each do |invoice| %>
+       <% tx_amt = (invoice.sold_items.map{|v| v.rate}.sum * invoice.tax.to_f)/100 %>
+       <% tot_sub += invoice.sold_items.map{|v| v.rate}.sum + tx_amt %>
+     <% end %>
+     <td class="col-3"><%= precision_label(invoices.collect(&:payable_amount).sum)%></td>
+     <td class="col-3"><%= precision_label(tot_dis) %></td>
+     <td class="col-3"><%= precision_label(tot_charges) %></td>
+     <td class="col-3"><%= precision_label(tot_tax) %></td>
+   </tr>
+
+   <% end %>
+      <% else %>
+   <p class="flash-msg">No Reports</p>
+<%end%>
+    </table>
+
+<%= will_paginate @report_data,:renderer => 'RemoteLinkRenderer', :params=> {:action => "day_wise_report", :status => params[:status]} %>

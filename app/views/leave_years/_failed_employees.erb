@@ -1,0 +1,36 @@
+<% if @failed_employees.present? %>
+  <div class="failed_list">
+      <div class="failed_desc"><%= t('failed_desc') %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="leave_process_record">
+          <tr class="tr-head">
+              <td class="name"><%= t('employees') %></td>
+              <td class="no_emp"><%= t('reason') %></td>
+              <td class="status"></td>
+          </tr>
+          <% @failed_employees.each do |employee| %>
+            <tr>
+                <td><%= employee.full_name %></td>
+                <% if @reasons[employee.id][:reason].count > 1%>
+                  <td><%  @reasons[employee.id][:reason].each do |r| %>
+                        <% unless r.include? ":" %>
+                          <%=  "-  #{t(r)} <br>"  %>
+                        <% else %>
+                          <% reason = r.split(":") %>
+                          <%= reason[0] +" : "+ t(reason[1].strip)  %>
+                        <% end %>
+                      <% end %>
+                  </td>
+                <% else %>
+                  <td><%=  t(@reasons[employee.id][:reason]) %></td>
+
+                <% end %>
+                <td><%= link_to_remote "#{t('retry_process')}",:url => {:controller => "leave_years", :action => "retry_reset", :employee_id => employee.id, :logs => @logs.id, :reason => @reasons[employee.id][:reason], :department_id => @department.id} %></td>
+            </tr>
+          <% end %>
+      </table>
+  </div>
+  <% if @failed_employees.present? %>
+    <%= pagination_status(@failed_employees) %>
+  <% end %>
+  <%= will_paginate @failed_employees %>
+<% end %>

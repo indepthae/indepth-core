@@ -1,0 +1,45 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="route_listing">
+    <tr class="tr-head">
+        <td class="col-1"><%= t('name') %></td>  
+        <td class="col-2"><%= t('vehicle') %></td>  
+        <td class="col-3"><%= t('no_of_stops') %></td>  
+        <td class="col-4"></td>
+    </tr>
+
+    <% if @routes.present? %>
+      <% @routes.each do |r| %>
+        <tr>
+            <td><%= link_to r.name,route_path(r.id) %></td>
+            <td><%= r.vehicle.try(:vehicle_no) %></td>
+            <td><%= r.route_stops.length %></td>
+            <td><%= link_to "#{t('edit_text')}", edit_route_path(r) %>
+                <% if r.pickups.empty? and r.drops.empty? %>
+                  <%= link_to "#{t('delete_text')}", delete_route_route_path(r, :active_status => params[:active_status]), :onclick => "return make_popup_box(this, 'confirm', 
+      '#{t('delete_route_confirmation', {:name => r.name})}', {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 
+      'title' : '#{t('delete_route')}', 'popup_class' : 'delete_confirmation'}); " %>
+                <% else %>
+                  <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                    <% end %>
+                    <% if r.is_active %>
+                      <%= link_to t('inactivate'), inactivate_route_route_path(r, :active_status => params[:active_status]) %>
+                    <% else %>
+                      <%= link_to t('activate'), activate_route_route_path(r, :active_status => params[:active_status]) %>
+                    <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <% if @flag == "1" %>
+        <tr><td colspan="4">  <%=t('routes.no_active_routes')%> </td></tr>
+      <% elsif @flag == "0" %>
+        <tr><td colspan="4">  <%=t('routes.no_inactive_routes')%> </td></tr>
+      <% else %>
+        <tr><td colspan="4">  <%=t('routes.no_routes_present')%> </td></tr>
+      <% end %>
+  <!--<tr><td colspan="4">  <%#=t('no_routes')%> </td></tr> -->
+<% end %>
+</table>
+<% if @routes.present? %>
+  <%= pagination_status(@routes) %>
+<% end %>
+<%= will_paginate @routes, :params => {:action => "index", :active_status => params[:active_status]} %>

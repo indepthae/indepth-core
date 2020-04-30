@@ -1,0 +1,66 @@
+<div id="exam_timings_details">
+    <div id="course_details">
+        <div class="fields-details">
+            <div class="field-label"><%= t('course') %></div>
+            <div class="fields-val"><%= @course.course_name %></div>
+        </div>
+        <% unless @batch.present? %>
+          <div class="fields-details">
+              <div class="field-label"><%= t('batches_text') %></div>
+              <div class="fields-val"><%= @course.batches_in_academic_year(@assessment_group.academic_year_id).count %></div>
+          </div>
+          <div class="fields-details">
+              <div class="field-label"><%= t('students') %></div>
+              <div class="fields-val"><%= @course.active_students_in_academic_year(@assessment_group.academic_year_id).count %></div>
+          </div>
+        <% else %>
+          <div class="fields-details">
+              <div class="field-label"><%= t('batches_text') %></div>
+              <div class="fields-val"><%= @batch.name %></div>
+          </div>
+          <div class="fields-details">
+              <div class="field-label"><%= t('students') %></div>
+              <div class="fields-val"><%= @batch.students.count %></div>
+          </div>
+        <% end %>
+    </div>
+    <div id="group_details">
+        <div class="fields-details">
+            <div class="field-label"><%= t('term_text') %></div>
+            <div class="fields-val"><%= @term.name %></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('exam_group') %></div>
+            <div class="fields-val"><%= @assessment_group.name %></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('maximum_marks') %></div>
+            <div class="fields-val"><%= @assessment_group.maximum_marks_text %></div>
+        </div>
+    </div>
+</div>
+
+<% @assessments.each do |batch, timetables| %>
+  <table id="assessments">
+      <tr class="tr-head">
+          <td class="date"><%= t('date_text') %></td>
+          <td class="time"><%= t('time_text') %></td>
+          <td class="subject"><%= "#{t('subject')} - #{batch.name}" %></td>
+      </tr>
+      <% timetables.each do |exam| %>
+        <tr>
+            <td class="date"><%= format_date(exam.exam_date, :format => :long_date_and_date) %></td>
+            <td class="time"><%= "#{format_date(Time.parse(exam.start_time), :format => :time )} #{t('to')} #{format_date(Time.parse(exam.end_time), :format => :time )}" %></td>
+            <td class="subject"><%= "#{exam.subject_name} #{exam.elective_group_id.present? ? '&#x200E;('+ t('elective') +')&#x200E;' : ''}" %></td>
+        </tr>
+      <% end %>
+  </table>
+<% end %>
+<div id="buttons">
+    <%= link_to "#{t('pdf_report')}", {:controller => "assessments", :action => "exam_timings_pdf",:page_height => 680, 
+      :report_format_type => "pdf", :course_id => @course.id, :group_id => @assessment_group.id, 
+      :batch_id => params[:batch_id]}, :class => "user_button", :target => '_blank'  %>
+    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+      :csv_report_type => "exam_timings",:report_format_type => "csv", :course_id => @course.id, 
+      :group_id => @assessment_group.id, :batch_id => params[:batch_id]},:class => "user_button"%>
+</div>

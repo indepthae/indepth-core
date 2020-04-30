@@ -1,0 +1,28 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_planner') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_plans_add_course, @assessment_plan %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <div class="left">
+        <div class="field_name"><%= t('exam_plan_name') %></div>
+        <div class="field_val"><%= @assessment_plan.name %></div>
+    </div>
+    <div class="right">
+        <div class="field_val"><%= @assessment_plan.academic_year.name %></div>
+        <div class="field_name"><%= t('academic_year') %></div>
+    </div>
+    <hr>
+    <div id ="header"><%= t('linking_courses_to_year_planner') %></div>
+    <div id ="description"><%= t('linking_courses_to_year_planner_description') %></div>
+    <div id="list_courses">
+        <%= render :partial => "course_form" %>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<% content_for :head do  %>
+  <%= stylesheet_link_tag("assessment_scores/fa_groups.css") %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>Exam Group</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Subjects List</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%if @batch.is_active%>
+      <% breadcrumb :batch_subject_list, @exam_group%>
+    <%else%>
+      <% breadcrumb :batch_subject_list_inactive_batch, @exam_group%>
+    <%end%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless @subjects.empty?  %>
+    <ul id="category-list">
+      <li class="listheading">
+        <div class="heading-name">Select a subject</div>
+        <div class="heading-edit">
+        </div>
+      </li>
+      <% @subjects.each do |subject| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <label>
+            <div class="category-name">
+              <%= link_to subject.name,subject_fa_groups_without_exam_path(:exam_group_id=>@exam_group.id,:subject_id=>subject.id,:cce_exam_category_id=>@exam_group.cce_exam_category_id) %>
+            </div>
+          </label>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <ul id="category-list">
+      <li class="listheading">
+        <div class="heading-name">No subjects present in this batch</div>
+      </li>
+    </ul>
+  <% end %>
+</div>

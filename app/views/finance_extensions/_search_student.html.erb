@@ -1,0 +1,55 @@
+<div id="search_box_bg" style="display: none">
+  <label class="common-label" for="user_name"><%= t('search_text') %>
+
+  </label>
+
+  <div id="search_textbox" class="val">
+    <%= text_field_tag("query", params['query'], :autocomplete => 'off') %>
+    <a href="#" onclick="cancel_search()" style="margin:0px 10px 0px 10px"><%= t('cancel') %></a>
+    <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader",
+                  :style => "display: none;") %>
+  </div>
+  <ul id="list-receivers"></ul>
+  <div class="seprate_div"></div>
+</div>
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<script type="text/javascript">
+  function cancel_search(){
+      j('#search_box_bg').hide()
+      j('#change-student').show();
+      j('#query').val('')
+  }
+
+  j(document).delegate("#query","input", function () {
+      var j = jQuery.noConflict();
+      var a
+      action='/finance_extensions/student_search_autocomplete'
+
+      parameters={student_id: <%=@student.id %>}
+
+      jQuery(function () {
+          a = j('#query').autocompleteAjax({serviceUrl: action, params: parameters,
+              onSelect: function (value, data) {
+
+                  data=data.replace(/'/g, '"')
+                  data=jQuery.parseJSON(data)
+                  if (data.receiver==false)
+                  {
+                      j('.autocomplete').hide();
+                      j('#query').val("")
+                  }
+                  else {
+                      j('#loader').show();
+                      window.location = +data.id;
+
+                  }
+
+              } });
+
+      });
+
+  })
+</script>

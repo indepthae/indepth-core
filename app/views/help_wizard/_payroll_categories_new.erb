@@ -1,0 +1,18 @@
+
+  <% help_wizard('Guide', 'Here\'s a brief step-by-step guide on how to create a payroll category.') do %>
+      <p>Payroll categories are components under which the emoluments are paid to the employees.</p>
+
+      <ol>
+        <li>Provide a meaningful and recognizable name for each payroll category as you want it to appear in the employee payslips.</li>
+        <li>Each payroll category is assigned a code (eg: Category - Basic Pay, Code - BASIC). The code will be the unique identifier of a payroll category. Payroll categories can have variable values based on formulas created using other payroll category codes. (eg: Health Allowance = Basic*0.10).</li>
+        <li>Category Value: The category value defines how the amount for the category is to be calculated. It can be one of the following:</li>
+        <ul>
+          <li><b>Numeric</b> - If the value is a numeric constant, use this option.</li>
+          <li><b>Formula</b> - If the value of this category is based on other categories, use the codes of other categories and create a formula.</li>
+          <li><b>Conditions</b> - If the value of the category is based on certain conditions.</li>
+        </ul>
+      </ol>
+
+      <p><b>Note:</b> If a category is numeric and is not given any value or given a value of 0, all categories using this category will derive the value 0 when calculating payroll.</p>
+      <p><b>Recommended:</b> It is good practice to connect all the formula based categories to employee’s gross pay (category code - GROSS) either directly or indirectly.</p>
+  <% end %>

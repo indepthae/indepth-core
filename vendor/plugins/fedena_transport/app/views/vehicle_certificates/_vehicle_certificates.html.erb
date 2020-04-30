@@ -1,0 +1,38 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="certificate_details">
+    <tr class="tr-head">
+        <td class="certificate_no"><%= t('certificate_no') %></td>
+        <td class="date_of_issue"><%= t('date_of_issue') %></td>
+        <td class="date_of_expiry"><%= t('date_of_expiry') %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @certificates.empty? %>
+      <% @grouped_certificates.each do |type, certificates| %>
+        <tr>
+            <td colspan="4"><b><%= type %></b></td>
+        </tr>
+        <% certificates.each do |c|  %>
+          <tr>
+              <td><%= c.certificate_no %></td>
+              <td><%= format_date(c.date_of_issue) %></td>
+              <td><%= format_date(c.date_of_expiry) %></td>
+              <td>
+                  <%= link_to t('edit'), edit_vehicle_vehicle_certificate_path(@vehicle.id, c.id)  %>
+                  <%= link_to t('delete'), delete_certificate_vehicle_vehicle_certificate_path(@vehicle.id, c.id), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_certificate_confirmation', {:name => c.certificate_no})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_certificate')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% if c.certificate.present? %>
+                  <%= link_to t('download_certificate'), c.certificate.url(:original, false)  %>
+                  <% end %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4"><%= t('upload_certificates') %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @certificates.present? %>
+  <%= pagination_status(@certificates) %>
+<% end %>
+<%= will_paginate @certificates %>

@@ -1,0 +1,59 @@
+<div class="detail_badges">
+    <div class="clm dates">
+        <div class="head">
+            <div class="left"><%=t('dates_text')%></div>
+            <div class="right"></div>
+        </div>
+        <div class="desc">
+            <table>
+                <tr>
+                    <td><%=t('from')%> </td>
+                    <td class="desc_val"> <%=format_date(@academic_year.start_date,:format => :month_year)%></td>
+                </tr>
+                <tr>
+                    <td><%=t('to')%></td>
+                    <td class="desc_val"> <%=format_date(@academic_year.end_date,:format => :month_year)%></td>
+                </tr>
+                <tr>
+                    <td><%=t('no_of_terms')%></td>
+                    <td class="desc_val text-right"> <%=@plan.terms_count%></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="clm courses">
+        <div class="head">
+            <div class="left"><%=t('courses_linked_count')%></div>
+            <div class="right">
+                <% if @plan.courses.present? %>
+                  <%= link_to "#{t('manage_courses')}", {:controller => "assessment_plans", :action => "manage_courses", :id => @plan.id} %>
+                <% else %>
+                  <%= link_to "#{t('add_courses')}", {:controller => "assessment_plans", :action => "add_courses", :id => @plan.id} %>
+                <% end %>
+            </div>
+        </div>
+        <div class="desc">
+            <% if @plan.courses.present? %>
+              <table>
+                  <tr>
+                      <td><%=t('courses_linked_count')%> </td>
+                      <td class="desc_val text-right"> <%=@plan.courses.count%></td>
+                  </tr>
+              </table>
+            <% else %>
+              <div class="empty_msg"><%= t('no_course_linked') %></div>
+            <% end %>
+        </div> 
+    </div>
+
+    <div class="clm results">
+        <div class="head">
+            <div class="left"><%=t('results')%></div>
+            <div class="right"></div>
+        </div>
+        <div class="desc">
+            <div class="empty_msg"><%= t('no_exams_desc') %></div>
+        </div>
+    </div>
+</div>

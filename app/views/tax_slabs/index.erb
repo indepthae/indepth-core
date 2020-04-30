@@ -1,0 +1,109 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('finance_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tax_slabs_text') %></div>
+    <% if permitted_to? :new, :tax_slabs %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to_remote "#{t('new_tax_slab')}", :url => { :controller=>"tax_slabs", 
+                    :action=>"new" } %>
+              </li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="header">
+        <%= t('tax_slabs_text') %>
+    </div>
+
+    <div class="description">
+        <%= t('manage_tax_slabs_description') %>
+    </div>
+
+    <div class="tax_slabs">
+        <%# div class="sub_heading"><%= t('tax_slabs_heading') % ></div%>
+        <div class="tax_slabs_listing">
+            <table>
+                <% if @tax_slabs.present? %>
+                  <tr class="tr-head">
+                      <td class="slab_name"><%= t('name')%></td>
+                      <td class="slab_rate"><%= "#{t('rate')} (%)" %></td>
+                      <td class="slab_desc"><%= t('description') %></td>
+                      <td class="actions"></td>
+                  </tr>
+                  <% @tax_slabs.each do |tax_slab| %>
+
+                    <tr>
+                        <td class="slab_name"><%= tax_slab.name %></td>
+                        <td class="slab_rate"><%= precision_label(tax_slab.rate) %></td>
+                        <td class="slab_desc"><%= tax_slab.description %> </td>                        
+                        <td class="actions">
+                            <% unless tax_slab.has_assignments? %>
+                              <% if permitted_to? :edit, :tax_slabs %>                              
+                                <%= link_to_remote t('edit_tax_slab'), :url => edit_tax_slab_path(tax_slab), :method => :get %>
+                              <% end %>
+                              <% if permitted_to? :destroy, :tax_slabs %>
+                                <%= link_to t('delete_tax_slab'), "#",  :onclick => "make_popup_box(
+        this, 'confirm', '#{t('delete_tax_slab_confirmation_message', {:slab_name => tax_slab.name})}',
+        {'ok' : '#{t('delete_tax_slab')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_tax_slab')}',
+        'popup_class' : 'remove_lt'}); return delete_slab(#{tax_slab.id});" %>
+                              <% end %>
+                            <% else %>
+                              <span class="small-strike"><%= t('edit_tax_slab') %></span>
+                              <span class="small-strike"><%= t('delete_tax_slab') %></span>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                  <% end %>
+                <% else %>
+                  <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+                <% end %>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+  delete_slab = function (tax_slab_id) {
+      j('.submit-button#yes').on('click', function () {
+          j.ajax({
+              type: 'DELETE',
+              url: '/tax_slabs/' + tax_slab_id
+          });
+      });
+  };
+</script>

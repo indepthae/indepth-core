@@ -1,0 +1,18 @@
+<div class="label-field-pair">
+  <label for="pay_period"><%= t('pay_period') %>: </label>
+  <div class="text-input-bg" id="date_range_text">
+    <%= payslip_range(@payroll_group, @start_date, @end_date) %>
+  </div>
+  <div class="change_date"><%= t('change_date') %></div>
+</div>
+
+<script type="text/javascript">
+  j(".change_date").click(function(){
+    j(".calendar_label").val("");
+    start_date = "";
+    end_date = "";
+    j("#select_date").show();
+    j("#date_range").hide();
+    j("#cancel").show();
+  })
+</script>

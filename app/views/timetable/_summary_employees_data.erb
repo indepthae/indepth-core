@@ -1,0 +1,101 @@
+<div class="summary_section">
+  <div class="section_heading">
+    <%= t('employees') %>
+  </div>
+  <div class="section_data">
+    <div class="section_row section_head_row">
+      <div class="section_column_1 heading">
+        <%= t('total_employees') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:employees][:total_count] || 0 %>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+    <% emps = @timetable_summary[:employees] %>
+    <% utilization = (emps[:total_count] != (emps[:fully_utilized_hours][:total] + emps[:under_utilized_hours][:total] + emps[:over_utilized_hours][:total])) %>
+
+    <% unless @batch.present? %>
+      <% total_employees = @timetable_summary[:employees][:total_count] %>
+      <div class="section_row has_tooltip">
+        <% hours = @timetable_summary[:employees][:fully_utilized_hours][:total] || 0 %>
+        <div class="section_column_1">
+          <% unless hours.zero?  %>
+            <%= link_to "#{t('hours_fully_utilized')}", :controller=>"timetable",:action => 'employees_hour_utilization', :id => @timetable.id, :type => 0 %>
+            <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "employee_full_hours", :style =>"display: none;" ) %>
+          <% else %>
+            <%= t('hours_fully_utilized') %>
+          <% end %>
+        </div>
+        <div class="section_column_2">
+          <%= hours.zero? ? '-' : hours %>
+        </div>
+        <div class="section_column_3">
+          <%= hours.zero? ? '-' : "#{((hours.to_f*100)/total_employees).round(2)}%" %>
+        </div>
+        <div class="notifier"><%= t('employees_fully_utilized_info') %></div>
+      </div>
+      <div class="section_row has_tooltip">
+        <% hours = @timetable_summary[:employees][:under_utilized_hours][:total] || 0 %>
+        <div class="section_column_1">
+          <% unless hours.zero?  %>
+            <%= link_to "#{t('hours_under_utilized')}", :controller=>"timetable",:action => 'employees_hour_utilization', :id => @timetable.id, :type => -1 %>
+            <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "employee_under_hours", :style =>"display: none;" ) %>
+          <% else %>
+            <%= t('hours_under_utilized') %>
+          <% end %>
+        </div>
+        <div class="section_column_2">
+          <%= hours.zero? ? '-' : hours %>
+        </div>
+        <div class="section_column_3">
+          <%= hours.zero? ? '-' : "#{((hours.to_f*100)/total_employees).round(2)}%" %>
+        </div>
+        <div class="notifier"><%= t('employees_under_utilized_info') %></div>
+      </div>
+      <div class="section_row has_tooltip">
+        <% hours = @timetable_summary[:employees][:over_utilized_hours][:total] || 0 %>
+        <div class="section_column_1">
+          <% unless hours.zero?  %>
+            <%= link_to "#{t('hours_over_utilized')}", :controller=>"timetable",:action => 'employees_hour_utilization', :id => @timetable.id, :type => 1 %>
+            <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "employee_over_hours", :style =>"display: none;" ) %>
+          <% else %>
+            <%= t('hours_over_utilized') %>
+          <% end %>
+        </div>
+        <div class="section_column_2">
+          <%= hours.zero? ? '-' : hours %>
+        </div>
+        <div class="section_column_3">
+          <%= hours.zero? ? '-' : "#{((hours.to_f*100)/total_employees).round(2)}%" %>
+        </div>
+        <div class="notifier"><%= t('employees_over_utilized_info') %></div>
+      </div>
+    <% end %>
+    <div class="section_row section_head_row">
+      <div class="section_column_1">
+        <%= t('average_classes_per_employee') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:employees][:average_classes] || 0 %>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+    <div class="section_row section_head_row has_tooltip">
+      <% #overlaps = (@batch.present? ? @overlap_timetable_summary["total"] : @timetable_summary[:employees][:overlaps]["total"]) || 0 %>
+      <% overlaps = (@timetable_summary[:employees][:overlaps][:total] || 0) %>
+      <div class="section_column_1">
+        <% unless overlaps.zero?  %>
+          <%= link_to "#{t('employee_overlaps')}", :controller=>"timetable",:action => 'employee_hour_overlaps', :id => @timetable.id, :batch_id => (@batch.present? ? @batch.id : '') %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "employee_overlap", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('employee_overlaps') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= overlaps %>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+  </div>
+</div>

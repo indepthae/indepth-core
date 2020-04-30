@@ -1,0 +1,51 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('allocate_room_to_the_student')}"%></div>
+
+
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="box">
+   <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><p><%= flash[:warn_notice] %></p> </div>
+  <% end %>
+  <div id="form_div">
+    <% form_for(:room_allocate) do |t| %>
+      <%= error_messages_for :room_allocate %>
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= "#{t('student_name')}"%></label>
+        <label for="vehicle_no"><%= @student.full_name %></label>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= "#{t('select_a_hostel')}"%> <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %> </label>
+        <div class="text-input-bg"><%= select :hostel_id, :id,
+            @hostels.map {|b| [b.name, b.id] },
+            {:prompt => "#{t('select_a_hostel')}"},
+            {:onchange => "#{remote_function(
+            :url => { :action => 'room_details' },
+            :with => "'hostel_id='+value+'&student_id=#{@student.id}'",
+            :update=>"room_details",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"
+            )}"} %>
+        </div>
+      </div>
+
+    <% end %>
+  </div>
+  <div id="room_details">
+
+  </div>
+  </div>
+</div>

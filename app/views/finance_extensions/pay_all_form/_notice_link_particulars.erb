@@ -1,0 +1,7 @@
+<% if can_access_request? :manage_masters, :master_fees %>
+    <p class="flash-msg">
+      <%= t('link_particular_discounts',
+            {:url => "#{link_to "#{t('link_text')}", manage_masters_master_fees_path({:fee_type => 'pay_all', :student_id => @student.id,
+                                                                                      :batch_id => params[:batch_id]}), :target => "_blank"}"}) %>
+    </p>
+<% end %>

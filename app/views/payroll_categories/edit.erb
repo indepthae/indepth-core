@@ -1,0 +1,98 @@
+<% unless rtl? %>
+  <%= stylesheet_link_tag ("payroll_categories/formulas") %>
+<% else %>
+  <%= stylesheet_link_tag ("rtl/payroll_categories/formulas") %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('hr_management') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_payroll_category').titleize %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :payroll_categories_edit, @category%>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h3><%= t('edit_payroll_category') %></h3>
+
+  <% form_for @category do |c| %>
+    <%= render :partial => "category_form" , :locals => {:c => c}%>
+    <hr/>
+    <%=submit_tag "#{t('update')}", :onclick=>'return validate_round_off()', :class => "submit-button"  %>
+  <% end %>
+  <%= link_to t('cancel'), payroll_categories_path, :class => "submit-button", :id => "cancel-link" %>
+</div>
+
+
+<script type ="text/javascript">
+
+  function render_formula_partial(elm, object_name)
+  {
+    new Ajax.Request('/payroll_categories/hr_formula_form',{
+      parameters:{'formula_type': elm.value, 'object_name' : object_name, 'object_id' : '<%= @category.id %>', 'object_type' : '<%= @category.class %>'},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j("#loader").show();
+      },
+      onComplete:function(resp){
+        j('#fields').html(resp.responseText);
+        if((elm.value == "3") || (elm.value == "2"))
+        {
+          j('.formula_help').show();
+          set_tab_height();
+        }
+        else
+          j('.formula_help').hide();
+        j("#loader").hide();
+      }
+    });
+  }
+
+  function add_fields(link, association, content){
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+    }
+  }
+
+
+function remove_fields(link){
+  $(link).previous("input[type=hidden]").value='1';
+  $(link).up(".fields").hide();
+}
+
+function align_formula_help()
+{
+j(window).on('scroll', function() {
+  var scrollTop = j(this).scrollTop();
+
+  j('.formula_and_conditions_fields').each(function() {
+    var topDistance = j(this).offset().top;
+
+    if ( (topDistance) < scrollTop )
+      j(".formula_help").stop().animate({"marginTop": (scrollTop - topDistance + j('#header_bg').outerHeight() + 20) + "px"}, "slow" );
+    else
+      j(".formula_help").stop().animate({"marginTop": "0px"}, "slow" );
+  });
+});
+}
+function validate_round_off(){
+    if((j('#_to_round_up').is(":checked")) && (j("#payroll_category_round_off_value").val()=="")){
+      alert("Rounding off is enabled.Please select an option for round up");
+    return false;
+  }
+    else
+      return true;
+  }
+
+</script>

@@ -1,0 +1,28 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_gradebook') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessments_enter_marks, [@assessment_group,@academic_year,@course,@batch] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash.now[:notice] %> </p>
+    <% end %>
+    <div class="assessments_box">
+        <div class="assessments_details">
+            <%= render :partial=> 'assessment_group_details_short' %>
+            <%= render :partial=> 'assessment_details_short' %>
+        </div>
+        <div id="mark_register">
+            <% if @students.present? %>
+              <%= render :partial => 'subject_marks_register'  %>
+            <% else %>
+              <p class="flash-msg"> <%= t('no_students_found') %> </p>
+            <% end %>
+        </div>
+    </div>
+</div>

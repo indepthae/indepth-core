@@ -1,0 +1,22 @@
+
+<h1><%= @school.name %></h1>
+<% form_for :whitelabel_config do |f| %>
+  <%= f.error_messages %>
+  <h2>WhiteLabel Settings</h2>
+
+  <%= hidden_field_tag "id", @school.id %>
+
+  <%= f.label :footer_text %>
+  <%= f.text_field 'footer_text', :value=>@current_school_settings.nil? ? nil : @current_school_settings.settings['footer_text'], :class=>'text', :id=>'username' %>
+
+  <%= f.label :footer_link %>
+  <%= f.text_field 'footer_link', :value=>@current_school_settings.nil? ? nil : @current_school_settings.settings['footer_link'], :class=>'text', :id=>'password' %>
+
+
+  <div class='form-actions'>
+    <%= f.submit 'Save', :class  => 'default btn' %>
+    <%= link_to 'Delete', { :action=>'remove_whitelabel_settings', :id=>@school.id }, :confirm=>"Are you sure?",:class  => 'btn-danger btn' %> <br/>
+  </div>
+
+
+<% end %>

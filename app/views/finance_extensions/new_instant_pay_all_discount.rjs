@@ -1,0 +1,4 @@
+page << "build_modal_box({'title' : '#{(@multi_fee_discount.new_record? ? t('add_discount') :
+    t('update_discount'))}'})" unless params[:multi_fee_discount].present?
+page.replace_html 'popup_content', :partial => 'finance_extensions/pay_all_form/instant_pay_all_discount_form'
+page << "document.body.scrollTop = document.documentElement.scrollTop = 0;"

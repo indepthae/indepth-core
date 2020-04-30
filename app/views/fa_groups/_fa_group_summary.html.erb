@@ -1,0 +1,24 @@
+<div class="title">
+  <%= t("name_text") %>
+  <div class="description">:&nbsp;&nbsp;&nbsp;<%= @fa_group.name %></div>
+</div>
+<div class="title">
+  <%= t("description_text") %>
+  <div class="description">:&nbsp;&nbsp;&nbsp;<%= @fa_group.desc %></div>
+</div>
+<div class="title">
+  <%= t("cce_exam_category") %>
+  <div class="description">:&nbsp;&nbsp;&nbsp;<%= @fa_group.cce_exam_category.name %></div>
+</div>
+<div class="title">
+  FA Group Calculation
+  <div class="description">:&nbsp;&nbsp;&nbsp;<%=@fa_group.criteria_formula.present? ? @fa_group.criteria_formula : "Average"%>
+    <%if @fa_group.fa_criterias.active.present?%>
+      <%= link_to " Edit Formula",edit_criteria_formula_fa_group_path(@fa_group.id),:class=>'themed_text'%>
+    <%end%>
+  </div>
+</div>
+<div class="title">
+  FA Criteria Calculation
+  <div class="description">:&nbsp;&nbsp;&nbsp;<%=@fa_group.di_formula == 1 ? "Average" : "Sum"%></div>
+</div>

@@ -1,0 +1,70 @@
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <!-- <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1"> -->
+    <% unless @students.blank? %>
+      <tr class="main_head tr-list_head">
+          <!--<tr class="tr-head">-->
+          <td><%= t('sl_no') %></td>
+          <td class="set_border_right"><%= t('first_name') %></td>
+          <td class="set_border_right"><%= t('batch') %></td>
+          <td class="set_border_right"><%= t('adm_no') %></td>
+          <% if roll_number_enabled? %>
+            <td class="set_border_right"><%= t('roll_no') %></td>
+          <% end %>
+          <td class="set_border_right"><%= t('fees_text') %></td>
+          <td class="set_border_right"></td>
+      </tr>      
+      <% @students.each_with_index do |student, i| %>
+                <!--<tr class="tr-<%= cycle('odd', 'even') %>">-->
+        <tr class="row-b">
+            <td class="sl-col"><%= i+1 %></td>
+            <td class="set_border_right col-4"><%=student.fullname%></td>
+            <td class="set_border_right col-4"><%= student.batch_full_name %></td>
+            <td class="set_border_right col-1"><%= student.admission_no %></td>
+            <% if roll_number_enabled? %>
+              <td class="set_border_right col-1"><%= student.roll_number.present? ? student.roll_number : "-" %></td>
+            <% end %>
+            <% fee_cnt = student.fee_count.to_i %>
+            <% all_fee_count = fee_cnt + student.hostel_count.to_i + student.transport_count.to_i %>            
+            <td class="set_border_right col-1">
+                <% student_fee = student.fee_due.to_f %>
+                <% total_fee = student_fee + student.transport_due.to_f + student.hostel_due.to_f %>                
+                <!-- < % if fee_cnt > 0 and  precision_label(student_fee).to_f > 0 %>                  -->
+                <% batch_id = student.present? ? student.batch_id : @batch_id %>
+                <% total_fee += student.total_automatic_finance_fee_fine(batch_id) if batch_id.present?  %>                
+                <%# total_fee += student.paid_manual_fine(batch_id).to_f unless precision_label(total_fee) == 0 %>
+                <!--< % end %>-->
+                <%= precision_label(total_fee) %>
+            </td>
+            <td class="set_border_right">
+                <% if all_fee_count > 0 %>
+                  <%= link_to t('view_structure'), {:action => :view_fees_structure, :id => student.id, 
+                    :id2 => student.batch_id}, :class => "structure_link" %>
+                <% else %>
+                  <div class="structure_link_disabled">
+                      <%= t('view_structure') %>
+                  </div>
+                <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+
+      <tr class="row-b">
+      <!--<tr class="tr-<%= cycle('odd', 'even') %>">-->
+          <td class="col-2"><%= t('no_students_found') %></td>
+      </tr>
+    <% end %>
+</table>
+<% unless @students.blank? %>
+  <% search_param = {:batch_id => @batch_id } if @batch_id.present? %>
+  <% search_param = {:query => @search_query } if @search_query.present? %>
+  <div class="seprater_div_bottom">
+      <div id="download_links">
+          <%= link_to "#{t('pdf_report')}", {:action => "structure_overview_pdf"}.merge(search_param), 
+            :target => "_blank", :class => "user_button" %>
+          <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+            :csv_report_type => "fee_structure_overview", :report_format_type => "csv" }.merge(search_param), 
+            :target => "_blank", :class => "user_button" %>
+      </div>
+  </div>
+<% end %>

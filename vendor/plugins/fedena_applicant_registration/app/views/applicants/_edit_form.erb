@@ -1,0 +1,234 @@
+<div class="label-field-pair course-name-display">
+    <label style="font-weight:normal !important;"><%= t('course') %></label>
+    <label><b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name}" : "#{@registration_course.course.course_name} (#{@registration_course.course.code})" %></b></label>
+</div>
+
+<% application_sections = @application_section.present? ? @application_section.section_fields : ApplicationSection::DEFAULT_FORM %>
+<% @default_fields = ApplicationSection::DEFAULT_FIELDS %>
+<% guardian_count = @application_section.present? ? @application_section.guardian_count : 1 %>
+
+<% form_remote_for @applicant, :url=>update_application_applicant_path(@applicant), :html=> {:id=>"applicant_form",:method => :post,:multipart=>true} do|f| %>
+  <div id="input-form-errors"></div>
+  <%= f.hidden_field :registration_course_id, :value=>@registration_course.id %>
+  <div id="application-form">
+      <% application_sections.sort_by{|k| k[:section_order].to_i}.each_with_index do|a,i| %>
+        <% field_group = nil %>
+        <% show_section = false %>
+        <% if a[:applicant_addl_field_group_id].present? %>
+          <% field_group = @field_groups.find_by_id(a[:applicant_addl_field_group_id].to_i) %>
+          <% if field_group.present? %>
+            <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?)  %>
+            <% section_name = field_group.name %>
+          <% end %>
+        <% else %>
+          <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present? and a[:section_name] != "administration_section") %>
+          <% section_name = t("#{a[:section_name]}") %>
+          <% if a[:section_name]=="elective_subjects" %>
+            <% if @registration_course.is_subject_based_registration.present? %>
+              <% show_section = true %>
+            <% else %>
+              <% show_section = false %>
+            <% end %>
+          <% end %>
+          <%# show_section = false if (a[:section_name]=="elective_subjects" and @registration_course.present? and @registration_course.is_subject_based_registration == false) %>
+        <% end %>
+        <% if show_section == true %>
+          <% if a[:section_name]=="guardian_personal_details" or a[:section_name]=="guardian_contact_details" %>
+            <% if a[:section_name]=="guardian_personal_details" %>
+              <% guardian_ind = 0 %>
+              <% guardian_contact_section = application_sections.find{|as| as[:section_name] == "guardian_contact_details"} %>
+              <% show_contact_section = false %>
+              <% show_contact_section = true if (guardian_contact_section.present? and guardian_contact_section[:fields].present? and (guardian_contact_section[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+              <% no_of_guardians = @applicant.applicant_guardians.count >= guardian_count.to_i ? @applicant.applicant_guardians.count : guardian_count %>
+              <% no_of_guardians.to_i.times do %>
+                <h3 class="section_list"><span class="record_group_name_label"><%= "#{section_name} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></span></h3>
+                <% f.fields_for :applicant_guardians, (@applicant.applicant_guardians[guardian_ind].present? ? @applicant.applicant_guardians[guardian_ind] : @applicant.applicant_guardians.build) do |build| %>
+                  <div class="section-fields">
+                      <%= render :partial=>"applicants_admins/edit_form_section", :locals=>{:a=>a,:i=>i,:f=>f,:build=>build,:field_group=>field_group,:guardian_ind=>guardian_ind} %>
+                  </div>
+                  <% if show_contact_section == true %>
+                    <h3 class="section_list"><span class="record_group_name_label"><%= "#{t('guardian_contact_details')} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></span></h3>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/edit_form_section", :locals=>{:a=>guardian_contact_section,:i=>i,:f=>f,:build=>build,:field_group=>field_group,:guardian_ind=>guardian_ind} %>
+                    </div>
+                  <% end %>
+                  <% guardian_ind += 1 %>
+                <% end %>
+
+
+              <% end %>
+            <% end %>
+          <% else %>
+            <h3 class="section_list"><span class="record_group_name_label"><%= section_name %></span></h3>
+            <% if a[:section_name] == "previous_institution_details" %>
+              <% f.fields_for :applicant_previous_data, (@applicant.applicant_previous_data.present? ? @applicant.applicant_previous_data : @applicant.build_applicant_previous_data) do|build| %>
+                <div class="section-fields">
+                    <%= render :partial=>"applicants_admins/edit_form_section", :locals=>{:a=>a,:i=>i,:f=>f,:build=>build,:field_group=>field_group,:guardian_ind=>nil} %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="section-fields">
+                  <%= render :partial=>"applicants_admins/edit_form_section", :locals=>{:a=>a,:i=>i,:f=>f,:build=>nil,:field_group=>field_group,:guardian_ind=>nil} %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+  </div>
+  <%= f.hidden_field :m_attr, :value=>@mandatory_attributes.join(", ") %>
+  <%= f.hidden_field :m_g_attr, :value=>@mandatory_guardian_attributes.uniq.join(", ") %>
+  <%= f.hidden_field :m_p_attr, :value=>@mandatory_previous_attributes.join(", ") %>
+  <%= f.hidden_field :m_add_attr, :value=>@mandatory_addl_attributes.uniq.join(", ") %>
+  <%= f.hidden_field :m_s_add, :value=>@mandatory_student_attributes.join(", ") %>
+  <%= f.hidden_field :m_att_attr, :value=>@mandatory_attachment_attributes.join(", ") %>
+
+  <div class="label-field-pair course-name-display">
+    <label style="font-weight:normal !important;"><%= t('total_payable_fee') %>:</label>
+    <label><b><%= currency %> <span id="total_payable"><%= "#{precision_label(@total_fee)}" %></span></b></label>
+  </div> 
+  <div class="label-field-pair course-name-display">
+    <label style="font-weight:normal !important; width:6% !important;"><%= t('summary') %>:</label>
+    <label id="summary-label" style="width: 85% !important; word-break: break-word;"><%=t('application_fee')%>:<%= currency %> <%= precision_label(@registration_course.amount.to_f) %> <%="#{','}" "#{t('subject_fees')} #{currency} #{precision_label(@normal_subject_amount.to_f)}" if @registration_course.subject_based_fee_colletion%> <span id="summary-display"> </span></label>
+  </div>
+
+  <div class="hor-line"></div>
+  <%#=f.submit "#{t('apply')}",:id=>'submit_button',:class=>"submit_button" %>
+  <%= link_to "#{t('update_application')}", "#", :class=>"user_button cancel_user_button", :id=>"submit_button" %>
+<% end %>
+
+<script type="text/javascript">
+
+  j(function () {
+      var icons = {
+          header: "down-arrow-img",
+          activeHeader: "up-arrow-img"
+      };
+      j("#application-form").accordion({
+          icons: icons,
+          header: "h3",
+          heightStyle: "content",
+          collapsible: true,
+          // workaround to allow multipple tabs open
+          beforeActivate: function (event, ui) {
+              // The accordion believes a panel is being opened
+              if (ui.newHeader[0]) {
+                  var currHeader = ui.newHeader;
+                  var currContent = currHeader.next('.ui-accordion-content');
+                  // The accordion believes a panel is being closed
+              } else {
+                  var currHeader = ui.oldHeader;
+                  var currContent = currHeader.next('.ui-accordion-content');
+              }
+              // Since we've changed the default behavior, this detects the actual status
+              var isPanelSelected = currHeader.attr('aria-selected') == 'true';
+
+              // Toggle the panel's header
+              currHeader.toggleClass('ui-corner-all', isPanelSelected).toggleClass('ui-accordion-header-active ui-state-active ui-corner-top', !isPanelSelected).attr('aria-selected', ((!isPanelSelected).toString()));
+
+              // Toggle the panel's icon
+              currHeader.children('.ui-icon').toggleClass('down-arrow-img', isPanelSelected).toggleClass('up-arrow-img', !isPanelSelected);
+
+              // Toggle the panel's content
+              currContent.toggleClass('accordion-content-active', !isPanelSelected)
+              if (isPanelSelected) {
+                  currContent.slideUp();
+              } else {
+                  currContent.slideDown();
+              }
+
+              return false; // Cancels the default action
+          }
+      });
+      j('h3').not('.ui-state-active').trigger('click');
+  });
+
+  j('#applicant_form').find(".user_button").click(function (event) {
+      submit_applicant_form(event);
+  });
+  j( document ).ready(function() {
+    j('#applicant_form').find(".subject_select").each(function() {
+    toggle_field_selector(this);
+    });
+    calculate_amount();
+  });
+  
+  j('#applicant_form').find(".subject_select_all").click(function (event) {
+      select_all_fields(this);
+      calculate_amount();
+  });
+  
+  j('#applicant_form').find(".subject_select").click(function (event) {
+      toggle_field_selector(this);
+      calculate_amount();
+  });
+  
+  function calculate_amount()
+  {
+    var total=0;
+    var content="";
+    var application_fee = <%= @application_fee.to_f %>;
+    var subject_amount = <%= @registration_course.subject_based_fee_colletion == true ? @normal_subject_amount.to_f : 0.0 %>;
+    var cur = '<%= @currency.to_s %>';
+    total=application_fee+subject_amount;
+    j('input.batches_box').each(
+      function()
+      {
+        if(this.checked == true)
+        {
+          var elective = j(this).parent().find("#subject_name").val();
+          if(!elective == ""){
+            var a=j(this).parent().find("#amount").val();
+            content+=", "+elective+"(elective): "+ cur +" "+ a 
+            var b = parseFloat(a);
+            total+=b;
+          }
+        }
+      }
+    );
+    j('#total_payable').text(total);
+    j('#summary-display').text(content);
+  }
+
+  function submit_applicant_form(e) {
+      e.preventDefault();
+      j('.paperclip_field input[type=file].paper').each(function () {
+          if (j(this).attr("direct") === "false") {
+              j(this).attr("disabled", true);
+          }
+      });
+      j('#applicant_form').find(".user_button").html("<%= t('please_wait_text') %>");
+      j('#applicant_form').find(".user_button").unbind('click');
+      j('#applicant_form').find(".user_button").bind('click', false);
+      j('#applicant_form').ajaxSubmit({
+          beforeSubmit: function (a, f, o) {
+              o.dataType = 'json';
+          },
+          complete: function (XMLHttpRequest, textStatus) {
+              console.log(XMLHttpRequest);
+              console.log(textStatus);
+              try {
+                  submit_status = j.parseJSON(XMLHttpRequest.responseText)
+                  if (submit_status.resp_text == "saved_successfully") {
+                      window.location.href = submit_status.redirect_url;
+                  }
+              } catch (e) {
+                  j("#input-form-errors").html(XMLHttpRequest.responseText);
+                  $('input-form-errors').scrollIntoView();
+                  j(".paper").attr("disabled", false);
+                  j('#applicant_form').find(".user_button").html("<%= t('proceed_text') %>");
+                  j('#applicant_form').find(".user_button").unbind('click')
+                  j('#applicant_form').find(".user_button").click(function (event) {
+                      submit_applicant_form(event);
+                  });
+              }
+              // XMLHttpRequest.responseText will contain the URL of the uploaded image.
+              // Put it in an image element you create, or do with it what you will.
+              // For example, if you have an image elemtn with id "my_image", then
+              //  $('#my_image').attr('src', XMLHttpRequest.responseText);
+              // Will set that image tag to display the uploaded image.
+          }
+      });
+  }
+  ;
+
+</script>

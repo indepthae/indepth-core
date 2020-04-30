@@ -1,0 +1,10 @@
+<% form_for :custom_gateway_online_pay, :url => {:controller => 'payment_settings', :action => 'payment_initialize'},
+            :method => :post, :html => {:class => 'payment-form'} do |f| %>
+    <% @information.each_pair do |k, v| %>
+        <%= hidden_field :online_payment, k.to_sym, :value => v %>
+    <% end %>
+    <%= hidden_field :online_payment, :current_school, :value => current_school_name %>
+    <% if @financial_year_enabled %>
+        <%= f.submit t('pay_fees'), :class => "submit_button", :style => @button_style %>
+    <% end %>
+<% end %>

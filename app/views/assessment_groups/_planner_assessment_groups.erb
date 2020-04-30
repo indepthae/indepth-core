@@ -1,0 +1,77 @@
+<% if assessments.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="check_all"><input type="checkbox" class="select_all"  onclick="checkAll()"/></td>
+          <td class="col4"><%= t('exams_text') %></td>
+          <td class="col5"><%= t('term_text') %></td>
+          <td class="col6"><%= t('exam_mode') %></td>
+          <td class="col7"><%= t('scoring') %></td>
+          <td class="col7"><%= t('max') %></td>
+      </tr>
+      <% assess_group_ids =  @assessment_group.assessment_group_ids %>
+      <% assessments.each do |assessment|  %>
+        <tr>
+            <td class="check_all"><%= check_box_tag "derived_assessment_group_settings[assessment_group_id][]",assessment.id,(assess_group_ids.include? assessment.id),{ :class=>'select_assess', :onclick =>"selectAg(this)", :assess_code => assessment.code, :max_marks=> assessment.maximum_marks } %></td>
+            <td><%= assessment.name_with_code %></td>
+            <td><%= assessment.parent.name %></td>
+            <td><%= assessment.exam_mode %></td>
+            <td><%= assessment.score_type %></td>
+            <td><%= assessment.maximum_marks %></td>
+        </tr>
+      <% end %>
+  </table>
+<% else %>
+  <div class="float" id="description"><%= t('no_assessment_groups_created') %></div>
+  <div class="warning danger"><%= t('activity_exam_will_be_present_in_report_by_default') %></div>
+<% end %>
+<script type="text/javascript">
+  $check_ags = []
+  $max_marks = []
+  j(document).ready(function () {
+    if( j('.select_assess:checked').length > 0){
+      j('.select_assess:checked').each(function(){
+        selectAg(this)
+      })
+    }else{
+      j('.formula__show__box').hide();
+    }
+  });
+  
+  checkAll = function ()
+  {
+      if (j('.select_all').prop('checked') == true)
+      {
+          j('.select_assess').each(function () {
+              j(this).prop('checked', true);
+              updateFormulaExplanation(this)
+          });
+      } else {
+          j('.select_assess').each(function () {
+              j(this).prop('checked', false);
+              updateFormulaExplanation(this)
+          });
+      }
+  }
+  
+  
+
+  selectAg = function (elm) {
+      if (j(".select_assess").not(":checked").length > 0)
+          j('.select_all').prop("checked", false);
+      else{
+          j('.select_all').prop("checked", true);
+      }
+      updateFormulaExplanation(elm);
+      updateFormula(j('.choose__formula:checked')[0])
+  }
+  
+  updateFormulaExplanation = function(elm){
+      $check_ags = j.grep($check_ags, function(value) {
+        return value != j(elm).attr('assess_code');
+      });
+      if(j(elm).is(':checked')){
+        $check_ags.push(j(elm).attr('assess_code'))
+      }
+      updateFormula(j('.choose__formula:checked')[0])
+  }
+</script>

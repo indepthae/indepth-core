@@ -1,0 +1,24 @@
+
+<div class="label-field-pair">
+  <label id="start_date"><%= t('from') %></label>
+  <%= calendar_date_select_tag 'leave_app[start_date]',I18n.l(Date.today,:format=>:default),:popup=>"force",:class=>'start_date',:disabled => true %>
+</div>
+
+<div class="label-field-pair">
+  <label id="end_date"><%= t('to') %></label>
+  <%= calendar_date_select_tag 'leave_app[end_date]', I18n.l(Date.today,:format=>:default),:popup=>"force",:class=>'end_date' ,:disabled => true%>
+  <%= image_tag("loader.gif",
+  :align => "absmiddle",
+  :border => 0,
+  :id => "loader2",
+  :style => "display: none;" ) %>
+</div>
+
+<div class="submit-button" id="view"><%= t('view') %></div>
+<div id="cancel"><%= t('cancel') %></div>
+<div class="error-msg" style="display:none;"><div class="error-icon"></div><%= t('select_valid_date')%></div>
+
+<script type="text/javascript">
+  j(".start_date").attr("disabled",false);
+  j(".end_date").attr("disabled",false)
+</script>

@@ -1,0 +1,403 @@
+<script type="text/javascript">
+  function add_config_field() {
+      div_count = j(".config-field-set").length
+      op_box = j(".config-field-set:last").clone();
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_config_fields_" + (div_count) + "_name");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][config_fields][" + (div_count) + "][name]");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").val("");
+
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_config_fields_" + (div_count) + "_value");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][config_fields][" + (div_count) + "][value]");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").val("");
+
+      j("#con-fields").append(op_box);
+  }
+
+  function add_variable_field() {
+      div_count = j(".variable-field-set").length
+      op_box = j(".variable-field-set:last").clone();
+      if ((op_box).find(".label-field-pair").length === 3) {
+          (op_box).find(".label-field-pair:last").remove();
+      }
+
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_variable_fields_" + (div_count) + "_name");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][variable_fields][" + (div_count) + "][name]");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").val("");
+
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("id", "custom_gateway_gateway_parameters_variable_fields_" + (div_count) + "_field_type");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("name", "custom_gateway[gateway_parameters][variable_fields][" + (div_count) + "][field_type]");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").prop('selectedIndex', 0);
+
+      j("#var-fields").append(op_box);
+  }
+
+  function toggle_additional_field_input(th_is) {
+      var selected_select = j(th_is);
+      if (selected_select.val() === "student_additional_field") {
+          var field_input = selected_select.parent().parent().parent().find(".label-field-pair:first").clone();
+          field_input.find("label:first").html("Additional Field Name");
+          var past_id = field_input.find(".text-input-bg:first").find("input[type=text]:first").attr("id");
+          var past_name = field_input.find(".text-input-bg:first").find("input[type=text]:first").attr("name");
+          field_input.find(".text-input-bg:first").find("input[type=text]:first").attr("id", past_id.replace("_name", "_additional_field_name"));
+          field_input.find(".text-input-bg:first").find("input[type=text]:first").attr("name", past_name.replace("[name]", "[additional_field_name]"));
+          field_input.find(".text-input-bg:first").find("input[type=text]:first").val("");
+
+          selected_select.parent().parent().parent().append(field_input);
+      }
+      else {
+          var addl_field_input = j("#" + selected_select.attr("id").replace("_field_type", "_additional_field_name"));
+          if (addl_field_input.length === 1) {
+              addl_field_input.parent().parent().remove();
+          }
+      }
+  }
+
+  function add_response_field() {
+      div_count = j(".response-field-set").length
+      op_box = j(".response-field-set:last").clone();
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_response_parameters_" + (div_count) + "_name");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][response_parameters][" + (div_count) + "][name]");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").val("");
+
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("id", "custom_gateway_gateway_parameters_response_parameters_" + (div_count) + "_parameter_type");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("name", "custom_gateway[gateway_parameters][response_parameters][" + (div_count) + "][parameter_type]");
+      op_box.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").prop('selectedIndex', 0);
+
+      j("#resp-fields").append(op_box);
+  }
+
+  function adjust_config_fields(th_is, div_count) {
+      d = j(th_is);
+
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_config_fields_" + (div_count) + "_name");
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][config_fields][" + (div_count) + "][name]");
+
+      d.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_config_fields_" + (div_count) + "_value");
+      d.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][config_fields][" + (div_count) + "][value]");
+
+      return d;
+  }
+
+  function remove_config_field(th_is) {
+      div_count = j(".config-field-set").length
+      if (div_count == 1) {
+          alert("Atleast 1 field is required.")
+      }
+      else {
+          j(th_is).parent().remove();
+          i = 0
+          j(".config-field-set").each(function () {
+              adjust_config_fields(this, i);
+              i = i + 1
+          });
+      }
+  }
+
+  function adjust_variable_fields(th_is, div_count) {
+      d = j(th_is);
+
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_variable_fields_" + (div_count) + "_name");
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][variable_fields][" + (div_count) + "][name]");
+
+      d.find(".label-field-pair:eq(1)").find(".text-input-bg:first").find("select:first").attr("id", "custom_gateway_gateway_parameters_variable_fields_" + (div_count) + "_field_type");
+      d.find(".label-field-pair:eq(1)").find(".text-input-bg:first").find("select:first").attr("name", "custom_gateway[gateway_parameters][variable_fields][" + (div_count) + "][field_type]");
+
+      if (d.find(".label-field-pair").length === 3) {
+          d.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_variable_fields_" + (div_count) + "_additional_field_name");
+          d.find(".label-field-pair:last").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][variable_fields][" + (div_count) + "][additional_field_name]");
+      }
+
+      return d;
+  }
+
+  function remove_variable_field(th_is) {
+      div_count = j(".variable-field-set").length
+      if (div_count == 1) {
+          alert("Atleast 1 field is required.")
+      }
+      else {
+          j(th_is).parent().remove();
+          i = 0
+          j(".variable-field-set").each(function () {
+              adjust_variable_fields(this, i);
+              i = i + 1
+          });
+      }
+  }
+
+  function adjust_response_fields(th_is, div_count) {
+      d = j(th_is);
+
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_gateway_parameters_response_parameters_" + (div_count) + "_name");
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[gateway_parameters][response_parameters][" + (div_count) + "][name]");
+
+      d.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("id", "custom_gateway_gateway_parameters_response_parameters_" + (div_count) + "_parameter_type");
+      d.find(".label-field-pair:last").find(".text-input-bg:first").find("select:first").attr("name", "custom_gateway[gateway_parameters][response_parameters][" + (div_count) + "][parameter_type]");
+
+      return d;
+  }
+
+  function remove_response_field(th_is) {
+      div_count = j(".response-field-set").length
+      if (div_count == 1) {
+          alert("Atleast 1 parameter is required.")
+      }
+      else {
+          j(th_is).parent().remove();
+          i = 0
+          j(".response-field-set").each(function () {
+              adjust_response_fields(this, i);
+              i = i + 1
+          });
+      }
+  }
+
+  function add_split_field() {
+      div_count = j(".split-field-set").length;
+      op_box = j(".split-field-set:last").clone();
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_account_wise_parameters_" + (div_count));
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[account_wise_parameters][" + (div_count) + "]");
+      op_box.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").val("");
+      j("#split-fields").append(op_box);
+  }
+
+  function remove_split_field(th_is) {
+      div_count = j(".split-field-set").length;
+      if (div_count == 1) {
+          alert("Atleast 1 parameter is required.")
+      }
+      else {
+          j(th_is).parent().remove();
+          i = 0
+          j(".split-field-set").each(function () {
+              adjust_split_fields(this, i);
+              i = i + 1
+          });
+      }
+  }
+
+  function adjust_split_fields(th_is, div_count) {
+      d = j(th_is);
+
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("id", "custom_gateway_account_wise_parameters_" + (div_count));
+      d.find(".label-field-pair:first").find(".text-input-bg:first").find("input[type=text]:first").attr("name", "custom_gateway[account_wise_parameters][" + (div_count) + "]");
+
+      return d;
+  }
+
+  function toggle_split_section(th_is) {
+      var d = j(th_is);
+      if (d.prop("checked") == true) {
+          j("#account-split-fields").show();
+      }
+      else {
+          j("#account-split-fields").hide();
+      }
+  }
+
+</script>
+<fieldset class="margin-bottom-20">
+    <h1 class="content-head">New Payment Gateway</h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+    <% if @owner.present? %>
+      <% owner_object = @owner.class.name.underscore.to_sym %>
+      <% form_path = "#{owner_object}_payment_gateways_path" %>
+    <% end %>
+    <% form_for @gateway,:url=>(@owner.present? ? send(form_path, @owner) : {:controller=>"payment_gateways",:action=>"create"}),:html=>{:class=>'form'} do|f| %>
+      <fieldset>
+          <%= error_string_for(f) %>
+          <%= f.error_message_on :base %>
+      </fieldset>
+      <fieldset class="label-field-pair">
+          <label>Name</label>
+          <div class="text-input-bg"><%= f.text_field :name %></div>
+      </fieldset>
+      <% unless @gateway.gateway_parameters.nil? %>
+        <div id="config-fields">
+            <div class="config-header">Configuration Fields</div>
+            <div id="con-fields">
+                <% @gateway.gateway_parameters[:config_fields].each_pair do|k,v| %>
+                  <div class="config-field-set">
+                      <fieldset class="label-field-pair">
+                          <label>Name</label>
+                          <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][config_fields][#{k}][name]", v["name"] %></div>
+                      </fieldset>
+                      <fieldset class="label-field-pair">
+                          <label>Value</label>
+                          <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][config_fields][#{k}][value]", v["value"] %></div>
+                      </fieldset>
+                      <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-config-link",:onClick=>"remove_config_field(this); return false;"} %>
+                  </div>
+                <% end %>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_config_link",:onClick=>"add_config_field(); return false;"}  %>
+        </div>
+        <div id="variable-fields">
+            <div class="config-header">Variable Fields</div>
+            <div id="var-fields">
+                <% @gateway.gateway_parameters[:variable_fields].each_pair do|k,v| %>
+                  <div class="variable-field-set">
+                      <fieldset class="label-field-pair">
+                          <label>Name</label>
+                          <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][variable_fields][#{k}][name]", v["name"] %></div>
+                      </fieldset>
+                      <fieldset class="label-field-pair">
+                          <label>Field Type</label>
+                          <div class="text-input-bg">
+                              <%= select_tag "custom_gateway[gateway_parameters][variable_fields][#{k}][field_type]",options_for_select([["Amount","amount"],["Redirect URL","redirect_url"],["Item Name","item_name"],["Payer Firstname","firstname"],["Payer Lastname","lastname"],["Payer Email","email"],["Payer Phone","phone"],["Student Admission Number","admission_no"],["Student Full Name","student_full_name"],["Student Roll Number","roll_no"],["Batch Name","batch_name"],["Fee Name","fee_name"],["Student Additional Field","student_additional_field"]],v["field_type"]),{:onchange=>"toggle_additional_field_input(this); return false;"} %>
+                          </div>
+                      </fieldset>
+                      <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-variable-link",:onClick=>"remove_variable_field(this); return false;"} %>
+                      <% if v["field_type"] == "student_additional_field" %>
+                        <fieldset class="label-field-pair">
+                            <label>Additional Field Name</label>
+                            <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][variable_fields][#{k}][additional_field_name]", v["additional_field_name"] %></div>
+                        </fieldset>
+                      <% end %>
+                  </div>
+                <% end %>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_variable_link",:onClick=>"add_variable_field(); return false;"}  %>
+        </div>
+        <div id="response-fields">
+            <div class="config-header">Response Parameters</div>
+            <div id="resp-fields">
+                <% @gateway.gateway_parameters[:response_parameters].each_pair do|k,v| %>
+                  <div class="response-field-set">
+                      <fieldset class="label-field-pair">
+                          <label>Name</label>
+                          <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][response_parameters][#{k}][name]", v["name"] %></div>
+                      </fieldset>
+                      <fieldset class="label-field-pair">
+                          <label>Parameter Type</label>
+                          <div class="text-input-bg">
+                              <%= select_tag "custom_gateway[gateway_parameters][response_parameters][#{k}][parameter_type]",options_for_select([["Amount","amount"],["Transaction Status","transaction_status"],["Success Code","success_code"],["Pending Code","pending_code"],["Reason Code","reason_code"],["Online Transaction Reference","transaction_reference"]],v["parameter_type"]) %>
+                          </div>
+                      </fieldset>
+                      <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-response-link",:onClick=>"remove_response_field(this); return false;"} %>
+                  </div>
+                <% end %>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_response_link",:onClick=>"add_response_field(); return false;"}  %>
+        </div>
+        <div id="enable_account_split">
+            <fieldset class="label-field-pair" style="margin-top:30px;">
+                <label><%= t('enable_account_wise_split') %></label>
+                <div class="text-input-bg"><%= f.check_box :enable_account_wise_split,{:onclick=>'toggle_split_section(this)'} %></div>
+            </fieldset>            
+        </div>
+        <div id="account-split-fields" style="display:<%= @gateway.enable_account_wise_split? ? "block" : "none" %>;">
+            <div class="config-header"><%= t('account_wise_parameters') %></div>
+            <div id="split-fields">
+                <% if @gateway.account_wise_parameters.present? %>
+                  <% @gateway.account_wise_parameters.each_pair do|k,v| %>
+                    <div class="split-field-set">
+                        <fieldset class="label-field-pair">
+                            <label><%= t('name') %></label>
+                            <div class="text-input-bg"><%= text_field_tag "custom_gateway[account_wise_parameters][#{k}]",v %></div>
+                        </fieldset>
+                        <%= link_to "<div class='remove-bg'></div> #{t('remove')}","#",{:class=>"remove-split-link",:onClick=>"remove_split_field(this); return false;"} %>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <div class="split-field-set">
+                      <fieldset class="label-field-pair">
+                          <label><%= t('name') %></label>
+                          <div class="text-input-bg"><%= text_field_tag "custom_gateway[account_wise_parameters][0]" %></div>
+                      </fieldset>
+                      <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-split-link",:onClick=>"remove_split_field(this); return false;"} %>
+                  </div>
+                <% end %>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_split_link",:onClick=>"add_split_field(); return false;"}  %>
+        </div>
+      <% else %>
+        <div id="config-fields">
+            <div class="config-header">Configuration Fields</div>
+            <div id="con-fields">
+                <div class="config-field-set">
+                    <fieldset class="label-field-pair">
+                        <label>Name</label>
+                        <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][config_fields][0][name]" %></div>
+                    </fieldset>
+                    <fieldset class="label-field-pair">
+                        <label>Value</label>
+                        <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][config_fields][0][value]" %></div>
+                    </fieldset>
+                    <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-config-link",:onClick=>"remove_config_field(this); return false;"} %>
+                </div>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_config_link",:onClick=>"add_config_field(); return false;"}  %>
+        </div>
+        <div id="variable-fields">
+            <div class="config-header">Variable Fields</div>
+            <div id="var-fields">
+                <div class="variable-field-set">
+                    <fieldset class="label-field-pair">
+                        <label>Name</label>
+                        <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][variable_fields][0][name]" %></div>
+                    </fieldset>
+                    <fieldset class="label-field-pair">
+                        <label>Field Type</label>
+                        <div class="text-input-bg">
+                            <%= select_tag "custom_gateway[gateway_parameters][variable_fields][0][field_type]",options_for_select([["Amount","amount"],["Redirect URL","redirect_url"],["Item Name","item_name"],["Payer Firstname","firstname"],["Payer Lastname","lastname"],["Payer Email","email"],["Payer Phone","phone"],["Student Admission Number","admission_no"],["Student Full Name","student_full_name"],["Student Roll Number","roll_no"],["Batch Name","batch_name"],["Fee Name","fee_name"],["Student Additional Field","student_additional_field"]]),{:onchange=>"toggle_additional_field_input(this); return false;"} %>
+                        </div>
+                    </fieldset>
+                    <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-variable-link",:onClick=>"remove_variable_field(this); return false;"} %>
+                </div>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_variable_link",:onClick=>"add_variable_field(); return false;"}  %>
+        </div>
+        <div id="response-fields">
+            <div class="config-header">Response Parameters</div>
+            <div id="resp-fields">
+                <div class="response-field-set">
+                    <fieldset class="label-field-pair">
+                        <label>Name</label>
+                        <div class="text-input-bg"><%= text_field_tag "custom_gateway[gateway_parameters][response_parameters][0][name]" %></div>
+                    </fieldset>
+                    <fieldset class="label-field-pair">
+                        <label>Parameter Type</label>
+                        <div class="text-input-bg">
+                            <%= select_tag "custom_gateway[gateway_parameters][response_parameters][0][parameter_type]",options_for_select([["Amount","amount"],["Transaction Status","transaction_status"],["Success Code","success_code"],["Pending Code","pending_code"],["Reason Code","reason_code"],["Online Transaction Reference","transaction_reference"]]) %>
+                        </div>
+                    </fieldset>
+                    <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-response-link",:onClick=>"remove_response_field(this); return false;"} %>
+                </div>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_response_link",:onClick=>"add_response_field(); return false;"}  %>
+        </div>
+        <div id="enable_account_split">
+            <fieldset class="label-field-pair">
+                <label><%= t('enable_account_wise_split') %></label>
+                <div class="text-input-bg"><%= f.check_box :enable_account_wise_split,{:onclick=>'toggle_split_section(this)'} %></div>
+            </fieldset>            
+        </div>
+        <div id="account-split-fields" style="display:none;">
+            <div class="config-header"><%= t('account_wise_parameters') %></div>
+            <div id="split-fields">
+                <div class="split-field-set">
+                    <fieldset class="label-field-pair" style="margin-top:30px;">
+                        <label><%= t('name') %></label>
+                        <div class="text-input-bg"><%= text_field_tag "custom_gateway[account_wise_parameters][0]" %></div>
+                    </fieldset>
+                    <%= link_to "<div class='remove-bg'></div> Remove Field","#",{:class=>"remove-split-link",:onClick=>"remove_split_field(this); return false;"} %>
+                </div>
+            </div>
+            <%= link_to "#{image_tag("/images/online_payments/add_3.png",:border => 0)} Add Field","#", {:id=>"add_split_link",:onClick=>"add_split_field(); return false;"}  %>
+        </div>
+      <% end %>
+      <fieldset>
+          <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+      </fieldset>
+      <script type="text/javascript">
+        var form_name = '<%= f.object_name %>';
+        var form_errors = <%= f.object.errors.to_a.inspect %>
+
+        j(function () {
+
+        });
+      </script>
+    <% end %>
+</div>

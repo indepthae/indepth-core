@@ -1,0 +1,4 @@
+<%if @tutors.present?%>
+  <div id="tutor_text"><%="#{t('tutor')}"%></div>
+  <div id="tutor_name"><%=@tutors.collect(&:full_name).join(', ')%></div>
+<%end%>

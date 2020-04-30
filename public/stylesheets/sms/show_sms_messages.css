@@ -1,0 +1,304 @@
+#content_wrapper {
+    height: 100% !important;
+}
+
+#content{
+    height: 100%;
+}
+
+#page-yield {
+    height: 100%
+}
+
+div.sms_log_conatiner {
+    border-radius: 5px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+    height: calc(100% - 320px);
+    font-size: 0px;
+    max-height: 700px;
+    width: 100%;
+    float: left;
+}
+
+
+div.messages_section{
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 5px;
+    height: 100%;
+    width: 35%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+}
+
+div.logs {
+    width: 65%;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-left-style: none;
+    border-top-right-radius: 4px;
+}
+
+div.container_head{
+    padding: 8px;
+    background: #eee;
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    box-sizing: border-box;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #ccc;
+}
+
+div.container_head::after{
+    content: "\00a0";
+}
+
+div.message_section_head{
+    border-top-left-radius: 3px;
+}
+
+div.logs_head{
+    border-top-right-radius: 3px;
+}
+
+div.content_box{
+    font-size: 12px;
+    overflow-y: scroll;
+    height: calc(100% - 32px);
+}
+
+div.switcher{
+    font-size: 0px;
+    text-align: center;
+    border-style:solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 2px;
+}
+
+div.switcher_container {
+    padding: 15px;
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: #ccc;
+}
+
+
+div.border_left{
+    border-left-style:solid;
+    border-left-width: 1px;
+    border-left-color: #ccc;
+}
+
+.toggle_switch{
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+    box-sizing: border-box;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px;
+    cursor: pointer;
+    color: #777;
+}
+
+.toggle_switch:hover{
+    background-color: #ddd;
+}
+
+.toggle_selected{
+    background-color: #ddd;
+}
+
+.toggle_active{
+    color: #333;
+    background: #eee;
+}
+
+div.message_element{  
+    height: 80px;
+    padding: 13px;
+    box-sizing: border-box;
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    cursor: pointer;
+}
+
+div.message_element:hover{
+    background: rgb(242, 255, 253);
+}
+
+div.message_head {
+    font-size: 12px;
+    margin-bottom: 2px;
+    height: 30px;
+    overflow: hidden;
+}
+
+div.message_timestamp {
+    font-size: 11px;
+    color: #777;
+    height: 12px;
+    overflow: hidden;
+}
+
+div.message_details{
+    padding: 25px;
+    border-bottom-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+}
+
+div.message_content{
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+div.sent_on_tag {
+    margin-bottom: 6px;
+}
+
+span.key_text {
+    color: #777;
+}
+
+
+table.recipient_details{
+    width: 100%;
+    text-align: left;
+}
+
+table.recipient_details th {
+    padding: 20px;
+}
+
+
+table.recipient_details td {
+    padding: 8px 8px 8px 15px;
+    vertical-align: top;
+}
+
+table.recipient_details tr.recipient_message{
+    color: #777;
+    text-align: left;
+    display: none;
+}
+
+table.recipient_details tr.recipient_message td{
+    padding: 0px 15px 8px 15px;
+
+}
+
+table.recipient_details tbody:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+span.action_link {
+    text-decoration: underline;
+    cursor: pointer;
+    user-select: none;
+}
+
+span.recipient_no {
+    display: block;
+    padding-top: 5px;
+    color: #777;
+}
+
+.remove_user_spacing{
+    padding-top:0px !important;
+}
+
+.right_text{
+    text-align: right;
+}
+
+img.loader_position {
+    position: absolute;
+    bottom: 15px;
+    transform: translate(-50%,0%);
+    left: 50%;
+    z-index: 100;
+}
+
+
+div.head {
+    margin-top: 50px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+div.sub_text {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+.start_date{
+    float: left;
+    margin: 1px 0px 13px 0px;
+}
+.end_date{
+    margin: 1px 19px 28px 6px;
+    float: left;
+}
+.filter_text{
+    margin: 9px 13px 12px 14px;
+    width: 2%;
+    float: left;
+    font-size: 13px;
+}
+.filter-section{
+    height: auto;
+    width: 100%; 
+}
+.calendar_label {
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    padding: 5px !important;
+    top: -2px !important;
+    position: relative;
+}
+.text-input-bg {
+    background: transparent;
+    height: 57px;
+    width: 250px;
+}
+h5.field_head {
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 10px;
+    margin-top: 15px;
+}
+
+
+
+.calendar_date_select {
+    font-size: 12px;
+    color: #ffffff;
+    border: #777 1px solid;
+    display: block;
+    width: 195px;
+    z-index: 10001;
+    -webkit-margin-before: 10px;
+    margin-top: 5px;
+}

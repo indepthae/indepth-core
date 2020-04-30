@@ -1,0 +1,2 @@
+<%= select :warden, :employee_id, @employees.map { |s| [s.full_name, s.id] },
+              {:prompt => "#{t('select_employee')}"} %>

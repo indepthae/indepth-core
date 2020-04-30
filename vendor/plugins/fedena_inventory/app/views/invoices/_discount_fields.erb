@@ -1,0 +1,47 @@
+<tr class="tr-<%= cycle('odd', 'even') %>" id="discount_fields">
+        <td >
+
+      <div class="label-field-pair3">
+        <%= c.text_field :name, :id => "dis_name" %>
+      </div>
+
+        </td>
+        <td >
+
+      <div class="label-field-pair5">
+        <%= c.text_field :amount, :id => "dis_amount" %>
+      </div>
+
+        </td>
+        <td class="col-5"><div id="remove-field"><%= link_to_remove_fields " ", c, "discount_fields" %></div>
+
+</td>
+      </tr>
+
+       <script type="text/javascript">
+       j("input#dis_amount").change(function(){
+        calculate_grandtotal()
+      });
+ j('a.delete_button_img').click(function(){
+      calculate_grandtotal();
+    })
+      j("input#dis_amount").change(function(){
+    var cur_dis = 0;
+    j.each(j('table.discounts').find('input#dis_amount:visible'), function(i, v){
+     if (j(v).val() != '' && !isNaN(j(v).val()) && j(v).val() > 0){
+       cur_dis = cur_dis + parseFloat(j(v).val());
+     }
+    })
+    
+    if (j('#grandtotal').val() < 0){
+       j("input#dis_amount").val("");
+       j("input#dis_name").val("");
+       calculate_grandtotal();
+    }
+  })
+
+
+      </script>
+
+
+      

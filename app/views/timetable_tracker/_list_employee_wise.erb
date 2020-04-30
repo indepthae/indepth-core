@@ -1,0 +1,4 @@
+<div class="text-input-bg1"><%= select :employee, :employee_id,
+      @employees.map {|e| ["#{e.full_name}(#{e.employee_number})", e.id]},
+      {:prompt => "#{t('select_employee')}"} %>
+</div>

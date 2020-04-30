@@ -1,0 +1,20 @@
+<% unless @students.empty?  %>
+  <% all_students = @students.collect{|s| s.id}.join(",")%>
+
+  <div class="scroll-inside">
+    <div class="hover"><%= link_to "#{t('select_all')}", '#', :onClick => "add_all_students('#{all_students}')", :class=> 'all' %>
+
+    </div>
+    <% @students.each do |s| %>
+      <div class="hover"><%= link_to "#{shorten_string(s.full_name,20)} <span> #{t('add')} </span> " , '#', :onClick => "add_student(#{s.id})",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')" ,:class=>"individual" %>
+
+      </div>
+    <% end %>
+  </div>
+  <% else %>
+<div class="hover"><div class="individual"><%= t('no_batch_selected') %></div></div>
+<% end %>
+
+

@@ -1,0 +1,109 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_gradebook') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessments_activate_exams, [@assessment_group,@academic_year,@course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="assessments_box">
+        <div class="main_header">
+            <%= @assessment_group.exam_type.activity ? t('activate_activity_exams') : t('activate_attribute_exams')%>
+        </div>
+        <div class="assessments_head">
+            <div class="left">
+                <label><%=t('exam_group')%></label>
+                <span><%= @assessment_group.name_with_code %></span>
+            </div>
+            <div class="right">
+                <label><%=t('status')%></label>
+                <span><%='Active'%></span>
+            </div>
+        </div>
+        <div class="assessments_details">
+            <% batches = @course.batches_in_academic_year(@academic_year.id) %>
+            <%= render :partial=> 'assessment_group_details', :locals => {:batches => batches} %>
+        </div>
+        <div class="batch_select">
+            <% form_for :batch_assessments, :url => {:action=>'activate_exam',:course_id => @course.id, :assessment_group_id => @assessment_group.id}  do |as| %>
+              <div class="sub-head"><%= t('batches_text') %></div>
+  <%# status = ((@assessment_schedule.new_record? and !@assessment_schedule.errors.any?) or (@batches.length == @assessment_schedule.batch_ids.length)) %>
+              <div class="select_batches" id="all_batches" style="display:<%= (true ? 'block' : 'none') %>">
+                  <div class="header"><%= "#{t('all_active_batches')} &#x200E;(#{@batches.length})&#x200E;" %></div>
+                  <div class="div_link" onclick="showBatches();"><%= t('select_batches') %></div>
+                  <div id="batch_names"><%= @batches.collect(&:full_name_with_status).join(', ') %></div>
+                  <% @batches.each do |batch| %>
+                    <%= hidden_field_tag "batch_ids[]", batch.id, :class => 'batch_ids' %>
+                  <% end %>
+              </div>
+              <div class="select_batches" id="each_batches" style="display:<%= (true ? 'none' : 'block') %>">
+                  <div class="header"><%= "#{t('specific_batches')}" %></div>
+                  <div class="div_link" onclick="hideBatches();"><%= t('select_all_batches') %></div>
+                  <div id="description">
+                      <%= @assessment_group.exam_type.activity ? t('batch_desc_activity_exams') : t('batch_desc_attribute_exams')%>
+                  </div>
+                  <div id="list_batches">
+                      <div id="list_header"><%= t('select_batches') %></div>
+                      <div id="batches_list">
+                          <% @batches.each do |batch| %>
+                            <div class="each_batch">
+                                <%= check_box_tag "batch_ids[]",batch.id, false,:class=>'check_batch',:id=>"assessment_schedule_batch_ids_"+"#{batch.id}", :disabled => true, :checked => (@assessments.keys.map(&:to_i).include? batch.id) %>
+                                <label for="batch_ids_<%= batch.id %>"><%= "#{batch.full_name_with_status}" %></label>
+                            </div>
+                          <% end %>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="form-submit">
+                <%= as.submit t('activate_exams_for_batches'),:class=>'submit-button'%>
+                <%= link_to "#{t('cancel')}",:back,:class=>'submit-button cancel-button' %>
+              </div>
+            <% end %>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    showBatches = function () {
+    j('#each_batches').show();
+    j('#all_batches').hide();
+    j('#all_batches input').attr('disabled', true);
+    j('#each_batches input').attr('disabled', false);
+    j('.check_batch').prop('checked',true);
+    }
+    hideBatches = function () {
+    j('#each_batches').hide();
+    j('#all_batches').show();
+    j('#all_batches input').attr('disabled', false);
+    j('#each_batches input').attr('disabled', true);
+    j('.check_batch').prop('checked',false);
+    }
+</script>

@@ -1,0 +1,94 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('applicant_regi_label') %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>            
+        </b>
+        <div class="date_align right">
+            <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; 
+            <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %> 
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+                <!--
+                < %=link_to_remote t('change_date'),:url => {:controller => "finance",:action =>"show_date_filter",
+                  :target_action=>@target_action,:id=>params[:id],:date_tag=>params[:date_tag],:start_date=>@start_date,
+                  :end_date=>@end_date}%> -->
+            </span>
+        </div>
+    </div>
+
+    <% unless @course_ids.empty? %>
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td><%= t('name') %></td>
+              <td class="set_border_right"><%= t('amount') %> (<%= currency %> ) </td>
+              <td class="set_border_right"><%= t('transaction_date') %></td>
+              <td class="set_border_right"><%= t('receipt_no') %></td>
+          </tr>
+          <%  j = 0 %>
+          <% @course_ids.each do |course,income| %>
+            <tr class="tr-list_head">
+                <td colspan="5">
+                    <%="#{j=j+1}. "%>
+                    <%c=Course.find_by_id(course)%>
+                    <%= (c.nil?) ? " " : c.full_name%>
+                </td>
+            </tr>
+            <%income.each do |i| %>
+              <tr class="row-b">
+                  <td><%= i.payee.full_name %> ( <%=i.applicant_reg_no%> )</td>
+                  <td class="set_border_right" align="right">
+                      <%= (i.master_transaction_id == 0 and i.category.is_income == true) ?  
+                        precision_label(i.amount) : "-#{precision_label(i.amount)}" %>
+                  </td>
+                  <td class="set_border_right"><%= format_date(i.transaction_date) %></td>
+                  <td class="set_border_right"><%= i.receipt_number %></td>
+              </tr>
+            <% end %>
+          <% end %>
+      </table>
+
+      <%= will_paginate  @transactions, :params => {:id => params[:id], :date_tag => params[:date_tag],
+        :start_date => @start_date, :end_date => @end_date}.merge(url_params),
+        :renderer => 'RemoteLinkRenderer'  %>
+
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%=precision_label(@grand_total)%></label>
+      </div>
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "applicants", 
+                        :action => "applicant_registration_report_csv", :start_date => @start_date, 
+                        :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%= t('no_transactions_present') %></div>
+    <% end %>
+</div>
+<script>
+  j('.date_box').hide();
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+</script>

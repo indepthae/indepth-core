@@ -1,0 +1,81 @@
+<table id="thread_listing" width="100%" cellpadding="1" cellspacing="1">
+    <% if @responses.present? %>
+      <% @responses.each do |message_recipient| %>
+        <% recipient = message_recipient.recipient %>
+        <% entry = get_entry(recipient) %>
+        <% has_unread_messages = message_recipient.thread.has_unread_messages_from message_recipient.id %>
+        <% if entry.present? %>
+          <tr class="th_entry" data-id="<%=message_recipient.id%>" data-thread="<%=@thread.id%>" id="thread_<%=message_recipient.recipient_id%>">
+              <td class="thread_entry">
+                  <div class="thread_entry">
+                      <div class="entry-thumbnail">
+                          <% if !recipient.parent? %>
+                            <%= image_tag entry.photo.url(:original, false) %>
+                          <% else %>
+                            <%= image_tag "single_user.png" %>
+                          <% end %>
+                      </div>
+                      <div class="entry_detail">
+                          <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= entry.full_name %></div>
+                          <div class="sec_info">
+                              <%if recipient.student?%>
+                                <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                              <%elsif recipient.parent?%>
+                                <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                              <%else%>
+                                <%= "#{t('department')} : #{entry.department}" %>
+                              <%end%>
+                          </div>
+                      </div>
+                  </div>
+              </td>
+          </tr>
+        <% else %>
+          <tr class="th_entry" data-id="<%=message_recipient.id%>" data-thread="<%=@thread.id%>" id="thread_<%message_recipient.recipient_id%>">
+              <td class="thread_entry">
+                  <div class="thread_entry">
+                      <div class="entry-thumbnail">
+                          <%= image_tag "blocked_user.png" %>
+                      </div>
+                      <div class="entry_detail">
+                          <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= t('deleted_user')%></div>
+                      </div>
+                  </div>
+              </td>
+          </tr> 
+        <% end %>
+      <%end%>
+    <% else %>
+      <tr class="no_thread_entry">
+          <td class="no_thread"><%=t('no_conversations')%></td>
+      </tr>
+    <% end %>
+</table>
+<script>
+  j('#thread_listing tr.th_entry').each(function () {
+      j(this).click(function () {
+          j(".coloured_background").removeClass('coloured_background');
+          j(this).addClass('coloured_background');
+          j.ajax({
+              type: 'GET',
+              url: "/messages/update_conversation",
+              data: {
+                  recipient_id: j(this).attr('data-id'),
+                  type: 'group_update',
+                  thread_id: j(this).attr('data-thread')
+              },
+              beforeSend: function () {
+                  j('#message_conversation').html("");
+                  j('#message_conversation').append("<img  alt='Loading...' src='/images/pk-loader.gif' style='display:none;' id='loader_4'></img>")
+                  j('#loader_4').css('display', 'block');
+              },
+              success: function () {
+              }
+          });
+      });
+  });
+  
+  if (j("#thread_<%=@recipient_id%>").length > 0) {
+      j("#thread_<%=@recipient_id%>").addClass('coloured_background');
+  }
+</script>

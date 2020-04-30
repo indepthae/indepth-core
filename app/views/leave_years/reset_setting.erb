@@ -1,0 +1,23 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('auto_credit_name') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_reset_setting') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_reset_setting %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h4><%= t('leave_reset_settings').titleize %></h4>
+    <div class="description"><%= t('leave_reset_setting_description1') %></div>
+    <div id="settings_enable">
+        <% remote_form_for :settings, :url => {:action=> 'confirmation_box'} do |s| %>
+          <%= render :partial => "setting_detail_form", :locals => {:s => s, :setting_type => "reset_setting"} %>
+        <% end %>
+    </div>
+</div>
+

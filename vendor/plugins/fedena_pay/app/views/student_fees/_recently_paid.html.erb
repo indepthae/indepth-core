@@ -1,0 +1,59 @@
+<div id="payments_details">
+  <div class="seprate_div"></div>
+  <div class="label-field-pair3">
+    <label><%= t('payment_history') %> </label>
+  </div>
+  <table id="listing1" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= t('receipt_no') %></td>
+      <td><%= t('fee_collections') %></td>
+      <td><%= t('payment_date') %></td>
+      <td><%= t('payment_mode') %></td>
+      <td><%= t('payment_notes') %></td>
+      <td><%= t('amount') %> (<%= currency %>)</td>
+      <td class="col-3" style="width:2%;"></td>
+    </tr>
+    <% @paid_fees.each_with_index do |f, i| %>
+        <tr class="tr-odd" id="mft<%= f.id %>">
+          <%= show_more_in_paid_fees(f.receipt_no) %>
+          <%= show_more_in_paid_fees(f.collection_name,'||',/^(.*?)[|]{2}/) %>
+          <td class="col-3 left_align" style="min-width: 80px"><%= format_date(f.transaction_date) %></td>
+          <% if f.reference_no.present? %>
+              <td class="col-3 left_align">
+                <div class="payment-mode" tooltip="<%= "#{get_payment_mode_text(f.payment_mode)}-#{f.reference_no}"  %>" delay="10">
+                  <%= f.payment_mode %>
+                </div>
+              </td>
+          <% else %>
+              <td class="col-3 left_align"><%= f.payment_mode %></td>
+          <% end %>
+          <td class="col-2 left_align" style="min-width: 120px; word-break:break-word"><%= f.payment_note %>
+          </td>
+          <td class="col-3" style="min-width: 90px">
+            <%= precision_label(f.amount.to_f) %>
+          </td>
+          <td class="col-3 receipt-actions">
+            <% transaction_ids =f.finance_transactions.present? ? f.finance_transactions.all.collect(&:id).sort : [f.id] %>
+            <%= pdf_button(@student.id, transaction_ids,@current_batch.id) %>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<script type="text/javascript">
+  j(function(){
+   // if (updatedChromeVersion()) {
+
+      if (<%= rtl?%>) {
+        j('.receipt-box').css('margin-right', '-20px');
+      } else {
+        j('.receipt-box').css('margin-left', '-20px');
+      }
+   // }
+  })
+
+  function updatedChromeVersion () {
+    var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+    return (raw && parseInt(raw[2], 10) > 54)
+  }
+</script>

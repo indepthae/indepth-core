@@ -1,0 +1,101 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('records_list') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <%  if permitted_to? :new,:record_groups %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_record')}", new_record_group_record_path(@record_group) %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :records_index, @record_group %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div id="rg_text"><%=@record_group.name%></div>
+  <%remote_form_for :record,:url=>update_priority_record_group_records_path(@record_group.id) do |f|%>
+    <%unless @records.count <= 1%>
+      <div id="reorder_records"><%=t('reorder_records')%></div>
+    <%end%>
+    <div class="drag_drop_msg hidden_sec"><i></i><%=t('drag_drop_msg')%></div>
+    <%unless @records.count == 0%>
+      <div id="records_preview"><%= link_to_remote "#{t('records_preview')}", :url => { :action => 'preview',:id=>@record_group.id } %></div>
+    <%end%>
+    <div id="other_details">
+      <%=render :partial=>'records'%>
+    </div>
+    <div id="save_button" class="hidden_sec"><%=f.submit%></div>
+    <div id="cancel_link" class="hidden_sec"><%=t('cancel')%></div>
+  <%end%>
+</div>
+<div id="modal-box" style="display: none"></div>
+<script type="text/javascript">
+  function updateSortorder(){
+
+    j('tr:visible.list').each(function (i) {
+      j(this).children().last().val(i+1);
+    });
+  }
+  j('#reorder_records').click(function(){
+    j('#reorder_records').hide();
+    j('.drag_drop_msg').removeClass('hidden_sec');
+    j('#save_button').show();
+    j('#cancel_link').show();
+    j('th#action').hide();
+    j('td.action').hide();
+    j('th#reorder').show();
+    j('td.reorder_val').show();
+    j('th#name').css('min-width','900px');
+    j('td.record_name').css('min-width','900px');
+    j("tr.list").hover(function(){
+      j(this).addClass('hover_hand');
+    },function(){
+      j(this).removeClass('hover_hand');
+    });
+    j("#student_details_table tbody").sortable({
+      cursor: 'move',
+      opacity: 0.6,
+      start: function( event, ui ) {
+      },
+      stop: function( event, ui ) {
+        updateSortorder();
+      },
+      items: "tr:not(.disable_sort)"
+    }).disableSelection();
+  });
+  j('#cancel_link').click(function(){
+    j.ajax({
+      type: 'GET' ,
+      url: "/records/cancel",
+      data : {
+        record_group_id : <%=@record_group.id%>
+      }
+    });
+    j('#cancel_link').hide();
+    j('#save_button').hide();
+    j('.drag_drop_msg').addClass('hidden_sec');
+    j('#reorder_records').show();
+  });
+  j('#record_submit').click(function(){
+    j('#cancel_link').hide();
+    j('#save_button').hide();
+    j('.drag_drop_msg').addClass('hidden_sec');
+    j('#reorder_records').show();
+    j('th#action').show();
+    j('td.action').show();
+    j('th#reorder').hide();
+    j('td.reorder_val').hide();
+    j('th#name').css('min-width','700px');
+    j('td.record_name').css('min-width','700px');
+    j("#student_details_table tbody").sortable("destroy");
+  });
+</script>

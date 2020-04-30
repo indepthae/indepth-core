@@ -1,0 +1,151 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('finance_transactions') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%=t('deleted_transactions')%></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('advanced'), :controller=>"finance", :action=>"transactions_advanced_search" %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="both">
+    <div id="search_box_bg" class="full_width">
+      <label for="user_name" class="full_width"><%= t('transaction_type') %></label>
+      <div class="text-input-bg full_width" id="transaction_type"><%= select :transaction, :type, [t('fees_text'), t('payslips'),t('others'), t('advance_fees_text')],
+          {:selected=>'value'},
+          {:onChange => "transaction_type_change(value);"} %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+    <div id="search_box_bg" class="search_by">
+      <label for="user_name"><%= t('search_by') %></label>
+      <div class="text-input-bg"><%= select :leave_management_all, :department_id, [t('admission_no'),t('date_text'),t('fee_collection_name')],
+          {:selected=>'value'},
+          {:onChange => "change(value);"} %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+    <div id="search_box_bg1" class="search">
+      <form name="search_form" action="" style="display:inline;">
+        <%= hidden_field_tag("option", params['option'], :value => t('admission_no')) %>
+        <label for="user_name"><%= t('search_text') %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader_search",
+            :style =>"display: none;" ) %>
+        </label>
+        <div id="search_textbox">
+          <%= text_field_tag("query", params['query'], :autocomplete => 'off') %>
+
+        </div>
+
+        <div class="extender"></div>
+      </form>
+    </div>
+
+    <div id="date-form" class="box" style="display:none">
+      <% remote_form_for(:student, :url => {:action=> 'transaction_filter_by_date'},:before => "Element.show('loader_date')",:success => "Element.hide('loader_date')", :html=> {:multipart=>true,:id=>"date_search_form"}) do |s| %>
+        <%= hidden_field_tag("transaction_type", '', :value => '',:id=>'hidden_tt') %>
+        <div class="date-select"><div id="search_box_bg">
+            <label for="user_name"><%= t('start_date') %> </label>
+
+            <%= calendar_date_select_tag 's_date', I18n.l(@date.present? ? @date.to_date : FedenaTimeSet.current_time_to_local_time(Time.now).to_date, :format=> :default),
+              :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force"%></div>
+          <div id="search_box_bg"><label for="user_name"><%= t('end_date') %> </label>
+            <%= calendar_date_select_tag 'e_date', I18n.l(@date.present? ? @date.to_date : FedenaTimeSet.current_time_to_local_time(Time.now).to_date, :format=> :default),
+              :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force"%>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader_date",
+              :style =>"display: none; margin-bottom:10px;" ) %></div>
+          <%= s.submit "", :value => "► Search", :class => "submit_button", :id => 'submit_button' %>
+        </div>
+
+      <%end%>
+    </div>
+
+
+  </div>
+  <script type="text/javascript">
+
+    function transaction_type_change(k){
+      if(k=='<%=t('fees_text')%>'){
+        $$('.search_by')[0].show();
+        if(j('#leave_management_all_department_id :selected').val() == "<%=t('date_text')%>")
+        {
+          $$('.search')[0].hide();
+          $$('.box')[0].show();
+        }
+        else
+        {
+          $$('.search')[0].show();
+          $$('.search')[0].children[0].children[2].children[0].value = ""
+          $$('.box')[0].hide();
+        }
+
+      }
+      else{
+        $$('.search')[0].hide();
+        $$('.search_by')[0].hide();
+        $$('.box')[0].show();
+        j('.calendar_field').val('<%=  FedenaTimeSet.current_time_to_local_time(Time.now).to_date %>');
+        j('.calendar_label').val('<%= format_date(FedenaTimeSet.current_time_to_local_time(Time.now).to_date,:format=> :long) %>');
+        j('#hidden_tt').val(j('#transaction_type :selected').val());
+      }
+      j.ajax({
+        url: "transaction_filter_by_date",
+        data: {transaction_type: j('#transaction_type :selected').val(),s_date: '<%= I18n.l(FedenaTimeSet.current_time_to_local_time(Time.now).to_date,:format=> :default) %>',e_date: '<%= I18n.l(FedenaTimeSet.current_time_to_local_time(Time.now).to_date + 1.day,:format=> :default)%>'}
+      })
+    }
+
+    function date(){
+      el=new Element('input' , {'type':'hidden','name':'transaction_type','value':j('#transaction_type :selected').val()})
+      $$('#date_search_form')[0].appendChild(el)
+      $$('#date_search_form')[0].request();
+    }
+    function change(k){
+      $('option').value=k;
+      var myarr=["<%=t('admission_no')%>","<%=t('fee_collection_name')%>"]
+      var contains = (myarr.indexOf(k) > -1);
+      if(contains){
+        $$('.search')[0].show();
+        $$('.search')[0].children[0].children[2].children[0].value = ""
+        $$('.box')[0].hide();
+
+      }
+      else{
+        $$('.search')[0].hide();
+        $$('.box')[0].show();
+      }
+    }
+    function search_ajax(){
+      if ($('query').value.include("%")) return;
+<%="#{remote_function(:url => {:action => "search_fee_collection"},
+:with => "'query='+$('query').value + '&option='+$('option').value",
+:before => "Element.show('loader_search')",
+:success => "Element.hide('loader_search')",
+:update=>"deleted_transactions"
+)}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    $$('.box')[0].hide();
+    new Form.Element.Observer('query', 1, search_ajax);
+  });
+
+  </script>
+  <div class="transaction-margin" style="height:60px"></div>
+  <div id="search_div" style="margin-top:40px;">
+    <div id="deleted_transactions">
+      <%= render :partial => 'finance/deleted_transactions' %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<% if @batch.present?  %>
+  <% unless @students.empty?  %>
+    <div class="list_name">
+        Previous Students
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader1", :style =>"display: none;" ) %>
+    </div>
+    <ul class="student_list">
+        <% @students.each_with_index do |s,i| %>
+          <% if @config == "admission_no" %>
+            <% student_text = "#{s.full_name} (#{s.admission_no})" %>
+          <%elsif @config == "roll_number" %>
+            <% if s.roll_number.present? %>
+              <% student_text = "#{s.full_name} (#{s.roll_number})"%>
+            <%else%>
+              <% student_text = "#{s.full_name} (-)" %>
+            <%end%>
+          <%else%>
+            <% if Configuration.enabled_roll_number? %>
+              <% if s.roll_number.present? %>
+                <% student_text = "#{s.full_name} (#{s.roll_number})"%>
+              <%else%>
+                <% student_text = "#{s.full_name} (-)" %>
+              <%end%>
+            <%else%>
+              <% student_text = "#{s.full_name} (#{s.admission_no})" %>
+            <%end%>
+          <% end %>
+          <li class="student_names">
+              <% if i==0 %>
+                <a href="#" id="<%=s.sid%>"  class="student-link active-link themed_text" > <%= student_text %></a>
+              <% else %>
+                <a href="#" id="<%=s.sid%>"  class="student-link" > <%= student_text %></a>
+              <% end %>
+          </li>
+        <% end %>
+    </ul>
+  <% else %>
+    <div class="list_name">
+        <p class="flash-msg"><%= t("no_students_in_batch")  %></p>
+    </div>
+  <% end %>
+<% end %>
+
+
+<script type="text/javascript">
+    function set_active(e){
+    j('.active-link').each(function(){
+    this.removeClassName('active-link themed_text');
+    });
+    e.addClassName('active-link themed_text');
+    }
+    function draw_report(e){
+    Element.show('loader1')
+    new Ajax.Request('/icse_reports/generate_previous_batch_exam_reports',
+    {asynchronous:true, evalScripts:true,
+    parameters:'subject_report[student_id]='+e.id+'&subject_report[batch_id]=<%= @batch.present? ? @batch.id : "" %>&subject_report[course_id]=<%= @batch.present?? @batch.course.id : "" %>',onSuccess:function(request){Element.hide('loader1')}
+    })
+    }
+    j('.student-link').click(function(){
+    draw_report(this);
+    set_active(this);
+    });
+</script>

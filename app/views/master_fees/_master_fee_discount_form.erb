@@ -1,0 +1,33 @@
+<% remote_form_for @discount, :url => fetch_obj_path(@discount, 'master_discount_master_fee'), :before => "$('submit_button').disable()",
+                   :complete => "setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+    <%= session_fingerprint_field %>
+    <div id="discount_form">
+      <div class="label-field-pair date_field">
+        <label for="start_date"><%= t('name') %></label>
+
+        <div class="text-input-bg">
+          <%= f.text_field :name %>
+        </div>
+      </div>
+      <div class="label-field-pair date_field">
+        <label for="end_date"><%= t('description') %></label>
+
+        <div class="text-input-bg">
+          <%= f.text_field :description %>
+        </div>
+      </div>
+    </div>
+    <div id="popup_footer">
+      <%= submit_tag t(fetch_obj_title(@discount)), :disable_with => "#{t('please_wait')}", :class => "submit-button",
+                     :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+    </div>
+<% end %>
+
+
+<script type="text/javascript">
+
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlfy').click(remove_popup_box);
+
+</script>

@@ -1,0 +1,27 @@
+development:
+      host: localhost
+      adapter: mysql
+      database: alsanawbar
+      port: 3306
+      username: fedena
+      password: fedenapw
+      encoding: utf8
+
+test: &test
+      host: localhost
+      adapter: mysql
+      database: fedena_pro
+      port: 3306
+      username: fedena
+      password: fedenapw
+      encoding: utf8
+production:
+      host: localhost
+      adapter: mysql
+      database: alsanawbar
+      port: 3306
+      username: fedena
+      password: fedenapw
+      encoding: utf8
+cucumber:
+  <<: *test

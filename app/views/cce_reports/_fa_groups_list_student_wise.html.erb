@@ -1,0 +1,20 @@
+<%if @batch.present?%>
+  <div class="label-field-pair">
+      <label for="batch_id">FA Group</label>
+      <div class="text-input-bg margin-left-10">
+          <%= select :fa_groups,:fa_group_name,
+            @fa_group_names.map {|b| [b, b]},
+            {:prompt => "All  "},
+            {:onChange => "#{remote_function(:url => {:action => "student_transcript"},
+            :with => "'fa_group='+ value+'&cat_id='+#{@cat_id}+'&batch_id='+#{@batch.id}",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"
+            )}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display:none") %>
+      </div>
+  </div>
+<%end%>

@@ -1,0 +1,7 @@
+<% form_for :sim_transaction, :url => get_payment_url do |f| %>
+  <%= sim_fields(@sim_transaction) %>
+  <br />
+  <% if @paid_fees.blank? %>
+    <%= f.submit 'Pay Fee',:class => "submit_button",:style => @button_style %>
+  <% end %>
+<% end %>

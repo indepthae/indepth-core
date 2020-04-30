@@ -1,0 +1,52 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_student_records') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="manage_student_records_text"><%=t('manage_student_records')%></div>
+  <div id="rg_desc"><%=t('manage_student_records_text_desc')%></div>
+  <%if (@current_user.admin? or @current_user.privileges.include?(Privilege.find_by_name('ManageStudentRecord'))) and (@courses_list.present?)%>
+    <div class="options_div">
+      <div id="option_desc_text"><%=t('manage_record_by')%></div>
+      <div class="grouped">
+        <div class="button_label">
+          <%= radio_button_tag  "courses", 'yes',true %><label for="courses_yes"><%=t('courses_and_batches_small')%></label>
+        </div>
+        <div class="button_label">
+          <%=radio_button_tag  "courses",'no',false %><label for="courses_no"><%=t('record_groups_small')%></label>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+  <%end%>
+  <div id="other_details">
+    <div id="student_items">
+      <%=render :partial=>'manage_student_records_course_batch_wise'%>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  j('input[type=radio]').each(function(){
+    j(this).click(function(){
+      j.ajax({
+        type: 'POST' ,
+        url: "/student_records/manage_student_records",
+        data : {
+          course_batch : j(this).val()
+        },
+        beforeSend :function(){
+          j('#loader').show();
+        },
+        success : function(data) {
+          j('#loader').hide();
+        }
+      });
+    });
+  });
+</script>

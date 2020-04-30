@@ -1,0 +1,39 @@
+<% remote_form_for @academic_year, :url => fetch_path(@academic_year), :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |ay| %>
+  <%= session_fingerprint_field %> 
+  <div id="year_form">
+      <div class="label-field-pair date_field">
+          <label for="start_date"><%= t('start_date') %></label>
+          <div class="text-input-bg">
+            <% if @academic_year.dependencies_present? %>
+              <%= text_field_tag :start_date, format_date(@academic_year.start_date), :disabled=>true %>
+            <% else %>  
+              <%= calendar_date_select_tag 'academic_year[start_date]', I18n.l(@academic_year.start_date.to_date,:format=>:default),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onchange => "change_name(this);", :id => 'start_date', :errors => @academic_year.errors["start_date"]  %>
+            <% end %>
+          </div>
+      </div>
+      <div class="label-field-pair date_field">
+          <label for="end_date"><%= t('end_date') %></label>
+          <div class="text-input-bg">
+            <% if @academic_year.dependencies_present? %>
+              <%= text_field_tag :end_date, format_date(@academic_year.end_date), :disabled=>true %>
+            <% else %>
+              <%= calendar_date_select_tag 'academic_year[end_date]', I18n.l(@academic_year.end_date.to_date,:format=>:default),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onchange => "change_name(this);", :id => 'end_date', :errors => @academic_year.errors["end_date"] %>
+            <% end %>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('academic_year_name_text') %></label>
+          <div class="text-input-bg"><%= ay.text_field :name, :placeholder => t('academic_year_example') %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@academic_year.new_record? ? t('create_academic_year') : t('update_academic_year'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlay').click(remove_popup_box);
+</script>

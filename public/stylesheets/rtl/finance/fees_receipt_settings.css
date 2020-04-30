@@ -1,0 +1,156 @@
+/**/
+#preview_frame {
+  width: 100%;
+   margin-right: 202px;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  width: 50%;
+  /*margin: 0 auto;*/
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: block;
+}
+.a4_preview_overrides {
+  transform: scale(0.85);
+  transform-origin: 0px 0px;
+ -ms-transform: scale(0.85); /* IE 9 */
+ -webkit-transform: scale(0.85); /* Safari and Chrome */
+ -o-transform: scale(0.85); /* Firefox */
+     margin-bottom: 0px;
+}
+.preview_container {
+    float: right;
+    clear: both;
+    width: 100%;
+}
+.radio-select input {
+  float: right;
+  margin-top: 1px;
+}
+.radio-select label {
+  font-weight: normal;
+  font-size: 14px;
+  /*margin-top: 5px;*/
+}
+.reveal-if-active {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+input[type="radio"]:checked ~ .reveal-if-active,input[type="checkbox"]:checked ~ .reveal-if-active {
+  opacity: 1;
+  max-height: 100px; /* little bit of a magic number :( */
+  overflow: visible;
+}
+
+.label-radio-pair {
+    width: 100%;
+    float: right;
+}
+.label-radio-pair label {
+  /*width: 200px;
+  float: left;
+  color: #444;
+  font-size: 14px;
+  font-weight: bold;*/
+  color: #333333;
+  font-size: 14px;
+  float: right;
+  width: 200px;
+}
+.label-radio-pair p {
+  clear: both;
+  margin-right: 20px;
+  color: #666;
+  font-size: 13px;
+  padding-top: 10px;
+  width: 535px;
+}
+.radio-select-options {
+    float: right;
+}
+.buttons {
+  float: right;
+  margin-top: 10px;
+}
+input#receipt_printer_receipt_printer_header_height {
+    width: 100px;
+    margin-right: 20px;
+    margin-left: 10px;
+}
+input#fee_receipt_receipt_printer_header_height {
+    width: 100px;
+    margin-right: 20px;
+    margin-left: 10px;
+}
+hr {
+  float: right;
+  width: 100%;
+  margin-top: 30px;
+}
+.submit-button {
+    margin: 0;
+    margin-left: 30px;
+}
+.header-size-label {
+  color: #666;
+  font-size: 13px
+}
+.reveal-if-active input {
+  padding-right: 5px;
+}
+.label-field-pair {
+  float: right;
+}
+#loader_image {
+    display: none;
+    float: right;
+}
+p.info {
+  float: right;
+  background-color: #F0F0F0;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #999999;
+  line-height: 17px;
+  margin-right: 202px;
+  margin-bottom: 30px;
+}
+.title {
+  font-size: 17px;
+  font-weight: bold;
+}
+.label-radios-pair label {
+  line-height: 30px;
+  color: #333333;
+  font: 400 14px / 30px Arial;
+}
+.left_label {
+  float: right;
+  width: 200px;
+}
+.label-field-pair label {
+  line-height: 30px;
+  color: #333333;
+  font: 400 14px / 30px Arial;
+}
+.label_options label {
+    margin-left: 20px;
+}
+select#receipt_printer_receipt_printer_template {
+    margin-right: 0px;
+}
+/*RTL only*/
+
+.label_options {
+    float: right;
+}
+.label_options input {
+    float: right;
+}
+.label_options label {
+    margin-left: 20px;
+    float: right;
+}

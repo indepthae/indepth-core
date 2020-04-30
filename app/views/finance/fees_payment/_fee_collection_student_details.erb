@@ -1,0 +1,75 @@
+<div class="details">
+    <div class="name normal_font">
+        <%= t('student_name') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+        <div class="val-align">
+            <%= @student.full_name %>
+        </div>
+    </div>
+</div>
+<% if roll_number_enabled? %>
+  <div class="details">
+      <div class="name normal_font">
+          <%= t('roll_no') %>
+      </div>
+      <div class="val">
+          <span>:</span>
+          <div class="val-align">
+              <%= @student.roll_number %>
+          </div>
+      </div>
+  </div>
+<% end %>
+<% unless @fee_category.nil? %>
+  <div class="details">
+      <div class="name normal_font">
+          <%= t('fee_category_name') %>
+      </div>
+      <div class="val">
+          <span>:</span>
+
+          <div class="val-align">
+              <%= @fee_category.name.capitalize %>
+          </div>
+      </div>
+  </div>
+<% end %>
+<div class="details">
+    <% unless @student.student_category.nil? %>
+      <div class="name normal_font">
+          <%= t('student_category') %>
+      </div>
+      <div class="val">
+          <span>:</span>
+
+          <div class="val-align">
+              <%= @student.student_category.name.capitalize %>
+          </div>
+      </div>
+    <% else %>
+      <div class="name normal_font">
+          <%= t('student_category') %>
+      </div>
+      <div class="val">
+          <span>:</span>
+
+          <div class="val-align">
+              <%= t('n_a') %>
+          </div>
+      </div>
+    <% end %>
+</div>
+<div class="details">
+    <div class="name normal_font">
+        <%= t('fees_collection_date_name') %>
+    </div>
+    <div class="val ">
+        <span>:</span>
+
+        <div class="val-align">
+            <%= @date.name.capitalize %>
+        </div>
+    </div>
+</div>

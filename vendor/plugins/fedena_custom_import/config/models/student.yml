@@ -1,0 +1,247 @@
+ student:
+    primary_keys:
+      admission_no: "Admission no"
+    overrides:
+      batch_id: "Batch Name"
+      nationality_id: "Nationality Name"
+      student_category_id: "Student Category Name"
+      country_id: "Country Name"
+      immediate_contact_id: "Immediate Contact Name"
+      employee_grade_id: "Employee Grade Name"
+      is_sms_enabled: "SMS Enabled"
+      is_email_enabled: "EMail Enabled"
+      biometric_id: "Biometric ID"
+      phone2: "Mobile"
+    associations:
+     - :batch
+     - :nationality
+     - :student_category
+     - :country
+     - :immediate_contact
+    associated_columns:
+      nationality: "name_as"
+      student_category: "name"
+      country: "name_as"
+    booleans:
+     - :is_sms_enabled
+     - :has_paid_fees
+     - :is_email_enabled
+     - :has_paid_fees_for_batch
+    filters:
+     - :status_description
+     - :is_active
+     - :is_deleted
+     - :passport_number
+     - :enrollment_date
+     - :photo_file_name
+     - :photo_content_type
+     - :photo_data
+     - :photo_file_size
+     - :library_card
+     - :user_id
+     - :school_id
+     - :immediate_contact_id
+     - :sibling_id
+     - :roll_number
+    map_combination:
+     batch: "full_name"
+    mandatory_columns:
+     - :admission_no
+     - :admission_date
+     - :first_name
+     - :date_of_birth
+     - :batch_id
+     - :nationality_id
+     - :gender
+    mandatory_header_associates:
+     - :immediate_contact
+    associates:
+     student_additional_detail: "student_additional_field"
+    associate_columns:
+      student_additional_detail: "additional_info"
+    associate_column_search:
+      student_additional_field: "name"
+    dependent: "user"
+    attr_accessor_list:
+      - :biometric_id
+    associate_primary_keys:
+      student_additional_detail:
+        additional_field_id:
+    additional_join:
+     - :StudentAdditionalField
+    options_join:
+     - :student_additional_field_options
+    instructions:
+      Admission no:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "AYS/2018/S001."
+      Admission date:
+          Type: "mm/dd/yyyy or dd-mm-yyyy"
+          Input Instruction and example: "03/13/2016 or 13-03-2016"  
+      First name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Middle name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Last name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""  
+      Batch Name:
+          Type: "Course code - Batch name"
+          Input Instruction and example: "For a course ‘Grade 1’ having course code ‘G1' and a batch named '2018 A’ batch name is G1 - 2018 A."
+      Date of birth:
+          Type: "mm/dd/yyyy or  dd-mm-yyyy"
+          Input Instruction and example: "03/13/2007 or 13-03-2007"  
+      Gender:
+          Type: "m or f"
+          Input Instruction and example: ""
+      Blood group:
+          Type: "A+, A-, A1+, A1-, A1B+, A1B-, A2-, A2+, A2B+, A2B-, B+, B-, B1+, O+, O-, AB+, AB-."
+          Input Instruction and example: ""
+      Birth place:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Nationality Name:
+          Type: "Country Name."
+          Input Instruction and example: " eg. For a student from India, enter nationality as India."
+      Language:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Religion:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Student Category Name:
+          Type: "An active student category."
+          Input Instruction and example: "General,OBC etc."
+      Address line1:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Address line2:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      City:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      State:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Pin code:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Country Name:
+          Type: "Country Name."
+          Input Instruction and example: ""
+      Phone1:
+          Type: "Numeric."
+          Input Instruction and example: ""
+      Mobile:
+          Type: "Numeric."
+          Input Instruction and example: "1234512345"
+      Email:
+          Type: " Valid email address."
+          Input Instruction and example: "This field is mandatory only if moodle is enabled."
+      SMS Enabled:
+          Type: "Y, NULL."
+          Input Instruction and example: "Enter Y to enable checkbox, NULL to keep it unchecked."
+      Has paid fees:
+          Type: "Y, NULL."
+          Input Instruction and example: "Enter Y to enable checkbox, NULL to keep it unchecked."
+      EMail Enabled:
+          Type: "Y, NULL."
+          Input Instruction and example: "Enter Y to enable checkbox, NULL to keep it unchecked."
+      Has paid fees for batch:
+          Type: "Y, NULL."
+          Input Instruction and example: "Enter Y to enable checkbox, NULL to keep it unchecked."
+      Biometric ID:
+           Type: "Alphanumeric."
+           Input Instruction and example: "" 
+           
+ guardian:
+    primary_keys:
+      first_name: "First name"
+      relation: "Other Relation"
+    overrides:
+      country_id: "Country Name"
+      dob: "Date of Birth"
+      relation: "Other Relation"
+      is_father: "Is Father"
+      is_mother: "Is Mother"
+    associations:
+     - :country
+     - :user
+    mandatory_columns:
+     - :first_name
+    associated_columns:
+      country: "name_as"
+    filters:
+     - :user_id
+     - :school_id
+     - :ward_id
+     - :photo_file_name
+     - :photo_content_type
+     - :photo_file_size
+     - :photo_updated_at
+    attr_accessor_list:
+     - :set_immediate_contact
+     - :is_father
+     - :is_mother
+    instructions:
+      First name: 
+          Type: "Alphanumeric."
+          Input Instruction and example: "This column cannot be modified during bulk edit."
+      Last name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Is Father:
+          Type: "Y or Leave Blank."
+          Input Instruction and example: "If guardian is father, enter Y, leave blank otherwise. This column cannot be modified during bulk edit."
+      Is Mother:
+          Type: "Y or Leave Blank."
+          Input Instruction and example: "If guardian is mother, enter Y, leave blank otherwise. Enter name of relation. This column cannot be modified during bulk edit."          
+      Other Relation:
+          Type: "Alphanumeric."
+          Input Instruction and example: "Enter name of relation like Uncle, Grandmother etc. Either one of the 3 fields is mandatory. This column cannot be modified during bulk edit."
+      Email:
+          Type: ""
+          Input Instruction and example: "Valid email address."
+      Office phone1:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+      Office phone2:
+          Type: "Numeric."
+          Input Instruction and example: "12345"
+      Mobile phone: 
+          Type: "Numeric."
+          Input Instruction and example: "1234512345"
+      Office address line1:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Office address line2:
+          Type: "Alphanumeric."    
+          Input Instruction and example: ""  
+      City:
+          Type: "Alphanumeric."
+          Input Instruction and example: "" 
+      State:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Country Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Date of Birth:
+          Type: "mm/dd/yyyy or  dd-mm-yyyy"
+          Input Instruction and example: "03/13/2007 or 13-03-2007"  
+      Occupation:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Income:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Education:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+      Set immediate contact:
+          Type: "Alphanumeric, underscore, hyphen and back slash (/)."
+          Input Instruction and example: "Enter admission number of the student to be made immediate contact. eg:-AYS/2018/S001"
+# Please refer to employee.yml for basic concept

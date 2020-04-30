@@ -1,0 +1,9 @@
+<div class="text-input-bg fieldWithErrors">
+  <%= text_field :course, :roll_number_prefix, :value => params[:course][:roll_number_prefix] %>
+  <div id="info"><%= t('max_characters') %></div>
+</div>
+<div id="error-msg"><% @sort_order.errors.full_messages.each do |error| %>
+   <%= error %><br>
+  <% end %></div>
+<div class="error-icon"></div>
+

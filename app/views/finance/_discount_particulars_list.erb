@@ -1,0 +1,31 @@
+
+<% if @particulars.present? %>
+    <%=hidden_field_tag :category,@fee_category.id if @fee_category%>
+    <div class="batch_select_box">
+      <div class="label-field-pair">
+        <label> <%= t('select_fees_particulars') %><span class="necessary-field">*</span>:
+        </label>
+      </div>
+      <div class="fee_category_scroll">
+       <label class="scroll-head"> <%= "#{t('list_of')} #{t('particulars')}" %></label>
+        <div class="sel-list">
+          <%= link_to_function t('all'), "select_all_receivers('particulars');" %>,
+          <%= link_to_function t('none'), "deselect_all_receivers();" %>
+        </div>
+        <% @particulars.each do |f| %>
+
+            <div class="each_batch">
+              <% checked = false %>
+              <% unless params[:fee_collection].nil? %>
+                  <% checked = params[:fee_collection][:category_ids].include?(f.id.to_s) if params[:fee_collection][:category_ids].present? %>
+              <% end %>
+              <label id="select-batch" params='particulars'><%= check_box_tag "fee_collection[category_ids][]", f.id, checked, :class=>'batches_box' %> <%= "#{f.name} &#x200E;( #{f.batch.full_name})&#x200E;" %></label
+            </div>
+
+        <% end %>
+      </div>
+    </div>
+
+<% else %>
+    <p class="flash-msg"> <%= t('finance.flash28') %> </p>
+<% end %>

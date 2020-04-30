@@ -1,0 +1,13 @@
+<div class="label-field-pair">
+    <div class="label">
+        <label for="batch_id" class="label-batch"><%= t('term_text') %></label>
+    </div>
+    <span class="batch_selector">
+        <%= select :gradebook_attendance,:linkable_id, @terms.map{|term| [term.name,term.id]},
+          {:include_blank=>t('select_term')},
+          {:onChange => "#{remote_function(:url => {:action => "load_button"},
+          :with => "'sub_type='+value")}"}
+      %>
+    </span>
+</div>
+<%= hidden_field_tag 'gradebook_attendance[linkable_type]','term' %>

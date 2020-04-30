@@ -1,0 +1,99 @@
+<div class="scrolable">
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <%  if @students.present? and @report_hash.present? %>
+          <% count=0 %>
+          <tr class="tr-head">
+              <td></td>
+              <% @exam_groups.each do |eg| %>
+                <% if @ia_indicators[eg.icse_exam_category_id.to_i].present? %>
+                  <% count=0 %>
+                  <%  count=@ia_indicators[eg.icse_exam_category_id.to_i].count %>
+                <% end %>
+                <td colspan="<%=@report_type=="detailed_internal_mark"? count+1 : count+3%>"><%= eg.name %></td>
+              <% end %>
+          </tr>
+          <tr class="tr-head" style="font-size: 12px;">
+              <td>Students</td>
+              <% @exam_groups.each do |eg| %>
+                <% if @report_type=="detailed_internal_and_external_mark" %>
+                  <% if @ia_indicators[eg.icse_exam_category_id.to_i].present? %>
+                    <% @ia_indicators[eg.icse_exam_category_id.to_i].each do |indicator| %>
+                      <td ><%= "#{indicator.name}(#{indicator.max_mark})"%></td>
+                    <% end %>
+                  <% end %>
+                  <td><%= "IA (#{@weightage_hash[eg.icse_exam_category_id.to_i].present?? @weightage_hash[eg.icse_exam_category_id.to_i]["ia_weightage"] : "-"})" %></td>
+                  <td><%= "EA (#{@weightage_hash[eg.icse_exam_category_id.to_i].present?? @weightage_hash[eg.icse_exam_category_id.to_i]["ea_weightage"] : "-"})" %></td>
+                  <td><%= "IA+EA (100)" %></td>
+                <% elsif @report_type=="detailed_internal_mark" %>
+                  <% if @ia_indicators[eg.icse_exam_category_id.to_i].present? %>
+                    <% @ia_indicators[eg.icse_exam_category_id.to_i].each do |indicator| %>
+                      <td ><%= "#{indicator.name}(#{indicator.max_mark})"%></td>
+                    <% end %>
+                  <% end %>
+                  <td><%= "IA (#{@weightage_hash[eg.icse_exam_category_id.to_i].present?? @weightage_hash[eg.icse_exam_category_id.to_i]["ia_weightage"] : "-"})" %></td>
+                <% end %>
+              <% end %>
+          </tr>
+          <tr class="blank"></tr>
+          <% @students.each do |student| %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+                <% if @config == "admission_no" %>
+                  <% student_text = "#{student.full_name} (#{student.admission_no})" %>
+                <%elsif @config == "roll_number" %>
+                  <% if student.roll_number.present? %>
+                    <% student_text = "#{student.full_name} (#{student.roll_number})"%>
+                  <%else%>
+                    <% student_text = "#{student.full_name} (-)" %>
+                  <%end%>
+                <%else%>
+                  <% if Configuration.enabled_roll_number? %>
+                    <% if student.roll_number.present? %>
+                      <% student_text = "#{student.full_name} (#{student.roll_number})"%>
+                    <%else%>
+                      <% student_text = "#{student.full_name} (-)" %>
+                    <%end%>
+                  <%else%>
+                    <% student_text = "#{student.full_name} (#{student.admission_no})" %>
+                  <%end%>
+                <% end %>
+                <td class="col-3"><%= student_text %> </td>
+                <% @exam_groups.each do |eg| %>
+                  <% if @report_type=="detailed_internal_and_external_mark" %>
+                    <% if @ia_indicators[eg.icse_exam_category_id.to_i].present? %>
+                      <% @ia_indicators[eg.icse_exam_category_id.to_i].each do |indicator| %>
+                        <td class="col-3"><%= @ia_score_hash[student.id.to_i].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s][indicator.id].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s][indicator.id]["mark"] : "-" : "-" :"-"%></td>
+                      <% end %>
+                    <% end %>
+                    <td class="col-3"><%=  @report_hash[student.id].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s]["ia_score"] : "-" : "-"%></td>
+                    <td class="col-3"><%=  @report_hash[student.id].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s]["ea_score"] : "-" : "-" %></td>
+                    <td class="col-3"><%=  @report_hash[student.id].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s]["total_score"] : "-" : "-" %></td>
+                  <% elsif @report_type=="detailed_internal_mark" %>
+                    <% if @ia_indicators[eg.icse_exam_category_id.to_i].present? %>
+                      <% @ia_indicators[eg.icse_exam_category_id.to_i].each do |indicator| %>
+                        <td class="col-3"><%= "#{@ia_score_hash[student.id.to_i].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s][indicator.id].present?? @ia_score_hash[student.id.to_i][eg.icse_exam_category_id.to_s][indicator.id]["mark"] : "-" : "-" :"-"}"%></td>
+                      <% end %>
+                    <% end %>
+                    <td class="col-3"><%= @report_hash[student.id].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s].present?? @report_hash[student.id][eg.icse_exam_category_id.to_s]["ia_score"] : "-" : "-"%></td>
+                  <% end %>
+                <% end %>
+            </tr>
+          <% end %>
+
+
+        <% else %>
+          <tr class="tr-head">
+              <td>No reports found for the search</td>
+          </tr>
+        <% end %>
+    </table>
+</div>
+<%  if @students.present? and @report_hash.present? %>
+  <div class="button">
+      <div class="pdf-button">
+          <%= link_to "► CSV Report", {:controller => "icse_reports", :action => "detailed_internal_and_external_mark_csv",:batch_id=>params[:subject_report][:batch_id],:student_category_id=>params[:subject_report][:student_category_id],:subject_id=>params[:subject_report][:subject_id],:gender=>params[:subject_report][:gender],:report_type=>params[:subject_report][:report_type],:exam_group_id=>params[:subject_report][:exam_group_id]},:target => '_blank' %>
+      </div>
+      <div class="pdf-button">
+          <%= link_to "► PDF Report", {:controller => "icse_reports", :action => "detailed_internal_and_external_mark_pdf",:batch_id=>params[:subject_report][:batch_id],:student_category_id=>params[:subject_report][:student_category_id],:subject_id=>params[:subject_report][:subject_id],:gender=>params[:subject_report][:gender],:report_type=>params[:subject_report][:report_type],:exam_group_id=>params[:subject_report][:exam_group_id]},:target => '_blank' %>
+      </div>
+  </div>
+<% end %>

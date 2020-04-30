@@ -1,0 +1,109 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "table_sort" %>
+  <%= stylesheet_link_tag 'custom_reports/print_show',:media => :print %>
+<% end %>
+
+<% lg = Logger.new('log/production.log') %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('custom_reports') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= @report.name %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if permitted_to? :index, :custom_reports %>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%=link_to t('show_all_reports') ,:controller=>:custom_reports,:action=>:index%>
+              </li>
+            <% end %>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to t('export_csv'),:controller=>:custom_reports, :action=>:to_csv,:id=>@report.id %>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :custom_reports_show,  @report%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div class="scroll">
+       <% unless @search_results.blank? %>
+        <div class="tables">
+            <div >
+                <table class="report-table sortable" id="sortable_example">
+                    <tr class="report-header">
+                        <th class="sinumber unsortable" nowrap="nowrap">SL No.</th>
+                        <%@report_columns.each do |rc| %>
+                          <th data-type="<%=@column_type[rc.method]%>" nowrap="nowrap" class="<%= 'unsortable' if rc.association_method.present? %>">
+                              <%= rc.title %>
+                          </th>
+                        <% end %>
+                    </tr>
+                    <% @search_results.each_with_index do |obj,serial_no| %>
+                      <% assocition_methods = @report_columns.collect(&:association_method).compact.reject(&:empty?) %>
+                      <% row_span_count = assocition_methods.empty? ? 1 : assocition_methods.each_with_object([]) { |i, ar| ar << (obj.send(i).to_a.count == 0 ? 1 : obj.send(i).to_a.count) }.max %>
+                      <% count = 0 %>
+                      <% fields_hash = {} %>
+                      <% obj.class.columns_hash.collect{|x,y| fields_hash[x]=y.type} %>
+                      <% while count < row_span_count %>
+                        <tr class="report-row">
+                            <% if count == 0 %>
+                              <td class="sinumber slcol" rowspan="<%= row_span_count %>"><%= ((@search_results.current_page-1)*@search_results.per_page)+serial_no+=1 %></td>
+                            <% end %>
+                            <% @report_columns.each do |col| %>
+                              <% unless col.association_method.present? %>
+                                <% if (obj.class.name == "Student" and (col.method.to_s == "immediate_contact_relation" or col.method.to_s == "parent_relation"))%>
+                                  <% value = obj.immediate_contact_translated_relation if col.method.to_s == "immediate_contact_relation" %>
+                                  <% value = obj.parent_translated_relation if col.method.to_s == "parent_relation" %>
+                                <% else %>
+                                  <% value = obj.send(col.method) %>
+                                <% end %>
+                                <% lg.info value %>
+                                <% case fields_hash[col.method]
+                                  when :date
+                                  value = format_date(value)
+                                  when :datetime
+                                  value = format_date(value,:format=>:short_date)
+                                  when :time
+                                  value = format_date(value,:format=>:time)
+                                  end
+                              %>                    
+                                <% if count == 0 %>
+                                  <td rowspan="<%= row_span_count %>">
+                                      <%= value %>
+                                  </td>
+                                <% end %>
+                              <% else %>
+                                  <td>
+                                    <% if col.association_method.to_s == "guardians" and col.method.to_s == "relation" %>
+                                      <% value = (obj.send(col.association_method)[count].nil? ? "" : obj.send(col.association_method)[count].send("translated_relation"))%>
+                                    <% else %>
+                                      <% value = (obj.send(col.association_method)[count].nil? ? "" : obj.send(col.association_method)[count].send(col.method))%>
+                                    <% end %>  
+                                    <% case fields_hash[col.method]
+                                      when :date
+                                      value = format_date(value)
+                                      when :datetime
+                                      value = format_date(value,:format=>:short_date)
+                                      when :time
+                                      value = format_date(value,:format=>:time)
+                                      end
+                                  %>
+                                    <%= value %>
+                                </td>
+                              <% end %>
+                            <% end %>
+                        </tr>
+                        <% count += 1 %>
+                      <% end %>
+                    <% end %>
+                </table>
+            </div>
+            <%= will_paginate @search_results %>
+        </div>
+        <%else%>
+         <p class="flash-msg"><%= "#{t('no_result')}"%></p>
+        <% end %>  
+    </div>
+</div>

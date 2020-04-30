@@ -1,0 +1,2 @@
+FinanceTransaction.update_all("category_id=(SELECT id from finance_transaction_categories where name='Transport' and school_id=finance_transactions.school_id and deleted=false)","finance_type='TransportFee'")
+FinanceTransaction.update_all("category_id=(SELECT id from finance_transaction_categories where name='Hostel' and school_id=finance_transactions.school_id and deleted=false)","finance_type='HostelFee'")

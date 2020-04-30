@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'student_record_preview'
+page << "Modalbox.show($('modal-box'), {title: '#{t('preview')}', width: 800});"

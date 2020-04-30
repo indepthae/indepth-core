@@ -1,0 +1,18 @@
+transport_allocation_report:
+    student_details: [:name, :admission_no, :roll_number, :batch_full_name, :father_first_name, :father_mobile_phone, :mother_first_name, :mother_mobile_phone]
+    employee_details: [:name, :employee_number, :department_name, :position_name]
+    transport_details: [:transport_allocation_status, :transport_allocation_type, :pickup_route, :pickup_stop, :drop_route, :drop_stop, :pickup_vehicle, :drop_vehicle] 
+route_wise_report:
+    student_details: [:name, :admission_no, :roll_number, :batch_full_name, :immediate_contact_first_name, :immediate_contact_mobile_phone, :father_first_name, :father_mobile_phone, :mother_first_name, :mother_mobile_phone]
+    employee_details: [:name, :employee_number, :department_name, :position_name]
+    transport_details: [:transport_allocation_type, :stop, :vehicle]    
+route_details_report:
+    route_details: [:name, :vehicle_no, :driver_name, :drive_mobile_phone, :attendant_name, :attendant_mobile_phone, :stops]
+transport_attendance_report:
+    student_details: [:student_name, :admission_no, :roll_number, :batch_full_name, :father_first_name, :father_mobile_phone, :mother_first_name, :mother_mobile_phone]
+    employee_details: [:employee_name, :employee_number, :department_name, :position_name]
+    transport_details: [:total, :attnd_percentage] 
+transport_fee_report:
+    student_details: [:name, :admission_no, :batch_full_name, :student_mobile_phone, :immediate_contact_first_name, :immediate_contact_mobile_phone, :father_first_name, :father_mobile_phone, :mother_first_name, :mother_mobile_phone]
+    employee_details: [:name, :employee_number, :employee_department]
+    fee_details: []

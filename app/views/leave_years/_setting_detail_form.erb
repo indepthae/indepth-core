@@ -1,0 +1,19 @@
+<div class="by_automatic">
+          <div class="label_field_pair">
+              <div class="by_automatic_value">
+                  <%= s.radio_button  "config_value", "1", :checked => "checked" %>
+                  <label class="label_for_gender" for="configuration_config_value_0"><%= t("#{setting_label1(setting_type)}") %></label>
+                  <div class="auto"><%= t("#{label_desc1(setting_type)}") %></div>
+              </div>
+          </div>
+      </div>
+      <div class="by_automatic">
+          <div class="label_field_pair">
+              <div class="by_automatic_value">
+                  <%= s.radio_button  "config_value", "0" %>
+                  <label class="label_for_gender" for="configuration_config_value_1"><%= t("#{setting_label2(setting_type)}") %></label>
+                  <div class="auto"><%= t("#{label_desc2(setting_type)}") %></div>
+              </div>
+          </div>
+      </div>
+<%= submit_tag "", :value => "#{t('save_settings')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>

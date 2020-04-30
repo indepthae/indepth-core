@@ -1,0 +1,59 @@
+<div class="label-field-pair">
+  <label for="pay_period"><%= t('pay_period') %>: </label>
+  <div class="text-input-bg">
+    <%= calendar_date_select_tag 'student[admission_date]',"",
+      :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onchange =>
+      "calculateDateRange(j(this).val());" %>
+  </div>
+  <div class="submit-button"><%= t('proceed') %></div>
+  <div id="cancel" style="display:none;"><%= t('cancel') %></div>
+  <%= image_tag("loader.gif",
+    :align => "absmiddle",
+    :border => 0,
+    :id => "loader",
+    :style =>"display: none;" ) %>
+</div>
+
+<div class="wrapper" style="display : none">
+  <div class="error-icon"></div>
+  <div class="error-msg"><%= t('select_a_date_to_continue') %></div>
+</div>
+
+
+<script type="text/javascript">
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+  
+  j(".submit-button").click(function(){
+    if(start_date){
+      new Ajax.Request('/employee_payslips/generate_payslips/<%= @payroll_group.id %>',{
+        parameters: {'start_date': start_date,'end_date': end_date },
+        asynchronous: true,
+        evalScripts : true,
+        method : 'get',
+        onLoading : function(){
+          j('#loader').show();
+        },
+        onComplete : function(resp){
+
+          j('#loader').hide();
+          j('#select_date').hide();
+          j('#date_range').show();
+          j("#list_payslip").show();
+        }
+      });
+    }
+    else{
+      j(".wrapper").show();
+    }
+  })
+
+
+  j("#cancel").click(function(){
+    j("#select_date").hide();
+    j("#date_range").show();
+  })
+
+</script>

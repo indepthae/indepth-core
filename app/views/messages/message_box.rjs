@@ -1,0 +1,6 @@
+if @message_thread.errors.present?
+  page.replace_html 'new_message_container', :partial => 'new'
+  page << "MakeMessageBox()"
+else
+  page << "window.location = '/messages?thread_id=#{@message_thread.id}'"
+end

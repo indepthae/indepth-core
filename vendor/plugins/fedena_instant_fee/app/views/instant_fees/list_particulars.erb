@@ -1,0 +1,32 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('instant_fees_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('particular_list') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li id="particular" class="themed_bg themed-dark-hover-background"><%= link_to_remote "#{t('add_particular')}", :url=> {:controller => 'instant_fees',:action => 'new_category_particular',:id => @instant_fee_category.id} %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <% fy_name = FinancialYear.fetch_name(@instant_fee_category.financial_year_id) %>
+      <%= render :partial => 'finance/financial_year_info', :locals => {:financial_year_name => fy_name} %>
+    </div>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="list_category_particulars">
+    <%= render :partial => 'list_category_particulars' %>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+  <div id="information"></div>
+</div>

@@ -1,0 +1,161 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('timetable_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('swap_timetable') %> </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="error"></div>
+    <div class="swap_title"><%= t('swap_timetable') %></div>
+
+    <div class="radio_button swap_button">
+        <input type="radio" name="setopt" id="batch_wise" class="batch_wise1" checked=true  autocomplete="off"  onclick="batch_wise();" /><%= t('batch_wise') %> 
+        <input type="radio" name="setopt" id="employee_wise" class="batch_wise2"   autocomplete="off" onclick="employee_wise();" /><%= t('employee_wise') %>
+    </div>
+    <div id="batch_wise_swap"><%= render :partial => "batch_wise"%></div>
+
+    <div id="employee_wise_swap"></div>
+    <div class="extender"></div>
+
+</div>
+
+<script>
+  function reset_timetable_period_options(tte_id, is_delete) {
+      j('#row-select_' + tte_id).removeClass('select-row');
+
+      if (j('#entry_' + tte_id).hasClass('tte_changed')) {
+          j('#sub_' + tte_id).hide();
+          j('#teach1_' + tte_id).hide();
+          j('#teach_' + tte_id).hide();
+      }
+      else {
+          j('#sub_' + tte_id).show();
+          j('#teach1_' + tte_id).show();
+          j('#teach_' + tte_id).show();
+      }
+
+      j('#link_' + tte_id).text('');
+      j('#entry_' + tte_id).show(); //.removeClass('tte_changed').addClass('tte_change');    
+      if (is_delete) {
+          j('#entry_' + tte_id).removeClass('tte_changed').addClass('tte_change').removeClass('tte_cancelled');
+          j('#sub_' + tte_id).hide();
+          j('#teach1_' + tte_id).hide();
+          j('#teach_' + tte_id).hide();
+
+      }
+      if (j('#entry_' + tte_id).hasClass('tte_change')) {
+          j('#cancel_entry_' + tte_id).show();
+          j('#sub_' + tte_id).show();
+          j('#teach1_' + tte_id).show();
+          j('#teach_' + tte_id).show();
+      }
+
+      j('#s_subject_entry_' + tte_id).hide();
+
+  }
+  function set_swap_data(tte_id) {
+      j('#sub_' + tte_id).hide();
+      j('#teach1_' + tte_id).hide();
+      j('#link_' + tte_id).hide();
+      j('#cancel_entry_' + tte_id).hide();
+      j('#entry_' + tte_id).show().removeClass('tte_change').addClass('tte_changed');
+  }
+  function update_tte_cancel(tte_id, is_cancelled = true){
+      j('#entry_' + tte_id).removeAttr('class');
+      j('#cancel_entry_' + tte_id).hide();
+      is_cancelled ? j('#entry_' + tte_id).addClass('tte_cancelled') : '';
+  }
+  j(document).delegate('select', 'change', function () {
+      if (j(this).parents('div[id^=link_]').length > 0) {
+          update_submit(this);
+      }
+  });
+  function update_submit(this_obj) {
+      var this_parent = j(this_obj).closest("div[id^=link_]");
+      var all_selections = j(this_parent).find('select');
+      var active_submit = 0;
+      j(all_selections).each(function (a, b) {
+          active_submit += j(b).val() ? 1 : 0;
+      });
+
+      (active_submit == 3) ? j(this_parent).find('.submit_button').removeAttr('disabled') : j(this_parent).find('.submit_button').attr('disabled', 'disabled');
+      //active_submit == 3 ? j(this_parent).find('.submit_button').removeAttr('disabled') : j(this_parent).find('.submit_button').attr('disabled','disabled');    
+  }
+
+  MakeBox = function (tte_id, swap_date, batch_id, timetable_swap_id, employee_wise_id, type) {
+      remove_popup_box();
+      options = {'submit': '<%=t('cancel_class')%>', 'cancel': '<%=t('no_text2')%>', 'field_name': 'alert_notify', 'input_type': 'checkbox', 'title': '<%=t('cancel_class')%>', 'class': 'popup-submit-button'};
+      build_modal_box(options);
+      build_prompt_popup_box("<%=t('alert_notify')%>", options);
+      j('#popup_content').html(j('#notify_alerts').html());
+      j('#popup_window #popup_footer > #yes').click(function () {
+          if (!j(this).hasClass('submitted')) {
+              j(this).addClass('submitted');
+              j.ajax({
+                  url: '/timetable_tracker/cancel_timetable_period',
+                  data: {
+                      'date': swap_date,
+                      'timetable_entry_id': tte_id,
+                      'batch_id': batch_id,
+                      'timetable_swap_id' : timetable_swap_id,
+                      'employee_wise_id' : employee_wise_id,
+                      'type' : type,
+                      'notify': j('#popup_content input[name=notify]')[0].checked ? 1 : 0,
+                  },
+                  success: function () {
+                      j('#yes').removeClass('submitted');
+                      remove_popup_box();
+                      j('#sub_' + tte_id).hide();
+                      j('#teach1_' + tte_id).hide();
+                      j('#teach_' + tte_id).hide();
+                  }
+              })
+          }
+      });
+  }
+  function disable_this_form(obj) {
+      j('#sub_' + obj).hide();
+      j('#teach1_' + obj).hide();
+      j('#link_' + obj).find('.submit_buttons').hide();
+      j('#loader_' + obj).show();
+  }
+
+  function batch_wise() {
+      j('#employee_wise_swap').html('');
+      j.ajax({
+          url: '/timetable_tracker/batch_wise',
+          type: 'GET',
+          dateType: 'html'
+      });
+
+  }
+
+  function employee_wise() {
+      j('#batch_wise_swap').html('');
+      j.ajax({
+          url: '/timetable_tracker/employee_wise',
+          type: 'GET',
+          dateType: 'html'
+      });
+  }
+
+  function update_options(obj) {
+      j('#row-select_' + obj).addClass('select-row');
+      j('#entry_' + obj).hide();
+      j('#sub_'+ obj).hide();
+      j('#teach1_'+ obj).hide();
+      j('#link_'+ obj).show();
+      j('#cancel_entry_'+ obj).hide();
+  }
+
+
+</script>

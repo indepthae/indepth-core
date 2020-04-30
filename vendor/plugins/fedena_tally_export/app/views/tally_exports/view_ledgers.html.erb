@@ -1,0 +1,86 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('view_ledgers') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('view_all_created_ledgers') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('create_ledgers')}", :action=>'create_ledger'%></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @ledgers.empty? %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= t('sl_no') %></td>
+        <td><%= t('ledger_name') %></td>
+        <td><%= t('company_name') %></td>
+        <td><%= t('voucher_name') %></td>
+        <td><%= t('account_name') %></td>
+        <td><%= t('finance_categories') %></td>
+        <td></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+
+      <% @ledgers.each_with_index do |ledger,i| %>
+        <tr class="tr-<%= cycle("odd","even") %>">
+          <td class="col-5"><%= i+1 %></td>
+          <td class="col-3"><%= ledger.ledger_name %></td>
+          <td class="col-3"><%= ledger.company_name %></td>
+          <td class="col-3"><%= ledger.voucher_name %></td>
+          <td class="col-3"><%= ledger.account_name %></td>
+          <td class="col-3">
+            <ol>
+              <% ledger.finance_transaction_categories.each do |cat| %>
+                <li><%= cat.name %></li>
+              <% end %>
+            </ol>
+          </td>
+          <td class="col-1">
+            <%= link_to "#{t('edit_text')}", { :action=>'edit_ledger', :id=>ledger.id} %>
+            <%= link_to "#{t('delete_text')}", { :action=>'delete_ledger', :id=>ledger.id}, :confirm => "#{t('are_you_sure')}" %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= t('no_ledgers_to_display') %></td>
+      </tr>
+    </table>
+
+  <% end%>
+</div>

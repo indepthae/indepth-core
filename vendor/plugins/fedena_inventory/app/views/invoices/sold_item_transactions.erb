@@ -1,0 +1,31 @@
+<% content_for :head do %>
+  <% if (rtl?) %>
+    <%= stylesheet_link_tag "rtl/gray_table_design" %>
+    <%= stylesheet_link_tag "rtl/finance/monthly_report" %>
+  <% else %>
+    <%= stylesheet_link_tag "gray_table_design" %>
+    <%= stylesheet_link_tag "finance/monthly_report" %>
+  <% end %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('inventory') %> <%= t('transaction_report') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transaction_report') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= breadcrumb :store_item_transactions, [@item, [@start_date, @end_date]] %>
+        <%= render_breadcrumbs %>
+    </div>
+    
+    <div id="date_filter" class="date_box">
+        <%= render :partial => "finance/filter_dates" %>
+    </div>
+    
+    <div id="fee_report_div">
+        <%= render :partial => "sold_item_transactions_partial" %>
+    </div>
+</div>

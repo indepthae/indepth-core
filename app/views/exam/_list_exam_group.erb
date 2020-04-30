@@ -1,0 +1,16 @@
+<div id="collection_receipients_data">
+      <div class="extender"></div>
+      <ul class="tabrow">
+        <li class="selected" type="Batch"><%=link_to_function "#{t('batch')}-#{t('wise')}","select_tab(this);" %></li>
+        <li  class="selected" type="exam_groups"><%=link_to_function "#{t('exam_group_text')}-#{t('wise')}","select_tab(this);" %></li>
+      </ul>
+      <div id="questions-main">
+         <div id="left-panel">
+          <%= render :partial => @partial %>
+        </div>
+        <div id="left-panel"></div>
+      </div>
+</div>
+
+
+

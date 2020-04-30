@@ -1,0 +1,70 @@
+<div class="label-field-pair" id ="leave_category">
+    <label for="employee_department_select"><%= t('leave_type') %></label>
+    <div class="text-input-bg"><%= select_tag 'department_id', options_for_select([["#{t('all')}","All"]]+@leave_types.map {|c| [c.name, c.id]}) %>
+    </div>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+</div>
+<div class="label-field-pair" id="lop_status">
+    <label for="employee_department_select"><%= t('leave_criteria') %></label>
+    <div class="text-input-bg"><%= select_tag 'leave_criteria', options_for_select([["#{t('all')}","All"], ["#{t('additional_leaves')}", "additional_leaves"], ["#{t('lop_deducted')}", "lop_deducted"], ["#{t('lop_not_deducted')}", "lop_not_deducted"]], :selected => params[:leave_criteria])     %>
+    </div>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+</div>
+
+<script type="text/javascript">
+  j("#department_id").change(function(){
+    var display_type= j("#display_type").val();
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    var id = <%=  params[:id] %>
+    j("#loader1").show();
+    new Ajax.Request('/employee_attendance/<%= params[:action]%>',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id,
+        leave_criteria: leave_criteria,
+        display_type: display_type,
+        type: "department_id",
+        id: id,
+        from: '<%= params[:from] %>'
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader1").hide();
+      }
+    });
+  })
+
+  j("#leave_criteria").change(function(){
+    var display_type= j("#display_type").val();
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    var id = <%=  params[:id] %>
+    j("#loader2").show();
+    new Ajax.Request('/employee_attendance/<%= params[:action]%>',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id,
+        leave_criteria: leave_criteria,
+        display_type: display_type,
+        id: id,
+        type: "leave_criteria",
+        from: '<%= params[:from] %>'
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader2").hide();
+      }
+    });
+  })
+</script>

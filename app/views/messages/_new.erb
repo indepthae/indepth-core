@@ -1,0 +1,186 @@
+<div id="new_message">
+    <div id="search_textbox">
+        <label class="modal-box-label" for="query"><%=t('recipient')%></label>
+        <%= text_field_tag("query_message", params['query'], :autocomplete => 'off',:placeholder=>"Search Students, Parents, and Employees with their names or number") %>
+        <%= image_tag("ajax_loader_gray_32.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style => "display: none;") %>
+        <div id="search_list"></div>
+    </div> 
+    <div id="msg-receivers"></div>    
+    
+    <div id="form-con">
+        <% form_for @message_thread, :url => {:controller=>'messages',:action=> 'create'},:html => {:id => "new_message_form",:multipart =>true} do |form| %>
+          <%= form.hidden_field :recipients_presence%>
+          <div class="wrapper" id='recipient_error' style="display:none"><div class="error-icon"></div><div class="error-msg"><%=t('select_recipient')%></div></div>
+          <div id="parent_select"></div>
+          <div class="label-field-pair">
+              <div class="label-container">
+                  <%= form.label :subject, "#{t('subject_messages')}" ,:class=>"modal-box-label"%></div>
+              <div class="input-container">
+                  <%= form.text_field :subject, :placeholder=>'What is this conversation about ?&lrm;' %>
+                  <div class="wrapper" id='subject_error' style="display: none">
+                      <div class="error-icon"></div>
+                      <div class="error-msg"> <%=t('subject_cant_blank')%></div></div>
+                  <div class="wrapper" id='subject_error2' style="display: none"><div class="error-icon"></div><div class="error-msg"> <%=t('subject_must_be_below_100')%></div></div>
+              </div>
+          </div>
+          <%= form.hidden_field :message_body_presence %>
+          <%= form.hidden_field :creator_id,:value =>@current_user.id %>
+          <div class="message-div">
+              <%- form.fields_for :messages do |f|%>
+                <div class="label-field-pair-text-area">
+                    <label class="modal-box-label" for="message_body">
+                        <%= t('message') %>
+                    </label>
+                    <div class="textarea-input-bg">
+                        <%= f.text_area :body %></div>
+                    <div class="wrapper" id='message_error' style="display: none">
+                        <div class="error-icon"></div>
+                        <div class="error-msg"><%=t('message_blank')%></div>
+                    </div>
+                </div>
+                <div class="new_msg_actions">
+                    <%= f.hidden_field :sender_id,:value => @current_user.id %>
+                    <%= f.hidden_field :is_primary,:value =>true %>
+
+                    <%- f.fields_for :message_attachments do |c|%>
+      <%#= render 'message_attachment_fields', :c => builder%>
+
+                    <% end %>                     
+                </div>    
+              <% end %>             
+          </div>
+          <div class="text-input-bg" id="browse-style">
+              <div id="selected_attachments" class="selected_attachments"></div>
+              <%= paperclip_file_field_tag_multiple 'message_thread[messages_attributes][0][message_attachments_attributes][0]','attachment', :multiple =>true,:size=>12, :direct => false,:object => MessageAttachment.new,:uni=>"new_message", :onclick => "this.value = null;"%>
+          </div>  
+          <div class='wrapper' id='attachment-error' style='display:none;'>
+              <div class='error-icon'></div><div class='error-msg'></div></div>
+          <div class="model_actions">
+              <%= hidden_field_tag :session_fingerprint, session_fingerprint%>         
+              <%= submit_tag "#{t('send')} #{t('message')}",:class=>'modal-box-submit_button submit-button', :id=>'new_message_submit' %>
+              <%= link_to "#{t('cancel')}","#",:onclick=>'close_modal_box();',:class=>'modal-box-cancel_button submit-button' %>
+          </div>
+        <%end%>
+
+    </div>
+</div>
+<script type="text/javascript">
+  j(window).scrollTop(0, 0);
+
+  valid_attachments = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf',
+      'application/powerpoint', 'application/mspowerpoint', 'application/vnd.ms-powerpoint',
+      'application/x-mspowerpoint', 'application/msword', 'application/mspowerpoint',
+      'application/vnd.ms-powerpoint', 'application/excel', 'application/vnd.ms-excel',
+      'application/x-excel', 'application/x-msexcel', 'application/rtf', 'application/x-rtf',
+      'text/richtext', 'text/plain', 'application/wordperfect', 'application/x-wpwin',
+      'text/tab-separated-values', 'text/csv', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.presentationml.slideshow', 'application/vnd.oasis.opendocument.text',
+      'application/vnd.oasis.opendocument.spreadsheet', 'image/svg+xml', 'application/vnd.ms-works', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/wpd', 'application/wordperf'];
+
+
+  var not_valid_type = false;
+<% if FedenaSetting.s3_enabled? %>
+    j(document).on("submit", "#new_message_form", function (event) {
+        event.preventDefault();
+        j('.message_popup #new_message_submit').attr('disabled', 'disabled');
+        var form = this;
+        j('.message_popup #message_thread_subject').val(j('.message_popup #message_thread_subject').val().strip());
+        j('.message_popup #message_thread_messages_attributes_0_body').val(j('.message_popup #message_thread_messages_attributes_0_body').val().strip());
+        status = validate_message(form);
+        j("#message_thread_messages_attributes_0_message_attachments_attributes_0_attachment").attr("disabled", "disabled");
+        if (status == 'true') {           
+            j('#new_message_form').ajaxSubmit({
+                beforeSubmit: function (a, f, o) {
+                    o.dataType = 'script';
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    console.log(XMLHttpRequest)
+                }
+            });
+ 
+        } else {
+            return false;
+        }
+
+    });
+<%else%>
+    j(document).on("submit", "#new_message_form", function (event) {
+        event.preventDefault();
+        new_attachment_set = window.new_message.attachment_set;
+        j('.message_popup #new_message_submit').attr('disabled', 'disabled');
+        var form = this;
+        j('.message_popup #message_thread_subject').val(j('.message_popup #message_thread_subject').val().strip());
+        j('.message_popup #message_thread_messages_attributes_0_body').val(j('.message_popup #message_thread_messages_attributes_0_body').val().strip());
+        status = validate_message(form);        
+        if (status == 'true') {
+            var form_data = new FormData(j("#new_message_form")[0]);
+            if (new_attachment_set.length > 0) {
+                for (var i = 0; i < new_attachment_set.length; i++) {
+                    form_data.append('message_thread[messages_attributes][0][message_attachments_attributes][' + i + '][attachment]', new_attachment_set[i]);
+                }
+            }
+            form_data.delete("message_thread[messages_attributes][0][message_attachments_attributes][0][attachment][]");
+            j.ajax({
+                url: "/messages/create",
+                type: "POST",
+                data: form_data,
+                success: function (msg) {
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        } else {
+            return false;
+        }
+
+    })
+
+<% end %>
+  validate_message = function (form) {
+      sub = j(form).find('#message_thread_subject').val();
+      sub_length = sub.length > 1 && j(form).find('#message_thread_subject').val().length > 100
+      body = j(form).find('#message_thread_messages_attributes_0_body').val();
+      recp = j('#popup_content #msg-receivers').html();
+      flag = true;
+      if (sub == '') {
+          j('#popup_content #subject_error').css("display", "block");
+          flag = false;
+      } else {
+          j('#popup_content #subject_error').css("display", "none");
+      }
+      if (body == '') {
+          j('#popup_content #message_error').css("display", 'block');
+          flag = false
+      } else {
+          j('#popup_content #message_error').css("display", 'none');
+      }
+      if (recp == '') {
+          j('#popup_content #recipient_error').css("display", 'block');
+          flag = false;
+      } else {
+          j('#popup_content #recipient_error').css("display", 'none');
+      }
+      if (sub_length) {
+          j('#popup_content #subject_error2').css("display", "block");
+          flag = false;
+      }
+
+      if (!flag) {
+          j('.message_popup #new_message_submit').attr('disabled', false);
+      }
+      return flag;
+  }
+
+
+</script>
+
+
+
+
+

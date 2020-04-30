@@ -1,0 +1,19 @@
+<% form_remote_for @field_group,:url=>@field_group.new_record? ? create_section_registration_courses_path : update_section_registration_course_path(@field_group),:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+  <div class="modal-form">  
+       <div id="form-errors"></div>
+      <div class="desc-section more-margin" style="margin-top:0px"><%= t("add_section_desc") %></div>
+      <div class="label-field-pair mb_input_row">
+          <label><%= "#{t('name')}" %></label>
+          <div class="text-input-bg"><%= f.text_field :name %></div>
+          <%= f.hidden_field :registration_course_id %>
+      </div>
+      <div class="label-field-pair mb_input_row text-area">
+          <label><%= t('description') %></label>
+          <div class="text-input-bg text-area-input"><%= f.text_area :description,:cols => 27, :rows => 5,:class => 'status-textarea' %></div>
+      </div>
+  </div>
+  <%= hidden_field_tag 'section_order',@section_order %>
+  <%= hidden_field_tag 'section_index',@section_index %>
+  <div class="hor-line"></div>
+  <%= f.submit "", :value => @field_group.new_record? ? "#{t('create_section')}" : "#{t('edit_section')}", :class => "submit_button", :id => 'submit_button' %>
+<% end %>

@@ -1,0 +1,130 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('batch')} #{t('wise')} #{t('report')}" %></div>
+  <%= report_job_status('csv_collection_report', 'finance_fee') %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="notice">
+    <%= t('collection_report_notice_msg')%>
+  </div>
+  <% form_for :batch_id, :url => {:action => 'collection_report_csv'}, :html => {:class => 'form_submit'} do |f| %>
+      <div class="filters" style="width:1034px">
+      <div class="filter">
+        <div class="label-field-pair">
+          <label for="start_date"><%= t('start_date') %></label>
+          <%=calendar_date_select_tag :start_date, I18n.l(@start_date), :readonly=>true,:popup=>"force", :class=> "date_selector",:id=>"start_date", :onchange=>"batch_selector(true)"%>
+        </div>
+        <div class="label-field-pair">
+          <label for="end_date"><%= t('end_date') %></label>
+          <%=calendar_date_select_tag :end_date, I18n.l(@end_date), :readonly=>true,:popup=>"force", :class=> "date_selector",:id=>"end_date", :onchange=>"batch_selector(true)"%>
+        </div>
+
+        <div class="label-field-pair">
+        <label class="form_label"><%=t('batch_type')%></label>
+        <%= select_tag "active",options_for_select( [[t('active'),1], [t('inactive'),2]]), :class=>"input_box", :id=>"active_inactive" , :onchange=>"batch_selector(false)"%>
+        </div>
+        <div class="label-field-pair" id="column_div">
+          <%= render :partial => "fee_collection_report_selector" %>
+        </div>
+        <div class="label-field-pair"></div>
+        <%=  link_to_function "#{t('export_as_csv')}", "form_submission()", :class => 'solid_button' %>
+        <%#= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style => "display: none;") %>
+      </div>
+      <div class="filter_batch">
+        <div id="batch_selector">
+          <div class="label-field-pair2">
+          <div  class="text-input-bg2" id="exam-group-select">
+
+            <div class="label-field-pair">
+              <label for="select_batch"><%= t('select_batch') %></label>
+            </div>
+              <div class="fee_category_scroll">
+                <% if @active_batches.present? %>
+                <div class="sel-list">
+                  <%= t('active') %>
+                  : <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>
+                  ,
+                  <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; })" %>
+                </div>
+                <% @active_batches.each_with_index do |batch , index| %>
+                <div class="each_batch">
+                  <%= check_box_tag "b[]", batch.id, true, :class => 'batches_box',:id=>"batch" + index.to_s %>
+                  &#x200E;<label class="batch_tag" for="<%= 'batch' + index.to_s %>"><%= batch.full_name %></label>&#x200E;
+                </div>
+                <% end %>
+                <% end %>
+              </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      </div>
+      <div class="extender"></div>
+  <% end %>
+</div>
+<div class="extender"></div>
+
+<script type="text/javascript">
+
+
+  function form_submission() {
+    if (j('.batches_box:input:checked') != null && j('.batches_box:input:checked').length != 0)
+    window.open("/reports/collection_report_csv?"+j('.form_submit').serialize());
+    event.preventDefault();
+  }
+
+
+    function batch_check() {
+        var flag = 0
+        $$('input.batches_box').each(function (checkbox) {
+            if (checkbox.checked == true) {
+                flag = 1
+            }
+        })
+        if (flag == 0) {
+            alert('<%= "#{t('select_atleast_one_batch')}"%>');
+            $$('input.batches_box')[0].checked = true
+        }
+    }
+
+    function refresh_batch(){
+      j.ajax(
+        {
+          url: "batch_selector",
+          type: "POST",
+          data: {val: j("#active_inactive").val(), start_date: j("#start_date").val() , end_date: j("#end_date").val()},
+          success: function () {
+          },
+          error: function () {
+            //if fails
+          }
+        });
+    }
+
+    refresh_batch();
+
+    function batch_selector(date_change){
+      if (date_change == true && j("#active_inactive").val()==2)
+      {
+        refresh_batch();
+      }
+      else{
+        if (date_change == false) {
+          refresh_batch();
+        }
+      }
+
+    }
+</script>

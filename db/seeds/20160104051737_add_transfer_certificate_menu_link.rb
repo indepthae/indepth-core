@@ -1,0 +1,7 @@
+cat = MenuLinkCategory.find_by_name("academics")
+unless cat.nil?
+  higher_link = MenuLink.create(:name=>'transfer_certificate',:target_controller=>'tc_templates',:target_action=>'index',:higher_link_id=>nil,:icon_class=>'tc_templates-icon',:link_type=>'general',:user_type=>nil,:menu_link_category_id=>cat.id) unless MenuLink.exists?(:name=>'transfer_certificate')
+  MenuLink.create(:name=>'tc_template_settings',:target_controller=>'tc_templates',:target_action=>'settings',:higher_link_id=>higher_link.id,:icon_class=>nil,:link_type=>'general',:user_type=>nil,:menu_link_category_id=>cat.id) if MenuLink.exists?(:name=>'transfer_certificate')
+  MenuLink.create(:name=>'generate_certificate',:target_controller=>'tc_template_generate_certificates',:target_action=>'index',:higher_link_id=>higher_link.id,:icon_class=>nil,:link_type=>'general',:user_type=>nil,:menu_link_category_id=>cat.id) if MenuLink.exists?(:name=>'transfer_certificate')
+  MenuLink.create(:name=>'generated_transfer_certificates',:target_controller=>'tc_template_generate_certificates',:target_action=>'generated_certificates',:higher_link_id=>higher_link.id,:icon_class=>nil,:link_type=>'general',:user_type=>nil,:menu_link_category_id=>cat.id) if MenuLink.exists?(:name=>'transfer_certificate')
+end

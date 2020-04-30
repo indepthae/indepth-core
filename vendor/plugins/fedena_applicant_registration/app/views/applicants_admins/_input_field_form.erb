@@ -1,0 +1,75 @@
+
+<%- form_remote_for @applicant_addl_field, :url=>@applicant_addl_field.new_record? ? create_field_applicants_admins_path : update_field_applicants_admin_path(@applicant_addl_field),:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |c| -%>
+  <div id="form-content">
+      <div class="form-box">
+          <div id="input-form-errors"></div>
+          <div class="label-field-pair">
+              <label><%= t('field_name') %> <span class="necessary-field">*</span></label>
+              <div class="text-input-bg"> <%= c.text_field :field_name %> </div>
+          </div>
+          <div class="label-field-pair" id="input_type_div">
+              <div class="label-container"> <%= c.label :field_type,"#{t('input_method')}" %></div>
+              <div class="text-input-bg">
+                  <%= c.select :temp_input_type, [["#{t('singleline_text')}","singleline"],["#{t('multiline_text')}","multiline"],["#{t('multiple_text')}","multiple"],["#{t('date_text')}","date"],["#{t('attachment_text')}","attachment"]] ,{},:class=>"input-type-select",:onchange=>'get_required_fields()'%>
+
+              </div>
+          </div>
+          <div class="custom" style="display: none" >
+              <%=render "type_select",:f=>c%>
+              <div class="label_container">
+                  <div class="label_row">
+                      <div class="label_td"><%=t('options')%> <span>(<%=t('min_2_required')%>)</span></div>
+                      <div class="label_td zero_rt_border"><%=t('default_option')%></div>
+                  </div>
+              </div>
+              <% c.fields_for :applicant_addl_field_values do |builder| %>
+                <%= render "applicant_addl_field_value_fields" ,:c=>builder%>
+              <% end %>
+              <div class="bottom_part">
+                  <%= link_to_add_options "#{image_tag "buttons/add_image.png" } #{t('add_option')}", c, :applicant_addl_field_values  %>
+                  <%= c.radio_button :no_default,true,:checked=>!c.object.applicant_addl_field_values.collect(&:is_default).include?(true),:class=>"no_default_rb"%><label id="label_no_default_yes" for="applicant_addl_field_no_default_true"><%=t('no_default')%></label>
+              </div>
+          </div>
+          <div id="record_type_suffix">
+              <div class="label-field-pair">
+                  <div class="label-container"> <%= c.label :record_type,"#{t('record_type')}" %></div>
+                  <div class="text-input-bg">
+                      <%= c.select :record_type, [["#{t('alphanumerics_text')}","alpha"],["#{t('numeric_text')}","numeric"]] ,{}%>
+                  </div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label><%= t('input_suffix') %></label>
+                  <div class="text-input-bg"> <%= c.text_field :suffix %> </div>
+              </div>
+          </div>
+
+          <div class="label_field_pair">
+              <div class="field_type">
+                  <%= c.radio_button  "is_mandatory", false, :checked => "checked" %>
+                  <label class="label_for_optional_field" for="applicant_addl_field_is_mandatory_false"> <%= t('optional_field') %></label>
+              </div>
+              <div class="field_type">
+                  <%= c.radio_button  "is_mandatory", true %>
+                  <label class="label_for_mandatory_field" for="applicant_addl_field_is_mandatory_true"><%= t('mandatory_field') %></label>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <% if @applicant_addl_field.section_name.present? %>
+    <%= c.hidden_field :section_name %>
+  <% else %>
+    <%= c.hidden_field :applicant_addl_field_group_id %>
+  <% end %>
+  <%= c.hidden_field :registration_course_id %>
+  <%= hidden_field_tag 'field_order',field_order %>
+  <%= hidden_field_tag 'field_index',field_index %>
+  <%= hidden_field_tag 'field_section_index',field_section_index %>
+  <div class="hor-line"></div>
+  <% unless @applicant_addl_field.new_record? %>
+    <%=submit_tag("#{t('update_field')}",:id=>'submit_button',:class=>"submit_button") %>
+  <% else %>
+    <%=submit_tag("#{t('create_field')}",:id=>'submit_button',:class=>"submit_button") %>
+  <% end %>
+<%- end -%>

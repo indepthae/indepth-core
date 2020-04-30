@@ -1,0 +1,404 @@
+<div class="list_table_div">
+    <% if @error %>
+      <p class="flash-msg"><%=@error_msg%></p>
+      <script>
+        j("input[type='text']").css("border", "1px solid red");
+      </script>
+    <% else %>
+      <div class="main_head_label">
+          <b id="fees_report_title">
+              <%= t('transaction_report') %>
+              <% if @accounts_enabled %>
+                <%= "#{t('for')}: #{@account_name}" %>
+                <% url_params = {:fee_account_id => @account_id} %>
+              <% else %>
+                <% url_params = {} %>
+              <% end %>
+          </b>
+
+          <div class="date_align right" style="margin-top: 3px">
+              <%= format_date(@start_date) %>
+              <label style="font-weight: 300">&nbsp;<%= t('to') %></label>&nbsp;
+              <%= format_date(@end_date) %>&nbsp;&nbsp;
+              <label style="font-weight: 300"><%= t('compared with') %></label>&nbsp;&nbsp;
+              <div class="date_align right add_margin_top">
+                  <%= format_date(@start_date2) %>
+                  <label style="font-weight: 300">&nbsp;<%= t('to') %></label>&nbsp;
+                  <%= format_date(@end_date2) %>
+                  <span id="show_date" class="themed_hover_text">
+                      <%= t('change_date') %>
+                      <!--
+                      < %= link_to_remote t('change_date'), 
+                        :url => {:controller => "finance", :action =>"show_compare_date_filter",
+                        :target_action => @target_action, :id => params[:id], :date_tag => params[:date_tag],
+                        :start_date => @start_date, :start_date2 => @start_date2, :end_date => @end_date,
+                        :end_date2 => @end_date2, :target_action => @target_action} %> -->
+                  </span>
+              </div>
+          </div>
+
+          <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px">
+              <tr class="main_head">
+                  <td><%= t('sl_no') %></td>
+                  <td class="set_border_right"><%= t('finance_categories') %></td>
+                  <td class="set_border_right">
+                      <%= "#{format_date(@start_date)} #{t('to')} #{format_date(@end_date)}"%>
+                  </td>
+                  <td class="set_border_right">
+                      <%= "#{format_date(@start_date2)} #{t('to')} #{format_date(@end_date2)}" %>
+                  </td>
+              </tr>
+
+              <% index = 0 %>
+              <% income_total = 0 %>
+              <% expenses_total = 0 %>
+              <% income_total_2 = 0 %>
+              <% expenses_total_2 = 0 %>
+
+              <tr class="tr-list_head">
+                  <td colspan="2"><%= t('income') %> (<%= currency %>)</td>
+                  <td  id="inc_amount" class="set_border_right" align="right"></td>
+                  <td  id="inc_amount2" class="set_border_right" align="right"></td>
+              </tr>
+
+              <tr class="row-b">
+                  <td><%= index+=1 %></td>
+                  <td class="set_border_right"><%= t('donations') %></td>
+                  <td class="set_border_right" align="right">
+                      <% if @donations_total.first.to_f > 0 %>
+
+                        <%= link_to"#{precision_label(@donations_total.first)}".to_f, 
+                          { :action => 'donations_report', :start_date => @start_date, :end_date => @end_date}.
+                          merge(url_params) %>
+
+                      <% else%>
+                        <%= precision_label(@donations_total.first) %>
+                      <% end %>
+                  </td>
+                  <td class="set_border_right" align="right">
+                      <% if @donations_total.second.to_f > 0 %>
+                        <%= link_to "#{precision_label(@donations_total.second.to_f)}", 
+                          {:action => 'donations_report', :start_date => @start_date2, :end_date => @end_date2}.
+                          merge(url_params) %>
+                      <% else %>
+                        <%= precision_label(@donations_total.second.to_f) %>
+                      <% end %>
+                  </td>
+
+                  <% income_total += @donations_total.first.to_f %>
+                  <% income_total_2 += @donations_total.second.to_f %>
+
+              </tr>
+              <tr class="row-b">
+                  <td><%= index+=1 %></td>
+                  <td class="set_border_right"><%= t('student_fees') %></td>
+                  <td class="set_border_right" align="right">
+                      <% if @transactions_fees.first.to_f > 0 %>
+
+                        <%= link_to "#{precision_label(@transactions_fees.first)}", 
+                          {:action => 'fees_report' , :start_date => @start_date,:end_date => @end_date}.
+                          merge(url_params) %>
+
+                      <% else %>
+                        <%= precision_label(@transactions_fees.first) %>
+                      <% end %>
+                  </td>
+                  <td class="set_border_right" align="right">
+                      <% if @transactions_fees.second.to_f > 0 %>
+                        <%= link_to "#{precision_label(@transactions_fees.second)}", 
+                          { :action => 'fees_report', :start_date => @start_date2, :end_date => @end_date2}.
+                          merge(url_params) %>
+                      <% else%>
+                        <%= precision_label(@transactions_fees.second) %>
+                      <% end%>
+                  </td>
+
+                  <% income_total += @transactions_fees.first.to_f %>
+                  <% income_total_2 += @transactions_fees.second.to_f %>
+
+              </tr>
+
+              <% FedenaPlugin::FINANCE_CATEGORY.each do |category| %>
+
+                <% plugin_present = "#{category[:plugin_name]}".present? ? 
+                  FedenaPlugin.can_access_plugin?("#{category[:plugin_name]}") : true %>
+
+                <% if plugin_present == true %>
+                  <% unless @plugin_amount[category[:category_name].camelize].nil? %>
+                    <% if @plugin_amount[category[:category_name].camelize].first.is_income.to_f == 1 %>
+                      <tr class="row-b">
+                          <td><%= index+=1 %></td>
+                          <td class="set_border_right">
+                              <%="#{t(category[:category_name].underscore.gsub(/\s+/, '_')+'_fees')}"%> 
+                          </td>
+                          <td class="set_border_right" align="right">
+                              <% if @plugin_amount[category[:category_name].camelize].first.amount_1.to_f>0 %>
+                                <%= link_to "#{precision_label(@plugin_amount[category[:category_name].camelize].first.amount_1)}", 
+                                  category[:destination].merge(:start_date => @start_date, :end_date => @end_date).
+                                  merge(url_params) %>
+                              <% else %>
+                                <%= precision_label(@plugin_amount[category[:category_name].camelize].first.amount_1)%>
+                              <% end %>
+                          </td>
+                          <td class="set_border_right" align="right">
+                              <% if @plugin_amount[category[:category_name].camelize].first.amount_2.to_f>0%>
+                                <%= link_to "#{precision_label(@plugin_amount[category[:category_name].camelize].first.amount_2)}",
+                                  category[:destination].merge(:start_date => @start_date2,:end_date => @end_date2).
+                                  merge(url_params)%>
+                              <% else %>
+                                <%= precision_label(@plugin_amount[category[:category_name].camelize].first.amount_2) %>
+                              <% end %>
+                          </td>
+                          <% income_total += @plugin_amount[category[:category_name].camelize].first.amount_1.to_f %>
+                          <% income_total_2 += @plugin_amount[category[:category_name].camelize].first.amount_2.to_f %>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+
+              <% @other_transaction_categories.each_with_index do |t,i| %>
+                <% if t.is_income%>
+                  <tr class="row-b">
+                      <td><%= i + index + 1 %></td>
+                      <td class="set_border_right"><%=t.name%> </td>
+                      <td class="set_border_right" align="right">
+                          <% if t.first.to_f > 0 %>
+                            <%= link_to "#{precision_label(t.first)}", 
+                              {:controller => "finance", :action => "income_details", :start_date => @start_date,
+                              :end_date => @end_date, :id => t.cat_id}.merge(url_params) if t.first.to_i > 0 %>
+                          <% else%>
+                            <%= precision_label(t.first) %>
+                          <% end %>
+                      </td>
+                      <td class="set_border_right" align="right">
+                          <% if t.second.to_f>0%>
+                            <%= link_to "#{precision_label(t.second)}", 
+                              {:controller => "finance", :action => "income_details", :start_date => @start_date2,
+                              :end_date => @end_date2, :id => t.cat_id}  if t.second.to_i > 0 %>
+                          <% else %>
+                            <%= precision_label(t.second) %>
+                          <% end %>
+                      </td>
+
+                      <% income_total += t.first.to_f %>
+                      <% income_total_2 += t.second.to_f %>
+
+                  </tr>
+                <% end %>
+              <% end %>
+              
+              <!-- wallet income -->
+              <% if @w_c_amount.present? %>
+                <tr class="row-b">
+                  <td><%= index+=1 %></td>
+                    <td class="set_border_right">
+                        <%= "#{t('advance_fees_credit_text')}" %>
+                    </td>
+                    <td class="set_border_right" align="right">
+                      <%= link_to precision_label(@w_c_amount) || 0.00, {:controller => "advance_payment_fees", :action => 'wallet_credit_transaction_report',
+                                                           :wallet_credit_mode => 1, :date_tag => params[:date_tag], :start_date => @start_date, :end_date => @end_date}.
+                                                                merge(url_params) %>
+                    </td>
+                    <td class="set_border_right" align="right">
+                      <%= link_to precision_label(@w_c_amount2) || 0.00, {:controller => "advance_payment_fees", :action => 'wallet_credit_transaction_report',
+                                                           :wallet_credit_mode => 1, :date_tag => params[:date_tag], :start_date => @start_date2, :end_date => @end_date2}.
+                                                                merge(url_params) %>
+                    </td>
+                    <% income_total += precision_label(@w_c_amount).to_f %>
+                    <% income_total_2 += precision_label(@w_c_amount2).to_f || 0.00 %>
+                </tr>
+              <% end %>
+
+              <!-- Expense !-->
+
+              <tr class="tr-list_head">
+                  <td colspan="2"><%= t('expenses') %> (<%= currency %>)</td>
+                  <td  id="exp_amount" class="set_border_right" align="right"></td>
+                  <td  id="exp_amount2" class="set_border_right" align="right"></td>
+              </tr>
+              <% index = 0 %>
+              <% unless @hr.nil? %>
+                <tr class="row-b">
+                    <td><%= index+=1 %></td>
+                    <td class="set_border_right"><%= t('employee_salary') %></td>
+                    <td class="set_border_right" align="right">
+                        <% if @salary.first.to_f>0%>
+                          <%= link_to "#{precision_label(@salary.first)}",
+                            { :action => 'salary_department', :start_date => @start_date, :end_date => @end_date}.
+                            merge(url_params) %>
+                        <% else %>
+                          <%= precision_label(@salary.first) %>
+                        <% end %>
+                    </td>
+
+                    <td class="set_border_right" align="right">
+                        <% if @salary.second.to_f > 0 %>
+                          <%= link_to "#{precision_label(@salary.second)}", 
+                            {:action => 'salary_department', :start_date => @start_date2, :end_date => @end_date2}.
+                            merge(url_params) %>
+                        <% else %>
+                          <%= precision_label(@salary.second) %>
+                        <% end %>
+                    </td>
+
+                    <% expenses_total+= @salary.first.to_f %>
+                    <% expenses_total_2 += @salary.second.to_f %>
+
+                </tr>
+              <% end %>
+              <% FedenaPlugin::FINANCE_CATEGORY.each do |category| %>
+                <% plugin_present = "#{category[:plugin_name]}".present? ? 
+                  FedenaPlugin.can_access_plugin?("#{category[:plugin_name]}") : true %>
+                <% if plugin_present == true %>
+                  <% unless @plugin_amount[category[:category_name].camelize].nil? %>
+                    <% unless @plugin_amount[category[:category_name].camelize].first.is_income.to_f == 1 %>
+                      <tr class="row-b">
+                          <td><%= index += 1 %></td>
+                          <td class="set_border_right">
+                              <%= "#{t(category[:category_name].underscore.gsub(/\s+/, '_')+'_fees')}" %> 
+                          </td>
+                          <td class="set_border_right" align="right">
+                              <% if @plugin_amount[category[:category_name].camelize].first.amount_1.to_f > 0 %>
+                                <%= link_to "#{precision_label(@plugin_amount[category[:category_name].camelize].first.amount_1)}", 
+                                  category[:destination].merge( :start_date => @start_date, :end_date => @end_date).
+                                  merge(url_params) %>
+                              <% else %>
+                                <%= precision_label(@plugin_amount[category[:category_name].camelize].first.amount_1) %>
+                              <% end %>
+                          </td>
+                          <td class="set_border_right" align="right">
+                              <% if @plugin_amount[category[:category_name].camelize].first.amount_2.to_f > 0 %>
+                                <%= link_to "#{precision_label(@plugin_amount[category[:category_name].camelize].first.amount_2)}", 
+                                  category[:destination].merge(:start_date => @start_date2, :end_date => @end_date2).
+                                  merge(url_params)%>
+                              <% else %>
+                                <%= precision_label(@plugin_amount[category[:category_name].camelize].first.amount_2) %>
+                              <% end %>
+                          </td>
+                          <% expenses_total += @plugin_amount[category[:category_name].camelize].first.amount_1.to_f %>
+                          <% expenses_total_2 += @plugin_amount[category[:category_name].camelize].first.amount_2.to_f %>
+                      </tr>
+
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+
+              <% @other_transaction_categories.each_with_index do |t,i| %>
+                <% unless t.is_income %>
+                  <tr class="row-b">
+                      <td><%= i + index + 1 %></td>
+                      <td class="set_border_right"><%= t.name %> </td>
+
+                      <td class="set_border_right" align="right">
+                          <% if t.first.to_f > 0 %>
+                            <%= link_to "#{precision_label(t.first)}", 
+                              {:controller => "finance", :action => "income_details", :start_date => @start_date,
+                              :end_date => @end_date,:id => t.cat_id}.merge(url_params)  if t.first.to_i >= 0 %>
+                          <% else %>
+                            <%=precision_label(t.first)%>
+                          <% end %>
+                      </td>
+
+                      <td class="set_border_right" align="right">
+                          <% if t.second.to_f>0 %>
+                            <%= link_to "#{precision_label(t.second)}", 
+                              {:controller => "finance", :action => "income_details", :start_date => @start_date2, 
+                              :end_date => @end_date2, :id => t.cat_id}.merge(url_params) if t.second.to_i >= 0 %>
+                          <% else %>
+                            <%= precision_label(t.second)%>
+                          <% end %>
+                      </td>
+                      <% expenses_total += t.first.to_f %>
+                      <% expenses_total_2 += t.second.to_f %>
+                  </tr>
+                <% end %>
+              <% end %>
+              
+              <!-- wallet expense -->
+              <% if @w_d_amount.present? %>
+                <tr class="row-b">
+                  <td><%= index+=1 %></td>
+                    <td class="set_border_right">
+                      <%= "#{t('advance_fees_debit_text')}" %>
+                    </td>
+                  <td class="set_border_right" align="right">
+                    <%= link_to precision_label(@w_d_amount) || 0.00, {:controller => "advance_payment_fees", :action => 'wallet_debit_transaction_report',
+                                                           :wallet_debit_mode => 1, :date_tag => params[:date_tag], :start_date => @start_date, :end_date => @end_date}.
+                                                                merge(url_params) %>
+                  </td>
+                  <td class="set_border_right" align="right">
+                    <%= link_to precision_label(@w_d_amount2) || 0.00, {:controller => "advance_payment_fees", :action => 'wallet_debit_transaction_report',
+                                                           :wallet_debit_mode => 1, :date_tag => params[:date_tag], :start_date => @start_date2, :end_date => @end_date2}.
+                                                                merge(url_params) %>
+                  </td>
+                  <% expenses_total += @w_d_amount.to_f %>
+                  <% expenses_total_2 += @w_d_amount2.to_f || 0.00 %>
+                </tr>
+              <% end %>
+
+              <%= hidden_field_tag 'hd_income', income_total, :id => "h_income" %>
+              <%= hidden_field_tag 'hd_income', income_total_2, :id => "h_income2" %>
+              <%= hidden_field_tag 'h_expense', expenses_total, :id => 'h_expense' %>
+              <%= hidden_field_tag 'h_expense', expenses_total_2, :id => 'h_expense2' %>
+
+              <tr class="tr-list_head">
+                  <td colspan="2"><%= t('grand_total') %> (<%= currency %>)</td>
+                  <td class="set_border_right" align="right">
+                      <%= precision_label(income_total-expenses_total)%>
+                  </td>
+                  <td class="set_border_right" align="right">
+                      <%= precision_label(income_total_2-expenses_total_2)%>
+                  </td
+              </tr>
+          </table>
+
+          <script>
+
+            var inc = j("#h_income").val();
+            var inc2 = j("#h_income2").val();
+            var exp = j("#h_expense").val();
+            var exp2 = j("#h_expense2").val();
+            j("#inc_amount").html(inc);
+            j("#inc_amount2").html(inc2);
+            j("#exp_amount").html(exp);
+            j("#exp_amount2").html(exp2);
+            j('.date_box').hide();
+
+            j("#show_date").click(function () {
+                j(".date_box").show();
+                j("#show_date").hide();
+            });
+
+            if (j('#hide_date_filter').is(":visible")) {
+                j('#show_date').hide();
+            }
+
+          </script>
+
+          <div class="seprater_div_bottom">
+              <div id="inner-tab-menu">
+                  <ul style="margin-top: 27px">
+  <%#*<li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('pdf_report')}",%>
+  <%#*{:controller => "finance", :action => "transaction_pdf",:report_format_type => "pdf", :start_date => @start_date, :end_date=>@end_date,:start_date2 => @start_date2, :end_date2=>@end_date2},:target => '_blank' %>
+                      <li class='themed_bg themed-dark-hover-background'>
+                          <%= link_to "#{t('csv_report')}",
+                            {:controller => "csv_export", :action => "generate_csv", 
+                            :csv_report_type => "compare_finance_transaction", :report_format_type => "csv",
+                            :start_date => @start_date, :end_date => @end_date, :start_date2 => @start_date2, 
+                            :end_date2 => @end_date2}.merge(url_params) %>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <% unless @salary == 0 and @donations_total == 0 and @transactions_fees and @other_transactions %>
+    <div style="width: 980px;height: 530px; overflow-x: auto;overflow-y:hidden;">
+        <script type="text/javascript" src="/javascripts/swfobject.js"></script>
+        <%= @graph %>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,20 @@
+
+<div class="label-field-pair-form">
+  <label for="select_department"><%= t('select_department') %></label>
+  <div class="text-input-bg">
+    <% departments = @departments %>
+
+
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;float:right" ) %>
+    <%= select :select_department, :department, departments.map { |s| [s.name, s.id] },
+      {:prompt => "#{t('select_department')}"},
+      {:onChange => "#{remote_function(:url => to_employees_forms_path, :with => "'dept_id='+value",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')")}"} %>
+  </div>
+</div>
+

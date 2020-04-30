@@ -1,0 +1,136 @@
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% if field_group.description.present? %>
+    <div class="desc-section"><%= field_group.description %></div>
+  <% end %>
+<% else %>
+
+  <% if a[:section_description].present? %>
+    <div class="desc-section">
+        <%= t("#{a[:section_description]}") %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if a[:applicant_addl_field_group_id].present? %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each do|fld| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type]=="applicant_additional" %>
+        <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+        <% if addl_field.present? %>
+          <div class='label-value-pair'>
+              <label class='field-label'><%= addl_field.field_name %></label>
+              <% addl_value = @applicant.applicant_addl_values.find_by_applicant_addl_field_id(addl_field.id) %>
+              <% if addl_field.field_type == "attachment" %>
+                <% if (addl_value.present? and addl_value.attachment.present?) %>
+                  <label class='value-label'><%=link_to addl_value.attachment_file_name ,addl_value.attachment.url(:original,false),:target => "_blank"  %></label>
+                <% end %>
+              <% elsif addl_field.field_type == "date" %>
+                <label class='value-label'><%= (addl_value.present? and addl_value.option.present?) ? format_date(addl_value.value.to_date,:format=>:long) : "" %></label>
+              <% else %>
+                <label class='value-label'><%= (addl_value.present? and addl_value.option.present?) ? addl_value.value : "" %> <%= (addl_field.field_type == "singleline" and addl_value.present? and addl_value.option.present?) ? addl_field.suffix : ""%></label>
+              <% end %>
+          </div>
+        <% end %>
+      <% elsif fld[:field_type]=="student_additional" %>
+        <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+        <% if st_addl_field.present? %>
+          <% student_ad_field = st_addl_field.student_additional_field %>
+          <% if student_ad_field.present? %>
+            <div class='label-value-pair'>
+                <label class='field-label'><%= student_ad_field.name %></label>
+                <% addl_value = @applicant.applicant_additional_details.find_by_additional_field_id(st_addl_field.student_additional_field_id) %>
+                <label class='value-label'><%= (addl_value.present? and addl_value.additional_info.present?) ? addl_value.additional_info : "" %></label>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% default_section = @default_fields[a[:section_name].to_sym] %>
+  <% photo_present = 0 %>
+  <% if a[:section_name] == "student_personal_details" %>
+    <% photo_field = a[:fields].find{|af| af[:field_name] == "student_photo"} %>
+    <% if (photo_field.present? and ["true",true,"default_true"].include?(photo_field[:show_field])) %>
+      <div id="photo-field"><%= image_tag @applicant.photo.url(:original, false) %></div>
+      <% photo_present = 1 %>
+      <% a[:fields].delete(photo_field) %>
+    <% end %>
+  <% end %>
+  <% a[:fields].sort_by{|l| l[:field_order].to_i}.each_with_index do|fld,ind| %>
+    <% if ["true",true,"default_true"].include?(fld[:show_field]) %>
+      <% if fld[:field_type] == "default" %>
+        <% if default_section.present? %>
+          <% field_details = default_section[:fields][fld[:field_name].to_sym] %>
+          <% f_attr = (field_details[:field_attr].present? ? field_details[:field_attr] : fld[:field_name]) %>
+          <div class="label-value-pair<%= (photo_present == 1 and ind<=2) ? " adjust-for-photo" : "" %>">
+              <label class='field-label'><%= fld[:field_name]=="choose_electives" ? t('applicants.chosen_electives') : t("#{fld[:field_name]}") %></label>
+              <label class='value-label'>
+                  <% if section_object.present? %>
+                    <% if ["country_id","nationality_id"].include?(f_attr.to_s) %>
+                      <%= section_object.send(f_attr.to_s).present? ? Country.find(section_object.send(f_attr.to_s)).name : "" %>
+                    <% elsif f_attr.to_s == "gender" %>
+                      <%= section_object.send(f_attr.to_s).present? ? (section_object.send(f_attr.to_s).downcase=="m" ? t('male') : t('female')) : "" %>
+                    <% elsif f_attr.to_s == "student_category_id" %>
+                      <%= section_object.send(f_attr.to_s).present? ? StudentCategory.find(section_object.send(f_attr.to_s)).name : "" %>
+                    <% elsif f_attr.to_s == "relation" %>        
+                      <%= section_object.send(f_attr.to_s).present? ? section_object.translated_relation : "" %>
+                    <% elsif f_attr.to_s == "subject_ids" %>
+                      <%= section_object.send(f_attr.to_s).present? ? section_object.send(f_attr.to_s).map{|s| latest_subject_name(s,@registration_course.course_id)}.join(", ") : "" %>
+                    <% else %>
+                      <%= section_object.send(f_attr.to_s).present? ? (section_object.send(f_attr.to_s).class.name == "Date" ? format_date(section_object.send(f_attr.to_s),:format=>:long) : section_object.send(f_attr.to_s)) : "" %>
+                    <% end %>      
+                  <% end %>
+              </label>
+          </div>
+        <% end %>
+      <% else %>
+        <% if fld[:field_type]=="applicant_additional" %>
+          <% addl_field = @applicant_addl_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if addl_field.present? %>
+            <div class='label-value-pair'>
+                <label class='field-label'><%= addl_field.field_name %></label>
+                <% if ["guardian_personal_details","guardian_contact_details"].include?(a[:section_name]) %>
+                  <% addl_value = @applicant.applicant_addl_values.select{|s| (s.applicant_addl_field_id==addl_field.id and s.applicant_guardian_id==section_object.id)}.first %>
+                <% else %>
+                  <% addl_value = @applicant.applicant_addl_values.find_by_applicant_addl_field_id(addl_field.id) %>
+                <% end %>
+                <% if addl_field.field_type == "attachment" %>
+                  <% if (addl_value.present? and addl_value.attachment.present?) %>
+                    <label class='value-label'><%=link_to addl_value.attachment_file_name ,addl_value.attachment.url(:original,false),:target => "_blank"  %></label>
+                  <% end %>
+                <% elsif addl_field.field_type == "date" %>
+                  <label class='value-label'><%= (addl_value.present? and addl_value.option.present?) ? format_date(addl_value.value.to_date,:format=>:long) : "" %></label>
+                <% else %>
+                  <label class='value-label'><%= (addl_value.present? and addl_value.option.present?) ? addl_value.value : "" %> <%= (addl_field.field_type == "singleline" and addl_value.present? and addl_value.option.present?) ? addl_field.suffix : ""%></label>
+                <% end %>
+            </div>
+          <% end %>
+        <% elsif fld[:field_type]=="student_additional" %>
+          <% st_addl_field = @applicant_student_addl_fields.find{|k| k[:student_additional_field_id]==fld[:field_name].to_i} %>
+          <% if st_addl_field.present? %>
+            <% student_ad_field = st_addl_field.student_additional_field %>
+            <% if student_ad_field.present? %>
+              <div class='label-value-pair'>
+                  <label class='field-label'><%= student_ad_field.name %></label>
+                  <% addl_value = @applicant.applicant_additional_details.find_by_additional_field_id(st_addl_field.student_additional_field_id) %>
+                  <label class='value-label'><%= (addl_value.present? and addl_value.additional_info.present?) ? addl_value.additional_info : "" %></label>
+              </div>
+            <% end %>
+          <% end %>
+        <% elsif fld[:field_type]=="applicant_attachment" %>
+          <% att_field = @addl_attachment_fields.find_by_id(fld[:field_name].to_i) %>
+          <% if att_field.present? %>
+            <div class='label-value-pair'>
+                <label class='field-label'><%= att_field.name %></label>
+                <% addl_value = @applicant.applicant_addl_attachments.find_by_applicant_addl_attachment_field_id(att_field.id) %>
+                <% if (addl_value.present? and addl_value.attachment.present?) %>
+                  <label class='value-label'><%=link_to addl_value.attachment_file_name ,addl_value.attachment.url(:original,false),:target => "_blank"  %></label>
+                <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

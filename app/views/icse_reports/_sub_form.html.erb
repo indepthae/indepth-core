@@ -1,0 +1,7 @@
+<div id="comb_1">
+  <div id="update_batch" ><%=render :partial=>'unique_list'%></div>
+  <%unless @batches.blank?%>
+    <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+    <%= submit_tag "", :value => "#{t('generate_text')}", :class => "submit-button", :disable_with => "► #{t('please_wait')}"%>
+  <%end%>
+</div>

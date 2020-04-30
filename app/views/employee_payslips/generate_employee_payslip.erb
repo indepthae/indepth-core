@@ -1,0 +1,131 @@
+<%= javascript_include_tag "hr" %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('generate_employee_payslip') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% case params[:from]
+    when "view_outdated_employees"
+      breadcrumb :employee_payslips_generate_employee_payslip_outdated_employees, [[@payroll_group, @employee], [@date_ranges.first.to_date, @date_ranges.last.to_date]]
+    when "view_regular_employees"
+      breadcrumb :employee_payslips_generate_employee_payslip_regular_employees, [@payroll_group, [@date_ranges.first, @date_ranges.last]]
+    when "view_employees_with_lop"
+      breadcrumb :employee_payslips_generate_employee_payslip_lop_employees, [[@payroll_group, @employee], [@date_ranges.first.to_date, @date_ranges.last.to_date]]
+    when "view_all_rejected_payslips"
+      breadcrumb :employee_payslips_regenerate_payslip_rejected_payslips, [[params[:payslip_id], @employee], [@date_ranges.first.to_date, @date_ranges.last.to_date]]
+    else
+      breadcrumb :employee_payslips_generate_employee_payslip, @employee
+    end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <h3><%= "#{t('generate_employee_payslip')}: #{@employee.full_name}" %></h3>
+  <% unless @employee.employee_salary_structure.current_group %>
+    <div id="ignore-and-apply"><p><%= t('generate_employee_payslip_changes_ignored_warning') %>
+        <%= link_to t('generate_employee_payslip_apply_payroll_group_changes'), {:controller => "payroll", :action => "create_employee_payroll", :id => @payroll_group.id, :employee_id => @employee.id, :apply => 1, :from => params[:from]||'generate_employee_payslip', :start_date => @date_ranges.first, :end_date => @date_ranges.last}, :class => "themed_text" %></p>
+    </div>
+  <% end %>
+  <div class="label-field-pair">
+    <% unless ["view_outdated_employees", "view_regular_employees", "view_employees_with_lop"].include? params[:from] %>
+      <div class="calender_text">
+        <input id="date_range_text" readonly="readonly" type="text"/>
+        <%= calendar_date_select_tag 'date_range', I18n.l(Date.today,:format=>:default),
+          :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onchange => "render_employee_payslip(this);" %>
+      </div>
+    <% else %>
+      <div class="fields-details">
+        <div class="field-label"><%= t('pay_period') %></div>
+        <div class="fields-val">: <%= @payslips_date_range.date_range %></div>
+      </div>
+    <% end %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  </div>
+  <div class="fields-details" id="name">
+    <div class="field-label"><%= t('name') %></div>
+    <div class="fields-val">: <%= "#{@employee.full_name} &#x200E;(#{@employee.employee_number})&#x200E;" %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('department') %></div>
+    <div class="fields-val">: <%= @employee.employee_department.name %></div>
+  </div>
+  <div class="fields-details">
+    <div class="field-label"><%= t('position') %></div>
+    <div class="fields-val">: <%= @employee.employee_position.name %></div>
+  </div>
+  <% unless @employee.employee_grade.nil? %>
+    <div class="fields-details">
+      <div class="field-label"><%= t('grade') %></div>
+      <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+    </div>
+  <% end %>
+  <hr/>
+
+  <div class="payroll_details">
+    <h3><%= t('payroll_details').titleize %></h3>
+    <div class="fields-details">
+      <div class="field-label"><%= t('payroll_group') %></div>
+      <div class="fields-val">: <%= @payroll_group.name %></div>
+    </div>
+    <div class="fields-details">
+      <div class="field-label"><%= t('payment_frequency') %></div>
+      <div class="fields-val">: <%= @payroll_group.salary_type_value + " - " + @payroll_group.payment_period_value %></div>
+    </div>
+    <div data-attrs="<%= Configuration.get_rounding_off_value.config_value.to_i %>" id="rounding_for"></div>
+    <% if @payroll_group.employee_lop.present? %>
+      <div class="fields-details">
+        <div class="field-label"><%= t('lop_calculation_method') %></div>
+        <div class="fields-val">: <%= @payroll_group.employee_lop.lop_as_deduction ? t('as_a_deduction', :code => "LOPA") : t('deduct_lopa_from_payroll_categories', :code => "LOPA") %></div>
+      </div>
+    <% end %>
+    <div id="payroll_form">
+      <%= render :partial => "employee_payslip_form" %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function render_employee_payslip(elm)
+  {
+    new Ajax.Request('generate_employee_payslip',{
+      parameters: {'date' : elm.value, 'employee_id' : '<%= @employee.id %>', 'from' : '<%= params[:from]%>'},
+      asynchronous: true,
+      evalScripts : true,
+      method : 'post',
+      onLoading : function(){
+        j('#loader').show();
+      },
+      onComplete : function(resp){
+        j('#payroll_form').html(resp.responseText);
+        j('#date_range_text').val(j('#date-range').text());
+        j('#loader').hide();
+      }
+    });
+  }
+  j(document).ready(function(){
+    j('.calendar_label').hide();
+    j('#date_range_text').val(j('#date-range').text());
+    if(j('.calendar_date_select:visible').length > 0)
+      j('.calendar_date_select:visible').offset({'left':j('#date_range_text').offset().left});
+  });
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+
+  j('#date_range_text').on('click',function(){
+    new CalendarDateSelect( this.next(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+    j('.calendar_date_select:visible').offset({'left':j('#date_range_text').offset().left});
+  });
+  j('.calendar_date_select_popup_icon').click(function(){
+    j('.calendar_date_select:visible').offset({'left':j('#date_range_text').offset().left});
+  })
+</script>

@@ -1,0 +1,33 @@
+
+<%if @course_record_groups.present?%>
+  <div id="other_details">
+    <div id="student_items">
+      <table id="student_details_table">
+        <tr>
+          <th id="name" rowspan="2"><%=t('record_group')%></th>
+          <th id="no_of_batches" colspan="2"><%=t('assigned_batches_snakecase')%></th>
+          <th id="action" rowspan="2"></th>
+        </tr
+        <tr>
+          <th class="sub_text"><%="#{t('active')}"%></th>
+          <th class="sub_text"><%="#{t('inactive')}"%></th>
+        </tr>
+        <%@course_record_groups.each do |key,value|%>
+          <tr>
+            <td colspan="4" class="highlighter"><%=key== "1" ? "#{t('active')}" : "#{t('inactive')}"%></td>
+          </tr>
+          <%value.each do |v|%>
+            <tr class="list_<%=cycle('odd', 'even')%>">
+              <td><%=v["rgname"]%></td>
+              <td><%=v["active_batches_count"]%></td>
+              <td><%=v["inactive_batches_count"]%></td>
+              <td><%=link_to_remote t('settings'),:url=>{:controller=>'record_groups',:action=>'record_group_settings',:id=>v["rgid"],:course_id=>@course.id}%></td>
+            </tr>
+          <%end%>
+        <%end%>
+      </table>
+    </div>
+  </div>
+<%else%>
+  <div class="no_entries"><%=t('no_records')%></div>
+<%end%>

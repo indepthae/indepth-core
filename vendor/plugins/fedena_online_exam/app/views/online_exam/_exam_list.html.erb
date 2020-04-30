@@ -1,0 +1,30 @@
+<%if @exams.present?%>
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td>
+        <%= t('name') %>
+      </td>
+      <td>
+        <%= t('start_date') %>
+      </td>
+      <td>
+        <%= t('end_date') %>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    <tr class="tr-blank"></tr>
+    <% @exams.each do |e| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-3"><%= "#{e.name}" %></td>
+        <td class="col-1"><%= format_date(e.start_date) %></td>
+        <td class="col-1"><%= format_date(e.end_date) %></td>
+        <td class="col-1"><%= link_to "#{t('view_result_text')}",{:action=>"exam_result" ,:id=>e.id, :batch_id=>@batch.id}, :class=>"view-link" %></td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @exams, :renderer => 'RemoteLinkRenderer',  :params => {:controller=>"online_exam",:action => "update_exam_list", :batch_id=>@batch.id} %>
+<%else%>
+  <p class="flash-msg"><%=t('no_exams')%></p>
+<%end%>

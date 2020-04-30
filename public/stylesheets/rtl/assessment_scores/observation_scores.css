@@ -1,0 +1,263 @@
+#page-yield ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+
+}
+#page-yield ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+    border-left: 1px solid #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#page-yield ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#page-yield ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#page-yield ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    /*border-radius: 10px;*/
+}
+
+#page-yield ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+#enclosure{
+    float: right;
+    width: 100%;
+}
+#student_list{
+    float: right;
+    width: 30%;
+    height: 600px;
+    border: 1px solid #999999;
+    overflow-x: auto;
+}
+#observation_sheet{
+    float: right;
+    width: 68%;
+    /*border: 1px solid #e5e5e5;*/
+    border: 1px solid #999999;
+    border-right: none;
+}
+#student_listing tbody{
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+/*    border-bottom: 1px solid #ccc;*/
+}
+table#student_listing{
+    background: none;
+    padding:0px;
+    width: 100%;
+/*    border: 1px solid #999999;*/
+}
+table, th, td {
+    border-collapse: collapse;
+    font-size: 13px;
+    
+}
+#student_listing th{
+    font-size: 14px;
+    color: #333333;
+    background: #eeeeee;
+    line-height: 30px;
+    border-bottom: 1px solid #999999;
+    text-align: right;
+    padding-right: 25px;
+}
+#student_listing tr.st_entry{
+    line-height: 30px;
+}
+#student_listing td{
+    border-bottom: 1px solid #cccccc;
+    padding-right: 25px; 
+}
+span.admission_no{
+    color: #666666;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.observation_sheet_header{
+    height: 27px;
+    background: #eeeeee;
+    border-bottom: 1px solid #999999;
+    padding: 11px;
+    font-size: 14px !important;
+    display: table;
+    width: 96.5%;
+}
+.submit_button{
+    float: left;
+    background: #27292B !important;
+    padding: 5px 9px !important;
+    border: none;
+    margin: 0px;
+    color:white;
+    font-size: 14px;
+    cursor: pointer;
+}
+div.student_name{
+    display: table;
+    float: right;
+    margin-top: 6px;
+    font-weight: bold;
+    width:90%;
+}
+.observation_sections{
+    height: 550px;
+    overflow-x: auto;
+    
+}
+.observation_section{
+    border-bottom: 1px solid #999999;
+    padding: 10px;
+}
+.sub_head{
+    font-weight: bold;
+    font-size: 14px;
+}
+tr.list-odd{
+    background: white;
+}
+tr.list-even{
+    background: #f5f5f5;
+}
+tr.st_entry{
+    line-height: 30px;
+}
+#observation_listing{
+    border: 1px solid #cccccc;
+    margin-top: 15px;
+}
+td.observation_label{
+    padding-right: 10px;
+    border-left: 1px solid #cccccc;
+}
+.label-field-pair{
+    width: 106px;
+}
+.label-field-pair input{
+    width: 80px;   
+}
+.text-input-bg{
+    width: 0px;
+}
+.observation_label_div{
+    width:500px;
+}
+.grade-section{
+    /*display: table;*/
+     float: right; 
+    margin-top: 19px;
+    font-size: 14px;
+}
+span.grade_field{
+    margin-right: 10px;
+}
+span.grade_field{
+    margin-right: 10px;
+    font-weight: bold;
+}
+.grade_and_remark{
+    width: 100%;
+    display: table;
+}
+.remark-section{
+    float: left;
+    margin-top: 15px;
+    font-size: 14px;
+    width: 433px;
+}
+.text-input-bg textarea{
+    -webkit-border-radius: 5px;
+    border: 1px solid #C6C6C6;
+    background-color: #EEEEEE;
+    width: 300px;
+    height: 35px;
+}
+.remark_label{
+    float: right;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+.remarks_list{
+    display: none;
+    margin-top: 0 !important;
+    position: absolute;
+    background: white;
+    border: 1px solid #d9d9d9;
+    /*left: 902.5px !important;*/
+    padding-right: 0px;
+    max-width: 300px;
+    box-shadow: -1px 2px 10px #d4d4d5;
+}
+.remark-select-button{
+    width: 33px;
+    float: left;
+    margin-top: 4px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    padding: 7px 0px;
+    border-radius: 5px;
+    background: #EEEEEE;
+}
+.remark-select-button a{
+    color: black;
+    text-decoration: none;
+}
+.remark-select-button a:hover{
+    color: black;
+    text-decoration: none;
+}
+li.remarks{
+    font-size: 13px;
+     /*height: 1.5em;*/ 
+    list-style-type: none;
+    min-width: 50px !important;
+    padding: 5px 10px !important; 
+    text-align: right;
+    width: auto !important;
+    border-radius: 0 0 0 0 !important;
+    border-bottom: 1px solid #cccccc;
+}
+li.remarks:hover{
+    background: #EEEEEE;
+    cursor: pointer;
+}
+.remark-section .label-field-pair{
+    float:right;
+}
+#loader_1{
+    float: right;
+    margin-top: 50px;
+    margin-right: 317px;
+}
+.coloured_background{
+    background-color: #f4f4f4;
+}
+#student_list .st_entry{
+    cursor: pointer;
+}
+#student_list .st_entry:hover{
+    background-color: #edf3ff;
+}
+.student_entry_div{
+    width: 230px;
+}
+span.completed{
+    width: 19px;
+    height: 16px;
+    display: block;
+    background-image: url(/images/iconsprite-1.png) !important;
+    background-position: 0px -361px !important;
+}
+#student_listing td.completion_indication{
+    padding-right: 0px;
+}

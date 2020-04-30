@@ -1,0 +1,127 @@
+<% s3_enabled =  FedenaSetting.s3_enabled? %>
+
+<% archived_guardian = nil %>
+<% # partial - used in bulk export -- if code moved to controller-- make changes to bulk export also %>
+<%if @guardian.attributes["former_id"].present?  %>
+  <% archived_guardian = ArchivedGuardian.find_by_former_id(@guardian.attributes["former_id"]) %>
+<%end%>
+
+<%if @keys[:full_name].present?%>
+  template_app.full_name = <%= @guardian.full_name.to_json%>;
+<%end%>
+
+<%if @keys[:first_name].present?%>
+  template_app.first_name = <%= @guardian.first_name.to_json%>;
+<%end%>
+
+<%if @keys[:last_name].present?%>
+  template_app.last_name = <%= @guardian.last_name.to_json%>;
+<%end%>
+
+<%if @keys[:relation].present?%>
+  template_app.relation = <%= @guardian.translated_relation.to_json%>;
+<%end%>
+  
+<%if @keys[:ward_batch_name].present?%> 
+  template_app.ward_batch_name = <%= @student.batch.full_name.to_json%>;     
+<%end%>
+    
+<%if @keys[:ward_admission_number].present?%>    
+  template_app.ward_admission_number = <%= @student.admission_no.to_json%>;
+<%end%>
+
+<%if @keys[:date_of_birth].present?%>
+  <%unless @guardian.dob.nil?%>
+    template_app.date_of_birth = <%= (format_date(@guardian.dob)).to_s.to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:dob_in_words].present?%>
+  <%unless @guardian.dob.nil?%>
+    template_app.dob_in_words = <%= get_date_in_words(@guardian.dob).to_json %>;
+  <%end%>
+<%end%>
+
+<%if @keys[:email].present?%>
+  template_app.email = <%= @guardian.email.to_json%>;
+<%end%>
+
+<%if @keys[:office_phone_1].present?%>
+  template_app.office_phone_1 = <%= @guardian.office_phone1.to_json%>;
+<%end%>
+
+<%if @keys[:office_phone_2].present?%>
+  template_app.office_phone_2 = <%= @guardian.office_phone2.to_json%>;
+<%end%>
+
+<%if @keys[:mobile_phone_no].present?%>
+  template_app.mobile_phone_no = <%= @guardian.mobile_phone.to_json%>;
+<%end%>
+
+<%if @keys[:address].present?%>
+  template_app.address = <%= "#{@guardian.office_address_line1} #{@guardian.office_address_line2}".to_json %>;
+<%end%>
+
+<%if @keys[:city].present?%>
+  template_app.city = <%= @guardian.city.to_json%>;
+<%end%>
+
+<%if @keys[:state].present?%>
+  template_app.state = <%= @guardian.state.to_json%>;
+<%end%>
+
+<%if @keys[:country].present?%>
+  template_app.country = <%= @guardian.country.nil? ? "" : @guardian.country.full_name.to_json%>;
+<%end%>
+
+<%if @keys[:education].present?%>
+  template_app.education = <%= @guardian.education.to_json%>;
+<%end%>
+
+<%if @keys[:income].present?%>
+  template_app.income = <%= @guardian.income.to_json%>;
+<%end%>
+
+<%if @keys[:occupation].present?%>
+  template_app.occupation = <%= @guardian.occupation.to_json%>;
+<%end%>
+
+<%if @keys[:guardian_photo].present?%>
+  <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled %>
+    <%if archived_guardian.present?%>
+      <%if archived_guardian.photo.present?%>
+        template_app.guardian_photo = <%= File.join(RAILS_ROOT, archived_guardian.photo.path).to_json %>;
+      <%end%>
+    <%else%>
+      <%if @guardian.photo.present?%>
+        template_app.guardian_photo = <%= File.join(RAILS_ROOT, @guardian.photo.path).to_json %>;
+      <%end%>
+    <%end%>
+  <%else%>
+    <%if archived_guardian.present?%>
+      template_app.guardian_photo = <%= archived_guardian.photo.url(:original,false).to_json %>;
+    <%else%>
+      template_app.guardian_photo = <%= @guardian.photo.url(:original,false).to_json %>;
+    <%end%>
+  <%end%>
+<%end%>
+<%if @keys[:ward_photo].present?%>
+    <%if @pdf_mode.present? && @pdf_mode == true && !s3_enabled %>
+      <%if @archived_student.present?%>
+        <%if @archived_student.photo.present?%>
+          template_app.ward_photo = <%= File.join(RAILS_ROOT, @archived_student.photo.path).to_json %>;
+        <%end%>
+      <%else%>
+        <%if @student.present && @student.photo.present?%>
+          template_app.ward_photo = <%= File.join(RAILS_ROOT, @student.photo.path).to_json %>;
+        <%end%>
+      <%end%>
+    <%else%>
+      <%if @archived_student.present?%>
+        template_app.ward_photo = <%= @archived_student.photo.url(:original,false).to_json %>;
+      <%else%>
+        template_app.ward_photo = <%= @student.photo.url(:original,false).to_json %>;
+      <%end%>
+    <%end%>
+<%end%>
+

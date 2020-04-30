@@ -1,0 +1,78 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t("pin_group") %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_pin_group') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :pin_groups_edit, @pin_group%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="pin_group_form">
+    <% form_for @pin_group do |f| %>
+      <%= f.error_messages %>
+
+      <div class="label-field-pair">
+        <label for="valid_from"><%= t('valid_from') %></label>
+        <div class="text-input-bg"><%= calendar_date_select_tag 'pin_group[valid_from]', I18n.l(@pin_group.valid_from,:format=>:default) ,:readonly=>true,:popup=>"force"%></div>
+      </div>
+      <div class="label-field-pair">
+        <label for="valid_till"><%= t('valid_till') %></label>
+        <div class="text-input-bg"><%= calendar_date_select_tag 'pin_group[valid_till]', I18n.l(@pin_group.valid_till,:format=>:default) ,:readonly=>true,:popup=>"force"%></div>
+      </div>
+      <div class="label-field-pair">
+        <%= f.label :name,t('name') %>
+        <%= f.text_field :name %>
+      </div>
+      <div class="label-field-pair">
+        <%= f.label :is_active,t('is_active') %>
+        <%= f.check_box :is_active %>
+      </div>
+      <div class="label-field-pair">
+        <%= f.label :course_ids,t('course_ids') %>
+        <div class="batches">
+          <div class="sel-list">
+            <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+            <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+          </div>
+          <% @courses.each do |c| %>
+            <div class="each_batch">
+              <%= check_box_tag "pin_group[course_ids][]", c.id,(@pin_group.course_ids.include?(c.id.to_s)),:class => "batches_box" %> <label><%= c.course.full_name %></label>
+            </div>
+          <% end %></div>
+      </div>
+      <%= f.submit 'Save',:class => 'submit_button'%>
+    <% end %>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

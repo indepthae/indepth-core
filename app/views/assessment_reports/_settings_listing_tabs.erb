@@ -1,0 +1,31 @@
+<div id="collection_receipients_data">
+      <div class="extender"></div>
+      <ul class="tabrow">
+        <li class="selected" type="list_planner"><%=link_to_remote "#{t('general_settings')}",:url => { :action => "settings",:assessment_plan_id =>@plan.id},:method => :get, :before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li type="list_exam_groups"><%=link_to_remote "#{t('attendance_settings')}",:url => { :action => "attendance_settings",:assessment_plan_id =>@plan.id }, :method => :get ,:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li type="list_exam_groups"><%=link_to_remote "#{t('records_and_remarks')}",:url => { :action => "records_and_remarks_settings",:assessment_plan_id =>@plan.id }, :method => :get ,:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li type="list_exam_groups"><%=link_to_remote "#{t('advance_settings')}",:url => { :action => "advanced_report_settings",:assessment_plan_id =>@plan.id }, :method => :get ,:before=>"select_tab(this)",:complete=>"j('#tab_loader').hide();j('#right-panel').show();"%></li>
+        <li style="width: 10px;"><%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "tab_loader", :style =>"display: none;" ) %></li>
+      </ul>
+      <div id="questions-main">
+        <div id="right-panel">
+          <%= render :partial => "report_settings" %>
+        </div>
+      </div>
+</div>
+<script type="text/javascript">
+  function select_tab(e) {
+
+    if (j(e).parent().hasClass( "selected" )){
+      return false
+    }else{
+      j("li").removeClass("selected");
+      j('#right-panel').hide();
+      j('#tab_loader').show();
+      j(e).parent().addClass("selected");
+      j('#right-panel-loader').show();
+      j('#right-panel-bottom').hide();
+      return true;
+    }
+  }
+</script>

@@ -1,0 +1,333 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.    -%>
+<% @total_tax = @total_tax.to_f %>
+<div id="page-yield" class="available_sections">
+    <div class="section">
+        <center>
+            <div class="hor_line"></div>
+            <h2><%= t('fee_summary') %></h2>
+            <div class="hor_line"></div>
+            <div class="extender"></div>
+        </center>
+        <% total_fees = 0 %>
+        <div id="main_info">
+            <div class="col-a">
+                <h4 style="width:505px;"> <%= "#{t('name')}: #{@student.full_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('admission_no')} : #{@student.admission_no}" %></h4>
+                <% if roll_number_enabled? %>
+                  <h4 style="width:505px;"> <%= "#{t('roll_no')} : #{@student.roll_number}" %></h4>
+                <% end %>
+                <h4 style="width:505px;"> <%= "#{t('course_text')} : #{@student.batch.course.course_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('batch')} : #{@financefee.batch.full_name}" %></h4>
+                <h4 style="width:605px;"> <%= "#{t('fees_collection_date_name')}: #{@date.name.capitalize}" %> </h4>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <table id="pdf-table" width="100%" cellspacing="0">
+            <tr class="table-header">
+                <td class="mark-td"><%= t('sl_no') %></td>
+                <td class="name-td"><%= t('particulars') %></td>
+                <td class="mark-td"> <%= "#{t('amount')}(#{@currency_type.to_s})" %></td>
+            </tr>
+            <% k=7 %>
+            <% i = 0 %>
+            <% c= 'even' %>
+            <% @fee_particulars.each do |fee| %>
+              <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                  <td class="mark-td"><%= i+=1 %></td>
+                  <% k+=1 %>
+                  <td class="name-td"><%= fee.name %></td>
+                  <td class="mark-td">&nbsp;<%= "#{precision_label(fee.amount.to_s)}" %></td>
+              </tr>
+              <% total_fees += fee.amount %>
+            <% end %>
+
+            <% unless @total_discount == 0 %>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-blank"></tr>
+              <tr class="table-header">
+                  <% k+=1 %>
+                  <td></td>
+                  <td class="col-1" colspan="2"><span class="space"><%= t('discount') %></span></td>
+              </tr>
+              <% k=0 %>
+              <% @discounts.each_with_index do |d, k| %>
+
+                <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                    <% if d.master_receiver_type=='FinanceFeeParticular' %>
+                      <% net_amount=d.master_receiver.amount %>
+                      <% discount_name= d.is_amount == false ? "#{shorten_string(d.name, 20)}-#{d.discount}%(#{d.master_receiver.name})" : "#{shorten_string(d.name, 20)}(#{d.master_receiver.name})" %>
+                    <% else %>
+                      <% discount_name= d.is_amount == false ? "#{shorten_string(d.name, 20)}(#{d.discount}%)" : shorten_string(d.name, 20) %>
+                      <% net_amount=@total_payable %>
+                    <% end %>
+                    <td class="mark-td"><%= k+=1 %></td>
+                    <td class="name-td"><%= discount_name %></td>
+                    <td class="mark-td"><%= precision_label(net_amount * d.discount.to_f/ (d.is_amount? ? net_amount : 100)) %></td>
+                </tr>
+              <% end %>
+            <% end %>
+
+            <% if @financefee.tax_enabled? and @tax_slabs.present? %>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-blank"></tr>
+              <tr class="table-header">
+                  <% k+=1 %>
+                  <td></td>
+                  <td class="col-1" colspan="2"><span class="space"><%= t('tax_text') %></span></td>
+              </tr>
+              <% k=0 %>
+              <% c= 'even' %>
+              <% @tax_slabs.each_pair do |tax_slab, slab_collections| %>
+                <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                    <td class="mark-td"><%= k+=1 %></td>
+                    <td class="name-td">
+                        <%= "#{tax_slab.name} - #{precision_label(tax_slab.rate)}%" %>
+                    </td>
+                    <% slab_total = slab_collections.map {|x| precision_label(x.tax_amount).to_f }.sum %>                    
+                    <td class="mark-td"><%= precision_label(slab_total) %></td>
+                </tr>
+              <% end %>
+              <% total_fees += @total_tax %>  
+            <% end %>
+
+
+            <% total_fine=0 %>
+            <% if @paid_fees %>
+              <% k=0 %>
+
+              <% unless @paid_fees.blank? %>
+                <% @paid_fees.each do |trans| %>
+                  <% if trans.fine_included %>
+                    <% if total_fine==0 %>
+                      <tr class="tr-blank"></tr>
+                      <tr class="table-header">
+                          <td></td>
+                          <td class="col-1" colspan="2"><span class="space"><%= t('fine') %></span></td>
+                      </tr>
+                    <% end %>
+                    <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                        <td class="col-1"><%= k+=1 %></td>
+                        <td class="col-2"><span><%= t('fine_on') %> <%= format_date(trans.transaction_date) %></span>
+                        </td>
+
+                        <td class="col-4"><%= "#{precision_label(trans.fine_amount.to_f)}" %></td>
+                    </tr>
+                    <% total_fine=total_fine+trans.fine_amount.to_f %>
+                    <% total_fees += trans.fine_amount.to_f %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <%# unless @paid_fees.nil? %>
+              <%# paid=0 %>
+              <%# @paid_fees.each { |a| paid += a.amount.to_f } %>
+              <%# total_fees -= paid %>
+              <%# if (@fine_amount.present?) and (@financefee.balance > 0) %>
+                <%# if total_fine==0 %>
+                  <%#*<tr class="tr-blank"></tr>%>
+                  <%#*<tr class="table-header">%>
+                      <%#*<td></td>%>
+                      <%#*<td class="col-1" colspan="2">%>
+                          <%#*<span class="space"><%= t('fine') %>
+                          <%#*</span>%>
+                      <%#*</td>%>
+                  <%#*</tr>%>
+                <%# end %>
+                <%#*<tr class="<%= cycle(c, (["odd", "even"]-[c]).first) % >">%>
+                    <%#*<td class="col-1"><%= k+=1 %>
+                    <%#*</td>%>
+                    <%#*<td class="col-2">%>
+                        <%#= t('fine_on') %> <%#= format_date(Date.today) %>
+                    <%#*</td>%>
+                    <%#*<td class="col-6">%>
+                        <%#= precision_label(@fine_amount.to_f) %>
+                        <%# total_fine=total_fine+@fine_amount.to_f %>
+                    <%#*</td>%>
+                <%#*</tr>%>
+              <%# end %>
+
+            <%# end %>
+            <% unless @financefee.is_paid_with_fine? %>
+                    <% paid=0 %>
+              <% @paid_fees.each { |a| paid += a.amount.to_f } %>
+              <% total_fees -= paid %>
+              <% if @fine_rule && !@fine_balance %>
+                <% if @total_fine==0 %>      
+                  <tr class="tr-blank"></tr>
+                      <tr class="table-header">
+                          <td></td>
+                          <td class="col-1" colspan="2"><span class="space"><%= t('fine') %></span></td>
+                      </tr>      
+                <% end %>
+                <tr class="<%= cycle(c, (["odd", "even"]-[c]).first)%>">
+                    <td class="col-1"><%= k+=1 %></td>
+                    <td class="col-2">
+                            <%= t('fine_on') %>
+                            <%= format_date(@date.due_date.to_date+@fine_rule.fine_days.days) %>
+                    </td>
+                    <td class="col-6">
+                        <%= precision_label(@fine_amount) %>
+                        <% total_fine = total_fine + @fine_amount %>
+                    </td>
+                </tr>
+              <% elsif @fine_amount.to_f > 0 %>
+                <% if @total_fine==0 %>
+                  <tr class="tr-blank"></tr>
+                      <tr class="table-header">
+                          <td></td>
+                          <td class="col-1" colspan="2"><span class="space"><%= t('fine') %></span></td>
+                      </tr>
+                  <%end%>
+                  <tr class="<%= cycle(c, (["odd", "even"]-[c]).first)%>">
+                      <td class="col-1"><%= k+=1 %></td>
+                    <td class="col-2">
+                            <%= t('fine_on') %>
+                            <%= format_date(FedenaTimeSet.current_time_to_local_time(Time.now).to_date) %>
+                    </td>
+                    <td class="col-6">
+                        <%= precision_label(@fine_amount) %>
+                        <% total_fine = total_fine + @fine_amount %>
+                    </td>
+                </tr>
+              <% end %>
+                 
+            <% end %>   
+
+            <tr class="tr-blank"></tr>
+            <tr class="table-header">
+                <td></td>
+                <td class="col-1" colspan="2"><span class="space"><%= t('summary') %></span></td>
+            </tr>
+            <% i = 0 %>
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <td class="col-1"><%= i += 1%> </td>
+                <td class="col-8"><%= "#{t('total')} #{t('particular')} #{t('fees_text')}" %></td>
+                <td class="col-6"><%= "#{precision_label(@total_payable)}" %></td>
+            </tr>
+
+
+            <% total_fees = (@total_payable - @total_discount) %>
+            <% total_fees += @total_tax if @financefee.tax_enabled? and @tax_slabs.present? %>
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <td class="col-1"><%= i += 1%> </td>
+                <td class="col-8"><%= t('total_discount') %></td>
+                <td class="col-6"><%= precision_label(@total_discount) %></td>
+            </tr>
+            <% if @financefee.tax_enabled? and @tax_slabs.present? %>
+              <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                  <td class="col-1"><%= i += 1%> </td>
+                  <td class="col-8"><%= t('total_tax') %></td>
+                  <td class="col-6"><%= precision_label(@total_tax) %></td>
+              </tr>
+            <% end %>
+
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <td class="col-1"><%= i += 1%> </td>
+                <td class="col-8" ><%= "#{t('total')} #{t('fine')}" %></td>
+                <td class="col-6"><%= precision_label(total_fine) %></td>
+            </tr>
+
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <% k+=1 %>
+                <td class="col-8" colspan="2"><%= t('total_fees') %></td>
+                <td class="col-6"><%= precision_label(total_fees) %></td>
+            </tr>
+
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <% k+=1 %>
+                <td class="col-8" colspan="2" ><%= t('payment_done') %></td>
+                <td class="col-6"><%= precision_label(paid) %></td>
+            </tr>
+
+            <% balance=@financefee.balance.to_f+@fine.to_f+@fine_amount.to_f %>
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                <% k+=1 %>
+                <td colspan="2" class="col-8"><%= t('amount_to_pay') %></td>
+                <td class="col-pdf"><%= precision_label(balance > 0 ? balance : 0) %></td>
+            </tr>
+            <% if ((k+1)%1)==0 %>
+          </table>
+          </center>
+      </div>
+      <div class="section">
+          <center>
+
+              <table id="pdf-table" width="100%">
+
+                <% end %>
+            </table>
+    </div>
+
+    <div id="pdf-info" class="section">
+
+        <% page_val=24 %>
+        <% k=19 %>
+        <% unless @paid_fees.empty? %>
+          <div class="section">
+              <h4><%= "#{t('payment_history')}" %></h4>
+
+              <table id="pdf-table" width="100%" cellspacing="0">
+                  <% c= 'even' %>
+
+                  <tr class="table-header">
+                      <td class="rec-td"> <%= t('receipt_no') %></td>
+                      <td class="date-td"> <%= t('payment_date') %></td>
+                      <td class="mode-td"> <%= t('payment_mode') %></td>
+                      <td class="note-td"> <%= t('payment_notes') %></td>
+                      <td class="rec-td"> <%= t('cashier') %></td>
+                      <td class="amount-td"> <%= t('amount') %>  (<%= currency %>)</td>
+                  </tr>
+                  <% @paid_fees.each_with_index do |p, i| %>
+
+                    <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %> <%= "paid" if @paid_fees.last.id.to_i == p.id.to_i and @financefee.is_paid == false %>">
+                        <td class="rec-td"> <%= p.receipt_number %></td>
+                        <td class="date-td"><%= format_date(p.transaction_date) %></td>
+                        <%if p.reference_no.present?%>
+                          <td class="mode-td"> <%= p.payment_mode %> - <%=p.reference_no%></td>
+                        <%else%>
+                          <td class="mode-td"> <%= p.payment_mode %></td>
+                        <%end%>
+                        <td class="note-td"> <%= p.payment_note %></td>
+                        <td class="rec-td">  <%= p.payment_mode=='Online Payment' ? p.get_cashier_name : p.cashier_name%></td>
+                        <td class="amount-td"><%= precision_label p.amount.to_f %></td>
+                    </tr>
+                  <% end %>
+
+              </table>
+
+          </div>
+        <% end %>
+
+        <% if @financefee.tax_enabled? and @tax_slabs.present? %>
+          <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+            <div class="section">
+                <h4 class="no_bold">
+                    <%= @tax_config[:finance_tax_identification_label] %> : 
+                    <%= @tax_config[:finance_tax_identification_number] %>
+                </h4>
+            </div>
+          <% end %>
+        <% end %>
+
+    </div>
+</div>
+
+

@@ -1,0 +1,72 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('course_subjects') %></div>
+    <div id="inner-tab-menu">
+        <ul id="import_logs">
+            <% if @course.present? %>
+              <%= render :partial => 'import_logs_link' %>
+            <% end %>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="list_box">
+        <div class="page_head"><%= t('course_subjects') %></div>
+        <div class="course_batches">
+            <div class="label-field-pair">
+                <label for="timetable_entry_course_id"><%= t('course') %>
+                    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+                </label>
+                <div class="text-input-bg">
+                    <%= select :course, :id,
+                      @courses.map {|c| [c.full_name, c.id] },
+                      {:prompt => t('select_a_course'), :selected => @course.try(:id)},
+                      {
+                      :onchange => "#{remote_function(
+                      :url => { :action => 'list_subjects' },
+                      :with => "'course_id='+value",
+                      :before => "Element.show('loader')",
+                      :success => "Element.hide('loader')"  )}"} %>
+                </div>
+            </div>
+        </div>
+        <hr class="sec_div" />
+        <div id="subject_list">
+            <%= render :partial => 'subject_list' if @course.present? %>
+        </div>
+    </div>
+    <div class="extender"></div>
+</div>
+
+<script type="text/javascript">
+  load_component_delete_method = function (type, course_id, object_id) {
+      j('.submit-button#yes').on('click', function () {
+          j.ajax({
+              type: 'DELETE',
+              url: '/subjects_center/delete_component',
+              data: {'type': type, 'course_id': course_id, 'id': object_id}
+          });
+      })
+  }
+
+  show_modal_actions = function () {
+      cancel_btn = j('<div></div>', {class: 'submit-button', onclick: 'remove_popup_box()', text: '<%= t('cancel') %>'});
+      submit_btn = j('<div></div>', {class: 'submit-button', name: 'commit', text: '<%= t('import_subjects') %>', onclick: 'import_subject_submit();'})
+      j('.pupup_import_subjects #popup_footer').append(submit_btn);
+      j('.pupup_import_subjects #popup_footer').append(cancel_btn);
+  }
+
+  import_subject_submit = function () {
+      j('#import_subject_form').submit();
+  }
+</script>

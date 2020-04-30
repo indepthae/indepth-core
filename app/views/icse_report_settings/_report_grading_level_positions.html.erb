@@ -1,0 +1,9 @@
+<div class="label_field_pair enclosure">
+    <div class="messages">Would you like to place the grading levels in the report?</div>
+    <div class="ind_block zero_bottom_margin">
+        <%= radio_button  :icse_report_setting, :grading_level_position,"0",:checked=>@setting[:grading_level_position]=="0"%>
+        <label class="general_label" for="icse_report_setting_grading_level_position_0">Above Signature</label>
+        <%= radio_button  :icse_report_setting, :grading_level_position, "1",:checked=>@setting[:grading_level_position]=="1"%>
+        <label class="general_label" for="icse_report_setting_grading_level_position_1">Below Signature</label>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+
+<% if @transport_fee_collection.due_date < (@payment_date || Date.today) %>
+   <tr>
+      <div class="label-category-pair3"> <td class="col-2 fine_text"> <label><%= "#{t('due_date_has_been_exceeded')}"%></label></td></div>
+        <td><div class="label-field-pair4"><%= text_field_tag "fees[fine]","",:class=>'precision_text' %></div>
+
+    <%=   link_to_function "#{t('add_fine')}","submit_fine('/transport_fee/update_employee_fine_ajax2',#{@transport_fee.receiver_id},#{@transport_fee.transport_fee_collection_id})",:class=>"user_button" %></td>
+      </tr>
+
+    <div class="extender"></div>
+<% end %>

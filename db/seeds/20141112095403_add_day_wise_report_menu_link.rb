@@ -1,0 +1,3 @@
+academics_category = MenuLinkCategory.find_by_name("academics")
+attendance_link = MenuLink.find_by_name('attendance')
+MenuLink.create(:name=>'day_wise_report',:target_controller=>'attendance_reports',:target_action=>'day_wise_report',:higher_link_id=>attendance_link.id,:icon_class=>nil,:link_type=>'general',:user_type=>nil,:menu_link_category_id=>academics_category.id) unless MenuLink.exists?(:name=>'day_wise_report')

@@ -1,0 +1,34 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('fee_collection_dates')}"%></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="box">
+  <div id ="message"></div>
+  <div class ="link-box">
+    <div class="link-heading"> 
+      <%= link_to "#{t('batch_wise_fee_collections')}", :action => 'hostel_fee_collection_new' %>
+    </div>
+    <div class="link-descr"><%= " #{t('create_text')}  #{t('batch_wise_fee_collections')}"%> </div>
+  </div>
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('user_wise_fee_collections')}",:action => "collection_creation_and_assign" %></div>
+      <div class="link-descr"><%= "#{t('create_text')} #{t('user_wise_fee_collections')}"%></div>
+    </div>
+
+  <div class="link-box">
+    <div class="link-heading"><%= link_to "#{t('view')}",:action => "hostel_fee_collection_view" %></div>
+    <div class="link-descr"><%= "#{t('displays_collection_dates')}"%></div>
+  </div>
+
+
+  <div id="modal-box" style="display:none;"></div>
+</div>
+</div>

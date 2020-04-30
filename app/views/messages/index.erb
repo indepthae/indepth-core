@@ -1,0 +1,245 @@
+<%= javascript_include_tag("jquery.ajaxAutocomplete.ch") %>
+<% if (rtl?) %>
+  <script>
+    j(document).ready(function () {
+        j("#drop_header").hover(
+                function () {
+                    link_off = j("#drop_header").offset();
+                    link_width = j("#drop_header").width();
+                    link_height = j("#drop_header").height();
+                    box_width = j("#box_1").width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    j("#box_1").css({top: (link_off.top + link_height), left: (link_off.left)});
+                    j("#box_1").css("display", "block");
+                },
+                function () {
+                    j("#box_1").css("display", "none");
+                });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function () {
+        j("#drop_header").hover(
+                function () {
+                    link_off = j("#drop_header").offset();
+                    link_width = j("#drop_header").width();
+                    link_height = j("#drop_header").height();
+                    box_width = j("#box_1").width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    j("#box_1").css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                    j("#box_1").css("display", "block");
+                },
+                function () {
+                    j("#box_1").css("display", "none");
+                });
+    });
+  </script>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('messages') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('conversations') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <% if @current_user.can_message? %>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to_remote "#{t('new_text')} #{t('message')}", :url => {:action => "new"} %>
+              </li>
+              <% if @current_user.admin? or @current_user.employee?   %>
+                <li id="drop_header" class='themed_bg themed-dark-hover-background sibling-small-drop'>
+                    <a href="#" id="drop_header_link">&#9660;</a>
+                    <ul id="box_1" class="more-menu-div" style="display:none;">
+                        <li class="themed_bg themed-dark-hover-background">
+                            <%= link_to "#{t('create_text')} #{t('broadcast_message')}", :controller=>'messages', :action=>'create_broadcast'%>
+                        </li>
+                    </ul>
+                </li>
+              <% end %>
+            <% end %>
+            <% if permitted_to? :message_settings, :messages %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('settings')}", :controller=>"messages", :action=>"message_settings"%></li>
+            <%  end %>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="message_box">
+        <div id="message_threads"><%= render :partial=>'threads' %></div>
+        <% if @recipient_only_gt%>
+          <div id="message_conversation"><%= render :partial=> 'group_conversations' %></div>
+        <% else%>
+          <div id="message_conversation"><%= render :partial=> 'conversations' %></div>
+        <%end%>
+    </div>
+    <div id="modal-box" style="display:none;"></div>
+</div>
+<script>
+  
+  var invalid_type = false;  
+
+  valid_attachments = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf',
+      'application/powerpoint', 'application/mspowerpoint', 'application/vnd.ms-powerpoint',
+      'application/x-mspowerpoint', 'application/msword', 'application/mspowerpoint',
+      'application/vnd.ms-powerpoint', 'application/excel', 'application/vnd.ms-excel',
+      'application/x-excel', 'application/x-msexcel', 'application/rtf', 'application/x-rtf',
+      'text/richtext', 'text/plain', 'application/wordperfect', 'application/x-wpwin',
+      'text/tab-separated-values', 'text/csv', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.presentationml.slideshow', 'application/vnd.oasis.opendocument.text',
+      'application/vnd.oasis.opendocument.spreadsheet', 'image/svg+xml', 'application/vnd.ms-works', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/wpd', 'application/wordperf'];
+  disable_submit();
+  j(document).delegate("#message_body", "input", function () {
+      check_disable();
+  });
+  
+  file_uploaded = function () {
+      j('#submit_button').removeAttr('disabled');
+  }
+
+  function  disable_submit() {
+      j('#submit_button').attr('disabled', 'disabled');
+  }
+
+  
+  function check_file_absence() {
+      no_file = false;            
+      if (window.reply_message.attachment_set.length == 0) {
+          no_file = true;
+      }
+      return no_file
+  }
+
+  function remove_uploaded_file() {
+      resetFileElement(j(".field1"));
+      resetFileElement(j(".style input"));
+      $reply_attachment_error = false
+      j('.form_cont #reply_attachment_error').css("display", "none");
+  }
+
+  function resetFileElement(e) {
+      //e.val('No file selected');
+      for (var i = 0; i < e.length; i++) {
+          e.wrap('<form>').closest('form').get(i).reset();
+      }
+      e.unwrap();
+
+  }
+<% if FedenaSetting.s3_enabled? %>
+    j(document).on("submit", "#message_reply", function (event) {        
+        event.preventDefault();
+        disable_submit();
+        var form = this;
+        var field = j("#reply_message_file");
+        var thread_id = j('#form_data').attr('data-thread');
+        var message_body = j('#message_body').val().trim();
+        if (window.reply_message.attachment_set.length == 0 && message_body == "") {
+            j('.form_cont').addClass('with_errors');
+        } else {
+            j('.form_cont').removeClass('with_errors');
+            j('#message_reply').ajaxSubmit({
+                beforeSubmit: function (a, f, o) {
+                    o.dataType = 'json';
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    j('.conversations.scrollbar').append(XMLHttpRequest.responseText);
+                    refresh_message_reply();
+                }
+            });
+        }
+    });
+
+    refresh_message_reply = function () {
+        if (j(".scrollbar").length > 0) {
+            j(".scrollbar").scrollTop(j(".scrollbar")[0].scrollHeight);
+        }
+        j('#message_body').val('');
+        j('#message_body').focus();
+        j(".wrapper#attachment-error").css("display", "none");
+        remove_attachment_div();
+        check_disable();
+    }
+    remove_attachment_div = function () {
+        j(".paperclip_field.attachment-clip").each(function () {
+            j(this).remove();
+            window.reply_message.attachment_set=[];
+            window.reply_message.index=0;
+            window.reply_message.pgb=[];
+            window.reply_message.pgb_in=[];            
+            window.reply_message.pgb_out=[];
+            window.reply_message.progress_index=0;
+            j(".conversations").height("508px");
+        });
+    }
+<% else %>
+    j(document).on("submit", "#message_reply", function (event) {
+        event.preventDefault();
+        disable_submit();
+        var form = this;
+        var field = j("#message_message_attachments_attributes_0_attachment");
+        var thread_id = j('#form_data').attr('data-thread');
+        var message_body = j('#message_body').val().trim();
+        if (window.reply_message.attachment_set.length == 0 && message_body == "") {
+            j('.form_cont').addClass('with_errors');
+        } else {
+            j('.form_cont').removeClass('with_errors');
+            var form_data = new FormData(j("#message_reply")[0]);
+            if (window.reply_message.attachment_set.length > 0) {
+                for (var i = 0; i < window.reply_message.attachment_set.length; i++) {
+                    form_data.append('message[message_attachments_attributes][' + i + '][attachment]', window.reply_message.attachment_set[i]);
+                }
+            }
+            form_data.delete('message[message_attachments_attributes][0][attachment][]');
+
+            j.ajax({
+                url: "/messages/create_message",
+                type: "POST",
+                data: form_data,
+                complete: function (XMLHttpRequest, textStatus) {
+                    j('.conversations.scrollbar').append(XMLHttpRequest.responseText);
+                    j("#conversations-scroll").css("height", "497px");
+                },
+                success: function (msg) {
+                    refresh_message_reply(window.reply_message.attachment_set);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    });
+
+    refresh_message_reply = function (attachment_set) {
+        if (j(".scrollbar").length > 0) {
+            j(".scrollbar").scrollTop(j(".scrollbar")[0].scrollHeight);
+        }
+        j('#message_body').val('');
+        j('#message_body').focus();
+        j(".wrapper#attachment-error").css("display", "none");
+        remove_attachment_div(attachment_set);
+        check_disable();
+    }
+
+
+    remove_attachment_div = function (attachment_set) {
+        j("#selected_attachments #attachment-style").each(function () {
+            j(this).remove();  
+            window.reply_message.attachment_set=[]
+            window.reply_message.index=0
+            
+        });
+    }
+<% end %>
+
+</script>

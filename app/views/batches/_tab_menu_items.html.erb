@@ -1,0 +1,62 @@
+<ul>
+  <%  if permitted_to? :index,:exam_groups and @batch.allow_exam_acess(@current_user)%>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('exams_text')}", batch_exam_groups_path(@batch) %> </li>
+  <% end %>
+
+  <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_text')}", edit_course_batch_path(@course, @batch) %></li>
+  <li class='themed_bg themed-dark-hover-background'><%= link_to("#{t('delete_text')}", [@course, @batch], :method => 'delete', :confirm => "#{t('delete_confirm_msg')}") %></li>
+
+  <li  id="drop_header" class='themed_bg themed-dark-hover-background'>
+    <a href="#" id="drop_header_link"><%= t('manage') %> &#9660;</a>
+    <ul id="box_1" class="more-menu-div" style="display:none;">
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('subject')}", :controller=>"batch_transfers", :action=>'subject_transfer', :id=>@batch %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('electives')}", batch_elective_groups_path(@batch) %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('assign_tutor')}",:action=>'assign_tutor', :id=>@batch %></li>
+      <% permitted_to? :set_roll_numbers, @batch,:context=>:student_roll_number do %>
+        <% if @batch.roll_number_generated? %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to t('manage_roll_numbers'),:controller => "student_roll_number", :action => "edit_roll_numbers", :id=>@batch,:src=>"batch_list" %></li>
+        <% else %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to t('manage_roll_numbers'),:controller => "student_roll_number", :action => "set_roll_numbers", :id=>@batch,:src=>"batch_list" %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </li>
+
+</ul>
+<% if (rtl?) %>
+  <script>
+    j(document).ready(function() {
+      j("#drop_header").hover(
+      function () {
+        link_off = j("#drop_header").offset();
+        link_width = j("#drop_header").width();
+        link_height = j("#drop_header").height();
+        box_width = j("#box_1").width();
+        //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+        j("#box_1").css({top: (link_off.top + link_height),left: (link_off.left)});
+        j("#box_1").css("display","block");
+      },
+      function () {
+        j("#box_1").css("display","none");
+      });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function() {
+      j("#drop_header").hover(
+      function () {
+        link_off = j("#drop_header").offset();
+        link_width = j("#drop_header").width();
+        link_height = j("#drop_header").height();
+        box_width = j("#box_1").width();
+        //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+        j("#box_1").css({top: (link_off.top + link_height),left: ((link_off.left + link_width) - box_width)});
+        j("#box_1").css("display","block");
+      },
+      function () {
+        j("#box_1").css("display","none");
+      });
+    });
+  </script>
+<% end %>

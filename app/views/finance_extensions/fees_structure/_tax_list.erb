@@ -1,0 +1,35 @@
+<div id="taxes-list">  
+    <% i = 0 %>
+    <tr class="row-a tr-head" cellpadding="1" cellspacing="1">
+        <td class="sl-col col-1"></td>
+        <td class="set_border_right bold_font" colspan="2">
+            <span><%= t('tax_text') %></span>
+        </td>
+    </tr>
+    <% unless @fee.is_a?(TransportFee) %>
+      <% @tax_slabs.each_pair do |tax_slab, slab_collections| %>
+        <tr class="row-b tax">
+            <td class="sl-col normal_font tax_index"><%= i+=1 %></td>
+            <td class="set_border_right particular-col normal_font">
+                <%= "#{tax_slab.name} - &#x200E;(#{precision_label(tax_slab.rate)}%)&#x200E;" %>
+            </td>
+            <% slab_total = slab_collections.map {|x| precision_label(x.tax_amount).to_f }.sum %>
+            <td class="set_border_right amount-col normal_font align_right">
+                <%= precision_label(slab_total) %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="row-b tax">
+          <td class="sl-col normal_font tax_index"><%= i+=1 %></td>          
+          <td class="set_border_right particular-col normal_font">
+              <%= "#{@tax_slab.name} - &#x200E;(#{precision_label(@tax_slab.rate)}%)&#x200E;" %>
+          </td>
+          <td class="set_border_right amount-col normal_font align_right">
+              <%= precision_label(@fee.tax_amount) %>
+          </td>          
+      </tr>
+    <% end %>
+</div>
+
+

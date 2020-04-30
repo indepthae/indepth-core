@@ -1,0 +1,11 @@
+<div id="input-form-errors"></div>
+<div class="top-info">
+    <div class="course-name"><label><%= t('course') %></label><label><b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} &#x200E;(#{@registration_course.course.code})&#x200E;" %></b></label></div>
+    <div class="applicant-count"><label><%= t('applicant_s') %></label><label><b><%= @applicants.count %> </b></label></div>
+    <div class="amount-collected"><label><b><%= currency %> <%= precision_label(@applicants.select{|a| a.has_paid==true}.sum(&:amount)) %></b></label><label><%= t('amount_collected') %></label></div>
+</div>
+<div class="hor_line"></div>
+<div id='result-main-section'>
+  <%= render :partial=>"result_main_section" %>
+</div>
+

@@ -1,0 +1,97 @@
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="fee-collections-list">
+  <% unless @user.nil? %>
+    <% if @fine.nil? %>
+      <%if @user.transaction_id.nil? %>
+        <%= render :partial => "defaulters_fine_submission" %>
+      <% end %>
+    <%end%>
+    <div id="register">
+      <div class="header">
+        <%unless @prev_user.nil?%>
+        <div class="prev">
+          <%= link_to_remote '◄',:url => {:action => 'employee_defaulters_transport_fee_collection_details',  :id => @prev_user.id, :collection_id=>@collection_id }%>
+        </div>
+        <%end%>
+        <div class="month">
+          <%= @user.user.full_name %>
+        </div>
+        <%unless @next_user.nil?%>
+        <div class="next">
+          <%= link_to_remote '►',:url => {:action => 'employee_defaulters_transport_fee_collection_details',  :id => @next_user.id, :collection_id=>@collection_id }%>
+        </div>
+        <%end%>
+        <div class="extender"></div>
+      </div>
+    </div>
+    <% total_fees =0 %>
+    <% unless @transport_fee.nil? %>
+      <% unless @transport_fee.empty? %>
+      <%# form_remote_for :fees, :url => {:action => 'update_ajax',:student => @student.id,:batch_id => @batch.id,:date => @date.id, :fine=>@fine} do |form| %>
+        <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+            <td><%= t('particulars') %></td>
+            <td><%= t('amount') %> (<%= currency %>)</td>
+          </tr>
+          <tr class="tr-blank"></tr>
+          <tr class="tr-<%= cycle("odd","even") %>">
+            <td class="col-2"><%= t('bus_fare') %></td>
+            <td class="col-6"><%= precision_label @user.bus_fare %></td>
+          </tr>
+          <% total_fees += @user.bus_fare %>
+          <%if @user.transaction_id.nil? %>
+            <% unless @fine.nil? %>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-<%= cycle("odd","even") %>">
+                <td class="col-2"><%= t('fine') %></td>
+                <td class="col-6"><%= precision_label @fine %></td>
+              </tr>
+              <% total_fees += @fine.to_f %>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-<%= cycle("odd","even") %>" cellpadding="1" cellspacing="1">
+                <td class="col-2" ><%= t('total_fees') %></td>
+                <td class="col-6" ><%= precision_label total_fees%></td>
+              </tr>
+            <% end %>
+          <%else%>
+            <% if @transaction.fine_included == true %>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-<%= cycle("odd","even") %>">
+                <td class="col-2"><%= t('fine_paid') %></td>
+                <% fine =@transaction.amount-@user.bus_fare %>
+                <td class="col-6"><%= precision_label fine %></td>
+              </tr>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-blank"></tr>
+              <tr class="tr-<%= cycle("odd","even") %>" cellpadding="1" cellspacing="1">
+                <td class="col-2" ><%= t('total_fees') %></td>
+                <td class="col-6" ><%= precision_label @transaction.amount%></td>
+              </tr>
+            <%end%>
+          <%end%>
+          <td style="width:30%"></td>
+          <td style="float:right;">
+            <p>
+
+              <%if @user.transaction_id.nil? %>
+                <%= link_to_remote "► #{t('pay_fees')}",:class=>'submit_button2' ,:url=>{:action=>'transport_defaulters_fee_pay', :id => @user.id,:fine =>@fine, :collection_id => @transport_fee_collection.id } %>
+              <% else %>
+              <h4><%= t('fees_paid') %></h4>
+        <%#end%>
+              </p>
+            </td>
+          <% end %>
+        <% end %>
+      <% end %>
+    </table>
+
+  </div>
+
+<%else%>
+  <div class="msg">
+    <p class="flash-msg"><%= t('no_defaulters') %></p>
+  </div>
+<%end%>

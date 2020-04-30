@@ -1,0 +1,78 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('hr_management') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('employees_with_outdated_payroll') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :employee_payslips_view_outdated_employees, [@payroll_group, [@start_date, @end_date]]  %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="header"><%= "#{t('generate_payslips').titleize} - #{t('employees_with_outdated_payroll')}" %></div>
+
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payroll_group') %>:</label>
+    <div class="text-input-bg" id="label_value"> <%= @payroll_group.name %> </div>
+  </div>
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('payment_frequency') %>: </label>
+    <div class="text-input-bg" id="label_value"><%= @payroll_group.salary_type_value + " - " + @payroll_group.payment_period_value %></div>
+  </div>
+  <div class="label-field-pair">
+    <label for="pay_period"><%= t('pay_period') %></label>
+    <div class="text-input-bg" id="date_range_text">
+      <%= payslip_range(@payroll_group, @start_date, @end_date) %>
+    </div>
+  </div>
+
+
+  <div id="actions">
+    <div class="status"><%= "#{t('showing')} #{@employees.total_entries} #{t('of')} #{@payroll_group.employees.count} #{t('employees_of_this_payroll_group')}"%></div>
+    <div class="summary"><%= link_to t('back_to_payslip_summary'), {:action => "generate_payslips", :id => @payroll_group.id, :start_date => @start_date, :end_date => @end_date} , :method => :post%></div>
+  </div>
+
+  <div id="employees">
+    <table>
+      <tr class="tr-head">
+        <td class="emp_name"><%= t('employee_text') %></td>
+        <td class="emp_no"><%= t('employee_number')  %></td>
+        <td class="dpt_name"><%= t('department') %></td>
+        <% if @payroll_group.enable_lop %>
+          <td class="recent_date"><%= t('additional_leaves') %></td>
+        <% end %>
+        <td class="actions"></td>
+      </tr>
+      <% if @employees.present? %>
+        <% @employees.each do |emp| %>
+          <tr>
+            <td class="emp_name"><%= emp.first_and_last_name %></td>
+            <td class="emp_no"><%=  emp.employee_number %></td>
+            <td class="dpt_name"><%= emp.name %></td>
+            <% if @payroll_group.enable_lop %>
+              <td class="recent_date"><%= emp.employee_not_deducted_leaves %></td>
+            <% end %>
+            <td class="actions">
+
+
+              <div id="generate_link"><%= link_to t('generate_payslip').capitalize, {:action => "generate_employee_payslip" ,:employee_id=>emp.id, :date => @start_date.to_date, :from => "view_outdated_employees" }%></div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+      <% end %>
+    </table>
+    <%= pagination_status(@employees) %>
+    <%= will_paginate @employees%>
+
+
+
+  </div>
+</div>

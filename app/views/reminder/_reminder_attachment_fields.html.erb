@@ -1,0 +1,10 @@
+<div class="fields">
+	<div class="label-field-pair">
+		<label for=""><%= t('select_file') %><%= t('maxi_size') %></label>
+		<div class="text-input-bg" id="browse-style">
+	    <%#= c.paperclip_file_field :attachment, :size=>14, :direct => false %>
+	    <%= c.paperclip_file_field :attachment %>
+	  </div>
+	</div>
+	<div class="remove-field"><%= link_to_remove_fields " ", c %></div>
+</div>

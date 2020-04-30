@@ -1,0 +1,276 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('gallery') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('galleries.images') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <%if @category.old_data%>
+    <div class="bread_crumb">
+      <%breadcrumb :galleries_category_old_more_option,@category%>
+      <%=render_breadcrumbs%>
+    </div>
+  <%else%>
+    <div class="bread_crumb">
+      <%breadcrumb :galleries_category_more_option,@category%>
+      <%=render_breadcrumbs%>
+    </div>
+  <%end%>
+
+  <div id="loading_overlay" class="loading_overlay">
+    <div class="loading_overlay_text"><%=t('galleries.deleting_images')%></div>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+  <p class="flash-msg">
+    <%= flash[:notice]  %>
+  </p>
+  <% end %>
+
+  <div class="album_photos">
+        <div class="head">
+        <%= @category.name%>
+        </div>
+        <div class="line"></div>
+        <div class="album_status">
+          <div class="photo_count elements">
+            <%=t('galleries.images_collen')%><b> <span id="photos_count"><%= @count%></span></b>
+          </div>
+          <%if !@category.old_data%>
+          <div class="visibility elements">
+            <%=t('galleries.visibility')%> <b><%=@visibility_tag%></b>
+          </div>
+          <div class="status elements">
+            <%=t('galleries.status')%><b> <span id="published_status"><%= @category.published ? t('galleries.published_status_active') : t('galleries.published_status_unpublished') %></span></b>
+          </div>
+          <%end%>
+          <div class="published_on elements">
+           <%= @category.published? ? t('galleries.published_on') : t('galleries.created_on')%><b> <%= @category.published? ? format_date(@category.published_date) : format_date(@category.created_at.to_date) %></b>
+          </div>
+        </div>
+
+        <div class="delete_status_tab">
+          <div class="delete_head">
+            <%=t('galleries.select_images_to_delete')%>
+          </div>
+          <div class="select_all">
+            <span id="select_all" class="themed_text" onclick="select_all()"><%=t('galleries.select_all')%></span>
+          </div>
+          <div class="stay_right">
+            <div id="selected_count1" class="selected_count">
+              <%=t('galleries.selected')%> <b>0</b> <%=t('galleries.images')%>
+            </div>
+            <div id="delete_top_div" class="delete_button">
+              <button id="delete_top" onclick="confirm_delete()" class="solid_button delete_photos"><%=t('galleries.delete_photos')%></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="album_images" class="album_images">
+
+          </div>
+
+
+
+        </div>
+        <div class="bottom_panel">
+          <div id="selected_count2" class="selected_count_bottom">
+            <%=t('galleries.selected')%> <b>0</b> <%=t('galleries.images')%>
+          </div>
+          <button onclick="confirm_delete()" id="delete_bottom" class="solid_button delete_spacing"><%=t('galleries.delete_photos')%></button>
+          <%=link_to t('galleries.cancel'),  {:controller => 'galleries', :action => (@category.old_data ? 'old_category_show' : 'category_show'), :id => @category.id} ,:class=>"solid_button"  %>
+        </div>
+
+
+
+      </div>
+
+
+
+
+</div>
+
+<script>
+    var delete_images_id = [];
+    var album_total_image_count=0;
+    var total_images = 0;
+    var select_all_flag = true;
+    var gallery_category_id='<%=@id%>';
+    var current_page=1;
+    var current_count;
+
+    j( document ).ready(function() {
+      //to load initial images through same ajax request
+      delete_photos();
+    });
+
+    disable_delete_button();
+
+    show_top_delete_button();
+    function show_top_delete_button(){
+      if(total_images>9){
+        j("#delete_top_div").css("display","inline-block");
+      }
+      else{
+        j("#delete_top_div").css("display","none");
+      }
+
+    }
+
+    function disable_delete_button(){
+      j("#delete_top").addClass("disabled_solid_button");
+      j("#delete_bottom").addClass("disabled_solid_button");
+      j("#delete_top").prop("disabled", true);
+      j("#delete_bottom").prop("disabled", true);
+    }
+
+    function enable_delete_button(){
+      j("#delete_top").removeClass("disabled_solid_button");
+      j("#delete_bottom").removeClass("disabled_solid_button");
+      j("#delete_top").prop('disabled', false);
+      j("#delete_bottom").prop('disabled', false);
+    }
+
+    function set_statubar_count(){
+      j("#photos_count").html(album_total_image_count);
+      if(album_total_image_count==0)
+      {
+        <%if @category.old_data%>
+          // for old albums
+          window.location.replace("/galleries/old_category_show/"+gallery_category_id);
+
+        <%else%>
+          // for new albums
+          window.location.replace("/galleries/category_show/"+gallery_category_id);
+        <%end%>
+
+      }
+    }
+
+    function select_all() {
+      if (select_all_flag) {
+        j("#select_all").html("Deselect all");
+        select_all_flag = false;
+        for (var i = 0; i < total_images; i++) {
+          check_image(i);
+        }
+      } else {
+        j("#select_all").html("Select all");
+        select_all_flag = true;
+        for (var i = 0; i < total_images; i++) {
+          uncheck_image(i);
+        }
+      }
+      selected_count();
+
+    }
+
+    function check_image(index){
+      j("#img" + index).data("checked",true);
+      j("#img" + index).addClass("check_true");
+      j("#overlay"+index).addClass("overlay");
+    }
+
+    function uncheck_image(index){
+      j("#img" + index).data("checked",false);
+      j("#img" + index).removeClass("check_true");
+      j("#overlay"+index).removeClass("overlay");
+    }
+
+    function selected_count() {
+      var count = 0;
+      var collect_id = [];
+      for (var i = 0; i < total_images; i++) {
+        if (j("#img" + i).data("checked") == true) {
+          count++;
+          var id=parseInt(j("#img" + i).data("value"));
+          collect_id.push(id);
+        }
+      }
+      //enabling disabling delete button
+      console.log("count:"+count);
+      if(count==0){
+        disable_delete_button();
+      }
+      else{
+        enable_delete_button();
+      }
+
+
+      delete_images_id = collect_id;
+      current_count=count;
+      j("#selected_count1").html("<%=t('galleries.selected')%> <b>" + count + "</b> <%=t('galleries.images')%>");
+      j("#selected_count2").html("<%=t('galleries.selected')%> <b>" + count + "</b> <%=t('galleries.images')%>");
+
+      if (total_images==0 && current_page>1)
+      {
+        current_page=current_page-1;
+        delete_photos();
+      }
+    }
+
+
+    function set_image_select_listener(){
+      //set click listener over image
+      j(".album_photo").click(function(e) {
+          var id = j(this).data("value");
+          if (j("#img" + id).data("checked") == false) {
+            check_image(id);
+          } else {
+            uncheck_image(id);
+          }
+
+
+        selected_count();
+      });
+    }
+
+    function confirm_delete() {
+      make_popup_box(this, 'confirm', "<%=t('galleries.multiple_delete_description')%> " ,{'ok' : "<%=t('galleries.delete_photo')%>", 'cancel' : "<%=t('galleries.cancel')%>", 'title' : "<%=t('galleries.delete_photo')%>" , 'popup_class' : 'remove_lt','return_status':true});return delete_confirmed();
+    }
+
+    function delete_confirmed(){
+      j('#yes').click(function () {
+        delete_photos();
+        remove_popup_box();
+      });
+
+    }
+
+    function delete_photos() {
+      if (delete_images_id.length!=0){
+        j("#loading_overlay").css("display","block");
+      }
+
+      j.ajax({
+        type: "POST",
+        data: {
+          "delete_images_id":  (delete_images_id.length==0 ? [0]:delete_images_id ),
+          "count": delete_images_id.length,
+          "page": current_page,
+          "id": gallery_category_id,
+          "session_fingerprint":"<%=session_fingerprint%>"
+        },
+        url: "/galleries/delete_multiple_photos",
+        success: function(msg) {
+          if(delete_images_id.length!=0){
+              j("#loading_overlay").css("display","none");
+          }
+          j('#album_images').html(msg);
+          //set_image_select_listener();
+          // to reset count and delete_images_id
+          selected_count();
+          set_statubar_count();
+          j("#select_all").html("Select all");
+          select_all_flag = true;
+          show_top_delete_button();
+        }
+      });
+    }
+  </script>

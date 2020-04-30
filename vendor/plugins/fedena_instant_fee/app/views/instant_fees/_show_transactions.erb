@@ -1,0 +1,107 @@
+<div id="search_box_bg" class="box">
+    <% remote_form_for(:date, :url => {:action=> 'instant_fee_transaction_filter_by_date',:category=>@category},:before => "Element.show('loader_date')",:success => "Element.hide('loader_date')", :html=> {:multipart=>true,:id=>"date_search_form"}) do |s| %>
+      <div class="date-select"><div class="date-search">
+              <label for="student_date_of_birth"><%= t('start_date') %> </label>
+              <%=hidden_field_tag :category_id,@category%>
+              <%= calendar_date_select_tag 's_date', I18n.l(@start_date.present? ? @start_date.to_date : Date.today , :format=> :default),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onChange => ""%></div>
+          <div class="date-search2"> <label for="student_date_of_birth"><%= t('end_date') %> </label>
+              <%= calendar_date_select_tag 'e_date', I18n.l(@end_date.present? ? @end_date.to_date : Date.today , :format=> :default),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force", :onChange => "Element.show('loader_date');date();"%>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader_date",
+                :style =>"display: none; margin-bottom:10px;" ) %>
+          </div>
+      </div>
+    <%end%>
+</div>
+<%if @transactions.present?%>
+  <%@start_date ||=Date.today%>
+  <%@end_date ||=Date.today%>
+  <div class="extender"></div>
+  <div class="height" style="witdth:100%;height:50px;"></div>
+  <div id="payments_details">
+      <div class="label-field-pair3">
+
+      </div>
+      <table id="listing1" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td><%= t('receipt_no') %></td>
+              <td><%= t('name') %></td>
+              <td><%= t('amount') %> </td>
+              <td><%= t('payment_date') %></td>
+              <td><%= t('payment_mode') %></td>
+              <td class="col-3" style="width:1%;"></td>
+          </tr>
+          <%k=0%>
+          <%k=(@page.to_i-1)*10 unless @page.nil?%>
+          <tr class="tr-blank"></tr>
+          <% @transactions.each_with_index do |f , i| %>
+            <tr class="tr-<%= cycle("odd","even") %>" id="row<%=f.id%>">
+                <td class="col-1">
+    <%#= link_to(f.receipt_no,{ :controller=>'finance',:action => "generate_fee_receipt_pdf",:transaction_id=>f.id,:particular_wise=>true},:target => '_blank') %>
+                    <%= f.receipt_number %>
+                </td>
+                <td class="col-2"><%= f.finance.payee_name %></td>
+                <td class="col-3" ><%= precision_label(f.amount.to_f) %></td>
+                <td class="col-3"><%= format_date(f.transaction_date) %></td>
+                <%if f.reference_no.present?%>
+                  <td class="col-3"><%= f.payment_mode %> - <%=f.reference_no%></td>
+                <%else%>
+                  <td class="col-3"><%= f.payment_mode %></td>
+                <%end%>
+
+                <td class="col-3" style="">
+                    <%= receipt_buttons(f.id) %>
+                    <%= link_to raw('<span class="revert_icon_img"></span>'), '#', :onclick => "return MakeBox(#{f.id});",:class=>"themed_text",:tooltip=>t('revert_transaction') %>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+      <div class="pagination_div"><div class="div1"><%= will_paginate @transactions, :previous_label=>"<", :next_label=>">", :renderer => 'RemoteLinkRenderer' ,:remote => { :loading =>  "$('loader_paginate').show();",:complete =>"$('loader').hide();"  }, :params => {:controller=>:instant_fees,:action => "instant_fee_transaction_filter_by_date",:category_id=>params[:category_id],:ids=>@transactions.collect(&:finance_id),:s_date=>@start_date,:e_date=>@end_date} %></div><div class="div2"><%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader_paginate",
+                :style =>"display: none;" ) %></div></div>
+
+  </div>
+<%else%>
+  <div class="height" style="witdth:100%;height:50px;"></div>
+  <div id="payments_details">
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td style="text-align:center;">
+                  <%=t('no_transaction_for_the_given_period')%></td>
+          </tr>
+      </table></div>
+<%end%>
+<script type="text/javascript">
+  MakeBox = function (f) {
+      remove_popup_box();
+      options = {'submit': '<%=t('revert_transaction')%>', 'cancel': '<%=t('cancel')%>', 'field_name': 'reason', 'input_type': 'text_area', 'title': '<%=t('revert_transaction')%>'};
+      build_modal_box(options);
+      build_prompt_popup_box('<%=t('reason')%>', options)
+      j('#popup_window #popup_footer > #yes').click(function () {
+          if(j(this).attr('disabled') == undefined) {
+              j(this).attr('disabled', 'disabled');
+              j.ajax({
+                  type: 'POST',
+                  url: '/instant_fees/delete_transaction_for_instant_fee',
+                  data: {
+                      'id': f,
+                      'category_id': '<%=@category%>',
+                      's_date': '<%=@start_date%>',
+                      'e_date': '<%=@end_date%>',
+                      'reason': j('#popup_content #prompt_value').val(),
+                      'session_fingerprint': '<%= session_fingerprint %>'
+                  },
+                  success: function () {
+                      remove_popup_box();
+                  }
+              });
+          }
+      });
+  }
+</script>

@@ -1,0 +1,52 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('remark_bank') %></div>
+      <div id="inner-tab-menu">
+          <% if @remark_templates.present? %>
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to t('edit_remark_bank'), {:controller => "remark_banks", :action => "edit", :id=> @remark_bank.id} %></li>
+            </ul>
+          <% end %>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%#= link_to "Delete Reamrk Bank",  @remark_bank,:confirm => "Delete remark bank?", :method => :delete, :onclick => "make_popup_box(this, 'confirm', '#{"Delete Remark Bank"}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{"Delete Reamrk Bank"}', 'popup_class' : 'delete_confirmation'});" %>
+                  <%= link_to t('delete_remark_bank'),  @remark_bank,:confirm => "Delete #{@remark_bank.name}", :method => :delete %>
+              </li>
+          </ul>
+      </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :remark_banks_show,@remark_bank %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="ativity_box">
+        <div class="header"><%= t('remark_bank') %></div>
+        <%= render :partial=>'remark_bank_details' %>
+        <hr>
+        <% if @remark_templates.present? %>
+          <div id="attributes">
+              <%= render :partial=> 'remark_templates', :locals => {:remark_templates=> @remark_templates }%>
+          </div>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  load_plan_delete_method = function () {
+      j('.submit-button#yes').on('click', function () {
+          _id = <%= @remark_bank.id %>
+          j.ajax({
+              type: 'DELETE',
+              url: '/remark_banks/' + _id
+          });
+      })
+  }
+</script>

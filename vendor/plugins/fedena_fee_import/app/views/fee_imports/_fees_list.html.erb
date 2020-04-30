@@ -1,0 +1,60 @@
+<div id="list">
+    <%if @fee_collection_dates.present?%>
+      <% unless flash[:warn_notice].nil? %>
+        <p class="flash-msg"><span><%= flash[:warn_notice] %></span> </p>
+      <% end %>
+      <div class="sel-list">
+          <%= t('layouts_default_select') %>: 
+          <a href="#" onclick="$$('input.collection_box').each(function (checkbox) {
+                      checkbox.checked = true;
+                  });
+                  return false;">
+                 <%= t('layouts_default_all') %>
+          </a>,
+          <a href="#" onclick="$$('input.collection_box').each(function (checkbox) {
+                      checkbox.checked = false;
+                  });
+                  ;
+                  return false;">
+                 <%= t('layouts_default_none') %>
+          </a>
+      </div>
+      <% disabled_collection_ids = @discounted_fees.map {|x| x.collection_id.to_i }.uniq %>
+
+      <% form_for :fees_list, :url=>{ :action=>'select_student' } do |form| %>
+        <%= form.hidden_field :student_id, :value => @student.id %>
+        <% @fee_collection_dates.each do |fee_collection| %>
+          <% is_assigned = @student_fees.include?(fee_collection.id) %>
+          <div class="name_list<%=cycle('odd', 'even')%>">
+              <li>
+                  <label>
+                      <% if @payed_fees.include?(fee_collection.id) %>
+                        <% tooltip_msg = 'fee_already_paid' %>
+                      <% elsif (is_assigned and disabled_collection_ids.include?(fee_collection.id)) %>
+                        <% tooltip_msg = 'pay_all_discount_exists' %>
+                      <% else %>
+                        <% tooltip_msg = "" %>
+                      <% end %>
+                      
+                      <% if tooltip_msg.present? %>
+                        <span class="help_info" tooltip="<%= t(tooltip_msg) %>"></span>
+                      <% else %>
+                        <span class="help_info help_info_hide"></span>
+                      <% end %>
+
+                      <%= check_box_tag 'fees_list[collection_ids][]', fee_collection.id, 
+                        @student_fees.include?(fee_collection.id) , {:class=>'collection_box', 
+                        :disabled=> (@payed_fees.include?(fee_collection.id) or 
+                            (is_assigned and disabled_collection_ids.include?(fee_collection.id))),
+                        } %> 
+                      <div class="att_list_names"> <%= fee_collection.name %> </div>
+                  </label>
+              </li>
+          </div>
+        <% end %>
+        <%= form.submit "#{t('assign_fees')}", :class=>"submit_button", :disable_with => "► #{t('please_wait')}" %>
+      <% end %>
+    <% else %>
+      <p class="flash-msg"> <span><%= t("no_fees_in_batch")  %> </span></p>
+    <% end %>
+</div>

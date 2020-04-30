@@ -1,0 +1,65 @@
+<div id="page-yield" class="available_sections">
+    <%if @general_records["ReportHeader"] == "0"%>
+      <div class="header">
+          <span class="logo header_parts">
+              <%if current_school_detail.logo.present?%>
+                <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+              <%else%>
+                <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+              <%end%>
+          </span>
+          <span class="header-content header_parts">
+              <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+              <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+          </span>
+      </div>
+    <%else%>
+      <div style="height:<%=@general_records["HeaderSpace"].to_i%>mm"></div>
+    <%end%>
+    <div class="section">
+        <div class="hor_line"></div>
+        <h2><%= "#{t('student_report')}"%></h2>
+        <div class="hor_line"></div>
+        <div class="extender"> </div>
+        <div class="info">
+            <div class="info-left">
+                <%[1,3,5,7].each do |i|%>
+                  <%display_text = ReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= ReportSetting.get_display_value(@general_records["StudentDetail#{i}"],@student) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+            <div class="info-right">
+                <%[2,4,6,8].each do |i|%>
+                  <%display_text = ReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= ReportSetting.get_display_value(@general_records["StudentDetail#{i}"],@student) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+        </div>
+    </div>
+    <div  class="section">
+        <span class="image_enclosure">
+            <img  alt="Exam Marks" src="<%=Rails.root.join('public','images','report.jpg')%>" ></img>
+        </span>
+    </div>
+    <div class="section">
+        <%if @general_records["Signature"] == "0"%>
+          <div class="wrapper">
+              <div class="footer">
+                  <div id="pdf-footer">
+                      <span class="signature push_left"><%= @general_records["SignLeftText"] %></span>
+                      <span class="signature"><%= @general_records["SignCenterText"] %></span>
+                      <span class="signature push_right"><%= @general_records["SignRightText"] %></span>
+                  </div>
+              </div>
+          </div>
+        <%end%>
+    </div>
+</div>

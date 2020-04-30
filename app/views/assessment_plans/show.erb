@@ -1,0 +1,166 @@
+<% if (rtl?) %>
+  <script>
+      j(document).ready(function () {
+      j("#drop_header").hover(
+      function () {
+      link_off = j("#drop_header").offset();
+      link_width = j("#drop_header").width();
+      link_height = j("#drop_header").height();
+      box_width = j("#box_1").width();
+      //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+      j("#box_1").css({top: (link_off.top + link_height), left: (link_off.left)});
+      j("#box_1").css("display", "block");
+      },
+      function () {
+      j("#box_1").css("display", "none");
+      });
+      });
+  </script>
+<% else %>
+  <script>
+      j(document).ready(function () {
+      j("#drop_header").hover(
+      function () {
+      link_off = j("#drop_header").offset();
+      link_width = j("#drop_header").width();
+      link_height = j("#drop_header").height();
+      box_width = j("#box_1").width();
+      //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+      j("#box_1").css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+      j("#box_1").css("display", "block");
+      },
+      function () {
+      j("#box_1").css("display", "none");
+      });
+      });
+  </script>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_planner') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if @plan.terms_count == 0 and @plan.assessment_groups.present?  %>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to "#{t('add_exams')}", new_assessment_group_path({:parent_id => @plan.id, :parent_type => @plan.class.to_s})%>
+              </li>
+            <% end %>
+            <li class='themed_bg themed-dark-hover-background'>
+                <% if @plan.courses.present? %>
+                  <%= link_to "#{t('manage_courses')}", {:controller => "assessment_plans", :action => "manage_courses", :id => @plan.id} %>
+                <% else %>
+                  <%= link_to "#{t('add_courses')}", {:controller => "assessment_plans", :action => "add_courses", :id => @plan.id} %>
+                <% end %>
+            </li>
+            <% if @has_dependencies %>
+              <li class="themed_bg themed-dark-hover-background">
+                  <%= link_to t('planner_exam'), {:controller => 'assessment_groups' , :action => 'planner_assessment', :assessment_plan_id => @plan.id} %>
+              </li>
+            <% end %>
+            <li id="drop_header" class='themed_bg themed-dark-hover-background sibling-small-drop'>
+                <a href="#" id="drop_header_link"><%=t('more')%> &#9660;</a>
+                <ul id="box_1" class="more-menu-div" style="display:none;">
+                    <li class="themed_bg themed-dark-hover-background"><%= link_to t('student_report_settings'), :controller=>'assessment_reports', :action=>'settings', :assessment_plan_id => @plan.id%></li>
+                    <% unless @has_dependencies %>
+                      <li class="themed_bg themed-dark-hover-background">
+                          <%= link_to t('delete_planner'), '#' , :onclick => "make_popup_box(this, 'confirm', '#{t('delete_planner_confirmation')}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_assessment_plan')}'}); return load_plan_delete_method();" %>
+                      </li>
+                    <% end %>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_plans_show, @plan %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="planner_container">
+        <div class="exam_planner_head">
+            <div class="left">
+                <div class="clm">
+                    <div class="label"><%="#{t('exam_plan_name')}"%></div>
+                    <div class="value">
+                      <% if permitted_to? :set_assessment_plan_name%>
+                        <div id="<%="assessment_plan_name_#{@plan.id}_edit" %>">
+                          <%= in_place_editor_field :assessment_plan, :name,{},{:cols=>3} %>
+                        </div>
+                      <% else %>
+                        <%=@plan.name%>
+                      <% end %>
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="clm">
+                    <div class="label"><%=t('academic_year')%></div>
+                    <div class="value"><%=@academic_year.name%></div>
+                </div>
+                <div class="clm text-right">
+                    <div class="label"><%=t('no_of_terms')%></div>
+                    <div class="value"><%=@plan.terms_count%></div>
+                </div>
+                <div class="clm text-right">
+                    <div class="label"><%=t('courses_linked_count')%></div>
+                    <div class="value"><%=@plan.courses.count%></div>
+                </div>
+            </div>
+        </div>
+        <div class="planner_box">
+            <%= render :partial=>'detail_badges' %>
+            <% if @plan.terms_count > 0  %>
+              <% @plan.assessment_terms.each do |term| %>
+                <%= render :partial=> 'terms', :locals=>{:term=>term}%>
+              <% end %>
+            <% else %>
+              <%= render :partial=>'exam_groups', :locals=>{:plan=>@plan}%>
+            <% end %>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+      load_plan_delete_method = function () {
+      j('.submit-button#yes').on('click', function () {
+        plan_id = <%=@plan.id%>
+          j.ajax({
+              type: 'DELETE',
+              url: '/assessment_plans/'+plan_id
+          });
+      })
+  }
+  
+  load_term_delete_method = function(term_id) {
+    j('.submit-button#yes').on('click', function () {
+          j.ajax({
+              type: 'DELETE',
+              url: '/assessment_plans/delete_term/'+term_id
+          });
+    })
+  }
+  
+  MakeTermBox = function () {
+      //hide_message();
+      //remove_popup_box();
+      options = {'title': '<%="#{t('edit_term')}"%>'};
+      build_modal_box(options);
+      j('#popup_window').addClass('term_popup');
+      j('#popup_footer').remove();
+      j('#popup_box_overlay').click(close_modal_box);
+  }
+  
+  toggle_updated_glow = function(term_id) {
+    j(term_id).addClass('green');
+    setTimeout(function() {
+      j(term_id).removeClass('green');
+    }, 1000);
+  }
+  
+</script>

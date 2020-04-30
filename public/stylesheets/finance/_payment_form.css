@@ -1,0 +1,739 @@
+/** common headers **/
+.each-detail {
+    width: 230px;
+}
+.each-detail .val {
+    min-width: 210px !important;
+}
+.each-detail .text-input-bg select{
+    width: 210px;
+}
+/** common payment form and payment history styles **/
+.main_head td{
+    font-size: 13px !important;
+}
+.main-head .particular-header{
+    min-width: 300px;
+}
+/* form columns */
+.sl-col {
+    min-width: 20px;
+    width: 20px;
+}
+
+/** payment form **/
+#payment_form {
+    display: inline-block;
+    margin-bottom: 20px;
+    width: 100%;
+}
+.amount-cols {
+    /* min-width: 100px; */
+    max-width: 0px;
+}
+.align_right, .total_amount, .balance_amount{
+    text-align: right;    
+}
+.paid_col{
+    padding-right: 25px !important;
+}
+.total_amount, .balance_amount{
+    padding-right: 26px !important;
+}
+
+.payment_box {
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    width: 80px;
+    float:right;
+    padding-left: 6px;
+    text-align: right;
+    padding-right: 5px;
+}
+
+.payment_box_t {
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    width: 80px;
+    float:right;
+    padding-left: 6px;
+    text-align: right;
+    padding-right: 5px;
+}
+
+.payment_details label, .pay_fees label {
+    font-weight: normal !important;
+}
+
+/** payment mode**/
+.payment_mode_block, .payment_history{
+    height: 40px;
+    float: left;
+    padding-top: 3px;  
+}
+
+.payment_mode_block label, .payment_history label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 130px;
+    padding-top: 10px;
+    /*font-weight: 600;*/
+    /*margin-left: 16px;*/
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.payment_mode_block input {
+    background: #fff !important;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 150px;
+    height: 17px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    padding: 5px;
+}
+
+#payment_mode_details .payment_mode_block {
+    width: 168px;
+    margin-left: 35px;
+}
+.pay_fees .payment_mode_block{    
+    width: 200px;
+    margin-right: 0px;
+}
+.text-input-bg3 select {
+    background-color: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 140px;
+    height: 29px;
+    padding: 3px 6px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+}
+/** other payment mode **/
+#payment_mode {
+    float: left;
+    /*margin-left: 35px;*/
+    /*margin-top: 16px;*/    
+}
+
+/** reference number **/
+.reference_no {
+    width: 88px;
+    float: left;
+    padding-top: 3px;
+    padding-left: 32px;
+}
+
+.reference_no label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.text-input-bg4 {
+    background: transparent;
+    height: 28px;
+    width: 200px;
+}
+
+.reference_no input, .amount_to_pay_block input {
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 200px;
+    height: 17px;
+    padding: 5px;
+}
+
+/** Amount to pay **/
+
+.amount_to_pay_block {
+    height: 76px;
+    width: 100px;
+    float: right;
+    padding-top: 3px;
+    /* margin-right: 10px; */
+}
+
+.amount_to_pay_block label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    margin-left: 6px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.amount_to_pay_block.paid input {
+    border: 0px;    
+}
+.amount_to_pay_block input {
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 6px;
+    width: 98px;
+    height: 17px;
+    text-align: right;
+    width: 100px !important;
+}
+.text-input-bg4 {
+    background: transparent;
+    height: 28px;
+    width: 200px;
+}
+/** payment notes **/
+.pay_fees {
+    margin-bottom: 14px;
+    float: left;
+    width: 938px;
+}
+/** payment history **/
+.payment_history{
+    margin-top: 5px;
+}
+.collection_column:hover {
+    color: #000!important;
+}
+.colln_or_recp_name{
+    float: left;
+    width:150px;
+    min-width:100px;
+    word-break: initial;
+    word-wrap: break-word;
+}
+.colln_or_recp_name .tooltip_info{
+    width: 130px;
+}
+/** underline in receipt number / collection names list **/
+.label-underline {
+    margin: 2px 0px 2px 0px;
+    background: #e2dede;
+    height: 1px;
+    border: none;
+}
+.receipt-actions{
+    display: table-cell;
+    /*min-width: 100px;*/
+    min-width: 110px;
+}
+.receipt-actions .tooltip_wrapper{
+    float: left !important;
+}
+.receipt-actions .tooltip_info {
+    width: 130px !important;
+}
+.receipt-actions a{
+    margin: 0px 5px;
+    padding: 5px;
+    display: block;
+    float: left;
+}
+.receipt-box{
+    display: none;
+    background: white;
+    border:1px solid darkgray;
+    list-style: none;
+    margin: 31px 0px 0px -90px;
+    height: 76px;
+    width: 165px;
+    position: absolute;
+    z-index: 1;
+}
+.overall-receipt{
+    border-bottom: 1px solid darkgray;
+}
+.arrow_box {
+    position: relative;
+    z-index: 7;
+    top: 24px;
+}
+.arrow_box:after, .arrow_box:before {
+    bottom: 100%;
+    left: 27%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.arrow_box:after {
+    border-color: rgba(136, 183, 213, 0);
+    border-bottom-color: white;
+    border-width: 11px;
+    margin-left: -13px;
+}
+.arrow_box:before {
+    border-color: rgba(194, 225, 245, 0);
+    border-bottom-color: darkgray;
+    border-width: 13px;
+    margin-left: -15px;
+}
+.receipt-box li{
+    padding: 5px;
+    padding-bottom:10px;
+    height:22px;
+}
+#page-yield .receipt-actions .receipt-box li a:hover{
+    background:none !important;
+    text-decoration: none !important;
+}
+.overall-receipt {
+    border-bottom: 1px solid darkgray;
+}
+.arrow_dominate{
+    background: transparent;
+    width: 26px;
+    height: 25px;
+    position: absolute;
+    top: -24px;
+    left: 23px;
+    padding-left: 9px;
+}
+.padding_left_10{
+    padding-left: 10px !important;
+}
+.padding_right_0{
+    padding-right: 0px !important;
+}
+.padding_right_0 input[type='checkbox'] {
+    margin-left: 0px;
+}
+.fright {
+    /*margin-right: 20px;*/
+    float: right;
+}
+.amount_to_pay label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    /*font-weight: 600;*/
+    margin-left: 6px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.amount_to_pay input {
+    background: #eee;
+    border: 1px solid #c6c6c6;
+    border: 0px;
+    margin: 5px 0 0 6px;
+    width: 98px;
+    height: 17px;
+    text-align: right;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    /*padding: 5px;*/
+}
+.text-input-bg3 select {
+    background-color: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;    
+    width: 160px;
+    height: 29px;
+    padding: 3px 6px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+}
+.reference_no input {
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 5px 0 0 0px;
+    width: 200px;
+    height: 17px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    padding: 5px;
+}
+.payment_notes {
+    height: 70px;
+    padding-top: 16px;
+    width: 460px;
+    float: left;
+}
+.payment_notes label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    /*font-weight: 600;*/
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.payment_notes textarea {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #C6C6C6;
+    margin: 5px 0 0 0px;
+    padding: 5px;
+    width: 518px;
+    height: 17px;
+    position: relative;
+    font-size: 13px;
+}
+.reference_no label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    /*margin-left: 16px;*/
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+.pay_fees {
+    margin-bottom: 14px;
+    float: left;
+    width: 938px;
+}
+.pay_fees_buttons {
+    float: right;
+    margin-top: 18px;
+    margin-right: 7px;
+}
+.pay_fees_buttons.no_top_margin{
+    margin-top: 0px !important;
+}
+.pay_fees_buttons a {
+    float: right !important;
+    margin: 33px 10px 0 !important;  
+    color: #fff !important;
+    background: #27292B !important;
+    font-size: 13px !important;
+    height: 17px;
+    border: none !important;
+}
+.pay_fees h4 {
+    text-align: right;
+    float: right;
+    margin-top: 40px;
+}
+.pay_fees_buttons.no_top_margin a{
+    margin: 22px 10px 0 !important;
+}
+.pay_fees .no_top_margin h4{
+    margin-top: 29px;
+}
+.pay_fees_buttons a:hover {
+    background: #373B3F;
+}
+.user_button {
+    padding: 7px 10px;
+    background: #27292B !important;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    font-weight: bold;
+    font-size: 13px;
+    border: 1px solid #ccc !important;
+    color: #fff !important;
+    font-family: arial;
+    cursor: pointer;
+    margin: 0 auto;
+    text-decoration: none;
+    float: right;
+}
+.user_button:hover {
+    background: #373B3F;
+}
+.submit_button {
+    background: #27292B !important;
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: arial;
+    height: 31px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 33px -2px 0 0;
+    padding: 7px 10px;
+    float: right;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.submit_button:hover {
+    background: #373B3F;
+}
+.tooltip_wrapper{
+    float: none;
+    white-space: normal;
+    display: inline;
+}
+#payments_details .main-head td, #payments_details .row-b td{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#payments_details .row-b td:nth-child(2) {
+    min-width: 200px;
+}
+#payments_details .transaction_mode div[tooltip]{
+    color: #333 !important;
+}
+#payments_details .transaction_mode .tooltip_info{
+    top: 0px !important;
+    margin-left: 30px;
+}
+/** payment table column**/
+.sl-col{
+    width: 45px !important;
+}
+.amount-col{
+    width: 100px;
+}
+.cancel-disc, .cancel-disc:hover{
+    width: 20px;
+    padding: 0px 10px 0px 0px !important;
+    color: #000 !important;    
+    background: transparent !important;
+}
+.seprate_div {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    float: left;
+    display: block;
+    width: 100%;
+}
+.payment_notes textarea{
+    width: 400px !important;
+}
+.pay_fees_buttons{
+    margin-right: 25px;
+}
+.amount_to_pay_block{    
+    margin-right: 26px;
+    text-align: right;
+    width: auto !important;
+}
+.amount_to_pay_block label{
+    margin-right: 7px !important;
+    text-align: right;
+    width: auto !important;
+}
+.amount_to_pay_block .text-input-bg4{
+    position: relative;
+    margin-right: 0px !important;
+    /*right: 5px;*/
+}
+.amount_to_pay_block input{    
+    padding-right: 5px;
+    width: 93px;
+    background: #fff;
+}
+/** payment details / history **/
+#payments_details{
+    border-top: 1px solid #ccc;
+    display: inline-block;
+    /*    margin-top: 30px;
+        padding-top: 10px;*/
+    width: 100%;
+}
+#payments_details .label-field-pair3 {
+    height: 40px;
+    display: inline-block;
+}
+#payments_details label {
+    color: #444 !important;
+    font-size: 14px; 
+    font-weight: bold !important;
+    margin-left: 0px !important;
+}
+/** add links **/
+.instant-particular a, .instant-particular a:hover, #page-yield .instant-particular a:hover{
+    font-weight: bold;
+    color: #333 !important;
+}
+.cancel-disc span.help_info {
+    width: 12px;
+    height: 14px;
+    display: block;
+    /*padding-top: -3px;*/
+    background: url(/images/iconsprite-1.png);
+    background-position: -64px -84px;
+}
+.waiver_info{
+    width: 12px;
+    height: 14px;
+    margin: 3px 5px;
+    padding: 2px;
+    display: block;
+    float: left;
+    /*padding-top: -3px;*/
+    background: url(/images/iconsprite-1.png);
+    background-position: -64px -84px;
+}
+.cancel-disc .tooltip_wrapper {
+    width: 200px;
+    position: absolute;
+    height: 200px;
+    overflow: visible;
+    margin-top: -7px;
+}
+.cancel-disc .tooltip_info {
+    left: -119px !important;
+}
+/** modal box style overrides **/
+#MB_window{
+    top: 40px !important;
+}
+#MB_frame, #MB_header, #modal-box input, #modal-box select{
+    border-radius: 0px !important;
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    -o-border-radius: 0px !important;
+}
+#MB_close{
+    background-color: transparent !important;
+    color: #999 !important;
+    font-weight: normal !important;
+}
+/** inline fine styles **/
+#head-show-fine, #show-fine, #summary-show-fine{
+    display: none;
+}
+.cancel-fine {
+    cursor: pointer;
+    background: #c3d9ff;
+}
+.cancel-fine:hover {
+    color: #990a10 !important;
+}
+/** pay all pages **/
+.instant_heading{
+    font-weight: bold;
+}
+#change_disable{
+    width: 30px !important;
+}
+/** advance fees section **/
+.wallet-section {
+    /* margin-bottom: 14px; */
+    float: left;
+    width: 938px;
+}
+.wallet-amount-block {
+    height: 70px;
+    padding-top: 16px;
+    width: auto;
+    float: right;
+    color: black;
+    margin: 0px -44px 0 0;
+}
+.wallet-amount-block label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    /* margin: 0 0 0px 0; */
+    width: auto;
+    padding-top: 10px;
+    /* font-weight: 600; */
+    padding-bottom: 5px;
+    font-weight: none !important;
+    text-align: right;
+    margin-right: 70px;
+}
+.wallet-amount-block input {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #C6C6C6;
+    margin: 5px 0 0 20px;
+    padding: 5px;
+    width: 100px;
+    height: 17px;
+    position: relative;
+    font-size: 13px;
+    text-align: right;
+}
+.wallet-info-block{
+    height: auto;
+    padding-top: 16px;
+    width: auto;
+    float: right;
+    color: black;
+    margin: 40px 0 0 0;
+}
+.wallet-info-block label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: -4px 9px 0 -41px;
+    width: auto;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-weight: none !important;
+    text-align: right;
+    float: left;
+}
+.wallet-info-block .text-input-bg4{
+    float: left;
+}
+.wallet-info-block  input {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #C6C6C6;
+    margin: -4px 0 0 2px;
+    padding: 5px;
+    width: 100px;
+    height: 17px;
+    position: relative;
+    font-size: 13px;
+}
+.text-input-bg4 #wallet-amount-label{
+    color: red;
+    width: 204px;
+    font-size: 11px;
+    display: none;
+}
+.user_button1 {
+    background-color: #EEE;
+    border: 1px solid #999;
+    cursor: pointer;
+    padding: 7px 10px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    margin-right: 10px;
+    float: left;
+    color: #000;
+    float: right;
+    text-decoration: none;
+    margin-right: 67px;
+    font-size: 15px;
+    height: 11px;
+    line-height: 5px;
+}

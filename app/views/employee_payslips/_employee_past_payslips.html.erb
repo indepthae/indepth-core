@@ -1,0 +1,70 @@
+<table>
+  <tr class="tr-head <%= "bg_light_grey" unless @payslips_list.present? %>">
+    <td class="range"><%= t('pay_period') %></td>
+    <td class="amount"><%= t('salary') %></td>
+    <td class="status"><%= t('payslip_status') %></td>
+    <td class="actions"></td>
+  </tr>
+  <% if @payslips.present? %>
+    <% @payslips.each do |year, payslips| %>
+      <tr class="tr-head bg_light_grey">
+        <td><%= "#{year} - #{year.next}" %></td>
+        <td colspan="3"><%= "#{t('total_cost')}: #{precision_label(@total_cost.detect{|c| c.year == year}.cost)}" %></td>
+      </tr>
+      <% payslips.each do |payslip| %>
+        <tr>
+          <% date_range = payslip.date_range %>
+          <td class="range"><%= date_range %></td>
+          <td class="amount"><%= precision_label(payslip.net_pay) %></td>
+          <td class="status"><%= payslip.payslip_status %></td>
+          <td class="actions">
+            <% if payslip.is_approved %>
+              <% if permitted_to? :view_payslip, :employee_payslips %>
+                <% if params[:finance].present? and params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:controller => 'finance', :action => 'view_employee_payslip', :id => payslip.id, :from => 'employee_payslips_finance_archived', :finance => params[:finance]} %>
+                <% elsif params[:finance].present? and !params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:controller => 'finance', :action => 'view_employee_payslip', :id => payslip.id, :from => 'employee_payslips_finance', :finance => params[:finance]} %>
+                <% elsif !params[:finance].present? and params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => payslip.id, :from  => 'employee_payslips_archived'} %>
+                <% else %>
+                  <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => payslip.id} %>
+                <% end %>
+              <% end %>
+            <% elsif payslip.is_rejected %>
+              <% if !params[:finance].present? and permitted_to? :edit_payslip, :employee_payslips %>
+                <%= link_to t('edit_payslip'), {:action => "edit_payslip", :id => payslip.id} %>
+              <% end %>
+              <% if !params[:finance].present? and permitted_to? :revert_employee_payslip, :employee_payslips %>
+                <%= link_to t('delete_payslip'), {:action => 'revert_employee_payslip', :id => payslip.id} , :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => @employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+              <% end %>
+            <% else %>
+              <% if permitted_to? :view_payslip, :employee_payslips %>
+                <% if params[:finance].present? and params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:controller => 'finance', :action => 'view_employee_payslip', :id => payslip.id, :from => 'employee_payslips_finance_archived', :finance => params[:finance]} %>
+                <% elsif params[:finance].present? and !params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:controller => 'finance', :action => 'view_employee_payslip', :id => payslip.id, :from => 'employee_payslips_finance', :finance => params[:finance]} %>
+                <% elsif !params[:finance].present? and params[:archived].present? %>
+                  <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => payslip.id, :from  => 'employee_payslips_archived'} %>
+                <% else %>
+                  <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => payslip.id} %>
+                <% end %>
+              <% end %>
+              <% if !params[:finance].present? and permitted_to? :revert_employee_payslip, :employee_payslips %>
+                <%= link_to t('delete_payslip'), {:action => 'revert_employee_payslip', :id => payslip.id, :archived => params[:archived]}, :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => @employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+              <% end %>
+            <% end %>
+            <% if permitted_to? :view_payslip_pdf, :employee_payslips %>
+              <%= link_to t('pdf_report'), {:action => 'view_payslip_pdf', :id => payslip.id}, :target => "_blank" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end  %>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+<% if @payslips_list.present? %>
+  <%= pagination_status(@payslips_list) %>
+  <%= will_paginate @payslips_list,:renderer => 'RemoteLinkRenderer', :params => {:employee_id => @employee.id, :status => params[:status], :finance => params[:finance]} %>
+<% end %>

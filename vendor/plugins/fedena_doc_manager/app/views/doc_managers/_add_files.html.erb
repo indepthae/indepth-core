@@ -1,0 +1,9 @@
+<div class="extender"></div>
+<div class="span-sub-heading">
+  <label class="themed_text themed_text_doc"><%= t('add_documents') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</label>
+</div>
+
+<iframe border="0px" height="200px" name="uploading" id="uploading" src="/doc_managers/add_iframe_files/<%= @folder.id %>?user_id=<%=params[:user_id]%>&page=<%=params[:page]%>&action_text=<%=params[:action_text]%>">
+
+</iframe>
+

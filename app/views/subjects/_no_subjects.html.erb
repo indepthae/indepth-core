@@ -1,0 +1,6 @@
+<!--table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1"-->
+  <% display = (defined?(subjects) and (subjects.present?)) ? 'none' : '' %>
+  <tr id="flash-elective-group-<%= elective_group.id %>" class="tr-even" style='display:<%= "#{display}" %>'>
+    <td colspan="4"><div id="no_subject"><%= "#{t('no_subjects')}" %></div></td>
+  </tr>
+<!--/table-->

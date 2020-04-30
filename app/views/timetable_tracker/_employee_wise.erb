@@ -1,0 +1,57 @@
+<form name="search_form" action="" style="display:inline;" >
+    <div class="emp_wise_selects">
+        <div class="label-field-pair2">
+            <%= t('department_select') %><br>
+            <div class="text-input-bg1"><%= select :department,:department_id,
+                  @departments.map {|d| [d.name, d.id]},
+                  {:prompt => "#{t('select_department')}"},
+                  {:onChange => "#{remote_function(:url => {:action => "list_employee_wise"},
+                  :with=>"'department_id='+value+'&date=#{params[:date]}'" ,
+                  :before => "Element.show('loader')",
+                  :success => "Element.hide('loader')")}"} %>
+            </div>
+        </div>
+        <div class="label-field-pair2" id=<%= "employee_list_#{params[:timetable_entry_id]}" %>>
+            <%= t('employee_select') %><br>
+            <% @employees=[] %>
+            <div class="text-input-bg1"><%= select :employee ,:employee_id,
+                  @employees.map {|d| [d.name, d.id]},
+                  {:prompt => "#{t('select_employee')}"},
+                  {:onChange => "#{remote_function(:url => {:action => "employee_wise_timetable"},
+                  :with => "j('form').serialize()"  ,
+                  :before => "Element.show('loader')",
+                  :success => "Element.hide('loader')"
+                  )}"}%>
+            </div>
+        </div>
+        <div class="label-field-pair-swap">
+            <%= t('date_select') %><br>
+            <div class="text-input-bg-swap"><%= calendar_date_select_tag 'employee[date]', I18n.l(Date.today,:format=>:default),
+                  :year_range => 10.years.ago..10.years.from_now, :readonly=>true, :popup=>"force",
+                  :onChange => "#{remote_function(:url => {:action => "employee_wise_timetable"},
+                :with => "j('form').serialize()" 
+
+                )}"%>
+            </div>
+        </div>
+        <div class="loading">
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader",
+              :style =>"display: none;" ) %>
+        </div>
+    </div>
+    <div class="loading">
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+    </div>
+</form>
+<div id="timetable1"> </div>
+
+
+
+

@@ -1,0 +1,41 @@
+<div class="extender"></div>
+<div class="close_link"><%= link_to_function "#{t('close_text')}" ,:onclick=>"$('list_#{params[:employee_id]}').hide();$('entry_#{params[:employee_id]}').show();",:class=>"themed_text" %></div>
+<% unless @over_time_details.empty?  %>
+  <div class="over_time"><%="#{@over_time_details.count} +" unless @over_time_details.count==0 %></div>
+  <% @over_time_details.each do |ot| %>
+    <div class="field_pair">
+        <div class="label1"> <%= format_date(ot.date) %></div>
+        <div class="label2"> <span class="label_bold"><%=ot.timetable_entry.employees.present?? ot.timetable_entry.employees.map(&:full_name).join(',') : "#{t('deleted_user')}"%></span> <%= "&#x200E;(#{ot.timetable_entry.assigned_name} -"%><span class="label_bold"><%=" #{ot.timetable_entry.batch.full_name}" %></span>)&#x200E;</div>
+        <div class="label1">  <%= "#{format_date(ot.timetable_entry.class_timing.start_time,:format=>:time)}-#{format_date(ot.timetable_entry.class_timing.end_time,:format=>:time)}" %></div>
+        <div class="label2">  <%= t('replaced_by') %> <span class="label_bold"> <%= ot.employee.nil?? "#{t('deleted_user')}": ot.employee.full_name %></span> <%="&#x200E;(#{ot.subject.name} - "%><span class="label_bold"><%="#{ot.timetable_entry.batch.full_name}"%></span>)&#x200E;</div>
+    </div>
+  <% end %>
+<% end %>
+<% unless @over_time_details.empty? or @lagging_details.empty? %>
+  <div class="hor_line"></div>
+<% end %>
+<% unless @lagging_details.empty?  %>
+  <div class="lagging"><%= "#{@lagging_details.count} -" unless @lagging_details.count==0%></div>
+  <% p @lagging_details %>
+  <%@lagging_details.each do |lag| %>
+    <% timetable_swap = lag.timetable_swaps.select {|x| x.date.to_s == lag.date} %>            
+    <% if timetable_swap.present? %>
+      <% timetable_swap = timetable_swap.first %>
+      <div class="field_pair">
+          <div class="label1"><%=format_date(lag.date)  %></div>
+          <div class="label2"><span class="label_bold"><%= lag.employees.nil?? "#{t('deleted_user')}" : lag.employees.map(&:full_name).join(',') %></span><%= "&#x200E; (#{lag.assigned_name} - "%><span class="label_bold"><%="#{lag.batch.full_name}" %></span>)&#x200E;</div>
+          <div class="label1"><%= "#{format_date(lag.class_timing.start_time,:format=>:time)}-#{format_date(lag.class_timing.end_time,:format=>:time)}" %></div>
+          <div class="label2">
+              <% if timetable_swap.is_cancelled %>
+                <%= t('cancelled') %>
+              <% else %>
+                <%=t('replaced_by')%>
+                <span class="label_bold"> <%= timetable_swap.employee.nil??  "#{t('deleted_user')}" : timetable_swap.employee.full_name %></span> 
+                <%="&#x200E; (#{timetable_swap.subject.present? ? timetable_swap.subject.name : 'Cancelled'} - "%>
+                <span class="label_bold"><%="#{lag.batch.full_name}"%></span>)&#x200E;
+              <% end %>
+          </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

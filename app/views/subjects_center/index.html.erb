@@ -1,0 +1,44 @@
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="box">
+        <%if can_access_request? :course_subjects,:subjects_center%>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('course_subjects')}" ,:controller=>'subjects_center' , :action=>'course_subjects' %></div>
+              <div class="link-descr"><%= t('course_subjects_description') %></div>
+          </div>
+        <%end%>
+        
+        <%if can_access_request? :index, :subject_skill_sets%>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('skill_sets')}" ,:controller=>'subject_skill_sets' , :action=>'index' %></div>
+              <div class="link-descr"><%= t('skill_sets_desc') %></div>
+          </div>
+        <%end%>
+        
+        <%if can_access_request? :link_batches, :subjects_center%>
+          <div class="link-box">
+              <div class="link-heading"><%= link_to "#{t('link_batches')}" ,:controller=>'subjects_center' , :action=>'link_batches' %></div>
+              <div class="link-descr"><%= t('link_batches_desc') %></div>
+          </div>
+        <%end%>
+
+    </div>
+
+    <div class="extender"></div>
+</div>
+

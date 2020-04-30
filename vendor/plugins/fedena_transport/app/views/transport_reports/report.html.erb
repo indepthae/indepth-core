@@ -1,0 +1,36 @@
+<%= javascript_include_tag 'jquery.multiple.select' %>
+<%= stylesheet_link_tag 'multiple-select' %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('reports_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_report_center') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :transport_reports_report, @type %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div id="report_selectors">
+        <%= render :partial => "#{@type}_selectors" %>
+    </div>
+    <div id="report_results">
+    </div>
+    <div id="loading" class="substitute"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+        <span><%= "#{t('loading')}.." %></span>
+    </div>
+</div>
+<script type="text/javascript">
+  j('#search-form').find("#submit_button").click(function (event) {
+      submit_applicant_form(event);
+  });
+  function submit_applicant_form(e) {
+      e.preventDefault();
+      if(validate_search_form()){
+        j('#search-form').submit();
+      }
+  }
+</script>

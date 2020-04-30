@@ -1,0 +1,60 @@
+<div id="enclosure">
+  <h5 >If FA criteria are A, B & C and FA Group maximum marks are 100:</h5>
+  <table id="pdf-table">
+    <tr class="header">
+      <td><%= "FA Criterion" %></td>
+      <td><%= "Obtained Marks" %></td>
+      <td><%= "Maximum Marks" %></td>
+    </tr>
+
+    <tr>
+      <td><%= "A" %></td>
+      <td><%= "24" %></td>
+      <td><%= "30" %></td>
+    </tr>
+    <tr>
+      <td><%= "B" %></td>
+      <td><%= "8" %></td>
+      <td><%= "10" %></td>
+    </tr>
+    <tr>
+      <td><%= "C" %></td>
+      <td><%= "3" %></td>
+      <td><%= "5" %></td>
+    </tr>
+
+  </table>
+  <h5 >1. Sum</h5>
+  <div class="cgpas">
+    <div class="batch-wise"><div class="title"><%= "Formula" %> &nbsp; : </div><div class="val themed_text">&nbsp; A+B+C </div> </div>
+  </div>
+  <div>
+    <%=image_tag('cce/sum_eg.png')%>
+  </div>
+  <h5 >2. Average</h5>
+  <div class="cgpas">
+    <div class="batch-wise"><div class="title"><%= "Formula" %> &nbsp; : </div><div class="val themed_text">&nbsp; avg(A,B,C @conversion_factor) </div> </div>
+  </div>
+  <div class="info_text_regular">
+    where A, B & C are Formula Keys of FA criterion, @conversion_factor is the common mark to which the criterion marks are to be converted.
+  </div>
+  <div class="info_text_italic">
+    @conversion_factor is only required if Total Marks Mode is used.
+  </div>
+  <div>
+    <%=image_tag('cce/avg_eg.png')%>
+  </div>
+  <h5 >3. Best</h5>
+  <div class="cgpas">
+    <div class="batch-wise"><div class="title"><%= "Formula" %> &nbsp; : </div><div class="val themed_text">&nbsp; best(Count, A,B,C, @conversion_factor, :sum) </div> </div>
+  </div>
+  <div class="info_text_regular">
+    where Count is the number of best marks to be taken, A,B,C are Formula Keys of FA criterion, @conversion_factor is the common mark to which the criterion marks are converted and :sum indicates that the best marks taken should be summed up. If :sum is not given then the best marks are averaged by default.
+  </div>
+  <div class="info_text_italic">
+    Both @conversion_factor and :sum are only required if Total Marks Mode is used.
+  </div>
+  <div>
+    <%=image_tag('cce/best_eg.png')%>
+  </div>
+</div>

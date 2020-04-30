@@ -1,0 +1,210 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('employee_payslip') %></div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% case params[:from]
+          when "assigned_employees"
+          breadcrumb :employee_payslips_assigned_employees, [@employee_payslip, [@employee, @employee_payslip.payslips_date_range.payroll_group]]
+          when "assign_employees"
+          breadcrumb :employee_payslips_assign_employees, [@employee_payslip, [@employee, @employee_payslip.payslips_date_range.payroll_group]]
+          when "payslip_generation_list"
+          breadcrumb :employee_payslips_payslip_generation_list_view_payslip, [@employee_payslip.payslips_date_range.payroll_group,[@employee_payslip.payslips_date_range.start_date, @employee_payslip.payslips_date_range.end_date]]
+          when 'past_payslips'
+          breadcrumb :employee_payslips_payslip_generation_list_view_payslip_past, [@employee_payslip.payslips_date_range.payroll_group,[@employee_payslip.payslips_date_range.start_date, @employee_payslip.payslips_date_range.end_date]]
+          when 'payslip_employees'
+          breadcrumb :employee_payslips_rejected_payslips_view_payslip_finance, @employee_payslip
+          when 'payslip_group'
+          breadcrumb :group_payslips_rejected_payslips_view_payslip_finance, @employee_payslip
+          when 'payslip_reports'
+          breadcrumb :hr_payslip_reports_view_payslip, @employee_payslip
+          when 'employee_payslips_archived'
+          breadcrumb :employee_payslips_view_payslip_archived, [@employee, @employee_payslip]
+          else
+          breadcrumb :employee_payslips_view_payslip, [@employee, @employee_payslip]
+          end %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <h3><%= "#{t('employee_payslip').titleize}" %></h3>
+    <div id="left-sec">
+        <div class="fields-details" id="name">
+            <div class="field-label"><%= t('name') %></div>
+            <% archived =  if @employee_payslip.employee_type == 'ArchivedEmployee'
+              "<span class='archived'> #{t('archived')}</span>"
+            end%>
+            <div class="fields-val">: <b><%= "#{@employee.first_and_last_name} &#x200E;(#{@employee.employee_number})&#x200E; #{archived||''}" %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('department') %></div>
+            <div class="fields-val">: <%= @employee.employee_department.name %></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('position') %></div>
+            <div class="fields-val">: <%= @employee.employee_position.name %></div>
+        </div>
+        <% unless @employee.employee_grade.nil? %>
+          <div class="fields-details">
+              <div class="field-label"><%= t('grade') %></div>
+              <div class="fields-val">: <%= @employee.employee_grade.name %></div>
+          </div>
+        <% end %>
+    </div>
+    <div id="right-sec">
+        <div class="fields-details">
+            <div class="field-label"><%= t('pay_period') %></div>
+            <% date_range = @employee_payslip.date_range %>
+            <div class="fields-val">: <b><%= date_range %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('status') %></div>
+            <div class="fields-val">: <b><%= @employee_payslip.payslip_status %></b></div>
+        </div>
+        <div class="fields-details">
+            <div class="field-label"><%= t('payroll_group') %></div>
+            <div class="fields-val">: <%= @employee_payslip.payslips_date_range.payroll_group.name %></div>
+        </div>
+        <% if @employee_payslip.days_count.present? %>
+          <div class="fields-details">
+              <div class="field-label"><%= t('loss_of_pay') %></div>
+              <div class="fields-val">: <%= @employee_payslip.deducted_from_categories ? t('deduct_at_payroll_categories') : "#{t('as_a_deduction', :code => "LOPA")}" %></div>
+          </div>
+        <% end %>
+    </div>
+    <hr/>
+    <div id="attendance-details">
+        <% details_order = (@employee_payslip.days_count.present? ? [:no_of_working_days, :no_of_days_present, :no_of_days_absent, :loss_of_pay_leaves] : [:no_of_working_days, :no_of_days_present, :no_of_days_absent]) %>
+        <% details_order.each do |key| %>
+          <div class="fields-details">
+              <div class="field-label"><%= t(key) %></div>
+              <div class="fields-val"><%= @attendance_details[key] %></div>
+          </div>
+        <% end %>
+    </div>
+    <hr/>
+    <% payroll_earnings = 0 %>
+    <% payroll_deductions = 0 %> 
+    <div class="sections">
+        <h3><%= t('payslip_details') %></h3>
+        <table cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name" id="col1"><%= t('earnings') %></td>
+                <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                  <td class="value" id="col2"><%= "#{t('actual_amount')} &#x200E;(#{@currency_type})&#x200E;" %></td>
+                <% end %>
+                <td class="value" id="col3"><%= "#{t('credited')} &#x200E;(#{@currency_type})&#x200E;" %></td>
+            </tr>
+
+            <% earnings = @employee_payslip.employee_payslip_categories.select{|c| !c.payroll_category.is_deduction} %>
+            <% earnings.each do |cat|  %>
+              <tr>
+                  <td><%= cat.payroll_category.name %></td>
+                  <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                    <% pay_amount = @payroll_revision["salary_components"][cat.payroll_category_id] %>
+                    <% payroll_earnings += pay_amount.to_f %>
+                    <td class="amount"><%= precision_label(pay_amount) %></td>
+                  <% end %>
+                  <td class="amount"><%= cat.amount %></td>
+              </tr>
+            <% end %>
+            <% @individual_payslips.select{|c| !c.is_deduction}.each do |cat|  %>
+              <tr>
+                  <td><%= cat.name %></td>
+                  <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                    <td class="amount"><%= "-" %></td>
+                  <% end %>
+                  <td class="amount"><%= cat.amount %></td>
+              </tr>
+            <% end %>
+            <tr class="total-amount">
+                <td><b><%= "#{t('total_salary').titleize}" %></b></td>
+                <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                  <td class="amount"><b><%= precision_label(payroll_earnings) %></b></td>
+                <% end %>
+                <td class="amount"><b><%= @employee_payslip.total_earnings %></b></td>
+            </tr>
+        </table>
+    </div>
+    <div class="sections">
+        <table cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('deductions') %></td>
+                <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                  <td class="value"><%= "#{t('actual_amount')} &#x200E;(#{@currency_type})&#x200E;" %></td>
+                <% end %>
+                <td class="value"><%= "#{t('deducted')} &#x200E;(#{@currency_type})&#x200E;" %></td>
+            </tr>
+            <% deductions = @employee_payslip.employee_payslip_categories.select{|c| c.payroll_category.is_deduction} %>
+            <% deductions.each do |cat|  %>
+              <tr>
+                  <td><%= cat.payroll_category.name %></td>
+                  <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                    <% pay_amount = @payroll_revision["salary_components"][cat.payroll_category_id] %>
+                    <% payroll_deductions += pay_amount.to_f %>
+                    <td class="amount"><%= precision_label(pay_amount) %></td>
+                  <% end %>
+                  <td class="amount"><%= cat.amount %></td>
+              </tr>
+            <% end %>
+            <% if @employee_payslip.lop.present? %>
+              <tr>
+                  <td><%= t('loss_of_pay') %></td>
+                  <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                    <td class="amount"><%= "-" %></td>
+                  <% end %>
+                  <td class="amount"><%= @employee_payslip.lop %></td>
+              </tr>
+            <% end %>
+            <% @individual_payslips.select{|c| c.is_deduction}.each do |cat|  %>
+              <tr>
+                  <td><%= cat.name %></td>
+                  <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                    <td class="amount"><%= "-" %></td>
+                  <% end %>
+                  <td class="amount"><%= cat.amount %></td>
+              </tr>
+            <% end %>
+            <tr class="total-amount">
+                <td><b><%= "#{t('total_deduction').titleize}" %></b></td>
+                <% if @employee_payslip.deducted_from_categories and @payroll_revision.present? %>
+                  <td class="amount"><b><%= precision_label(payroll_deductions) %></b></td>
+                <% end %>
+                <td class="amount"><b><%= @employee_payslip.total_deductions %></b></td>
+            </tr>
+        </table>
+        <table class="net_pay_row" cellpadding="1" cellspacing="1">
+            <tr class="net_pay_row total-amount">
+                <td id="net-pay" colspan="2"><b><%= "#{t('net_pay').titleize}" %></b></td>
+                <td class="value amount"><b><%= @employee_payslip.net_pay %></b></td>
+            </tr>
+        </table>
+    </div>
+    <% if @employee_payslip.is_rejected %>
+      <% rejector = @employee_payslip.rejector %>
+      <div id="rejection-remarks">
+          <div id="remarks-head"><b><%= "#{t('rejection_remarks')} #{t('by')} "  %></b><%= rejector.present? ? "#{rejector.full_name} &#x200E;(#{rejector.username})&#x200E;" : "#{t('deleted_user')}" %></div>
+          <div id="remarks-desc"><%= @employee_payslip.reason.present? ? @employee_payslip.reason : '-' %></div>
+      </div>
+    <% end %>
+    <div class="footnote">
+        <% if @info.present? %>
+          <p><%= @info %></p>
+        <% end %>
+    </div>
+    <% unless @employee_payslip.is_approved %>
+      <% if params[:finance].nil? and permitted_to? :revert_employee_payslip, :employee_payslips %>
+        <%= link_to t('delete_payslip'), {:action => 'revert_employee_payslip', :id => @employee_payslip.id, :from => params[:from]}, :class => "submit-button", :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => @employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+      <% end %>
+    <% end %>
+    <%= link_to t('pdf_report'), {:action => 'view_payslip_pdf', :id => @employee_payslip.id}, :class => "submit-button", :target => "_blank" %>
+</div>
+<script type="text/javascript">
+  j(document).ready(function(){
+      net_pay_wid = j('#col1').outerWidth() + j('#col2').outerWidth();
+      j('#net-pay').outerWidth(net_pay_wid);
+  });
+</script>

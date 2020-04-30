@@ -1,0 +1,65 @@
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<% if @paid_fees_collections.present? %>
+<div id="payments_details">
+  <div class="label-field-pair3">
+    <label><%= t('payment_history') %> </label>
+  </div>
+
+  <% if @paid_fees_collections.present? %>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0" >
+      <tr class="main-head tr-list_head">
+        <td><%= t('receipt_no') %></td>
+        <td class="set_border_right"><%= t('payment_date') %></td>
+        <td class="set_border_right"><%= t('payment_mode') %></td>
+        <td class="set_border_right"><%= t('payment_notes') %></td>
+        <% unless @current_user.student? or @current_user.parent? %>
+          <td class="set_border_right"><%= t('cashier') %></td>
+        <% end %>
+        <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+        <%unless @payer_type.present? and @payer_type=="Archived Student"%>
+          <td class="set_border_right col-3" ></td>
+        <%end%>
+      </tr>
+      <% i = 0 %>
+      <% @paid_fees_collections.each do |f| %>
+          <tr class="row-b">
+              <td class="col-3"><%= f.transaction_receipt.present? ? f.transaction_receipt.ef_receipt_number : " "%></td>
+              <td class="set_border_right col-3">
+                  <%= format_date(f.date_of_advance_fee_payment) %>
+              </td>
+              <td class="set_border_right col-3">
+                  <%= "#{f.payment_mode} #{ f.reference_no.present? ? '- ' + f.reference_no : ''}" %>
+              </td>
+              <td class="set_border_right col-2"><%= f.payment_note %></td>
+              <% unless @current_user.student? or @current_user.parent? %>
+                <td class="set_border_right col-3">
+                    <%= f.payment_mode=='Online Payment' ? f.get_cashier_name : f.cashier_name %>
+                </td>
+              <% end %>
+
+              <td class="set_border_right col-3 align_right">
+                  <%= precision_label(f.fees_paid.to_f) %>
+              </td>
+
+              <% if @current_user %>
+                <td class="set_border_right col-3 receipt-actions">
+                  <%= receipt_options(f.id) %>
+                  <% if @current_user.admin? %>
+                    <%= link_to raw('<span class="revert_icon_img"></span>'), '#',
+                      :onclick => "return MakeBox(#{f.id}, #{f.student_id});",:class=>"themed_text", :tooltip=>t('revert_transaction') %>
+                  <% end %>
+                </td>
+              <% end %>
+          </tr>
+          <% end %>
+    </table>
+    <%= will_paginate @paid_fees_collections, :renderer=>'RemoteLinkRenderer', :params => {:controller => "advance_payment_fees", :action => "payment_history", :student_id => @student.id} %>
+  <% else %>
+    <div class="no_entries"><%= t('no_records_found') %></div>
+  <% end %>
+</div>
+<% end %>

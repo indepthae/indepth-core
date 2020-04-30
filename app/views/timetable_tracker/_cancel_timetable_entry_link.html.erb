@@ -1,0 +1,14 @@
+<% tte ||= @timetable_entry %>
+<% tt_swap ||= @timetable_swap %>
+<% swap_date ||= @timetable_swap.date %>
+<% timetable_swap_id ||= params[:timetable_swap_id] %>
+<%  type ||= @swapping_type %> 
+<%  employee_wise_id ||= @employee.id %>
+<%= link_to raw('Cancel Class'), '#',  :onclick => "return MakeBox(#{tte.id},'#{swap_date}', #{tte.batch_id}, '#{timetable_swap_id}', '#{employee_wise_id}' ,'#{type}');", :class=>"swap_themed_text", :tooltip => t('cancel_class') %>
+<!-- %=link_to_remote "#{t('cancel_class')}", :url=>{:action=>'cancel_timetable_period',:timetable_entry_id=>tte.id,:batch_id => tte.batch_id, :date=>swap_date},:success=>"$('cancel_entry_#{tte.id}').hide();$('link_#{tte.id}').show();" ,:html=>{:class=>"themed_text"},:confirm => t('delete_confirm_msg')% -->
+<div id="notify_alerts" style="display: none">
+  <%= render :partial => 'alert_notify' %>
+</div>
+<script type="text/javascript">
+  
+</script>

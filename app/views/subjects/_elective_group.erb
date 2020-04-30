@@ -1,0 +1,29 @@
+<tbody class="<%= (klass == 'level-1') ? 'disable_sort' : ''%>">
+  <tr class="<%= klass %> disable_sort" id="elective_group-<%= e_group.id %>">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= e_group.name %></div>
+          <div class="component_link component_type">
+              <%= t('elective_group').titleize %>
+          </div>
+          <div class="col-37 pull-right" id="operations">
+              <div class="link_button pull-left links">
+                  <% unless e_group.dependency_present? %>
+                    <%= link_to_remote(t('delete'),
+                      :url => {:controller=>'subjects',:action=>'destroy_elective_group',:id=>e_group.batch_id,:id2=>e_group.id},
+                      :method => 'delete',
+                      :confirm => t('delete_confirm_msg'),
+                      :update => "header_links-#{e_group.id}",
+                      :success => "j('.header_links-#{e_group.id}').remove();")
+                    %>
+                  <% else %>
+                    <%= "<strike>#{t('delete_text')}</strike>" %>
+                  <% end %>
+              </div>
+          </div>
+      </td>
+  </tr>
+  <% e_group.subjects.select{|s| !s.is_deleted }.each do |sub| %>
+      <%= render :partial => 'subject', :locals => {:subject => sub, :klass =>(klass == 'level-1' ) ? 'level-2' : 'level-3', :tbody_required => false} %>
+  <% end %>
+</tbody>

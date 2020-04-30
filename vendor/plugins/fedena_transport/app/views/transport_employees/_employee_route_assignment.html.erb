@@ -1,0 +1,21 @@
+<p><%= t('this_employee_is_assigned_to_routes') %></p>
+<ul id="category-list">
+    <li class="listheading">
+        <div class="heading-no"><%= t('assigned_routes') %></div>
+        <% if permitted_to? :index, :transport_employees %>
+          <%= link_to t('manage_drivers'), {:controller => 'transport_employees', :action => 'index'} %>
+        <% end %>
+    </li>
+
+    <% @employee.routes.each do |route| %>
+      <li class="list<%=cycle('odd', 'even')%>">
+          <div class="category-number">
+              <% if permitted_to? :show, :routes %>
+                <%= link_to route.name, {:controller => 'routes', :action => 'show', :id => route.id} %>
+              <% else %>
+                <%= route.name %>
+              <% end %>
+          </div>
+      </li>
+    <% end %>
+</ul>

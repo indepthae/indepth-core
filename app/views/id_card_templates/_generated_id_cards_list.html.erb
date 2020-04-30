@@ -1,0 +1,99 @@
+<div class="content">
+  <div class="generated_id_cards">
+    <table class="primary">
+      <tr>
+        <th><%= t('sl_no') %></th>
+        <% if @id_card_template.user_type == 1 %>
+          <th> <%= t('student_name') %> </th>
+          <th> <%= t('admission_no') %> </th>
+        <% elsif @id_card_template.user_type == 2 %>
+          <th> <%= t('employee_name') %> </th>
+          <th> <%= t('employee_no') %> </th>
+        <% else %>
+          <th> <%= t('guardian_name') %> </th>
+        <%end%>
+        <th> <%= t('date_text') %> </th>
+        <th  class="links"> </th>
+      </tr>
+      <%if @generated_id_cards.present? %>
+      <%sl_no = ((params[:page].present? ? params[:page].to_i - 1 : 0)* @per_page ) + 1 %>
+      <%@generated_id_cards.each do |c|%>
+      <tr <%= "class='currently_created'" if params[:currently_created_single].present? && c.id == params[:currently_created_single].to_i %>>
+        <td  class="center_text"><%= sl_no %></td>
+        <%sl_no = sl_no + 1%>
+        <%issued_for = c.get_issued_for%>
+        <% if @id_card_template.user_type == 1 %>
+          <td><%= issued_for.full_name if issued_for.present? %></td>
+          <td  class="center_text"><%= issued_for.admission_no if issued_for.present? %>
+        <% elsif @id_card_template.user_type == 2 %>
+          <td><%= issued_for.full_name if issued_for.present? %></td>
+          <td  class="center_text"><%= issued_for.employee_number if issued_for.present? %></td>
+        <% else %>
+          <td><%= issued_for.full_name if issued_for.present? %></td>
+        <%end%>
+        <td class="center_text"><%= format_date(c.issued_on) %></td>
+        <td class="center_text">
+          <%if c.generated_pdfs.present? %>
+            <% a4_link = c.generated_pdfs.select{|g| g.style=="a4"}.first.pdf.url(:original,false) %>
+            <% card_size_link = c.generated_pdfs.select{|g| g.style=="card_size"}.first.pdf.url(:original,false) %>
+          <%else%>
+            <% a4_link = generate_id_card_pdf_id_card_templates_path(:id=>c.id) %>
+            <% card_size_link = generate_id_card_pdf_id_card_templates_path(:id=>c.id, :single_page_enabled=>true) %>
+          <%end%>
+          <%=link_to t('a4_canvas'), a4_link, :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+          <%=link_to t('single_card_size'), card_size_link, :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+          <%=link_to t('delete'), delete_generated_id_card_id_card_templates_path(:id=>c.id,:page=>params[:page]), :class=>"themed_text delete_links_single" %>
+        </td>
+      </tr>
+      <%end%>
+      
+      <%else%>
+      <tr>
+        <% if @id_card_template.user_type == 1 %>
+          <td class="center_text" colspan="5"> <%= t('no_generated_id_card_present') %> </td>
+        <% elsif @id_card_template.user_type == 2 %>
+          <td class="center_text" colspan="5" > <%= t('no_generated_id_card_present') %> </td>
+        <% else %>
+          <td class="center_text" colspan="4" > <%= t('no_generated_id_card_present') %> </td>
+        <%end%>
+      </tr>
+      <%end%>
+      </table>
+      <div class="paginate_box">
+        <%= will_paginate @generated_id_cards, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "id_card_templates",:action => "generated_id_cards_list",
+          :id_card_template_id => params[:id_card_template_id], :academic_year_id => params[:academic_year_id] }%>
+      </div>
+    
+    </div>
+  </div>
+  
+  <script>
+  var pass_through = false;
+  function delete_confirmed(elem) {
+    (function () {
+
+      var e = elem;
+
+      j('#yes').click(function () {
+        remove_popup_box();
+        pass_through = true;
+        e.click();
+        pass_through = false;
+      });
+    })();
+  }
+
+  j(".delete_links_single").click(function (e) {
+    if (pass_through == false) {
+      e.preventDefault();
+    }
+    make_popup_box(this, 'confirm', "<%=t('delete_generated_id_card_desc')%> ", {
+      'ok': "<%=t('delete')%>",
+      'cancel': "<%=t('cancel')%>",
+      'title': "<%=t('delete_generated_id_card')%>",
+      'popup_class': 'remove_lt',
+      'return_status': true
+    });
+    return delete_confirmed(this);
+  });
+  </script>

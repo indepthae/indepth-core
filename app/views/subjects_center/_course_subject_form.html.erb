@@ -1,0 +1,94 @@
+<% remote_form_for @component, :url => {:action => @component.new_record? ? 'create_component' : 'update_component', :type => 'course_subject', :id => @component.id, :course_id => @course.id}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |c| %>
+  <%= session_fingerprint_field %> 
+  <%= c.hidden_field :parent_id %>
+  <%= c.hidden_field :parent_type %>
+  <%= c.hidden_field :course_id, :value => @course.id %>
+  <div id="subject_group_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('course_subject_name') %></label>
+          <div class="text-input-bg"><%= c.text_field :name  %></div>
+      </div>
+      <div class="label-field-pair-group flex pull-left">
+          <div class="label-field-pair">
+              <label for="name"><%= t('code') %></label>
+              <div class="text-input-bg"><%= c.text_field :code  %></div>
+          </div>
+          <div class="label-field-pair">
+              <label for="name"><%= t('max_weekly_classes') %></label>
+              <div class="text-input-bg"><%= c.text_field :max_weekly_classes  %></div>
+          </div>
+      </div>
+      <% if (@course.cwa_enabled? or @course.gpa_enabled?) %>
+        <div class="label-field-pair">
+            <label for="name"><%= t('credit_hours') %></label>
+            <div class="text-input-bg"> <%= c.text_field :credit_hours %></div>
+        </div>
+      <% end %>
+      
+      <div class="label-field-pair">
+        <div class="label-container pull-left"><label><%= t('is_activity') %></label></div>
+        <div class="input-container pull-left"><%= c.check_box :is_activity, :onchange => 'toggle_skill_set(this)' %></div>
+      </div>
+      
+      <div class="label-field-pair" id="skill_selector" style="display: <%= c.object.is_activity? ? 'none' : 'block'%>">
+            <div class="label-container pull-left"><label><%= t('select_skill_set') %></label></div>
+            <div class="input-container pull-left">
+                  <%= c.select :subject_skill_set_id, @skill_sets.map{|s| [s.name, s.id]}, 
+                            {:include_blank => t('choose_a_skill_set')} %>
+            </div>
+      </div>
+      <div class="label-field-pair">
+          <div class="label-container pull-left"><label><%= t('no_exam') %></label></div>
+          <div class="input-container pull-left"><%= c.check_box :no_exams %></div>
+      </div>
+      <div class="label-field-pair">
+          <div class="label-container pull-left"><label><%= t('exclude_for_final_score') %></label></div>
+          <div class="input-container pull-left"><%= c.check_box :exclude_for_final_score %></div>
+      </div>
+      <%if @course.cce_enabled? %>
+        <div class="label-field-pair">
+            <div class="label-container pull-left"><label>6<sup>th</sup> <%= t('subject') %></label></div>
+            <div class="input-container pull-left"><%= c.check_box :is_sixth_subject%></div>
+        </div>
+        <div class="label-field-pair">
+            <div class="label-container pull-left"><label><%= t('asl_subject') %></label></div>
+            <div class="input-container pull-left"><%= c.check_box :is_asl,{:onclick=>'get_asl_mark_field(this)'} %></div>
+        </div>
+        <div class="label-field-pair_exp pull-left<%= c.object.is_asl? ? '' : ' no_show' %>" id="asl_mark">
+            <div class="label-container pull-left"><label>ASL Mark</label></div>
+            <div class="student_gender_value pull-left">
+                <%= c.radio_button  "asl_mark", 20,:checked=>true , :class => 'pull-left'%>
+                <label class="label_for_gender margin_right_20 pull-left" for="subject_asl_mark_20">20 Marks</label>
+                <%= c.radio_button  "asl_mark", 10 , :class=> 'pull_left'%>
+                <label class="label_for_gender" for="subject_asl_mark_10">10 Marks</label>
+            </div>
+        </div>
+      <%end%>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{head}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlay').click(remove_popup_box);
+    
+    get_asl_mark_field = function(e){
+      if (j(e).prop('checked') == true){
+        j('#asl_mark').removeClass('no_show');
+      }
+      else{
+        j('#asl_mark').addClass('no_show');
+      }
+    }
+    
+    toggle_skill_set = function(e) {
+      if(j(e).is(':checked')){
+        j('#skill_selector').hide();
+        j('#course_subject_subject_skill_set_id').val('');
+      }else{
+        j('#skill_selector').show();
+      }
+    }
+</script>

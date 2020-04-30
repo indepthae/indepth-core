@@ -1,0 +1,24 @@
+<% unless @instant_fee_categories.blank? %>
+  <div class="extender"></div>
+  <div id="information">
+    <table class="sortable" id="listing" width="100%">
+      <tr class="tr-head">
+        <th class="col-sl"><%= t('sl_no') %></th>
+        <th class="col-2"> <%= t('category_name') %></th>
+        <th class="col-2"><%= t('description') %></th>
+        <th class="col-2"><%= t('select') %></th>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% @instant_fee_categories.each_with_index do |category,index| %>
+        <tr class="tr-<%= cycle('odd','even') %>">
+          <td class="col-sl"><%= index +=1 %></td>
+          <td class="col-2"><%= link_to "#{category.name}", :controller=>"instant_fees", :action=>"list_particulars", :id=>category.id %></td>
+          <td class="col-2"><%= link_to "#{category.description}", :controller=>"instant_fees", :action=>"list_particulars", :id=>category.id %></td>
+          <td class="options"><%= link_to_remote "#{t('delete_text')}", :url=>{:controller => "instant_fees", :action => "delete_category",:id => category.id}, :confirm => "#{t('are_you_want_to_delete_category')}" %><%= link_to_remote "#{t('edit_text')}", :url=> {:controller => "instant_fees", :action => "edit_category",:id => category.id} %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_default_category_exist') %>.</p>
+  <% end %>
+</div>

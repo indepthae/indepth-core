@@ -1,0 +1,102 @@
+<div class="tooltip_content">
+    <div class="tooltip_head">
+        <div class="emp_name">
+            <%=  truncate(@employee.full_name, :length => 25, :omission => '...' ) %>
+        </div>
+        <div class="current_date">
+            <%= format_date(params[:date].to_date, :format=>:long) %>
+        </div>
+    </div>
+    <% unless @timetable_entries.blank? and @emp_swaps.blank? %>
+      <% @timetable_entries.each do |i , v| %>
+        <div class="batch_name">
+            <span class="tooltip_headings">  <%= t('batch') %>: </span> <%= truncate(v.first.batch.name, :length => 34, :omission => '...' ) %>
+        </div>
+        <div class="classes">
+            <% v.each do | tte| %> 
+              <div class="class_time_title"> 
+                  <div class="tooltip_headings">  <%= t('class_time')%></div>
+              </div>
+              <div class="class_subject_title">
+                  <div class="tooltip_headings"><%= t('class_subject')  %></div>
+              </div>
+              <% if @current_class_timing.start_time == tte.class_timing.start_time and @current_class_timing.end_time == tte.class_timing.end_time %>
+                <div class="overlap_class">
+                    <div class="class_time"> <%= "#{format_date(tte.class_timing.start_time,:format=>:time)} -
+        #{format_date(tte.class_timing.end_time,:format=>:time)}" %>  </div>
+                    <div class="subject_name"> <%= truncate(tte.assigned_name, :length => 25, :omission => '...' )%> </div>
+                </div>
+              <% else %>
+                <div class="">
+                    <div class="class_time"> <%= "#{format_date(tte.class_timing.start_time,:format=>:time)} -
+        #{format_date(tte.class_timing.end_time,:format=>:time)}" %>  </div>
+
+                    <div class="subject_name"> <%= truncate(tte.assigned_name, :length => 25, :omission => '...' )%> </div>
+                </div>
+              <% end %>
+            <% end %>
+            <% @emp_swaps.each do |es| %>
+              <% if  @emp_swaps.present? and es.batch_id.to_i == i %>
+                <% if "#{format_date(@current_class_timing.start_time,:format=>:time)}" == es.start_time and "#{format_date(@current_class_timing.end_time,:format=>:time)}" == es.end_time %>
+                  <div class="overlap_class">
+                      <div class="class_time">   <%=  es.start_time  %> - <%= es.end_time %> </div>
+                      <div class="subject_name"> <%= truncate(es.subject.name,:length => 25, :omission => '...' )%> </div>
+                  </div>
+                <% else %>
+                  <div class="tooltip_swapped_class">
+                      <div class="class_time">   <%=  es.start_time  %> - <%= es.end_time %> </div>
+                      <div class="subject_name"> <%= truncate(es.subject.name,:length => 25, :omission => '...' )%> </div>
+                  </div>
+                <% end %>
+              <% end %>
+            <% end %>
+        </div>
+      <% end %>
+      <% @emp_swaps.each do |es| %>
+        <% unless  @timetable_entries.keys.include?(es.batch_id.to_i)  %>
+          <div class="batch_name">
+              <span class="tooltip_headings">  <%= t('batch') %>: </span> <%= truncate(es.batch_name, :length => 30, :omission => '...' )  %>
+          </div>
+          <div class="class_time_title"> 
+              <div class="tooltip_headings">  <%= t('class_time')%></div>
+          </div>
+          <div class="class_subject_title">
+              <div class="tooltip_headings"><%= t('class_subject')  %></div>
+          </div>
+          <% if "#{format_date(@current_class_timing.start_time,:format=>:time)}" == es.start_time and "#{format_date(@current_class_timing.end_time,:format=>:time)}" == es.end_time %>
+            <div class="overlap_class classes">
+                <div class="class_time">   <%=  es.start_time  %> - <%= es.end_time %> </div>
+                <div class="subject_name"> <%= truncate(es.subject.name, :length => 25, :omission => '...' )%> </div>  
+            </div>
+          <% else %>
+            <div class="class_name_time classes">
+                <div class="class_time">   <%=  es.start_time  %> - <%= es.end_time %> </div>
+                <div class="subject_name"> <%= truncate(es.subject.name, :length => 25, :omission => '...' )%> </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="available_teacher">
+          <%=  @employee.full_name %>  <%=   t('not_classes') %> 
+      </div>
+    <% end %>
+    <% if @events.present? %>
+      <div class="events">
+          <div class="tooltip_headings">
+              <div class="event_time"> <%= t('event_time')%></div>    
+              <div class="event_name"><%= t('event_name')%></div>
+          </div>
+      </div>
+    <% end %>
+
+    <% @events.each do |e| %>
+      <div class="events_list">
+          <div class="event_date_time">
+              <%= "#{format_date(e.start_date,:format=>:time)} -
+             #{format_date(e.end_date,:format=>:time)}" %> 
+          </div>
+          <div class="event_title"> <%= truncate(e.title, :length => 26, :omission => '...' )%> </div>
+        <% end %>
+    </div>  
+</div>

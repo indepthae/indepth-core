@@ -1,0 +1,35 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<%if @inactive_batches.empty? %>
+  <h4 align="center" style= "padding-right:21px"><%= t('no_inactive_batches_found') %></h4>
+<% else %>
+   <div class="update_batch_list">
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+       <tr class="tr-head tr_head_style">
+           <td class="batch_list_font"><%= t('sl_no') %></td>
+           <td class="batch_list_font"><%= t('batch_name') %></td>
+           <td class="batch_list_font"><%= t('option') %></td>
+       </tr>
+       <tr class="tr-blank tr_blank_style">
+
+       </tr>
+      <% @inactive_batches.each_with_index do |batch,i| %>
+       <tr id="<%=batch.id%>" class=" tr-<%= cycle('odd', 'even') %>" style="height: 40px;">
+          <td class="col-1">
+              <%= ((params[:page].to_i-1)*@inactive_batches.per_page.to_i)+(i+1)%>
+          </td>
+          <td class="col-2">
+            <div class="category-name"><%= batch.full_name %></div>
+          </td>
+          <td class="col-1">
+            <div id="activate_button"><%= link_to_remote "#{t('activate')}", :html=>{:class=>'themed_text'},:confirm=>"Are you sure?",:url=>{:params=>{:type=>"inactive"},:action=>'inactivate_batch', :id=>batch.id, :page=>params[:page]}%></div>
+          </td>
+       </tr>
+      <% end %>
+    </table>
+      <%= will_paginate @inactive_batches,:params =>{:action=>'update_batch',:course_name=>@course_id,:type=>"inactive_batch"}, :renderer=>'RemoteLinkRenderer'%>
+    </div>
+<% end %>

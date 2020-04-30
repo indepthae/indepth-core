@@ -1,0 +1,129 @@
+<div class="available_sections">
+  <div class="section photo-section">
+
+    <h4 class="section-heading"><%= t('basic_information') %></h4>
+    <%= attr_pair(t('application_date'),format_date(@applicant.created_at,:format => :long_date))  %>
+    <%= attr_pair(t('last_name'),@applicant.last_name) %>
+    <%= attr_pair(t('middle_name'),@applicant.middle_name) %>
+    <%= attr_pair(t('first_name'),@applicant.first_name) %>
+    <%= attr_pair(t('application_status'),@applicant.status.capitalize) %>
+    <%= attr_pair(t('application_fee'),@applicant.has_paid ? t('paid') : t('not_paid')) %>
+    <%= attr_pair(t('gender'),@applicant.gender.downcase=="m" ? t('male') : t('female')) %>
+    <%= attr_pair(t('nationality'),@applicant.nationality.name)  if @applicant.nationality.present?%>
+    <% if !course_pin_system_registered_for_course(@applicant.registration_course.course_id) %>
+      <%= attr_pair(t('pin_no'),@applicant.pin_number)  unless @applicant.pin_number.nil? %>
+    <% end %>
+    <%= attr_pair(t('registration_amount'),@applicant.amount) %>
+    <%= attr_pair(t('online_transaction_id'),@online_transaction_id) %>
+  </div>
+  <div class="section">
+    <h4 class="section-heading"><%= t('admission_information') %></h4>
+    <%= attr_pair(t('course'),@applicant.registration_course.course.full_name) %>
+    <%= attr_pair(t('reg_no'),@applicant.reg_no) %>
+  </div>
+  <div class="extender"></div>
+  <div class="section">
+
+    <h4 class="section-heading"><%= t('contact_information') %></h4>
+    <% if @applicant.address_line1.present? %>
+      <%= attr_pair(t('address'),@applicant.address_line1 + ", "+ @applicant.address_line2 ) %>
+    <% else %>
+      <%= attr_pair(t('address'),@applicant.address_line1 + @applicant.address_line2 ) %>
+    <% end %>
+    <%= attr_pair(t('city'),@applicant.city) %>
+    <%= attr_pair(t('state'),@applicant.state) %>
+    <%= attr_pair(t('zip_code'),@applicant.pin_code) %>
+    <%= attr_pair(t('country'),@applicant.country.name) %>
+    <%= attr_pair(t('phone'),@applicant.phone1) %>
+    <%= attr_pair(t('mobile'),@applicant.phone2) %>
+    <%= attr_pair(t('email'),@applicant.email) %>
+    <%= attr_pair(t('date_of_birth'),format_date(@applicant.date_of_birth)) %>
+  </div>
+  <div class="extender"></div>
+  <% unless @applicant.applicant_guardian.blank? %>
+    <% applicant_guardian = @applicant.applicant_guardian %>
+    <div class="section">
+      <h4 class="section-heading"><%= t('guardian_information') %></h4>
+      <%= attr_pair(t('first_name'),applicant_guardian.first_name) %>
+      <%= attr_pair(t('last_name'),applicant_guardian.last_name) %>
+      <%= attr_pair(t('relation'),applicant_guardian.translated_relation) %>
+      <%= attr_pair(t('occupation'),applicant_guardian.occupation) %>
+      <%= attr_pair(t('income'),applicant_guardian.income) %>
+      <%= attr_pair(t('education'),applicant_guardian.education) %>
+      <%= attr_pair(t('dob'),format_date(applicant_guardian.dob)) %>
+    </div>
+    <div class="extender"></div>
+    <div class="page-break"></div>
+    <div class="section">
+      <h4 class="section-heading"><%= t('guardian_contact_information') %></h4>
+      <% if applicant_guardian.office_address_line1.present? %>
+        <%= attr_pair(t('address'),applicant_guardian.office_address_line1 + ", "+ applicant_guardian.office_address_line2 ) %>
+      <% else %>
+        <%= attr_pair(t('address'),applicant_guardian.office_address_line1 + applicant_guardian.office_address_line2 ) %>
+      <% end %>
+      <%= attr_pair(t('city'),applicant_guardian.city) %>
+      <%= attr_pair(t('state'),applicant_guardian.state) %>
+      <%= attr_pair(t('country'),applicant_guardian.country.name) %>
+      <%= attr_pair(t('office_phone1'),applicant_guardian.office_phone1) %>
+      <%= attr_pair(t('office_phone2'),applicant_guardian.office_phone2) %>
+      <%= attr_pair(t('mobile'),applicant_guardian.mobile_phone) %>
+      <%= attr_pair(t('email'),applicant_guardian.email) %>
+    </div>
+  <% end %>
+  <div class="extender"></div>
+  <% unless @applicant.applicant_previous_data.blank? %>
+    <% previous_data = @applicant.applicant_previous_data %>
+    <div class="section">
+      <h4 class="section-heading"><%= t('last_attended_institution_details') %></h4>
+      <%= attr_pair(t('last_attended_school'),previous_data.last_attended_school) %>
+      <%= attr_pair(t('qualifying_exam'),previous_data.qualifying_exam) %>
+  <%#= attr_pair(t('qualifying_exam_year'),previous_data.qualifying_exam_year) %>
+      <%= attr_pair(t('qualifying_exam_roll'),previous_data.qualifying_exam_roll) %>
+      <%= attr_pair(t('qualifying_exam_final_score'),previous_data.qualifying_exam_final_score) %>
+    </div>
+  <% end %>
+  <div class="extender"></div>
+  <div class="section">
+    <h4 class="section-heading themed_text"><%= t('additional_detail') %></h4>
+    <% @additional_details.each do |additional_data| %>
+      <%= attr_pair(additional_data.additional_field.try(:name),additional_data.additional_info) %>
+    <% end %>
+  </div>
+  <div class="extender"></div>
+  <% unless @applicant.registration_course.applicant_addl_field_groups.blank? %>
+    <% @applicant.registration_course.applicant_addl_field_groups.active.each do |grp| %>
+      <div class="extender"></div>
+      <div class="section">
+        <h4 class="section-heading"><%= grp.name %></h4>
+        <% grp.applicant_addl_fields.active.each do |f| %>
+          <% opt= @addl_values.select{|s| s.applicant_addl_field_id==f.id} %>
+          <% v = opt.blank? ? "-" : opt.first.value%>
+          <%= attr_pair(f.field_name,v) %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<script type="text/javascript">
+  var body = document.body,
+  html = document.documentElement;
+  var pg_height = 0;//Magic number.. TADA
+  var page = new Element('div',{'class' : 'page'});
+  var pageBreak = new Element('div',{'class' : 'page-break'});
+  var insertPageBreak = function(){body.appendChild(pageBreak.cloneNode(true))};
+  var insertPage = function(){body.appendChild(page.cloneNode(true));};
+  var currPage = function(){return $$('.page').last()}
+  $$('.available_sections .section').each(function(el){
+    if(currPage() == null){
+      insertPage();//first page
+    }
+    a = parseInt(el.getHeight());
+    b = parseInt(currPage().getHeight());
+    c = a+b;
+    if(c>pg_height){
+      insertPage();
+    }
+    currPage().appendChild(el);
+  });
+</script>
+

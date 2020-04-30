@@ -1,0 +1,7 @@
+<fieldset>
+  <label>
+    <%= link_to @domain.domain,"http://#{@domain.domain}",:target=>"_blank" %>
+  </label>
+  <%= link_to_remote 'Delete', :update=>:detail_list, :url=> delete_domain_multi_school_group_path(@multi_school_group,:domain_id=>@domain.id), :method=>:get, :html=>{:class=>"button-grey-small float-right-with-margin"} if permitted_to? :delete_domain, @multi_school_group, :context=>:multi_school_groups %> <br/>
+
+</fieldset>

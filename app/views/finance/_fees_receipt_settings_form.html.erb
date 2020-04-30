@@ -1,0 +1,57 @@
+<% form_for @receipt_printer, :url => { :action => "fees_receipt_settings" } do |f| %>
+  <div class="label-radios-pair">
+    <%= f.label :receipt_printer_type,[],:class => "left_label" %>
+    <div class="label_options">
+      <% @receipt_printer_types.each do |key,value| %>
+        <%= f.radio_button :receipt_printer_type, key %>
+        <%= f.label :receipt_printer_type, value, :value => key %>
+      <% end %>
+    </div>
+  </div>
+  <div class="label-field-pair">
+    <label for="select_template"><%= t('print_sheet_size') %></label>
+    <div class="text-input-bg">
+      <%= f.select("receipt_printer_template", @settings.map{| item| [item[0],item[1].to_i]},{},{:onchange => "set_template(this.value)"} ) %>
+     </div>
+   </div>
+   <%= image_tag("loader.gif",:id=>"loader_image") %>
+   <div class="preview_container">
+     <iframe src="<%= @receipt_printer.preview_url %>" id="preview_frame" frameborder="0" scrolling="no" onload='javascript:initilize_iframe(this);'></iframe>
+   </div>
+   <% if @receipt_printer.dot_matrix? || @receipt_printer.thermal? %>
+     <p class="info" id="receipt_printer_info_message">
+       <%= @receipt_printer.dot_matrix_info_message %>
+     </p>
+   <% end %>
+   <div class="label-radio-pair">
+     <label for="select_template"><%= t('receipt_header') %></label>
+     <div class="radio-select-options">
+       <div class="radio-select">
+         <%= f.radio_button 'receipt_printer_header_type', '0' %>
+         <%= label_tag 'receipt_printer_receipt_printer_header_type_0', t('auto_generate') %>
+         <p><%= t('fee_receipt_auto_generate_descr') %> </p>
+         <div class="reveal-if-active"></div>
+       </div>
+       <div class="radio-select">
+         <%= f.radio_button 'receipt_printer_header_type', '1'%>
+         <%= label_tag 'receipt_printer_receipt_printer_header_type_1', t('customized_header') %>
+         <p><%= t('fee_receipt_custom_generate_descr') %> </p>
+         <div class="reveal-if-active">
+           <%= f.text_field  "receipt_printer_header_height"%>
+           <span class="header-size-label"><%= t('millimeters') %></span>
+         </div>
+       </div>
+     </div>
+   </div>
+   <hr>
+  <div class="buttons">
+    <%= submit_tag "", :value => "#{t('save_settings')}", :class => "submit-button" %>
+    <button type="button" name="button" onclick="print_preview()" class="submit-button"><%= t('print_sample_receipt') %></button>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j("input[name='receipt_printer[receipt_printer_type]']:radio").change(function () {
+    j.post('/finance/fees_receipt_settings_update_form/'+j(this).val(), function( data ) {});
+  });
+  set_template(j("#receipt_printer_receipt_printer_template").val());
+</script>

@@ -1,0 +1,115 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="report">
+    <div class="left-table">
+        <% if @employees.present? %>
+          <table align="center" width="100%" cellpadding="1" cellspacing="1">
+              <tr class="header-row">
+                  <th><%= t('employee_text') %></th>
+                  <th><%= t('leave_balance_on_start')%></th>
+                  <th><%= t('leaves_added') %></th>
+                  <th><%= t('leaves_taken') %></th>
+                  <th><%= t('leave_balance_on_end') %></th>
+              </tr>
+              <!-- Data Comes Here -->
+              <% @employees.each do |dpt, emp| %>
+                <tr>
+                    <td colspan="5" class="dept-name"><%= dpt %></td>
+                </tr>
+                <% emp.each do |e|  %>
+                    <tr class="each-employee-row">
+                        <!-- First Column -->
+                        <td class="employee-name-table-cell">
+                            <div class="employee_name"> <%= link_to "#{e.full_name} (#{e.employee_number})&#x200E;",{ :controller =>"employee_attendance", :action=> "additional_leave_detailed", :id=> e.id , :from => params[:action]}, :target=> '_blank', :class => "my-leaves-link"  %></div>
+                        </td>
+                        <% if  @leave_balance_on_start_date_hash[e.id].present? %>
+                          <!-- Second Column : Leave Balance at start -->
+                          <td class="table-cell">
+                              <table class="cell-table">
+                                  <% i=0 %>
+                                  <% @leave_balance_on_start_date_hash[e.id].each_pair do |k,v| %>
+                                    <tr>
+                                        <td class="<%= i == 0 ? "left-inner-cell-first" : "left-inner-cell" %>">&#x200E;<%= k %>&#x200E;</td>
+                                        <td class="<%= i == 0 ? "right-inner-cell-first" : "right-inner-cell" %>"><%= v.present? ?  v : "-" %></td>
+                                    </tr>
+                                    <% i+=1 %>
+                                  <% end %>
+                              </table>
+                          </td>
+                          <!-- Third Column : Leave added during the date -->
+                          <td class="table-cell">
+                              <table>
+                                  <% i=0 %>
+                                  <% @leave_added_in_between_hash[e.id].each_pair do |k,v| %>
+                                    <tr>
+                                        <td class="<%= i == 0 ? "left-inner-cell-first" : "left-inner-cell" %>">&#x200E;<%= k %>&#x200E;</td>
+                                        <td class="<%= i == 0 ? "right-inner-cell-first" : "right-inner-cell" %>"><%= v.present? ?  v : "-" %></td>
+                                    </tr>
+                                    <% i+=1 %>
+                                  <% end %>
+                              </table>
+                          </td>
+                          <!-- Fourth Column : Leave Taken during the date -->
+                          <td class="table-cell">
+                              <table>
+                                  <% i=0 %>
+                                  <% @leave_taken_in_between_hash[e.id].each_pair do |k,v| %>
+                                    <tr>
+                                        <td class="<%= i == 0 ? "left-inner-cell-first" : "left-inner-cell" %>">&#x200E;<%= k %>&#x200E;</td>
+                                        <td class="<%= i == 0 ? "right-inner-cell-first" : "right-inner-cell" %>"><%= v.present? ?  v : "-" %></td>
+                                    </tr>
+                                    <% i+=1 %>
+                                  <% end %>
+                              </table>
+                          </td>
+                          <!-- Fifth Column : Leave Balance at end date -->
+                          <td class="table-cell">
+                              <table>
+                                  <% i=0 %>
+                                  <% @leave_balance_on_end_date_hash[e.id].each_pair do |k, v| %>
+                                    <tr>
+                                        <td class="<%= i == 0 ? "left-inner-cell-first" : "left-inner-cell" %>">&#x200E;<%= k %>&#x200E;</td>
+                                        <td class="<%= i == 0 ? "right-inner-cell-first" : "right-inner-cell" %>"><%= v.present? ?  v : "-" %></td>
+                                    </tr>
+                                    <% i+=1 %>
+                                  <% end %>
+                              </table>
+                          </td>
+                        <% else %>
+                          <td colspan="4"><%= t('leave_types_not_present') %></td>
+                        <% end %>
+                    </tr>
+                <% end %>
+              <% end %>
+          </table>
+        <% else %>
+          <p class="flash-msg"> <%= t('leave_types_not_present') %> </p>
+        <% end %>
+    </div>
+</div>
+<div class="status">
+    <%= pagination_status(@employees_dep) %>
+    <%= will_paginate @employees_dep, :renderer => 'RemoteLinkRenderer',:params => {:start_date => params[:start_date],:end_date => params[:end_date], :department_id => params[:department_id]||"all"} %>
+</div>
+<% if @employees.present? %>
+  <div class="link">
+      <%= link_to "#{t('csv_report')}", {:controller => 'csv_export', :action => 'generate_csv',:csv_report_type => "employee_leave_balance_report",:report_format_type => "csv",:user => @current_user.id,:start_date =>params[:start_date],:end_date => params[:end_date], :department_id => params[:department_id]},:target => '_blank', :class => 'user_button' %>
+  </div>
+<% end %>

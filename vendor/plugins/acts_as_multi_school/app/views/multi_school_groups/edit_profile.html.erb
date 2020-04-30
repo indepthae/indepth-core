@@ -1,0 +1,25 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Edit Multi School Group</h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+
+  <% form_for @multi_school_group,:url=>{:action=>:edit_profile},:method=>:put,:html=>{:class=>'form'} do |f| %>
+
+    <fieldset>
+      <%= error_string_for(f) %>
+      <%= f.error_message_on :base %>
+    </fieldset>
+    <fieldset>
+      <%= f.label :name, "Organization" %>
+      <%= f.text_field :name %>
+    </fieldset>
+    
+    <fieldset>
+      <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    </fieldset>
+  <% end %>
+
+
+
+</div>
+

@@ -1,0 +1,81 @@
+<% roll_num_enabled = Configuration.enabled_roll_number? %>
+<table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+    <tr>
+        <td id="firstTd"></td>
+        <td rowspan="2">
+            <div id="divHeader" style="">
+                <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                    <tr id="main_heading">
+                        <td colspan=<%= @header_hash[:names].count %> >
+                            <div class="tableHeader th_1"><%=  %></div>
+                        </td>
+                    </tr>
+                    <tr id="sub_header">
+                        <% i = 1 %>
+                        <% claz = "tableSubHeader tsh_#{i}" %>
+                        <% @header_hash[:names].each do |activity_name| %>
+                          <td><div class="<%=claz%>"> <%= activity_name %> </div></td>
+                        <% end %>
+                        <% i = i + 1 %>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td id="sl_no"><%= t('no_text') %></td>
+        <td id="student_names"><%= t('single_student') %></td>
+        <% if roll_num_enabled %>
+          <td id="roll_number"><%= t('roll_nos')%>  </td>
+        <% else %>
+          <td id="adn_number"><%=t('admission_no') %> </td>
+        <% end %>
+    </tr>
+    <tr>
+        <td valign="top">
+            <div id="firstcol">
+                <table width="350px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                    <% j=0 %>
+                    <% @students.each do |student| %>
+                      <% j=j+1 %>
+                      <tr>
+                          <td class="tableFirstCol"><div class="sl_no"><%=j%> </div></td>
+                          <td class="tableFirstCol"><div class="student_names" title="<%= student.full_name %> "><%= truncate(student.full_name,:length => 40)  %> </div></td>
+                          <% if roll_num_enabled %>
+                            <td class="tableFirstCol"><div class="roll_number"> <%=student.roll_number%> </div></td>
+                          <% else %>              
+                            <td class="tableFirstCol"><div class="adn_number"> <%=student.admission_no%> </div></td>           
+                          <% end %>
+                      </tr>
+                    <% end %>  
+                </table>
+            </div>
+        </td>
+        <td valign="top">
+            <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                    <% @students.each_with_index do |student,i| %>
+                      <tr id="<%= i ==0 ? "firstTr" : "" %>">
+                          <% @header_hash[:ids].each do |id| %>
+                            <td>
+                                <div class="scores">
+                                    <%= @score_hash[id][student.id][:grade].present? ? @score_hash[id][student.id][:grade] : "-" %>
+                                </div>
+                            </td>
+                          <% end %>
+                      </tr>
+                    <% end %>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+<div id="buttons">
+    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+      :csv_report_type => "gradebook_consolidated_reports",:report_format_type => "csv" }.merge(@report_generator.param),:class => "user_button"%>
+</div>
+<script type="text/javascript">
+  j(document).ready(function () {
+      fnAdjustTable();
+  });
+</script>

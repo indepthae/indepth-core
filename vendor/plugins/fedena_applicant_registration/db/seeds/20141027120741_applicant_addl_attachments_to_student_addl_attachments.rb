@@ -1,0 +1,1 @@
+Rake::Task["fedena_applicant_registration:applicant_addl_attachments_to_student_addl_attachments"].execute

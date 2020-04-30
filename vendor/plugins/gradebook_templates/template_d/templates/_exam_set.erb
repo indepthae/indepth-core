@@ -1,0 +1,31 @@
+<div class="section">
+    <table class="primary condensed invert">
+        <tr>
+            <th><%= I18n.t('scholastic_areas') %></th>
+            <% report.term_names.each do |term_name| %>
+              <th colspan="<%=report.term_section_col_count(term_name, {:template=>'d'}) %>"><%= term_name%></th>
+            <%end%>
+            <% final_column = report.term_section_col_count(nil, {:template=>'d'}) %>
+            <% unless final_column.zero? %>
+              <th colspan="<%=  final_column %>"></th>
+            <% end %>
+        </tr>
+        <tr class="theme_text">
+            <%= sub_headers(report, {:template=>'d'}) %>
+        </tr>
+        <% if aggregate_enabled?({:template=>'d'}) %>
+          <% report.main_subjects_included_in_total.each do |subject| %>
+            <%= get_subject_row(subject,0, {:template=>'d'}) %>
+          <% end %>
+          <%= aggregate_rows({:template=>'d'}) %>
+          <% report.main_subjects_excluded_from_total.each do |subject| %>
+            <%= get_subject_row(subject,0, {:template=>'d'}) %>
+          <% end %>
+        <% else %>
+          <% report.main_subjects.each do |subject| %>
+            <%= get_subject_row(subject,0, {:template=>'d'}) %>
+          <% end %>
+        <% end %>
+
+    </table>
+</div>

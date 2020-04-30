@@ -1,0 +1,23 @@
+<small><%= link_to "Enter Marks", exam_group_fa_scores_with_fa_path(:exam_group_id=>@exam_group.id,:fa_group=>@fa_group) %></small>
+<%if @fa_group_status.include? @fa_group%>
+  <% if @fa_group_sms_sent.include? @fa_group %>
+    <small><%= link_to_remote("Resend SMS",:url=>{:controller=>'exam_groups',:action=>'fa_group_result_publish',:exam_group_id=>@exam_group.id,:fa_group=>@fa_group},:confirm=>"#{t('delete_confirm_msg')}",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')")  %>
+    </small>
+  <% else %>
+    <small><%= link_to_remote("Sent SMS",:url=>{:controller=>'exam_groups',:action=>'sent_resend_fa_group_publish_sms',:exam_group_id=>@exam_group.id,:fa_group=>@fa_group},:confirm=>"#{t('delete_confirm_msg')}",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')")  %>
+    </small>
+  <% end %>
+<% else %>
+  <small><%= link_to_remote("Publish Results",:url=>{:controller=>'exam_groups',:action=>'sent_resend_fa_group_publish_sms',:exam_group_id=>@exam_group.id,:fa_group=>@fa_group,:batch_id=>@batch.id},:confirm=>"#{t('delete_confirm_msg')}",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')")  %>
+  </small>
+  <%= image_tag("loader.gif",:align => "absmiddle",
+    :border => 0,
+    :id => "loader",
+    :style =>"display: none;" ) %>
+<%end%>

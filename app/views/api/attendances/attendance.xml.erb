@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.attendance_detail{
+  @xml.attendance do
+    config = Configuration.get_config_value('CustomAttendanceType')||"0"
+    if @attendance.class.name == "Attendance"
+      @xml.student_admission_no(@attendance.student.admission_no)
+      @xml.forenoon(@attendance.forenoon)
+      @xml.afternoon(@attendance.afternoon)
+      if config == '1'
+        type =  AttendanceLabel.find_by_id(@attendance.attendance_label_id) unless @attendance.attendance_label_id == nil
+        @xml.attendance_label_name(type.present? ? type.name : '-')
+        end
+      @xml.date(@attendance.month_date)
+      @xml.batch_name(@attendance.batch.full_name)
+      @xml.reason(@attendance.reason)
+      elsif @attendance.class.name == "SubjectLeave"
+      @xml.student_admission_no(@attendance.student.admission_no)
+      @xml.subject_code(@attendance.subject.nil? ? "Deleted Subject" : @attendance.subject.code)
+      @xml.class_timing_name(@attendance.class_timing.try(:name))
+      @xml.batch_name(@attendance.batch.full_name)
+      if config == '1'
+        type =  AttendanceLabel.find_by_id(@attendance.attendance_label_id) unless @attendance.attendance_label_id == nil
+        @xml.attendance_label_name(type.present? ? type.name : '-')
+        end
+      @xml.reason(@attendance.reason)
+      @xml.date(@attendance.month_date)
+    end
+  end
+}%>

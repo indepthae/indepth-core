@@ -1,0 +1,38 @@
+<% if @reports.present? %>
+  <label for="batch_id"><%= t('report') %></label>  
+  <span class="student_details">
+      <% if @type == 'exam_report' %>
+        <%= select :assessment, :batch,
+          grouped_options_for_select(@reports),
+          {:include_blank =>t('select_report')},
+          {:onChange => "#{remote_function(:url => {:action => "refresh_report"},
+          :with => "'reportable_id='+ value +'&exam_type=#{@type}'+'&student_id=#{@student.id}'+'&batch_id=#{@batch.id}'",
+          :before => "Element.show('loader1')",
+          :success => "Element.hide('loader1')"
+          )}"} 
+      %> 
+    <% else %>
+        <%= select :assessment, :batch,
+          options_for_select(@reports.map{|r| [r.name, r.reportable_id]}),
+          {:include_blank =>t('select_report')},
+          {:onChange => "#{remote_function(:url => {:action => "refresh_report"},
+          :with => "'reportable_id='+ value +'&exam_type=#{@type}'+'&student_id=#{@student.id}'+'&batch_id=#{@batch.id}'",
+          :before => "Element.show('loader1')",
+          :success => "Element.hide('loader1')"
+          )}"} 
+      %> 
+
+    <% end %>
+    <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader1",
+        :style =>"display: none;" ) 
+    %>
+
+  </span>
+<% elsif @type == 'select'%>
+  <span class="student_details"></span>
+<% else %>
+  <span class="student_details"><%= t('no_reports') %></span>
+<% end %>    

@@ -1,0 +1,44 @@
+<div class="leg messages_leg" style="position: absolute;width:40px;clear:both;">
+    <div id="profile-menu">
+        <li class="a">
+            <div id="show-notification">
+                <ul class="notifications">
+                    <li class="notification_overlay"></li>
+                    <%=image_tag("ajax_loader_gray_32.gif", :align => "absmiddle", :border => 0, :id => "loader_notification", :style =>"display: none;")%>
+                    <% if notification_count > 0 %>
+                      <li class="notification_links">
+                          <div class="ns message_count"><span><%="#{t('new_text')} #{t('notifications')}</span> <span>(#{notification_count})&#x200E;</span>"%></div>
+                          <div class="ns new_mesage"><%= link_to t('mark_all_read'),'#', :onClick=>"mark_notifications_read();"%></div>
+                      </li>
+                    <% end %>
+                    <li id="notification_list">
+                        <% if notification_count > 0 %>
+                          <% @current_user.unread_notifications.each do |notification| %>
+                            <div class="notifications_strip">
+                                <div class="notification_header">
+                                    <%=show_notification_icon(notification.initiator)%>
+                                    <div class="notification_intiator"><%= notification.initiator %></div>
+                                    <div class="notification_date">
+                                        <% date = notification.created_at %>
+                                        <% if(date.to_date - Date.today).to_i < 0 %>
+                                          <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M %p")  %>
+                                        <% else %>
+                                          <%=  change_time_to_local_time(date).strftime("%I:%M %p")  %>
+                                        <% end %>
+                                    </div>
+                                </div>
+                                <div class="notification_content"><%=notification.content%></div>
+                            </div>
+                          <% end %>
+                        <% else %>
+                          <div id="no_unread_noti">No Unread Notifications</div>
+                        <% end %>
+                    </li>
+                    <li>
+                        <div class="ns page_link"><%= link_to 'View all', {:controller=>'notifications', :action=>'index'} %></div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </div>
+</div>

@@ -1,0 +1,302 @@
+<% if @payer_type.present? and @payer_type=='Archived Student' %>
+  <% @transaction.student=@student.to_student %>
+<% end %>
+<div id="fees_details">
+    <% total_fees =0 %>
+    <% remote_form_for :fees, :url => {:action => 'hostel_fee_collection_pay', :student => @hostel_fee.student_id}, :before => "$('submit_button').disable()", :complete => "setTimeout(function(){$('submit_button').enable();},5000)" do |form| %>
+
+      <% unless @hostel_fee.nil? %>
+        <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td><%= "#{t('name')}" %></td>
+                <td><%= "#{t('amount')}" %> (<%= currency %>)</td>
+            </tr>
+            <tr class="tr-<%= cycle("odd", "even") %>">
+                <td class="col-2"><%= @hostel_fee.student.full_name %></td>
+                <td class="col-6">
+                    <%= precision_label(@hostel_fee.rent) %>
+                </td>
+                <td style="width: 1%;background: #c3d9ff"></td>
+            </tr>
+            <tr class="tr-blank"></tr>
+            <% total_fees += @hostel_fee.rent %>
+            <% if @hostel_fee.tax_enabled and @hostel_fee.tax_collections.present? %>
+              <tr class="tr-<%= cycle("odd", "even") %>">
+                  <td class="col-2"><%= "#{@tax_slab.name} (#{precision_label(@tax_slab.rate)}%)" %></td>
+                  <td class="col-6">
+                      <%= precision_label(@hostel_fee.tax_amount) %>
+                  </td>
+                  <td style="width: 1%;background: #c3d9ff"></td>
+              </tr>
+              <% total_fees += @hostel_fee.tax_amount %>
+            <% end %>
+            <tr class="tr-even" id="show-fine"></tr>
+
+            <%= render :partial => 'paid_fine', :locals => {:hostel_fee => @hostel_fee, :total_fees => total_fees} %>
+
+
+            <%= render :partial => "student_fine_submission" %>
+
+
+
+
+            <% unless @hostel_fee.is_paid? %>
+              <tr>
+                  <td colspan="3">
+
+
+                      <div class="payment_details">
+                          <div class="label-field-pair3">
+                              <label><%= t('payment_mode') %>
+                                  <%= image_tag("loader.gif",
+                                    :align => "absmiddle",
+                                    :border => 0,
+                                    :id => "loader1",
+                                    :style => "display: none;") %></label>
+
+                              <div class="text-input-bg3"><%= select :fees, :payment_mode, [["#{t('cash')}", "Cash"], ["#{t('online_payment')}", "Online Payment"], ["#{t('cheque')}", "Cheque"], ["#{t('dd')}", "DD"], ["#{t('others')}", "Others"]], {}, {:onChange =>
+                                      "#{remote_function(:url => {:action => "select_payment_mode"}, :with => "'payment_mode='+value", :before => "$('loader1').show();", :success => "$('loader1').hide();")}"} %>
+                              </div>
+                          </div>
+                          <div id="payment_mode"></div>
+                          <div class="label-field-pair5">
+                              <label><%= t('reference_no') %>
+                              </label>
+
+                              <div class="text-input-bg4">
+                                  <%= form.text_field :reference_no %>
+                              </div>
+                          </div>
+
+                          <div class="label-field-pair4" style="margin-right: 38px">
+                              <label><%= t('amount') %>
+                              </label>
+
+                              <div class="text-input-bg4" id="amount">
+
+                                  <%= form.text_field :amount, :value => precision_label(@hostel_fee.balance), :class => 'precision_text' %>
+
+                              </div>
+                          </div>
+
+                      </div>
+                  </td>
+              </tr>
+              <tr class="tr-blank"></tr>
+              <tr>
+                  <td colspan="5">
+                      <%= transaction_date_field %>
+
+
+                      <div class="label-field-pair3-text-area">
+                          <label><%= t('payment_notes') %> </label>
+
+                          <div class="textarea-input-bg3"><%= form.text_area :payment_note, :cols => 50, :rows => 1 %>
+                          </div>
+                      </div>
+                      <div class="pay_fees_button" style="margin-right: 17px;">
+                          <%= form.hidden_field :finance_id, :value => @hostel_fee.id %>
+                          <%= form.hidden_field :finance_type, :value => 'HostelFee' %>
+                          <%= form.submit "#{t('pay_fees')}", :class => "user_button", :id => 'submit_button', :onClick => "return validate_payment_mode();" %>
+                      </div>
+                  </td>
+              </tr>
+            <% else %>
+              <tr>
+                  <td colspan="2">
+                      <div>
+                          <% unless (@payer_type.present? and @payer_type=="Archived Student") %>
+                            <h4><%= "#{t('fees_paid')}" %>  </h4>
+                          <% end %>
+                      </div>
+                  </td>
+              </tr>
+            <% end %>
+
+          <% end %>
+      </table>
+    <% end %>
+
+    <% if @hostel_fee.finance_transactions.present? %>
+      <div class="label-field-pair3">
+          <label><%= t('payment_history') %> </label>
+      </div>
+      <div id="payments_details" style="margin-top:40px;">
+
+          <table id="listing1" align="center" width="100%" cellpadding="1" cellspacing="1">
+              <tr class="tr-head">
+                  <td><%= t('receipt_no') %></td>
+                  <td><%= t('payment_date') %></td>
+                  <td><%= t('payment_mode') %></td>
+                  <td><%= t('payment_notes') %></td>
+                  <td><%= t('amount') %> (<%= currency %>)</td>
+                  <% unless (@payer_type.present? and @payer_type=="Archived Student") %>
+                    <td class="col-3" style="width:2%;"></td>
+                  <% end %>
+              </tr>
+              <tr class="tr-blank"></tr>
+              <% @hostel_fee.finance_transactions.each do |transaction| %>
+                <tr class="tr-<%= cycle("odd", "even") %>">
+                    <td class="col-1">
+                        <%= transaction.receipt_number %>
+
+                    </td>
+                    <td class="col-3"><%= format_date(transaction.transaction_date) %></td>
+                    <% if transaction.reference_no.present? %>
+                      <td class="col-3"><%= transaction.payment_mode %>
+                          - <%= transaction.reference_no %></td>
+                    <% else %>
+                      <td class="col-3"><%= transaction.payment_mode %></td>
+                    <% end %>
+                    <td class="col-2"><%= transaction.payment_note %></td>
+                    <td class="col-3">
+                        <%= precision_label(transaction.amount.to_f) %>
+                    </td>
+                    <td class="col-3 receipt-actions">
+                        <%= receipt_buttons(transaction.id) %>
+                        <% unless (@payer_type.present? and @payer_type=="Archived Student") %>
+
+                          <%= link_to ("<span class='revert_icon_img'></span>"), '#', :onclick => "return MakeBox(#{transaction.id});", :class => "themed_text", :tooltip => t('revert_transaction') %>
+
+                        <% end %>
+                    </td>
+                </tr>
+              <% end %>
+
+          </table>
+
+      </div>
+    <% end %>
+</div>
+<script type="text/javascript">
+  j('#fees_payment_mode').change(function () {
+      switch (j(this).val()) {
+          case 'Online Payment' :
+              j('.label-field-pair5').children().first().text("<%=t('transaction_id')%>");
+              break;
+          case 'Cheque' :
+              j('.label-field-pair5').children().first().text("<%=t('cheque_no')%>");
+              break;
+          case 'DD' :
+              j('.label-field-pair5').children().first().text("<%=t('dd_no')%>");
+              break;
+          default :
+              j('.label-field-pair5').children().first().text("<%=t('reference_no')%>");
+              break;
+      }
+  });
+  MakeBox = function (t_id) {
+      remove_popup_box();
+      options = {
+          'submit': '<%=t('revert_transaction')%>',
+          'cancel': '<%=t('cancel')%>',
+          'field_name': 'reason',
+          'input_type': 'text_area',
+          'title': '<%=t('revert_transaction')%>'
+      };
+      build_modal_box(options);
+      build_prompt_popup_box('<%=t('reason')%>', options)
+      j('#popup_window #popup_footer > #yes').click(function () {
+          j.ajax({
+              type: 'POST',
+              url: '/hostel_fee/delete_hostel_fee_transaction',
+              data: {
+                  'id': t_id,
+                  'reason': j('#popup_content #prompt_value').val(),
+              },
+              success: function () {
+                  remove_popup_box();
+              }
+          });
+      });
+  };
+  submit_fine = function () {
+      j("body").scrollTop(0);
+      remove_popup_box();
+      options = {
+          'submit': '<%=t('add')%>',
+          'cancel': '<%=t('cancel')%>',
+          'field_name': 'fine_amount',
+          'input_type': 'text_input',
+          'title': '<%=t('add_fine')%>'
+      };
+      build_modal_box(options);
+      build_prompt_popup_box('<%=t('fine_amount')%>', options)
+      j('#prompt_value').addClass('precision_text')
+      j('#popup_window #popup_footer > #yes').click(function () {
+          show_fine(parseFloat(j('#popup_content #prompt_value').val()))
+          total_wallet_amount = <%= (@student.present? and @student.advance_fee_wallet.present?) ? @student.advance_fee_wallet.amount : "0.00" %>
+          j('#wallet_amount_applied').val(false)
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+          j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+      });
+  };
+  show_fine = function (fine) {
+      fine = parseFloat(fine || 0);
+      if (fine > 0) {
+          var precision = parseInt("<%= @precision %>");
+          input = ' <td class="col-2">Fine</td> <td class="col-6" id="fine">' + fine.toFixed(precision) + ' </td> <td class="cancel-fine cancel-color" style="width:1%;cursor: pointer;background: #c3d9ff">x</td>'
+          fine_amount_updations(fine, 'add', precision);
+
+          j('#fine-slab').hide();
+
+          var fine_amount_hidden_field = j('<input>').attr({
+              type: 'hidden',
+              id: 'hidden_fine_amount',
+              name: 'fees[fine_amount]',
+              value: fine
+          });
+          var fine_included_hidden_field = j('<input>').attr({
+              type: 'hidden',
+              id: 'hidden_fine_included',
+              name: 'fees[fine_included]',
+              value: true
+          });
+
+          j(fine_amount_hidden_field).appendTo('form');
+          j(fine_included_hidden_field).appendTo('form');
+      }
+      remove_popup_box();
+  }
+
+  function fine_amount_updations(fine, operator, precision) {
+      fine = parseFloat(fine || 0);
+      total_fees = parseFloat(j("#total-fees").text());
+      amount_pay = parseFloat(j("#fees_amount").val());
+      j('#show-fine').append(input)
+      j("#total-fees").text(add_or_subtract(operator, total_fees, fine).toFixed(precision));
+      j("#fees_amount").val(add_or_subtract(operator, amount_pay, fine).toFixed(precision));
+      j("#amount_t").val(add_or_subtract(operator, amount_pay, fine).toFixed(precision));
+  }
+
+  function add_or_subtract(operator, element1, element2) {
+      switch (operator) {
+          case "add":
+              return element1 + element2;
+          case "subtract":
+              return element1 - element2;
+      }
+
+  }
+
+  j(document).on('click', '.cancel-fine', function () {
+      if (j('.cancel-fine').length == 1) {
+          var precision = parseInt("<%= @precision %>");
+          fine = parseFloat(j('#fine').text())
+          fine_amount_updations(fine, 'subtract', precision);
+          j('#show-fine').text("")
+          j('#fine-slab').show();
+          j("#fees_amount").removeAttr('tooltip')
+          j("#fees_amount").removeAttr('readonly')
+          j("#amount_t").removeAttr('readonly');
+          j('[id^="hidden_fine_amount"]').remove();
+          j('[id^="hidden_fine_included"]').remove();
+          j('#wallet_amount_applied').val(false)
+          j('.wallet-amount-field').val(parseFloat(total_wallet_amount).toFixed(precision))
+          j('.wallet-amount-applied').val(parseFloat(0.00).toFixed(precision))
+      }
+  });
+
+
+</script>
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>

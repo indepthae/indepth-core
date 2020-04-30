@@ -1,0 +1,50 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('course_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('show') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :student_roll_number_view_batches, @course %>
+    <%= render_breadcrumbs %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+   <h5><%= "#{t('list_of_batches')}" %></h5>
+   <table id="listing_theme" class ="subjects" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= "#{t('batch_name')}" %></td>
+      <td><%= "#{t('roll_no_status')}" %></td>
+      <td><%= "#{t('options')}" %></td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @batches.each do |batch| %>
+      <% permitted_to? :set_roll_numbers, batch,:context=>:student_roll_number do %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%= batch.full_name %></td>
+          <td class="col-1">
+            <%  if batch.roll_number_generated? %>
+              <%= t('set') %>
+            <% else %>
+              <div id="status_text"><%= t('not_set') %></div>
+            <% end %>
+          </td>
+          <td class="col-3">
+            <% if batch.roll_number_generated? %>
+              <%= link_to "#{t('edit_roll_numbers')}", {:controller => "student_roll_number", :action => "edit_roll_numbers", :id => batch.id,:src=>"sms_settings"}, :class => "themed_text" %>
+            <% else %>
+              <%= link_to "#{t('set_roll_numbers')}", {:controller => "student_roll_number", :action => "set_roll_numbers", :id => batch.id,:src=>"sms_settings"}, :class => "themed_text" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <%end%>
+  </table>
+ <%= will_paginate @batches %>
+  </div>
+</div>

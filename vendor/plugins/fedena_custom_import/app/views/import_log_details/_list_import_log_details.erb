@@ -1,0 +1,28 @@
+<% unless @import_log_details.empty? %>
+  <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-header">
+      <td class="sl_no"><%= t('serial_no') %></td>
+      <td class="model"><%= t('row_no') %></td>
+      <td class="date"><%= t("status") %></td>
+      <td class="status"><%= t("description") %></td>
+    </tr>
+    <% @import_log_details.each_with_index do |import_log_detail,index| %>
+      <tr class="tr-body">
+        <td class="sl_no"><%= ((@import_log_details.current_page - 1) * @import_log_details.per_page) + index + 1 %></td>
+        <td class="model"><%= import_log_detail.model.to_i %></td>
+        <td class="date"><%= import_log_detail.status.capitalize %></td>
+        <%if import_log_detail.description.include? '_' %>
+          <td class="status"><%= t(import_log_detail.description).gsub(/\n/, '<br/>') %></td>
+        <% else %>
+          <td class="status"><%= import_log_detail.description.gsub(/\n/, '<br/>') %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @import_log_details, :renderer => 'RemoteLinkRenderer' ,:params=>{:action=>"filter",:import_id => @import.id}, :param_name => :import_log_details_page,:remote => {:with => "'filter_import_log_details='+$('filter_import_log_details').value"} %>
+
+<% else %>
+  <div id="flash-box">
+    <p class="flash-msg"><%= t('no_data_import') %></p>
+  </div>
+<% end %>

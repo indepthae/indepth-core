@@ -1,0 +1,95 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('process_leave') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_leave_process') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_leave_process %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('leave_process_description') %></div>
+    <div id="active_year1">
+        <div class="left-side">
+            <div id ="description2"><%= t('previous_active_leave_year') %> : <span class = "active_year_name"><%= @leave_year.start_date.to_date.year %> -  <%= @leave_year.end_date.to_date.year %> </span>
+                <div class="year_range"> <%= t('start_date')%> : <span class = "active_year_start_date"><%= format_date(@leave_year.start_date) %></span> <div class="end_date_year"><%= t('end_date')%> : <span class = "active_year_end_date"><%= format_date(@leave_year.end_date) %></span></div></div>
+            </div>
+        </div>
+        <div class='header1-icon leave-year-icon'></div>
+        <div class="right-side">
+            <% unless @next_active_year.present? %>
+              <div class="process_leave_year">
+                  <div class="next_leave_year">
+                      <%= t('create_leave_year_desc') %>
+                  </div>
+                  <div class="create_leave_year">
+                      <%= link_to_remote "#{t('create_leave_year')}", :url => {:controller => "leave_years", :action => "new", :id => @leave_year.id ,:type => "end_process"}, :html => {:class => 'submit-button'} %>
+                  </div>
+              </div>
+            <% else %>
+              <div id ="description1"><%= t('new_leave_year') %> : <span class="active_year_name"><%= @next_active_year.start_date.to_date.year %> -  <%=  @next_active_year.end_date.to_date.year %> </span> <%= link_to_remote t('change'), :url => {:controller => "leave_years", :action => "set_active", :type => "end_process"}, :method => :get , :html => {:class => 'submit-button'} %>
+                  <div class="year_range"> <%= t('start_date')%> : <span class="active_year_start_date"><%= format_date(@next_active_year.start_date) %></span> <div class="end_date_year"><%= t('end_date')%> : <span class = "active_year_end_date"><%= format_date(@next_active_year.end_date) %></span></div> </div>
+              </div>
+            <% end %>
+        </div>
+    </div>
+
+    <% if @next_active_year.present? %>
+      <div id="active_year">
+          <%= link_to_remote "#{t('start_processing')}", :url => {:action => "leave_process", :id => @active_year.id}, :method => :post, :confirm => "#{t('delete_confirm_msg')}", :before=> "disable_link(this)",  :html => {:class => 'submit-button'} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none; margin-bottom: -30px; "
+            ) %>
+      </div>        
+    <% end %>
+</div>
+
+</div>
+
+<script>
+  function disable_link(obj) {
+      j('#loader').show();
+      j(obj).html("<%= t('please_wait') %>");
+      j(obj).attr("onclick", "return false;");
+  }
+  fetch_year_details = function (elm) {
+      new Ajax.Request('/leave_years/fetch_details', {
+          parameters: {'id': elm.value},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j(elm).parent().next('#loader').show();
+          },
+          onComplete: function (resp) {
+              j('#active_year_msg').hide();
+              j(elm).parent().parent().next('#active_year_details').html(resp.responseText);
+              j(elm).parent().next('#loader').hide();
+          }
+      });
+  }
+
+  validate = function () {
+      if (j('#leave_year_year_id').val() == "") {
+          j('#active_year_msg').show();
+          return false;
+      } else {
+          j('#active_year_msg').hide();
+          return true;
+      }
+  }
+  change_name = function (elm) {
+      start_date = j('#start_date').val();
+      end_date = j('#end_date').val();
+      start_year = (new Date(start_date)).getFullYear();
+      end_year = (new Date(end_date)).getFullYear();
+      j('#leave_year_name').val(start_year + ' - ' + end_year);
+  }
+</script>

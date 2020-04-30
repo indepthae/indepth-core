@@ -1,0 +1,42 @@
+<div class="time_overall fleft max_width">
+  <%if @end_date==Date.today%>
+    <%if @start_date==Date.today-30.days%>
+      <div id="day_count" class="fleft">Last 30 days</div>
+    <%elsif @start_date==Date.today-3.months%>
+      <div id="day_count" class="fleft">Last 3 months</div>
+    <%elsif @start_date==Date.today-6.months%>
+      <div id="day_count" class="fleft">Last 6 months</div>
+    <%else%>
+      <div id="day_count" class="fleft"></div>
+    <%end%>
+  <%end%>
+  <div class="time_span fleft half_width">
+    <div id="start_date_label" class="fleft"><%=format_date(@start_date)%></div>
+    <%=hidden_field_tag :start_date_value,@start_date%>
+    <div id="to_text" class="fleft"><%="#{t('to')}"%></div>
+    <div id="end_date_label" class="fleft"><%=format_date(@end_date)%></div>
+    <%=hidden_field_tag :end_date_value,@end_date%>
+  </div>
+  <div id="change_date" class="fright change_date"><%=t('change_date')%></div>
+  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none" ) %>
+</div>
+<script type="text/javascript">
+  j('#change_date').click(function(){
+    j.ajax({
+      type: 'GET' ,
+      url: "/finance/get_advance_time",
+      data : {
+        start_date_as : j('#start_date_value').val(),end_date_as : j('#end_date_value').val()
+      },
+      beforeSend : function() {
+        j("#loader").show();
+      },
+      success : function(data) {
+        j('#advance_time').html(data);
+        j('#advance_time').addClass('margin_bottom_30');
+        j('.hor_line').css('display','block');
+        j("#loader").hide();
+      }
+    });
+  });
+</script>

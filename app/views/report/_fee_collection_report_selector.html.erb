@@ -1,0 +1,5 @@
+<label class="form_label"><%=t('columns_selected')%></label>
+<span id="count"><%= (@selected_columns||{}).values.flatten.length %></span><span><%= t('selected') %></span>
+    <%= link_to_remote "#{t('customize_columns')}", :url => {:action => "fee_defaulters_columns", :columns => @selected_columns, :fee_collection => true}, :html => {:id => 'column_link'} %>
+    <%= hidden_field_tag :columns, (@selected_columns||{}).to_json %>
+

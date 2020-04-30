@@ -1,0 +1,36 @@
+<% content_for :head do  %>
+  <%= stylesheet_link_tag(*get_stylesheet_for_current_receipt_template) %>
+  <%= javascript_include_tag("receipt_printer") %>
+<% end %>
+<%# TODO: replace existing variables with readable names %>
+<%@fts_hash.each do |k,v|%>
+  <%= render :partial => get_current_receipt_partial,:locals=>{:k=>k,:v=>v} %>
+<%end%>
+<% if ReceiptPrinter.hide_header? %>
+  <style >
+      .receipt-header{
+          visibility: hidden;
+      }
+      #pdf-header{
+          visibility: hidden;
+          height: <%= ReceiptPrinter.receipt_printer_header_height %>mm;
+      }
+  </style>
+<% end %>
+<script type="text/javascript">
+    j('section:empty').remove();
+    j.map( j("section"), function( val, i ) {
+    if(val.innerHTML.trim()=="") {
+    val.remove();
+    }
+    });
+    j(document).ready(function () {
+    });
+    <% if ReceiptPrinter.receipt_printer_header_type ==1 %>
+      j(".receipt-header").css("height","<%= ReceiptPrinter.receipt_printer_header_height %>mm");
+      j("#pdf-header").css("height","<%= ReceiptPrinter.receipt_printer_header_height %>mm");
+      j(".receipt-header").empty();
+      j("#pdf-header").empty();
+
+    <% end %>
+</script>

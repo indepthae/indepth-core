@@ -1,0 +1,62 @@
+<% offset = params[:page].nil? ? 0 : (params[:page].to_i-1)*12 %>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1" class='<%= "#{@forms.present? ? '' : 'narrow_border'}" %>'>
+  <% if @forms.present? %>
+    <tr class="tr-head">
+      <td class="col-1">
+        <%= t('sl_no') %>
+      </td>
+      <td class="col-2">
+        <%= t('form_name') %>
+      </td>
+      <td class="col-3">
+        <%= t('type') %>
+      </td>
+      <td class="col-4">
+        <%= t('status') %>
+      </td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @forms.each_with_index do |form,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <% submitted = form.submitted?(@current_user) %>
+        <% multi_submit = form.permitted_to_submit?(@current_user) %>
+        <td class="col-1">
+          <%= i+1+offset %>
+        </td>
+        <td class="col-2">
+          <% unless(form.allowed_to_submit?(@current_user)) %>
+            <%= form.name %>
+          <% else %>
+            <%= link_to "#{form.name}", form_path(form), :class => "themed_text" %>
+          <% end %>
+        </td>
+        <td class="col-3">
+          <div class="form_type">
+            <%= form.is_feedback ? t('feedback') : form.is_public ? t('public') : t('private') %>
+          </div>
+        </td>
+        <td class="col-4">
+          <% if form.submitted?(@current_user) %>
+            <div class="align_left">
+              <%= t('submitted') %>
+            </div>
+            <div class="align_right">
+              <%= link_to t('view_responses'), responses_form_submission_path(form), :class => "themed_text" %>
+            </div>
+          <% else %>
+              <%= t('not_submitted_yet') %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr class="tr-odd">
+      <td class="col_1">
+        <div class="message">
+          <%= t('no_forms') %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @forms,:renderer => 'RemoteLinkRenderer', :method=>'get'%>

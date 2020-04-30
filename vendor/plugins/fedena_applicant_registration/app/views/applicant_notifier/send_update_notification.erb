@@ -1,0 +1,15 @@
+<html>
+    <body>
+        Dear <%= @full_name %>,<br/><br/>
+        The status of your application with Registration no. <b><%= @reg_no %></b> for <b><%= @reg_course_name %></b> has been updated to <b><%= @status_name %>.</b><br/><br/>
+        Thank you.
+        <br/><br/>
+        <%@em=Digest::SHA1.hexdigest( "#{@recipients}#{Time.now.to_s.split(//).sort_by {rand}.join}" )%>
+        <%if FedenaSetting.company_details[:company_name].present?%>
+          <%="#{t('powered_by')} #{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"}"%>
+        <%end%>
+        <br/>
+
+        <%="#{@footer.gsub("URL","#{@hostname}")}#{" "}"%>
+    </body>
+</html>

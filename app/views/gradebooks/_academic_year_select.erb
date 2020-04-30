@@ -1,0 +1,17 @@
+<%#= duration(@academic_year) %>
+<div id="academic_year_label"><%="#{t('academic_year').titleize} : "%></div>
+<div id="academic_year_show"><%=@academic_year.name%></div>
+<div id="academic_year_change">
+        <%= select_tag "academic_year[year_id]", 
+          options_for_select(@academic_years.map{|ay| [ay.name,ay.id]}, @academic_year.try(:id)||'') ,
+          :onchange => "#{remote_function(:url => {:action => "change_academic_year"},:with => "'id='+value")}" %>
+</div>
+<div id="academic_year_change_button"><%= link_to t('change'), '#', :onclick=>'toggle_change_ay(this)'%></div>
+<script>
+    toggle_change_ay = function(el){
+      j('#academic_year_change').toggle();
+      j('#academic_year_show').toggle();
+      var text = j("#academic_year_change_button a").text() == 'Change' ? 'Cancel' : 'Change';
+      j("#academic_year_change_button a").text(text)
+    }
+</script>

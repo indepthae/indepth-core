@@ -1,0 +1,23 @@
+<div class="type_filter">
+    <div class="filter_title"><%= t('filters') %>:</div>
+    <% if @config_enable == '1'%>
+      <div class='filter_option1'><%= t('attendance_type') %></div>
+      <div class="label-field-pair3">
+          <div class="text-input-bg3">
+              <%= select :attendance_label_id, :id, 
+                @attendance_types.map {|a| [a.attendance_type, a.id] }, 
+                {:prompt => "#{t('all_types')}"},
+                {:onchange => "#{remote_function(
+                :url => {:action => 'day_wise_report_filter_by_attendance_type'},
+                :with => "'attendance_label_id='+value+'&date=#{@date}'",
+                :before => "Element.show('loader1')",
+                :success => "Element.hide('loader1')")}"} %>
+              <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+          </div>
+      </div>
+    <% end %>
+</div>
+
+<div id="report_details">
+    <%= render :partial => 'report_details' , :locals => {:attendance_label =>  @attendance_label} %>
+</div>

@@ -1,0 +1,6 @@
+if @saved == false
+ page.replace_html 'modal-box', :partial => 'taxable_discount_form'
+ page << "Modalbox.show($('modal-box'), {title: ''});"
+else
+  page << "Modalbox.hide();"
+end

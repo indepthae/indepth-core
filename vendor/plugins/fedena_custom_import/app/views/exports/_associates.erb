@@ -1,0 +1,28 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="label-field-pair">
+    <label for="student_grade"><%= t('associated_data') %></label>
+</div>
+<div class="fee_category_scroll">
+    <% (@associated_models + @join_models).each do |model| %>
+      <div class="each_batch">
+          <%= check_box_tag("associated_models[]",model.second, false,
+            :onchange => remote_function(
+              :before => "get_model_names(),get_associate_names()",
+              :url => { :controller => "exports",:action => "show_associated_columns",:model => @model},
+              :with => "'status='+this.checked+'&model_names='+get_model_names()+'&associate_names='+get_associate_names()"),:class => "right")%>
+  <%#= check_box_tag "associated_models[]", model.second, { :onchange => remote_function( :url => { :action => 'show_associated_columns', :columns => Export.prepare_associated_columns(@model,model.second) })},{:class=>'message_check' } %>
+          <%if @model == 'Hostel'%>
+          <label for="model_<%= model.first %>"><%= t('hostel_additional_details') %></label>
+          <%elsif @model == 'RoomDetail'%>
+          <label for="model_<%= model.first %>"><%= t('room_additional_details') %></label>
+          <%else%>
+            <label for="model_<%= model.first %>"><%= model.first.to_s %></label>
+          <%end%>
+      </div>
+    <% end %>
+</div>

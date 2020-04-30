@@ -1,0 +1,9 @@
+<% unless @active_gateway.nil?%>
+  <% @gateway_fields.each do |field| %>
+    <div class="label-field-pair label-field-pair-gateway">
+      <label for=<%= "#{t(field)}" %>><%= t(field) %></label>
+      <div class="text-input-bg"><%= text_field_tag "payment_settings[#{field}]",PaymentConfiguration.config_value(field) %></div>
+    </div>
+  <% end %>
+  <%= submit_tag t('save'),:class => "submit-button" %>
+<% end %>

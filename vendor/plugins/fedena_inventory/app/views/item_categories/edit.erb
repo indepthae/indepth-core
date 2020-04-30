@@ -1,0 +1,76 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('item_category') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation">
+      <span><%= flash[:warn_notice] %> </span>
+    </div>
+  <% end %>
+  <% form_for(@item_category) do |f| %>
+
+    <%= f.error_messages %>
+    <div id="form-content">
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('name')}" %></div>
+        <div class="input-container"><%= f.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('code')}" %></div>
+        <div class="text-input-bg"><%= f.text_field :code %></div>
+      </div>
+
+      <div id="submit-button">
+        <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+      </div>
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+
+  <div class="box">
+  <% unless @item_categories.empty? %>
+    <table id="listing_theme">
+    <tr class="tr-head">
+      <td><%= "#{t('sl_no')}" %></td>
+      <td><%= "#{t('name')}" %></td>
+      <td><%= "#{t('code')}" %></td>
+      <td></td>
+    </tr>
+    <tr class="tr-blank"></tr>
+     <% @item_categories.each_with_index do |store,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1"><%= i+1  %></td>
+        <td class="col-2"><div class="category-name"><%= store.name  %></div></td>
+        <td class="col-4">
+          <div class="category-code"><%= store.code %></div>
+            <td class="col-3">
+              <div id="operations">
+                <div id ="edit"><%= link_to "#{t('edit_text')}", edit_item_category_path(store), :class => "themed_text" %></div>
+                <div id="delete"><%= link_to(t('delete_text'), item_category_path(store),  :class => "themed_text",:method => 'delete', :confirm => "#{t('delete_confirm_msg')}") if permitted_to? :destroy, :store_categories %></div>
+              </div>
+            </td>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+    <div class="extender"></div>
+  </div>
+    <% end %>
+</div>
+

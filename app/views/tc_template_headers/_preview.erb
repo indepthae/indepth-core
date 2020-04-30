@@ -1,0 +1,141 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="header_preview">
+    <% if @current_template.header_enabled? %>
+      <div class ="header_head">
+          <% if @header["InstitutionLogo"].is_enabled %>
+            <div class="<%= @header["InstitutionLogo"].value == "left" ? 'logo_to_left' : 'logo_to_right' %>">
+                <div class="logo">
+                    <%= image_tag current_school_detail.logo.url(:original, false) %>
+                </div>
+            </div>
+            <div class="institution_details_to_<%= @header['AlignInstitutionDetail'].value%>">
+                <div class="preview_institution_name"><%= @header["InstitutionName"].value if @header["InstitutionName"].is_enabled%> </div>
+                <%- if @header["Address"].is_enabled%><div class="institution_address_preview"><span class="preview_institution_address"><%=  ( @header["Address"].value || "&nbsp;")%></span> </div><%- end %>
+                <div class="institution_contact_preview"><%- if @header["Website"].is_enabled%><span class="preview_institution_website"><%= @header["Website"].value || "&nbsp;"%><%- if @header["Website"].value.present?%><%- if @header["Phone"].value.present? or @header["Email"].value.present?%><%- if @header["Phone"].is_enabled == true or @header["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @header["Phone"].is_enabled%><span class="preview_institution_website"><%= @header["Phone"].value || "&nbsp;" %><%- if @header["Phone"].value.present?%><%- if @header["Email"].value.present?%><%- if @header["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @header["Email"].is_enabled%><span class="preview_institution_email"><%= @header["Email"].value || "&nbsp;" %></span><%- end %></div>
+                    <% if  @header["AdditionalField"].present?%>
+                      <% @header["AdditionalField"].additional_field.each do |additional_field| %>
+                    <div class="institution_additional_preview"><span class="preview_additional_<%= additional_field.text_size%> preview_additional_<%= additional_field.text_color%>">
+                            <%= additional_field.value%>
+                        </span></div>
+                  <% end %>
+                <% end %> 
+            </div>
+          <%else%>
+            <div class="institution_details_with_no_logo_to_<%= @header['AlignInstitutionDetail'].value%>">
+                <div class="preview_institution_name"><%= @header["InstitutionName"].value if @header["InstitutionName"].is_enabled%> </div>
+                <%- if @header["Address"].is_enabled%><div class="institution_address_preview"><span class="preview_institution_address"><%=  ( @header["Address"].value || "&nbsp;")%></span> </div><%- end %>
+                <%- if @header["Website"].is_enabled%><div class="institution_contact_preview"><span class="preview_institution_website"><%= @header["Website"].value || "&nbsp;"%><%- if @header["Website"].value.present?%><%- if @header["Phone"].value.present? or @header["Email"].value.present?%>  <%- if @header["Phone"].is_enabled == true or @header["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @header["Phone"].is_enabled%><span class="preview_institution_website"><%= @header["Phone"].value || "&nbsp;" %><%- if @header["Phone"].value.present?%><%- if @header["Email"].value.present?%>  <%- if @header["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @header["Email"].is_enabled%><span class="preview_institution_email"><%= @header["Email"].value || "&nbsp;" %></span></div><%- end %>
+                    <% if  @header["AdditionalField"].present?%>
+                      <% @header["AdditionalField"].additional_field.each do |additional_field| %>
+                    <div class="institution_additional_preview"><span class="preview_additional_<%= additional_field.text_size%> preview_additional_<%= additional_field.text_color%>">
+                            <%= additional_field.value%>
+                        </span></div>
+                  <% end %>
+                <% end %> 
+            </div>
+          <%  end %>  
+
+
+      </div>
+      <div class="header_bottom">
+
+          <div class="preview_certificate_name">
+              <%= @header["CertificateName"].value%>
+          </div>
+          <%  if @header["DateOfIssue"].value == "" %>
+            <% date_text = t('date_of_issue') %>
+          <% else %>
+            <% date_text = @header["DateOfIssue"].value %>
+          <% end %>
+          <div class="preview_certificate_date_and_serial">
+              <div class="certificate_serial">
+                  <%=t('certification_no')%> : <span class="certificate_serial_number"><%=  (@serial_number) %></span>
+              </div>
+              <% if @header["DateOfIssue"].is_enabled%><div class="certificate_date"><%= truncate(date_text, 20, "") %> : 
+                    <span class="date_format">
+                        <% if @date_of_issue.present? %>
+                          <%= format_date @date_of_issue %>
+                        <% else %>
+                          <% if @config_date_separator == "/" %>
+                            <% if @config_date_format == "1" %>
+                              <%= content_tag(:span,  "dd / mm / yyyy", :class => "date_placeholder")%>
+                            <%elsif @config_date_format == "2"%>
+                              <%= content_tag(:span,  "mm / dd / yyyy", :class => "date_placeholder")%>
+                            <%elsif @config_date_format == "3"%>
+                              <%= content_tag(:span,  "yyyy / mm / dd", :class => "date_placeholder")%>
+                            <%end%>
+                          <%else%>
+                            <% if @config_date_format == "1" %>
+                              <%= content_tag(:span,  "dd - mm - yyyy", :class => "date_placeholder")%>
+                            <%elsif @config_date_format == "2"%>
+                              <%= content_tag(:span,  "mm - dd - yyyy", :class => "date_placeholder")%>
+                            <%elsif @config_date_format == "3"%>
+                              <%= content_tag(:span,  "yyyy - mm - dd", :class => "date_placeholder")%>
+                            <%end%>
+                          <%end%>
+                        <%  end %>
+                    </span></div>
+              <% end %>
+          </div>
+      </div>
+    <% else %>
+    
+      <div class="header_bottom">
+          
+            <%if @header["CertificateName"].is_enabled.present?%>
+            <div class="preview_certificate_name">
+                <%= @header["CertificateName"].value%>
+            </div>
+            <%  if @header["DateOfIssue"].value == "" %>
+              <% date_text = t('date_of_issue') %>
+            <% else %>
+              <% date_text = @header["DateOfIssue"].value %>
+            <% end %>
+            <div class="preview_certificate_date_and_serial">
+                <div class="certificate_serial">
+                    <%=t('certification_no')%> : <span class="certificate_serial_number"><%=  (@serial_number) %></span>
+                </div>
+                <% if @header["DateOfIssue"].is_enabled%><div class="certificate_date"><%= truncate(date_text, 20, "") %> : 
+                      <span class="date_format">
+                          <% if @date_of_issue.present? %>
+                            <%= format_date @date_of_issue %>
+                          <% else %>
+                            <% if @config_date_separator == "/" %>
+                              <% if @config_date_format == "1" %>
+                                <%= content_tag(:span,  "dd / mm / yyyy", :class => "date_placeholder")%>
+                              <%elsif @config_date_format == "2"%>
+                                <%= content_tag(:span,  "mm / dd / yyyy", :class => "date_placeholder")%>
+                              <%elsif @config_date_format == "3"%>
+                                <%= content_tag(:span,  "yyyy / mm / dd", :class => "date_placeholder")%>
+                              <%end%>
+                            <%else%>
+                              <% if @config_date_format == "1" %>
+                                <%= content_tag(:span,  "dd - mm - yyyy", :class => "date_placeholder")%>
+                              <%elsif @config_date_format == "2"%>
+                                <%= content_tag(:span,  "mm - dd - yyyy", :class => "date_placeholder")%>
+                              <%elsif @config_date_format == "3"%>
+                                <%= content_tag(:span,  "yyyy - mm - dd", :class => "date_placeholder")%>
+                              <%end%>
+                            <%end%>
+                          <%  end %>
+                      </span></div>
+                <% end %>
+                <%else%>
+                  <div class="not_enabled_message"><%= t('no_header_enabled')%></div>
+                <%end%>
+            </div>
+          
+        </div>
+            <!-- <%#*<div class="not_enabled_message"><%= t('no_header_enabled')%></div>%> -->
+          <%#end%>
+    <%  end %>
+</div>

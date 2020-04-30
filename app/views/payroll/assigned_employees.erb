@@ -1,0 +1,53 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payroll_group_employees') %></div>
+  <% if params[:finance].nil? and permitted_to? :assign_employees, :payroll %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to t('assign_employees'), :controller=>"payroll", :action=>"assign_employees", :id => params[:id] %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <%  breadcrumb :payroll_groups_assigned_employees, @payroll_group %>
+    <% else %>
+      <%  breadcrumb :payroll_groups_assigned_employees_finance, @payroll_group %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"><%= flash[:notice] %></p>
+  <% end %>
+
+  <div class="label-field-pair">
+    <label for="department"><%= t('department') %></label>
+    <div class="text-input-bg">
+      <%= select_tag :department_id, options_for_select([["#{t('all_departments')}",'All']] + @departments.map { |c| [c.name, c.id] }),
+        {:onchange => "#{remote_function(:url => {:action => "employee_list", :id => params[:id], :finance => params[:finance] },
+        :with => "'value='+value+'&is_assigned='+true",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')")}"
+      }%>
+    </div>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  </div>
+
+
+  <div id="employee_list">
+    <%= render :partial => "list_employees", :is_assigned => true %>
+  </div>
+</div>

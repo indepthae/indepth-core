@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'edit_batch_prefix'
+page << "Modalbox.show($('modal-box'), {title: '#{t('set_or_edit_roll_no_prefix')}', width: 500});"

@@ -1,0 +1,53 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div>
+    <div>
+        <div class = "i_heading"><%=t('instruction')%></div>
+        <ul>   
+            <li class="instrctn_msg"><%=t('edit_i1')%></li>
+            <li class="instrctn_msg"><%=t('edit_i2')%></li>
+            <li class="instrctn_msg"><%=t('edit_i3')%></li>
+            <li class="instrctn_msg"><%=t('edit_i4')%></li>
+        </ul>
+    </div>
+    <table>
+        <tr class="tr-header">
+            <td><%=t('data_type')%></td>
+            <td><%=t('field_cannot_edit_msg')%></td>
+        </tr>
+        <%if @models.present?%>
+          <%@models.each do |model|%>
+            <tr class="tr-body">
+                <td><%= model.first %></td>
+                <td><%= @settings[model.first] %></td>
+            </tr>
+          <%end%>
+        <%end%>
+    </table>
+    <div class = "i_heading"><%=t('example')%></div>
+    <div class = "eg_msg"><%=t('eg_msg')%></div>
+    <table>
+        <tr class="tr-header">
+            <td><%=t('eg_head_1')%></td>
+            <td><%=t('eg_head_2')%></td>
+            <td><%=t('eg_head_3')%></td>
+            <td><%=t('eg_head_4')%></td>
+        </tr>
+        <tr class="tr-body">
+            <td><%=t('eg_body_1')%></td>
+            <td></td>
+            <td><%=t('eg_body_2')%></td>
+            <td></td>
+        </tr>
+        <tr class="tr-body">
+            <td><%=t('eg_body_3')%></td>
+            <td></td>
+            <td></td>
+            <td><%=t('eg_body_4')%></td>
+        </tr>
+    </table>
+</div>

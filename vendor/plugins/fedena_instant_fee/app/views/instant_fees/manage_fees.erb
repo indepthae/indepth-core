@@ -1,0 +1,33 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('instant_fees_text')  %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_instant_fees') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_category')}", :url=> {:controller => 'instant_fees',:action => 'new_category'} %></li>
+      <li id="particular" class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_particular')}", :url=> {:controller => 'instant_fees',:action => 'new_particular'} %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => 'finance/financial_year_info' %>
+    </div>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="list_categories">    
+    <div class="extender"></div>
+    <%= render :partial => 'list_categories' %>
+  </div>
+  <div id="modal-box" style="display:none;"></div>
+</div>

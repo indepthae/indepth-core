@@ -1,0 +1,317 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 15 Jan, 2016, 3:21:48 PM
+    Author     : foradian
+*/
+.reveal-if-active{
+    margin-top: 30px;
+}
+
+hr.faded{
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid rgb(226, 226, 226);
+    padding: 0; 
+}
+textarea{
+    height: 50px;
+    width: 465px;
+    max-width: 465px;
+    overflow: auto;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}
+select{
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+
+}
+.page_header{
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.page_header_desc{
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+.save_preference{
+    background: #27292B !important;
+    color: white;
+    /*    height: 30px;*/
+    font-size: 16px;
+    font-weight: bold;
+    -webkit-border-radius: 10px;
+    padding-right: 20px !important;
+    padding-left: 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+}
+.save_preference:focus{
+    outline:none;
+}
+.radio-select input {
+    float: right;
+    margin-top: 1px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+    margin-left: 7px;
+    margin-top: 2px;
+}
+.radio-select label {
+    font-weight: normal;
+    font-size: 14px;
+    /*margin-top: 5px;*/
+}
+input[type="text"]{
+    width: 465px;
+}
+
+.label-radio-pair {
+    width: 100%;
+    float: right;
+}
+.label-radio-pair label {
+    color: #333333;
+    font-size: 13px;
+    float: right !important;
+    /*    width: 500px;*/
+}
+@-moz-document url-prefix() {
+    .label-radio-pair label {
+        padding-top: 5px;
+    } 
+}
+.label-radio-pair p {
+    clear: both;
+    margin-right: 20px;
+    color: #666;
+    font-size: 13px;
+    padding-top: 6px;
+    width: 800px;
+    margin: 6px;
+    padding-right: 20px;
+}
+.radio-select-options {
+    float: right;
+    width: 100%;
+}
+.buttons {
+    float: right;
+    margin-top: 10px;
+}
+
+.institution_details_form{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    border-bottom: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.institution_details_row{
+    min-height: 32px;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding: 20px;
+    vertical-align: middle;
+    overflow: auto;
+}
+.row_sub_head{
+    padding: 0px 0px 5px 5px;
+    color: #666;
+    font-size: 13px;
+}
+
+.last, .last > a{
+    border: none;
+    /*display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: underline;
+    font-size: 13px;
+    color: #333;
+}
+.last > a {
+    padding-left: 10px;
+}
+.last{
+    padding: 10px;
+    border-bottom: 1px solid rgb(226, 226, 226);
+    padding-right: 20px;
+    line-height: 28px;
+}
+
+#page-yield .last a:hover{
+    color: black !important;
+}
+.close-field{
+    float: right;
+    margin: 2px 5px 0px 5px;
+    font-weight: 600;
+    text-decoration: none;
+}
+a.close-field{
+    color: #E26C37;
+    margin-left: 25px;
+}
+.delete_button_img{
+    margin-top: 9px;
+    margin-right: 14px;
+}
+.additional_institution_details_label{
+    width: 500px;
+    float: right;
+}
+
+.cb_value > input#additional_field{
+    width: 300px;
+}
+.additional_institution_details_fields{
+    float:right;
+    /*    margin-left: 50px;*/
+    /*    margin-top: 15px;
+        margin-bottom: 15px;*/
+}
+.text_size_select{
+    margin-left: 20px;
+}
+.text_size_select > select#text_size{
+    background: none;
+    max-width: 200px;
+}
+.text_color_select > select#text_color{
+    background: none;
+    max-width: 200px;
+}
+.footer_preview_box{
+    float: right;
+    width: 100%;
+}
+.template_settings_sub_head{
+    margin-top: 30px;
+    color: rgb(113, 113, 113);
+    font-weight: bold;
+}
+.footer_preview{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    margin-top: 20px;
+    margin-bottom: 20px; 
+    padding: 30px;
+    font-size: 14px;
+    color: #666;
+}
+
+div[class^="footer_head"]{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    overflow: auto;
+    justify-content: center;
+    margin-bottom: 50px; 
+}
+.footer_head_large{
+    font-size: 16px;
+}
+.footer_head_small{
+    font-size: 13px;
+}
+.footer_head_medium{
+    font-size: 15px;
+}
+.footer_head_very_small{
+    font-size: 12px;
+}
+.footer_head_normal{
+    font-size: 14px;
+}
+.footer_head_black{
+    color: black;
+}
+.footer_head_grey{
+    color: grey;
+}
+.footer_signatures{
+    /*    display:flex;
+        justify-content:space-between;*/
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    color: black;
+}
+.footer_signatures div:first-child {           /* Uncheck if using flex*/
+    text-align: right;
+}
+.footer_signatures div:last-child {             /* Uncheck if using flex*/
+    text-align: left;
+}
+
+.signature_preview{
+    white-space:nowrap;
+    display: table-cell;                 /* Uncheck if using flex*/
+    text-align: center;                    /* Uncheck if using flex*/
+}
+.footer_signatures div:-child {             /* Uncheck if using flex*/
+    text-align: left;
+}
+
+
+.not_enabled_message{
+    margin: 20px;
+    font-size: 22px;
+    color: grey;
+    text-align: center;
+}
+
+.submit-button{
+    background: #27292B !important;
+    padding: 7px 9px !important;
+    float: right !important;
+    -webkit-border-radius: 12px !important;
+    border-radius: 10px !important;
+    border: none;
+    margin: 0px;
+}
+.submit-button:focus{
+    outline: none !important;
+}
+.label-radio-pair{
+    width: auto !important;
+}
+.right{
+    margin-right: 30px;
+}
+#sort-desc{
+    font-weight: bold;
+}
+.radio-select{
+    float: right;
+    width: 100%;
+    margin-top: 20px;
+}
+.radio-select:first-child{
+}
+.submit_form{
+    float: right;
+    width: 100%;
+    margin-top: 30px;
+}
+.sub-radio-select{
+    float: right;
+    width: 100%;
+    margin-top: 20px;
+    margin-right: 50px;
+}

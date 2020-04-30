@@ -1,0 +1,189 @@
+<% form_for @message_thread ,:url=>{:action=>:create_broadcast},:html => { :multipart => true }do |l| %>
+  <%unless @recipients_employees.blank?%>
+    <%= hidden_field_tag :recipients_employees, @recipients_employees.collect(&:id).join(",")%>
+  <%else%>
+    <%= hidden_field_tag :recipients_employees,''%>
+  <%end%>
+  <%unless @recipients_students.blank?%>
+    <%= hidden_field_tag :recipients_students, @recipients_students.collect(&:id).join(",")%>
+  <%else%>
+    <%= hidden_field_tag :recipients_students,''%>
+  <%end%>
+  <%unless @recipients_parents.blank?%>
+    <%= hidden_field_tag :recipients_parents, @recipients_parents.collect(&:id).join(",")%>
+  <%else%>
+    <%= hidden_field_tag :recipients_parents,''%>
+  <%end%>
+  <h4><%= t('choose_recipients') %></h4>
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" )
+    %>
+      <div id="select-employee-department">
+          <%if @departments.present?%>
+            <%=   render :partial=>"select_employee_department" %>
+          <%end%>
+      </div>
+  </div>
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader1",
+        :style =>"display: none;" ) %>
+      <!-- <div class="extender"></div> -->
+      <div id="select-student-course">
+          <%if @batches.present?%>
+            <%=  render :partial=> "select_student_course" %>
+          <%end%>
+      </div>
+  </div>
+  <div class="selection_item">
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader2",
+        :style =>"display: none;" ) %>
+      <!-- <div class="extender"></div> -->
+      <div id="select-parents">
+          <%if @parents_for_batch.present?%>
+            <%=  render :partial=> "select_parents" %>
+          <%end%>
+      </div>
+  </div>
+  <!-- <div class="extender"></div> -->
+  <div class="select_users">
+      <%if @departments.present?%>
+        <div class="label-field-to">
+            <div id="to_employees">
+            </div>
+        </div>
+      <% end %>
+      <%if @batches.present? %>
+        <div class="label-field-to">
+            <div id="to_students"></div>
+        </div>
+      <% end %>
+      <%if @parents_for_batch.present?%>
+        <div class="label-field-to">
+            <div id="to_parents"></div>
+        </div>
+      <% end %>
+  </div>
+  <hr class="divider">
+  <h4><%= t('selected_recipients') %></h4>
+  <div class="selected_users">
+      <% if @to_all_employees %>
+        <div id="recipient-list" class="recipient-list"><%=render :partial=>'recipient_list_all_employees'%></div>
+      <% else %>
+        <%if @departments.present?%>
+          <div id="recipient-list" class="recipient-list"><%if @recipients_employees.present?%><%=render :partial=>'recipient_list_employees'%><%end%></div>
+        <% end %>
+      <% end %>
+      <% if @to_all_students %>
+        <div id="recipient-list1" class="recipient-list"><%=render :partial=>'recipient_list_all_students'%></div>
+      <%else%>
+        <div id="recipient-list1" class="recipient-list"><%if @recipients_students.present?%><%=render :partial=>'recipient_list_students'%><%end%></div>
+      <%end%>
+      <% if @to_all_parents %>
+        <div id="recipient-list2" class="recipient-list"><%=render :partial=>'recipient_list_all_parents'%></div>
+      <%else%>
+        <div id="recipient-list2" class="recipient-list"><%if @recipients_parents.present?%><%=render :partial=>'recipient_list_parents'%><%end%></div>
+      <%end%>
+  </div>
+  <%= l.hidden_field :recipients_presence %>
+  <div class="wrapper" id='recipient_error' style="display:none"><div class="error-icon"></div><div class="error-msg"><%=t('select_recipient')%></div></div>
+
+  <hr class="divider">
+  <h4><%= t('compose_message') %></h4>
+  <div class="message">
+      <div class="label-field-pair_column">
+          <label for="subject"><%= t('subject_messages') %></label>
+          <%if @subject.present?%>
+            <div class="text-input-bg"><%= l.text_field :subject,:value=>@subject %></div>
+          <%else%>
+            <div class="text-input-bg"><%= l.text_field :subject%></div>
+          <%end%>         
+          <div class="wrapper" id='subject_error' style="display: none">
+              <div class="error-icon"></div>
+              <div class="error-msg"> <%=t('subject_cant_blank')%></div>
+          </div>
+          <div class="wrapper" id='subject_error2' style="display: none">
+              <div class="error-icon"></div>
+              <div class="error-msg"> <%=t('subject_must_be_below_100')%></div>
+          </div>
+
+      </div>
+      <% l.fields_for :messages do  |m|%>
+        <div class="label-field-pair_column">
+            <label for="student_grade"><%= t('message') %></label>
+            <div class="redactor-area-bg">
+                <%= m.text_area :body %>
+                <div class="wrapper" id='message_error' style="display: none">
+                    <div class="error-icon"></div>
+                    <div class="error-msg"><%=t('message_blank')%></div>
+                </div>
+                <%= m.hidden_field :sender_id, :value=>@user.id  %>
+                <%= m.hidden_field :is_primary, :value=>true  %>
+                <%= m.hidden_field :is_to_all, :value=>true  %>                 
+            </div>
+
+        </div>
+
+    
+        <%= l.hidden_field :attachment_support %>              
+      <%end%>
+      <div class="label-field-pair_column attachment-section">
+          <label for=""><%="#{t('attach_file')} &lrm;(#{t('maxi_size')})&lrm;"  %></label>
+      </div>
+      <div class="text-input-bg" id="browse-style">
+          <div id="selected_attachments" class="selected_attachments"></div>
+          <%= paperclip_file_field_tag_multiple 'message_thread[messages_attributes][0][message_attachments_attributes][0]','attachment', :multiple =>true,:size=>12, :direct => false, :object => MessageAttachment.new, :uni =>"bm_message"  %>            
+      </div>  
+      <div class='wrapper' id='attachment-error' style='display:none;'>
+            <div class='error-icon'></div><div class='error-msg'></div></div>
+      <div class="pull-left">
+          <div class="can_reply_check">
+              <div class="label-field">
+                  <div class="input-container"><%= l.check_box :can_reply, :checked=>false %></div>
+                  <div class="label-container"><label class="" for="message_thread_can_reply"><%="#{t('can_reply_broadcast')}"%></label></div>
+              </div>
+              <div class="can_reply_desc">
+                  <%= t('can_reply_desc') %>
+              </div>
+          </div>
+      </div>
+
+      <hr class="divider">
+      <div class="extender"></div>
+      <div id="submit-button">
+      <%= hidden_field_tag :session_fingerprint, session_fingerprint%>
+          <%= l.hidden_field :creator_id, :value=>@user.id %>
+          <%= l.hidden_field :is_group_message, :value=>true %>
+          <%= submit_tag "#{t('send_message_text')}", :class => 'send_button'%>
+          <%= link_to"#{t('cancel')}",{:controller=>:messages,:action=>:index} ,:class => 'send_button',:style=>"color: white !important;"%>
+      </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+
+  valid_attachments = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/bmp', 'application/pdf',
+      'application/powerpoint', 'application/mspowerpoint', 'application/vnd.ms-powerpoint',
+      'application/x-mspowerpoint', 'application/msword', 'application/mspowerpoint',
+      'application/vnd.ms-powerpoint', 'application/excel', 'application/vnd.ms-excel',
+      'application/x-excel', 'application/x-msexcel', 'application/rtf', 'application/x-rtf',
+      'text/richtext', 'text/plain', 'application/wordperfect', 'application/x-wpwin',
+      'text/tab-separated-values', 'text/csv', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.presentationml.slideshow', 'application/vnd.oasis.opendocument.text',
+      'application/vnd.oasis.opendocument.spreadsheet', 'image/svg+xml', 'application/vnd.ms-works', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/wpd', 'application/wordperf'];
+  var not_valid_type = false;  
+  var index = 0 ; 
+
+
+
+</script>

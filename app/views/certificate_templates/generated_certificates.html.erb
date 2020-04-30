@@ -1,0 +1,78 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('generated_certificates') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('generate_certificate')}", generate_certificate_certificate_templates_path  %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('bulk_export')}", bulk_export_certificate_templates_path  %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%if !@student_templates.present? && !@employee_templates.present? %>
+  <p class="flash-msg"> <%= t('no_certificate_templates_present') %> </p>
+  <%else%>
+  <div id="box">
+    <div class="head">
+      <%= t('generated_certificates') %>
+    </div>
+    <div class="sub_text">
+      <%= t('generated_certificates_subhead') %>
+    </div>
+    <div class="content">
+      <div class="student_templates">
+        <%if @student_templates.present? %>
+        <table class="primary">
+          <tr>
+            <th> <%= t('student_templates') %> </th>
+            <th  class="links"></th>
+          </tr>
+          <%@student_templates.each do |t|%>
+            <tr>
+              <td><%= t.name %></td>
+              <td  class="center_text">
+                <%=link_to t('view_certificates'), list_generated_certificates_certificate_templates_path(:certificate_template_id=>t.id), :class=>"themed_text delete_links"%>
+              </td>
+            </tr>
+          <%end%>
+
+        </table>
+        <%end%>
+      </div>
+
+      <div class="employee_templates">
+        <%if @employee_templates.present? %>
+        <table class="primary">
+          <tr>
+            <th> <%= t('employee_templates') %> </th>
+            <th  class="links"></th>
+          </tr>
+          <%@employee_templates.each do |t|%>
+            <tr>
+              <td><%= t.name %></td>
+              <td  class="center_text">
+                <%=link_to t('view_certificates'), list_generated_certificates_certificate_templates_path(:certificate_template_id=>t.id), :class=>"themed_text delete_links"%>
+              </td>
+            </tr>
+          <%end%>
+
+        </table>
+        <%end%>
+      </div>
+    </div>
+
+
+  </div>
+  <%end%>
+</div>

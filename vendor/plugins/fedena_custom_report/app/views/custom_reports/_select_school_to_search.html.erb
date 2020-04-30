@@ -1,0 +1,28 @@
+<%= javascript_include_tag 'list_school'  %>
+<% content_for :head do %>
+  <script type="text/javascript" src="/javascripts/state_bodies.js"></script>
+<%  end %>
+<div id="collector_main">
+<%# form_for :report_queries_for_school, :url=>{:action=>:generate} do |form| %>
+  <div id="rev_list" class="list_box">
+    <ul>
+      <li class="listhead">Revenue district <span id="togall" class="togall">ALL</span></li>
+      <% @revenue_districts.each do |r| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <%= check_box_tag 'school[school_revenue_district][]', r.id,false,{:id=>"rev_district_check_#{r.id}"} %>
+          <span><%= r.revenue_district_name %></span>
+          <a class="add button rev_button"></a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="edu_list" class="list_box">
+
+  </div>
+  <div id="sub_list" class="list_box">
+
+  </div>
+  <div id="school_list" class="list_box">
+
+  </div>
+</div>

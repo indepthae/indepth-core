@@ -1,0 +1,290 @@
+<% i=0 %>
+<% v["categorized_particulars"].each do |particular_type| %>
+  <% particular_type.last.each do |fp| %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>
+        <div class="particalar_name"><%= fp.name %></div>
+        <div class="particalar_amount"><%= precision_label fp.amount %></div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if precision_label(v["total_discount"].to_f).to_f != 0.0 %>
+  <div class="subsection">
+      <div class="light_hor_line"></div>
+      <div id="sub_text_left"><%= t('discounts') %></div>
+      <div id="sub_text_right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+      <div class="light_hor_line"></div>
+      <div class="extender"></div>
+  </div>
+
+  <% v["discounts"].each_with_index do |d, i| %>
+    <% discount_text = d.is_amount == true ? "#{d.name}" : "#{d.name}-#{d.discount}% " %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>
+
+        <% if d.master_receiver_type=='FinanceFeeParticular' %>
+          <% particular=d.master_receiver %>
+          <div class="particalar_name"><%= "#{discount_text}  &#x200E;(#{particular.name}) &#x200E;" %></div>
+          <div class="particalar_amount">
+              <%= precision_label(particular.amount * d.discount.to_f/ 
+                  (d.is_amount? ? particular.amount : 100)) %>
+          </div>
+        <% else %>
+          <div class="particalar_name"><%= discount_text %></div>
+          <div class="particalar_amount">
+              <%= precision_label(v["total_payable"] * d.discount.to_f/ 
+                  (d.is_amount? ? v["total_payable"] : 100)) %>
+          </div>
+        <% end %>
+
+    </div>
+  <% end %>
+<% end %>
+<% if has_tax?(v) %>
+  <div class="subsection">
+      <div class="light_hor_line"></div>
+      <div id="sub_text_left"><%= t('tax_text') %></div>
+      <div id="sub_text_right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+      <div class="light_hor_line"></div>
+      <div class="extender"></div>
+  </div>
+  <% i = 0 %>
+  <% v['tax_slab_collections'].each_pair do |slab, tax_collections| %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>
+        <div class="particalar_name">
+            <%= "#{slab.name} &#x200E;(#{precision_label(slab.rate)}%)&#x200E;" %>
+        </div>
+        <div class="particalar_amount">
+            <%= precision_label(tax_collections.map(&:tax_amount).sum.to_f) %>
+        </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% i=0 %>
+<% total_fine=0 %>
+<% if v["fine"].present? and v["fine"].to_f > 0.0 %>
+  <% if total_fine==0 %>
+    <div class="subsection">
+        <div class="light_hor_line"></div>
+        <div id="sub_text_left"><%= t('fine') %></div>
+        <div id="sub_text_right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+        <div class="light_hor_line"></div>
+        <div class="extender"></div>
+    </div>
+  <% end %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= t('fine_on') %> <%= format_date(Date.today) %></div>
+      <div class="particalar_amount">
+          <%= precision_label(v["fine"].to_f) %>
+          <% total_fine=total_fine+v["fine"].to_f %>
+      </div>
+  </div>
+  <% total_fees += v["fine"].to_f %>
+<% end %>
+<% paid_fine=0 %>
+<% if v["paid_fees"].present? %>
+  <% unless v["paid_fees"].blank? %>
+    <% v["paid_fees"].each do |trans| %>
+      <% if trans.fine_included %>
+
+        <% if total_fine==0 %>
+          <div class="subsection">
+              <div class="light_hor_line"></div>
+              <div id="sub_text_left"><%= t('fine') %></div>
+              <div id="sub_text_right">
+                  <%= t('amount') %> (<%= v["currency"] %>)
+              </div>
+              <div class="light_hor_line"></div>
+              <div class="extender"></div>
+          </div>
+        <% end %>
+        <div class="particalars_list_item">
+            <div class="slno"><%= i+=1 %>.</div>
+            <div class="particalar_name"><%= t('fine_on') %> <%= format_date(trans.transaction_date) %></div>
+            <div class="particalar_amount">
+                <%= precision_label(trans.fine_amount) %>
+                <% total_fine=total_fine+trans.fine_amount %>
+            </div>
+        </div>
+        <% total_fees += trans.fine_amount.to_f %>
+        <% paid_fine+= trans.fine_amount.to_f if trans.description=='fine_amount_included' %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+
+<% if v["fine_rule"].present? and v["auto_fine"].to_i==0%>
+  <% if total_fine==0 %>
+    <div class="subsection">
+        <div class="light_hor_line"></div>
+        <div id="sub_text_left"><%= t('fine') %></div>
+        <div id="sub_text_right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+        <div class="light_hor_line"></div>
+        <div class="extender"></div>
+    </div>
+  <% end %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+1 %>.</div>
+      <div class="particalar_name"><%= t('fine_on') %> <%= format_date(v["collection"].due_date.to_date+v["fine_rule"].fine_days.days) %><%= discount_text = v["fine_rule"].is_amount ? "" : " (#{v["fine_rule"].fine_amount}&#x200E;%)" %></div>
+      <div class="particalar_amount">
+          <%= precision_label(v["fine_amount"]-paid_fine) %>
+          <% total_fine=total_fine+v["fine_amount"]-paid_fine %>
+      </div>
+  </div>
+<% end %>
+
+<div class="subsection summary-line">
+    <div class="light_hor_line"></div>
+    <div id="sub_text_left"><%= t('summary') %></div>
+    <div id="sub_text_right"><%= t('amount') %> (<%= v["currency"] %>)</div>
+    <div class="light_hor_line"></div>
+    <div class="extender"></div>
+</div>
+<% i=0 %>
+<div class="particalars_list_item">
+    <div class="slno"><%= i+=1 %>.</div>
+    <div class="particalar_name"><%= "#{t('total')} #{t('fees_text')}" %></div>
+    <div class="particalar_amount"><%= precision_label(v["total_payable"]) %></div>
+</div>
+<% if precision_label(v["total_discount"].to_f).to_f !=0 %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('discount')}" %></div>
+      <div class="particalar_amount"><%= precision_label(v["total_discount"].to_f) %></div>
+  </div>
+<% end %>
+<% if v['tax_enabled'] and v['tax_slab_collections'].present? %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('tax_text')}" %></div>
+      <div class="particalar_amount"><%= precision_label(v["total_tax"].to_f) %></div>
+  </div>
+<% end %>
+<% unless total_fine <= 0 and (v["fine"].blank? or v["fine"].to_f <= 0.0) %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('fine')}" %></div>
+      <div class="particalar_amount"><%= precision_label(total_fine) %></div>
+  </div>
+<% end %>
+
+<!-- <div class="subsection">
+  <div class="light_hor_line"></div>
+</div> -->
+<div class="receipt-footer-bottom">
+    <div class="left_info">
+        <div class="left_info_label"><%= t('payment_mode') %></div>
+        <div class="left_info_value"><%= v["payment_mode"] %></div>
+
+        <% if v["reference_no"].present? %>
+          <% if v["payment_mode"] == "Online Payment" %>
+            <div class="left_info_label"><%= t('transaction_id') %></div>
+          <% elsif v["payment_mode"] == "Cheque" %>
+            <div class="left_info_label"><%= t('cheque_no') %></div>
+          <% elsif v["payment_mode"] == "DD" %>
+            <div class="left_info_label"><%= t('dd_no') %></div>
+          <% else %>
+            <div class="left_info_label"><%= t('reference_no') %></span></div>
+          <% end %>
+          <div class="left_info_value"><%= v["reference_no"] %></div>
+        <% end %>
+
+        <% if v["payment_mode"] == "Cheque" %>
+          <div class="left_info_label"><%= t('cheque_date') %></div>
+          <div class="left_info_value"><%= v["cheque_date"] %></div>
+          <div class="left_info_label"><%= t('bank_name') %></div>
+          <div class="left_info_value"><%= v["bank_name"] %></div>
+        <% end %>
+
+        <% if v["payment_note"].present? %>
+          <div class="left_info_label"><%= t('notes') %></div>
+          <div class="left_info_value"><%= v["payment_note"] %></div>
+        <% end %>
+
+        <% if has_tax?(v) %>
+          <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+            <div class="left_info_label"><%= @tax_config[:finance_tax_identification_label] %></div>
+            <div class="left_info_value"><%= @tax_config[:finance_tax_identification_number] %></div>          
+          <% end %>
+        <% end %>
+    </div>
+    <div class="right_total">
+        <div class="right_total_label"><%= t('total_amount_to_pay') %></div>
+        <% total_fees = (v["total_payable"]-v["total_discount"].to_f+total_fine) %>
+        <% if v['tax_enabled'] and v['tax_slab_collections'].present? %>
+          <% total_fees += v['total_tax'].to_f %>
+        <% end %>
+        <div class="right_total_amount"><%= precision_label(total_fees) %></div>
+        <% unless v["done_transactions"].present? and v["done_transactions"].count >= 1 %>
+          <% if precision_label(total_fees-v["amount"].to_f).to_f==0.0 %>
+    <%#= t('total_amount_paid') %>
+    <%#= precision_label(v["amount"].to_f) %>
+          <% else %>
+    <%#= t('amount_paid') %>
+    <%#= precision_label(v["amount"].to_f) %>
+            <div class="right_total_label"><%= t('total_due_amount') %></div>
+            <div class="right_total_amount"><%= precision_label(total_fees-v["amount"].to_f) %></div>
+          <% end %>
+        <% else %>
+          <% if v["finance_type"]=='FinanceFee' %>
+            <div class="right_total_label"><%= t('previous_payments') %></div>
+            <div class="right_total_amount"><%= precision_label(v["done_amount"]) %></div>
+    <%#= t('amount_paid') %>
+    <%#= precision_label(v["amount"].to_f) %>
+            <b>
+                <div class="right_total_label"><%= t('total_amount_paid') %></div>
+                <div class="right_total_amount"><%= precision_label(v["done_amount"]+v["amount"].to_f) %></div>
+            </b>
+            <% unless precision_label(total_fees-v["done_amount"]-v["amount"].to_f).to_f==0 %>
+              <div class="right_total_label"><%= t('total_due_amount') %></div>
+              <% due_amount = total_fees-v["done_amount"]-v["amount"].to_f %>
+              <div class="right_total_amount"><%= precision_label(due_amount < 0 ? 0 : due_amount) %></div>
+            <% end %>
+          <% end %>
+        <% end %>
+    </div>
+</div>
+
+<div class="receipt-footer-bottom words_bottom">
+    <% show_amount_in_words = (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") %>
+    <div class="left_info amount_margin">
+        <% if show_amount_in_words %>
+          <span style="font-weight: bold;">
+              <%=t('amount_in_words')%></span> : 
+          <%= NumberToWord.convert(precision_label(v["amount"].to_f), @config[:pdf_receipt_nsystem], @default_currency) %>
+          <br/>
+        <% end %>
+        <% if @invoice_enabled and v["collection"].invoice_enabled %>
+          <span style="font-weight: bold;">
+              <%=t('payment_for_invoice')%></span> : 
+          <%= v["invoice_no"] %>
+        <% end %>
+    </div>    
+    <div class="right_total">
+        <% unless v["done_transactions"].present? and v["done_transactions"].count >= 1 %>
+          <% if precision_label(total_fees-v["amount"].to_f).to_f==0.0 %>
+            <b>
+                <div class="right_total_label"><%= t('total_amount_paid') %></div>
+                <div class="right_total_amount"><%= precision_label(v["amount"].to_f) %></div>
+            </b>
+          <% else %>
+            <b>
+                <div class="right_total_label"><%= t('amount_paid') %></div>
+                <div class="right_total_amount"><%= precision_label(v["amount"].to_f) %></div>
+            </b>
+          <% end %>
+        <% else %>
+          <% if v["finance_type"]=='FinanceFee' %>
+            <b>
+                <div class="right_total_label"><%= t('amount_paid') %></div>
+                <div class="right_total_amount"><%= precision_label(v["amount"].to_f) %></div>
+            </b>
+          <% end %>
+        <% end %>
+    </div>
+</div>

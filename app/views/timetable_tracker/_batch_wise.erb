@@ -1,0 +1,28 @@
+<form name="search_form" action="" style="display:inline;">
+    <div class="label-field-pair-swap">
+        <%= t('batch_select') %><br>
+        <div class="text-input-bg-swap" ><%= select :batch, :batch_id,
+              @batches.map {|b| [b.full_name, b.id]},
+              {:prompt => "#{t('select_a_batch')}"},
+              {:onChange => "#{remote_function(:url => {:action => "batch_timetable"},
+              :with => "j('form').serialize()",
+              :before => "Element.show('loader')",
+              :success => "Element.hide('loader')"
+              )}"} %>
+         <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+        </div>
+    </div>
+    <div class="label-field-pair-swap">
+        <%= t('date_select') %><br>
+        <div class="text-input-bg-swap"><%= calendar_date_select_tag 'batch[date]', I18n.l(Date.today,:format=>:default),
+              :year_range => 10.years.ago..10.years.from_now, :readonly=>true, :popup=>"force",
+              :onChange => "#{remote_function(:url => {:action => "batch_timetable"},
+            :with => "j('form').serialize()" )}"%>
+        </div>
+    </div>
+</form>
+ <div id="timetable"> </div>

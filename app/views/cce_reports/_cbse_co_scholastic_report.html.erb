@@ -1,0 +1,98 @@
+
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <%case @observation_group.observation_kind
+  when "1"%>
+    <%unless @co_hash.blank?%>
+      <tr class="tr-head">
+        <td>SESSION</td>
+        <td><%="#{@batch.start_date.year}-#{@batch.end_date.year}"%></td>
+        <td> EXAM </td>
+        <td colspan="<%=@co_hash[:ob_list].uniq.count%>"><%="#{@batch.name}"%></td>
+      </tr>
+      <tr class="tr-head">
+        <td>BOARD REG.NO</td>
+        <td>ROLL NO</td>
+        <td>NAME</td>
+        <%@co_hash[:ob_list].uniq.sort{|a,b| a[:sort_order].to_i<=>b[:sort_order].to_i}.each do |o|%>
+          <td><%="#{o[:code].upcase} - #{o[:name].upcase}"%></td>
+        <%end%>
+      </tr>
+      <% @batch.students.find(:all, :order =>"#{Student.sort_order}").each do |s| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"></td>
+          <% if roll_number_enabled? %>
+            <td class="col-2"><%=s.roll_number_in_context%></td>
+          <%else%>
+            <td class="col-2"><%=""%></td>
+          <% end %>
+          <td class="col-2"><%= s.full_name %> </td>
+          <%if @co_hash[s.id][:observations].present? %>
+            <%@co_hash[s.id][:observations].sort{|a,b| a.last[:sort_order].to_i<=>b.last[:sort_order].to_i}.each do |o|%>
+              <td><%=o.last[:grade]%></td>
+            <%end%>
+          <%else%>
+            <%@co_hash[:ob_list].each do |o|%>
+              <td>-</td>
+            <%end%>
+          <%end%>
+        </tr>
+      <% end %>
+    <%else%>
+      <tr class="tr-head">
+        <td>No reports found for the search</td>
+      </tr>
+    <%end%>
+  <%when "3"%>
+    <%unless @co_hash.blank?%>
+      <tr class="tr-head">
+        <td>SESSION</td>
+        <td><%="#{@batch.start_date.year}-#{@batch.end_date.year}"%></td>
+        <td> BATCH </td>
+        <td colspan="<%=@co_hash[:ob_list].uniq.length * 2%>"><%="#{@batch.name}"%></td>
+      </tr>
+      <tr class="tr-head">
+        <td>BOARD REG.NO</td>
+        <td>ROLL NO</td>
+        <td>NAME</td>
+        <%@co_hash[:ob_list].length.times do%>
+          <td><%=@observation_group.name%></td>
+          <td>Grade</td>
+        <%end%>
+      </tr>
+      <% @batch.students.find(:all, :order =>"#{Student.sort_order}").each do |s| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"></td>
+          <% if roll_number_enabled? %>
+            <td class="col-2"><%=s.roll_number_in_context%></td>
+          <%else%>
+            <td class="col-2"><%=""%></td>
+          <% end %>
+          <td class="col-2"><%= s.full_name %> </td>
+          <%if @co_hash[s.id][:observations].present? %>
+            <%@co_hash[s.id][:observations].sort{|a,b| a.last[:sort_order].to_i<=>b.last[:sort_order].to_i}.each do |o|%>
+              <td><%="#{o.last[:code]} - #{o.last[:name]}"%></td>
+              <td><%=o.last[:grade].present? ? o.last[:grade] : ""%></td>
+            <%end%>
+          <%else%>
+            <%@co_hash[:ob_list].each do |o|%>
+              <td><%="#{o[:code]} - #{o[:name]}"%></td>
+              <td>-</td>
+            <%end%>
+          <%end%>
+        </tr>
+      <% end %>
+    <%else%>
+      <tr class="tr-head">
+        <td>No reports found for the search</td>
+      </tr>
+    <%end%>
+  <%end%>
+</table>
+<%unless @co_hash.blank?%>
+  <div class="button">
+    <div class="pdf-button">
+      <%= link_to "► CSV Export", {:controller => "cce_reports", :action => "generate_cbse_co_scholastic_report_csv",:assessment=>{:batch_id=>@batch.id},:subject_report=>{:observation_group_id=>@observation_group.id}},:target => '_blank' %>
+    </div>
+  </div>
+<%end%>
+

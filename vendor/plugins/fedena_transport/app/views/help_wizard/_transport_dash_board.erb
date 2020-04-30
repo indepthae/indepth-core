@@ -1,0 +1,34 @@
+
+<% help_wizard('Update', 'Transport has been updated recently. There are few important things you should know.') do %>
+  <p>
+      Transport module now allows multiple ways to configure and run your vehicles. 
+      Start with <%= link_to 'Basic Settings', {:controller => :transport, :action => :configurations}, {:target=>:_blank} %> 
+      to setup configurations in the transport module according to your institution. 
+      Ensure that no changes are required after the configuration is done. </p>
+  <p>
+    With this update, Passengers are no longer assigned to Vehicles. 
+    A single vehicle may be assigned to more than one route. 
+    It also captures much more information like Certificates, Maintenance details etc. 
+    Finish setup of <%= link_to 'Vehicles', {:controller => :vehicles, :action => :index}, {:target=>:_blank} %>  to add missing details.
+  </p>
+  <p>
+    Routes and Stops have been auto created after the update. 
+    The sub routes have been converted to stops. 
+    Make the necessary changes to the routes and stops as required before you start using the module again. 
+    Finish setup of <%= link_to 'Routes', {:controller => :routes, :action => :index}, {:target=>:_blank} %> and 
+    <%= link_to 'Stops', {:controller => :vehicle_stops, :action => :index}, {:target=>:_blank} %>
+  </p>
+  <p>
+    If the same vehicle was used for more than one route, new routes have been created using the same name appended by a number. 
+    Example a route with name Morning Route will be created as Morning Route, Morning Route1, Morning Route2 and so on. 
+  </p>
+  <p>
+    Vehicles, Routes and Stops are created Academic Year wise. 
+    Use the Import feature to copy settings from the current academic year to the next. 
+  </p>
+  
+  <p>
+    If you are unsure how to proceed with a setting, contact your support team. 
+  </p>
+
+<% end %>

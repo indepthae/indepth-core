@@ -1,0 +1,39 @@
+<div class="content-div  bg-light grey-border shadow custom_date-form">
+  <% remote_form_for :book_mark, :url=>{:action=>'bookmark'}, :before=>'j("#palette-list-submit").val("Please Wait..");',:complete=>'bookmark_hide();',:html=>{:class=>"form"} do |f| %>
+    <fieldset class="field_pair bookmark_form">
+      <%= f.label :name, "Bookmark Name", :class => "book_mark_label" %>
+      <%= text_field_tag "bookmark[name]" ,{},options={:class=>"book_mark_text"} %>
+    </fieldset>
+    <%= hidden_field_tag "bookmark[url]",request.url %>
+    <%= hidden_field_tag "bookmark[created_at]" %>
+    <div class = "custom-date-buttons">
+      <%= link_to t('cancel'), "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list_custom_date(); return false;'}%>
+      <%= f.submit "Save", :onClick=>"return bookmark_validation();", :id => 'palette-list-submit' %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  function hide_list_custom_date(){
+    j(".book_mark_text").val("")
+    j("#bookmark_form").hide();
+    j("#bookmark_main_link").show();
+  }
+  function bookmark_validation(){
+    if (j(".book_mark_text").val().strip()==""){
+      alert("Bookmark Name can't be blank");
+      return false;
+    }
+    else{
+      var d=new Date();
+      j('#bookmark_created_at').val(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
+      return true;
+    }
+  }
+  function bookmark_hide(){
+    j("#palette-list-submit").val("Search");
+    j(".book_mark_text").val("")
+    j("#bookmark_form").hide();
+    j("#bookmark_main_link").show();
+  }
+</script>

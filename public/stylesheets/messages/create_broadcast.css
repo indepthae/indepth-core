@@ -1,0 +1,610 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 11 Apr, 2017, 12:05:02 PM
+    Author     : nidhin
+*/
+
+.create-options{
+
+}
+
+.to-options{
+    float:left;
+    width:385px;
+    margin: 8px 0 5px 0;
+}
+
+.to-options a{
+    font-weight:bold;
+}
+.text-area-bg {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    background:transparent none repeat scroll 0 0;
+    float:left;
+    /*width:250px;*/
+}
+.label-field-pair textarea {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    -webkit-border-radius:10px;
+    background:#EEEEEE none repeat scroll 0 0;
+    border:1px solid #C6C6C6;
+    margin:5px 0 0px 10px;
+    padding:5px;
+    width:205px;
+}
+.button {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    -webkit-border-radius:10px;
+    background:#27292B none repeat scroll 0 0;
+    border:medium none;
+    color:#FFFFFF;
+    cursor:pointer;
+    font-family:arial;
+    font-size:14px;
+    font-weight:bold;
+    margin:30px 0 0 280px;
+    padding:7px 12px;
+    text-align:center;
+    width:auto;
+}
+.scrolable{
+    float:left;
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+    -webkit-border-radius:10px;
+    background:#EEEEEE none repeat scroll 0 0;
+    border:1px solid #C6C6C6;
+    /*margin:5px 0 15px 10px;*/
+    padding:7px;
+    width:241px;
+    overflow:auto;
+    max-height:100px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+.scroll-inside{
+    max-height:100px;
+    overflow:auto;
+}
+.scroll-inside a.all {
+    color:#444444;
+    font-weight:bold;
+    font-size:14px;
+    text-decoration:none;
+}
+.scroll-inside a.individual{
+    font-size:14px;
+    text-decoration:none;
+    color:#444444;
+}
+.scroll-inside .hover span.add-span{
+    display: none;
+}
+.scroll-inside .hover:hover a{
+    text-decoration:underline;
+    color:#9f0c14;
+}
+
+.scroll-inside .hover:hover span.add-span{
+    display:block;
+    float:right;
+    color:#444444;
+    font-size:13px;
+    padding-top:2px;
+}
+.id-span {
+  color: gray;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.hover{
+    border-bottom:1px solid #dddddd;
+      width: 90%;
+}
+#form{
+    width:500px;
+    float:left;
+}
+.message{
+    /*width:400px;
+    float:left;*/
+}
+.label-field-pair textarea:focus{
+    background: #fff;
+    border: 1px solid #9e0f15;
+}
+.label-field-pair label{
+    width:150px;
+}
+.label-field-pair input, .label-field-pair textarea{
+    width:300px;
+}
+.selection_item {
+  width: 30%;
+  float: left;
+}
+.label-field-to {
+  width: 30%;
+  min-height: 130px;
+  float: left;
+}
+.select_users {
+  clear: both;
+  padding-top :12px;
+}
+.selected_users{
+  clear: both;
+}
+.recipient-list {
+  float: left;
+  width: 30%;
+  min-height: 30px;
+}
+.label-field-pair_column{
+  min-height: 90px;
+  /*width: 600px;*/
+  width: 258px;
+  padding-top: 3px;
+}
+.label-field-pair_column label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin-bottom: 10px;
+    /*float: left;*/
+    width: 200px;
+    padding-top: 10px;
+    font-weight: 600;
+
+}
+.label-field-pair_column input {
+    border: 1px solid #c6c6c6;
+    /*margin: 5px 0 0 10px;*/
+    margin-top: 10px;
+    width: 597px;
+    height: 42px;
+    padding: 5px;
+    background: #eee;
+    border-radius: 10px;
+}
+.redactor-area-bg textarea {
+  background: #eee;
+  border-radius: 10px;
+  resize: none;
+  width: 98.3%;
+  height: 90%;
+  padding: 10px;
+  border: 1px solid #c6c6c6;
+}
+.label-field-pair_column  input:focus {
+    background: #fff;
+    border: 1px solid #9e0f15;
+}
+.redactor-area-bg{
+  width: 597px;
+  height: 300px;
+}
+.redactor-area-bg textarea:focus{
+  background: #fff;
+  border: 1px solid #9e0f15;
+}
+#reminder_body {
+  width: 587px;
+  height: 290px;
+  border-style: solid;
+  border-color: #ccc;
+  border-width: 1px;
+  padding: 10px;
+  float: left;
+  margin-top: 10px;
+
+}
+/*overrides*/
+.fields .label-field-pair_column{
+    min-height: 20px !important;
+}
+.paperclip_field input.field1{
+    border: none !important;
+    background: white !important;
+    min-width: 55px;
+    height : 26px !important;
+    max-width: 110px;
+}
+.paperclip_field{
+    margin-left: -10px !important;
+    width: 68%;
+    float: left;
+}
+
+#browse-style{  
+   
+    height: auto;
+    width:100%;
+    
+}
+.style input{
+    cursor: pointer;
+}
+.style {
+    border:none !important;  
+}
+
+    
+.style:before {
+    content: "Attach File" !important;    
+    text-decoration: none;
+    padding-left: 19px;
+    color: #080;
+    font-size: 13px;
+    cursor: pointer;
+    background: url(/images/iconsprite-1.png) no-repeat -95px -344px;
+}
+.style:after {
+    content: '' !important;
+}
+.redactor_editor {
+  height: 200px;
+}
+.text-input-bg select {
+  margin: 0px;
+  width: 258px;
+}
+.send_button {
+  background:#27292B none repeat scroll 0 0;
+  border:medium none;
+  color:#FFFFFF;
+  cursor:pointer;
+  font-family:arial;
+  font-size:14px;
+  font-weight:bold;
+  padding:7px 12px;
+  text-align:center;
+  width:auto;
+  border-radius:10px;
+  text-decoration: none;
+}
+input.send_button {
+  margin-right: 15px;
+}
+.right {
+  float: right;
+  font-size: 13px;
+  margin-top: 2px;
+}
+.right:hover {
+  text-decoration: underline;
+  cursor: pointer
+}
+.divider {
+  clear: both;
+  color: #ccc;
+  border-color: #ccc;
+  background-color: #ccc;
+  height: 1px;
+  border: 0;
+  margin: 0;
+}
+.extender {
+  height: 20px;
+}
+.scrolable-left-label{
+  /*margin-left: 10px;*/
+  font-size: 14px;
+}
+.message .label-field-pair_column {
+    margin-top: 20px;    
+    width: 100%;
+    float: right;
+}
+h4{
+  font-size: 15px;
+}
+.selection_item .label-field-pair_column {
+  min-height: 10px;
+}
+.loader {
+  float: right;
+  margin-right: 56px;
+}
+#loader,#loader1,#loader2 {
+  float: right;
+  margin-right: 56px;
+  margin-top: 14px;
+}
+.message {
+  font-size: 14px;
+}
+.left {
+  float: left;
+  clear: both;
+}
+
+#page-yield .remove-field a:hover {
+   
+}
+.message #attachment-field-div {
+    margin-top: 10px;
+}
+#attachment-field-div label {
+  margin-bottom: 15px;
+  direction: ltr;
+}
+.s3_error {
+  margin-top: -8px;
+}
+.error-icon {
+    width:15px;
+    height:12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right:2px;
+    float:left;
+}
+.error-msg{
+    float:left;
+    color: red;
+    font-size: 13px;
+    width:300px;
+    margin-bottom: 20px;
+    font-style: italic;
+
+}
+.wrapper{
+    margin-top: 5px;
+    /*margin-left: 10px;*/
+    width: 400px;
+    float: left;
+}
+.can_reply_check{
+    float:left;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    line-height: 1.5;
+    width: 59%;
+}
+.can_reply_check label{
+    font-weight: bold;
+}
+.can_reply_desc{
+    font-size: 13px;
+    color: #666;
+    margin-top: 10px;
+    padding-left: 30px;
+}
+.can_reply_check .input-container{
+    float:left;
+}
+.can_reply_check .input-container input{
+    margin-top: 2px;
+    margin-right: 13px;
+}
+.pull-left{
+    float:left;
+}
+.can_reply_check .label-container{
+    user-select: none;
+}
+
+.remove-field a {
+    cursor: pointer;
+    text-decoration: none;
+    color: transparent;
+    background: transparent url("/images/iconsprite-1.png") no-repeat scroll -31px 1px;
+    width: 16px;
+    float: left;
+    display: block;
+    height: 16px;
+    margin-top: 3px;
+}
+.remove-field a:hover{
+    background-position: -31px -15px;
+}
+.remove-field {
+    float: left;
+    margin-top: 7px;
+}
+#attachment-field-div{
+    float: left;
+    width: 100%;
+}
+#attachment-field-div .text-input-bg{
+    width: 350px !important;
+}
+.text-input-bg {
+    background: transparent;
+    height: 60px;
+    width: 250px;
+    float: left;
+}
+#attachment-style {
+    width: 100%;
+    height: 20px;
+    padding-top: 5px
+}
+
+#attachment-style:after {
+    /* content: url(/images/iconsprite-1.png); */
+    
+    content: ' ';
+    width: 21px;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -120px -64px;
+    height: 15px;
+    display: block;
+    float: left;
+    margin-top: -14px;
+}
+.add_fields {
+    clear: both;
+    margin-top: 10px;
+}
+.fields {
+    width: 600px;
+    clear: both;
+}
+a.add_button_img {
+    text-decoration: none;
+    padding-left: 14px;
+    color: #080;
+    font-size: 13px;
+}
+/*.upload_button{
+    margin-top: 35px;
+}*/
+.remove_attachment_tag {
+    color: #646969;
+    cursor: pointer;
+}
+.attachment_preview {
+    font-size: 13px;
+    color: #646969;
+    margin-left: 27px;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -183px -70px;
+    width: 40%;
+    float: left;
+}
+.remove_attachment {    
+    display: inline-block;
+    float: right;
+    margin-right: 101px;
+    margin-top: -11px;
+    width: 70%
+}
+ .remove_attachment_tag {
+    color: #8a9292;
+    cursor: pointer;
+    font-weight: bold;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -30px 2px;
+    width: 16px;
+    float: left;
+    display: block;
+    height: 14px;
+    margin-top: -4px;
+}
+.remove_attachment_tag:hover{
+    background-position: -30px -15px;
+}
+.bm_attachment_preview {
+    font-size: 13px;
+    color: #646969;
+    margin-left: 29px;
+    padding-top: 7px;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -183px -70px;
+    width: 20%;
+    float: left;
+}
+.bm_remove_attachment {    
+    display: inline-block;
+    float: right;
+    margin-right: 161px;
+    margin-top: -14px;
+    width: 63%;
+}
+.bm_attach-button{    
+    text-decoration: none;
+    padding-left: 28px;
+    color: #080;
+    font-size: 13px;
+    cursor:pointer;
+    background: url('/images/iconsprite-1.png') no-repeat -101px -344px
+
+}
+.pgbar {
+    
+     border: none !important;
+     background: none !important;
+   
+}
+.attachment-clip:before {
+    content: ' ';
+    width: 27px;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -117px -62px;
+    height: 15px;
+    display: block;
+    float: left;
+    margin-top: 10px;
+}
+input[type=text].field1 {
+    width: 110px !important;
+    border-radius: 8px 0px 0px 8px !important;
+    text-align: left;
+    color: #666666;
+    opacity: 1;
+    border: 1px solid #ccc;
+    float: left;
+}
+.text-input-bg {
+    background: transparent;
+    height: 15px ;
+}
+.paperclip_field{
+    float: left;
+    margin-left: -11px;
+    width: 100%;
+    height: 22px ;
+
+}
+#attachment-error{
+    font-size: 10px;
+    color: red;
+}
+#browse-style {
+    width : 100% !important;
+}
+#selected_attachments {
+    margin-top: 7px;
+}
+.attachment_preview {
+    font-size: 13px;
+    color: #646969;
+    margin-left: 27px;
+    background: transparent url(/images/iconsprite-1.png) no-repeat scroll -183px -70px;
+    width: 40%;
+    float: left;
+}
+.paperclip_field {
+    height: 24px;
+}
+.text-input-bg span {
+    font-size: 15px;
+    line-height: normal;
+    margin-left: 0;
+    font-weight: normal;
+    color: #333;
+}
+#subject_error {
+    margin-top: 57px;
+    /* margin-bottom: 12px; */
+}
+#subject_error2 {
+    margin-top: 57px;
+    /* margin-bottom: 12px; */
+}
+.attachment-section {
+    min-height: 20px;
+}

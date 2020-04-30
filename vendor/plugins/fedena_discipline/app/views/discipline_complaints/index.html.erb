@@ -1,0 +1,100 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('discipline') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('complaints') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :new,:discipline_complaints %>
+        <%if DisciplineComplaint.is_privileged_user(@current_user.id) or @current_user.admin?%>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", new_discipline_complaint_path%></li>
+        <% end %>
+      <%end%>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+  <% unless @discipline_complaints.empty? %>
+    <div id="head">
+      <div id="c_search">
+        <div id="search_textbox">
+          <form name="search-form" id="search-form">
+            <label for="query"><%= t('search_text') %>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader",
+                :style =>"display: none;" ) %>
+            </label>
+            <div class="text-input-bg-complaint">
+              <%= text_field_tag "query", params[:query], :autocomplete => 'off' %>
+            </div>
+          </form>
+        </div>
+        <div id="pending">
+            <label for="sort_by" id="filter"><%= t('filter_by_status') %>
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loading",
+              :style =>"display: none;" ) %>
+          </label>
+          <div class="text-input-bg">
+            <%if params[:sort_param]=="pending"%>
+              <%= select :discipline_complaint, :action, [["#{t('pending')}", 'pending'],["#{t('all')}", 'all'],["#{t('solved')}",'solved']], {} ,{:onChange => "#{remote_function(:url => {:action => "index"},
+                :with => "'sort_param='+value",:before => "$('loading').show();",
+                :success => "$('loading').hide();")}"}  %>
+            <%elsif params[:sort_param]=="solved"%>
+              <%= select :discipline_complaint, :action, [["#{t('solved')}",'solved'],["#{t('all')}", 'all'],["#{t('pending')}", 'pending']], {} ,{:onChange => "#{remote_function(:url => {:action => "index"},
+                :with => "'sort_param='+value",:before => "$('loading').show();",
+                :success => "$('loading').hide();")}"}  %>
+            <%else%>
+              <%= select :discipline_complaint, :action, [["#{t('all')}", 'all'],["#{t('pending')}", 'pending'],["#{t('solved')}",'solved']], {} ,{:onChange => "#{remote_function(:url => {:action => "index"},
+                :with => "'sort_param='+value",:before => "$('loading').show();",
+                :success => "$('loading').hide();")}"}  %>
+            <%end%>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="view_all">
+
+    </div>
+
+
+    <div class="extender"> </div>
+    <div id="list">
+      <%=render :partial=>"sort_pending"%>
+    </div>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_complaints') %> </p>
+  <% end %>
+  <script type="text/javascript">
+    function search_complaint_ajax()
+    {
+      if ($('query').value.include("%")) return;
+<%="#{remote_function(:url => {:action => "search_complaint_ajax"},
+:with =>  "'query='+ $('query').value",
+:before => "Element.show('loader')",
+:success => "Element.hide('loader')",
+:update=>"list" )}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('query', 1, search_complaint_ajax);
+    
+  });
+
+  </script>
+
+
+</div>
+

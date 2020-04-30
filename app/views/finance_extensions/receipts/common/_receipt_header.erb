@@ -1,0 +1,26 @@
+<% printer ||= false %>
+<% preview ||= false %>
+<% template_exists = (template_id.present? and @data[:templates].has_key?(template_id.to_i)) %>
+<%# template_exists = false if printer && preview %>
+<% if template_exists %>
+    <%= render :partial => "receipt_templates/receipt_header",
+               :locals => {:header_content => @data[:templates][template_id.to_i].try(:last), :printer => printer} %>
+
+<% else %>
+
+    <%= render :partial => "finance_extensions/receipts/defaults/receipt_header",
+               :locals => {:default_configs => default_configs, :printer => printer} %>
+
+<% end %>
+
+<!-- 
+< % if (template_id.present? and @data[:templates].has_key?(template_id.to_i)) %>
+
+  < %= render :partial => "receipt_templates/receipt_header", 
+    :locals => {:header_content => @data[:templates][template_id.to_i].try(:last).header_content_for_pdf }%>
+
+< % else %>    
+  < %= render :partial => "finance_extensions/receipts/defaults/receipt_header", 
+    :locals => {:default_configs => default_configs} %>
+< % end %>
+-->

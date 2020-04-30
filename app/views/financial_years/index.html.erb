@@ -1,0 +1,125 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('financial_year_name') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_financial_years') %></div>
+  <% if permitted_to? :new, :financial_years %>
+      <div id="inner-tab-menu">
+        <ul>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('new_financial_year')}", :url => {:controller => "financial_years", :action => "new"} %></li>
+        </ul>
+      </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :financial_years_index %>
+    <%= render_breadcrumbs %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="header"><%= t('financial_years_text') %></div>
+  <% if @active_year.nil? and @financial_years.present? %>
+      <div id="active_year">
+        <div id="description"><%= t('active_financial_year_description') %></div>
+        <%= link_to_remote "#{t('set_active_financial_year')}", :url => set_active_financial_years_path, :method => :get, :html => {:class => 'submit-button'} %>
+      </div>
+  <% elsif @active_year.present? %>
+      <div id="description"><%= t('active_financial_year_description') %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="aca_years">
+        <tr class="tr-head">
+          <td class="name"><%= t('active_financial_year') %></td>
+          <td class="start_date"><%= t('start_date') %></td>
+          <td class="end_date"><%= t('end_date') %></td>
+          <td class="action"></td>
+        </tr>
+        <tr>
+          <td><%= @active_year.name %></td>
+          <td><%= format_date(@active_year.start_date) %></td>
+          <td><%= format_date(@active_year.end_date) %></td>
+          <td>
+            <%= link_to_remote t('edit'), :url => edit_financial_year_path(@active_year), :method => :get %>
+            <%= link_to_remote t('change_active_financial_year'), :url => set_active_financial_years_path, :method => :get %>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+  <div id="description"><%= t('inactive_financial_year_desc') %></div>
+  <div id="leave_group_list">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="aca_years">
+      <tr class="tr-head">
+        <td class="name"><%= t('inactive_financial_years') %></td>
+        <td class="start_date"><%= t('start_date') %></td>
+        <td class="end_date"><%= t('end_date') %></td>
+        <td class="action"></td>
+      </tr>
+      <% if @financial_years.present? %>
+          <% @financial_years.each do |ay| %>
+              <tr>
+                <td><%= ay.name %></td>
+                <td><%= format_date(ay.start_date) %></td>
+                <td><%= format_date(ay.end_date) %></td>
+                <td>
+                  <%= link_to_remote t('edit'), :url => edit_financial_year_path(ay), :method => :get %>
+                  <% unless ay.dependencies_present? %>
+                      <%= link_to t('delete'), delete_year_financial_year_path(ay), :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_financial_year_confirmation', {:name => ay.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_financial_year')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% else %>
+                       <span class="deleted">
+                         <%= t('delete') %>
+                       </span>
+                  <% end %>
+                </td>
+              </tr>
+          <% end %>
+      <% else %>
+          <tr>
+            <td colspan="4"><%= @active_year.present? ? t('no_inactive_financial_years') : t('create_an_financial_year') %></td>
+          </tr>
+      <% end %>
+    </table>
+    <% if @financial_years.present? %>
+        <%= pagination_status(@financial_years) %>
+    <% end %>
+    <%= will_paginate @financial_years %>
+  </div>
+</div>
+<script type="text/javascript">
+    fetch_year_details = function (elm) {
+        new Ajax.Request('/financial_years/fetch_details', {
+            parameters: {'id': elm.value},
+            asynchronous: true,
+            evalScripts: true,
+            method: 'post',
+            onLoading: function () {
+                j(elm).parent().next('#loader').show();
+            },
+            onComplete: function (resp) {
+                j('#active_year_msg').hide();
+                j(elm).parent().parent().next('#active_year_details').html(resp.responseText);
+                j(elm).parent().next('#loader').hide();
+            }
+        });
+    }
+
+    validate = function () {
+        if (j('#financial_year_year_id').val() == "") {
+            j('#active_year_msg').show();
+            return false;
+        } else {
+            j('#active_year_msg').hide();
+            return true;
+        }
+    }
+    change_name = function (elm) {
+        start_date = j('#start_date').val();
+        end_date = j('#end_date').val();
+        start_year = (new Date(start_date)).getFullYear();
+        end_year = (new Date(end_date)).getFullYear();
+        j('#financial_year_name').val(start_year + ' - ' + end_year);
+    }
+</script>

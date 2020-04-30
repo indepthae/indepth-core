@@ -1,0 +1,322 @@
+<div id="date-range"><%= @payslips_date_range.date_range %></div>
+<% if (@payslip.empty? or params[:regenerate].present?) and @employee.joining_date <= @date_ranges.last and @ranges.empty? %>
+  <% form_for @payslips_date_range, :url => {:action => "create_employee_wise_payslip",:from => params[:from], :id => @payslips_date_range.id, :employee_id => @employee.id, :payslip_id => params[:payslip_id]}, :html => {:onsubmit => "return validate();"} do |range| %>
+    <%= session_fingerprint_field %>
+    <%= range.hidden_field :start_date %>
+    <%= range.hidden_field :end_date %>
+    <%= range.hidden_field :payroll_group_id %>
+    <%= range.hidden_field :revision_number %>
+    <% range.fields_for :employee_payslips, @employee_payslip do |f| %>
+      <%= f.hidden_field :employee_id %>
+      <%= f.hidden_field :gross_salary %>
+      <%= f.hidden_field :revision_number %>
+      <%= f.hidden_field :payroll_revision_id %>
+      <%= f.hidden_field :regenerate, :value => params[:regenerate] %>
+      <h3><%= t('payroll_categories_of_this_payroll_group') %></h3>
+      <div class="description"><%= t('payroll_categories_of_payroll_group_desc') %></div>
+      <%= render :partial => "payroll_structure" %>
+      <% if !@lop_as_deduction and @lop_amount and @additional_leaves.present? %>
+        <div>
+          <% count= @selected_leaves.inject(0){|sum,e| sum += (e.is_half_day ? 0.5 : 1)}  %>
+          <%= f.hidden_field :lop_amount,:value => precision_label(@lop_amount), :id => 'lop-amount'  %>
+          <%= f.hidden_field :additional_leaves, :value => @selected_leaves.collect(&:id).join(","), :id => "additional_leaves"  %>
+          <%= f.hidden_field :days_count, :value => count, :id => "days_count" %>
+          <%= f.hidden_field :deducted_from_categories, :value => true %>
+        </div>
+        <div id="lop-details" class="lop_from_cat">
+          <div class="fields-details">
+            <div class="field-label"><%= t('selected_deductable_lop_leaves') %></div>
+            <div class="fields-val">: <span id="lop_days"><%= "#{count} #{t('days_text',{:count => count})}" %></span></div>
+            <div class="div_link" onclick="showLopModalBox()"><%= t('select_leave') %></div>
+          </div>
+          <div class="fields-details">
+            <div class="field-label"><%= t('loss_of_pay') %></div>
+            <div class="fields-val">: <%= "<span id='lop_amount-dis'>#{precision_label(count * @lop_amount)}</span> #{@currency_type} &thinsp;(<span id='lop_count'>#{count}</span> * #{precision_label(@lop_amount)} #{@currency_type})" %></div>
+          </div>
+        </div>
+      <% end %>
+      <div class="earnings">
+        <div class="sub-head"><%= t('earnings') %></div>
+        <% @net_pay = 0 %>
+        <% total_earnings = 0  %>
+        <% f.fields_for :employee_payslip_categories, @earnings do |comp| %>
+          <% c_obj = comp.object %>
+          <div class="label-field-pair">
+            <label for="category-name"><%= comp.object.pc_name %></label>
+            <div class="text-input-bg">
+              <%= comp.text_field :amount, :value => precision_label(c_obj.amount), :pc_code => c_obj.pc_code, :class => "amount" %>
+              <div class="wrapper" id="live-val"></div>
+            </div>
+            <span class="currency-type"><%= @currency_type %></span>
+            <%= comp.hidden_field :payroll_category_id %>
+            <%= comp.hidden_field :pc_name %>
+            <%= comp.hidden_field :is_deduction %>
+          </div>
+          <% total_earnings += c_obj.amount.to_f %>
+        <% end %>
+        <div id="individual_earnings">
+          <% f.fields_for :individual_payslip_categories, @individual_earnings do |comp| %>
+            <% c_obj = comp.object %>
+            <div class="label-field-pair individual_category">
+              <label for="category-name"><%= c_obj.name %></label>
+              <div class="text-input-bg">
+                <%= comp.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                <div class="wrapper" id="live-val"></div>
+              </div>
+              <span class="currency-type"><%= @currency_type %></span>
+              <%= comp.hidden_field :name %>
+              <%= comp.hidden_field :is_deduction %>
+              <%= link_to '', '#/', :class => "cross_button", :onclick => "remove_fields(this)" %>
+            </div>
+            <% total_earnings += c_obj.amount.to_f %>
+          <% end %>
+        </div>
+        <div id="earning" class="add_link" onclick="showModalBox(this)"><div id="add-icon"></div><%= t('add_an_earning') %></div>
+        <div class="label-field-pair">
+          <label for="total_earnings"><%= "#{t('total_salary').titleize}" %></label>
+          <div class="total"><%= precision_label(total_earnings) %></div>
+          <span class="currency-type"><%= @currency_type %></span>
+        </div>
+      </div>
+      <% total_deductions = 0 %>
+      <div class="deductions">
+        <div class="sub-head"><%= t('deductions') %></div>
+        <% f.fields_for :employee_payslip_categories, @deductions do |comp| %>
+          <% c_obj = comp.object %>
+          <div class="label-field-pair">
+            <label for="category-name"><%= comp.object.pc_name %></label>
+            <div class="text-input-bg">
+              <%= comp.text_field :amount, :value => precision_label(c_obj.amount), :pc_code => c_obj.pc_code, :class => "amount" %>
+              <div class="wrapper" id="live-val"></div>
+            </div>
+            <span class="currency-type"><%= @currency_type %></span>
+            <%= comp.hidden_field :payroll_category_id %>
+            <%= comp.hidden_field :pc_name %>
+            <%= comp.hidden_field :is_deduction %>
+          </div>
+          <% total_deductions += c_obj.amount.to_f %>
+        <% end %>
+        <% if @lop_as_deduction and @lop_amount and @additional_leaves.present? %>
+          <div class="label-field-pair">
+            <label for="category-name"><%= t('loss_of_pay') %></label>
+            <div class="text-input-bg">
+              <% count= @selected_leaves.inject(0){|sum,e| sum += (e.is_half_day ? 0.5 : 1)}  %>
+              <%= f.text_field :lop, :value => precision_label( count * @lop_amount), :class => "amount", :id=> 'loss_of_pay' %>
+              <%= f.hidden_field :lop_amount,:value => precision_label(@lop_amount), :id => 'lop-amount'  %>
+              <%= f.hidden_field :additional_leaves, :value => @selected_leaves.collect(&:id).join(","), :id => "additional_leaves"  %>
+              <%= f.hidden_field :days_count, :value => count, :id => "days_count" %>
+              <div class="wrapper" id="live-val"></div>
+            </div>
+            <span class="currency-type"><%= @currency_type %></span>
+          </div>
+          <% total_deductions += (count * @lop_amount).to_f %>
+          <div id="lop-details">
+            <div class="fields-details">
+              <div class="field-label"><%= t('selected_deductable_lop_leaves') %></div>
+              <div class="fields-val">: <span id="lop_days"><%= "#{count} #{t('days_text',{:count => count})}" %></span></div>
+              <div class="div_link" onclick="showLopModalBox()"><%= t('select_leave') %></div>
+            </div>
+            <div class="fields-details">
+              <div class="field-label"><%= t('loss_of_pay') %></div>
+              <div class="fields-val">: <%= "<span id='lop_amount-dis'>#{precision_label(count * @lop_amount)}</span> #{@currency_type} &thinsp;(<span id='lop_count'>#{count}</span> * #{precision_label(@lop_amount)} #{@currency_type})" %></div>
+            </div>
+          </div>
+        <% end %>
+        <div id="individual_deductions">
+          <% f.fields_for :individual_payslip_categories, @individual_deductions do |comp| %>
+            <% c_obj = comp.object %>
+            <div class="label-field-pair individual_category">
+              <label for="category-name"><%= c_obj.name %></label>
+              <div class="text-input-bg">
+                <%= comp.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount" %>
+                <div class="wrapper" id="live-val"></div>
+              </div>
+              <span class="currency-type"><%= @currency_type %></span>
+              <%= comp.hidden_field :name %>
+              <%= comp.hidden_field :is_deduction %>
+              <%= link_to '', '#/', :class => "cross_button", :onclick => "remove_fields(this)" %>
+            </div>
+            <% total_deductions += c_obj.amount.to_f %>
+          <% end %>
+        </div>
+        <div id="deduction" class="add_link" onclick="showModalBox(this)"><div id="add-icon"></div><%= t('add_a_deduction') %></div>
+        <div class="label-field-pair">
+          <label for="total_deductions"><%= "#{t('total_deduction').titleize}" %></label>
+          <div class="total"><%= precision_label(total_deductions) %></div>
+          <span class="currency-type"><%= @currency_type %></span>
+        </div>
+      </div>
+      <% @net_pay = total_earnings - total_deductions %>
+      <% @net_pay = PayrollGroup.rounding_up(@net_pay,Configuration.get_rounding_off_value.config_value.to_i) if  !(Configuration.to_enable_round_off.config_value.to_i.zero?) %>
+      <div class="label-field-pair" id="net_pay">
+        <label for="net_pay"><%= "#{t('net_pay').titleize}" %></label>
+        <div class="total"><%= precision_label(@net_pay) %></div>
+        <span class="currency-type"><%= @currency_type %></span>
+      </div>
+      <div class="wrapper" id="net_pay_warning" style="display : none"><div class="error-icon"></div><div class="error-msg"><%= t('net_pay_must_be_a_positive_amount') %></div></div>
+
+      <%= f.hidden_field :net_pay, :value => @net_pay ,:id => "net_pay_field"%>
+    <% end %>
+    <%=submit_tag "#{t('generate_payslip').capitalize}", :disable_with => "#{t('please_wait')}", :class => "submit-button"  %>
+  <% end %>
+  <% if ["view_outdated_employees", "view_regular_employees", "view_employees_with_lop"].include? params[:from] %>
+    <%= link_to t('cancel'), {:controller => "employee_payslips", :action => params[:from], :id => @payroll_group.id, :start_date => @date_ranges.first, :end_date => @date_ranges.last}, :class => "submit-button", :id => "cancel-link" %>
+  <% else %>
+    <%= link_to t('cancel'), payslip_for_employees_employee_payslips_path(), :class => "submit-button", :id => "cancel-link" %>
+  <% end %>
+  <div id="MB_overlay" style="display:none;"></div>
+  <div id="MB_window" style="display:none;">
+    <%= render :partial => "list_additional_leaves" %>
+  </div>
+<% else %>
+  <p class="flash-msg">
+    <% if @employee.joining_date > @date_ranges.last %>
+      <%= t('employee.flash45') %>
+    <% elsif @ranges.present? %>
+      <%= t('payslip_has_been_overlapped_for',:start_date  => format_date(@ranges.first.start_date,:short), :end_date => format_date(@ranges.first.end_date, :short)) %>
+    <% else %>
+      <%= t('payslip_has_been_already_generated_for') %>
+    <% end %>
+  </p>
+<% end %>
+<div id="overlay"></div>
+<div id="modalMsg"  class="HideModal">
+  <%= render :partial => "add_individual_category" %>
+</div>
+
+<script type="text/javascript">
+  var count = j('.individual_category').length;
+  var precision = <%= FedenaPrecision.get_precision_count %>;
+  j("input[class='amount']").change(function(){
+    calculate_net_pay();
+  });
+  j(document).ready(function(){
+    if(j('#net_pay_field').length > 0)
+    {
+      net_pay = j('#net_pay_field').val();
+      if((net_pay.length == 0) || isNaN(net_pay) || (net_pay < 0) )
+        j('#net_pay_warning').show();
+    }
+  });
+  function showModalBox(elm)
+  {
+    document.getElementById("overlay").className = "OverlayEffect";
+    document.getElementById("modalMsg").className = "ShowModal";
+    if(elm.id == 'earning')
+    {
+      j("#MB_caption").text("<%= t('add_an_earning') %>");
+      j("#modalMsg").attr('is_deduction',0);
+      j('#MB_content #ok').text("<%= t('generate_payslip_bulk.add_earning') %>");
+    }
+    else
+    {
+      j("#MB_caption").text("<%= t('add_a_deduction') %>");
+      j("#modalMsg").attr('is_deduction',1);
+      j('#MB_content #ok').text("<%= t('generate_payslip_bulk.add_deduction') %>");
+    }
+    j("#modalMsg").attr('parent_attr_name','payslips_date_range[employee_payslips_attributes][0][individual_payslip_categories_attributes]');
+    j('#category_name').val('');
+    j('#ind_amount').val('');
+    if(j('html').attr('dir') == 'ltr')
+      j('#modalMsg').css({left : (j('body').width() - j('#modalMsg').width())/2});
+    else
+      j('#modalMsg').css({right : (j('body').width() - j('#modalMsg').width())/2});
+  }
+  function removeModalBox(){
+    document.getElementById("modalMsg").className = "HideModal";
+    document.getElementById("overlay").className = "";
+    j('#MB_content .wrapper').children().hide();
+    return false;
+  }
+  function calculate_net_pay()
+  {
+    sum = 0;
+    j(".earnings input[class='amount']").each(function(){
+      if(this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+      {
+        val = parseFloat(parseFloat(this.value).toFixed(precision))
+        sum += val;
+        j(this).val(parseFloat(this.value).toFixed(precision));
+        j(this).parent('.text-input-bg').find('#live-val').html('');
+      }
+      else
+        make_error_message(this,"<%= "#{t('earnings')} " %> ");
+    });
+    earnings = sum;
+    j('.earnings .total').text(sum.toFixed(precision).toString());
+    j(".deductions input[class='amount']").each(function(){
+      if(this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+      {
+        val = parseFloat(parseFloat(this.value).toFixed(precision))
+        sum -= val;
+        j(this).val(parseFloat(this.value).toFixed(precision));
+        j(this).parent('.text-input-bg').find('#live-val').html('');
+      }
+      else
+        make_error_message(this, "<%= "#{t('deductions')} " %> ");
+    });
+    j('.deductions .total').text((earnings - sum).toFixed(precision).toString());
+    var round_up_to = "<%= Configuration.to_enable_round_off.config_value %>";
+    if( round_up_to != 0)
+    {
+      sum = to_round_off(sum)
+    }
+    j('#net_pay .total').text(sum.toFixed(precision).toString());
+    j('#net_pay_field').val(sum.toFixed(precision).toString());
+    if(sum < 0)
+      j('#net_pay_warning').show();
+    else
+      j('#net_pay_warning').hide();
+  }
+
+  function remove_fields(elm)
+  {
+    j(elm).parent().remove();
+    calculate_net_pay();
+  }
+  function make_error_message(elm, flag)
+  {
+    icon=jQuery('<div></div>',{'class': 'error-icon'});
+    if(isNaN(elm.value))
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': flag + '<%= t('must_be_a_number') %>'});
+    else if(parseInt(elm.value) < 0)
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': flag + '<%= t('cannot_be_a_negative_amount') %>'});
+    else
+      msg=jQuery('<div></div>',{'class': 'error-msg','text': "<%= t('please_enter_an_amount') %>"});
+    j(elm).parent('.text-input-bg').find('#live-val').html(icon.add(msg));
+  }
+  function validate()
+  {
+    calculate_net_pay();
+    valid = true
+    net_pay = j('#net_pay_field').val();
+    j("input[class='amount']").each(function(){
+      if((this.value.length == 0) || isNaN(this.value) || (parseInt(this.value) < 0))
+        valid = false
+    });
+    if((net_pay.length == 0) || isNaN(net_pay) || (parseInt(net_pay) < 0))
+    {
+      j('#net_pay_warning').show();
+      valid = false;
+    }
+    return valid;
+  }
+  function showLopModalBox()
+  {
+    j('body').css('overflow','hidden');
+    j('#MB_overlay').show();
+    j('#MB_overlay').css('opacity',0.75);
+    j('#MB_window').show();
+    if(j('html').attr('dir') == 'ltr')
+      j('#MB_window').css({left : (j('body').width() - j('#MB_window').width())/2});
+    else
+      j('#MB_window').css({right : (j('body').width() - j('#MB_window').width())/2});
+    checkLeaves();
+  }
+  function hideLopModalBox()
+  {
+    j('body').css('overflow','scroll');
+    j('#MB_overlay').hide();
+    j('#MB_window').hide();
+  }
+</script>

@@ -1,0 +1,29 @@
+   <% unless @report_data.empty? %>
+
+<table id="listing_theme" class="sold_items" width="100%">
+    <tr class="tr-head">
+      <td><%= "#{t('invoice_date')}" %></td>
+      <td><%= "#{t('invoice_no')}" %></td>
+      <td><%= "#{t('total')} (#{@currency})" %></td>
+      <td><%= "#{t('discount')} (#{@currency})" %></td>
+      <td><%= "#{t('additional_charges')} (#{@currency})" %></td>
+      <td><%= "#{t('tax')} (%)" %></td>
+    </tr>
+   <tr class="tr-blank"></tr>
+   <% @report_data.each_with_index do |row, i| %>
+
+   <tr class="tr-<%= cycle('odd', 'even') %>" id="store_item_fields">
+     <td class="col-1"><%= format_date(row.date) %></td>
+     <td class="col-3"><%= link_to row.invoice_no, invoice_path(row.id)  %></td>
+     <% tax_amount = (row.grand_total.to_f * row.tax.to_f)/100 %>
+     <td class="col-3"><%= precision_label(row.payable_amount)%></td>
+     <td class="col-3"><%= precision_label(row.discount) %></td>
+     <td class="col-3"><%= precision_label(row.add_charges) %></td>
+     <td class="col-3"><%= precision_label(row.tax) %></td>
+   </tr>
+   <% end %>
+     <% else %>
+   <p class="flash-msg">No Reports</p>
+<%end%>
+    </table>
+<%= will_paginate @report_data,:renderer => 'RemoteLinkRenderer', :params=> {:action => "invoice_report", :status => params[:status]} %>

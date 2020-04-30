@@ -1,0 +1,23 @@
+<% if(@form_template.errors.empty?) %>
+  <div id="template_id">
+    <%= @form_template.id %>
+  </div>
+  <div id="publish">
+    <%= @publish %>
+  </div>
+<% else %>
+  <div id="errors">
+    <%= error_messages_for 'form_template', :header_message => nil %>
+  </div>
+<% end %>
+<script>
+  h = [];
+  j('#errorExplanation').find('li').each(function(a,b){
+    if(j.inArray(j(b).text(),h)>=0){
+      j(b).attr('style','display:none');
+    }else{
+      h.push(j(b).text());
+    }
+  });
+  h = [];
+</script>

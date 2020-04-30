@@ -1,0 +1,6 @@
+<div id="entry_<%= params[:timetable_entry_id] %>" class="tte_change">
+    <%=link_to_remote "#{t('change')}", :url=>{:action=>'timetable_swap_from',:timetable_entry_id=>params[:timetable_entry_id],:batch_id=>params[:batch_id],:date=>params[:date]},:success=>"$('entry_#{params[:timetable_entry_id]}').hide();$('link_#{params[:timetable_entry_id]}').show();" ,:html=>{:class=>"themed_text"}%>
+</div>
+<div id="cancel_entry_<%= params[:timetable_entry_id] %>" class="tte_cancel">
+    <%=link_to_remote "#{t('cancel_class')}", :url=>{:action=>'cancel_timetable_period',:timetable_entry_id=>params[:timetable_entry_id],:date=>params[:date]},:success=>"$('cancel_entry_#{params[:timetable_entry_id]}').hide();$('link_#{params[:timetable_entry_id]}').show();" ,:html=>{:class=>"themed_text"},:confirm => t('delete_confirm_msg')%>
+</div>

@@ -1,0 +1,129 @@
+<%= javascript_include_tag("receipt_printer") %>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+  <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+  <%= stylesheet_link_tag "rtl/finance/_collection_layouts" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+  <%= stylesheet_link_tag "finance/_payment_form" %>
+  <%= stylesheet_link_tag "finance/_collection_layouts" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('student_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('fee_status') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                 <% path = @student_type == "ArchivedStudent" ?  'archived_student' :  'student'  %>
+                  <%= link_to "#{t('fees_text')}", :controller => path, :action => 'fees', :id => @student.id %>
+            </li>
+            <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to "#{t('student_profile')}", :controller => path, :action => 'profile', :id => @student.id %>
+              </li>
+          </ul>
+      </div>
+  </div>
+
+  <div id="page-yield">
+      <div class="bread_crumb">
+          <% breadcrumb :hostel_fee_student_profile_fee_details, [@student,@hostel_fee] %>
+          <%= render_breadcrumbs  %>
+      </div>
+      <% total_fees =0 %>
+      <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+      <% unless flash[:error].nil? %> <p class="errorExplanation"> <%= flash[:error] %> </p> <% end %>
+      <div id="student_profile_heading1">
+          <div id="student_main_info1">
+              <span class="name"><b> <%= @student.full_name %> </b> </span>
+              <span class="course"><%= t('course_and_batch') %>: <%= @student.batch.complete_name %> </span>
+              <span class="adm"><%= t('adm_no') %>: <%= @student.admission_no %> </span>
+          </div>
+          <div class="extender"> </div>
+      </div>
+
+      <% @total_fees = 0 %>
+      <% @total_paid_fine = 0 %>
+      <% @amount_to_pay = 0  %>
+      <% @prevent_instant = @hide_print_options = true %>
+
+      <table class="gray_table_list" width="100%" cellpadding="0" cellspacing="0">        
+          <tr class="main_head tr-list_head">
+              <td class="sl-col"><%= t('sl_no') %></td>
+              <td class="set_border_right"><%= "#{t('particulars')}" %></td>
+              <td class="set_border_right" colspan="2">
+                  <%= "#{t('amount')}" %> (<%= currency %>)
+              </td>
+          </tr>
+
+          <% i = 0 %>
+
+          <%= render :partial => "hostel_fee/fees_payment/particular_list",
+            :locals => {:i => i} %>
+
+          <%= render :partial => "hostel_fee/fees_payment/tax_list",
+            :locals => {:i => i} %>
+
+          <%= render :partial => 'hostel_fee/fees_payment/student_fine_list', 
+            :locals => {:i => i, :hostel_fee => @hostel_fee, 
+            :total_fees => @total_fees} %>
+
+          <!-- < %= render :partial => 'paid_fine', :locals => {:hostel_fee => @hostel_fee, 
+            :total_fees => total_fees} %> -->
+
+          <%= render :partial => 'hostel_fee/fees_payment/summary', :locals => {:i => i, 
+            :total_fine => @total_paid_fine.to_f} %>
+
+          <%= render :partial => "hostel_fee/fees_payment/student_payment_block" %>
+      </table>
+
+      <%= render :partial => "hostel_fee/fees_payment/paid_fees" %>
+
+  </div>
+  <%#gateway_amount=(@custom_gateway.present? and CustomGateway.available_gateways.present? and PaymentConfiguration.config_value("enabled_fees").present? and PaymentConfiguration.is_hostel_fee_enabled?)? @custom_gateway.gateway_parameters[:variable_fields][:amount] : '' %>
+  <% if  @student_type == 'Student'  %>
+    <% total_fees = @student.hostel_fee_balance(params[:id2]) %>
+  <% end %>
+
+  <script type="text/javascript">
+
+    j("#fees_paid").focusout(function (e) {
+        var precision = parseInt("<%= @precision %>");
+        total_amount = actual_amount();
+        amount_paying = user_amount();
+        if ((amount_paying > total_amount) || (amount_paying <= 0)) {
+            j("#fees_paid").val(total_amount.toFixed(precision));
+            e.preventDefault();
+        } else {
+            update_payment_amount(amount_paying);
+        }
+    });
+
+    function update_payment_amount(amount) {
+        j('#' + amount_field_id_name()).val(amount);
+    }
+
+    function user_amount() {
+        return parseFloat(j("#fees_paid").val() || 0);
+    }
+
+    function actual_amount() {
+        return parseFloat("<%=precision_label(@hostel_fee.balance.to_f)%>");
+    }
+
+    function amount_field_id_name() {
+        id_name = "online_payment_amount";
+        return id_name;
+    }
+
+    j('form').submit(function () {
+        j('input[id$="amount"]').val(j('#fees_paid').val());
+        j('input[id$="wallet_amount"]').val(j('#advance_fees').val());
+    });
+
+  </script>
+
+  <iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>

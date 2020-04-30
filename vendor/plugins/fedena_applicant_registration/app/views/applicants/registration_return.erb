@@ -1,0 +1,35 @@
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<% unless flash[:error].nil? %>
+  <p class="errorExplanation"> <%= flash[:error] %> </p>
+<% end %>
+<p style="font-weight: bold;margin-bottom:-10px; width: 100%; text-align: center;">
+  <% if @applicant.has_paid == true %>
+    Amount Paid :
+  <% else %>
+    Total Payable Amount :
+  <% end %>
+  <span class="themed_text"><%= @currency %> <%= precision_label @applicant.amount %></span>
+</p>
+<table align="center">
+  <tr>
+    <td>
+      <% form_for :token_check,:url => {:action => "print_application"},:html => {:target => '_blank', :style=>"width:150px; float:left;"} do |f| %>
+        <%= f.hidden_field :print_token,:value => @applicant.print_token %>
+        <%= f.submit 'Print Application',:class => "submit_button submit-button_print" %>
+      <% end %>
+    </td>
+    <% if FedenaPlugin.can_access_plugin? "fedena_pay" %>
+      <td>
+        <% unless @applicant.has_paid == true or @applicant.status == "discarded" %>
+          <% unless (@applicant.has_paid == true or @applicant.application_status.name == 'discarded')  %>
+              <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and PaymentConfiguration.op_enabled? and PaymentConfiguration.is_applicant_registration_fee_enabled?) %>
+                  <%= custom_gateway_intermediate_button(@applicant.amount, "false", 0.00, "", "", "Registration Fee", @applicant.print_token, 'applicants') %>
+              <% end %>
+            <% end %>
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
+</table>

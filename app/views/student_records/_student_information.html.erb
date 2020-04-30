@@ -1,0 +1,29 @@
+<%=stylesheet_link_tag "jquery-ui_1.css"%>
+<div id="sname"><%=@student.full_name%></div>
+<div id="completed"><%="#{@value.to_i}% #{t('completed')}"%></div><div id="progressbar"></div>
+<div id="entire_block">
+  <div class="block addl_width">
+    <span class="label"><%=t('course')%></span>
+    <span class="value addl_value_width"><%=@batch.full_name%></span>
+  </div>
+  <div class="block">
+    <span class="label"><%=t('admission_no')%></span>
+    <span class="value"><%=@student.admission_no%></span></div>
+  <%if roll_number_enabled?%>
+    <div class="block">
+      <span class="label"><%=t('roll_nos')%></span>
+      <span class="value"><%=@batch.is_active==true ? @student.roll_number.present? ? @student.roll_number : "-" : @student.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number.present? ? @student.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number : "-" %></span>
+    </div>
+  <%end%>
+  <div class="block">
+    <span class="label"><%=t('grading_system')%></span>
+    <span class="value"><%=Batch::GRADINGTYPES[@batch.course.grading_type].nil? ? 'Normal' : Batch::GRADINGTYPES[@batch.course.grading_type]%></span>
+  </div>
+</div>
+<script type="text/javascript">
+  j(function() {
+    j( "#progressbar" ).progressbar({
+      value: <%=@value%>
+    });
+  });
+</script>

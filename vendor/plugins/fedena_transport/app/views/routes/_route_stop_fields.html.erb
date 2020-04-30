@@ -1,0 +1,13 @@
+<tr style="display : <%= (c.object.marked_for_destruction? ? 'none' : '') %>">
+    <td><%= c.select :vehicle_stop_id, @stops.map{|v| [v.name, v.id]}, {:include_blank => "#{t('select_a_stop')}", 
+  :disabled => (stops - [c.object.vehicle_stop_id])}, {:class =>'stop-list', :disabled => (@assigned_stops.include? c.object.vehicle_stop_id.to_i)} %></td>
+    <td><%= c.text_field :pickup_time_dup, :value => c.object.get_pickup_time, :class => 'pickup_time' %></td>
+    <td><%= c.text_field :drop_time_dup, :value => c.object.get_drop_time, :class => 'drop_time' %></td>
+    <td><%= c.text_field :distance, :value => (sprintf("%g",c.object.distance) if c.object.present? and c.object.distance.present?) %></td>
+    <td><%= c.text_field :fare, :value => precision_label(c.object.fare), :readonly => @flat_based_fee, :class => 'precision_text stop_fare' %>
+        <%= c.hidden_field :stop_order, :value => 1 %>
+    </td>
+    <% unless index.nil? or index.to_i == 1 or (@assigned_stops.include? c.object.vehicle_stop_id) %>
+      <td><%= link_to_remove_fields "", c %></td>
+    <% end %>
+</tr>

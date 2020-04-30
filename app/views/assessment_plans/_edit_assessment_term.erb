@@ -1,0 +1,27 @@
+<% remote_form_for @assessment_term, :url=>{:action => 'update_assessment_term', :id=>@assessment_term.id}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |form| %>
+  <div class="term_details_banner"><%= render :partial => 'term_details_banner' %></div>
+  <div class="form_container">
+    <div class="label-field-pair left">
+        <label for="assessment_term_name"><%= "#{t('term_name_text')}" %></label>
+        <div class="text-area-bg">
+            <%= form.text_field  :name %>
+        </div>
+    </div>
+    <div class="label-field-pair left">
+        <label for="assessment_start_date"><%= "#{t('start_date').titleize}" %></label>
+        <div class="text-area-bg start_date">
+          <%= form.calendar_date_select :start_date,:popup=>"force", :id=>'start_date'%>
+        </div>
+    </div>
+    <div class="label-field-pair left">
+        <label for="assessment_end_date"><%= "#{t('end_date').titleize}" %></label>
+        <div class="text-area-bg start_date">
+          <%= form.calendar_date_select :end_date,:popup=>"force", :id=>'end_date'%>
+        </div>
+    </div>
+    <%= form.hidden_field :academic_year_id, :value => @assessment_term.assessment_plan.academic_year_id %>
+    <div class="actions">
+      <%= form.submit t('update_term_text') , :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+    </div>
+  </div>
+<% end %>

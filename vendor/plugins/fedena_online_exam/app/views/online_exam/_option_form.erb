@@ -1,0 +1,11 @@
+<div class="option_label_field">
+  <p class="op-count"><%= t('option') %> <%= i %></p>
+  <div class="label-field-pair2">
+    <label><%= t('is_answer') %></label>
+    <div class="text-input-bg"><%= s.check_box :is_answer %></div>
+  </div>
+  <div id="option_text_field_bg">
+    <%= s.redactor :option,:latex=>true%>
+    <%= link_to "<div class='remove-bg'></div> #{t('remove_option')}","#",{:class=>"remove-link",:onClick=>"remove_option(this); return false;"} %>
+  </div>
+</div>

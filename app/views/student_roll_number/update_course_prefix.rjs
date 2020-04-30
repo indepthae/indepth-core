@@ -1,0 +1,7 @@
+if @error.nil?
+	page.replace_html "prefix-#{params[:id]}", :text => params[:course][:roll_number_prefix].empty? ? "-" : params[:course][:roll_number_prefix]
+  page.replace_html "links-#{params[:id]}", :partial => "set_edit_course_prefix", :locals => {:id => params[:id], :roll_number_prefix =>  params[:course][:roll_number_prefix] }
+  page << "Modalbox.hide();"
+else
+	page.replace_html 'test', :partial => 'errors', :object => @sort_order
+end

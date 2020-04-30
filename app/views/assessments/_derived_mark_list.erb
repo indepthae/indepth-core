@@ -1,0 +1,41 @@
+<% roll_num_enabled = Configuration.enabled_roll_number? %>
+      <%= session_fingerprint_field %> 
+      <table id="assessments">
+          <tr class="tr-head">
+              <td class="sl_no"><%= t('no_text') %></td>
+              <td class="name"><%= t('student_text') %></td>
+              <% if roll_num_enabled %>
+                  <td class="roll_no"><%= t('roll_nos') %></td>
+              <% else %>
+                  <td class="roll_no"><%= t('admission_no') %></td>
+              <% end %>
+              <% if ([1,3].include? @assessment_group.scoring_type) %>
+                <td class="marks"><%= t('marks') %></td>
+              <% end %>
+              <% if ([2,3].include? @assessment_group.scoring_type) %>
+                <td class="grade"><%= t('grade') %></td>
+              <% end %>
+          </tr>
+          <% @assessment_marks.each_with_index do |mark,i| %>
+            <% stud = mark.student %>
+            <tr class="tr-<%= cycle('even', 'odd') %>">
+              <td class="sl_no"><%= i+1 %></td>
+              <td class="name"> <%= stud.full_name %> </td>
+              <% if roll_num_enabled %>
+                  <td class="roll_no"><%=  stud.roll_number %></td>
+              <% else %>
+                <td class="roll_no"><%= stud.admission_no %></td>
+              <% end %>
+              <% if ([1,3].include? @assessment_group.scoring_type) %>
+                  <td class="marks"><%= (mark.mark)? mark.mark: "-" %></td>
+              <% end %>
+              <% if ([2,3].include? @assessment_group.scoring_type) %>
+                    <td class="grade">
+                        <span class="grade_text"><%= mark.grade %></span>
+                    </td>
+              <% end %> 
+              
+          
+            </tr>
+          <% end %>
+      </table>

@@ -1,0 +1,23 @@
+<% if @employees.present? or @search_params.present? %>
+  <div id="loading" class="substitute"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+      <span><%= "#{t('loading')}.." %></span>
+  </div>
+  <div id="employees_form">
+      <div class="employees_table">
+
+      </div>
+      <% if @employees.present? %>
+        <div id="status"><%= t('showing_employees_count', {:count => @employees.length}) %></div>
+      <% end %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  json_data = JSON.parse('<%= @hash.to_json.gsub("'", %q(\\\')) %>');
+  changed_data = JSON.parse(Object.toJSON(json_data));
+  if (json_data.search) {
+      showOverlay();
+      drawTable(json_data);
+      hideOverlay();
+  }
+  
+</script>

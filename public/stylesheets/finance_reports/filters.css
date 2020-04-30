@@ -1,0 +1,202 @@
+.label-field-pair {
+    /*width: 400px;*/
+    width: 390px;
+    height: auto;
+    min-height: 50px;
+    float: left;
+    padding-top: 3px;
+}
+
+.section {
+    width: 100% !important;
+}
+
+.label-field-pair label {
+    font-weight: normal;
+    font-size: 13px;
+    width: 130px;
+}
+
+.text-input-bg select {
+    margin-left: 0px;
+    /*width: 227px;*/
+    -webkit-border-radius: .3em;
+}
+.text-input-bg-large{
+    width: 400px !important;
+}
+.text-input-bg-large label{
+    margin-top: 0px;
+    float: left;
+    margin-right: 20px;
+    width: auto;
+    white-space: nowrap;
+}
+.text-input-bg-large input[type=radio]{
+    width: 10px;
+    float: left;
+    margin-top: 8px;
+    margin-left: 0px;
+    margin-right: 10px;
+}
+#report_selectors .text-input-bg {
+    width: 220px;
+    height: 28px;
+    float: left;
+}
+
+#report_selectors .text-input-bg select {
+    width: 100%;
+}
+
+#list_batches {
+    display: none;
+}
+
+#list_batches label {
+    width: auto;
+    margin-right: 8px;
+}
+
+#fetch_report {
+    width: 100%;
+    clear: both;
+    float: none;
+}
+
+#fetch_report input[type=submit] {
+    border-radius: 0.3em;
+    width: auto;
+    background: #27292B;
+    color: #fff;
+    height: 29px;
+    border: 0px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: 130px;
+}
+#fetch_report input[type="submit"]:disabled {
+    opacity: 0.5;
+}
+/** multi select batches **/
+#list_batches .ms-parent {
+    margin-top: 5px;
+    font-size: 13px !important;
+}
+
+#list_batches .ms-parent .ms-choice {
+    border-radius: 0.3em;
+}
+
+#list_batches .ms-parent .placeholder {
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 27px;
+    /*padding-left: 0px;*/
+}
+
+.date_range {
+    width: calc(100% - 150px);
+}
+
+.date_range, .date_range .date_select, .date_range .range_separator {
+    float: left;
+}
+
+.date_range .range_separator {
+    margin-left: 22px;
+    margin-right: 22px;
+}
+
+.date_range .range_separator label {
+    min-width: 20px;
+    width: auto;
+}
+
+.date_range .date_select input {
+    border-radius: 0px !important;
+    margin-left: 0px;
+}
+
+/** multi select overrides **/
+.ms-drop {
+    overflow-y: hidden !important;
+}
+
+.ms-drop input[type="checkbox"] {
+    width: 14px !important;
+    margin: 0 5px 0 0 !important
+}
+.ms-drop ul > li label{
+    width: 130px !important;
+}
+.text-input-bg .ms-choice span {
+    font-size: inherit;
+    font-weight: normal;
+    margin-left: auto;
+    line-height: 26px;
+}
+
+/** errors **/
+.error-icon {
+    width: 15px;
+    height: 12px;
+    background: url("/images/iconsprite-1.png");
+    background-position: -42px -344px;
+    margin-right: 2px;
+    float: left;
+}
+
+.error-msg {
+    float: left;
+    color: red;
+    font-size: 13px;
+    width: 205px;
+}
+
+.wrapper {
+    margin-top: 5px;
+    float: left;
+    width: 100%;
+    display: none;
+}
+
+#list_courses .ms-parent {
+    margin-top: 5px;
+    /*! font-size: 13px !important; */
+}
+
+#list_courses .ms-parent .ms-choice {
+    border-radius: 0.3em;
+}
+
+#list_courses .ms-parent .placeholder {
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 27px;
+    /*padding-left: 0px;*/
+}
+
+#list_courses label {
+    min-width: 40px;
+}
+
+#list_accounts .ms-parent {
+    margin-top: 5px;
+    /*! font-size: 13px !important; */
+}
+
+#list_accounts .ms-parent .ms-choice {
+    border-radius: 0.3em;
+}
+
+#list_accounts .ms-parent .placeholder {
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 27px;
+    /*padding-left: 0px;*/
+}
+
+#list_accounts label {
+    min-width: 40px;
+}

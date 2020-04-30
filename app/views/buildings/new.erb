@@ -1,0 +1,44 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "buildings" %>
+  <%= javascript_include_tag :defaults, :cache => true %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('buildings') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('add_building') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% form_for @building do |f| %>
+    <%= f.error_messages  %>
+    <div class="label-field-pair">
+      <div class="label-container"><%= f.label :name, "#{t('building_name')}" + " :"%></div>
+      <div class="input-container"><%= f.text_field :name %></div>
+    </div>
+    <h5><%= t('add_rooms') %></h5>
+    <div class="form">
+      <% f.fields_for :classrooms do |builder| %>
+        <%= render 'classroom_fields', :c => builder%>
+      <% end %>
+      <div>
+        <%= link_to_add_fields "<span class='add_building'></span> #{t('add_field')}", f, :classrooms %>
+      </div>
+    </div>
+      <%= f.submit "#{t('save')}",:class=>"submit_button", :disable_with => "#{t('please_wait')}" %>
+
+    <% end %>
+</div>
+
+
+<script>
+j(function(){
+  window.history.pushState({},"", "/buildings/new");
+})
+</script>

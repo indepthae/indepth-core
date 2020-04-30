@@ -1,0 +1,32 @@
+<% if !@hostel_fee_collection.empty? %>
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= "#{t('name')}"%></td>
+      <td><%= "#{t('batch')}"%></td>
+      <td><%= "#{t('start_date')}"%></td>
+      <td><%= "#{t('due_date')}"%></td>
+      <td></td>
+    </tr>
+    <% @hostel_fee_collection.each do |h| %>
+      <tr  class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-4"><%= h.name %></td>
+        <td class="col-4">
+          <%b=Batch.find(h.hostel_batch_id)%>
+          <% unless b.blank? %>
+            <%= b.full_name %>
+          <% end %>
+        </td>
+        <td class="col-1"><%= format_date(h.start_date) %></td>
+        <td class="col-1"><%= format_date(h.due_date) %></td>
+        <td class="col-3">
+          <div class="edit"><%= link_to_remote "#{t('edit_text')}", :url => {:action => 'hostel_fee_collection_edit', :id => h,:batch_id=>params[:batch_id]} %></div>
+           <% unless h.has_paid_fees_in_this_batch?(params[:batch_id])%>
+            <div class="edit"><%= link_to_remote "#{t('delete_text')}",:url=>{:action=>'delete_fee_collection_date',:id=>h,:batch_id=>params[:batch_id]}, :confirm=>"#{t('delete_confirm_msg')}"%></div>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <div class= "msg"><p class= "flash-msg"><%= t('no_students_found') %></p></div>
+<% end %>

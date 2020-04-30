@@ -1,0 +1,8 @@
+
+#page.visual_effect(:highlight, 'student-category-list')
+page.replace_html 'student-category-list', :partial => 'student_category_list'
+if @deleted == true
+  page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('student_category_deleted_succesfully')}</p>"
+else
+  page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('sorry_category_in_use')}</p>"
+end

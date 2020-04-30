@@ -1,0 +1,18 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('auto_credit_name') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_autocredits') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_autocredit_setting %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h4><%= t('leave_credit_settings').titleize %></h4>
+    <div class="description"><%= t('leave_credit_setting_description') %></div>
+    <%= render :partial => "settings_from"  , :locals => {:setting_type => "automatic"}%>
+</div>

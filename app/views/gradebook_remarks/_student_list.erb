@@ -1,0 +1,97 @@
+<table class="listing-table">
+    <tr>
+        <th class="col-with-border col-1"><%= t('sl_no') %></th>
+        <th class="col-2"><%= t('student_name') %></th>
+        <th class="col-3"><%= t('remarks') %></th>
+        <th class="col-4"><%= "" %></th>
+    </tr>
+    <% @remarks.each_with_index do |remark,i| %>
+      <tr>
+          <td class="col-with-border col-1">
+              <%= ((@students.current_page - 1) * @students.per_page) + i + 1 %>
+          </td>
+          <td class="col-2">
+              <%= @students_hash[remark.student_id] %>
+          </td>
+          <td class="col-3">
+              <% form_for remark, :url=>{:action => 'update_remark'} do |r| %>
+                <%= session_fingerprint_field %>
+                <%= r.text_area :remark_body, :class => 'remark-body', :onclick => 'remark_body_on_focus(this);' %>
+                <%= r.hidden_field :batch_id, :class => 'batch_id' %>
+                <%= r.hidden_field :student_id, :class => 'student_id' %>
+                <%= r.hidden_field :reportable_type, :class => 'reportable_type' %>
+                <%= r.hidden_field :reportable_id, :class => 'reportable_id' %>
+                <%= r.hidden_field :remarkable_type, :class => 'remarkable_type' %>
+                <%= r.hidden_field :remarkable_id, :class => 'remarkable_id' %>
+                <span class="submit-button sub-button-new" onclick="update_remark(this)" data="1"><%= "#{t('save')}" %></span>
+              <% end %>
+          </td>
+          <td class="col-4">
+              <span class="reset-link" onclick="return reset_remark(this);"><%= t('reset') %></span>
+              <span class="add-from" onclick="add_from_remark_bank(this);"><%= "#{'+'} #{t('add_from_remark_bank')}" %></span>
+          </td>
+      </tr>
+    <% end %>
+</table>
+<%= will_paginate @students, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "gradebook_remarks",:action => "update_student_list",
+  :batch_id => params[:batch_id], :remark_type => params[:remark_type], :remarkable_id => params[:remarkable_id], 
+  :report_type => params[:report_type], :reportable_id => params[:reportable_id]}%>
+
+<script type="text/javascript">
+  update_remark = function (th_is) {
+      const save = '<%= t('save') %>';
+      const saved = '<%= t('saved') %>';
+      const saving = '<%= t('saving') %>';
+      if (j(th_is).text() == save) {
+          const session_fingerprint = j(th_is).parent().find('.session_fingerprint').val();
+          const remark_body = j(th_is).parent().find('.remark-body').val();
+          const batch_id = j(th_is).parent().find('.batch_id').val();
+          const student_id = j(th_is).parent().find('.student_id').val();
+          const reportable_type = j(th_is).parent().find('.reportable_type').val();
+          const reportable_id = j(th_is).parent().find('.reportable_id').val();
+          const remarkable_type = j(th_is).parent().find('.remarkable_type').val();
+          const remarkable_id = j(th_is).parent().find('.remarkable_id').val();
+
+          j.ajax({
+              url: "update_remark",
+              type: 'POST',
+              data: {
+                  gradebook_remark: {
+                      session_fingerprint: session_fingerprint,
+                      batch_id: batch_id,
+                      remark_body: remark_body,
+                      student_id: student_id,
+                      reportable_type: reportable_type,
+                      reportable_id: reportable_id,
+                      remarkable_type: remarkable_type,
+                      remarkable_id: remarkable_id,
+                  }
+              },
+              beforeSend: function (jqXHR, settings) {
+                  j(th_is).text(saving);
+                  j(th_is).css('cursor', 'default');
+              },
+              success: function (data)
+              {
+                  if (data.status == true)
+                      j(th_is).text(saved);
+                  j(th_is).css('cursor', 'default');
+              },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+              }
+          });
+      }
+  };
+
+  reset_remark = function (th_is) {
+      j(th_is).parent().parent().find('.remark-body').val("");
+      remark_body_on_focus(j(th_is).parent());
+  };
+
+  remark_body_on_focus = function (th_is) {
+      const save = '<%= t('save') %>';
+      j(th_is).parent().find('.submit-button').text(save);
+      j(th_is).parent().find('.submit-button').css('cursor', 'pointer');
+  };
+</script>

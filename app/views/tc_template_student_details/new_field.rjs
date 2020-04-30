@@ -1,0 +1,9 @@
+# TODO Operate on the page object
+unless @subfield
+  page.replace_html 'modal-box', :partial => 'new_field'
+  page << "Modalbox.show($('modal-box'), {title: 'New Field', width: 750});"
+else
+  page.replace_html 'modal-box', :partial => 'new_sub_field'
+  page << "Modalbox.show($('modal-box'), {title: 'Add Sub Field', width: 750});"
+end
+

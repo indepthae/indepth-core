@@ -1,0 +1,64 @@
+<div id="form-errors">
+    <% if @errors.present? %>
+      <div id="error-box">
+          <ul>
+              <% @errors.each do |msg| %>
+                <li class="error-font-size"> <%= msg %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div class="description">&#x200E;<%= t('credit_description_new') %>&#x200E;</div>
+<% remote_form_for :log ,:before =>"$('submit-button').disable();",:complete=>"$('submit-button').enable();" do |f| %>
+  <%= session_fingerprint_field %>
+  <% if @employee_count != 1  %>
+    <div class="label-field-pair">
+        <label><%= t("no_of_employees") %></label>
+        <div class="text-input-bg"><%= @employee_count %>
+        </div>
+    </div>
+  <% else %>
+    <div class="label-field-pair">
+        <label><%= t("employee_name") %></label>
+        <div class="text-input-bg"><%= @employee.full_name %>
+        </div>
+    </div>
+  <% end %>
+  <% if @leave_types.present? %>
+    <div class="label-field-pair">
+        <label><%= t('leave_type') %></label>
+        <div class="text-area-bg">
+            <div class="leave-type-checkboxes">
+                <div class="sel-types">
+                    <%= check_box_tag "select_all", "", false, {:onclick => "select_all_fields(this);",:class=>' select_all_check'}%>
+                    <label for="select_all" class="special_prop"><%= t('select_all') %></label><span class="credit_status"><%#= t('credit_status') %></span>
+                </div>
+                <% @leave_types.each do |id,type| %>
+                  <div class="each-type">
+                      <%= check_box_tag "leave_type_ids[]", id, false, {:onclick => "toggle_field_selector(this);",:class=>'leave_type_list'}%>
+                      <label class="special_prop no_margin_top" id="subject-name-label"><%= type %></label><span class="each_credit_status"><%#= credit_status(id) %></span>
+                  </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+  <% end %>
+  <div class="label-field-pair" id="remarks">
+      <label><%= t("credit_remarks") %></label>
+      <div class="text-area-bg"><%= f.text_area :remarks , :cols => 30, :rows => 5%>
+      </div>
+  </div>
+  <div class="label-field-pair">
+      <label class="margin-top-100"><%= t("credit_date") %></label>
+      <div class="text-input-bg"><%= calendar_date_select_tag "log[credited_date]" , @credited_date.present? ? @credited_date : "" , :id => "credited_date",:readonly=>true, :errors => @log.errors[:credited_date],:popup=>"force"%> </div>
+      <label></label>
+  </div>
+  <%= f.hidden_field :credit_type, :value =>  @credit_type %>
+  <%= f.hidden_field :employee_ids, :value => @employee_ids %>
+  <%= f.submit  "", :value => "#{t('credit_leaves')}", :class => "submit_button",:id => "submit-button", :onclick => "return reset_leave_confirm();", :disabled => @disabled %>
+
+<% end %>

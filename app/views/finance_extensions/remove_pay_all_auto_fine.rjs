@@ -1,0 +1,13 @@
+# TODO Operate on the page object
+unless params[:fine_transaction].present?
+  page << "remove_popup_box();"
+  page << "build_modal_box({title: '#{t('remove_fine')}', popup_class: 'manual_fine_box'});" 
+  page << "popup_box_overlay.show();"
+  page << "popup_window.show();"
+  page.replace_html 'popup_content', :partial => "finance_extensions/pay_all_form/remove_pay_all_auto_fine"
+  page << "document.body.scrollTop = document.documentElement.scrollTop = 0;"
+else
+  page << "remove_fine_link.hide();"
+  page << "popup_box_overlay.hide();"
+  page << "popup_window.hide();"
+end

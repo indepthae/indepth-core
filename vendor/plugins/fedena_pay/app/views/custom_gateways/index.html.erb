@@ -1,0 +1,55 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('custom_gateways') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('gateway_list') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_gateway')}", new_custom_gateway_path %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+<%= make_breadcrumb %>
+<%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %><p class="flash-msg"><%= flash[:notice] %></p><% end %>
+
+  <div class="box">
+    <% unless @gateways.blank? %>
+
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td>
+        <%= t('name') %>
+      </td>
+      <td>
+        <%= t('status') %>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    <tr class="tr-blank"></tr>
+    <% @gateways.each do |g| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-3"><%= g.name %></td>
+        <% active = @active_gateway.include? g.gateway_id %>
+        <% if active %>
+          <td class="col-1"><%= t('active') %></td>
+        <% else %>
+          <td class="col-1"><%= t('inactive') %></td>
+        <%  end  %>
+        <td class="col-1 normal-font themed_text"><%= link_to "#{t('edit_text')} ",edit_custom_gateway_path(g.id) if @own_gateways.collect(&:id).include?(g.id)%> <%= link_to "| #{t('delete_text')} ",g,:method=>:delete, :confirm=>"#{t('delete_confirm_msg')}" if (active == false and @own_gateways.collect(&:id).include?(g.id)) %> <%= link_to (@own_gateways.collect(&:id).include?(g.id) ? "| #{t('manage_accounts')}" : "#{t('manage_accounts')}"),manage_accounts_custom_gateway_path(g.id) if g.enable_account_wise_split%> </td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+
+  <p class="flash-msg"> <%= t('no_gateway_found') %> </p>
+
+<% end %>
+  </div>
+</div>

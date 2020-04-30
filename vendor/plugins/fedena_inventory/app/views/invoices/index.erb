@@ -1,0 +1,62 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('invoice') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+  <%  if permitted_to? :new, :invoices %>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}",{:action => "new", :selected_store => @selected_store} %> </li>
+
+    </ul>
+  </div>
+  <% end %>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+    <div class="box">
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+    
+   <div class="label-field-pair">
+      <label for="student_course"><%= "#{t('select_a_store')}" %>:
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+      </label>
+      <div class="text-input-bg">
+        <%= select :course, :name,
+          Store.active.map {|b| [b.name , b.id]},
+          {:prompt => "#{t('select_a_store')}"},
+          {:onChange => "#{remote_function(:url => {:action => "update_invoice"},
+          :with => "'id='+ value+'&query='+$('query').value",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')"
+          )}"} %>
+      </div>
+   <div id="search-container">
+        <%= text_field_tag('query', params[:query], :autocomplete => 'off', :placeholder => "#{t('search')} #{t('invoice_no')}.") %><br/>
+      </div>
+   </div>
+    <script type="text/javascript">
+      function search_ajax(){
+        if ($('query').value.include("%")) return;
+  <%="#{remote_function(:url =>{:action=>:update_invoice} ,
+  :with => "'query='+$('query').value+'&id='+j('#course_name').val()",
+  :before => "Element.show('loader')",
+  :success => "Element.hide('loader')"
+  )}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('query', 1, search_ajax);
+  });
+
+
+    </script>
+    <div id ="update_invoice"></div>
+    </div>
+</div>

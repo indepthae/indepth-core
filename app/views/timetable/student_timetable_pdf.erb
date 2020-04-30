@@ -1,0 +1,149 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<div class="report">
+  <div id="pdf_header">
+    <div id="tt_name"><%=t('timetable_text')%> : <%=format_date(@tt.start_date,:format=>:long_date)%> - <%=format_date(@tt.end_date,:format=>:long_date)%></div>
+    <div id="batch_name"><%=t('batch')%> : <%=@batch.full_name%></div>
+  </div>
+  <div id="pdf-info">
+    <div id="pdf-table">
+      <% legend_ttes = [] %>
+      <%  @weekday.each do |week| %>
+        <% c =cycle('even','even ') %>
+        <div class="<%= "#{c}"%>" id="<%="#{c}_#{week}"%>">
+          <div class="col-pdf_weekday" id="<%="#{c}_#{week}"%>"><%= WeekdaySet.shortened_weekday_name(week) -%></div>
+          <%@class_timings=@class_timing_sets.find_by_weekday_id(week).class_timing_set.class_timings%>
+          <% @class_timings.each do |ct|  %>
+            <% tte = @timetable[week][ct.id]%>
+            <% if (tte.is_a? TimetableEntry and !ct.is_break?) %>
+              <div class="col-pdf-slots">
+                <span>
+                  <%="#{format_date(ct.start_time,:format=>:time)} - #{format_date(ct.end_time,:format=>:time)}"%>
+                </span>
+                <br/>
+                <br/>
+                <% unless tte.entry_type == 'Subject'   %>
+                  <% period = tte.assigned_name %>
+                <% else %>
+                  <% period = tte.entry.nil?? " " : "#{tte.entry.code.titleize} - #{tte.entry.name.titleize}" %>
+                <% end %>
+                <span class="pdf_period">
+                  <%= shorten_string(period,56) %>
+                </span><br/>
+                <% unless tte.entry_type == "ElectiveGroup"   %>
+                  <% # = split_str(teacher.to_s,5) %>
+                  <% teacher_names_arr = timetable_entry_employee_names(tte.employees) %>
+                  <%= teacher_names_arr.first %>
+                  <% legend_ttes << tte if teacher_names_arr.second %>
+                <% else %>
+                  (<%= t('elective') %>)
+                <% end %>
+
+              </div>
+            <% else %>
+              <%if ct.is_break?%>
+                <div class="col-pdf-break"></div>
+              <%else%>
+                <div class="col-pdf-slots">
+                  <span><%="#{format_date(ct.start_time,:format=>:time)}-#{format_date(ct.end_time,:format=>:time)}"%></span>
+                </div>
+              <%end%>
+            <% end %>
+          <% end %>
+        </div>
+
+      <% end %>
+    </div>
+
+  </div>
+
+</div>
+<% if @batch.elective_groups or legend_ttes.present? %>
+<div class="legends" border="0">
+  <div class="legend_heading">
+    <div class="legend_text"><%= t('timetable_pdf_legends') %></div>
+    <div class="legend-break-indicator">
+      <div class="break-marker"></div>
+      <div class="break-indicator"><%= t('timetable_break') %></div>
+    </div>
+  </div>
+  
+  <% weekdays = legend_ttes.group_by{|x| x.weekday_id } %>
+  <% weekdays.each_pair do |k,v| %>
+    <% sub_ttes = v.group_by(&:entry_id) %>
+    <% sub_ttes.each_pair do |x,y| %>
+      <% sub_ttes_hash = y.group_by(&:employee_ids) %>
+      <% sub_ttes_hash.each_pair do |emp_ids, tte_recs| %>
+        <div class="legend_tte_group">
+          <div class="legend_group_names">
+            <div class="legend_weekday">
+              <%= "#{WeekdaySet.weekday_name(k)}" %>
+            </div>
+            <div class="legend_class_timing_separator">
+              <%= "&nbsp;:&nbsp;" %>
+            </div>
+            <% tte_recs.each_with_index do |tte,i| %>
+              <div class="legend_class_timing">
+                <%= "#{format_date(tte.class_timing.start_time,:format=>:time)} - #{format_date(tte.class_timing.end_time,:format=>:time)}" %>
+              </div>
+              <div class="legend_class_timing_separator">
+                <%= ",&nbsp;&nbsp;" unless (i+1) == tte_recs.count %>
+              </div>
+            <% end %>
+          </div>
+          <div class="legend_tte_subject">
+            <%= "#{tte_recs.first.entry.code.titleize} - #{tte_recs.first.entry.name.titleize}" %>
+          </div>
+          <div class="legend_tte_employee">
+            <%= "#{tte_recs.first.employees.map(&:first_name).join(', ')}" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+  <% end %>
+
+  <% @batch.elective_groups.select{|e| e.is_deleted==false}.each do |el| %>
+    <div class="electives">
+      <div class="group_names"><%= el.name %></div>
+      <%if el.subjects.select{|s| s.is_deleted==false}.count!=0%>
+        <% el.subjects.select{|s| s.is_deleted==false}.each do |sub| %>
+          <div class="subject-employees">
+            <div class="subject"><%= sub.name %></div>
+            <div class="employee">: <%= sub.employees.count!=0 ? sub.employees.collect{|e| e.full_name.strip}.join(', ') : t('no_employee_assigned') %></div>
+          </div>
+        <% end %>
+      <%else%>
+        <%=t('no_elec_subjects')%>
+      <%end%>
+    </div>
+  <% end %>
+
+</div>
+<% end %>
+<script type="text/javascript">
+  
+  $$('.even').each(function(d){
+    if(d.getElementsByClassName('col-pdf-slots').length>9){
+      d.childElements().first().style.height=((d.childElements().first().getHeight()-7)*2)+"px";
+    }
+  });
+  
+</script>

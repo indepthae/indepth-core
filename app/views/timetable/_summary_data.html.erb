@@ -1,0 +1,35 @@
+<% "Course-Batch section :: Timetable summary"  %>
+<%= render :partial => "#{@batch.present? ? 'summary_batch_data' : 'summary_course_data'}" %>
+
+<% "Employee section :: Timetable summary"  %>
+<%= render :partial => 'summary_employees_data' %>
+
+<% "Total values section" %>
+<div class="summary_section">
+  <div class="section_data">
+    <div class="section_row section_head_row row_hightlight has_tooltip">
+      <div class="section_column_1">
+        <%= t('total_weekly_classes') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:weekly_classes][:total_count] || 0 %>
+      </div>
+      <div class="section_column_3"></div>
+      <div class="notifier">
+        <%= t("#{@batch.present? ? 'total_weekly_classes_batch_info':'total_weekly_classes_info'}") %>
+      </div>
+    </div>
+    <div class="section_row section_head_row row_hightlight has_tooltip">
+      <div class="section_column_1">
+        <%= t('total_classes_allocated') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:weekly_classes][:total_allocated_classes] || 0 %>
+      </div>
+      <div class="section_column_3"></div>
+      <div class="notifier">
+        <%= t("#{@batch.present? ? 'total_classes_allocated_batch_info':'total_classes_allocated_info'}") %>
+      </div>
+    </div>
+  </div>
+</div>

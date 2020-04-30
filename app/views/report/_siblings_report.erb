@@ -1,0 +1,266 @@
+<div id="sibling_list">
+
+    <% if @students.present? %>
+      <div class="submit-button export_csv_btn">
+          <%= link_to "#{t('export_as_csv')}", 
+            {:controller => "report",:action => 'siblings_report_csv', :type => params[:type], :batch_id=> params[:batch_id], :sort_order =>@sort_order}, :target => "blank", :permission =>false %>
+      </div>
+      <div class="overflow">
+          <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+
+              <tr class="tr-head sub-heading" style="min-width: 100%;">
+                  <td class="sl_no">
+                      <%= t('sl_no') %>
+                  </td>
+                  <% if @sort_order=="first_name DESC" %>
+                    <td class="name">
+                        <%= link_to_remote  "#{t('name')} &#8595;", :url=>{:action=>"siblings_report",:sort_order=>"first_name ASC",:type=>params[:type], :batch_ids=> @batch_ids}  %>
+                    </td>
+                  <% elsif @sort_order=="first_name ASC" %>
+                    <td class="name">
+                        <%= link_to_remote  "#{t('name')} &#8593;", :url=>{:action=>"siblings_report",:sort_order=>"first_name DESC",:type=>params[:type], :batch_ids=> @batch_ids}  %>
+                    </td>
+                  <%else%>
+                    <td class="name">
+                        <%= link_to_remote  "#{t('name')}", :url=>{:action=>"siblings_report",:sort_order=>"first_name DESC",:type=>params[:type], :batch_ids=> @batch_ids }  %>
+                    </td>
+                  <%end%>
+
+                  <% if @sort_order=="admission_no DESC" %>
+                    <td class="admission">
+                        <%= link_to_remote  "#{t('admission_number')} &#8595;", :url=>{:action=>"siblings_report",:sort_order=>"admission_no ASC",:type=>params[:type], :batch_ids=> @batch_ids}  %>
+                    </td>
+                  <%elsif @sort_order=="admission_no ASC"%>
+                    <td class="admission">
+                        <%= link_to_remote  "#{t('admission_number')} &#8593;", :url=>{:action=>"siblings_report",:sort_order=>"admission_no DESC",:type=>params[:type],:batch_ids=> @batch_ids }  %>
+                    </td>
+                  <%else%>
+                    <td class="admission">
+                        <%= link_to_remote  "#{t('admission_number')}", :url=>{:action=>"siblings_report",:sort_order=>"admission_no DESC",:type=>params[:type], :batch_ids=> @batch_ids}  %>
+                    </td>
+
+                  <%end%>
+                  <td class="name">
+                      <%= t('batch') %>
+                  </td>
+                  <td class="name">
+                      <%= t('sibling_name') %>
+                  </td>
+                  <td class="admission">
+                      <%= t('sibling_admission_no') %>
+                  </td>
+                  <td class="batch">
+                      <%= t('sibling_batch') %>
+                  </td>
+                  <td class="name">
+                      <%= t('father_name') %>
+                  </td>
+                  <td class="email">
+                      <%= t('father_mobile') %>
+                  </td>
+                  <td class="email">
+                      <%= t('father_email') %>
+                  </td>
+                  <td class="name">
+                      <%= t('mother_name') %>
+                  </td>
+                  <td class="email">
+                      <%= t('mother_mobile') %>
+                  </td>
+                  <td class="email">
+                      <%= t('mother_email') %>
+                  </td>
+
+                  <td class="name">
+                      <%= t('other_guardians')  %>
+                  </td>
+                  <td class="name">
+                      <%= t('relation') %>
+                  </td>
+                  <td class="email">
+                      <%= t('mobile') %>
+                  </td>
+                  <td class="email">
+                      <%= t('email')  %>
+                  </td>
+
+              </tr>
+
+              <tr class="tr-blank"></tr>
+              <% page_count=0 %>
+
+              <% @students.each_with_index do |student,index| %>
+                <% if params[:page].present? %>
+                  <% if params[:page].to_i >= 1 %>
+                    <% index = index + (params[:page].to_i - 1) * @students.per_page.to_i %>
+                  <% end %>
+                <% else %>
+                  <% index = index %>
+                <% end %>
+                <% page_count +=1 %>
+
+                <tr class="tr-<%= cycle('odd', 'even') %>">
+                    <td class="col-3">
+                        <%= index+1 %>
+                    </td>
+                    <td class="col-3">
+                        
+                        <%= student.full_name %>
+                    </td>
+                    <td class="col-3">
+                        <%= student.admission_no %> 
+                    </td>
+                    <td class="col-3">
+                        &#x200E;<%= student.batch.full_name %>&#x200E;
+                    </td>
+
+                    <td id="siblings_name" class="col-1" >
+                        <%sibling_ids=student.sibling_ids%>
+                        <%sibling_ids=sibling_ids.split(',')%>
+                        <%fnames=student.sibling_fname%>
+                        <%lnames=student.sibling_lname%>
+                        <%mnames=student.sibling_mname%>
+
+                        <%fnames=fnames.present? ? fnames.split(',') : ""%>
+                        <%lnames=lnames.present? ? lnames.split(',') : ""%>
+                        <%mnames=mnames.present? ? mnames.split(',') : ""%>
+                        
+
+                        <ul>
+                            <%fnames.each_with_index do |n, i|%>
+                              <li class="table_column_li">
+                                  <%= "#{n} #{mnames[i]} #{lnames[i]}" %>
+                              </li>
+                            <% end %>
+
+                        </ul>
+                    </td>
+                    <td id="siblings_name" class="col-1" >
+                        <%admission_no=student.sibling_admission_nos %>
+                        <%admission_no=admission_no.split(',')%>
+                        <ul>
+                            <%admission_no.each do |ad_no|%>
+                              <li class="table_column_li">
+                                  <%=ad_no%>
+                              </li>
+                            <% end %>
+
+                        </ul>
+                    </td>
+
+                    <td id="siblings_name" class="col-1" >
+                        <%batch=student.batch_name %>
+                        <%course=student.sibling_course_name %>
+                        <%batch=batch.split(',')%>
+                        <%course=course.split(',')%>
+
+                        <ul>
+                            <%batch.each_with_index do |b,i|%>
+                              <li class="table_column_li">
+                                  &#x200E; <%="#{course[i]} - #{b}"%>&#x200E;
+                              </li>
+
+                            <%end%>
+
+                        </ul>
+                    </td>
+                    <% father=student.guardians.to_a.find{|x| x.relation =~ /father/} %>
+                    <td class="col-3">
+                        <%= father.try(:full_name) %>
+                    </td>
+                    <td class="col-3">
+                        <%= father.try(:mobile_phone) %>
+                    </td>
+                    <td class="col-3">
+                        <%= father.try(:email) %>
+                    </td>
+                    <% mother=student.guardians.to_a.find{|x| x.relation =~ /mother/} %>
+                    <td class="col-3">
+                        <%= mother.try(:full_name) %>
+                    </td>
+                    <td class="col-3">
+                        <%= mother.try(:mobile_phone) %>
+                    </td>
+                    <td class="col-3">
+                        <%= mother.try(:email) %>
+                    </td>
+
+                    <%other_guardian=student.guardians.to_a.find_all{|x| x.relation !~ /father|mother/}%>
+                    <td id="siblings_name" class="col-1">
+                        <%if other_guardian.present?%>
+                          <ul>
+                              <%other_guardian.each do |other|%>
+                                <li class="table_column_li">
+                                    <%="#{other.first_name} #{other.last_name}"%>
+                                </li >
+                              <% end %>
+
+                          </ul>
+                        <%else%>
+                          <%=""%>
+                        <%end%>
+                    </td>
+
+                    <td id="siblings_name" class="col-1">
+                        <%if other_guardian.present?%>
+                          <ul>
+                              <%other_guardian.each do |other|%>
+                                <li class="table_column_li">
+                                    <%="#{other.relation}"%>
+                                </li>
+                              <% end %>
+
+                          </ul>
+                        <%else%>
+                          <%=""%>
+                        <%end%>
+                    </td>
+
+                    <td id="siblings_name" class="col-1">
+                        <%if other_guardian.present?%>
+                          <ul>
+
+                              <%other_guardian.each do |other|%>
+                                <li class="table_column_li">
+                                    <%=other.mobile_phone%>
+                                </li>
+                              <% end %>
+
+                          </ul>
+                        <%else%>
+                          <%=""%>
+                        <%end%>
+                    </td>
+
+                    <td id="siblings_name" class="col-1 margin_left_col">
+                        <%if other_guardian.present? %>
+                          <ul>
+                              <%other_guardian.each do |other|%>
+                                <li class="table_column_li">
+                                    <%=other.email%>
+                                </li>
+                              <% end %>
+
+                          </ul>
+                        <%else%>
+                          <%=""%>
+                        <%end%>
+                    </td>
+                </tr>
+
+              <% end %>
+
+          </table>
+      </div>
+
+      <% if @students.total_entries.to_i > @students.per_page.to_i%>
+        <div class="pagination_list pagination_float">
+            <div class="pagination_text">
+                <%= will_paginate @students,:renderer => 'RemoteLinkRenderer' ,:params=>{:batch_id=>params[:batch_id], :type => @type, :sort_order => @sort_order }%>
+            </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="flash-msg" style="float: left; width: 100%;"> <%= t('sibling_record_not_found') %></p>
+    <% end %>
+</div>

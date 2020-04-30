@@ -1,0 +1,26 @@
+<ul id="userspecific-list">
+  <% unless @active_userspecific_folders.empty? and @inactive_userspecific_folders.empty? %>
+    <% unless @active_userspecific_folders.empty? %>
+      <li class="listheading"><div class="userspecific-name"><%= t('active_folders') %></div></li>
+      <% @active_userspecific_folders.each do |c| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="userspecific-name"><%= truncate(c.name,45) %></div>
+          <div class="userspecific-edit"><%= link_to "#{t('edit_text')}", edit_userspecific_folder_path(:folder_type=>params[:folder_type],:action_text=>@action,:id => c.id) %></div>
+          <div class="userspecific-edit"><%= link_to "#{t('delete_text')}", destroy_folder_path(:id=>c.id,:folder_type=>params[:folder_type]), :confirm => "#{t('delete_confirm_msg')}" %></div>
+        </li>
+      <% end %>
+    <% end %>
+    <% unless @inactive_userspecific_folders.empty? %>
+      <li class="listheading"><div class="userspecific-name"><%= t('inactive_folders') %></div></li>
+      <% @inactive_userspecific_folders.each do |c| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="userspecific-name"><%= truncate(c.name,45) %></div>
+          <div class="userspecific-edit"><%= link_to "#{t('edit_text')}", edit_userspecific_folder_path(:folder_type=>params[:folder_type],:action_text=>@action,:id => c.id) %></div>
+          <div class="userspecific-edit"><%= link_to "#{t('delete_text')}", destroy_folder_path(:id=>c.id,:folder_type=>params[:folder_type]), :confirm => "#{t('delete_confirm_msg')}" %></div>
+        </li>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="flash-msg"><%= t('no_userspecific_folders') %></p>
+  <% end %>
+</ul>

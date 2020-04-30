@@ -1,0 +1,36 @@
+<div class="label-field-pair" style="width:345px;">
+
+  <label for="subject_id">Exam Group</label>
+  <% if params[:type]=="cbse_scolastic_report" or  params[:type]=="asl"%>
+    <div  class="text-input-bg" id="exam-group-select">
+      <%= select :assessment, :exam_group_id,
+        @exam_groups.map {|c| [c.name, c.id]},
+        {:prompt => "Select an exam group"},
+        {:onChange => "#{remote_function(:url => {:action => @action,:type=>params[:type]},
+        :with => "'exam_group_id='+ value",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')"
+        )}"} %> <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </div>
+  <%else%>
+    <div  class="text-input-bg" id="exam-group-select">
+      <%= select :assessment, :exam_group_id,
+        @exam_groups.map {|c| [c.name, c.id]},
+        {:prompt => "All"},
+        {:onChange => "#{remote_function(:url => {:action => @action,:type=>params[:type]},
+        :with => "'exam_group_id='+ value",
+        :before => "Element.show('loader')",
+        :success => "Element.hide('loader')"
+        )}"} %> <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </div>
+  <%end%>
+
+</div>

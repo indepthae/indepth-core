@@ -1,0 +1,59 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tc_template_generate_certificate') %></div>
+    <div id="inner-tab-menu">
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_generate_report_preview, @student%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="flash-msg"></div>
+    <div id ="error_msg"></div>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%= t('tc_template_generate_certificate') %></label>
+        </div>
+    </div>
+    <%= render :partial=>'student_profile_head'  %>
+    <div class="middile_section" id="middle_section">
+        <div class="text" id="text">
+        </div>
+        <div id="tc_display">
+            <%= render :partial=>"preview" %>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+if(j('.logo_to_left').length == 1){
+  j('.institution_details_to_center').css('float', 'left');
+}
+else{
+  j('.institution_details_to_center').css('float', 'right');
+}
+  if(j('.institution_contact_preview').children().length == 0){
+    j('.institution_contact_preview').css('display', 'none');
+  }
+  else{
+    j('.institution_contact_preview').css('display', 'inline-block');
+  }
+  
+   if(j('span.words').length > 0)
+  {
+    j('span.words').parent().css('white-space','normal');
+  }
+  if(j('span.in_figures').length > 0)
+  {
+    j('span.in_figures').parent().css('white-space','normal');
+  }
+</script>

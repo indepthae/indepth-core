@@ -1,0 +1,145 @@
+<div class="break_page">
+    <div class="break_page width800 margin-set-left-right ">
+
+        <div class="left-box fleft width50">
+            <div class="label_part fleft width150 ">
+                <%= t('payment_mode') %>
+            </div>
+            <div class="value_part fleft width150auto bold ">
+                <%= payment_summary.payment_mode %>
+            </div>
+            <% payment_summary.reference_no ||= @transaction_ledger.reference_no %>
+            <% if payment_summary.reference_no.present? %>
+              <% reference_text = get_payment_mode_text(payment_summary.payment_mode) || "ref" %>
+              <div class="label_part fleft width150 ">
+                  <%= reference_text %>
+              </div>
+              <div class="value_part fleft width150auto ">
+                  <%= payment_summary.reference_no %>
+              </div>
+              <% if payment_summary.payment_mode == "Cheque" %>
+                <!-- cheque date -->
+                <div class="label_part fleft width150 clearboth">
+                    <%= t('cheque_date') %>
+                </div>
+                <div class="value_part fleft width150auto ">
+                    <%= payment_summary.cheque_date %>
+                </div> 
+                <!-- bank name -->
+                <div class="label_part fleft width150 clearboth">
+                    <%= t('bank_name') %>
+                </div>
+                <div class="value_part fleft width150auto ">
+                    <%= payment_summary.bank_name %>
+                </div> 
+              <% end %>
+            <% end %>
+        </div>
+        <div class="right-box fright width50">
+<%# cashier = overall_summary.cname.nil? ? '' : (overall_summary.payment_mode=='Online Payment' ? f_cashier_name(overall_summary.usersid) : overall_summary.cname) %>
+            <% if payment_summary.cname.present? %>
+              <div class="label_part fleft width150 ">
+                  <%= t('cashier') %>
+              </div>
+              <div class="value_part fleft width150auto ">
+                  <%= payment_summary.cname %>
+              </div>
+            <% end %>
+            <% if payment_summary.payment_note.present? %>
+              <div class="label_part fleft width150 clearboth"><%= t('notes') %></div>
+              <div class="value_part fleft width150auto remarks ">
+                  <%= payment_summary.payment_note %>
+              </div>
+            <% end %>
+            <% if payment_summary.overall_tax_enabled %>
+              <% if default_configs.finance_tax_identification_label %>
+                <div class="label_part fleft width150 clearboth">
+                    <%= default_configs.finance_tax_identification_label %>
+                </div>
+                <div class="value_part fleft width150auto ">
+                    <%= default_configs.finance_tax_identification_number %>
+                </div>
+              <% end %>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="extender"></div>
+
+    <hr class="hor_line"/>
+
+    <div class="top_pay">
+
+        <% show_amount_in_words = (default_configs.pdf_receipt_atow.to_i == 1) %>
+        <% if payment_summary.wallet_amount_applied.present? and payment_summary.wallet_amount_applied == true %>
+          <% if rtl? %>
+            <div class="wallet-amount-paid-right">
+                <span class="bold margin-right20 font-size-13 fright margin-set-left-right amount-style">
+                    <div class="fleft margin-right5 font-size-13">
+                      <%= default_configs.currency || default_configs.default_currency %>
+                    </div>
+                    <%= " &#x200E;#{payment_summary.wallet_amount} " %>
+                </span>
+
+                <span class="bold title font-size-13 margin-right20 fright " style="white-space: nowrap;">
+                    <%= t('wallet_amount_applied') %> 
+                </span>
+            </div>
+          <% else %>
+            <div class="wallet-amount-paid-right">
+                <span class="bold font-size-13 total_amount_title" style="white-space: nowrap;">
+                    <%= t('wallet_amount_applied') %> 
+                </span>
+
+                <span class="bold font-size-13 total_amount">
+                    <%= default_configs.currency || default_configs.default_currency %>
+                      <%= wallet_amount %>
+                </span>
+            </div>
+          <% end %>
+        <% end %>
+
+
+        <% if rtl? %>
+          <% if show_amount_in_words %>
+            <div class="amount-paid-left">
+                <span class="amount_in_words"><%=t('amount_in_words')%></span> : 
+                <%= NumberToWord.convert(total_amount_paid,
+                  default_configs.pdf_receipt_nsystem, default_configs.default_currency) %>
+            </div>
+          <% end %>
+          <div class="amount-paid-right">
+              <span class="bold margin-right20 font-size-13 fright margin-set-left-right amount-style">
+                  <div class="fleft margin-right5 font-size-13">
+                    <%= default_configs.currency || default_configs.default_currency %>
+                  </div>
+                  <%= " &#x200E;#{total_amount_paid} " %>
+              </span>
+
+              <span class="bold title font-size-13 margin-right20 fright " style="white-space: nowrap;">
+                  <%= t('total_amount_paid') %> 
+              </span>
+          </div>
+        <% else %>
+          <% if show_amount_in_words %>
+            <div class="amount-paid-left">
+                <span style="font-weight: bold;"><%=t('amount_in_words')%></span> : 
+                <%= NumberToWord.convert(total_amount_paid,
+                  default_configs.pdf_receipt_nsystem, default_configs.default_currency) %>
+            </div>
+          <% end %>
+            <div class="amount-paid-right">
+                <span class="bold font-size-13 total_amount_title" style="white-space: nowrap;">
+                    <%= t('total_amount_paid') %> 
+                </span>
+
+                <span class="bold font-size-13 total_amount">
+                    <%= default_configs.currency || default_configs.default_currency %>
+                  <%= total_amount_paid %>
+                </span>
+            </div>
+        <% end %>
+
+
+    </div>
+</div>

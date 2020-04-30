@@ -1,0 +1,1 @@
+FeeDiscount.update_all(["master_receiver_id=receiver_id,master_receiver_type=receiver_type"])

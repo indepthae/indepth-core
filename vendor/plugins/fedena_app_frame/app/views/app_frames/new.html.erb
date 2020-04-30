@@ -1,0 +1,103 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('app_frames_text') %></h1>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('app_frames_text')}", app_frames_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% form_for @app_frame do |f| %>
+    <%= f.error_messages %>
+    <div class="label-field-pair">
+      <label for="name"><%= t('name') %><span class="necessary-field">*</span></label>
+      <div class="text-input-bg"><%= f.text_field :name %></div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="link"><%= t('link') %><span class="necessary-field">*</span></label>
+      <div class="text-input-bg"><%= f.text_field :link %></div>
+    </div>
+
+    <div class="label-checkbox-pair">
+      <label class="status" for="behaviour"><%= t('behaviour') %></label>
+      <div id="radio-buttons">
+        <%= f.radio_button  "new_tab", "false", :checked => "checked" %>
+        <label class="label_for_status" for="open_inside_app"><%= t('open_inside_app') %></label>
+
+        <%= f.radio_button  "new_tab", "true" %>
+        <label class="label_for_status" for="open_in_new_tab"><%= t('open_in_new_tab') %></label>
+      </div>
+      <div id="warning_message" style="display: none;">
+        <div id="warn-sym"></div>
+        <p><%= t('warning_message_to_give_correct_url') %></p>
+      </div>
+    </div>
+
+    <div class="label-field-pair">
+      <label for="client_name"><%= t('client_name') %></label>
+      <div class="text-input-bg">
+        <%= f.select :client_id ,@clients.map{|c| [c.name,c.id]} ,:prompt=>"Select a client",:selected=>@app_frame.try(:client_id).to_i %>
+      </div>
+    </div>
+
+    <div class="grades">
+      <div class="label-field-pair">
+        <label for="privilege_list"><%= t('privilege_list') %></label>
+      </div>
+      <div class="fee_category_scroll">
+        <div class="sel-list">
+          <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+          <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+        </div>
+        <% ["admin","student","employee","parent"].each do |privilege| %>
+          <div class="each_batch">
+            <%= check_box_tag "app_frame[privilege_list][]",  privilege , (f.object.privilege_list.present? and f.object.privilege_list.include? privilege),{:class=>'batches_box'} %> <label for="configuration_<%= privilege %>"><%= privilege.capitalize %></label>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <%= f.submit t('submit'), :class => 'submit-button', :disable_with=>"Please Wait..." %>
+  <% end %>
+</div>
+<script type="text/javascript">
+  var j = jQuery.noConflict();
+  function app_frame_link_validate()
+  {
+    if(document.URL.match(/https/)){
+      if($('app_frame_link').value.match(/https/))
+      {
+        $('warning_message').hide();
+        $('app_frame_new_tab_false').disabled = false;
+      }
+      else
+      {
+        $('app_frame_new_tab_true').checked = true;
+        $('app_frame_new_tab_false').disabled = true;
+        $('warning_message').show();
+      }
+    }
+  }
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('app_frame_link', 1, app_frame_link_validate);
+  });
+  j(document).ready(function(){
+    if(document.URL.match(/https/) && $('app_frame_link').value != "" && $('app_frame_link').value.match(/https/) == null)
+    {
+      $('app_frame_new_tab_true').checked = true;
+      $('app_frame_new_tab_false').disabled = true;
+      $('warning_message').show();
+    }
+  });
+</script>

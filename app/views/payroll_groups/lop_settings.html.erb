@@ -1,0 +1,376 @@
+<% unless rtl? %>
+  <%= stylesheet_link_tag ("payroll_categories/formulas") %>
+<% else %>
+  <%= stylesheet_link_tag ("rtl/payroll_categories/formulas") %>
+<% end %>
+<div id="content-header">
+    <%= payslip_management_header_icon(params[:finance].present?) %>
+    <% unless params[:finance].present? %>
+      <h1><%= "#{t('hr_management')}" %></h1>
+    <% else %>
+      <h1><%= t('employee_payslip_management') %></h1>
+    <% end %>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('lop_settings') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :payroll_groups_lop_settings, @payroll_group %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <h4><%= t('lop_settings_of_payroll_group') %></h4>
+    <div class="description"><%= t('lop_settings_of_payroll_group_desc') %></div>
+
+    <% form_for @payroll_group, :url => {:action => "save_lop_settings"} do |f| %>
+      <%= session_fingerprint_field %>
+      <div class="label-field-pair" id="enable_lop">
+          <%= f.radio_button :enable_lop, true, :id => "enable_lop_true", :onclick => "show_lop_formula();" %>
+          <label for="enable_lop_true"><%= t('enable_loss_of_pay') %></label>
+          <%= f.radio_button :enable_lop, false, :id => "enable_lop_false", :onclick => "show_lop_formula();" %>
+          <label for="enable_lop_false"><%= t('disable_loss_of_pay') %></label>
+      </div>
+      <div id="lop-formula">
+          <hr></hr>
+          <div id="prorated_method" class="formula_section">
+              <h4 class="sub-head"><%= "#{t('loss_of_pay_amount')} &#x200E;(LOPA)&#x200E;" %></h4>
+              <div class="description"><%= t('loss_of_pay_amount_desc') %></div>
+              <h5><%= "#{t('calculate_cost_of_one_working_day')} &#x200E;(LOP1D)&#x200E;" %></h5>
+              <% f.fields_for :employee_lop do |el| %>
+                <% el.fields_for :hr_formula do |hf| %>
+                  <% form_obj = hf.object %>
+      <%# form_obj.value_type ||= 2 %>
+                  <div class="label-field-pair">
+                      <label for="category_name"><%= t('loss_of_pay_formula') %></label>
+                      <div class="text-input-bg">
+                          <%= hf.select :value_type, HrFormula::VALUE_TYPE.map {|key, value| [t(value), key]}, {:include_blank => "Select value type"}, :onchange => "render_formula_partial(this,'#{hf.object_name}','#{el.object.id}','#{el.object.class}')", :class => 'lop_formula_type'%>
+                          <%= hf.hidden_field :cat_list, :class => "cat_list_value" %>
+                      </div>
+
+                      <%= image_tag("loader.gif",
+                        :align => "absmiddle",
+                        :border => 0,
+                        :id => "loader1",
+                        :style =>"display: none;" ) %>
+                  </div>
+                  <div id="formula-fields">
+                      <div id ="fields">
+                          <% case form_obj.value_type.to_i
+                            when 1 %>
+                            <%= render :partial => 'payroll_categories/numeric_value_field', :locals => {:object_name => hf.object_name, :hr_formula => @payroll_group.employee_lop.hr_formula} %>
+                            <%= hf.hidden_field :cat_list, :class => "cat_list_value" %>
+                          <% when 2 %>
+                            <%= render :partial => 'payroll_categories/formula_field', :locals => {:object_name => hf.object_name,  :hr_formula => @payroll_group.employee_lop.hr_formula }%>
+                          <% when 3 %>
+                            <%= render :partial => 'payroll_categories/formula_with_condition',  :locals => {:object_name => hf.object_name, :hr_formula => @payroll_group.employee_lop.hr_formula}%>
+                          <% end %>
+
+                      </div>
+                      <div id="lop_equation">
+                          <div id="left-hand-side"><%= "#{t('loss_of_pay_amount')} &#x200E;(LOPA)&#x200E; =" %></div>
+                          <div id="right-hand-side">
+                              <span><%= "#{t('cost_of_one_working_day')} &#x200E;(LOP1D)&#x200E;" %></span>
+                              <span>x</span>
+                              <span><%= "#{t('number_of_loss_of_pay_leaves')} &#x200E;(LOPD)&#x200E;" %></span>
+                          </div>
+                      </div>
+                      <div class="formula_help">
+                          <%= render :partial => "payroll_categories/formula_help" %>
+                      </div>
+
+                  </div>
+                <% end %>
+            </div>
+            <hr></hr>
+            <div id="lop_methods">
+                <h4 class="sub-head"><%= "#{t('deduction_of_loss_of_pay_amount')} &#x200E;(LOPA)&#x200E;" %></h4>
+                <div class="description"><%= t('deduction_of_loss_of_pay_amount_desc') %></div>
+                <div class="label-field-pair lop_section" id="enable_lop">
+                    <%= el.radio_button :lop_as_deduction, true, :id => "lop_as_deduction_true", :onclick => "show_lop_method();" %>
+                    <label for="lop_as_deduction_true"><%= "#{t('as_a_deduction', :code => "LOPA")}" %></label>
+                    <div class="description">
+                        <%= t('lopa_as_a_deduction_desc', :code => "LOPA") %>
+                        <div class="examples" onclick="more_examples('lop_as_deduction')"><%= t('view_example') %></div>
+                    </div>
+                </div>
+                <div class="label-field-pair lop_section" id="enable_lop">
+                    <%= el.radio_button :lop_as_deduction, false, :id => "lop_as_deduction_false", :onclick => "show_lop_method();" %>
+                    <label for="lop_as_deduction_false"><%= t('deduct_lopa_from_payroll_categories', :code => "LOPA") %></label>
+                    <div class="description">
+                        <%= t('deduct_lopa_from_payroll_categories_desc', :code => "LOPA") %>
+                        <div class="examples" onclick="more_examples('lop_from_cat')"><%= t('view_example') %></div>
+                    </div>
+                </div>
+            </div>
+            <div id="formula-fields" class="deduction_method">
+                <% earnings = Hash[@hash.select{|k,v| !v["is_deduction"]}] %>
+                <% deductions = Hash[@hash.select{|k,v| v["is_deduction"]}] %>
+                <%= el.hidden_field :category_present %>
+                <table align="center" width="100%" cellpadding="1" cellspacing="1">
+                    <tr class="tr-head">
+                        <td class="category"><%= t('payroll_category') %></td>
+                        <td class="category_formula"><%= t('value') %></td>
+                        <td class="value"><%= t('lop_condition') %></td>
+                        <td class="actions"></td>
+                    </tr>
+                    <tr class="sub_heading bg_dark_grey">
+                        <td colspan="4"><%= t('earnings') %></td>
+                    </tr>
+                    <% earnings.each do |key, val| %>
+                      <tr>
+                          <td><%=  val["name"] %></td>
+                          <td><div class="formula-text"><%=  val["formula"] %></div></td>
+                          <td id="lop_<%= key %>"><%=  val["lop_condition"] %></td>
+                          <td>
+                              <div class="div_link add add_link_<%= key %>" id="<%= key %>" onclick="lop_formula_form(this)" style="display : <%= val["selected"] ? 'none' : 'block' %>"><%= t('add_lop_condition') %></div>
+                              <div class="div_link edit edit_link_<%= key %>" id="<%= key %>" onclick="lop_formula_form(this)" style="display : <%= val["selected"] ? 'block' : 'none' %>"><%= t('edit_text') %></div>
+                              <div class="div_link remove remove_link_<%= key %>" id="<%= key %>" onclick="remove_confirmation(this)" cat_name="<%=  val["name"] %>" style="display : <%= val["selected"] ? 'block' : 'none' %>"><%= t('remove') %></div>
+                          </td>
+                      </tr>
+                    <% end %>
+                    <tr class="sub_heading bg_dark_grey">
+                        <td colspan="4"><%= t('deductions') %></td>
+                    </tr>
+                    <% deductions.each do |key, val| %>
+                      <tr>
+                          <td><%=  val["name"] %></td>
+                          <td><div class="formula-text"><%=  val["formula"] %></div></td>
+                          <td id="lop_<%= key %>"><%=  val["lop_condition"] %></td>
+                          <td>
+                              <div class="div_link add add_link_<%= key %>" id="<%= key %>" onclick="lop_formula_form(this)" style="display : <%= val["selected"] ? 'none' : 'block' %>"><%= t('add_lop_condition') %></div>
+                              <div class="div_link edit edit_link_<%= key %>" id="<%= key %>" onclick="lop_formula_form(this)" style="display : <%= val["selected"] ? 'block' : 'none' %>"><%= t('edit_text') %></div>
+                              <div class="div_link remove remove_link_<%= key %>" id="<%= key %>" onclick="remove_confirmation(this)" cat_name="<%=  val["name"] %>" style="display : <%= val["selected"] ? 'block' : 'none' %>"><%= t('remove') %></div>
+                          </td>
+                      </tr>
+                    <% end %>
+                </table>
+            </div>
+            <div id='lop_form_content'><%= render :partial => 'lop_condition_fields' %></div>
+          <% end %>
+      </div>
+      <%= f.hidden_field :lop_formulas, :value => "{}" %>
+      <%=submit_tag "#{t('save_settings')}", :disable_with => "#{t('please_wait')}", :class => "submit-button"  %>
+    <% end %>
+    <%= render :partial => 'lop_examples' %>
+</div>
+<script type="text/javascript">
+  var json_data = JSON.parse('<%= @hash.to_json.gsub("'", %q(\\\')) %>');
+  var changed_data = JSON.parse(Object.toJSON(json_data));
+  var cat_codes = '<%= @payroll_categories.collect(&:code).join(",") %>';
+  function show_lop_formula()
+  {
+      if (j('#enable_lop_true').is(':checked'))
+      {
+          j("#lop-formula").show();
+          j('.lop select, .lop input, .lop textarea').attr('disabled', false);
+          set_height();
+      } else
+      {
+          j("#lop-formula").hide();
+          j('.lop select, .lop input, .lop textarea').attr('disabled', true);
+      }
+  }
+
+  function render_formula_partial(elm, object_name, object_id, object_type)
+  {
+      new Ajax.Request('/payroll_categories/hr_formula_form', {
+          parameters: {'formula_type': elm.value, 'object_name': object_name, 'object_id': object_id, 'object_type': object_type},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j(elm).parent().next('#loader1').show();
+          },
+          onComplete: function (resp) {
+              j(elm).closest('.label-field-pair').next().children('#fields').html(resp.responseText);
+              if ((elm.value == "3") || (elm.value == "2"))
+              {
+                  j(elm).closest('.label-field-pair').next().children('.formula_help').show();
+                  set_tab_height();
+              } else
+                  j(elm).closest('.label-field-pair').next().children('.formula_help').hide();
+              j(elm).parent().next('#loader1').hide();
+          }
+      });
+  }
+
+  function show_lop_method() {
+      if (j('#lop_as_deduction_true').is(':checked'))
+      {
+          j(".deduction_method").hide();
+          j('.lop select, .lop input, .lop textarea').attr('disabled', false);
+      } else
+      {
+          j(".deduction_method").show();
+          j('.lop select, .lop input, .lop textarea').attr('disabled', true);
+      }
+  }
+
+  function lop_formula_form(elm) {
+      if (j('.lop_formula_popup').length == 0) {
+          build_modal_box({title: '<%= t('add_loss_of_pay_condition_for_payroll_category') %>', popup_class: 'lop_formula_popup'});
+          j('.lop_formula_popup #popup_content').append(j('#lop_form_content'));
+          j('.lop_formula_popup #MB_close').attr('onclick', 'hide_popup_box()');
+          j('.lop_formula_popup').prev('#popup_box_overlay').click(hide_popup_box);
+          cancel_btn = j('<div></div>', {class: 'submit-button', onclick: 'hide_popup_box()', text: '<%= t('cancel') %>'});
+          submit_btn = j('<div></div>', {class: 'submit-button', onclick: 'add_lop_formula(' + elm.id + ')', text: '<%= t('add_lop_condition') %>', id: 'add_lop_condition'});
+          j('.lop_formula_popup #popup_footer').append(submit_btn);
+          j('.lop_formula_popup #popup_footer').append(cancel_btn);
+      } else {
+          j('.lop_formula_popup').show();
+          j('.lop_formula_popup').prev('#popup_box_overlay').show();
+      }
+      if (j('html').attr('dir') == 'ltr')
+          j('.lop_formula_popup').css({left: (j('body').width() - j('.lop_formula_popup').width()) / 2});
+      else
+          j('.lop_formula_popup').css({right: (j('body').width() - j('.lop_formula_popup').width()) / 2});
+      j('#add_lop_condition').attr('onclick', 'add_lop_formula(' + elm.id + ')');
+      j('#cat_name b').html(changed_data[elm.id]["name"]);
+      j('#lop_form_content span.cat_formula').html(changed_data[elm.id]["formula"]);
+      j('#formula-head span#code').html(changed_data[elm.id]["code"]);
+      j('#formula-head span#name').html(changed_data[elm.id]["cat_name"]);
+      if(changed_data[elm.id].selected){
+        j('.lop_formula_popup #popup_header_part h4').text('<%= t('edit_loss_of_pay_condition_for_payroll_category') %>');
+        j('.lop_formula_popup #popup_footer #add_lop_condition').text('<%= t('edit_lop_condition') %>');
+      }
+      else{
+        j('.lop_formula_popup #popup_header_part h4').text('<%= t('add_loss_of_pay_condition_for_payroll_category') %>');
+        j('.lop_formula_popup #popup_footer #add_lop_condition').text('<%= t('add_lop_condition') %>');
+      }
+      if (changed_data[elm.id].lop_condition != '-')
+          j('#lop_formula').val(changed_data[elm.id].lop_condition);
+      else
+          j('#lop_formula').val();
+      j('.lop_formula_popup #popup_content .validate_result').html('');
+      j('.lop_formula_popup #popup_content .lop_validate').attr('cat_id', elm.id);
+      if (changed_data[elm.id].actual_value)
+          j('#actual_value_true').prop('checked', true);
+      else
+          j('#actual_value_false').prop('checked', true);
+      if (changed_data[elm.id].changed.length > 0) {
+          j('.new_formula').show();
+          show_new_formula();
+          j('#valid_formula').val('true');
+      } else {
+          j('.new_formula').hide();
+          j('.lop_formula_fields').show();
+          j('#valid_formula').val('0');
+      }
+  }
+
+  function hide_popup_box() {
+      j('.lop_formula_popup').hide();
+      j('.lop_formula_popup').prev('#popup_box_overlay').hide();
+  }
+
+  function show_new_formula() {
+      if (j('#actual_value_true').is(':checked')) {
+          j('.lop_formula_fields').hide();
+          j('#valid_formula').val('true');
+      } else {
+          j('.lop_formula_fields').show();
+          j('#valid_formula').val('0');
+      }
+  }
+
+  function add_lop_formula(id) {
+      valid = j('#valid_formula').val();
+      if (valid == "0") {
+          clickLopValidate(0);
+      } else if (valid == "false") {
+
+      } else {
+          j.each(changed_data[id].dependency_ids, function (i, val) {
+              if (changed_data[val].changed.indexOf(id) < 0)
+                  changed_data[val].changed.push(id);
+          });
+          j('.add_link_' + id).hide();
+          j('.edit_link_' + id).show();
+          j('.remove_link_' + id).show();
+          if ((changed_data[id].changed.length > 0) && (j('#actual_value_true').is(':checked')))
+              changed_data[id].actual_value = true;
+          else
+              changed_data[id].actual_value = false;
+          if (changed_data[id].actual_value) {
+              changed_data[id].lop_condition = '-';
+              j('#lop_' + id).text('-');
+          } else {
+              lop_val = j('#lop_formula').val().toUpperCase();
+              changed_data[id].lop_condition = lop_val;
+              j('#lop_' + id).text(lop_val);
+          }
+          j('#lop_formula').val('');
+          changed_data[id].selected = true;
+          data = Object.toJSON(changed_data);
+          j('#payroll_group_lop_formulas').val(data);
+          hide_popup_box();
+      }
+  }
+
+  function remove_confirmation(elm) {
+      build_modal_box({title: '<%= t('remove_lop_formula') %>', popup_class: 'remove_conf_popup'});
+      j('.remove_conf_popup #popup_content').append('<%= t('remove_lop_formula_confirmation_message') %><b>' + j(elm).attr('cat_name') + '</b>');
+      j('.remove_conf_popup #MB_close').attr('onclick', 'remove_confrm_popup()');
+      j('.remove_conf_popup').prev('#popup_box_overlay').click(remove_confrm_popup);
+      cancel_btn = j('<div></div>', {class: 'submit-button', onclick: 'remove_confrm_popup()', text: '<%= t('cancel') %>'});
+      submit_btn = j('<div></div>', {class: 'submit-button', onclick: 'remove_lop_formula(' + elm.id + ')', text: '<%= t('ok') %>', id: 'add_lop_condition'});
+      j('.remove_conf_popup #popup_footer').append(submit_btn);
+      j('.remove_conf_popup #popup_footer').append(cancel_btn);
+      if (j('html').attr('dir') == 'ltr')
+          j('.remove_conf_popup').css({left: (j('body').width() - j('.remove_conf_popup').width()) / 2});
+      else
+          j('.remove_conf_popup').css({right: (j('body').width() - j('.remove_conf_popup').width()) / 2});
+  }
+
+  function remove_lop_formula(cat_id) {
+      id = parseInt(cat_id);
+      j.each(changed_data[id].dependency_ids, function (i, val) {
+          if (changed_data[val].changed.indexOf(id) >= 0)
+              changed_data[val].changed.splice(changed_data[val].changed.indexOf(id), 1);
+      });
+      j('.add_link_' + id).show();
+      j('.edit_link_' + id).hide();
+      j('.remove_link_' + id).hide();
+      changed_data[id].lop_condition = '';
+      changed_data[id].selected = false;
+      changed_data[id].actual_value = true;
+      data = Object.toJSON(changed_data);
+      j('#payroll_group_lop_formulas').val(data);
+      j('#lop_' + id).text('');
+      remove_confrm_popup();
+  }
+
+  function remove_confrm_popup() {
+      overlay = j('.remove_conf_popup').prev('#popup_box_overlay')
+      j('.remove_conf_popup').remove();
+      overlay.remove();
+  }
+
+  function set_height() {
+      max_height = j('.lop_section').map(function () {
+          return j(this).outerHeight();
+      }).get().max();
+      j('.lop_section').outerHeight(max_height);
+      if (j('html').attr('dir') == 'ltr')
+          j('.lop_section').first().css({'border-right': 0});
+      else
+          j('.lop_section').first().css({'border-left': 0});
+  }
+
+  j(document).ready(function () {
+      show_lop_formula();
+      show_lop_method();
+      j('.cat_list_value').val(cat_codes);
+      data = Object.toJSON(json_data);
+      j('#payroll_group_lop_formulas').val(data);
+      if (j('#enable_lop_truee').is(':checked'))
+          set_height();
+      for_val = j('.lop_formula_type').val()
+      if ((for_val == "3") || (for_val == "2"))
+      {
+          j('.formula_help').show();
+          set_tab_height();
+      } else
+          j('.formula_help').hide();
+  });
+</script>

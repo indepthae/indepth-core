@@ -1,0 +1,176 @@
+<%-#
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%  if (rtl?) %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: (link_off.left)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% end %>
+<% current_username = @current_user.username %>
+<% profile_employee_no = @employee.employee_number %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('employee_profile') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('library_details') %></div>
+
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to t('profile_text') ,:controller=>"employee" ,:action=>"profile" , :id=>@employee.id %>
+            </li>
+
+            <% if @current_user.admin? %>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to "#{t('delete_text')}" ,:controller=>"employee",:action=>'remove',:id=>@employee.id %>
+              </li>
+            <% end %>
+            <li class='drop_header themed_bg themed-dark-hover-background'>
+                <a href="#" class="drop_header_link"><%= t('more') %> &#9660;</a>
+                <ul id="box_4" class="more-menu-div" style="display:none;">
+                    <% FedenaPlugin::ADDITIONAL_LINKS[:employee_profile_more_menu].each do |mod| %>
+                      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t(mod[:title])}",mod[:destination].merge(:id=>@employee.id) %></li>
+                    <% end %>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+
+
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%breadcrumb :library_employee_library_details,@employee%>
+        <%=render_breadcrumbs%>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="employee_profile_heading">
+
+        <div id="profile_picture_display">
+            <% if @employee.photo.file? %>
+              <%= image_tag @employee.photo.url(:original, false) %>
+            <% else %>
+              <%= image_tag "HR/default_employee.png" %>
+            <% end %>
+        </div>
+
+        <div id ="employee_main_info">
+            <h3> <%= @employee.full_name %>  </h3>
+            <h4><%= t('employee_id') %>: <%= @employee.employee_number %> </h4>
+        </div>
+
+        <div id="profile-general-info">
+
+
+        </div>
+        <div class="extender"></div>
+
+    </div>
+    <div id="profile-infos">
+        <div class="extender"></div>
+        <% unless @borrowed.blank? and @reserved.blank? %>
+          <ul class="item-list">
+              <% unless @borrowed.blank? %>
+                <li class="heading1"><%= "#{t('books_borrowed')}"%></li>
+                <% @borrowed.each do |borrowed| %>
+                  <li class="list<%=cycle('odd', 'even')%>">
+                      <div class="item-name">
+                          <%= borrowed.book.title + "(#{t('due_date')} :- " + format_date(borrowed.due_date,:format=>:long) + ")"%>
+                      </div>
+                  </li>
+                <% end %>
+                <br/>
+              <% end %>
+              <% unless @reserved.blank? %>
+                <li class="heading1"><%= "#{t('books_reserved')}"%></li>
+                <% @reserved.each do |reserved| %>
+                  <li class="list<%=cycle('odd', 'even')%>">
+                      <div class="item-name">
+                          <%= reserved.book.title + "(&rlm;#{t('reserved_date')} :- " + format_date(reserved.reserved_on,:format=>:long) + ")"%>
+                      </div>
+                  </li>
+                <% end %>
+              <% end %>
+          </ul>
+        <% else %>
+          <p class="flash-msg"><%= "#{t('no_library_active_record_present')}" %></p>
+        <% end %>
+    </div>
+</div>
+
+

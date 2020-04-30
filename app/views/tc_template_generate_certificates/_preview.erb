@@ -1,0 +1,35 @@
+
+<div class="template_settings_sub_head" id="edit_link">
+    <%= t('preview_certificate')%>
+    <span class="edit_certificate"><%= link_to t('edit_certificate'), :action => "edit", :id => @student.id, :submitted_data => @tc_data, :certificate_number=>@serial_number,:date_of_issue=>@date_of_issue, :preview=>true%></span>
+</div>
+<div class="preview_box">
+    <%=render :partial=>'transfer_certificate'%>
+</div>
+<div class="form_submission" id="form_field">
+    <%- form_for :generate_report, :url => {:action=>"create"}  do |f| -%>
+      <% @tc_data.each do |key,value| %>
+        <%= hidden_field_tag "generate_report[record_data][#{key}][value_1]",value[:value_1] %> 
+        <%= hidden_field_tag "generate_report[record_data][#{key}][value_2]",value[:value_2] if value[:value_2].present? %> 
+        <% if value[:sub_field].present? %>
+          <% value[:sub_field].each do |sub_key, sub_value| %>
+            <%= hidden_field_tag "generate_report[record_data][#{key}][sub_field][#{sub_key}][value_1]",sub_value[:value_1] %> 
+            <%= hidden_field_tag "generate_report[record_data][#{key}][sub_field][#{sub_key}][value_2]",sub_value[:value_2] if sub_value[:value_2].present?%> 
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= f.hidden_field :certificate_number, :value=>extract_prefix(@serial_number,@prefix)  %>
+      <%= f.hidden_field :prefix, :value=>@prefix  %>
+      <%= f.hidden_field :date_of_issue, :value=>@date_of_issue  %>
+      <%= f.hidden_field :student_id, :value=>@id %>
+      <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+      <div class="submit_button">
+          <%=submit_tag " #{t('generate_transfer_certificate')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+      </div>
+      <%= link_to "#{t('edit_certificate')}", {:action => "edit", :id => @student.id, :submitted_data => @tc_data, :certificate_number=>@serial_number,:date_of_issue=>@date_of_issue, :preview=>true}, :class => "submit-button", :method => :get  %>
+    
+    <%end%>
+</div>
+<iframe class="" style="display: none" id="tc_printer_template_container"></iframe>
+
+

@@ -1,0 +1,26 @@
+<div class="com_block">
+    <p class="messages">In this section you can configure the labels of the signatures needed in your report card. You can give upto 3 signatures.</p>
+</div>
+<div id="signature_section">
+    <div id="left_side">
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :cce_report_setting, :sign_left_text, :value => @setting[:sign_left_text] %>
+            </div>
+        </div>
+    </div>
+    <div id="center_side">
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :cce_report_setting, :sign_center_text, :value => @setting[:sign_center_text] %>
+            </div>
+        </div>
+    </div>
+    <div id="right_side">
+        <div class="label-field-pair">
+            <div class="text-input-bg">
+                <%= text_field :cce_report_setting, :sign_right_text, :value => @setting[:sign_right_text] %>
+            </div>
+        </div>
+    </div>
+</div>

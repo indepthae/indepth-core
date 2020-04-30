@@ -1,0 +1,51 @@
+<% form_for @employee_form, :url => transport_employees_path do |f| %>
+  <%= session_fingerprint_field %> 
+  <div class="employees_table">
+
+      <div class="container">
+          <table width="100%" cellpadding="1" cellspacing="1" id="employee_details">
+              <thead>
+                  <tr class="header">
+                      <th class="name"><div><%= t('employee_name') %></div></th>
+                      <th class="employee_no"><div><%= t('employee_no') %></div></th>
+                      <th class="position"><div><%= t('employee_position') %></div></th>
+                      <th class="category"><div><%= t('employee_category') %></div></th>
+                      <th class="job"><div><%= t('job') %></div></th>
+                      <th class="mobile"><div><%= t('mobile') %></div></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <% unless @employees.empty? %>
+                    <%= f.hidden_field :department_id %>
+                    <% f.fields_for :route_employees do |e| %>
+                      <%= e.hidden_field :employee_id %>
+                      <%= e.hidden_field :re_id %>
+                      <% form_object = e.object %>
+                      <tr>
+                          <td class="name"><%= form_object.employee_name %></td>
+                          <td class="employee_no"><%= form_object.employee_number %></td>
+                          <td class="position"><%= form_object.employee_position %></td>
+                          <td class="category"><%= form_object.employee_category %></td>
+                          <td class="job">
+                              <%= e.select :task, RouteEmployee::EMPLOYEE_TASK.map{|k,v| [t(v), k]}, {:include_blank => "#{t('select_an_option')}"}, {:onchange => "enable_phone_option(this)", :disabled => form_object.assigned} %>
+                          </td>
+                          <td class="mobile">
+                              <%= e.text_field :mobile_phone, :disabled => form_object.re_id.nil?, :class => "mobile_phone" %>
+                          </td>
+                      </tr>
+                    <% end %>
+                  <% else %>
+                    <tr>
+                        <td colspan="6"><%= t('no_employees_in_this_dept') %></td>
+                    </tr>
+                  <% end %>
+              </tbody>
+          </table>
+      </div>
+
+  </div>
+  <% unless @employees.empty? %>
+    <%= link_to t('cancel'), transport_employees_path, :class => "submit-button", :id => "cancel-link" %>
+    <%= submit_tag "", :value => "#{t('save')}", :class => "submit-button", :disable_with => "#{t('please_wait')}" %>
+  <% end %>
+<% end %>

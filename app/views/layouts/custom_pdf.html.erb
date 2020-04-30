@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="<%= (Fedena.rtl) ? 'rtl' : 'ltr' %>">
+  <head>
+    <% @direction = (Fedena.rtl) ? 'rtl/' : '' %>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>   
+
+    <% if params[:d].present? %>
+      <%= stylesheet_link_tag([@direction+'application', @direction+'_styles/ui.all'])%>
+      <%= stylesheet_link_tag(*get_pdf_stylesheets) %>
+      <%= stylesheet_link_tag  @direction+"_layouts/pdf" %>
+    <% end %>
+    <link rel="stylesheet" type="text/css" href="<%="#{RAILS_ROOT}/public/stylesheets/#{@direction}_layouts/pdf.css" %>" media="all" />
+    <link rel="stylesheet" type="text/css" href="<%="#{RAILS_ROOT}/public/stylesheets/#{get_pdf_stylesheets}.css"%>" media="all" />
+    <link rel="stylesheet" type="text/css" href="<%= "#{RAILS_ROOT}/public/stylesheets/#{@direction}_styles/ui.all.css"%>" media="all" />
+    
+    <%= wicked_pdf_stylesheet_link_tag "#{@direction}rapid_report_framework" %>
+    
+    <%=yield :head%>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>

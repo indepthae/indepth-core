@@ -1,0 +1,13 @@
+
+<div class="label-field-pair">
+  <label for="course"><%= t('batchess') %></label>
+  <div class="text-input-bg">
+
+    <%= select :select_batch, :batch, @batches.map { |s| [s.full_name, s.id] },
+      {:prompt => "#{t('select_course')}"},
+      {:onChange => "#{remote_function(:url => {:action => "to_students"}, :with => "'batch_id='+value",
+      :before => "Element.show('loader1')",
+        :success => "Element.hide('loader1')")}"} %>
+
+  </div>
+</div>

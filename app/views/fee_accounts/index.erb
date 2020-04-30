@@ -1,0 +1,111 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('finance_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('fee_accounts_text') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to_remote "#{t('new')}", :url => new_fee_account_path %>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="header">
+        <%= t('fee_accounts_text') %>
+    </div>
+
+    <div class="description">
+        <%= t('fee_accounts_description') %>
+    </div>
+
+    <table class="gray_table_list" cellpadding="0" cellspacing="0" width="100%">
+        <% if @fee_accounts.present? %>
+          <tr class="main_head tr-list_head">
+              <td class="set_border_right td-name"><%= t('name') %></td>
+              <td class="set_border_right td-description"><%= t('description') %></td>
+              <td class="set_border_right td-actions"></td>
+          </tr>
+
+          <% @fee_accounts.each do |fee_account| %>
+
+            <tr>
+                <td class="set_border_right td-name"><%= fee_account.name %></td>
+                <td class="set_border_right td-description"><%= fee_account.description %></td>
+                <td class="set_border_right td-actions">
+                    <% unless fee_account.has_assignments? %>
+                      <% if permitted_to? :edit, :fee_accounts %>                              
+                        <%= link_to_remote t('edit'), :url => edit_fee_account_path(fee_account), 
+                          :method => :get %>
+                      <% end %>
+                      <% if permitted_to? :destroy, :fee_accounts %>
+                        <%= link_to t('delete'), "#", :onclick => 
+                          "make_popup_box(this, 'confirm', '#{t('delete_fee_account_confirmation_message', 
+                        {:account_name => fee_account.name})}', {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 
+        'title' : '#{t('delete_fee_account')}', 'popup_class' : 'remove_lt'}); return delete_fee_account(#{fee_account.id});"  %>
+                      <% end %>
+                    <% else %>
+                      <span class="small-strike"><%= t('edit') %></span>
+                      <span class="small-strike"><%= t('delete') %></span>
+                    <% end %>
+                </td>
+            </tr>
+
+          <% end %>
+
+        <% else %>
+          <tr>
+              <td colspan="3">
+                  <%= t('nothing_to_list') %>
+              </td>
+          </tr>
+        <% end %>
+    </table>
+</div>
+
+<script>
+
+  delete_fee_account = function (fee_account_id) {
+      j('.submit-button#yes').on('click', function () {
+          j.ajax({
+              type: 'DELETE',
+              url: '/fee_accounts/' + fee_account_id
+          });
+      });
+  };
+
+</script>

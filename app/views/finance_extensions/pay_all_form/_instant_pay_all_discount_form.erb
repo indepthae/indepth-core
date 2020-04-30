@@ -1,0 +1,129 @@
+<% remote_form_for @multi_fee_discount, :url => {:controller => 'finance_extensions', 
+  :action => "create_instant_pay_all_discount" }, :html => {:method => :post, :id => @student.id}, 
+  :before=>"$('submit_button_discount').disable()", 
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |multi_fee_discount| %>
+  <%= session_fingerprint_field %> 
+  <%= hidden_field_tag :student_id, @student.id, :id=>"student_id"%>
+  <%= hidden_field_tag :transaction_date, @transaction_date %>
+  <%= hidden_field_tag :batch_id, @current_batch.id, :id=>"batch_id" %>
+  <%= multi_fee_discount.hidden_field :fee_type %>
+  <% if @temporary_manual_fines.present? %>
+    <% @temporary_manual_fines.each_pair do |fee_type, fee_data| %>
+      <% fee_data.each_pair do |fee_id, fi_amt| %>
+        <% next unless fi_amt.to_f > 0 %>
+        <%= hidden_field_tag "manual_fines[#{fee_type}][#{fee_id}]", fi_amt %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% @grouped_fees.each_pair do |fee_type, fees| %>
+    <% fees.each do |fee| %>
+      <% next if fee_type == 'finance_fee' and @disabled_fee_ids.include?(fee.id) %>
+      <% unless (fee.is_paid and fee.balance != 0) %>
+        <%= multi_fee_discount.hidden_field "#{fee_type}_ids", :multiple => true, :value => fee.id, :class => "#{fee_type}_ids" %>
+      <% end %>
+    <% end %>
+  <% end %>
+    <div id="multi_fee_discount_form">
+      <!--<div id ="description">< %= t('multi_fee_discount_create_description') %></div>-->
+      <div class="label-field-pair">
+          <label><%= "Student Category" %></label>
+          <div id="student-category"><%= @student.student_category.present? ? @student.student_category.name : "-" %></div>
+      </div>
+      <div class="label-field-pair">
+        <label for="name"><%= t('name') %></label>
+
+        <div class="text-input-bg">
+          <%= multi_fee_discount.select :master_fee_discount_id,
+                                        options_for_select(@master_discounts.map { |x| [x.name, x.id] }),
+                                        :include_blank => t('select_a_discount') %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="collections"><%= "Collections" %></label>
+          <div class="text-input-bg">
+              <% over_all_options = [["Overall"]] %>
+              <% fee_options = @grouped_fees.map do |fee_type, fees|  
+                fees.reject!{|fee| (fee_type == 'finance_fee' or fee_type == 'transport_fee') and @disabled_fee_ids.include?(fee.id) }
+                ["#{fee_type.capitalize.gsub('_',' ')}", fees.map{|fee| [fee.collection_name, fee.id]}]
+                end %>
+              <% selected = @multi_fee_discount.collections %>              
+              <%= multi_fee_discount.select :collections, options_for_select(over_all_options, selected) + 
+                grouped_options_for_select(fee_options), {:include_blank => t('select_fee_collection')}.
+                merge({:selected => selected})%>
+              <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader",
+                :style =>"display: none;" ) %>
+          </div>
+      </div>
+
+      <div id="particulars_list">
+        <% if @multi_fee_discount.fee_type == 'FinanceFee' and selected.to_i > 0 %>
+            <%= render :partial => "discount_particulars_list" %>
+        <% end %>
+      </div>
+      <%if permitted_to? :fetch_waiver_amount_pay_all, :finance_extensions%>
+      <div class="label-field-pair discount_type">
+          <label><%= t('waiver_discount_text') %></label>
+          <div class="text-input-bg">
+              <div class="check_box_group">
+                  <%= multi_fee_discount.check_box  :waiver_check, :checked => "false", :id => "change_disable" ,:onchange => "fetch_max_dis(j(this).val())"%>
+                  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "waiver_loader",
+                :style =>"display: none;" ) %>
+              </div>
+          </div>
+      </div>
+      <%end%>
+      <div class="label-field-pair discount_type">
+          <label><%= t('discount_type_text') %></label>
+          <div class="text-input-bg">
+              <div class="radio_group">
+                  <%= multi_fee_discount.radio_button  :is_amount, false, :class =>"readonly_divs is_waiver", :checked => "checked"%>
+                  <%= multi_fee_discount.label :is_amount, "#{t('percentage')}", :value => false %>
+              </div>
+              <div class="radio_group">
+                  <%= multi_fee_discount.radio_button  :is_amount, true, :class =>"readonly_divs",:id => "amount_check" %>
+                  <%= multi_fee_discount.label :is_amount, "#{t('amount')}", :value => true %>
+              </div>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="discount"><%= t('discount_amount') %></label>
+          <div class="text-input-bg">
+              <%= multi_fee_discount.text_field :discount, :class => "precision_text readonly_divs", :id=>"discount_amount" %>
+          </div>
+      </div>
+    </div>
+
+    <div id="popup_footer">
+      <%= submit_tag "#{t('add_discount')}", :class => "submit-button", :id => "submit_button_discount" %>
+      <div class="submit-button" onclick="remove_popup_box();">
+        <%= t('cancel') %>
+      </div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+  j("#change_disable").click(function(){
+  if(j('#change_disable').prop('checked') == true){
+    j(".readonly_divs").prop("readonly",true);
+    j(".is_waiver").attr("disabled", true); 
+    j("#amount_check").prop("checked", true);
+  }else{
+    j(".readonly_divs").prop("readonly",false);   
+    j(".is_waiver").attr("disabled", false);   
+  }
+  });
+  
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  reset_selected_fee();
+
+    <% if !@multi_fee_discount.valid? and @multi_fee_discount.fee_type.present? and
+        @multi_fee_discount.fee_id.present?  %>
+    selected_fee_type = '<%= @multi_fee_discount.fee_type.underscore %>';
+    selected_fee_lbl = '<%= @multi_fee_discount.fee_type.underscore.humanize %>';
+    selected_fee_id = <%= @multi_fee_discount.fee_id %>;
+    set_discount_collection();
+    <% end %>
+
+</script>

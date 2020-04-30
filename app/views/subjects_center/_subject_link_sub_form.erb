@@ -1,0 +1,43 @@
+<div class="accordion-course-batches-table">
+    <div class="batch-row-header">
+        <div class="batch-column-1">
+            <%= t('batches_text') %>
+        </div>
+        <div class="batch-column-2">
+            <%= t('allocation_status') %>
+        </div>
+        <div class="batch-column-3">
+
+        </div>
+    </div>
+    <% fields_for @course do |course| %>
+    <% course.fields_for :all_course_subjects, @subjects, :child_index => @subjects.first.id do |course_sub| %>
+      <% course_sub.fields_for :subjects do |sub| %>
+      <% next if sub.object.is_deleted or !sub.object.batch.is_active%>
+      <div class="batch-row">
+          <div class="batch-column-1">
+              <%= @course.course_batches.to_a.find{|cb| cb.id == sub.object.batch_id}.try(:name)  %>
+              <% if sub.object.errors.present?  %>
+                <div class="batch_errors">
+                    <%= sub.object.errors.full_messages.join(' ,') %>
+                </div>
+              <% end %>
+          </div>
+          <div class="batch-column-2">
+              <%= sub.object.new_record? ? t('not_allocated').titleize : t('allocated') %>
+          </div>
+          <div class="batch-column-3">
+              <div class="label_pair">
+                  <%= sub.check_box :selected,:checked => !sub.object.new_record?, :class => "select_leave", :onclick=>"select_batch(this)", :disabled => !sub.object.no_dependency_for_deletion? %>
+                  <%= sub.hidden_field :batch_id %>
+                  <%= sub.hidden_field :_destroy, :value => '0' %>
+                  <%= sub.hidden_field :course_subject_id %>
+
+                  <label class="core_label sub-header"><%= t('assign').titleize %></label>
+              </div>
+          </div>
+      </div>
+    <% end %>
+    <% end %>
+    <% end %>
+</div>

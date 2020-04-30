@@ -1,0 +1,116 @@
+<tr class="selected">
+    <td colspan="4">
+        <div id="vehicle_transport_form">
+            <% common_route = (@different_route.nil? ? false : (@different_route.to_i == 0)) %>
+            <% if common_route and @transport.mode == 3 %>
+              <% @transport.pickup_route_id = @transport.drop_route_id %>
+            <% end %>
+            <% remote_form_for @transport, :url => {:action => :assign_passenger, :passenger_id => params[:passenger_id], 
+              :passenger_type => params[:passenger_type], :common_route => (common_route ? 'true' : 'false')}, 
+              :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000); "  do |tr| %>
+              <%= session_fingerprint_field %> 
+              <%= tr.hidden_field :academic_year_id %>
+              <%= tr.hidden_field :receiver_id %>
+              <%= tr.hidden_field :receiver_type %>
+              <%= tr.hidden_field :common_route, :value => @different_route %>
+              <div class="tr-section">
+                  <div class="label-field-pair <%= (@transport.errors[:mode].present? ? 'error-field' : '') %>">
+                      <label for="mode"><%= t('transport_mode') %></label>
+                      <div class="text-input-bg">
+                          <%= tr.select :mode, Transport::TRANSPORT_MODE.map{|k, v| [t(v), k]}, {}, {:onchange => "fetch_mode(this);"}  %>
+                      </div>
+                  </div>
+              </div>
+              <div class="tr-section">
+                  <div class="label-field-pair pick_up <%= (@transport.errors[:pickup_route_id].present? ? 'error-field' : '') %> <%= ('common' if common_route) %>" style="display:<%= (!common_route and @transport.mode == 3) ? 'none' : 'block' %>"  >
+                      <label for="pickup_route">
+                          <span><%= common_route ? t('route') : t('pickup_route') %></span>
+                          <% status_present = (@seat_status.present? and @seat_status[:pickup].present?) %>
+                          <% if status_present %>
+                            <div class="error-icon" style="display: block" tooltip='<%= @seat_status[:pickup]  %>'> </div>
+                          <% else %>
+                            <div class="error-icon" style="display: none"> </div>
+                          <% end %>
+                      </label>
+                      <div class="text-input-bg">
+
+                          <%= tr.select :pickup_route_id, (@routes+@transport.pickup_route.to_a).uniq.map{|r| [r.name, r.id]},
+                            {:include_blank => "#{t((common_route ? 'select_a_route' : 'select_a_pickup_route'))}"}, 
+                            {:onchange => "fetch_stops(this, 'transport_pickup_stop_id');", :route_type => "pickup",
+                            :passenger_id =>  @transport.receiver_id, :passenger_type => @transport.receiver_type} %>
+                          <%= image_tag("loader.gif",
+                            :align => "absmiddle",
+                            :border => 0,
+                            :id => "loader",
+                            :style =>"display: none;" ) %>
+
+                      </div>
+                  </div>
+                  <% unless common_route %>
+                    <div class="label-field-pair drop <%= (@transport.errors[:drop_route_id].present? ? 'error-field' : '') %>" style="display:<%= (@transport.mode == 2) ? 'none' : 'block' %>" >
+                        <label for="drop_route">
+                            <span><%= t('drop_route') %></span>
+                            <% status_present = (@seat_status.present? and @seat_status[:drop].present?) %>
+                            <% if status_present %>
+                              <div class="error-icon" style="display: block " tooltip='<%= @seat_status[:drop]  %>'> </div>
+                            <% else %>
+                              <div class="error-icon" style="display: none"> </div>
+                            <% end %>
+                        </label>
+                        <div class="text-input-bg">
+                            <%= tr.select :drop_route_id, (@routes+@transport.drop_route.to_a).uniq.map{|r| [r.name, r.id]} ,
+                              {:include_blank =>"#{t('select_a_drop_route')}"}, 
+                              {:onchange => "fetch_stops(this, 'transport_drop_stop_id');", :route_type => "drop",
+                              :passenger_id =>  @transport.receiver_id, :passenger_type => @transport.receiver_type} %>
+                            <%= image_tag("loader.gif",
+                              :align => "absmiddle",
+                              :border => 0,
+                              :id => "loader",
+                              :style =>"display: none;" ) %>
+
+                        </div>
+                    </div>
+                  <% end %>
+              </div>
+              <div class="tr-section">
+                  <div class="label-field-pair pick_up <%= (@transport.errors[:pickup_stop_id].present? ? 'error-field' : '') %>" style="display:<%= (@transport.mode == 3) ? 'none' : 'block' %>" >
+                      <label for="pickup_stop"><%= t('pickup_stop') %></label>
+                      <div class="text-input-bg">
+                          <%= tr.select :pickup_stop_id, (@pickup_stops||[]).map{|r| [r.name, r.id]}, 
+                            {:include_blank => "#{t('select_a_pickup_stop')}", :type => 'pick_up'}, :onchange => "set_stop_fare(this, 'pick_up')" %>
+                      </div>
+                  </div>
+                  <div class="label-field-pair drop <%= (@transport.errors[:drop_stop_id].present? ? 'error-field' : '') %>" style="display:<%= (@transport.mode == 2) ? 'none' : 'block' %>" >
+                      <label for="drop_stop"><%= t('drop_stop') %></label>
+                      <div class="text-input-bg">
+                          <%= tr.select :drop_stop_id, (@drop_stops||[]).map{|r| [r.name, r.id]}, 
+                            {:include_blank => "#{t('select_a_drop_stop')}", :type => 'drop'}, :onchange => "set_stop_fare(this, 'drop')"  %>
+                      </div>
+                  </div>
+              </div>
+              <div class="amount-section">
+                  <div class="label-field-pair <%= (@transport.errors[:bus_fare].present? ? 'error-field' : '') %>">
+                      <label for="fare"><%= "#{t('fare')} &#x200E;(#{@currency})&#x200E;" %></label>
+                      <div class="text-input-bg">
+                          <%= tr.text_field :bus_fare, :value => precision_label(@transport.bus_fare), :class => 'precision_text' %>
+                      </div>
+                  </div>
+                  <div class="label-field-pair">
+                      <div class="input-container">
+                          <%= tr.check_box :auto_update_fare %>
+                          <label for="auto_update_fare"><%= t('auto_update_fare') %></label>
+                      </div>
+                  </div>
+              </div>
+
+              <%=submit_tag t('assign'), :disable_with => "#{t('please_wait')}", 
+                :class => "submit-button", :id => "submit_button" %>
+            <% end %>
+        </div>
+    </td>
+</tr>
+<script type="text/javascript">
+  pickup_stop_fares = <%= (@pickup_stop_fares||{}).to_json %>;
+  drop_stop_fares =  <%= (@drop_stop_fares||{}).to_json %>;
+</script>
+

@@ -1,0 +1,86 @@
+<div id="elect_sub">
+  <%= "#{t('elective_groups_text')}" %>
+  <div class="subs">
+    <div class="sub_text">
+      <%= t('elective_groups_sub_text') %>
+    </div>
+    <div id="add_sub">
+      <%unless @batch.nil? %>
+        <%#= link_to "+ #{t('new_elective_group')}", new_batch_elective_group_path(@batch), :class=>''%>
+        <% link_to "#{t('assigned_elective_subjects')}", {:controller => 'student', :action => 'assigned_elective_subjects', :id => @batch.id}, :class => '' %>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% unless @elective_groups.empty? %>
+  <table id="listing_theme" class="elective_groups" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class="col-2"><%= "#{t('subject')}" %></td>
+      <td class="col-3"><%= "#{t('code')}" %></td>
+      <td class="col-5"><%= "#{t('max_weekly_classes')}" %></td>
+      <td class="col-4"></td>
+    </tr>
+    <% @elective_groups.each do |e| %>
+      <tr class="elective-head" id="elective_group-<%=e.id%>">
+        <td colspan="3" class="elective-column">
+          <div class="elective_option_pair">
+            <label id="elective_group_name-<%= e.id %>">
+              <%= e.name %>
+            </label>
+            <%= link_to_remote "#{t('edit_text')}",:url => { :controller=>"subjects",:action => 'edit_elective_group', :id =>e.id},
+              :method => 'get', :html => {:class => ''} %>
+          </div>
+        </td>
+        <td class="col-4" id="operations">
+          <div class="links delete_link">
+            <%= render :partial => 'delete_elective_group', :locals => {:e => e} %>
+          </div>
+          <div class="links right_align">
+            <%#= link_to_remote "+ #{t('add_elective_subject')}", {:url => { :controller=>"subjects",:action => 'new', :id => @batch,:id2=>e}}, :class => "themed_text"%>
+          </div>
+        </td>
+      </tr>
+      <% @esubjects = e.subjects.active  %>
+
+      <%= render :partial => "no_subjects", :locals => {:elective_group => e, :subjects => @esubjects, :display => (@esubjects.empty? ? 'block' : 'none')} %>
+
+      <% unless @esubjects.empty? %>
+        <div id="flash-<%= e.id%>" style="display:none;"><% render :partial => "no_subjects", :locals => {:elective_group => e} %></div>
+        <% @esubjects.each do |subject| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>" id="subject-<%=subject.id%>" data="elective_group-<%= e.id %>">
+            <td class="col-2"><div class="category-name"><%= truncate(subject.name, :length => 30)  %></div></td>
+            <td class="col-3"><div class="category-code"><%= truncate(subject.code, :length => 13) %></div></td>
+            <td class="col-5"><div class="category-code"><%= subject.max_weekly_classes %></div></td>
+            <td class="col-4" id="operations">
+              <div id ="edit" class="links">
+                <%= link_to_remote "#{t('edit_text')}",:url => { :controller=>"subjects",:action => 'edit', :id =>subject,:id2=>@elective_group},:method => 'get', :html => {:class => ''} %>
+              </div>
+              <!--div id ="setting" class="links">< %= link_to_remote "#{t('settings')}",:url => { :controller=>"auto_timetablers",:action => 'subject_setting', :id =>subject},:method => 'get', :html => {:class => ''} %></div-->
+              <div id="delete" class="links">
+                <% unless subject.is_not_eligible_for_delete %>
+                  <%= link_to_remote(t('delete_text'),
+                    :url => subject_path(subject),
+                    :method => 'delete',
+                    :confirm => t('delete_confirm_msg'),
+                    :update => "subject-#{subject.id}",
+                    :complete =>"hide_elective_table(#{e.id});",
+                    :success => "after_delete(#{e.id},#{subject.id})") %>
+                <% else %>
+                  <s><%= t('delete_text') %></s>
+                <% end %>
+              </div>
+              <div id="assign" class="links">
+                <% unless subject.elective_group_id.nil? %>
+                  <%= link_to "#{ t('assign_student')}", {:controller=>"student", :action=>"electives",:id=>@batch,:id2=>subject.id }, :class => ''%>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+
+    <% end %>
+  </table>
+
+<% end %>
+<div id="no_subjects" style="display:<%= @elective_groups.empty? ? '': 'none'%>"><%= "#{t('no_electives')}" %></div>

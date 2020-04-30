@@ -1,0 +1,23 @@
+<% if @components.present? %>
+<div class="subjects_container">
+    <div class="subject_groups pull-left" id="sortable_subjects">
+        <% @components.each do |component| %>
+          <table align="center" width="100%" cellpadding="1" cellspacing="1" id="logs" class="subject_list_table">
+              <% if component.is_a? Subject %>
+                <%= render :partial => 'subject', :locals => {:subject => component, :klass => 'level-1', :tbody_required => true} %>
+              <% elsif component.is_a? ElectiveGroup %>
+                <%= render :partial => 'elective_group', :locals => {:e_group => component, :klass => 'level-1'} %>
+              <% elsif component.is_a? BatchSubjectGroup %>
+                <%= render :partial => 'subject_group', :locals => {:subject_group => component} %>
+              <% end %>
+          </table>
+        <% end %>
+    </div>
+</div>
+<% else %>
+  <div class="empty-info"><%= t('no_subjects_and_groups_assigned') %></div>
+<% end %>
+<%= link_to "#{t('assigned_elective_subjects')}", {:controller => 'student', :action => 'assigned_elective_subjects', :id => @batch.id}, :class => 'outer_link' %>
+<script>
+  <%= render_generic_multi_hook %>
+</script>

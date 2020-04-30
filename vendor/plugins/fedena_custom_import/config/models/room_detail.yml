@@ -1,0 +1,53 @@
+ room_detail:
+    primary_keys:
+      room_number: "Room Number"
+    overrides:
+      type_of_hostel: "Hostel Type"
+      name_of_hostel: "Hostel Name"
+    associations:
+     - :hostel
+    associated_columns:
+    filters:
+     - :school_id
+     - :hostel_id
+    joins:
+    join_column_search:
+    mandatory_joins:
+    associates:
+      hostel_room_additional_detail: "hostel_room_additional_field"
+    associate_columns:
+      hostel_room_additional_detail: "additional_info"
+    associate_column_search:
+      hostel_room_additional_field: "name"
+    associate_primary_keys:
+      hostel_room_additional_detail:
+        hostel_room_additional_field_id: 
+    mandatory_columns:
+      - :room_number
+      - :students_per_room
+      - :rent
+      - :type_of_hostel
+      - :name_of_hostel
+    attr_accessor_list:
+      - :type_of_hostel
+      - :name_of_hostel
+    additional_join:
+     - :HostelRoomAdditionalField
+    options_join:
+     - :room_additional_field_options
+    instructions:   
+      Hostel Name:
+        Type: "Alphanumeric."
+        Input Instruction and example: "Enter a Valid Hostel Name."
+      Hostel Type:
+        Type: "Alphanumeric."
+        Input Instruction and example: "Enter Common or Gents or Ladies to set the hostel type."
+      Room number: 
+        Type: "Alphanumeric."
+        Input Instruction and example: "Enter the Room Number."
+      Students per room: 
+        Type: "Numeric."
+        Input Instruction and example: "Enter the count of number of students in each room."
+      Rent: 
+        Type: "Numeric."
+        Input Instruction and example: "Enter the rent amount for the room."

@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <title><%= @title %></title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body dir="<%= @direction %>" style="width: 100%; height: auto;">
+        <div class = "message-content">
+            <%= @message %>
+        </div>
+        <p>
+          --
+          <br/>
+          <%= "#{@footer}" %>
+
+          <br/>
+          
+          <font size="1">
+            <% if FedenaSetting.company_details[:company_name].present? %>
+              <%= "#{t('powered_by')}#{" "}#{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"} | "%>
+            <%end%>
+            <%=link_to "#{t('unsubscribe')}",@unsubscribe_link %>
+          </font>
+        </p>
+    </body>
+</html>

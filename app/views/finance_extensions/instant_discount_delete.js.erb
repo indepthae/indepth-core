@@ -1,0 +1,13 @@
+j=jQuery.noConflict()
+if (<%= @target_action=='pay_fees_defaulters'%>){
+    window.location.href="/finance/pay_fees_defaulters/<%=@financefee.student_id%>?batch_id=<%=@financefee.batch_id%>&date=<%=@financefee.fee_collection_id%>"
+}
+else {
+    j.ajax({
+
+        url: '/<%=@target_controller %>/<%=@target_action %>',
+
+        data: {batch_id: <%=@fee_discount.batch_id%>, date:<%=@financefee.fee_collection_id%>, student:<%=@financefee.student_id%>,id: <%=@financefee.student_id%>}
+
+    });
+}

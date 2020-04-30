@@ -1,0 +1,23 @@
+<% total_fees =0 %>
+<% i = 0 %>
+<div id="particulars-list">
+    <% @categorized_particulars.each do |particular_type| %>
+      <tr class="row-a <%= particular_type.first %>head">
+          <td class="sl-col col-1"></td>
+          <td class="set_border_right col-1 bold_font" colspan="2">
+              <span><%= "#{particular_type.first.underscore.humanize}-#{t('wise')}" %></span>
+          </td>
+      </tr>
+      <% particular_type.last.each do |fee| %>
+        <tr class="row-b particular" id="particular<%=fee.id %>" >
+            <td class="sl-col col-1 particular_index normal_font"><%= i+=1 %></td>
+            <td class="set_border_right particular-col normal_font"><%= fee.name %></td>
+            <td class="set_border_right amount-col amount-cols normal_font align_right">
+                <%= precision_label fee.amount %>
+            </td>            
+        </tr>
+
+        <% total_fees += fee.amount %>
+      <% end %>
+    <% end %>
+</div>

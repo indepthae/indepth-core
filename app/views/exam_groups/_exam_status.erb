@@ -1,0 +1,50 @@
+<div  class="exam_status_left">
+  <p class="set_margin in_right"><%=t('batch_exam_status')%> :</p>
+  <p class="set_text_bold">
+    <% unless @exam_group.is_published %>
+      <%= t('schedule_not_published')%>
+    <% else  %>
+      <%unless  @exam_group.result_published%>
+        <%= t('schedule_published') %>
+      <% else %>
+        <%= t('result_published') %>
+      <% end  %>
+    <% end  %>
+  </p>
+</div>
+<div  class="exam_status_right">
+  <%if can_access_request? :publish,:exam%>
+    <p>
+      <% unless @exam_group.is_published %>
+        <%= link_to_remote("#{t('publish_exam_schedule')}",:url=>{:controller=>'exam',:action=>'publish',:id=>@exam_group.id,:status=>"schedule"},:confirm=>"#{t('delete_confirm_msg')}",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')")  %>
+      <% else  %>
+        <%  unless  @exam_group.result_published  %>
+          <% if @sms_setting.application_sms_active and @sms_setting.exam_result_schedule_sms_active %>
+            <%= link_to_remote "#{t('resend_sms_notification')}",:url=>{:controller=>'exam',:action=>'publish',:id=>@exam_group.id,:status=>"schedule"},:confirm=>"#{t('delete_confirm_msg')}",
+              :before => "Element.show('loader')",
+              :success => "Element.hide('loader')"  %>
+          <% end %>
+          <span>
+            <%= link_to_remote("#{t('publish_exam_result')}",:url=>{:controller=>'exam',:action=>'publish',:id=>@exam_group.id,:status=>"result"},:confirm=>"#{t('delete_confirm_msg')}",
+              :before => "Element.show('loader')",
+              :success => "Element.hide('loader')")  %>
+          </span>
+        <% else %>
+          <% if @sms_setting.application_sms_active and @sms_setting.exam_result_schedule_sms_active %>
+            <%= link_to_remote "#{t('resend_sms_notification')}",:url=>{:controller=>'exam',:action=>'publish',:id=>@exam_group.id,:status=>"result"},:confirm=>"#{t('delete_confirm_msg')}",
+              :before => "Element.show('loader')",
+              :success => "Element.hide('loader')"  %>
+          <% end  %>
+        <% end  %>
+      <% end  %>
+    </p>
+    <p>
+      <%= image_tag("loader.gif",:align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+    </p>
+  <%end%>
+</div>

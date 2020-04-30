@@ -1,0 +1,40 @@
+<%= javascript_include_tag "sortable" %>
+<div id="student_items">
+    <%if @students.present?%>
+      <table class="sortable" id="student_details_table" onload="sortables_init()">
+          <tr class="disable_sort">
+              <th class="unsortable" style="display: none;"></th>
+              <th id="name" data-sorting-type="natural_sort"><%=t('former_student_name')%></th>
+              <th class="value_criterea" data-sorting-type="natural_sort"><%= t('admission_no') %></th>
+              <th class="unsortable" id="course_study"><%= t('last_batch_studied') %></th>
+              <th class="unsortable" id="action"></th>
+          </tr>
+          <%@students.each_with_index do |sd,index|%>
+            <tr class="list">
+                <td style="display: none;"></td>
+                <td class="record_name"><%= sd.full_name %></td>
+                <td class="value_criterea">
+                    <%= sd.admission_no %>
+                </td>
+                <% last_batch= Batch.find(sd.batch_id) %>
+                <td class="course_study"><%= last_batch.full_name  %></td>
+                <td class="action">
+                    <% if @students_has_record.include? sd %>
+                      <%= link_to "#{t('view_certificate')}", :action => 'show', :id => sd.id %> |
+                      <%= link_to "#{t('regenerate_certificate')}", :action => 'regenerate_certificate', :id => sd.id  %>
+                    <% else %>
+                      <%= link_to "#{t('generate_certificate')}", :action => 'edit', :id => sd.id  %>
+                    <% end %>
+                </td>
+
+
+            </tr>
+          <%end%>
+      </table>
+    <%else%>
+      <div class="no_entries"><%=t('no_students_found')%></div>
+    <%end%>
+</div>
+<script type="text/javascript">
+    sortables_init();
+</script>

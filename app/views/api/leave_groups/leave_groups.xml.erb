@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.leave_group_detail{
+  @leave_groups.each do |leave_group|
+    @leave_group = leave_group
+    @xml.leave_group do
+      @xml.name(@leave_group.name)
+      @xml.description(@leave_group.description.present? ? @leave_group.description : '-')
+      @xml.leave_types_count(@leave_group.leave_types_count)
+      @xml.employees_count(@leave_group.employees_count)
+    end
+  end
+}%>
+
+

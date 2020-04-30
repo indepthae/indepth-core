@@ -1,0 +1,148 @@
+<div class="formula_and_conditions_fields">
+  <%- fields_for object_name, hr_formula do |f|%>
+    <% f.fields_for :formula_and_conditions do |builder| %>
+      <%= render 'payroll_categories/formula_and_condition_fields', :c => builder %>
+    <% end %>
+    <div>
+      <%= link_to_add_formula_fields "<div id='add-icon'></div><div id='add-text'>#{t('add_another_condition')}</div>", f, :formula_and_conditions, 'payroll_categories/formula_and_condition' %>
+    </div>
+    <div class="default_value_section">
+      <div class="header">
+        <span><%= t('default_condition') %></span>
+        <span class="default_condition_desc"><%= t('default_condition_desc') %></span>
+      </div>
+      <div class="label-field-pair formula_fields">
+        <label for="default_value">Value</label>
+        <div class="text-area-bg">
+          <div class="div_link validate" onclick ="clickHandler(this)"><%= t('validate') %></div>
+          <%= f.text_area  :default_value, {:class => "formula"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+          <div class="validate_result">
+            <% if f.object.default_value_valid %>
+              <div class="cross_button tick_symbol"></div>
+              <div class="error-msg success-msg"><%= t('validated_message') %></div>
+            <% end %>
+          </div>
+          <%= f.hidden_field :cat_list, :class => "cat_list_value" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+<script type="text/javascript">
+  j(j('.formula_condition_section')[0]).find('#close-link').remove();
+  add_fields = function(link, association, content){
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+    }
+  }
+
+
+  remove_condition = function(link){
+    j(link).parent().parent().next('.remove_expression').val(1);
+    j(link).parent().parent().remove();
+  }
+
+  recalculate = function(ele){
+    str = j(ele).parents('ul.tag_it').siblings().last().val();
+    if (str == undefined){
+      str = j(ele).parents('ul.tag_it').siblings().last().children().val()
+    }
+    removed_val = j(ele).siblings('.tagit-label').text();
+    
+    new_value = str.replace(removed_val,"")
+    j(ele).parents('.tag_it').siblings().last().val(new_value);
+    j(ele).parents('.tag_it').siblings().last().children().val(new_value);
+    j(ele).parents('li').remove();
+  }
+
+  clickHandler = function(elm){
+    elm = j(elm);
+    new Ajax.Request('/payroll_categories/validate_formula',{
+      parameters:{'formula' : elm.parent().find('.formula').val(), 'cat_code' : j('#payroll_category_code').attr('value'), 'selected_cats' : elm.parent().find('.cat_list_value').val(), 'is_lop' : j('#payroll_category_code').length},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        elm.siblings('#loader').show();
+      },
+      onComplete:function(resp){
+        par_div = elm.siblings('.validate_result');
+        if(JSON.parse(resp.responseText).first().length > 0){
+          elements=[]
+          icon = j('<div></div>', {'class' : "error-icon"});
+          elements.push(icon);
+          JSON.parse(resp.responseText).first().each(function(m){
+            msg = j('<div></div>', {'class' : 'error-msg', 'text' : m});
+            elements.push(msg);
+          });
+          par_div.html(elements);
+        }
+        else{
+          icon = j('<div></div>', {'class' : "cross_button tick_symbol"})
+          msg = j('<div></div>', {'class' : 'error-msg success-msg', 'text' : '<%= t('validated_message') %>'})
+          par_div.html(icon.add(msg));
+        }
+        elm.parent().find('.wrapper').remove();
+        elm.parent().find('.formula').val(JSON.parse(resp.responseText).last());
+        elm.siblings('#loader').hide();
+      }
+    });
+  }
+ 
+
+  j('.formula').on('change', function(){
+    j(this).closest('.formula_fields').find('.validate_result').html('');
+    j(this).closest('.formula_fields').find('.wrapper').remove();
+  });
+  
+  j("a.tagit-close").on("remove", function () {
+    recalculate(this);
+  })
+
+  j("a.tagit-close").click(function () {
+    recalculate(this);
+  })
+
+  j(document).ready(function(){
+    selected_categories = [];
+    j('.selected_categories .category:visible .category_code').each(function(){
+      selected_categories.push(j(this).text());
+    });
+    j('.cat_list_value').val(selected_categories.join(","));
+    if (j('#payroll_category_code').length == 0) {
+          j('.cat_list_value').val(cat_codes);
+    }
+  });
+
+  j(window).on('scroll', function() {
+    var scrollTop = j(this).scrollTop();
+    j('.formula_and_conditions_fields').each(function() {
+      var topDistance = j(this).offset().top;
+      var defaultSecBtm = j('.default_value_section').offset().top + j('.default_value_section').outerHeight();
+      if ( (topDistance) < scrollTop )
+        var forHelpTop = (scrollTop - topDistance + j('#header_bg').outerHeight() + 20);
+      else
+        var forHelpTop = 0;
+      var forHelpBtm = topDistance + forHelpTop + j('.default_value_section').outerHeight();
+      if (defaultSecBtm < forHelpBtm){
+        forHelpTop = forHelpTop - (forHelpBtm - defaultSecBtm);
+      }  
+      j(".formula_help").stop().animate({"marginTop": forHelpTop}, "slow" );
+    });
+  });
+
+</script>
+
+

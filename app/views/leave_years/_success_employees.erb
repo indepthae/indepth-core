@@ -1,0 +1,19 @@
+<% if @success_employees.present? %>
+  <div class="success_list">
+      <div class="success_desc"><%= t('success_desc') %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="leave_process_record">
+          <tr class="tr-head">
+              <td class="name"><%= t('employees') %></td>
+          </tr>
+          <% @success_employees.each do |employee| %>
+            <tr>
+                <td><%= employee.full_name %></td>
+            </tr>
+          <% end %>
+      </table>
+      <% if @success_employees.present? %>
+        <%= pagination_status(@success_employees) %>
+      <% end %>
+      <%= will_paginate @success_employees %>
+  </div>
+<% end%>

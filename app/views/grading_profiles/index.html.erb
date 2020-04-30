@@ -1,0 +1,111 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('grading_profiles_text') %></div>
+    <% if permitted_to? :new , :grading_profiles %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to_remote "#{t('create_a_grading_profile')}", 
+                    :url => {:controller => "grading_profiles", :action => "new"} %>
+              </li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :grading_profiles_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('grading_profiles_text') %></div>
+    <% if @default_grade_set.nil? and @grade_sets.present? %>
+      <div id="active_year">
+          <div id ="description"><%= t('grading_profiles_description') %></div>
+          <%= link_to_remote "#{t('set_default_grading_profile')}", :url => set_default_grading_profiles_path, :method => :get, :html => {:class => 'submit-button'} %>
+      </div>
+    <% elsif @default_grade_set.present? %>
+      <div id ="description"><%= t('grading_profiles_description') %></div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="aca_years">
+          <tr class="tr-head">
+              <td class="name"><%= t('default_grading_profile') %></td>
+              <td class="type"><%= t('type') %></td>
+              <td class="grades_count"><%= t('no_of_grades') %></td>
+              <td class="action"></td>
+          </tr>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <td><%= link_to @default_grade_set.name, grading_profile_path(@default_grade_set) %></td>
+              <td><%= @default_grade_set.grade_type %></td>
+              <td><%= @default_grade_set.grades_count %></td>
+              <td>
+                <%= link_to t('view_profile'), grading_profile_path(@default_grade_set) %> | 
+                <%= link_to_remote t('chnage_default_grading_profile'), :url => set_default_grading_profiles_path, :method => :get  %>
+              </td>
+          </tr>
+      </table>
+    <% end %>
+    
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('grading_profile') %></td>
+                <td class="type"><%= t('type') %></td>
+                <td class="grades_count"><%= t('no_of_grades') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @grade_sets.present? %>
+              <% @grade_sets.each do |gs|  %>
+                <tr class="tr-<%= cycle('even', 'odd') %>">
+                    <td><%= link_to gs.name, grading_profile_path(gs) %></td>
+                    <td><%= gs.grade_type %></td>
+                    <td><%= gs.grades_count %></td>
+                    <td><%= link_to t('view_profile'), grading_profile_path(gs) %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="4"><%= t('create_a_grading_profile') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @grade_sets.present? %>
+          <%= pagination_status(@grade_sets) %>
+        <% end %>
+        <%= will_paginate @grade_sets %>
+    </div>
+</div>
+<script type="text/javascript">
+  fetch_profile_details = function (elm) {
+      new Ajax.Request('/grading_profiles/fetch_details', {
+          parameters: {'id': elm.value},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j(elm).parent().next('#loader').show();
+          },
+          onComplete: function (resp) {
+              j('#active_year_msg').hide();
+              j(elm).parent().parent().next('#active_year_details').html(resp.responseText);
+              j(elm).parent().next('#loader').hide();
+          }
+      });
+  }
+  
+  validate = function () {
+      if (j('#grade_set_id').val() == "") {
+          j('#active_year_msg').show();
+          return false;
+      } else {
+          j('#active_year_msg').hide();
+          return true;
+      }
+  }
+</script>

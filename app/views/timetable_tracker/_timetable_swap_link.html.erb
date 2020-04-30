@@ -1,0 +1,7 @@
+<% tte ||= @timetable_entry %>
+<% tt_swap ||= @timetable_swap %>
+<% swap_date ||= @timetable_swap.date %>
+<%=link_to_remote "#{t('change')}", :url=>{:action=>'timetable_swap_from',:timetable_entry_id=>tte.id, :employees => tte.employees,
+  :employee_wise_id => @employee.id, :type => @swapping_type ,:batch_id=>tte.batch_id,:date=>swap_date},
+              :html=>{:class=>"swap_themed_text"}%>
+

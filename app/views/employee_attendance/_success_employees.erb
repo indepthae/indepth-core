@@ -1,0 +1,17 @@
+<div class="description"><%= "#{t('employee_reset_success_logs_desc', {:success => @success})}" %></div>
+<table>
+  <tr class="tr-head">
+    <td class="employees td-20"><%= t('employees') %></td>
+    <td class="department td-30"><%= t('department') %></td>
+    <td class="department td-50"><%= t('leave_types') %></td>
+  </tr>
+  <% @employee_logs.each do |log| %>
+    <% leave_type_names = Employee.leave_type_names(log.emp_id,@log.leave_type_ids) %>
+    <tr>
+      <td class="employees"><%= "#{log.first_name} (#{log.employee_number})&#x200E;" %></td>
+      <td class="remarks"><%= log.name %></td>
+      <td class="remarks"><%= leave_type_names.present? ? leave_type_names : "__" %></td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @employee_logs, :renderer => "RemoteLinkRenderer", :params => {:id => params[:id],  :success => true} %>

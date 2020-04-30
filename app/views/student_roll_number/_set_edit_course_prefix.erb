@@ -1,0 +1,9 @@
+<%= link_to "#{t('view_batches')}",{:controller => "student_roll_number", :action => "view_batches" , :id => id}, :class => "themed_text" , :id => "list_batch"%>
+<div id="seperator">|</div>
+<div id="set_edit_links">
+  <% if roll_number_prefix.present? %>
+    <%= link_to_remote "#{t('edit_roll_no_prefix')}", :url => {:controller => "student_roll_number", :action => "edit_course_prefix", :id => id}, :html => {:class => "themed_text"} %>
+  <% else %>
+    <%= link_to_remote "#{t('set_roll_no_prefix')}", :url => {:controller => "student_roll_number", :action => "set_course_prefix", :id => id}, :html => {:class => "themed_text"} %>
+  <%end %>
+</div>

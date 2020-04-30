@@ -1,0 +1,261 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('exams_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('view_exam_groups') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if can_access_request? :new,:exams %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_subject_exam')}", {:controller=>"exams",:action=>"add_new_exams",:exam_group_id=>@exam_group.id} %></li>
+            <% end %>
+            <% if @batch.cce_enabled? and can_access_request? :subject_list,@batch,:context=>:exam_groups %>
+              <li class="themed_bg themed-dark-hover-background"><%= link_to "FA Scores", exam_group_fa_scores_path(:exam_group_id=>@exam_group.id) %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%unless params[:from]=="course_exam_group"%>
+          <% breadcrumb :exam_groups_show, @exam_group%>
+        <%else%>
+          <% breadcrumb :exam_group_show_through_course_exam_group,@exam_group%>
+        <%end%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="flash_msg"></div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg" id="flash_msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="box">
+        <div class="update_msg">
+            <div id="exam_group_details">
+                <div class="discription_div set_width_high">
+                    <div class="item_input">
+                        <p class="set_text_bold"><%=t('exam_group')%></p>
+                        <p class ="input_items"><%=t('exam_type')%></p>
+                        <%unless @exams.empty?%>
+                          <p class ="input_items"><%=t('date_text')%></p>
+                        <%end%>
+                    </div>
+                    <div class="item_input">
+                        <p class="set_text_bold">
+                            <%unless @course_exam_group.nil?%>
+                              <% if permitted_to? :show, :course_exam_groups %>
+                                <%= link_to @course_exam_group.name,course_exam_group_path(@course_exam_group.id)%>
+                              <%else%>
+                                <%=@course_exam_group.name%>
+                              <%end%>
+                            <%else%>
+                              <% if permitted_to? :edit, :exams %>
+                            <div id =<%="exam_group_name_#{@exam_group.id}_edit"%>>
+                                <%= in_place_editor_field :exam_group, :name %>
+                            </div>
+                          <% else %>
+                            <%= @exam_group.name %>
+                          <% end %>
+                        <%end%>
+                        </p>
+                        <p class ="input_items"><%=t("#{@exam_group.exam_type.underscore}")%></p>
+                        <%unless @exam_group.exams.empty?%>
+                          <p class ="input_items">
+                              <%start_date=@exam_group.exams.minimum(:start_time).to_date%>
+                              <%end_date=@exam_group.exams.maximum(:end_time).to_date%>
+                              <%="#{format_date(start_date)} #{t('to')} #{format_date(end_date)}"%>
+                          </p>
+                        <%end%>
+                    </div>
+                </div>
+                <div  class="discription_div">
+                    <div class="item_input">
+                        <p class="set_text_bold" style="line-height: normal;"><%=t('course_text')%></p>
+                        <p class ="input_items"><%=t('batch')%></p>
+                        <p class ="input_items"><%=t('students')%></p>
+                        <p class ="input_items"><%=t('batch_tutor')%></p>
+
+                    </div>
+                    <div class="item_input">
+                        <p class="set_text_bold"><%= @exam_group.batch.course.course_name%></p>
+                        <p class ="input_items"><%= @exam_group.batch.name%></p>
+                        <p class ="input_items"><%= @exam_group.batch.students.count%></p>
+                        <p class ="input_items" style="line-height: normal;margin-top: 7px;"><%= @exam_group.batch.employees.map{|x| "<span class='item_span'>#{x.full_name} (#{x.employee_number})</span></br>"}%></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="extender set_border_bottom"></div>
+        <% unless @exams.empty?%>
+          <% @employee_subjects=[] %>
+          <% @employee_subjects= @current_user.employee_record.subjects.map { |n| n.id} if @current_user.employee?  %>
+          <% if @batch.cce_enabled?%> 
+            <div class="summary_section">
+                Summative Assessment
+            </div>  
+          <%end%>
+          <div class="status_div" id="exam_status">
+              <%=render :partial=>"exam_status"%>
+          </div>
+          <% unless @exam_group.exam_type == 'Grades' %>
+            <div style="clear:both">
+                <table id="listing">
+                    <tr class="tr-head">
+                        <td><%= t('subject') %></td>
+                        <td><%= t('max_mark') %></td>
+                        <td><%= t('min_mark') %></td>
+                        <% if permitted_to? :edit, :exams %>
+                          <td></td>
+                        <% end %>
+                    </tr>
+                    <% @exams.each do |exam| %>
+                      <% @exam = exam %>
+                      <%if can_access_request? :show,:exams%>
+                        <tr class="tr-<%= cycle('odd', 'even') %>">
+                            <% @exam = exam %>
+                            <td class="col-2"><%= link_to exam.subject.name, exam_group_exam_path(@exam_group, exam,:from=>params[:from]) %></td>
+                            <% if permitted_to? :edit, :exams %>
+                              <td class="col-1">
+                                  <div id="<%= "exam_maximum_marks_#{@exam.id}_edit" %>" class="mark">
+                                      <% if @exam_group.is_published %>
+                                        <%=@exam.maximum_marks%>
+                                      <%else%>
+                                        <%= in_place_editor_field :exam, :maximum_marks,{},{:cols=>1} %>
+                                      <%end%>
+                                  </div>
+                              </td>
+                              <td class="col-1">
+                                  <div id=<%= "exam_minimum_marks_#{@exam.id}_edit" %>>
+                                      <% if @exam_group.is_published %>
+                                        <%=@exam.minimum_marks%>
+                                      <%else%>
+                                        <%= in_place_editor_field :exam, :minimum_marks,{},{:cols=>1} %>
+                                      <%end%>
+                                  </div></td>
+                              <td class="col-1">
+                                  <% if @exam_group.result_published %>
+                                    <small><s><%= t('edit_text') %></s></small>
+                                  <% else %>
+                                    <small><%= link_to t('edit_text'), edit_exam_group_exam_path(@exam_group, exam) %></small>
+                                  <% end %>
+                                  <% if @exam.removable? %>
+                                    <small><%= link_to t('delete_text'), [@exam_group, exam], :method => 'delete', :confirm => t('delete_confirm_msg') %></small>
+                                  <% else %>
+                                    <small><s><%= t('delete_text') %></s></small>
+                                  <% end %>
+                              </td>
+                            <% else %>
+                              <td class="col-1"><span><%= exam.maximum_marks %></span></td>
+                              <td class="col-1"><span><%= exam.minimum_marks %></span></td>
+                            <% end %>
+                        </tr>
+                      <%end%>
+                    <% end %>
+                </table>
+              <% else %>
+                <table id="listing" width="100%">
+                    <tr class="tr-head">
+                        <td><%= t('subject') %></td>
+                        <% if permitted_to? :edit, :exams %>
+                          <td></td>
+                        <% end %>
+                    </tr>
+                    <% @exams.each do |exam| %>
+                      <% if @employee_subjects.include?(exam.subject.id) or @current_user.admin?  or @current_user.privileges.map{|p| p.name}.include?("ExaminationControl") or @current_user.privileges.map{|p| p.name}.include?("EnterResults") %>
+                        <tr class="tr-<%= cycle('odd', 'even') %>">
+                            <% @exam = exam %>
+                            <td class="col-3"><%= link_to exam.subject.name, exam_group_exam_path(@exam_group, exam,:from=>params[:from]) %></td>
+                            <td class="col-1">
+                                <% if permitted_to? :edit, :exams %>
+                                  <small><%= link_to t('edit_text'), edit_exam_group_exam_path(@exam_group, exam) %></small>
+                                <%end%>
+                                <%if can_access_request? :destroy,:exams%>
+                                  <% if @exam.removable? %>
+                                    <small><%= link_to t('delete_text'), [@exam_group, exam], :method => 'delete', :confirm => t('delete_confirm_msg') %></small>
+                                  <% else %>
+                                    <small><s><%= t('delete_text') %></s></small>
+                                  <% end %>
+                                <%end%>
+                            </td>
+                        </tr>
+                      <% end %>
+                    <% end %>
+                </table>
+              <% end %>
+          </div>
+        <%else%>
+          <div  class="flash_msg_div">
+              <%if @current_user.is_a_tutor_for_this_batch(@batch) and !@current_user.admin and !@current_user.privileges.include?(Privilege.find_by_name("ExaminationControl")) and !@current_user.privileges.include?(Privilege.find_by_name("EnterResults"))%>
+                <p class="flash-msg" id="flash_msg"> <%= t('tutor_cannot_see_subjects') %> </p>
+              <%else%>
+                <p class="flash-msg" id="flash_msg"> <%= t('no_subject_exams_added') %> </p>
+              <%end%>
+          </div>
+        <%end%>
+        <% if @batch.cce_enabled? and @fa_group_names.present?%>
+          <div style="clear:both"  id="fa_group_list">
+              <div class="summary_section addl_30_margin">
+                  Formative Assessment
+              </div>
+              <table id="listing">
+                  <tr class="tr-head">
+                      <td>FA Groups</td>
+                      <td></td>
+                  </tr>
+                  <%@fa_group_names.each do |fgn|%>
+                    <tr class="tr-<%= cycle('odd', 'even') %>">
+                        <td class="col-3"><%=fgn%></td>
+                        <td class="col-1" id="<%=fgn%>">
+                            <small><%= link_to "Enter Marks", exam_group_fa_scores_with_fa_path(:exam_group_id=>@exam_group.id,:fa_group=>fgn) %></small>
+                            <%if @exam_group.send "#{fgn.downcase}_status"%>
+                              <% if @fa_group_sms_sent.include? fgn %>
+                                <% if permitted_to? :sent_resend_fa_group_publish_sms, :exam_groups %>
+                                  <small><%= link_to_remote("Resend SMS",:url=>{:controller=>'exam_groups',:action=>'sent_resend_fa_group_publish_sms',:exam_group_id=>@exam_group.id,:fa_group=>fgn},:confirm=>"#{t('delete_confirm_msg')}",
+                                        :before => "Element.show('loader')",
+                                        :success => "Element.hide('loader')")  %>
+                                  </small>
+                                <%end%>
+                              <% else %>
+                                <% if permitted_to? :sent_resend_fa_group_publish_sms, :exam_groups %>
+                                  <small><%= link_to_remote("Send SMS",:url=>{:controller=>'exam_groups',:action=>'sent_resend_fa_group_publish_sms',:exam_group_id=>@exam_group.id,:fa_group=>fgn},:confirm=>"#{t('delete_confirm_msg')}",
+                                        :before => "Element.show('loader')",
+                                        :success => "Element.hide('loader')")  %>
+                                  </small>
+                                <%end%>
+                              <% end %>
+                            <% else %>
+                              <% if permitted_to? :fa_group_result_publish, :exam_groups %>
+                                <small><%= link_to_remote("Publish Results",:url=>{:controller=>'exam_groups',:action=>'fa_group_result_publish',:exam_group_id=>@exam_group.id,:fa_group=>fgn,:batch_id=>@batch.id},:confirm=>"#{t('delete_confirm_msg')}",
+                                      :before => "Element.show('loader')",
+                                      :success => "Element.hide('loader')")  %>
+                                </small>
+                              <%end%>
+                              <%= image_tag("loader.gif",:align => "absmiddle",
+                                :border => 0,
+                                :id => "loader",
+                                :style =>"display: none;" ) %>
+                            <%end%>
+                        </td>
+                    </tr>
+                  <%end%>
+              </table>
+          </div>
+        <%end%>
+    </div>
+</div>

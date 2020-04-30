@@ -1,0 +1,11 @@
+if @initial.present?
+  page.replace_html 'modal-box', :partial => 'employees_hour_utilization'
+  page << "Modalbox.show($('modal-box'), {title: '#{t('employees')} - #{t(@utilization == "0" ? 'hours_fully_utilized' : (@utilization == "1" ? 'hours_over_utilized' : 'hours_under_utilized' ))}', width: 600});"
+elsif @error.present?
+#	page.replace_html 'form-errors', :partial => 'errors', :object => @entity_setting
+#  page.visual_effect(:highlight, 'form-errors')
+else
+#  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+#  page.replace_html "subject_hour-#{@entity.id}", :text => @entity.max_weekly_classes if (@entity.is_a? Subject)
+#  page << "Modalbox.hide();"
+end

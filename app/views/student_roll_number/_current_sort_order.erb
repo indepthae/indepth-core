@@ -1,0 +1,13 @@
+<% if Configuration.roll_number_sort_order %>
+  <div id ="sort_order">
+    <div id="sort_order_val"><%= t(Configuration.roll_number_sort_order)  %> </div>
+    <div id="edit_link"><%= link_to_remote "Edit" , :url => {:controller => "student_roll_number", :action => "edit_sort_order_warning"},:html => {:class => "themed_text"} %></div>
+  </div>
+<% else %>
+  <div id ="sort_order_description_1"><%= t('edit_sort_order_description_1') %></div>
+  <div id ="sort_order_description_2"><%= t('edit_sort_order_description_2') %></div>
+  <div id="label"><%= t('sort_students_based_on') %></div>
+  <div id ="sort_order">
+    <%= render :partial => "select_sort_order" %>
+  </div>
+<% end %>

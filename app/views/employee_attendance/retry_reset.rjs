@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'retry_reset'
+page << "Modalbox.show($('modal-box'), {title: '#{t('retry_reset')}', width: 500});"

@@ -1,0 +1,11 @@
+<%= stylesheet_link_tag 'payment_settings/initialize_payment.css' %>
+
+<div class="waiting-div">
+    <h2 style="margin-top:50px;text-align:center;">Completing payment process</h2>
+    <div class="wait-div"><span class="wait-text">Please wait</span> <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: block; margin-top: 1px; float: left; margin-left: 5px;" ) %></div>
+    <div class="warn-div">Please do not press <b>Refresh</b> or <b>Back</b> button.</div>
+</div>

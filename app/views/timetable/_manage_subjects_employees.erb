@@ -1,0 +1,38 @@
+<div class="subject_list">
+  <div class="subject-label">
+    <%= t('manage_subject_employee_heading') %>
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader_sub", :style =>"display: none;" ) %>
+  </div>
+  <table class="subjects-table" border="1">
+    <tr class="subjects-header-row subject-row">
+      <th class="subject-col-1">
+        <%= t('subject') %>
+      </th>
+      <th class="subject-col-2">
+        <%= t('assigned_employees') %>
+      </th>
+      <th class="subject-col-3">
+        &nbsp;
+      </th>
+    </tr>
+    <% @batch.subjects.sort_by{|sb| sb.priority.to_i}.each_with_index do |subject,i| %>
+      <tr class="subject-row <%= i== 0 ? 'selected':''%>" id="subject-<%= subject.id %>">
+        <%= render :partial => 'subject_row', :locals => {:subject => subject} %>
+      </tr>
+    <% end %>
+  </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>

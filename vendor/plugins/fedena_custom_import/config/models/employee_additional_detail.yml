@@ -1,0 +1,13 @@
+ employee_additional_detail:
+    overrides:
+      employee_id: "Employee Name"
+      additional_field_id: "Additional Field Name"
+      additional_info: "Additional Information"
+    associations:
+     - :employee
+     - :additional_field
+    filters:
+     - :employee_id
+   
+# Please refer to employee.yml for basic concept.
+    

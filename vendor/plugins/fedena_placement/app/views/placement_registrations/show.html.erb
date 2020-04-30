@@ -1,0 +1,39 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= @placement_registration.placementevent.title.to_s %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%  breadcrumb :placement_registrations_show,@placement_registration%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="invitation-details">
+    <ul id="details-list">
+      <li class="label-text-pair"><label><%= t('student_name') %>:</label> <span>  <%=@placement_registration.student.full_name %></span></li>
+      <li class="label-text-pair">  <label><%= t('events') %>:</label>      <span>    <%= @placement_registration.placementevent.title %></span></li>
+      <li class="label-text-pair">    <label><%= t('date_text') %>:</label>  <span>      <%= format_date(@placement_registration.placementevent.date,:format=>:long) %></span></li>
+      <li class="label-text-pair">     <label><%= t('company_name') %>:</label> <span>      <%= @placement_registration.placementevent.company.to_s %></span></li>
+      <li class="label-text-pair">  <label><%= t('description') %>:</label>    <span>     <%= @placement_registration.placementevent.description.to_s %></span></li>
+    </ul>
+  </div>
+  <% if @current_user.student? && @current_user.student_record.id ==  @placement_registration.student.id  %>
+    <div id="status" class="themed_text">
+      <% if  @placement_registration.is_placed%>
+        <p><%= t('placed') %></p>
+      <% elsif  @placement_registration.is_applied && @placement_registration.is_approved.nil? %>
+        <p><%= t('your_application_is_waiting_approval') %></p>
+      <% elsif   @placement_registration.is_approved %>
+        <p><%= t('your_registration_is_approved') %></p>
+      <% elsif @placement_registration.is_approved == false %>
+        <p><%= t('your_registration_is_rejected') %></p>
+      <% else %>
+        <div><%= link_to "#{t('apply')}",  { :action => "apply", :id => @placement_registration}, :class=>"user_button" %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

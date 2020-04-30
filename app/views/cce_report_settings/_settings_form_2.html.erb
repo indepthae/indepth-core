@@ -1,0 +1,22 @@
+<% remote_form_for :cce_report_setting,:url =>{:action=>'settings',:id=>"2"}, :html => { :method => :post } do |c| %>
+  <div class="box">
+    <div class="messages modal_spec_style no_bottom_margin">Select the record group to be linked to the “Self Awareness” section.</div>
+    <div class="label-field-pair">
+      <label class="main_header">CCE Report Section</label><label class="main_header">Associated Record Group</label>
+      <label for="configuration_currency_type">Self Awareness</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :self_awareness, options_for_select(@record_groups.map{|b| [b.name,b.id]}, @setting[:self_awareness].to_i),
+          { :selected=>@setting[:self_awareness].to_i,:include_blank=>t('select_an_option')},
+          {:onChange => "#{remote_function(:url => {:action => "update_record_lists"},
+          :with => "'id='+value+ '&rg_type_id=2'",:before=>"$('loader').show();",:success=>"$('loader').hide();")}"} %>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+    <div id="record_sections_2">
+      <%=render :partial=>'self_awareness_records'%>
+    </div>
+    <div id="submit_button">
+      <%= submit_tag "Link record group",:id=>'submit-button',:class=>'addl_margin_left'%>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,19 @@
+<div>
+      <span class="span-sub-heading"><%= t('additional_attachments') %>aaaaa</span>
+      <hr class="sub-heading"></hr>
+      <div class="all_additional_items">
+        <div id="additional_label" >
+          <label for="attachment" ><%= t('attachment') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</label>
+        </div>
+        <div id="additional_right">
+          <div class="addl_attachments">
+            <% s.fields_for :applicant_addl_attachments do |a| %>
+              <%= render "applicant_addl_attachment_fields",:f=>a  %>
+            <% end %>
+          </div>
+          <div class="add_addl_attachment">
+            <%= link_to_add_addl_attachment "#{image_tag "buttons/add_2.png" } #{t('add_txt')}", s, :applicant_addl_attachments %>
+          </div>
+        </div>
+      </div>
+    </div>

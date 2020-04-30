@@ -1,0 +1,94 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('app_frames_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @app_frame.name %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'>    <%= link_to t('edit_text'), edit_app_frame_path(@app_frame) %> </li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :app_frames_show, @app_frame %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('name') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @app_frame.name %>
+        </td>
+      </tr>
+
+      <tr class="tr-even">
+        <td class="col-1">
+          <b><%= t('link') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @app_frame.link %>
+        </td>
+      </tr>
+
+      <tr class="tr-even">
+        <td class="col-1">
+          <b><%= t('behaviour') %>:</b>
+        </td>
+        <td class="col-1">
+          <% unless @app_frame.new_tab or (request.url.match(/https/).present? and !@app_frame.link.match(/https/).present?) %>
+            <%= h t('open_inside_app') %>
+          <% else %>
+            <%= h t('open_in_new_tab') %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('client_name') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @app_frame.client.try :name %>
+        </td>
+      </tr>
+
+      <tr class="tr-even">
+        <td class="col-1">
+          <b><%= t('privilege_list') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @app_frame.privilege_list.map(&:capitalize).join(', ') %>
+        </td>
+      </tr>
+
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('client_script') %> :</b>&rlm; (<span style="font-size: 10px;"><%= t('client_script_note') %></span>)
+        </td>
+        <td class="col-1">
+          <%str='<script type="text/javascript">
+window.onload = function(){
+window.parent.postMessage(document.body.offsetHeight, "*");
+}
+</script>' %>
+          <textarea rows="5" cols="60" disabled style="direction:ltr;border:none;width:98%"><%= (str) %></textarea>
+        </td>
+      </tr>
+
+
+    </table>
+    <div class="extender"></div>
+  </div>
+</div>
+

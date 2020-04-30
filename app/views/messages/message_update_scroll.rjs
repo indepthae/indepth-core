@@ -1,0 +1,11 @@
+if @messages.next_page
+  page.replace_html "infinite_messages_#{params[:page]}",:partial=>'infinite_message'
+  page << 'j(".scrollbar").get(0).scrollTop = j(".scrollbar").children("div:not(:empty)").get(0).scrollHeight'
+  page.replace_html 'infinite-scrolling-messages', :partial=> 'message_pages'
+else
+  page.replace_html "infinite_messages_#{params[:page]}",:partial=>'infinite_message'
+  page << 'j(".scrollbar").get(0).scrollTop = j(".scrollbar").children("div:not(:empty)").get(0).scrollHeight'
+  page.replace_html 'infinite-scrolling-messages', :partial=> 'message_pages'
+  page << 'j(".conversations").off("scroll");'
+  page << 'j("#infinite-scrolling-messages .pagination").remove();'
+end

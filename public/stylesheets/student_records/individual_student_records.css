@@ -1,0 +1,371 @@
+.content_student_record{
+    float: left;
+    width: 100%;
+    height: 700px;
+}
+#student_list{
+    float: left;
+    width: 30%;
+    margin-right:3px;
+}
+#student_record{
+    float: left;
+    width: 69%;
+}
+table{
+    width:100%;
+    border-collapse: collapse;
+}
+th,td{
+    border: 1px solid #ccc;
+    font-size: 13px;
+    font-weight: normal;
+    text-align: left;
+    padding: 10px;
+    color: #333;
+    border-top: 0px;
+}
+th{
+    font-size: 13px;
+    background-color: #e5e5e5;
+    font-weight: bold;
+}
+td.student_entry,th#student_label{
+    width: 170px;
+    height: 20px;
+}
+tr:hover{
+    background-color: #edf3ff;
+    cursor: pointer;
+}
+#student_record_data_holder{
+    width:100%;
+    height: 702px;
+    float:left;
+}
+#top_section_full{
+    width: 90%;
+    height: 10%;
+    float: left;
+}
+#main_section_full{
+    width:100%;
+    height: 632px;
+    overflow: auto;
+    border:1px solid #ccc;
+}
+#scrollable_table{
+    overflow-y: auto;
+    max-height: 654px;
+}
+.heading_sec_50{
+    float: left;
+    width: 50%;
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.heading_sec_50_right{
+    float: right;
+    width: 25%;
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.heading_sec_33{
+    float: left;
+    width: 30%;
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.header_name,.header_value{
+    float: left;
+    width: 90%;
+    font-size: 15px;
+}
+.header_name{
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: normal;
+    color: #666;
+}
+.bold_text{
+    font-weight: bold;
+    font-size: 13px;
+}
+.next a{
+    float: left;
+    -moz-border-radius: 40px;
+    -webkit-border-radius: 40px;
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    background: #fff;
+    text-align: right;
+    color: #121212;
+    font-size: 22px;
+    text-decoration: none;
+    outline: none;
+    display: block;
+}
+.previous_student{
+    float: left;
+    width: 5%;
+    padding-bottom: 24px;
+    cursor: pointer;
+}
+.next_student{
+    float: left;
+    width: 5%;
+    padding-bottom: 24px;
+    cursor: pointer;
+}
+#top{
+    float: left;
+    width: 100%;
+    /* height: 54%; */
+    background-color: #e5e5e5;
+    border: 1px solid #ccc;
+    border-bottom:0px;
+}
+.previous_student span{
+    margin-left: 15px;
+    float: left;
+    cursor: pointer;
+}
+.next_student span{
+    float: right;
+    margin-right: 15px;
+    cursor: pointer;
+}
+.record_group_name{
+    float: left;
+    width: 90%;
+    margin-left: 40px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 15px;
+}
+.sl_no{
+    float: left;
+    margin-left: 40px;
+    margin-top: 21px;
+    font-size: 13px;
+    font-weight: normal;
+    color: #666;
+}
+.record_name{
+    float:left;
+    margin-top:21px;
+    margin-left: 5px;
+    color: #666;
+    font-size: 13px;
+    font-weight: bold;
+}
+.record_detail_set{
+    float: left;
+    width: 90%;
+}
+.data_list{
+    float: left;
+    margin-left: 60px;
+    margin-top: 10px;
+    width: 80%;
+    color: #333;
+    font-size: 14px;
+    text-align: justify;
+}
+.data_list > a{
+    color:#666;
+}
+.record_group_wise{
+    float: left;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    width:100%;
+}
+span#previous{
+    background: #e5e5e5 url(../../images/iconsprite-1.png) no-repeat;
+    background-position: 0px -33px !important;
+    display: block;
+    float: left;
+    height: 12px;
+    margin-top: 24px;
+    padding-left: 15px;
+    margin-left: 10px;
+    color: #f00;
+    text-decoration: none;
+}
+span#next{
+    background: #e5e5e5 url(../../images/iconsprite-1.png) no-repeat;
+    background-position: -15px -33px !important;
+    display: block;
+    float: left;
+    height: 12px;
+    margin-top: 24px;
+    padding-left: 15px;
+    margin-left: 10px;
+    color: #f00;
+    text-decoration: none;
+}
+.coloured_background{
+    background-color: #f4f4f4;
+}
+.course_batch_selection_advanced{
+    float: left;
+    width: 100%;
+    margin-bottom: 30px;
+}
+#course_batch_name_label{
+    float: left;
+    margin-right: 20px;
+    font-size: 15px;
+    font-weight: normal;
+    color: #666;
+}
+#course_batch_name{
+    float: left;
+    margin-right: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #666;
+}
+#link_for_change a{
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #666;
+}#link_for_change a:hover{
+    text-decoration: underline;
+}
+#page_informer{
+    float: left;
+    width: 100%;
+    font-size: 17px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 20px;
+}
+#batch_informer{
+    float: left;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.batch_details{
+    float: left;
+    font-size: 15px;
+    font-weight: bold;
+    color: #666;
+    margin-right: 30px;
+}
+.batch_details span{
+    float: left;
+    margin-right: 20px;
+    font-size: 15px;
+    font-weight: normal;
+    color: #666;
+}
+.label-field-pair{
+    width: 35%;
+    float: left;
+}
+.label-field-pair select{
+    width: 180px;
+    height: 29px;
+    padding: 0px 3px 0px 5px;
+    float: left;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    -webkit-border-radius: 0px;
+}
+.label-field-pair label{
+    float: left;
+    width: auto;
+    margin-right: 10px;
+}
+#student_record_submit{
+    float: left;
+    margin-right: 10px;
+    margin-top: 7px;
+    background-color: #eeeeee;
+    border: 1px solid #999999;
+    cursor: pointer;
+    padding: 7px 10px;
+    margin-right: 10px;
+    float: left;
+    color: #000000;
+}
+.text-input-bg {
+    background: transparent;
+    height: 28px;
+    width: 180px;
+    float: left;
+}
+#cancel_link{
+    font-size: 14px;
+    color: #666666;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 15px;
+    float: left;
+    margin-left: 10px;
+}
+#cancel_link:hover{
+    text-decoration: underline;
+}
+.hor_line{
+    width:100%;
+    background: #999;
+    height: 1px;
+    float:left;
+}
+form{
+    float: left;
+    width: 100%;
+    margin-bottom: 20px;
+}
+#desc_text{
+    float: left;
+    width: 100%;
+    font-size: 13px;
+    font-weight: normal;
+    color: #999;
+    margin-bottom: 30px;
+}
+.slabel{
+    float: left;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.svalue{
+    float: left;
+    font-size: 13px;
+    font-weight: bold;
+}
+#student_name_info{
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+#student_informer{
+    float: left;
+    width: 100%;
+    margin-bottom: 30px;
+}
+#loader_1{
+    float: left;
+    margin-top: 50px;
+    margin-left: 300px;
+}
+#no_records{
+    margin-left: 245px;
+    font-size: 13px;
+    font-style: italic;
+    color: #444;
+    margin-top: 50px;
+    float:left;
+}

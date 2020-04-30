@@ -1,0 +1,20 @@
+<%if @custom_fields.present? %>
+<%@custom_fields.each do |c|%>
+  <%key = "custom_#{c.key}".to_sym%>
+  <%if @keys[key].present?%>
+    <div class="field_section">
+      <div class="field_head">
+        <%= "#{c.name}"%>
+      </div>
+      <div class="field">
+        <%= text_field "",key, :id=>key %>
+      </div>
+    </div>
+    <script>
+    j('#<%="custom_#{c.key}"%>').on('change paste keyup',function(){
+      template_app.<%="custom_#{c.key}"%> = j(this).val();
+    });
+    </script>
+  <%end%>
+<%end%>
+<%end%>

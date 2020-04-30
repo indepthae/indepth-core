@@ -1,0 +1,34 @@
+<% content_for :head do  %>
+  <%= stylesheet_link_tag("select_list.css") %>
+<% end %>
+<div class="content-div  bg-light grey-border shadow">
+    <% form_for :task, :url => {:action=>"run_task",:id=>params[:id], :script=>params[:script]}, :html=>{:class=>'form',:multipart => true}  do |f| %>
+
+      <% @current_script.params_list.each_pair do |key, value| %>
+        <fieldset>
+            <%= f.label key %>
+            <% if value == "string" %>
+              <%= f.text_field "#{key}" %>
+            <% elsif value == "file" %>
+              <%= file_field_tag "uploaded_file" %>
+            <% elsif value == "date" %>   
+              <%= f.text_field "#{key}", :placeholder => "dd-mm-yyyy OR mm/dd/yyyy" %>
+            <% else %>
+              <%= f.text_field "#{key}" %>
+            <% end %>
+        </fieldset>
+      <% end %>
+
+      <% if @current_script.instruction.present? %>
+        <fieldset>
+            <%= "#{@info_name} : #{@column_map}" %>
+        </fieldset>
+      <% end %>
+
+      <fieldset>
+          <%= f.submit 'Check', :confirm=>"Are you sure?", :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+          <%= f.submit 'Run', :confirm=>"Are you sure?", :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+      </fieldset>
+
+    <% end %>
+</div>

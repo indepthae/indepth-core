@@ -1,0 +1,429 @@
+<script type="text/javascript">
+  
+  function show_hide_parent_student_check(){
+    students = $('form_students').value;
+    if(students.length > 0){
+      j('.student_selected').show();
+    }else{
+      j('.student_selected').hide();
+    }
+  }
+  function show_members_if_exists(){
+    if($('form_members').value != ''){
+      members = $('form_members').value;
+      show_hide_parent_student_check();
+      disabled_members = $('form_disabled_members').value;
+<%= remote_function(:before => "Element.show('loader')",
+  :success => "Element.hide('loader')",:url => {:action => 'update_member_list'}, :with => "'members='+members+'&disabled_members='+disabled_members" ) %>
+    }
+  }
+  function show_targets_if_exists(){
+    if($('form_targets').value != ''){
+      targets = $('targets').value;
+<%= remote_function(:before => "Element.show('loader2')",
+  :success => "Element.hide('loader2')",:url => {:action => 'update_target_list'}, :with => "'targets='+targets" ) %>
+    }
+  }
+  function add_student(student) {
+    var student_list = new Array();
+    if($('form_students').value != '')
+      student_list = $('form_students').value.split(',');
+    else
+      student_list = [];
+
+    var student_exists = false;
+    var flag = true;
+    for(i=0; i<student_list.length; i++)
+      if(student_list[i] == student)
+        student_exists = true;
+
+    if(!student_exists) {
+      targets = $('form_targets').value;
+      targets_list = targets.split(',');
+      if(jQuery.inArray(String(student),targets_list) > -1){
+        flag = false;
+      }else{
+        student_list.push(student);
+      }
+    }
+    if(flag){
+      $('form_students').value = student_list.join();
+      show_hide_parent_student_check($('form_students').value);
+      students = $('form_students').value;
+    }
+  }
+  function add_member(member) {
+    var member_list = new Array();
+    if($('form_members').value != '')
+      member_list = $('form_members').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+    var flag = true;
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      targets = $('form_targets').value;
+      targets_list = targets.split(',');
+      if(jQuery.inArray(String(member),targets_list) > -1){
+        flag = false;
+        alert("<%= t('member_is_target_already') %>");
+      }else{
+        member_list.push(member);
+      }
+    }
+    if(flag){
+      $('form_members').value = member_list.join();
+      members = $('form_members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+    }
+  }
+  
+  function add_all_students(student) {
+    var student_list = new Array();
+    if($('form_students').value != '')
+      student_list = $('form_students').value.split(',');
+    else
+      student_list = [];
+
+    var new_list = student.split(',');
+    var flag = true;
+    for(i=0;i<new_list.length;i++)
+    {
+      var student_exists = false;
+      for(k=0; k<student_list.length; k++)
+        if(student_list[k] == new_list[i])
+          student_exists = true;
+      if(!student_exists){
+        targets = $('form_targets').value;
+        targets_list = targets.split(',');
+        if(jQuery.inArray(String(new_list[i]),targets_list) > -1){
+          flag = false;
+        }else{
+          student_list.push(new_list[i]);
+        }
+      }
+    }
+    if(flag){
+      $('form_students').value = student_list.join();
+      show_hide_parent_student_check();
+      students = $('form_students').value;
+    }
+  }
+
+  function add_all_member(member) {
+    var member_list = new Array();
+    if($('form_members').value != '')
+      member_list = $('form_members').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+    var flag = true;
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(k=0; k<member_list.length; k++)
+        if(member_list[k] == new_list[i])
+          member_exists = true;
+      if(!member_exists){
+        targets = $('form_targets').value;
+        targets_list = targets.split(',');
+        if(jQuery.inArray(String(new_list[i]),targets_list) > -1){
+          flag = false;
+        }else{
+          member_list.push(new_list[i]);
+        }
+      }
+    }
+
+    if(flag){
+      $('form_members').value = member_list.join();
+      members = $('form_members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+    }else{
+      alert("<%= t('some_members_are_targets_already') %>");
+    }
+  }
+
+  function remove_all_member(member) {
+    var member_list = new Array();
+    if($('form_members').value != '')
+      member_list = $('form_members').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(k=0; k<member_list.length; k++)
+        if(member_list[k] == new_list[i])
+          member_exists = true;
+      if(member_exists){
+        member_list.splice(member_list.indexOf(new_list[i]));
+      }
+    }
+    $('form_members').value = member_list.join();
+    members = $('form_members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+  }
+
+
+  function remove_student(student) {
+    students = $('form_students').value;
+    var student_list = new Array();
+    student_list = $('form_students').value.split(',');
+
+    for(i=0; i<student_list.length; i++)
+      if (student_list[i] == student){
+        student_list.splice(i,1);
+        break;
+      }
+
+    $('form_students').value = student_list.join();
+    show_hide_parent_student_check();
+    students = $('form_students').value;
+  }
+
+  function remove_member(member) {
+    members = $('form_members').value;
+    disabled_members = $('form_disabled_members').value;
+    var member_list = new Array();
+    var disabled_member_list = new Array();
+    member_list = $('form_members').value.split(',');
+    if(disabled_members.length > 0){
+      disabled_member_list = disabled_members.split(',');
+    }
+    var flag = false;
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member){
+        if(disabled_members.length > 0){
+          if(jQuery.inArray(member.toString(), disabled_member_list) == -1){
+            member_list.splice(i,1);
+          }else{
+            alert("<%= t('member_user_already_submitted') %>");
+            flag = true;
+          }
+      }else{
+        member_list.splice(i,1);
+      }
+      break;
+    }
+    if(!flag){
+      $('form_members').value = member_list.join();
+      members = $('form_members').value;
+      rid = '#member_'+member;
+      j(rid).parent().remove();
+    }
+
+  }
+
+  /*** targets ***/
+
+  function show_targets_if_exists(){
+    if($('form_targets').value != ''){
+      targets = $('form_targets').value;
+<%= remote_function(:url => update_target_list_forms_path, :with => "'targets='+targets" ) %>
+    }
+  }
+
+  function add_target(target) {
+    var flag = true;
+    var target_list = new Array();
+    if($('form_targets').value != '')
+      target_list = $('form_targets').value.split(',');
+    else
+      target_list = [];
+
+    var target_exists = false;
+
+    for(i=0; i<target_list.length; i++)
+      if(target_list[i] == target)
+        target_exists = true;
+
+    if(!target_exists) {
+      members = $('form_members').value;
+      members_list = members.split(',');
+      if(jQuery.inArray(String(target),members_list) > -1){
+        flag = false;
+        alert("<%= t('target_is_member_already') %>");
+      }else{
+        target_list.push(target);
+      }
+    }
+    if(flag){
+      $('form_targets').value = target_list.join();
+      targets = $('form_targets').value;
+<%= remote_function(:url => {:action => 'update_target_list'}, :with => "'targets='+targets" ) %>
+    }
+  }
+
+  function add_all_target(target) {
+    var target_list = new Array();
+    if($('form_targets').value != '')
+      target_list = $('form_targets').value.split(',');
+    else
+      target_list = [];
+
+    var new_list = target.split(',');
+    var flag = true;
+    for(i=0;i<new_list.length;i++)
+    {
+      var target_exists = false;
+      for(k=0; k<target_list.length; k++)
+        if(target_list[k] == new_list[i])
+          target_exists = true;
+      if(!target_exists){
+        members = $('form_members').value;
+        members_list = members.split(',');
+        if(jQuery.inArray(String(new_list[i]),members_list) > -1){
+          flag = false;
+        }else{
+          target_list.push(new_list[i]);
+        }
+      }
+    }
+    if(flag){
+      $('form_targets').value = target_list.join();
+      targets = $('form_targets').value;
+<%= remote_function(:url => {:action => 'update_target_list'}, :with => "'targets='+targets" ) %>
+    }else{
+      alert("<%= t('some_targets_are_members_already') %>");
+    }
+  }
+
+  function remove_target(target) {
+    targets = $('form_targets').value;
+    disabled_targets = $('form_disabled_targets').value;
+    var target_list = new Array();
+    var disabled_target_list = new Array();
+    target_list = $('form_targets').value.split(',');
+    if(disabled_targets.length > 0){
+      disabled_target_list = disabled_targets.split(',');
+    }
+    var flag = false;
+    for(i=0; i<target_list.length; i++)
+      if (target_list[i] == target){
+        if(disabled_targets.length > 0){
+          if(jQuery.inArray(target.toString(), disabled_target_list) == -1){
+            target_list.splice(i,1);
+          }else{
+            alert("<%= t('targeted_user_already_submitted') %>");
+            flag = true;
+          }
+      }else{
+        target_list.splice(i,1);
+      }
+      break;
+    }
+    if(!flag){
+      $('form_targets').value = target_list.join();
+      targets = $('form_targets').value;
+      tid = '#target_'+target;
+      j(tid).parent().remove();
+    }
+  }
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('form_builder_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('forms.edit_form') %></div>
+
+  <div id="inner-tab-menu">
+    
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb" id="brd_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="form_page">
+    <% form_for @form, :url => { :action => "update" } do |f| %>
+      <%= render :partial => 'form_page', :locals => {:f => f} %>
+      <div id="submit_or_cancel">
+        <%=submit_tag "#{t('publish')}", :class => 'button', :disable_with => "#{t('please_wait')}" %>
+        <%=link_to "#{t('cancel')}",manage_forms_path, :class => 'button' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<script>
+  if(j('#form_is_feedback').is(':checked')){
+    j('.feedback').each(function(a,b){
+      j(b).css('display','block');
+    })
+  }else if(j('#form_is_public_false').is(':checked')){
+    j('.private').each(function(a,b){
+      j(b).css('display','block');
+    })
+  }
+  j('#form_is_feedback').on('change',function(){
+    if(j(this).is(':checked')){
+      $('form_is_public_false').checked = true;
+      if(j('#form_is_targeted').is(':checked')){
+        j('#form_target_list').show();
+      }
+      j('.feedback').each(function(a,b){
+        j(b).css('display','block');
+      });
+      j('.not_feedback').each(function(a,b){
+        j(b).css('display','none');
+      })
+    }else{
+      j('.not_feedback').removeClass('initial_hide');
+      j('#form_target_list').hide();
+      $('form_is_public_true').checked = true;
+      if(j('#form_is_public_false').is(':checked')){
+        j('.not_feedback').each(function(a,b){
+          j(b).css('display','');
+        })
+      }else{
+        j('.feedback').each(function(a,b){
+          j(b).css('display','');
+        });
+        j('.not_feedback').each(function(a,b){
+          j(b).css('display','');
+        })
+      }
+    }
+  });
+  j('#form_is_public_false').on('change',function(){
+    if(j(this).is(':checked')){
+      j('.private').each(function(a,b){
+        j(b).css('display','block');
+      });
+    }
+  });
+  j('#form_is_public_true').on('change',function(){
+    if(j(this).is(':checked')){
+      j('.private').each(function(a,b){
+        j(b).css('display','');
+      });
+    }
+  });
+  j('#form_is_targeted').on('change',function(){
+    console.log(j(this).is(':checked'));
+    j(this).is(':checked') ? j('#form_target_list').css('display','block') : j('#form_target_list').css('display','');
+  });
+  j(document).ready(function(){
+    if(j('#form_is_targeted').is(':checked')){
+      j('#form_target_list').css('display','block');
+    }
+    if(j('#form_is_feedback').is(':checked')){
+
+    }else{
+      j('.not_feedback').each(function(a,b){
+        j(b).removeClass('initial_hide');
+      })
+    }
+    show_hide_parent_student_check();
+  });
+</script>

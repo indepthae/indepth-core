@@ -1,0 +1,14 @@
+<% total_fees =0 %>
+<% i = 0 %>
+<div id="particulars-list">
+    <tr class="tr-<%= cycle("odd", "even") %> particular" id="particular<%=@fee.id %>" >
+        <td class="col-1 normal_font particular_index"><%= i+=1 %></td>
+        <td class="set_border_right particular-col normal_font"><%= t('transport_fee.bus_fare') %></td>
+        <td class="set_border_right amount-col amount-cols normal_font align_right">
+            <%= precision_label @fee.bus_fare %>
+        </td>
+    </tr>
+</div>
+<% @total_payable = @fee.bus_fare %>
+
+

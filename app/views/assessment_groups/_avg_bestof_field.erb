@@ -1,0 +1,11 @@
+<%= t('avg_best_of_field') %>
+<%= text_field_tag "derived_assessment_group_settings[other_settings][ag_count]" ,ag_count,
+                                    {:class => 'core_field ag_count', :onkeypress => "return isIntegerKey(event,this); check_count(this)"}%>
+<span id='ag_count_helper'></span>
+))
+<%= g.hidden_field :ag_count if obj.derived_assessment? %>
+<script type="text/javascript">
+    check_count = function(el){
+      return parseInt(j(el).val()) <= $check_ags.length
+    }
+</script>

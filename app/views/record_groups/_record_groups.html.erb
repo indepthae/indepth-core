@@ -1,0 +1,32 @@
+
+<div id="other_details">
+  <div id="student_items">
+    <%if @record_groups.group_by(&:is_active).present?%>
+      <table id="student_details_table">
+        <tr>
+          <th id="name"><%=t('record_group')%></th>
+          <th id="action"></th>
+        </tr>
+        <%@record_groups.group_by(&:is_active).each do |k,v|%>
+          <tr>
+            <td colspan="2" class="highlighter sep_border"><%=  k == true ? "#{t('active')}" : "#{t('inactive')}"%></td>
+          </tr>
+          <%v.each do |rg|%>
+            <tr class="list_<%=cycle('odd', 'even')%>">
+              <td>
+                <%=rg["name"]%>
+              </td>
+              <td>
+                <%=link_to "#{t('manage_records')}",record_group_records_path(rg["id"])%>
+                <%=link_to_remote "#{t('settings')}", :url =>edit_record_group_url(rg["id"]),:method=>:get%>
+              </td>
+            </tr>
+          <%end%>
+        <%end%>
+      </table>
+      <%=will_paginate @record_groups,:params => {:controller => record_groups_path }%>
+    <%else%>
+      <div class="no_entries"><%=t('no_record_groups_present')%></div>
+    <%end%>
+  </div>
+</div>

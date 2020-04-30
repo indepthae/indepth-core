@@ -1,0 +1,13 @@
+<h5><%= t('maintenance_attachments') %></h5>
+<table width="50%" cellpadding="1" cellspacing="1" id="route_listing">
+    <% if @attachments.present? %>
+      <% @attachments.each do |r| %>
+        <tr>
+            <td><%= r.name %></td>
+            <td><%= link_to t('download_attachment'), r.attachment.url(:original, false) %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="2">  <%=t('no_attachments_uploaded')%> </td></tr>
+    <% end %>
+</table>

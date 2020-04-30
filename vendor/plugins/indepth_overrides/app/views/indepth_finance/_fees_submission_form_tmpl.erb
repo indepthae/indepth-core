@@ -1,0 +1,367 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.    -%>
+<% unless flash[:notice].nil? %>
+  <div id="errorExplanation" class="errorExplanation"><p><%= t('there_were_pblm') %></p>
+      <ul>
+          <li><%= flash[:notice] %></li>
+      </ul>
+  </div>
+<% end %>
+
+<% unless flash[:warning].nil? %><p class="flash-msg"><%= flash[:warning] %></p>
+<% end %>
+<div class="details">
+    <div class="name normal_font">
+        <%= t('student_name') %>
+    </div>
+    <div class="val">
+        <span>:</span>
+        <div class="val-align">
+            <%= @student.full_name %>
+        </div>
+    </div>
+    <% if roll_number_enabled? %>
+      <div class="details">
+          <div class="name normal_font">
+              <%= t('roll_no') %>
+          </div>
+          <div class="val">
+              <span>:</span>
+              <div class="val-align">
+                  <%= @student.roll_number %>
+              </div>
+          </div>
+        <% end %>
+        <% unless @fee_category.nil? %>
+          <div class="name normal_font">
+              <%= t('fee_category_name') %>
+          </div>
+          <div class="val">
+              <span>:</span>
+
+              <div class="val-align">
+                  <%= @fee_category.name.capitalize %>
+              </div>
+          </div>
+        <% end %>
+        <% unless @student.student_category.nil? %>
+          <div class="name normal_font">
+              <%= t('student_category') %>
+          </div>
+          <div class="val">
+              <span>:</span>
+
+              <div class="val-align">
+                  <%= @student.student_category.name.capitalize %>
+              </div>
+          </div>
+        <% else %>
+          <div class="name normal_font">
+              <%= t('student_category') %>
+          </div>
+          <div class="val">
+              <span>:</span>
+
+              <div class="val-align">
+                  <%= t('n_a') %>
+              </div>
+          </div>
+        <% end %>
+        <div class="name normal_font">
+            <%= t('fees_collection_date_name') %>
+        </div>
+        <div class="val ">
+            <span>:</span>
+
+            <div class="val-align">
+                <%= @date.name.capitalize %>
+            </div>
+        </div>
+    </div>
+    <br/>
+</div>
+
+
+<div class="height-fixer"></div>
+<div class="extender"></div>
+<% total_fees =0 %>
+<% form_remote_for :fees, :id => 'fees_form', :url => {:action => 'fees_submission_save', 
+  :student => @student.id, :date => @date.id, :fine => @fine, :special_fine => @fine_amount}, 
+  :html => {:id => "fees_form"}, :before => "prev_double()", :complete => "set_back()" do |form| %>
+
+  <% unless @fee_particulars.nil? %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+            <td><%= t('sl_no') %></td>
+            <td><%= t('particulars') %></td>
+            <td><%= t('amount') %>
+                (<%= currency %>)</td>
+        </tr>
+        <% i = 0 %>
+        <%= render :partial => 'finance/particular_list' %>
+
+        <% unless @total_discount == 0 %>
+          <tr class="tr-blank"></tr>
+          <tr class="tr-head" cellpadding="1" cellspacing="1">
+              <td class="col-1"></td>
+              <td class="col-1 bold_font" colspan="2">
+                  <span><%= t('discount') %></span>
+              </td>
+          </tr>
+        <% end %>
+        <% @total_fine = 0 %>
+        <%= render :partial => 'finance/discount_list', :locals => {:i => i, :total_fees => total_fees} %>
+        <% if @financefee.tax_enabled? and @financefee.tax_collections.present? %>
+          <%= render :partial => 'finance/tax_list', :locals => {:i => i, :total_tax => total_fees } %>          
+        <% end %>
+        <%= render :partial => 'finance/student_fine_list', :locals => {:i => i, :total_fees => total_fees,:payment_date=> @transaction_date} %>
+        <% total_fees1 = 0 %>
+        <% unless @particular_wise_paid %>
+          <% if !@financefee.is_paid_with_fine? and @due_date.to_date < @transaction_date and @fine.nil? %>
+            <tr>
+                <td></td>
+                <td class="col-2 fine_text align_right">
+                    <label><%= "#{t('due_date_has_been_exceeded')}"%></label>
+                </td>
+                <td>
+                    <div class="instant-particular">
+                        <%= link_to_remote '+ Add Fine', :url => {
+                          :controller => "finance",
+                          :action => "fees_submission_student", "id" => @student.id,"add_fine"=>1,"date"=> @date.id,
+                          :current_action => @target_action,
+                          :current_controller=>@target_controller,
+                          :transaction_date=>@transaction_date
+                          },
+                          :method=>:get %>
+                    </div>
+                </td>
+            </tr>
+        <%#= render :partial => "fine_submission" if @fine.nil? %>
+          <% end %>
+        <% end %>
+        <% balance=@financefee.balance.to_f+@fine.to_f %>
+        <%= render :partial => 'summary', :locals => {:total_fine => @total_fine.to_f} %>
+
+        <%  unless @financefee.is_paid_with_fine?%>
+          <tr>
+              <td colspan="3">
+                  <div class="payment_details">
+                      <div class="label-field-pair3">
+                          <label><%= t('payment_mode') %>  <%= image_tag("loader.gif",
+                                :align => "absmiddle",
+                                :border => 0,
+                                :id => "loader1",
+                                :style => "display: none;") %></label>
+
+                          <div class="text-input-bg3">
+                              <%= select :fees, :payment_mode, [["#{t('cash')}", "Cash"],["#{t('online_payment')}", "Online Payment"],["#{t('cheque')}", "Cheque"],["#{t('dd')}","DD"],["#{t('others')}", "Others"]],
+                                {:selected=>params[:payment_mode]}, 
+                                {
+                                :onChange => "#{remote_function(:url => {:action => "select_payment_mode"},
+                                :with => "'payment_mode='+value",
+                                :before => "$('loader1').show();",
+                                :success => "$('loader1').hide();")}"
+                                } %>
+                          </div>
+                      </div>
+                      <div id="payment_mode">
+                          <div id="payment_mode_details">
+                              <% if params[:payment_mode]=='Others'%>
+                                <%=render :partial=>'finance/select_payment_mode',:locals=>{:mode=> params[:others_payment_mode]} %>
+                              <% end %>
+                          </div>
+                      </div>
+                      <div class="label-field-pair5">
+                          <label><%= t('reference_no') %> </label>
+
+                          <div class="text-input-bg4">
+                              <%= form.text_field :reference_no,:value=>params[:reference_no], :disabled => 
+                                @particular_wise_paid%>
+                          </div>
+                      </div>
+
+                      <div class="label-field-pair4">
+                          <label><%= t('amount_to_pay') %> </label>
+
+                          <div class="text-input-bg4">
+                              <%= form.text_field :fees_paid, :value => precision_label(balance+
+                                  @fine_amount.to_f), :class => 'precision_text', 
+                                :disabled => @particular_wise_paid %>
+                              <%= hidden_field_tag :total_fees, total_fees1,
+                                :disabled => @particular_wise_paid %>
+                          </div>
+                      </div>
+
+                  </div>
+              </td>
+          </tr>
+        <% end %>
+        <tr>
+            <td colspan="3">
+                <div class="pay_fees">
+
+                    <% unless @financefee.is_paid_with_fine? %>
+                      <%= transaction_date_field(@transaction_date,:onchange=> (<<-CODE
+          j.post('/finance/fees_submission_student',{date: #{@date.id},id:#{@student.id},fine_amount:#{@fine.nil? ? 0 : @fine},transaction_date: j('#transaction_date').val(),payment_mode: j('#fees_payment_mode').val(),payment_note:j('#fees_payment_note').val(),reference_no:j('#fees_reference_no').val(),others_payment_mode: j('.others_payment_mode').val()})
+                        CODE
+                        ));
+                    %>
+                      <div class="label-field-pair3-text-area">
+                          <label><%= t('payment_notes') %> </label>
+
+                          <div class="textarea-input-bg3">
+                              <%= form.text_area :payment_note, :cols => 50, :rows => 1,
+                                :value=>params[:payment_note], :disabled => @particular_wise_paid %>
+                          </div>
+                      </div>
+                      <div class="pay_fees_buttons">
+                          <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+                          <% unless @particular_wise_paid %>
+                            <%= submit_tag "► #{t('pay_fees')}", :class => 'submit_button', :id => 'submit_button', :onClick => "return validate_payment_mode()" %>
+                          <% end %>
+                          <%= link_to "► #{'Single Statement'}",
+                            {:controller => "student", :action => "single_statement", :id => @student.id}, :target => '_blank', :class => 'user_button' %>
+                          <%= link_to "► #{t('print_summary')}",
+                            {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, :id2 => @date.id}, :target => '_blank', :class => 'user_button' unless @trans.nil? %>
+                          <%= link_to "► #{t('print_summary')}",
+                            {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, :id2 => @date.id, :batch_id => @financefee.batch_id}, :target => '_blank', :class => 'user_button' %>
+                      </div>
+                    <% else %>
+                      <div class="pay_fees_buttons">
+                          <h4><%= t('fees_paid') %></h4>
+                          <%= link_to "► #{t('print_summary')}",
+                            {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, :id2 => @date.id, :batch_id => @financefee.batch_id}, :target => '_blank', :class => 'user_button' %>
+                      </div>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+    <%#*<tr>%>
+    <%#*<td colspan="3">%>
+    <%# unless @paid_fees.nil? or not total_fees.to_f == 0 %>
+    <%#= link_to "► #{t('print_receipt')}",
+    {:controller => "finance", :action => "student_fee_receipt_pdf", :id => @student.id, :id2=>@date.id},:target => '_blank', :class=> 'user_button' %>
+    <%# end %>
+    <%#*</td>%>
+    <%#*</tr>%>
+
+      <% end %>
+  </table>
+<% end %>
+<%= render :partial => 'finance/paid_fees', :locals => {:batch_id => @financefee.batch_id, :delete_action => "delete_transaction_for_student"} %>
+
+<script type="text/javascript">
+  j('#fees_payment_mode').change(function () {
+      switch (j(this).val()) {
+          case 'Online Payment':
+              j('.label-field-pair5').children().first().text("<%=t('transaction_id')%>");
+              break;
+          case 'Cheque':
+              j('.label-field-pair5').children().first().text("<%=t('cheque_no')%>");
+              break;
+          case 'DD':
+              j('.label-field-pair5').children().first().text("<%=t('dd_no')%>");
+              break;
+          default:
+              j('.label-field-pair5').children().first().text("<%=t('reference_no')%>");
+              break;
+      }
+  });
+  j(document).undelegate(".fine-deletion", "click");
+  j("form").submit(function () {
+      j('#submit_button').attr('disabled', 'disabled');
+      j('#submit_button').val('<%=t('please_wait') %>');
+  });
+  j("form").bind('ajax:complete', function () {
+      j('#submit_button').removeAttr('disabled');
+      j('#submit_button').val('<%="► #{t(' pay_fees ')}" %>');
+
+  });
+
+  j(document).click(function (e) {
+      j('div#revert-pop-up').hide();
+
+  });
+
+  j(function () {
+      j('.inactive-delete').hover(function (e) {
+          var moveLeft = 0;
+          var moveDown = 0;
+          var moveLeft = ((j(this).position().left) + (j(this).width()) / 2);
+          var moveDown = (j(this).position().top) - 35;
+          trans_details_show(moveLeft, moveDown, this);
+
+      }, function () {
+          j('div#revert-pop-up').hide();
+      });
+  });
+
+  function trans_details_show(moveLeft, moveDown, e) {
+      var rtl = "<%= (rtl?) ? 'rtl' : 'ltr'  %>";
+
+      if (rtl == 'rtl') {
+          left_index = -40;
+      } else {
+          left_index = -285;
+      }
+
+      moveLeft = moveLeft + left_index;
+
+      j('div#revert-pop-up').delay(350).show(0);
+
+      moveDown = moveDown - (j('div#revert-pop-up').height());
+      j("div#revert-pop-up").css('top', moveDown).css('left', moveLeft);
+  }
+  j("#submit_button").click(function (e) {
+      var precision = parseInt("<%= @precision %>");
+      amount_paying = parseFloat(j("#fees_fees_paid").val());
+      payment_done = parseFloat(j(".payment_done").text());
+      amount_to_pay = parseFloat(j(".amount_to_pay").text());
+      total_fees = parseFloat(j(".total_fees").text());
+      if ((amount_paying > (total_fees - payment_done)) && amount_paying != amount_to_pay) {
+          alert("can't do partial payment for fine");
+          j("#fees_fees_paid").val(amount_to_pay.toFixed(precision));
+          e.preventDefault();
+      }
+
+  });
+  j(document).delegate('.fine-deletion', 'click', function (e) {
+      student = j(this).attr('student');
+      batch_id = j(this).attr('batch_id');
+      date = j(this).attr('date');
+      proceed = confirm('<%=t('delete_confirm_msg') %>');
+      console.log(proceed);
+      if (proceed) {
+          j.ajax({
+              method: "post",
+              url: '/finance/fees_submission_student',
+              data: {
+                  "fine[student]": student,
+                  "fine[batch_id]": batch_id,
+                  "fine[date]": date
+              }
+
+          });
+      }
+  });
+  if (j('.flash-msg').length > 0) {
+      j('#fees_detail').css('padding-top:0px');
+  }
+
+</script>

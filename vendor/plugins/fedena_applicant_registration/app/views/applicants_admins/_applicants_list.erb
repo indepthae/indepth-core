@@ -1,0 +1,120 @@
+<div id='applicants-div'>
+    <div class='desc-div'>
+        <% if @selected_status.present? %>
+          <%= @selected_status.is_default == true ? "#{t('listing_applicants_with_status')} #{t(@selected_status.name)}" : "#{t('listing_applicants_with_status')} #{@selected_status.name}" %>
+        <% else %>
+          <%= t('listing_all_applicants') %>
+        <% end %>
+    </div>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+
+        <tbody style='display:block;max-height:400px;overflow:auto;'>
+            <tr class="tr-list_head">
+                <td style="width:5%"><%= check_box_tag "select_all",1,false,{:class=>"select_all",:onclick=>"toggle_all_checkboxes(this);"} %>
+                    <div class="reorder-icon invisible-div"></div></td>
+                <td><%= t('regi_no') %></td>
+                <td style="width:40%"><%= t('applicant_name') %></td>
+                <td><%= t('date_format') %></td>
+                <% unless @selected_status.present? %>
+                  <td><%= t('status') %></td>
+                <% else %>
+                  <% if (@selected_status.name == "alloted" and @selected_status.is_default == true) %>
+                    <td><%= t('allotted_to_batch') %></td>
+                  <% end %>
+                <% end %>
+                <td><%= t('application_fee') %> </td>    
+            </tr>
+
+            <% if @shown_applicants.present? %>
+              <% @shown_applicants.each do |applicant| %>
+                <tr class="row-<%=cycle('b', 'a')%>">
+                    <% if (applicant.application_status.present? and applicant.application_status.name == "alloted") %>
+                      <td><%= check_box_tag "applicant_ids[]",applicant.id, false,{:class=>"disabled_show_field_checkbox",:disabled=>true} %></td>
+                    <% else %>
+                      <td><%= check_box_tag "applicant_ids[]",applicant.id, false,{:class=>"show_field_checkbox",:onchange=>"check_select_all_value(this);"} %></td>
+                    <% end %>
+                    <td><%= applicant.reg_no %></td>
+                    <td><%= link_to applicant.full_name, {:action=>'view_applicant',:id=>applicant.id} %></td>
+                    <td><%= format_date(FedenaTimeSet.current_time_to_local_time(applicant.created_at).to_date,:format=>:short_date) %></td>
+                    <% unless @selected_status.present? %>
+                      <td><%= applicant.application_status.is_default == true ? (applicant.application_status.name == "alloted" ? (applicant.batch_id.present? ? "#{t('alloted')} - #{applicant.batch.full_name}" : "#{t('alloted')}") : t(applicant.application_status.name)) : applicant.application_status.name %></td>
+                    <% else %>
+                      <% if (@selected_status.name == "alloted" and @selected_status.is_default == true) %>
+                        <td><%= applicant.batch_id.present? ? applicant.batch.full_name : "-" %></td>
+                      <% end %>
+                    <% end %>
+                    <td><%= applicant.has_paid == true ? t('paid') : t('not_paid') %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr class='row-b'><td colspan='0'><%= t('no_applicants_found') %></td></tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+<% if @shown_applicants.present? %>
+  <div id='buttons-div'>
+      <% unless (@selected_status.present? and @selected_status.name=="alloted" and @selected_status.is_default==true) %>
+        <%=  link_to_function "#{t('update_status')}","show_status_form(); return false;",{:class=>'user_button'} %>
+        <%=  link_to_function "#{t('allocate_applicant')}","show_allocation_form(); return false;",{:class=>'user_button'} %>
+        <% unless (@selected_status.present? and @selected_status.name=="discarded" and @selected_status.is_default==true) %>
+          <%=  link_to_function "#{t('discard')}","discard_applicants(); return false;",{:class=>'user_button'} %>
+        <% end %>
+      <% end %>
+      
+      <div class="dropdown right-float">
+        <button class="dropbtn"><%= t('reports') %> &#9660;</button>
+        <div class="dropdown-content">
+          <%= link_to t('export_as_csv'), {:controller=>"csv_export", :action => "generate_csv", :csv_report_type => "applicant_registration", :report_format_type => "csv",:id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"active"}%>
+          <%= link_to t('detailed_csv_report'), {:controller=>"applicants_admins", :action => "detailed_csv_report", :id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"active"}, :target => "blank" %>
+          <%= link_to t('download_pdf'), {:controller=>"applicants_admins", :action => "applicants_pdf", :report_format_type => "pdf",:id => @registration_course.id, :start_date => @start_date, :end_date => @end_date, :name_search_param => @search_params, :selected_status=>@selected_status, :applicant_type=>"active", :page_height => 760}, :target => '_blank'%>
+        </div>
+      </div>
+      <%= link_to_remote t('message_applicants'), {:url=>message_applicants_applicants_admins_path, :method=>:get}, :class => "user_button right-float", :id => "message_btn"%> 
+      
+  </div>
+  <div id="update-status-div" class="operation-section" style="display:none;">
+      <label class="desc-label"><%= t('change_status_text') %></label>
+      <div class="vertical-pair">
+          <label><%= t("application_status") %></label>
+          <% if @selected_status.present? %>
+            <% status_options = @active_statuses.select{|s| !((s.is_default==true and ["discarded","alloted"].include?(s.name)) or s.id==@selected_status.id)}.map{|a| a.is_default==true ? ["#{t(a.name)}",a.id] : [a.name,a.id]}  %>
+          <% else %>
+            <% status_options = @active_statuses.select{|s| !(s.is_default==true and ["discarded","alloted"].include?(s.name))}.map{|a| a.is_default==true ? ["#{t(a.name)}",a.id] : [a.name,a.id]}  %>
+          <% end %>      
+          <%= select_tag "application_status", options_for_select([["#{t('select_a_status')}",""]] + status_options)%>
+      </div>
+      <div class="vertical-pair">
+          <label><%= t("has_paid_fees") %></label>
+          <div class="check-label-pair">
+              <%= check_box_tag "has_paid", 1, false %>
+              <label><%= t('paid_text') %></label>
+          </div>
+      </div>
+      <%=  link_to_function "#{t('update_status')}","update_status(); return false;",{:class=>'user_button', :id=>"update-status-button"} %>
+      <%=  link_to_function "#{t('cancel')}","hide_status_form(); return false;",{:class=>'user_button'} %>
+  </div>
+<div id="allocation-div" class="operation-section" style="display:none;">
+      <div class="float_left" style="width:40%;">
+          <label class="desc-label"><%= t('select_batch_to_admit') %></label>
+      </div>
+      <div class="vertical-pair float_left" style="width:47%;">
+          <%= select_tag "batch_id", options_for_select([["#{t('select_a_batch')}",""]] + @registration_course.course.batches.all(:conditions=>{:is_active=>true,:is_deleted=>false}).map{|b| [b.full_name,b.id]}), 
+            {:onchange => "#{remote_function(:url => {:action => "fee_collection_list"}, :with => "'batch_id='+value", :before => "Element.show('loader');",
+            :success => "Element.hide('loader');")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+      </div>     
+      <div id="fee_collections" class="width100"></div>
+      <div class="width100" style="margin-top:20px;">
+          <div class="float_left" style="width:40%; height: 10px;"> </div>
+          <div class="vertical-pair float_left" style="width:47%;">
+              <%=  link_to_function "#{t('allocate_applicants')}","allocate_applicants(); return false;",{:class=>'user_button',:id=>"allocate-button"} %>
+              <%=  link_to_function "#{t('cancel')}","hide_allocation_form(); return false;",{:class=>'user_button'} %>
+          </div>
+      </div>
+  </div>
+<% end %>

@@ -1,0 +1,26 @@
+
+<label class="head_label"><%= t('admit_applicant_to_a_batch') %><span></span></label>
+
+
+<div id="grading-levels-form">
+
+  <% form_remote_for :allotment,:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" ,:url=>{:action=>'allot_applicant'} do |f| %>
+    <div id="form-errors"></div>
+    <div class="label-field-pair">
+      <div class="label-container"><label><%= t('select_a_batch') %> :</label></div>
+      <%= f.hidden_field :id,:value => @applicant.id %>
+      <%= f.select :batch_id, @batches.map { |c| [c.full_name, c.id] },{:prompt => t('select_batch')} %>
+    </div>
+    <%=  submit_tag "► #{t('save')}",:class=>'submit_button',:id => 'submit_button'%>
+
+
+  <% end %>
+</div>
+<script type="text/javascript">
+  
+  j('a#MB_close span,#MB_overlay').on('click',function(){
+    j('#conf-status-U').children().first().show();
+    j('#conf-status-U').children().last().remove();
+  })
+  
+</script>

@@ -1,0 +1,9 @@
+<%form_for @search,:url=>{:action=>'fee_receipts'},:html=>{:method=> :post} do |f|%>
+  <%=f.text_field :receipt_no_as,:placeholder=>"#{t('receipt_no')}"%>
+  <%=hidden_field_tag :start_date_as,@start_date%>
+  <%=hidden_field_tag :end_date_as,@end_date%>
+  <%=f.submit "#{t('search_receipts')}"%>
+<%end%>
+<div class="advance_search"><%=link_to_remote "#{t('advanced_search_text')}",:url=>{:controller=>'finance',:action=>'get_advance_search',:search=>{:start_date_as=>@start_date,:end_date_as=>@end_date}},:html=>{:class=>"change_date"}%></div>
+<%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none" ) %>
+

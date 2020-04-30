@@ -1,0 +1,6 @@
+<div class="label-field-pair" style="width:345px;">
+  <label for="subject_id">Exam Group</label>
+  <div  class="text-input-bg" id="exam-group-select">
+    <%= select :subject_report, :exam_group_id, @exam_groups.map{|a| [a.name,a.id]},{:prompt=> "All"}%>
+  </div>
+</div>

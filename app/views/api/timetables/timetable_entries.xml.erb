@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.timetable_detail{
+  @timetable_entries.each do |timetable_entry|
+    @timetable_entry = timetable_entry
+    @xml.timetable_entry do
+      #@xml.timetable("#{@timetable_entry.timetable.try(:start_date)}-#{@timetable_entry.timetable.try(:end_date)}")
+      if @timetable_entry.entry_type == 'Subject'        
+        @xml.subject(shorten_string(@timetable_entry.assigned_name_with_code,38))
+      end
+      if @user.student?
+      @xml.teacher_name(timetable_entry.employees.map{|e| e.full_name}.join(", "))  
+      else
+      @xml.teacher_name(@user.full_name)
+      end
+      @xml.weekday(WeekdaySet.weekday_name(timetable_entry.weekday_id))
+      @xml.class_timing("#{@timetable_entry.class_timing.try(:start_time).strftime("%I:%M%p")}-#{@timetable_entry.class_timing.try(:end_time).strftime("%I:%M%p")}")
+      @xml.course(@timetable_entry.batch.course.full_name)
+      @xml.batch(@timetable_entry.batch.full_name)            
+    end
+  end
+}%>
+
+

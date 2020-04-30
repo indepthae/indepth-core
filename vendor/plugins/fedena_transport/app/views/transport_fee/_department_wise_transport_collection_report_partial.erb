@@ -1,0 +1,136 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('transport_fees_report') %> - <%= @collection.name %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>
+        </b>
+        <div class="date_align right">
+            <label class="date_tag">
+                <%= params[:date_tag] %>
+            </label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; 
+            <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %> 
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+            </span>
+        </div>
+    </div>
+    <!--
+      < %=link_to_remote t('change_date'),:url => {:controller => "transport_fee",:action =>"show_date_filter",
+    :target_action=>@target_action,:id=>params[:id],:date_tag=>params[:date_tag],
+    :start_date=>@start_date,:end_date=>@end_date}%>
+    -->
+    <% unless @departments.empty? and @courses.empty? %>
+      <% unless @departments.empty?%>
+        <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+            <div class="main_head_label"><b id="fees_report_title"><%= t('employees') %></b></div>
+            <tr class="main_head">
+                <td><%= t('department') %></td>
+                <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+            </tr>
+            <% total = 0 %>
+            <% @departments.each do |dep| %>
+              <tr class="row-b">
+                  <td >
+                      <%= link_to "#{dep.dep_name}", {:action => 'employee_transport_fees_report', 
+                        :id => params[:id], :date_tag => params[:date_tag], :dep_id => dep.dep_id, 
+                        :type => "employee", :start_date => @start_date, :end_date => @end_date}.
+                        merge(url_params) %>
+                  </td>
+                  <td class="set_border_right" align="right" style="width: 100px;">
+                      <%= precision_label(dep.amount) %>
+                  </td>
+                  <%  total += dep.amount.to_f %>
+              </tr>
+            <% end %>
+
+            <tr class="main_head">
+                <td><%= t('total') %></td>
+                <td class="set_border_right" align="right"><%= precision_label(total) %></td>
+            </tr>
+
+        </table>
+      <% end %>
+      <br/>
+      <br/>
+      <% unless @courses.empty? %>
+
+        <% total = 0 %>
+
+        <div class="main_head_label"><b id="fees_report_title"><%= t('students') %></b></div>
+        <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+            <tr class="main_head">
+                <td><%= t('batch') %></td>
+                <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+            </tr>
+
+            <% @courses.each do |course,batches| %>
+              <tr class="tr-list_head">
+                  <td colspan="2"><%=Course.find(course).course_name%></td>
+              </tr>
+              <% batches.each do |b| %>
+                <tr class="row-b">
+                    <td >
+                        <%=link_to "#{b.batch_name}", {:action => 'employee_transport_fees_report',
+                          :id => params[:id], :batch_id => b.batch_id, :date_tag => params[:date_tag],
+                          :type => "student", :start_date => @start_date, :end_date => @end_date}.
+                          merge(url_params) %>
+                    </td>
+                    <td class="set_border_right" align="right" style="width: 100px;">
+                        <%= precision_label(b.amount) %>
+                    </td>
+                    <% total += b.amount.to_f %>
+                </tr>
+              <% end %>
+            <% end %>
+            <tr class="main_head">
+                <td><%= t('total') %></td>
+                <td class="set_border_right" align="right"><%= precision_label(total) %></td>
+            </tr>
+        </table>
+      <% end %>
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%= precision_label(@grand_total) %></label>
+      </div>
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "transport_fee", 
+                        :action => "transport_employee_department_wise_collection_report_csv", :id => params[:id],
+                        :start_date => @start_date, :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <% end %>
+</div>
+
+<script>
+
+  j('.date_box').hide();
+
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+
+</script>

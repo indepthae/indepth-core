@@ -1,0 +1,8 @@
+<%= select  :fees_submission, :dates_id, (@dates.present? ? @dates.map { |e| [e.full_name, e.id]} : []),
+            {:prompt => "#{t('select_fee_collection_date')}"},
+            {:onChange => "#{remote_function( :url =>
+                                                      {:action => "fee_collection_head_wise_report"},
+                                              :with => "'fee_collection_id='+value+'&batch_id='+($('fees_submission_batch_id').value)",
+                                              :before => "Element.show('loader1')",
+                                              :success => "Element.hide('loader1')")}"
+            } %>

@@ -1,0 +1,10 @@
+if @errors.present?
+  page.replace_html 'modal-box', :partial => 'edit'
+  page.replace_html 'form-errors', :partial => 'errors', :object => @category
+  page << "Modalbox.show($('modal-box'), {title: '#{t('update_category_title')}', width: 500});"
+elsif @saved.present?  
+  page.replace_html 'form-errors', :text => ''
+  page.replace_html "category_row_#{@category.id}", :partial => "category_row", :object => @category
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page << "Modalbox.hide();"
+end

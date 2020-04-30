@@ -1,0 +1,128 @@
+<% i=0 %>
+<% @inv_data["categorized_particulars"].each do |particular_type| %>
+  <% particular_type.last.each do |fp| %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>
+        <div class="particalar_name"><%= fp.name %></div>
+        <div class="particalar_amount"><%= precision_label fp.amount %></div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @fee.tax_enabled? and @inv_data["tax_slab_collections"].present? %>
+  <div class="subsection">
+      <div class="light_hor_line"></div>
+      <div id="sub_text_left"><%= t('tax_text') %></div>
+      <div id="sub_text_right"><%= t('amount') %> (<%= @inv_data["currency"] %>)</div>
+      <div class="light_hor_line"></div>
+      <div class="extender"></div>
+  </div>
+  <% i = 0 %>
+  <% @inv_data['tax_slab_collections'].each_pair do |slab, tax_collections| %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>
+        <div class="particalar_name">
+            <%= "#{slab.name} &#x200E;(#{precision_label(slab.rate)}%)&#x200E;" %>
+        </div>
+        <div class="particalar_amount">
+            <%= precision_label(tax_collections.map(&:tax_amount).sum.to_f) %>
+        </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% i=0 %>
+<% total_fine=0 %>
+<% if @inv_data["fine"].present? and @inv_data["fine"].to_f > 0.0 %>
+  <% if total_fine==0 %>
+    <div class="subsection">
+        <div class="light_hor_line"></div>
+        <div id="sub_text_left"><%= t('fine') %></div>
+        <div id="sub_text_right"><%= t('amount') %> (<%= @inv_data["currency"] %>)</div>
+        <div class="light_hor_line"></div>
+        <div class="extender"></div>
+    </div>
+  <% end %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name">
+          <%= t('fine_on') %> <%= format_date(Date.today) %>
+      </div>
+      <div class="particalar_amount">
+          <%= precision_label(@inv_data["fine"].to_f) %>
+          <% total_fine = total_fine + @inv_data["fine"].to_f %>
+      </div>
+  </div>
+  <% total_fees += @inv_data["fine"].to_f %>
+<% end %>
+
+<div class="subsection summary-line">
+    <div class="light_hor_line"></div>
+    <div id="sub_text_left"><%= t('summary') %></div>
+    <div id="sub_text_right">
+        <%= t('amount') %> (<%= @inv_data["currency"] %>)
+    </div>
+    <div class="light_hor_line"></div>
+    <div class="extender"></div>
+</div>
+<% i=0 %>
+<div class="particalars_list_item">
+    <div class="slno"><%= i+=1 %>.</div>
+    <div class="particalar_name">
+        <%= "#{t('total')} #{t('fees_text')}" %>
+    </div>
+    <div class="particalar_amount">
+        <%= precision_label(@inv_data["total_payable"]) %>
+    </div>
+</div>
+
+<% if @fee.tax_enabled? and @fee.tax_collections.present? %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('tax_text')}" %></div>
+      <div class="particalar_amount"><%= precision_label(@inv_data["total_tax"].to_f) %></div>
+  </div>
+<% end %>
+<% unless total_fine <= 0 and (@inv_data["fine"].blank? or @inv_data["fine"].to_f <= 0.0) %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('fine')}" %></div>
+      <div class="particalar_amount"><%= precision_label(total_fine) %></div>
+  </div>
+<% end %>
+
+<!-- <div class="subsection">
+  <div class="light_hor_line"></div>
+</div> -->
+
+<div class="receipt-footer-bottom">
+    <div class="left_info">        
+        <% if @fee.tax_enabled? and @fee.tax_collections.present? %>
+          <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+            <div class="left_info_label tax_label"><%= @tax_config[:finance_tax_identification_label] %></div>
+            <div class="left_info_value tax_label"><%= @tax_config[:finance_tax_identification_number] %></div>          
+          <% end %>
+        <% end %>
+    </div>
+
+    <div class="right_total">
+        <div class="right_total_label"><%= t('total_amount_to_pay') %></div>
+        <% total_fees = (@inv_data["total_payable"].to_f + total_fine) %>
+        <% if @fee.tax_enabled? and @fee.tax_collections.present? %>
+          <% total_fees += @inv_data['total_tax'].to_f %>
+        <% end %>
+        <div class="right_total_amount"><%= precision_label(total_fees) %></div>
+
+        <% total_due_amount = precision_label(total_fees-@inv_data["done_amount"].to_f) %>
+        <div class="right_total_label"><%= t('total_due_amount') %></div>
+        <div class="right_total_amount">
+            <%= total_due_amount %>
+        </div>
+
+        <div class="right_total_label"><%= t('total_amount_paid') %></div>
+        <div class="right_total_amount">
+            <%= precision_label(@inv_data["done_amount"]) %>
+        </div>
+
+    </div>
+</div>

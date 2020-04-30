@@ -1,0 +1,29 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('auto_credit_name') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_leave_credit').titleize %></div>
+  <% unless @leave_types.zero? %>
+    <div id="inner-tab-menu">
+      <ul>
+        <li class='themed_bg themed-dark-hover-background'>
+        <% if @config == "0" %><%= link_to "#{t('credit_leaves')}", :controller=>"employee_attendance", :action=>"credit_leaves" %> <% end %></li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+ <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h4><%= t('leave_credit_records') %></h4>
+
+  <div class="description"><%= t('leave_credit_log_description') %></div>
+
+  <div id="list"><%= render :partial => 'credit_logs'%></div>
+</div>

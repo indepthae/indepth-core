@@ -1,0 +1,22 @@
+<% unless @batches.empty? %>
+    <% @batches.each do |batch| %>
+        <div id="qn-<%= batch.id %>">
+
+
+          <div class="each-question student-link" id="<%= batch.id %>" >
+            <div class="question-box">
+              <%= "#{batch.full_name} " %>
+            </div>
+          </div>
+
+        </div>
+    <% end %>
+<% else %>
+    <div class="no-questions"><%= t("no_active_batches_found") %></div>
+<% end %>
+<script type="text/javascript">
+    if (j("#question-list").find(".selected").length == 0) {
+        j("#question-list").find(".each-question").first().addClass("selected");
+    }
+</script>
+

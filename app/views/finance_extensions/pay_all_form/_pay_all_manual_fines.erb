@@ -1,0 +1,66 @@
+<% if @temporary_manual_fines.present? or @multi_transaction_fines.present? %>
+  <tr class="row-a">
+      <td class="sl-col col-1"></td>                  
+      <td colspan="<%= fee_head_col_span + 1%>" class="instant_heading">
+          <%= t('fines') %>
+      </td>
+  </tr>
+<% end  %>
+<% fi = 0 %>
+<% if @temporary_manual_fines.present? %>  
+  <% @temporary_manual_fines.each_pair do |fee_type, fee_data| %>
+    <% fee_data.each_pair do |fee_id, fi_amt| %>
+      <% next if (fi_amt.is_a?(Hash) or fi_amt.to_f <= 0) %>
+      <tr class="row-b">
+          <td class="sl-col col-1">
+              <%= fi = fi.next %>
+          </td>
+          <td class="set_border_right padding_right_0" colspan="<%= @is_tax_present ? 4 : 3%>">
+              <%= t('fine_on') %>
+              <%= format_date(Date.today) %>
+              <% if fee_type.present? %>
+                <span class="discount-collection-details">                    
+                    <% if fee_type == "finance_fee" %>
+                      <% collection_name = FinanceFee.find(fee_id).finance_fee_collection.name %>                      
+                    <% elsif fee_type == "transport_fee" %>
+                      <% collection_name = TransportFee.find(fee_id).transport_fee_collection.name %>
+                    <% elsif fee_type == "hostel_fee" %>
+                      <% collection_name = HostelFee.find(fee_id).hostel_fee_collection.name %>
+                    <% end %>                    
+                    <%= "&rlm;(#{collection_name}&rlm;)"  %>
+                </span>
+              <% end %>
+          </td>
+          <td class="set_border_right align_right">
+              <% param = {:student_id => @student.id, :batch_id => params[:batch_id]} %>
+              <% if precision_label(@total_amount_to_pay).to_f != 0.to_f %>
+                <%= link_to_remote "#{t('remove')}", {:url => {:action => "delete_instant_pay_all_fine",
+                    :fee_type => fee_type, :fee_id => fee_id, :manual_fines => @temporary_manual_fines }.
+                    merge(param), :confirm => "#{t('delete_confirm_msg')}"}, {:class => "option_link" } %>
+              <% end %>
+          </td>
+          <td class="set_border_right">
+              <%= precision_label(fi_amt) %>
+          </td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>
+<% if @multi_transaction_fines.present? %>
+  <% @multi_transaction_fines.each do |mtf| %>
+    <tr class="row-b">
+        <td class="sl-col col-1">
+            <%= fi = fi.next %>
+        </td>
+        <td class="set_border_right padding_right_0" colspan="<%= @is_tax_present ? 4 : 3%>">
+            <%= t('fine_on') %>
+            <%= format_date(mtf.created_at.to_date) %>
+            <span class="discount-collection-details">                
+                <%= "&rlm;(#{mtf.name}&rlm;)"  %>
+            </span>
+        </td>
+        <td class="set_border_right align_right"></td>
+        <td class="set_border_right"><%= precision_label(mtf.amount) %></td>
+    </tr>
+  <% end %>
+<% end %>

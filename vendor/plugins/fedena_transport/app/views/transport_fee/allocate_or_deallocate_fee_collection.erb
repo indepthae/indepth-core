@@ -1,0 +1,151 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('transport_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{I18n.t('manage')} #{I18n.t('fee_collection')}" %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "finance/financial_year_info" %>
+    </div>
+  </div>
+  <div id='flash-div'>
+
+  </div>
+  <div class="select-type">
+    <div class="collection-select">
+      <label for="select_fee_collection"><%= "#{t('select')}:" %></label>
+
+      <div class="collection_operation_select">
+        <label class="label_for_student" for="student_gender" style="float: right">
+          <%= radio_button_tag('name', '', '', options = {:class => 'radio_btn_select', :id => 'collection_type'}) %>
+          <%= t('employee_text') %>
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :class => "loader_radio",
+                        :style => "display: none;") %>
+        </label>
+        <label class="label_for_student" for="student_gender">
+          <%= radio_button_tag('name', '', '', options={:class => 'radio_btn_select'}) %><%= t('student_text') %>
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :class => "loader_radio",
+                        :style => "display: none;") %>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div id="batch_or_department">
+    <%= render :partial => 'batches' %>
+  </div>
+
+  <div id="receivers"></div>
+</div>
+
+<script type="text/javascript">
+
+    function set_active() {
+        $$('.selected').each(function (e) {
+            e.removeClassName('selected');
+        });
+        this.addClassName('selected');
+    }
+
+    function draw_report() {
+        j('#right-panel-bottom').hide()
+        j('#right-panel-loader').show()
+        if (j(this).attr('receiver_type') == 'Student') {
+            batch_id = j('#current_batch_id').val();
+            new Ajax.Request('/transport_fee/list_fees_for_student',
+                    {
+                        asynchronous: true, evalScripts: true,
+                        parameters: 'receiver=' + this.id + '&batch_id=' + batch_id, onSuccess: function (request) {
+                        j('#flash-div').children().remove();
+                        j('#right-panel-bottom').show();
+                        j('#right-panel-loader').hide();
+                    }
+                    });
+        } else {
+            new Ajax.Request('/transport_fee/list_fees_for_employee',
+                    {
+                        asynchronous: true, evalScripts: true,
+                        parameters: 'receiver=' + this.id, onSuccess: function (request) {
+                        j('#flash-div').children().remove();
+                        j('#right-panel-bottom').show();
+                        j('#right-panel-loader').hide();
+                    }
+                    });
+        }
+    }
+
+    document.observe("dom:loaded", function () {
+        $$('.student-link').invoke('observe', 'click', draw_report);
+        $$('.student-link').invoke('observe', 'click', set_active);
+
+    });
+
+    j(document).delegate('.collection_check', 'click', function (e) {
+        colln_id = j(this).children('.collection_box').val();
+        if (j(this).children('.collection_box').prop('checked')) {
+            j('#user_' + colln_id).attr('disabled', false);
+            j('#event_' + colln_id).attr('disabled', false);
+        } else {
+            j('#user_' + colln_id).attr('disabled', true);
+            j('#event_' + colln_id).attr('disabled', true);
+        }
+    });
+
+    function validate_assign() {
+        var flag = 0;
+        $$('.collection_box').each(function (el) {
+            if (el.checked == true) {
+                flag = 1;
+            }
+        });
+
+        if (flag == 0) {
+            alert("<%#= "#{t('please_select_atleast_one_fee')}" %>");
+            return false;
+        } else
+            return true;
+    }
+
+    function receiver_type_change() {
+        if (j('#collection_type').prop("checked") == true) {
+            show_employee_details();
+        } else {
+            show_student_details();
+        }
+    }
+
+    j('.radio_btn_select').change(function () {
+        j('#collection_receipients_data').remove();
+        j(this).next().show();
+        receiver_type_change();
+    });
+
+    function show_employee_details() {
+        j.ajax({
+            url: '<%= url_for :action => "show_employee_departments"%>',
+            data: {},
+            dataType: 'script',
+            success: function () {
+                j('.loader_radio').hide();
+            }
+        });
+    }
+
+    function show_student_details() {
+        j.ajax({
+            url: '<%= url_for :action => "show_student_batches"%>',
+            data: {},
+            dataType: 'script',
+            success: function () {
+                j('.loader_radio').hide();
+            }
+        });
+    }
+
+</script>
+

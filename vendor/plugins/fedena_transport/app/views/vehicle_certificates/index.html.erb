@@ -1,0 +1,34 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport.vehicle_details') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('vehicle_certificates_text') %></div>
+    <% if permitted_to? :new , :vehicle_certificate_types %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('upload_certificate')}", new_vehicle_vehicle_certificate_path(@vehicle.id) %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= breadcrumb :vehicle_certificates_index, @vehicle %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('vehicle_certificates_description') %></div>
+    <div id ="addl_details_list">
+        <%= render :partial => 'vehicle_certificates' %>
+    </div>
+</div>
+<script type="text/javascript">
+  function delete_certificate(elm) {
+      j(elm).parent().find(".delete-certificate-field").val(true);
+      j(elm).parent().find(".prev-certificate").remove();
+      j(elm).remove();
+  }
+</script>
+

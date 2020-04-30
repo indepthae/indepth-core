@@ -1,0 +1,71 @@
+<div class="summary_section">
+  <div class="section_heading">
+    <%= t('subjects_text') %>
+  </div>
+  <div class="section_data">
+    <div class="section_row section_head_row">
+      <div class="section_column_1 heading">
+        <%= t('total_subjects') %>
+      </div>
+      <div class="section_column_2">
+        <%= @timetable_summary[:subjects][:total_count] %>
+      </div>
+      <div class="section_column_3"></div>
+    </div>
+    <% subject_total = @timetable_summary[:subjects][:total_count] %>
+    <div class="section_row has_tooltip">
+      <% completely_allocated_count = @timetable_summary[:subjects][:completely_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless completely_allocated_count.zero? %>
+          <%= link_to "#{t('completely_allocated')}", :controller=>"timetable",:action => 'batch_subject_utilization', :id => @timetable.id, :batch_id => @batch.id, :type => 2 %>              
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "subject_completely_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('completely_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{completely_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{subject_total.zero? ? '-' : (completely_allocated_count * 100)/subject_total}%" %>
+      </div>
+      <div class="notifier"><%= t('subjects_completely_allocated_info') %></div>
+    </div>
+    <div class="section_row has_tooltip">
+      <% partially_allocated_count = @timetable_summary[:subjects][:partially_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless partially_allocated_count.zero? %>
+          <%= link_to "#{t('partially_allocated')}", :controller=>"timetable",:action => 'batch_subject_utilization', :id => @timetable.id, :batch_id => @batch.id, :type => 1 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "subject_partially_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('partially_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{partially_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{subject_total.zero? ? '-' : (partially_allocated_count * 100)/subject_total}%" %>
+      </div>
+      <div class="notifier"><%= t('subjects_partially_allocated_info') %></div>
+    </div>
+    <div class="section_row has_tooltip">
+      <% not_allocated_count = @timetable_summary[:subjects][:not_allocated][:total] || 0 %>
+      <div class="section_column_1">
+        <% unless not_allocated_count.zero? %>
+          <%= link_to "#{t('not_allocated')}", :controller=>"timetable",:action => 'batch_subject_utilization', :id => @timetable.id, :batch_id => @batch.id, :type => 0 %>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "subject_not_allocated", :style =>"display: none;" ) %>
+        <% else %>
+          <%= t('not_allocated') %>
+        <% end %>
+      </div>
+      <div class="section_column_2">
+        <%= "#{not_allocated_count}" %>
+      </div>
+      <div class="section_column_3">
+        <%= "#{subject_total.zero? ? '-' : (not_allocated_count * 100) / subject_total}%" %>
+      </div>
+      <div class="notifier"><%= t('subjects_not_allocated_info') %></div>
+    </div>
+  </div>
+</div>

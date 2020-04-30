@@ -1,0 +1,38 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('library_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('manage_barcode')}"%></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><span><%= flash[:warn_notice] %> </span></div>
+  <% end %>
+  <div class="search_form">
+    <% remote_form_for :search, :url=>{:controller=>'books', :action=>'manage_barcode'}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+      <div class="label-field-pair" id="filter_select">
+        <label for="search_by" id="search_label_on_manage_barcode"><%= "#{t('search_by')}"%></label>
+        <div class="text-input-bg">
+          <%= f.select :search_by,   [["#{t('book_number')}",'Book Number'],["#{t('title')}",'title'], ["#{t('tag')}",'tag'], ["#{t('author')}",'author']] %>
+        </div>
+      </div>
+      <div class="label-field-pair" id="search_box">
+        <div class="text-input-bg">
+          <%= f.text_field :name %>
+        </div>
+      </div>
+
+      <%= f.submit "#{t('search_text')}",:disable_with => "► #{t('please_wait')}",  :class => "submit_button1", :id => "submit_button" %>
+    <% end %>
+  </div>
+  <div id="book-list" class="books">
+
+  </div>
+</div>

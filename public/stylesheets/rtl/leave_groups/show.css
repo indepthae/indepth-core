@@ -1,0 +1,272 @@
+/*Header*/
+#group_details{
+    float: right;
+    width: 75%;
+    margin-bottom: 20px;
+}
+#group_status{
+    float: right;
+    width: 25%;
+    margin-bottom: 20px;
+}
+.fields-details {
+    float: right;
+    width: 100%;
+    font-weight: normal;
+    font-size: 14px;
+    color: #444;
+    margin: 10px 0;
+}
+.field-label {
+    float: right;
+    max-width: 200px;
+    min-width: 100px;
+    color: #8C8C8C; 
+}
+.fields-val {
+    float: right;
+    max-width: 600px;
+    margin-right: 10px;
+}
+#group_name{ font-size: 16px;}
+hr {
+    border: 1px solid #cccccc;
+    border-bottom: 0px;
+    width: 980px;
+    float: right;
+}
+.add-link, #page-yield .add-link:hover {
+    color: black !important;
+    font-size: 13px;
+    margin-right: 20px;
+}
+#description {
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+}
+
+/*Popup box style*/
+#popup_window
+{
+    width: 690px;
+    top: 40px;
+    float: right;
+}
+.remove_lt{ width: 480px !important;}
+#popup_frame .part {
+    width: 610px;
+}
+.remove_lt .part{ width: 400px !important;}
+#popup_content #description{ margin-top : 0px}
+#popup_content .label-field-pair{
+    float: right;
+    width: 100%;
+    margin-bottom: 20px;
+}
+#popup_content .label-field-pair label { 
+    width: 100%; 
+    margin-bottom: 10px;
+}
+#popup_content .text-input-bg input{
+    margin-right: 0;
+    -webkit-border-radius: 0;
+    width: 400px;
+}
+#popup_content .text-input-bg textarea{
+    resize: none;
+    -webkit-border-radius: 0;
+    width: 400px;
+    height: 60px;
+}
+#popup_content{
+    padding-right: 0px !important ;
+    padding-left: 0px !important;
+}
+.remove_lt #popup_content{
+    padding: 20px 40px !important;
+    width: 400px !important;
+    border-bottom: 0px;
+}
+#popup_footer{
+    padding-right: 40px;
+    padding-left: 40px;
+    border-top: 1px solid #c6c6c6;
+    float: right;
+    width: 610px;
+    padding-top: 20px;
+}
+#leave_group_form{
+    float: right;
+    padding-right: 40px;
+    padding-left: 40px;
+}
+#popup_content{width: 690px !important;}
+.fieldWithErrors textarea{border: 1px solid #9c0000 !important;}
+.wrapper {
+    margin-top: 5px;
+    margin-right: 0 !important;
+}
+
+/*Content*/
+#left, #right{
+    width: 450px;
+    float: right;
+    margin-top: 30px;
+}
+#right{
+    margin-right: 80px;
+}
+#header{
+    font-weight: bold;
+    font-size: 16px;
+    color: #444;
+}
+#left #header, #right #header{
+    width: 50%;
+    float: right
+}
+#left table, #right table{
+    margin-top: 20px;
+}
+#left table a, #left table a:hover, #right table a, #right table a:hover{
+    color: black !important;
+    text-decoration: none;
+}
+td.type_name{width: 23%;}
+td.type_count{width: 10%;}
+td.action{width: 13%;}
+
+#left .add-link, #right .add-link{float: left;text-decoration: none;}
+.blank-div{
+    float: right;
+    width: 248px;
+    height: 50px;
+    border: 1px solid #ccc;
+    color: #444;
+    font-size: 13px;
+    background: #f0f0f0;
+    padding: 175px 100px;
+    text-align: center;
+    margin-top: 20px;
+}
+table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+  //  overflow: auto;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+    float: right;
+    border-collapse: collapse;
+    /* border-bottom: 0px; */
+}
+#page-yield table .tr-head {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+}
+tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+tr:last-child{ border: 0px;}
+td {
+    padding: 10px;
+    border-left: 1px solid #bfbfbf;
+}
+td.check_all{width: 5%;}
+td.lev_name{width: 50%;}
+td.lev_count{width: 35%;}
+td.lev_count input.leave_count{width: 70px;}
+td.lev_count .fieldWithErrors{ float: right}
+td.lev_count .wrapper{min-width: 15px !important;margin: 3px 10px 0 0;}
+td.lev_count .error-icon{ margin-right: 19px}
+#popup_content ::-webkit-scrollbar, #left ::-webkit-scrollbar, #right ::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+    border: 0px;
+}
+#popup_content ::-webkit-scrollbar-track, #left ::-webkit-scrollbar-track, #right ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+}
+#popup_content ::-webkit-scrollbar-thumb, #left ::-webkit-scrollbar-thumb, #right ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#popup_content ::-webkit-scrollbar-thumb:hover, #left ::-webkit-scrollbar-thumb:hover, #right ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#popup_content ::-webkit-scrollbar, #left ::-webkit-scrollbar, #right ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#popup_content ::-webkit-scrollbar-track, #left ::-webkit-scrollbar-track, #right ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#popup_content ::-webkit-scrollbar-thumb, #left ::-webkit-scrollbar-thumb, #right ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+.update_credit_checkbox{}
+.update_credit_lebal{
+    font-size: 14px;
+    padding: 5px;
+    margin: 11px 0px 15px 0px;
+}
+.update_credit_hint{
+    margin: 10px 0px 18px 10px;
+    font-size: 13px;
+    color: grey;
+}
+.fieldWithErrors .tooltip_info {
+    width: 140px !important;
+    margin: 7px 4px 1px 6px !important;
+}
+.tooltip_info2 {
+    background: url(/images/iconsprite-1.png) no-repeat -63px -85px;
+    float: left;
+    width: 13px;
+    height: 13px;
+    -webkit-margin-start: 11px;
+    -webkit-margin-end: 115px;
+    -webkit-margin-before: 4px;
+    -webkit-margin-after: 3px;
+
+    -moz-margin-end : 100px;
+    -moz-margin-start : 10px;
+    -moz-margin-after : 20px;
+    -moz-margin-before : 20px;
+   margin: 7px 4px 5px 105px;
+    font-weight: normal !important;
+}
+.lev_count .tooltip_info {
+    width: 240px;
+    padding: 5px;
+    top: 100%;
+    display: inline-block;
+    margin: 2px 0px 5px 50px;
+    z-index: 254;
+    left: 0;
+    position: absolute;
+    background: #FFFFFF;
+    border: 1px solid #B2B2B2;
+    pointer-events: none;
+    color: #000000;
+    text-align: right;
+    font-size: 13px;
+    font-weight:normal;
+}
+.lev_count .tooltip_wrapper {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    width: auto;
+    color: #999;
+}
+.tooltip_info:after {
+    border-bottom-color: #fff;
+}

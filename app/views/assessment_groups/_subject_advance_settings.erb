@@ -1,0 +1,25 @@
+<% if @course_subjects.present? %>
+  <%= link_to_function t('show_advance_settings'), "toggle_settings(this);",:class=>"toggle_settings_link"%>
+  <div id="description1" class="override_exam"><%#= t('skip_subjects_desc') %></div>
+  <div class="override_exam container" style="display: none;">
+      <div class="header"><%= t('override_exam_max_marks') %></div>
+      <div class="override_exam" id="description"><%= t('skip_subjects_desc_2') %></div>
+      <div id="subject_list">
+        <%= render :partial => 'skip_subject_list', :locals => {:g =>g} %>
+      </div>
+      <% if @assessments_created %>
+        <div class="warning danger"><%= t('subject_advance_settings_override_warning') %></div>
+      <% end %>
+  </div>
+<% end %>
+<script type="text/javascript">
+    toggle_settings = function(el){
+      j('.override_exam.container').slideToggle(function(){
+        if(j('.override_exam.container').is(':visible')){
+          j(el).text('<%= t('hide_advance_settings') %>')
+        }else{
+          j(el).text('<%= t('show_advance_settings') %>')
+        }
+      });
+    }
+</script>

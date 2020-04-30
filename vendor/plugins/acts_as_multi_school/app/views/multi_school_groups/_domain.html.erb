@@ -1,0 +1,26 @@
+<fieldset>
+  Assigned Domains
+  <br/>
+  <span id="message_div" class="validation-error"><%= @message %></span>
+</fieldset>
+<div id="domains">
+  <% @multi_school_group.school_domains.each do |d| %>
+    <fieldset>
+      <label>
+        <%= link_to d.domain,"http://#{d.domain}", :target=>"_blank" %>
+      </label>
+      <%= link_to_remote 'Delete', :update=>:detail_list, :url=> delete_domain_multi_school_group_path(@multi_school_group,:domain_id=>d.id), :method=>:get, :html=>{:class=>"button-grey-small float-right-with-margin"} if permitted_to? :delete_domain, @multi_school_group, :context=>:multi_school_groups %> <br/>
+
+    </fieldset>
+  <% end %>
+</div>
+<% if permitted_to? :add_domain, @multi_school_group, :context=>:multi_school_groups %>
+  <% form_remote_for :add_domain,:url=>{:action=>"add_domain"},:html => {:class => 'form'} do |f| %>
+    <fieldset>
+      <%= f.label :domain,'Add a new domain' %>
+      <%= f.text_field :domain %><label>(company.com/company.domain.com)</label>
+
+      <%= f.submit "Add", :class=>"button-grey-small float-right-with-margin margin-top-5",:disable_with => "Please wait..." %>
+    </fieldset>
+  <% end %>
+<% end %>

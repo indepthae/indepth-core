@@ -1,0 +1,70 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+      <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20">
+    <h1 class="content-head">Templates</h1>
+    <% unless @templates.empty? %>
+      <%= link_to 'Reload All', reset_gradebook_templates_path, :class  => 'button-red float-right'%>
+    <% end %>
+</fieldset>
+<div class="content-div container-width">
+    <div class='content-list'>
+        <% unless @templates.empty? %>
+          <% @templates.each do |template| %>
+            <fieldset class="bg-light grey-border shadow" id="<%= template.name %>">
+                <%= render :partial => 'template_list',:locals => {:template => template} %>
+            </fieldset>
+          <% end %>
+        <% else %>
+          <fieldset class="bg-light grey-border shadow">
+              <label>No Templates found.</label>
+          </fieldset>
+        <% end %>
+    </div>
+</div>
+
+<script type="text/javascript">
+  var q = jQuery.noConflict();
+  function add_reset_template(name)
+  {
+      q.ajax({
+          type: 'POST',
+          url: '/gradebook_templates/reset',
+          data: {
+              name: name
+          },
+          beforeSend: function () {
+              q('#add-loader-' + name).show();
+          },
+          success: function (data) {
+              q('#add-loader-' + name).hide();
+              q('#' + name).fadeOut();
+              q('#' + name).fadeIn();
+          }
+
+      });
+  }
+
+  function activate_template(flag, name) {
+      q.ajax({
+          type: 'POST',
+          url: '/gradebook_templates/activate',
+          data: {
+              name: name,
+              activate: flag
+          },
+          beforeSend: function () {
+              q('#add-loader-' + name).show();
+          },
+          success: function (data) {
+              q('#add-loader-' + name).hide();
+              q('#' + name).fadeOut();
+              q('#' + name).html(data);
+              q('#' + name).fadeIn();
+          }
+
+      });
+  }
+</script>

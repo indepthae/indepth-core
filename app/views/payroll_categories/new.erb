@@ -1,0 +1,70 @@
+<% unless rtl? %>
+  <%= stylesheet_link_tag ("payroll_categories/formulas") %>
+<% else %>
+  <%= stylesheet_link_tag ("rtl/payroll_categories/formulas") %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('hr_management') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('create_payroll_category').titleize %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <h3><%= t('create_payroll_category') %></h3>
+
+  <% form_for @category do |c| %>
+    <%= render :partial => 'category_form', :locals => {:c => c} %>
+    <hr/>
+    <%=submit_tag "#{t('create_payroll_category')}", :class => "submit-button", :onclick=>"return validate_round_off()"  %>
+  <% end %>
+  <%= link_to t('cancel'), payroll_categories_path, :class => "submit-button", :id => "cancel-link" %>
+</div>
+
+
+<script type ="text/javascript">
+  function render_formula_partial(elm, object_name)
+  {
+    new Ajax.Request('/payroll_categories/hr_formula_form',{
+      parameters:{'formula_type': elm.value, 'object_name' : object_name, 'object_id' : '<%= @category.id %>', 'object_type' : '<%= @category.class %>'},
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onLoading: function(){
+        j("#loader").show();
+      },
+      onComplete:function(resp){
+        j('#fields').html(resp.responseText);
+        if((elm.value == "3") || (elm.value == "2"))
+        {
+          j('.formula_help').show();
+          set_tab_height();
+        }
+        else
+          j('.formula_help').hide();
+        j("#loader").hide();
+      }
+    });
+  }
+
+  function remove_fields(link){
+    $(link).previous("input[type=hidden]").value='1';
+  }
+  function validate_round_off(){
+    if((j('#_to_round_up').is(":checked")) && (j("#payroll_category_round_off_value").val()=="")){
+      alert("Rounding off is enabled.Please select an option for round up");
+      return false;
+  }
+    else
+      return true;
+  }
+
+    
+</script>

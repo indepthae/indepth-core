@@ -1,0 +1,27 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('vehicle_certificate_settings') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('vehicle_certificate_types') %></div>
+    <% if permitted_to? :new , :vehicle_certificate_types %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_details')}", :url => {:controller => "vehicle_certificate_types", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('vehicle_certificate_types_description') %></div>
+    <div id ="addl_details_list">
+        <%= render :partial => 'vehicle_certificate_types' %>
+    </div>
+</div>
+

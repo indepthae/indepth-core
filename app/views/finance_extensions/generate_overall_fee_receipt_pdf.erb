@@ -1,0 +1,334 @@
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/finance_extensions/generate_overall_fee_receipt_pdf.css', :media => "all" %>
+  <% else %>
+    <%= stylesheet_link_tag 'finance_extensions/generate_overall_fee_receipt_pdf.css', :media => "all" %>
+  <% end %>
+<% end %>
+<% @transactions.each do |template, transactions| %>
+
+  <% total_fees =0 %>  
+  <% if (template.present? and @templates.has_key?(template.to_i)) %>
+
+    <%= render :partial => "receipt_templates/receipt_header", 
+      :locals => {:header_content => @templates[template.to_i].try(:last).header_content_for_pdf }%>
+
+  <% else %>    
+    <div id="pdf-header">
+        <div class="logo">
+            <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+        </div>
+        <div class="header-content" 
+             style='text-align:<%= @config[:pdf_receipt_halignment].present? ? "#{@config[:pdf_receipt_halignment]}" : "left" %>;'>
+            <p><%=Configuration.get_config_value('InstitutionName'); %></p>
+            <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+        </div>  
+    </div>
+  <% end %>
+  <div id="page-yield">
+      <% overall_summary = @overall_receipt.fetch_fees_summary %>
+      <% transaction_ledger_entry = overall_summary.transaction_ledger %>
+      <div id="overall-receipt-box">
+          <div class="top">
+              <% if transaction_ledger_entry.transaction_mode == 'SINGLE' %>
+                <span class="title_top"><%= t('overall_receipt') %></span>
+                <span class="receipt_no">
+                    <%= t('receipt_no') %>:<%= transaction_ledger_entry.receipt_no %>
+                </span>
+                <span class="date_top"><%= t('date_text') %>
+                    <%= ": #{format_date(overall_summary.transaction_date, :format => :short_date)}" %>
+                </span>
+              <% else %>
+                <span class="margin-set-left-right title bold title font-size-13 recipt_name">
+                    <%= t('overall_receipt') %>
+                </span>
+                <span class="margin-set-left-right date fright date_recipt">
+                    <%= t('date_text') %>
+                    <%= ": #{format_date(overall_summary.transaction_date, :format => :short_date)}" %>
+                </span>              
+              <% end %>            
+          </div>
+          <hr class="hor_line"/>
+          <div class="extender"></div>
+          <div id="basic_info_section" class="width800 margin-set-left-right">
+
+              <div class="left-box fleft width400">
+                  <div class="label_part fleft width150"><%= t('student_name') %></div>
+                  <div class="value_part fleft width250 bold"><%= @student.full_name %></div>
+                  <div class="label_part fleft width150"><%= t('admission_no') %></div>
+                  <div class="value_part fleft width250"><%= @student.admission_no %></div>
+                  <% if roll_number_enabled? %>
+                    <div class="label_part fleft width150"><%= t('roll_no') %></div>
+                    <div class="value_part fleft width250"><%= @student.roll_number %></div>
+                  <% end %>
+              </div>
+              <div class="width90"></div>
+              <div class="right-box  fright width360">
+                  <div class="label_part fleft width90">
+                      <%= t('course_text') %>
+                  </div>
+                  <div class="value_part fleft width200">
+                      <div class="fleft margin-left20"><%= @current_batch.course.full_name %></div>
+                  </div>
+                  <div class="label_part fleft width90">
+                      <%= t('batch') %>
+                  </div>
+                  <div class="value_part fleft width200">
+                      <div class="fleft margin-left20"><%= @current_batch.full_name %></div>
+                  </div>
+                  <% if @student.guardian_name.present? %>
+                    <div class="label_part fleft width90" style="height:auto">
+                        <%= t('parent') %>
+                    </div>
+                    <div class="value_part fleft width200">
+                        <div class="fleft margin-left20 width250"><%= @student.guardian_name %></div>
+                    </div>
+                  <% end %>
+              </div>
+
+
+          </div>
+          <div class="extender">
+          </div>
+          <table class="width800 margin-top30">
+              <% paid_collections=@overall_receipt.fetch_collection_details %>
+              <% is_tax_enabled = paid_collections.map {|x| x.tax_enabled.to_i}.include?(1) %>            
+              <% is_invoice_enabled = @invoice_enabled and paid_collections.map {|x| x.invoice_enabled.to_i}.include?(1) %>            
+              <% @tax_config = Configuration.get_multiple_configs_as_hash(['FinanceTaxIdentificationLabel',
+                  'FinanceTaxIdentificationNumber']) if is_tax_enabled %>
+              <tr class="main_section">
+                  <% if transaction_ledger_entry.transaction_mode == 'MULTIPLE' %>
+                    <td class="border-left-none"><%= t('receipt_no') %></td>
+                    <% if is_invoice_enabled %>
+                      <td class=""><%= t('invoice_no') %></td>
+                    <% end %>
+                    <td class="width250"><%= t('fee_collection') %></td>
+                  <% else %>
+                    <% if is_invoice_enabled %>
+                      <td class="border-left-none"><%= t('invoice_no') %></td>
+                    <% end %>
+                    <td class="width250 border-left-none"><%= t('fee_collection') %></td>                  
+                  <% end %>
+                  <td><%= t('due_date') %></td>
+                  <td><%= "#{t('actual_amount_with_fine')} &#x200E;(#{currency}) &#x200E;" %></td>
+                  <% if is_tax_enabled %>
+                    <td><%= "#{t('tax_text')} &#x200E;(#{currency}) &#x200E;" %></td>
+                  <% end %>
+                  <td> <%= "#{t('transaction_amount')}  &#x200E;(#{currency}) &#x200E;" %></td>
+                  <td class="border-right-none"> <%= "#{t('due_amount')} &#x200E;(#{currency}) &#x200E;" %></td>
+              </tr>
+              <% total_amount_to_pay=0 %>
+              <% total_due_after_payment=0 %>
+              <% total_amount_paid=0 %>
+              <% paid_collections.each_with_index do |collection_detail, i| %>
+                <% if (i+1)==paid_collections.length %>
+
+                  <tr class="td-border-top-none">
+                    <% else %>
+                  <tr class="td-border-none">
+                    <% end %>
+
+                    <% if transaction_ledger_entry.transaction_mode == 'MULTIPLE' %>
+                      <td class="border-left-none"><%= collection_detail.receipt_no %></td>
+                      <% if is_invoice_enabled %>
+                        <td class="">
+                            <%= (collection_detail.invoice_enabled.to_i == 1) ? collection_detail.invoice_number : "" %>
+                        </td>
+                      <% end %>
+                      <td class="width250"><%= collection_detail.fee_collection_name %></td>
+                    <% else %>                    
+                      <% if is_invoice_enabled %>
+                        <td class="border-left-none">
+                            <%= (collection_detail.invoice_enabled.to_i == 1) ? collection_detail.invoice_number : "" %>
+                        </td>
+                      <% end %>
+                      <td class="width250 border-left-none"><%= collection_detail.fee_collection_name %></td>
+                    <% end %>
+
+                    <td class="width90"><%= format_date(collection_detail.due_date, :format => :short_date) %></td>
+
+                    <% fine_details = @overall_receipt.automatic_finance_fee_fine(@current_batch.id,
+                      collection_detail.finance_id,collection_detail.transaction_id,
+                      collection_detail.transaction_date) %>                  
+
+                    <%  manual_fine_amount = fine_details.try(:all_paid_fine_amount).to_f - 
+                      fine_details.try(:auto_paid_fine).to_f%>
+
+                    <% actual_amount = collection_detail.balance.to_f + 
+                      collection_detail.balance_addition_actual_amount.to_f + 
+                      fine_details.try(:fine_amount).to_f + manual_fine_amount.to_f %>                                    
+
+                    <td class="amount-alignment-style"><%= precision_label(actual_amount) %></td>
+
+                    <% if is_tax_enabled %>
+                      <td class="amount-alignment-style">
+                          <%= precision_label(collection_detail.tax_amount) %>
+                      </td>                  
+                    <% end %>
+
+                    <% total_amount_to_pay+=actual_amount %>
+
+                    <td class="bold amount-alignment-style">
+                        <%= precision_label collection_detail.transaction_amount %>
+                    </td>
+
+                    <% total_amount_paid += collection_detail.transaction_amount.to_f %>
+
+                    <% due_amount = collection_detail.balance.to_f + 
+                      collection_detail.balance_addition_due_amount.to_f + 
+                      fine_details.try(:fine_amount).to_f - 
+                      fine_details.try(:auto_paid_fine).to_f %>
+
+                    <td class="border-right-none amount-alignment-style">
+                        <%= precision_label due_amount%>
+                    </td>
+
+                    <% total_due_after_payment += due_amount %>
+                </tr>
+              <% end %>
+          </table>
+          <div class="extender">
+          </div>
+          <div class="break_page">
+              <div class="break_page width800 margin-set-left-right ">
+
+                  <div class="left-box fleft width100">
+                      <div class="label_part fleft width150 width100key">
+                          <%= t('payment_mode') %>
+                      </div>
+                      <div class="value_part fleft width250 bold width100val">
+                          <%= overall_summary.payment_mode %>
+                      </div>
+                      <% if overall_summary.reference_no.present? %>
+                        <% reference_text=get_payment_mode_text(overall_summary.payment_mode) %>
+                        <div class="label_part fleft width150 width100key">
+                            <%= reference_text %>
+                        </div>
+                        <div class="value_part fleft width250 width100val">
+                            <%= overall_summary.reference_no %>
+                        </div>
+                        <% if overall_summary.payment_mode == "Cheque" %>
+                          <!-- cheque date -->
+                          <div class="label_part fleft width150 width100key">
+                              <%= t('cheque_date') %>
+                          </div>
+                          <div class="value_part fleft width250 width100val">
+                              <%= overall_summary.cheque_date %>
+                          </div> 
+                          <!-- bank name -->
+                          <div class="label_part fleft width150 width100key">
+                              <%= t('bank_name') %>
+                          </div>
+                          <div class="value_part fleft width250 width100val">
+                              <%= overall_summary.bank_name %>
+                          </div> 
+                        <% end %>
+                      <% end %>
+
+                      <% cashier = overall_summary.cname.nil? ? '' : 
+                        (overall_summary.payment_mode=='Online Payment' ? 
+                          f_cashier_name(overall_summary.usersid) : overall_summary.cname) %>
+                      <% if cashier.present? %>
+                        <div class="label_part fleft width150 width100key">
+                            <%= t('cashier') %>
+                        </div>
+                        <div class="value_part fleft width250 width100val">
+                            <%= cashier %>
+                        </div>
+                      <% end %>
+                      <% if overall_summary.payment_note.present? %>
+                        <div class="label_part fleft width150 width100key"><%= t('notes') %></div>
+                        <div class="value_part fleft width250 remarks width100val">
+                            <%= overall_summary.payment_note %>
+                        </div>
+                      <% end %>
+                      <% if is_tax_enabled %>
+                        <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+                          <div class="label_part fleft width150 width100key">
+                              <%= @tax_config[:finance_tax_identification_label] %>
+                          </div>
+                          <div class="value_part fleft width250 width100val">
+                              <%= @tax_config[:finance_tax_identification_number] %>
+                          </div>
+                        <% end %>
+                      <% end %>
+                  </div>
+
+  <%#*<div class="right-box fright width400">%>
+  <%#*<div class="label_part fleft margin-left20 width200">%>
+  <%#*<div class="margin-left20"> <%#= t('total_amount_to_pay_with_fine') %>
+  <%#*</div>%>
+  <%#*</div>%>
+  <%#*<div class="value_part fright margin-right20 width150">%>
+  <%#*<div class="fright bold amount-adjust">  <%#= "#{precision_label total_amount_to_pay} " %>
+  <%#*</div>%>
+  <%#*</div>%>
+  <%#*<div class="label_part fleft margin-left20 width200">%>
+  <%#*<div class="margin-left20"><%#= t('total_due_after_payment') %>
+  <%#*</div>%>
+  <%#*</div>%>
+  <%#*<div class="value_part fright margin-right20 width150">%>
+  <%#*<div class="fright bold amount-adjust"> <%#= "#{precision_label(total_due_after_payment)}" %>
+  <%#*</div>%>
+  <%#*</div>%>
+
+  <%#*</div>%>
+
+
+              </div>
+              <div class="extender">
+              </div>
+              <hr class="hor_line"/>
+              <div class="top_pay">
+                  <% show_amount_in_words = (@config[:pdf_receipt_atow].present? and 
+                      @config[:pdf_receipt_atow]=="1") %>
+                  <% if rtl? %>
+                    <% if show_amount_in_words %>
+                      <div class="amount-paid-left">
+                          <span class="amount_in_words"><%=t('amount_in_words')%></span> : 
+                          <%= NumberToWord.convert(precision_label(total_amount_paid), @config[:pdf_receipt_nsystem], @default_currency) %>
+                      </div>
+                    <% end %>
+                    <div class="amount-paid-right">
+                        <span class="bold margin-right20 font-size-13 fright margin-set-left-right amount-style">
+                            <div class="fleft margin-right5 font-size-13">
+                                <%= currency %>
+                            </div>
+                            <%= " &#x200E;#{precision_label total_amount_paid} " %></span>
+                        <span class="bold title font-size-13 margin-right20 fright " style="white-space: nowrap;">
+                            <%= t('total_amount_paid') %> 
+                        </span>
+                    </div>
+                  <% else %>
+                    <% if show_amount_in_words %>
+                      <div class="amount-paid-left">
+                          <span style="font-weight: bold;"><%=t('amount_in_words')%></span> : 
+                          <%= NumberToWord.convert(precision_label(total_amount_paid), @config[:pdf_receipt_nsystem], @default_currency) %>
+                      </div>
+                    <% end %>
+                    <div class="amount-paid-right">
+                        <span class="bold font-size-13 total_amount_title" style="white-space: nowrap;">
+                            <%= t('total_amount_paid') %> 
+                        </span>
+                        <span class="bold font-size-13 total_amount">
+                            <%= currency %><%= " #{precision_label total_amount_paid} " %>
+                        </span>
+                    </div>
+                  <% end %>
+
+
+              </div>
+          </div>
+      </div>
+
+      <div id="pdf-footer-second">
+          <div class="note_part"><%= @config[:pdf_receipt_custom_footer] %></div>    
+          <div class="signature_part">
+              <% if @config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1" %>
+                <%= @config[:pdf_receipt_signature_name].blank? ? t('signature') :  @config[:pdf_receipt_signature_name] %>
+              <% end %>
+          </div>
+      </div>
+  </div>
+  <div class="page-break"></div>
+<% end %>

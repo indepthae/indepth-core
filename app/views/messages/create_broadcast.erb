@@ -1,0 +1,389 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<script>
+  function add_recipient(recipient) {
+    var recipient_list = new Array();
+    if($('recipients_employees').value != '')
+      recipient_list = $('recipients_employees').value.split(',');
+    else
+      recipient_list = [];
+
+    var recipient_exists = false;
+
+    for(i=0; i<recipient_list.length; i++)
+      if(recipient_list[i] == recipient)
+        recipient_exists = true;
+
+    if(!recipient_exists) {
+      recipient_list.push(recipient);
+    }
+    $('recipients_employees').value = recipient_list.join();
+    recipients = $('recipients_employees').value;
+
+<%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients_employees='+recipients" ) %>
+  }
+  function add_recipient1(recipient) {
+    var recipient_list = new Array();
+    if($('recipients_students').value != '')
+      recipient_list = $('recipients_students').value.split(',');
+    else
+      recipient_list = [];
+
+    var recipient_exists = false;
+
+    for(i=0; i<recipient_list.length; i++)
+      if(recipient_list[i] == recipient)
+        recipient_exists = true;
+
+    if(!recipient_exists) {
+      recipient_list.push(recipient);
+    }
+    $('recipients_students').value = recipient_list.join();
+    recipients = $('recipients_students').value;
+<%= remote_function(:url => {:action => 'update_recipient_list1'}, :with => "'recipients_students='+recipients" ) %>
+  }
+  function add_recipient2(recipient) {
+    var recipient_list = new Array();
+    if($('recipients_parents').value != '')
+      recipient_list = $('recipients_parents').value.split(',');
+    else
+      recipient_list = [];
+
+    var recipient_exists = false;
+
+    for(i=0; i<recipient_list.length; i++)
+      if(recipient_list[i] == recipient)
+        recipient_exists = true;
+
+    if(!recipient_exists) {
+      recipient_list.push(recipient);
+    }
+    $('recipients_parents').value = recipient_list.join();
+    recipients = $('recipients_parents').value;
+<%= remote_function(:url => {:action => 'update_recipient_list2'}, :with => "'recipients_parents='+recipients" ) %>
+  }
+
+  function add_all_recipient(recipient) {
+    insert_all_employees(recipient)
+    recipients = $('recipients_employees').value;
+<%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients_employees='+recipients" ) %>
+  }
+  function insert_all_employees(recipient) {
+    var recipient_list = new Array();
+    if($('recipients_employees').value != '')
+      recipient_list = $('recipients_employees').value.split(',');
+    else
+    recipient_list = [];
+    var new_list = recipient.split(',');
+    for(i=0;i<new_list.length;i++)
+    {
+      var recipient_exists = false;
+      for(var j=0; j<recipient_list.length; j++)
+        if(recipient_list[j] == new_list[i])
+          recipient_exists = true;
+      if(!recipient_exists) recipient_list.push(new_list[i]);
+    }
+    $('recipients_employees').value = recipient_list.join();
+  }  
+  function add_all_recipient1(recipient) {
+    insert_all_students(recipient)
+    recipients = $('recipients_students').value;
+<%= remote_function(:url => {:action => 'update_recipient_list1'}, :with => "'recipients_students='+recipients" ) %>
+  }
+  function insert_all_students(recipient){
+    var recipient_list = new Array();
+    if($('recipients_students').value != '')
+      recipient_list = $('recipients_students').value.split(',');
+    else
+      recipient_list = [];
+
+    var new_list = recipient.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var recipient_exists = false;
+      for(var j=0; j<recipient_list.length; j++)
+        if(recipient_list[j] == new_list[i])
+          recipient_exists = true;
+      if(!recipient_exists) recipient_list.push(new_list[i]);
+    }
+
+    $('recipients_students').value = recipient_list.join();
+  }
+  function add_all_recipient2(recipient) {
+    insert_all_parents(recipient)
+    recipients = $('recipients_parents').value;
+<%= remote_function(:url => {:action => 'update_recipient_list2'}, :with => "'recipients_parents='+recipients" ) %>
+  }
+  
+  function insert_all_parents(recipient){
+        var recipient_list = new Array();
+    if($('recipients_parents').value != '')
+      recipient_list = $('recipients_parents').value.split(',');
+    else
+      recipient_list = [];
+
+    var new_list = recipient.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var recipient_exists = false;
+      for(var j=0; j<recipient_list.length; j++)
+        if(recipient_list[j] == new_list[i])
+          recipient_exists = true;
+      if(!recipient_exists) recipient_list.push(new_list[i]);
+    }
+
+    $('recipients_parents').value = recipient_list.join();
+  }
+  function remove_recipient(recipient) {
+    recipients = $('recipients_employees').value;
+    var recipient_list = new Array();
+    recipient_list = $('recipients_employees').value.split(',');
+
+    for(i=0; i<recipient_list.length; i++)
+      if (recipient_list[i] == recipient)
+    {
+      recipient_list.splice(i,1);
+      break;
+    }
+
+    $('recipients_employees').value = recipient_list.join();
+    recipients = $('recipients_employees').value;
+    set_employee_count();
+    <%= remote_function(:url => {:action => 'update_recipient_list'}, :with => "'recipients_employees='+recipients" ) %>
+  }
+  function remove_recipient2(recipient) {
+    recipients = $('recipients_parents').value;
+    var recipient_list = new Array();
+    recipient_list = $('recipients_parents').value.split(',');
+
+    for(i=0; i<recipient_list.length; i++)
+      if (recipient_list[i] == recipient)
+    {
+      recipient_list.splice(i,1);
+      break;
+    }
+
+    $('recipients_parents').value = recipient_list.join();
+    recipients = $('recipients_parents').value;
+    set_parents_count();
+<%= remote_function(:url => {:action => 'update_recipient_list2'}, :with => "'recipients_parents='+recipients" ) %>
+
+
+
+  }
+  function remove_recipient1(recipient) {
+    recipients = $('recipients_students').value;
+    var recipient_list = new Array();
+    recipient_list = $('recipients_students').value.split(',');
+
+    for(i=0; i<recipient_list.length; i++)
+      if (recipient_list[i] == recipient)
+    {
+      recipient_list.splice(i,1);
+      break;
+    }
+    set_students_count();
+    $('recipients_students').value = recipient_list.join();
+    recipients = $('recipients_students').value;
+    <%= remote_function(:url => {:action => 'update_recipient_list1'}, :with => "'recipients_students='+recipients" ) %>
+
+  }
+  if (j(".fields:visible").length==5){
+        j(".add_fields").hide();
+  } 
+  function remove_fields(link) {
+    j(link).prev("input[type=hidden]").val("1");
+    j(link).closest(".fields").remove();
+    j(".add_fields").show();
+      
+  }
+  function add_fields(link, association, content,view) {
+    console.log("broadcast");
+    console.log(view);
+    if (j(".fields:visible").length <5){
+      if (j(".fields:visible").length>=4){
+        j(".add_fields").hide();
+      }    
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g")
+      j(link).parent().before(content.replace(regexp, new_id));
+
+    }
+  }
+  function remove_all_employees(obj)
+  {
+    j("#recipient-list").empty();
+    j("#recipients_employees").val("");
+  }
+  function remove_all_students(obj)
+  {
+    j("#recipient-list1").empty();
+    j("#recipients_students").val("");
+  }
+  function remove_all_parents(obj)
+  {
+    j("#recipient-list2").empty();
+    j("#recipients_parents").val("");
+  }
+  function number_of_selected_employees() {
+    return j("#recipient-list").find(".scroll-inside").first().find(".hover").length;
+  }
+  function number_of_selected_students() {
+    return j("#recipient-list1").find(".scroll-inside").first().find(".hover").length;
+  }
+  function number_of_selected_parents() {
+    return j("#recipient-list2").find(".scroll-inside").first().find(".hover").length;
+  }
+  function set_employee_count(){
+    employees_count=number_of_selected_employees();
+    if (employees_count>0) {
+      j("#selected_employees_count").html(employees_count);
+    }else {
+      remove_all_employees(this);
+    }
+  }
+  function set_parents_count(){
+    parents_count=number_of_selected_parents();
+    if (parents_count>0) {
+      j("#selected_parents_count").html(parents_count);
+    } else {
+      remove_all_parents(this);
+    }
+  }
+  function set_students_count(){
+    students_count=number_of_selected_students();
+    if( students_count >0) {
+      j("#selected_students_count").html(students_count);
+    } else {
+        remove_all_students(this);
+    }
+  }
+  function resetFormElement(e) {
+    e.wrap('<form>').closest('form').get(0).reset();
+    e.unwrap();
+  }
+  function reset_file_field () {
+    resetFormElement(j("#field_message_thread_messages_attributes_0_message_attachment_attributes_attachment"));
+    resetFormElement(j("#message_thread_messages_attributes_0_message_attachment_attributes_attachment"));
+  }
+  
+</script>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('messages') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%#= "#{t('create_text')} #{t('group')} #{t('message')}" %><%= t('conversations') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :create_broadcast_message %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="create-options">
+    <% current_user = @current_user %>
+  </div>
+  <%= render 'form.html.erb' %>
+  <div class="extender">
+  </div>
+</div>
+<%= load_redactor_script %>
+<script type="text/javascript">
+ <% if FedenaSetting.s3_enabled? %>
+<% else %>       
+   j(document).on("submit", "#new_message_thread", function (event) {
+      var new_attachment_set_bm = window.bm_message.attachment_set;
+      j(window).scrollTop(0, 0);
+      event.preventDefault();      
+      j('#new_message_submit').attr('disabled', 'disabled');
+      var form = this;
+      j('#message_thread_subject').val(j('#message_thread_subject').val().strip());
+      j('#message_thread_messages_attributes_0_body').val(j('#message_thread_messages_attributes_0_body').val().strip());
+      status = validate_message(form);
+      console.log(status);
+      if (status == 'true') {
+          var form_data = new FormData(j("#new_message_thread")[0]);
+          if (new_attachment_set_bm.length > 0) {
+              for (var i = 0; i < new_attachment_set_bm.length; i++) {
+                  form_data.append('message_thread[messages_attributes][0][message_attachments_attributes][' + i + '][attachment]', new_attachment_set_bm[i]);
+              }
+          }
+          form_data.delete("message_thread[messages_attributes][0][message_attachments_attributes][0][attachment][]");
+   
+          j.ajax({
+              url: "/messages/create_broadcast",
+              type: "POST",
+              data: form_data,
+              success: function (msg) {
+                  j(window).scrollTop(0, 0);
+              },
+              cache: false,
+              contentType: false,
+              processData: false
+          });
+      } else {
+          return false;
+      }
+
+  });
+
+  validate_message = function (form) {
+      sub = j(form).find('#message_thread_subject').val();
+      sub_length = sub.length > 1 && j(form).find('#message_thread_subject').val().length > 100
+      body = j(form).find('#message_thread_messages_attributes_0_body').val();
+      recp1 = j('#recipient-list').html();
+      recp2 = j('#recipient-list1').html();
+      recp3 = j('#recipient-list2').html();
+      flag = true;
+      if (sub == '') {
+          j('#subject_error').css("display", "block");
+          flag = false;
+      } else {
+          j('#subject_error').css("display", "none");
+      }
+      if (body == '') {
+          j('#message_error').css("display", 'block');
+          flag = false
+      } else {
+          j('#message_error').css("display", 'none');
+      }
+      if ((recp1 == '') && (recp2 == '') && (recp3 == '')) {
+          j('#recipient_error').css("display", 'block');
+          flag = false;
+      } else {
+          j('#recipient_error').css("display", 'none');
+      }
+      if (sub_length) {
+          j('#subject_error2').css("display", "block");
+          flag = false;
+      }
+      
+      if (!flag) {
+          j('.send_button').attr('disabled', false);
+      }
+      return flag;
+  }
+<% end %> 
+</script>  

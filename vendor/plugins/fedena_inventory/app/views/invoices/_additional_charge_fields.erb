@@ -1,0 +1,29 @@
+
+<tr class="tr-<%= cycle('odd', 'even') %>" id ="additional_charge_fields">
+        <td >
+
+      <div class="label-field-pair3">
+        <%= c.text_field :name, :id => 'add_name' %>
+      </div>
+
+        </td>
+        <td>
+
+      <div class="label-field-pair5">
+        <%= c.text_field :amount, :id => "add_amount" %>
+      </div>
+
+        </td>
+        <td class="col-5">    <div id="remove-field"><%= link_to_remove_fields " ", c, "additional_charge_fields" %></div>
+</td>
+      </tr>
+      <script type="text/javascript">
+       j("input#add_amount").change(function(){
+
+        calculate_grandtotal();
+      });
+      j('a.delete_button_img').click(function(){
+      calculate_grandtotal();
+    })
+      
+      </script>

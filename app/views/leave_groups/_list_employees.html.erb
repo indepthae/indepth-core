@@ -1,0 +1,55 @@
+<% if @employees.present? or @search_params.present? %>
+  <div id="loading" class="substitute"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+      <span><%= "#{t('loading')}.." %></span>
+  </div>
+  <div id="employees_form">
+      <div class="employees_table">
+
+      </div>
+
+      <% if @employees.present? %>
+        <% selected = @leave_group.leave_group_employees.select{|e| e.selected}.count %>
+        <div id="status">
+            <div id="count_0" style="display:<%= selected == 0 ? 'block' : 'none' %>"><%= t('leave_group_selected_employees_count', {:count => 0, :total => @total}) %></div>
+            <div id="count_1" style="display:<%= selected == 1 ? 'block' : 'none' %>"><%= t('leave_group_selected_employees_count', {:count => 1, :total => @total}) %></div>
+            <div id="count_2" style="display:<%= selected > 1 ? 'block' : 'none' %>"><%= t('leave_group_selected_employees_count', {:count => (selected > 1 ? selected : 2), :total => @total}) %></div>
+        </div>
+        <div id="add_emp_footer">
+             <div class="wrapper" style="display:none;"><div class="error-icon"></div><div class="error-msg"><%= t('select_atleast_one_employee') %></div></div>
+            <%= link_to t('cancel'), leave_group_path(@leave_group), :class => "submit-button" %>
+            <%= submit_tag "#{t('add_employees_to_leave_group')}", :class => "submit-button", :id => "submit_button", :onclick => "confirmationBox()" %>
+           
+        </div>
+      <% end %>
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  json_data = JSON.parse('<%= @hash.to_json.gsub("'", %q(\\\')) %>');
+  changed_data = JSON.parse(Object.toJSON(json_data));
+  var data = {'total': "<%= @total %>", 'name': "<%= @leave_group.name %>", 'leave_group_id': "<%= @leave_group.id %>", 'config': <%= @config %>}
+  var translations = {
+      'confirmation_title': "<%= t('add_employees_to_leave_group') %>",
+      'confirmation_message': "<%= t('adding_employees_confirmation_message', {:name => @leave_group.name}) %>",
+      'credit_label_value': "<%= t('credit_label_value') %>",
+      'confirmation_message_for_credit': "<%= t('msg_for_credit') %>",
+      'message1': "<%= t('adding_employees_to_group_message', {:name => @leave_group.name}) %>",
+      'adding_status': "<%= "#{t('employees_added')} <span id='count'>0</span> #{t('of')} <span id='total'>0</span> #{t('multiple_employees')}" %>",
+      'adding_failed_status': "<%= "#{t('failed')} <span id='failed_count'>0</span> #{t('of')} <span id='total'>0</span> #{t('multiple_employees')}" %>",
+      'ok': "<%= t('ok') %>",
+      'save': "<%= t('save') %>",
+      'cancel': "<%= t('cancel') %>",
+      'warning': "<%= t('generate_payslip_bulk.pls_dont_refresh_or_press_back_button') %>",
+      'complete_message': "<%= "#{t('adding_employees_completed_message')} <b>#{@leave_group.name}</b>" %>",
+      'nothing_to_list': "<%= t('nothing_to_list') %>"
+  }
+
+  initialize_variables(data, translations);
+  if (json_data.search) {
+      showOverlay();
+      drawTable(json_data);
+      hideOverlay();
+  }
+
+</script>

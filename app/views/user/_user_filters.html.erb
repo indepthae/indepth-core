@@ -1,0 +1,21 @@
+<% unless @user_type == 'admins' %>
+  <div class="label-field-pair search-field" id="filter-sec">
+      <% unless @user_type == 'employees' %>
+        <label for="batch"><%= t('batch') %></label>
+        <div class="text-input-bg">
+            <%= select_tag "filter", grouped_options_for_select(@filters, nil, t('select_a_batch')), :onchange => "search_user_ajax('filter')" %>
+        </div>
+      <% else %>
+        <label for="employee_department"><%= t('employee_department') %></label>
+        <div class="text-input-bg">
+            <%= select_tag "filter", options_for_select(@filters), {:prompt => t('select_department'), :onchange => "search_user_ajax('filter')"} %>
+        </div>
+      <% end %>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader2",
+        :class => "loader_img",
+        :style =>"display: none;" ) %>
+  </div>
+<% end %>

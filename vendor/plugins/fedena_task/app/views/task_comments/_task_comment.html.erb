@@ -1,0 +1,13 @@
+<li id="comment-item-<%= task_comment.id %>">
+  <div class="comment-details">
+    <div class="commenter"><%= task_comment.user.present? ? task_comment.user.first_name : "#{t('deleted_user')}" %></div>
+    <% if task_comment.can_be_deleted_by?(@current_user) %>
+    <div class="delete-comment"><%= link_to_remote  "#{t('delete_text')}", :url => { :controller => 'task_comments', :action => 'destroy', :id => task_comment }, :confirm => "#{t('delete_comment_confirmation')}" %></div>
+    <% end %>
+     <div class="comment-posted-at"><%= t('posted') %><%= time_ago_in_words(task_comment.created_at) %> <%= t('ago') %></div>
+     <% unless task_comment.attachment_file_name.nil? %>
+     <div class="download-attachment"><%= link_to "#{t('download_attachment')}", task_comment.attachment.url(:original, false),:class=>"themed_text", :target => '_blank'%> </div>
+    <% end %>
+  </div>
+  <div class="comment-content"><%= sanitize   task_comment.description.strip.gsub("\n", "<br/>"),:tags => %w[b i a ], :attributes => %w[href] %></div>
+</li>

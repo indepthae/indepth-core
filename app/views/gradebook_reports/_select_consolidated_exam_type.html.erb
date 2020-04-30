@@ -1,0 +1,11 @@
+<div class="label-field-pair">
+    <label for="exam" class="label-exam"><%= t('type') %></label>
+    <span class="student_selector">
+        <%= select :consolidated_exam_report, :type, @list,
+          {:include_blank =>t('select_exam')},
+          {:onChange => "#{remote_function(:url => {:action => "reload_checkboxes"},
+          :with => "'type='+ value"
+          )}"} 
+      %>
+    </span>
+</div>

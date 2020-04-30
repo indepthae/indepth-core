@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.route_details{
+  @routes.each do |route|
+    @route = route
+    @xml.route do
+      @xml.destination(@route.destination)
+      @xml.main_route(@route.main_route.try(:destination))
+      @xml.cost(@route.cost)
+    end
+  end
+}%>
+
+

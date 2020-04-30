@@ -1,0 +1,16 @@
+<table class="primary striped condensed">
+    <thead>
+    <th style="width:70%"><%= activity_sets.first.name %></th>
+        <% activity_sets.each do |activity_set| %>  
+      <th><%= activity_set.term_name %></th>
+    <%end%>
+</thead>
+<%activity_sets.first.activities.each_with_index do |activity, index| %>
+  <tr>
+      <td><%= activity.name %></td>
+      <% activity_sets.each do |activity_set| %>
+        <td><%= activity_set.scores[index].grade %></td>
+      <%end%>  
+  </tr>  
+<%end%>
+</table>

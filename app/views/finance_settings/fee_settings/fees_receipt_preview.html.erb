@@ -1,0 +1,29 @@
+<% content_for :head do %>
+    <%= stylesheet_link_tag(*get_stylesheet_for_receipt_template(@template_name)) %>
+    <%= javascript_include_tag("receipt_printer") %>
+<% end %>
+
+<% @transactions.each do |k, v| %>
+    <% v.template_id = @fee_template.id if @fee_template.present? %>
+    <%= render :partial => get_receipt_partial(@template_name),
+               :locals => {:k => k, :transaction_hash => v, :printer => true, :preview => true} %>
+    <%#= get_receipt_partial(@template) %>
+<% end %>
+
+<script type="text/javascript">
+
+    j('section:empty').remove();
+    j.map(j("section"), function (val, i) {
+        if (val.innerHTML.trim() == "") {
+            val.remove();
+        }
+    });
+
+    <% if ReceiptPrinter.receipt_printer_header_type ==1 %>
+    j(".receipt-header").css("height", "<%= ReceiptPrinter.receipt_printer_header_height %>mm");
+    j("#pdf-header").css("height", "<%= ReceiptPrinter.receipt_printer_header_height %>mm");
+    j(".receipt-header").empty();
+    j("#pdf-header").empty();
+    <% end %>
+
+</script>

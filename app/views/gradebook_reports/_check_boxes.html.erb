@@ -1,0 +1,24 @@
+<div class="label-field-pair label-cb-pair">
+    <div class="checkbox-input-bg">
+        <%= check_box :consolidated_exam_report, :average, :disabled =>@checkbox_average_highest %>
+    </div>
+    <label class="cb_label"><%= t('average')%></label>
+</div>
+<div class="label-field-pair label-cb-pair">
+    <div class="checkbox-input-bg">
+        <%= check_box :consolidated_exam_report, :highest, :disabled =>@checkbox_average_highest %>
+    </div>
+    <label class="cb_label"><%= t('highest')%></label>
+</div>
+<div class="label-field-pair label-cb-pair">
+    <div class="checkbox-input-bg">
+        <%= check_box :consolidated_exam_report, :total, :disabled =>@checkbox_total_rank %>
+    </div>
+    <label class="cb_label"><%= "#{t('total')}(%)" %></label>
+</div>
+<div class="label-field-pair label-cb-pair">
+    <div class="checkbox-input-bg">
+        <%= check_box :consolidated_exam_report, :rank, :disabled =>@checkbox_total_rank %>
+    </div>
+    <label class="cb_label"><%= t('rank')%></label>
+</div>

@@ -1,0 +1,20 @@
+<div id="page-yield">
+  <div class="m_box">
+    <div id="delete_msg"><%=t('activate_desc')%></div>
+    <% form_remote_for :inactivate_batches,:url=>{:action=>'show_activating_form'},:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+      <div class="fee_category_scroll1">
+        <div class="sel_batches">
+          <label  for="all_active_batches" class="special_prop no_margin_top"><%= "#{t('courses_text')}"%></label>
+        </div>
+        <%@disabled_courses.each do |c| %>
+          <div class="each_batch">
+            <%= check_box_tag "registration_course_ids[]", c.id, false, :class=>'batches_box active_batch_list'%>
+            <label class="special_prop no_margin_top"><%= c.course.course_name %></label>
+          </div>
+        <% end %>
+      </div>
+      <div class="hor_line"></div>
+      <%= f.submit "", :value => "#{t('activate_courses')}", :class => "submit_button", :id => 'submit_button' %>
+    <%end%>
+  </div>
+</div>

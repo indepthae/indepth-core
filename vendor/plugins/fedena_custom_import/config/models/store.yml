@@ -1,0 +1,37 @@
+ store:
+    primary_keys:
+     code: "Code"
+    overrides:
+      store_category_id: "Store Category  Code"
+      store_type_id: "Store Type  Code"
+    associations:
+     - :store_category
+     - :store_type
+
+    associated_columns:
+      store_category: "code"
+      store_type: "code"
+    filters:
+     - :school_id
+     - :is_deleted
+    mandatory_columns:
+     - :name
+     - :code
+     - :store_type_id 
+     - :store_category_id
+    instructions:
+        Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Code:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""
+        Store Category  Code:
+          Type: "An active Store Category Code."
+          Input Instruction and example: ""
+        Store Type  Code:
+          Type: "An active Store Type Code."
+          Input Instruction and example: ""
+        Invoice prefix:
+          Type: "Alphanumeric."
+          Input Instruction and example: ""

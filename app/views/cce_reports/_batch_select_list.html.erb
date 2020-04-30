@@ -1,0 +1,30 @@
+<div class="label-field-pair"><label>Batch<span class="necessary-field">*</span>  </label></div>
+<div class="fee_category_scroll">
+  <div class="sel-list">
+    Select: <%= link_to_function "#{t('all')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}" %>,
+    <%= link_to_function "#{t('none')}", "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}" %>
+  </div>
+  <% batches.each do |f| %>
+    <div class="each_batch">
+      <%= check_box_tag "batch_ids[]", f.id, (batch_ids.include?("#{f.id}") unless batch_ids.nil?) ,:id=>"batch_ids_#{f.id}",:class=>'batches_box', :onChange=>"#{remote_function(:url => {:action => "update_students_list"}, :with => "'deselected_students='+get_deselected_students()+'&batch_ids='+get_batch_ids()")}"%>
+      <label for=<%="batch_ids_#{f.id}"%>><%= f.full_name %></label>
+    </div>
+  <% end %>
+</div>
+<div class="label-field-pair">
+  <label>Report Type</label>
+  <div class="select_exam_type">
+    <%=radio_button_tag  "report_type", "cce_report", :checked => "checked" %>
+    <label class="label_for_exam_type" for="exam_type_true">Detailed Report</label>
+    <%= radio_button_tag  "report_type", "fedena_report",:checked => "checked" %>
+    <label class="label_for_exam_type" for="exam_type_false">Basic Report</label>
+  </div>
+</div>
+<div class="submit_btn">
+  <%= submit_tag "", :value => "► Generate Report", :class => "submit-button", :disable_with => "► #{t('please_wait')}" %>
+  <%= image_tag("loader.gif",
+    :align => "absmiddle",
+    :border => 0,
+    :id => "loading",
+    :style =>"display: none;" ) %>
+</div>

@@ -1,0 +1,49 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= @school_asset.asset_name %></h1>
+  <% unless @school_asset.asset_description.blank? %>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= @school_asset.asset_description %></div>
+  <% end %>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :new, :school_assets %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit')}", edit_school_asset_asset_entry_path(:school_asset_id=>@school_asset.id) %></li>
+        <li class='themed_bg themed-dark-hover-background'><%=link_to "#{t('delete')}" ,school_asset_asset_entry_path(:school_asset_id=>@school_asset.id),:method=>:delete,:confirm=>"Are you sure you want to delete this entry?"%></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+<div class="bread_crumb">
+    <% breadcrumb :asset_entries_show, [@school_asset,@asset_entry]%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <ul id="category-list">
+    <% @asset_entry.asset_field_names.each do |key,val|  %>
+      <li class="list<%=cycle('odd', 'even')%>">
+        <div class="category-name">
+          <%=  "#{val["field_name"]}".capitalize %>
+        </div>
+        <% if val["field_type"]=="has_many" %>
+          <div class="category-delete">
+            <% rec=@asset_entry[val["related"]] %>
+            <%= rec.map{ |d| d.default_field }.join(", ") %>
+          </div>
+        <% elsif val["field_type"]=="belongs_to" %>
+          <div class="category-delete">
+            <% rec=@asset_entry[val["related"]] %>
+            <%= rec.default_field unless rec.nil? %>
+          </div>
+        <% else %>
+          <div class="category-delete">
+            <%= @asset_entry.send key %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

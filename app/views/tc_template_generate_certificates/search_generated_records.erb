@@ -1,0 +1,25 @@
+
+<div id="student_items">
+    <%if @students.present?%>
+      <table id="student_details_table">
+          <tr class="disable_sort">
+              <th id="name"><%=t('student_name')%></th>
+              <th class="value_criterea"><%= t('certificate_issued_on') %></th>
+              <th id="action"></th>
+          </tr>
+          <%@students.each do |sd|%>
+            <tr class="list">
+                <td class="record_name"><%= sd.full_name %> - <%=sd.admission_no%></td>
+                <td class="value_criterea">
+                    <%= format_date(get_record_of_student(sd).date_of_issue) %>
+                </td>
+                <td class="action">
+                    <%= link_to "#{t('view_certificate')}", :action=>"show", :id => sd.id%>
+                </td>
+            </tr>
+          <%end%>
+      </table>
+    <%else%>
+      <div class="no_entries"><%=t('no_students_found')%></div>
+    <%end%>
+</div>

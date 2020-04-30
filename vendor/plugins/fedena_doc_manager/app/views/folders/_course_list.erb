@@ -1,0 +1,22 @@
+
+<div class="dept-list">
+  <% if @courses %>
+    <div class="label-field-pair">
+      <label for="course" class="label_text"><%= t('course_list') %></label>
+    </div>
+    <% if @courses.present?  %>
+      <div class ="scrolable" >
+        <% x = '<span> x </span>' %>
+        <div class="scroll-inside2">
+          <% @courses.each do |m|  %>
+            <div class="hover">
+              <%= link_to m.course_name + x, "#", :onClick => "remove_course(#{m.id})", :class=> 'individual',
+                :before => "Element.show('loader')",
+                :success => "Element.hide('loader')" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

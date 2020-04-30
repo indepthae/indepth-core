@@ -1,0 +1,56 @@
+<%= javascript_include_tag 'jquery.multiple.select' %>
+<%= stylesheet_link_tag 'multiple-select' %>
+<div id="content-header">
+  <%= payslip_management_header_icon(!params[:hr].present?) %>
+  <% if params[:hr] %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('advanced_payslip_reports') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class="themed_bg themed-dark-hover-background"><div id="edit_template" onClick="build_templates_form('edit');"><%= t('edit_template') %></div></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('delete'), {:action=>"destroy", :id => @custom_report.id, :hr => params[:hr]}, :method => :delete, :confirm => t('delete_confirm_msg') %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:hr].present? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% breadcrumb :finance_hr_reports_report %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h3><%= @custom_report.name %></h3>
+  <%= render :partial => 'filter_values' %>
+  <div class="input_section" id="<%= @base_template.name %>_inputs">
+    <% form_for :input_values, :url => {:action => 'fetch_reports'}, :html => {:id => "input_form", :onsubmit => "return send_request('inputs');"} do |f| %>
+      <%= render_input_fields %>
+      <%=submit_tag "#{t('view_report')}", :class => "submit-button inputs_submit"  %>
+    <% end %>
+  </div>
+  <div id="employee_details"></div>
+  <div id="filter_cols">
+    <div class ="filter_section" id="<%= @base_template.name %>_filters"></div>
+    <div class ="columns_section" id="<%= @base_template.name %>_columns"></div>
+  </div>
+  <div class ="report_section" id="<%= @base_template.name %>_result"></div>
+  <div id="loading" class="substitute"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+    <span><%= "#{t('loading')}.." %></span>
+  </div>
+  <div class ="template_section" id="<%= @base_template.name %>_templates">
+    <%= render :partial => 'templates_form' %>
+  </div>
+  <div id="report_values">
+    <input type="hidden" id="inputs_temp" value ="{}"/>
+    <input type="hidden" id="filters_temp" value ="{}"/>
+    <input type="hidden" id="columns_temp" value ="{}"/>
+    <input type="hidden" id="filter_result" value ="{}"/>
+  </div>
+</div>
+<%= render :partial => "report_js" %>

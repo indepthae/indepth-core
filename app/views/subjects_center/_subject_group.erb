@@ -1,0 +1,28 @@
+<tbody class="disable_sort">
+  <tr class="disable_sort">
+      <td class="reorder-drag"><i></i></td>
+      <td class="course_name" colspan="4">
+          <div class="pull-left bold"><%= subject_group.name %></div>
+          <div class="component_link component_type">
+              <%= t('subject_group') %>
+          </div>
+          <div class="col-37 pull-right">
+              <div class="link_button pull-left">
+                  <%= component_edit_link(t('edit_text'), 'subject_group', @course.id, subject_group.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_add_link(t('subject'), 'course_subject', @course.id, 'SubjectGroup', subject_group.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_add_link(t('elective_group'), 'course_elective_group', @course.id, 'SubjectGroup', subject_group.id) %>
+              </div>
+              <div class="link_button pull-left">
+                  <%= component_delete_link(t('delete_text'), 'subject_group', @course.id, subject_group) %>
+              </div>
+          </div>
+      </td>
+      <%= hidden_field_tag "course_subjects[subject_group][#{subject_group.id}]", subject_group.priority, :class => 'component_field priority_field', :component_type => 'subject_group', :component_id => subject_group.id%>    
+  </tr>
+</tbody>
+<%= render :partial => 'subjects_with_elective_groups', :locals => {:obj => subject_group} %>
+

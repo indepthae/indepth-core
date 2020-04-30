@@ -1,0 +1,66 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('day_wise_report') %></div>
+  
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+    <div class="box">
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+   <% form_remote_for :status ,:url=>{:action=>'day_wise_report'},:loading=>"$('loader').show();",:loaded=>"$('loader').hide();"  do |f| %>
+    <div class="filter">
+      <div class="label-field-pair">
+        <label for="type"><%= t('select_store') %></label>
+        <div class="text-input-bg margin-left-10">
+          <%= f.select :store, @stores.map{|st| [st.name,st.id]} , {} ,{}  %>
+        </div>
+      </div>
+      <div class="label_field_pair">
+            <label class="paid" for="is_paid"><%= t('paid_status') %></label>
+          <div class="student_gender_value" >
+            <%= radio_button_tag   "status[is_paid]", value =1, checked=true%>
+            <label class="paid" for="is_paid_true"> <%= t('true_val') %></label>
+            <%= radio_button_tag  "status[is_paid]" ,value =0%>
+            <label class="paid" for="is_paid_false"><%= t('false_val') %></label>
+            <%= radio_button_tag  "status[is_paid]" ,value = "all"%>
+            <label class="paid" for="is_paid_all"><%= t('all') %></label>
+          </div>
+        </div>
+    </div>
+    <div class="filter1">
+      <div class="label-field-pair">
+        <label for="from"><%= t('from') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'status[from]', I18n.localize(Date.today, :format=>:default), :year_range => 30.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="to"><%= t('to') %></label>
+        <div class="text-input-bg">
+          <%= calendar_date_select_tag 'status[to]', I18n.localize(Date.today, :format=>:default), :year_range => 30.years.ago..0.years.ago,:readonly=>true,:popup=>"force" %>
+        </div>
+      </div>
+
+    </div>
+
+    <%= submit_tag "► #{t('search_text')}", :class=> 'submit_button', :disable_with => "#{t('please_wait')}"  %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+            <div class="hor_line"></div>
+
+  <% end %>
+    <div id ="update_report"></div>
+    </div>
+</div>

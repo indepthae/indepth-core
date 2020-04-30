@@ -1,0 +1,10 @@
+<div class="label-field-pair">
+    <label for="collections"><%= t('particulars') %></label>
+    <div class="text-input-bg">
+        <% _selected = @multi_fee_discount.present? ? @multi_fee_discount.particulars : nil %>
+        <% over_all_options = [["Overall"]] %>
+        <% particular_options = @particulars.map {|particular| [particular.name, particular.id]} %>
+        <%= select :multi_fee_discount, :particulars, options_for_select(over_all_options, _selected) + 
+          options_for_select(particular_options, _selected.to_i) %>
+    </div>
+</div>

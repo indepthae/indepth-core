@@ -1,0 +1,46 @@
+<div id="user_docs_search_area">
+    <div class="searchbox" id="user_search_box">
+        <form name="search-form" id="search-form">
+            <label><%= t('search_users') %></label>
+
+            <div class="text-input-bg">
+                <%= text_field_tag "query1", params[:query] %>
+            </div>
+            <div class="loader_div">
+                <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader4",
+                  :style =>"display: none;" ) %>
+            </div>
+        </form>
+    </div>
+    <div id="userspecific_docs_area"></div>
+</div>
+<script type="text/javascript">
+  j = jQuery.noConflict();
+  jQuery(function () {
+     
+      j('#query1').autocompleteAjax({serviceUrl: '/doc_managers/user_docs_ajax/id',
+          onChange: function (value, data) {
+              console.log(value);
+              update_loader();
+      },
+          onSelect: function (value, data) {
+              if (typeof data != 'undefined') {
+<%= remote_function(:url => update_userspecific_docs_doc_managers_path,
+  :with => "'user_id='+data" ) %>
+              }
+          }
+      });
+  });
+  function update_loader() {
+      j('#loader4').hide();
+  }
+  j("input#query1").keypress(function () {
+      j('#loader4').show();
+  })
+  
+      
+
+</script>

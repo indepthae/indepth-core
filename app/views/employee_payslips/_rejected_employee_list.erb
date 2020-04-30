@@ -1,0 +1,39 @@
+<table>
+  <tr class="tr-head">
+    <td class="emp_name"><%= t('employee_text') %></td>
+    <td class="pay_period"><%= t('pay_period')  %></td>
+    <td class="pg_name"><%= t('payroll_group') %></td>
+    <td class="dpt_name"><%= t('department') %></td>
+    <td class="reason"><%= t('remark') %></td>
+    <td class="actions"></td>
+  </tr>
+  <% if @employees.present? %>
+    <% @employees.each do |emp| %>
+      <tr>
+        <td class="emp_name"><%= "#{emp.full_name} &#x200E;(#{emp.employee_number})&#x200E;" %></td>
+        <% date_range = emp.date_range %>
+        <td class="emp_no"><%= date_range  %></td>
+        <td class="dpt_name"><%= emp.pg_name %></td>
+        <td class="recent_date"><%= emp.name %></td>
+        <td class="recent_date"><%= emp.reason %></td>
+        <td class="actions">
+          <% if params[:finance].nil? %>
+            <% if permitted_to? :edit_payslip, :employee_payslips %>
+              <%= link_to t('edit_payslip'), {:action => "edit_payslip", :id => emp.id, :from => "view_all_rejected_payslips"} %>
+            <% end %>
+            <% if permitted_to? :revert_employee_payslip, :employee_payslips %>
+              <%= link_to t('delete_payslip'), {:action => "revert_employee_payslip", :id => emp.id, :from => "view_all_rejected_payslips"}, :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => emp.full_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %>
+            <% end %>
+          <% else %>
+            <%= link_to t('view_payslip'), {:action => 'view_payslip', :id => emp.id, :from => params[:from], :finance => params[:finance]} %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+
+<%= pagination_status(@employees) %>
+<%= will_paginate @employees,:renderer => 'RemoteLinkRenderer', :params => {:pg_id => params[:pg_id], :dpt_id => params[:dpt_id], :finance => params[:finance]} %>

@@ -1,0 +1,39 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_report') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :derived_assessments_show, [@assessment_group,@academic_year,@course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="assessments_box">
+        <div class="assessments_head">
+            <div class="left">
+                <label><%=t('exam_group')%></label>
+                <span><%= @assessment_group.name_with_code %></span>
+            </div>
+            <div class="top_right">
+                <label><%=t('status')%></label>
+                <span><%=@assess_active ? t('active') : t('inactive')%></span>
+            </div>
+        </div>
+        <% batches = @course.batches_in_academic_year(@academic_year.id) %>
+        <div class="assessments_details">
+            <%= render :partial=> 'assessment_group_details', :locals => {:batches => batches} %>
+        </div>
+        <% if batches.present? %>
+          <div class="batches_assessments_list">
+              <%= render :partial => 'derived_calculation_form' %>
+          </div>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_batches_in_the_acedemic_year') %> </p>
+        <% end %>
+    </div>
+</div>

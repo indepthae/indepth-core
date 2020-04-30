@@ -1,0 +1,135 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('grn') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('new_text') %></div>
+  <div id="inner-tab-menu"></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+
+
+    <% form_for(@grn) do |f| %>
+
+      <%= f.error_messages %>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('grn_no')}" %></div>
+        <div class="input-container"><%=  f.text_field :grn_no, :value=> @last_grn.nil? ? nil : @last_grn.next %></div>
+      </div>
+
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('purchase_order')}" %></div>
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader",:style =>"display: none;" ) %>
+        <div class="text-input-bg"><%= f.select :purchase_order_id,
+            @purchase_orders.map{|s| [s.po_no, s.id]},
+            {:prompt => "#{t('select_purchase_order')}"},
+            {:onChange => "#{remote_function(:url => {:action => "update_po"},
+            :with => "'po_id='+ value",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"
+            )}"}  %></div>
+      </div>
+
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('invoice_no')}" %></div>
+        <div class="text-input-bg-indent"><%= f.text_field :invoice_no %></div>
+      </div>
+
+
+
+      <div class="indent_date label-field-pair">
+        <div class="label-container1"><%= "#{t('grn_date')}" %></div>
+        <div class="text-input-bg-indent">
+          <%= calendar_date_select_tag 'grn[grn_date]',
+            @grn.grn_date.blank? ? I18n.l(Date.today,:format=>:default):@grn.grn_date,
+            :year_range => 30.years.ago..5.years.from_now , :readonly=>true,:popup=>"force"%>
+        </div>
+      </div>
+
+
+      <div class="indent_date label-field-pair">
+        <div class="label-container1"><%= "#{t('invoice_date')}" %></div>
+        <div class="text-input-bg-indent">
+          <%= calendar_date_select_tag 'grn[invoice_date]',
+            @grn.invoice_date.blank? ? I18n.l(Date.today,:format=>:default):@grn.invoice_date,
+            :year_range => 30.years.ago..5.years.from_now, :readonly=>true,:popup=>"force" %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('other_charges')}" %></div>
+        <div class="text-input-bg-indent"><%= f.text_field :other_charges, :class=>'precision_text' %></div>
+      </div>
+
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+
+        <tr class="tr-head">
+          <td class="lable-text">
+            <%= t('store_item_id') %></td>
+
+          <td class="lable-text">   <%= t('quantity') %></td>
+          <td class="lable-text">
+            <%= t('unit_price') %>
+          </td>
+          <td class="lable-text">
+            <%= t('discount') + "(%)" %>
+          </td>
+          <td class="lable-text">  <%= t('tax') + " (%)" %></td>
+
+          <td class="lable-text">   <%= t('expiry_date') %></td>
+          <td>  </td>
+        </tr>
+      </table>
+
+      <div id="update_po_item">
+        <%=  render 'grn_item_fields', :f => f %>
+      </div>
+    </div>
+
+    <hr class="label-underline"></hr>
+    <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+  <%  end %>
+
+  <div class="extender"></div>
+</div>
+
+<script type="text/javascript">
+
+  function remove_fields(link) {
+    $(link).previous("input[type=hidden]").value = "1";
+    $(link).up(".fields").hide();
+  }
+
+  function remove_grn_fields(rnd_id) {
+    $("grn_grn_items_attributes_"+rnd_id+"__delete").value = "1";
+    $("grn_items_"+rnd_id).down('.fields').hide();
+  }
+
+
+  function add_fields(link, association, content) {
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    StoreSelected();
+  }
+
+</script>
+
+
+

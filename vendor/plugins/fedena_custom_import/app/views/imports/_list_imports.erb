@@ -1,0 +1,35 @@
+<% unless @imports.empty? %>
+  <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-header">
+      <td class="sl_no"><%= t('serial_no') %></td>
+      <td class="name"><%= t("export_name") %></td>
+      <td class="date"><%= t("date_text") %></td>
+      <td class="status"><%= t("status") %></td>
+      <td class="options"><%= t("options") %></td>
+    </tr>
+    <% @imports.each_with_index do |import,index| %>
+      <tr class="tr-body">
+        <td class="sl_no"><%= ((@imports.current_page - 1) * @imports.per_page) + index + 1 %></td>
+        <td class="name"><%= import.export.name %></td>
+        <td class="date"><%= format_date(Import.default_time_zone_present_time(import.created_at),:format=>:long) %></td>
+        <% if import.status.nil? 
+            status=""
+          elsif import.status==import.status.underscore
+            status=t(import.status)
+          else 
+            status=import.status 
+        end %>
+        <td class="status"><%= status%></td>
+        <td class="options">
+          <%= link_to t('import_log_details'),import_log_details_path(:import_id => import.id) %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @imports, :renderer => 'RemoteLinkRenderer' ,:params=>{:action=>"filter",:export_id => @export.id}, :param_name => :imports_page,:remote => {:with => "'filter_imports='+$('filter_imports').value"} %>
+  </div>
+<% else %>
+  <div id="flash-box">
+    <p class="flash-msg"><%= t('no_data_import') %></p>
+  </div>
+<% end %>

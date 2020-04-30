@@ -1,0 +1,91 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :forms_show, @form %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% form_for( :form_submission, :html => {:multipart => true}, :url => new_form_submission_forms_path) do |form| %>
+    <%= error_messages_for :form, :header_message => nil %>
+    <% missing = @form.fields_missing.present? ? @form.fields_missing.split(',') : [] %>
+    <%= form.hidden_field :response %>
+    <%= form.hidden_field :form_id, :value=>@form.id %>
+    <div class="form_name">
+      <%#= form.label @form.name %>
+      <label for="form_submission_<%= @form.name %>"><%= @form.name %></label>
+    </div>
+    <% if @form.is_targeted%>
+      <div class="form_target">
+        <%= form.label t('target') %>
+        <%= form.select :target,options_for_select(@targets.collect{|x| [x.full_name,x.id]}) %>
+      </div>
+    <% end %>
+
+    <% @fields.each do |field|  %>
+      <% if @response.present? %>
+        <% if field.field_type != 'hr' %>
+          <%= render_field(field,@response[field.field_type]["#{field.id}"],((missing.include? field.id.to_s) ? true:false)) %>
+        <% else %>
+          <%= render_field(field,{},((missing.include? field.id.to_s) ? true:false)) %>
+        <% end %>
+      <% else %>
+        <%= render_field(field,{},((missing.include? field.id.to_s) ? true:false)) %>
+      <% end %>
+    <% end %>
+  <%# if @form.permitted_to_submit?(@current_user) and !@form.submitted?(@current_user) %>
+    <% if @form.allowed_to_submit?(@current_user) %>
+      <div class="field_block">
+        <%= form.submit t('submit'), :class=>"button", :disable_with => t('please_wait') %>
+    <%# below is a reset button, to clear enteries of form%>
+        <%= form.submit t('reset'), :class=>"button", :type => "reset" %>
+      </div>
+    <% end %>
+
+  <% end %>
+</div>
+<script>
+  j('select').each(function(a,b){
+    id = j(this).attr('id');
+    j(b).find('option').each(function(x,y){
+      opt = y.value;
+      console.log(opt);
+      os = opt.split(':field_option_id');
+      if(os.length > 1){
+        os1 = os[1].split(':field_option_weight');
+        val = os[0];
+        opt_id = os1[0];
+        weight = os1[1];
+        j(y).attr('attr_opt',opt_id);
+        j(y).attr('attr_data',weight);
+        j(y).attr('value',val);
+
+      }
+    });
+    wid = id.split('value')[0] + 'weight';
+    oid = id.split('value')[0] + 'option_id';
+    j('#'+wid).attr('value',j(this).find("option").first().attr('attr_data'));
+    j('#'+oid).attr('value',j(this).find("option").first().attr('attr_opt'));
+  });
+  j('select').on('change',function(){
+    id = j(this).attr('id');
+    console.log(id);
+    wid = id.split('value')[0] + 'weight';
+    oid = id.split('value')[0] + 'option_id';
+    j('#'+wid).attr('value',j(this).find(":selected").attr('attr_data'));
+    j('#'+oid).attr('value',j(this).find(":selected").attr('attr_opt'));
+  });
+  j('input').on('change',function(){
+    if(j(this).is(':radio')){
+      option_id = 'form_radio_'+j(this).attr('attr_self')+'_option_id';
+    }else if(j(this).is(':checkbox')){
+      option_id = 'form_checkbox_'+j(this).attr('attr_self')+'_option_id';
+    }
+    j('#'+option_id).val(j(this).attr('attr_id'));
+  });
+</script>

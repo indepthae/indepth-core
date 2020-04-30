@@ -1,0 +1,45 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('email_send') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('email_alert_settings_privilege') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash.now[:notice] %> </p>
+  <% end %>
+
+  <div class="head"><%= t('email_alert_settings_privilege') %></div>
+  <div class="sub_text"><%= t('email_alert_settings_desc') %></div>
+  <hr class="label-underline" ></hr>
+  <div id="user_options">
+    <%  form_for :email_alerts,:url=>{:controller=>"email_alerts",:action=>"email_alert_settings"} do |f| %>
+      <%FedenaEmailAlert.alert_bodies.sort_by{|m| m.name.to_s}.each do |alert_data|%>
+        <%if alert_data.plugin.nil? or FedenaPlugin.can_access_plugin?(alert_data.plugin)%>
+          <div class="button-box" style="font-size:13px" >
+            <div class="email_title" style="font-size:15px; margin-bottom:15px; margin-left: 5px;" ><b><%="#{t(alert_data.name.to_s+'_text')}" %></b></div>
+            <%alert_data.mail_to.each do |send_to|%>
+              <%= check_box_tag "select_options[#{alert_data.name}[mail_to]][]",send_to.recipient,(EmailAlert.find_by_model_name(alert_data.name.to_s).present? and EmailAlert.find_by_model_name(alert_data.name.to_s).mail_to.include?(send_to.recipient.to_s)),:class=>"category_select",:id=>"#{alert_data.name}_#{send_to.recipient.to_s.humanize()}"%>
+              <label for="<%="#{alert_data.name}_#{send_to.recipient.to_s.humanize()}"%>"> <%=send_to.recipient.to_s.humanize()%></label>
+            <%end%>
+          </div>
+        <%end%>
+      <%end%>
+    </div>
+    <hr class="label-underline"></hr>
+    <div class="submit-area" >
+      <%= submit_tag "#{t('save')}", :class=>"create" %>
+    </div>
+  <%end%>
+</div>
+<script type="text/javascript">
+  $$('#user_options .button-box').each(function(ele, index){
+    if(index%3 == 0){
+      ele.addClassName("left-button");
+    }
+  });
+</script>

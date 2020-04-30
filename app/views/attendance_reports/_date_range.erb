@@ -1,0 +1,33 @@
+<div class ="custom_date">  <% remote_form_for :report,  :url => {:action => 'report',:batch_id=>params[:batch_id],:mode=>params[:mode],:subject_id=>params[:subject_id]},:loading => "$('loader4').show();", :loaded => "$('loader4').hide();" do |form| %>
+    <div class="custom_start_date">
+    <div class="label-field-pair">
+      <label>
+        <%= t('start_date') %>
+      </label>
+      <div class="text-input-bg">
+        <%= calendar_date_select_tag 'start_date', I18n.l(@start_date,:format=>:default) ,:popup=>:force%>
+      </div>
+    </div>
+    </div>
+     <div class="custom_end_date">
+    <div class="label-field-pair">
+      <label>
+        <%= t('end_date') %>
+      </label>
+      <div class="text-input-bg">
+         <%= calendar_date_select_tag 'end_date', I18n.l(@end_date,:format=>:default) ,:popup=>:force%>
+      </div>
+    </div>
+     </div>
+    <div class="custom_submit"> <%= submit_tag "#{t('view_report')}",:class=>'user_button' %></div>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader4", :style =>"display: none;" ) %>
+  <%end%>
+
+</div>
+
+<script type="text/javascript">
+  j('.calendar_label').on('click',function(){
+    var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+</script>

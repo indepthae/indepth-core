@@ -1,0 +1,135 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('inventory') %> <%= t('transaction_report') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transaction_report') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'>
+                <%= link_to "#{t('pdf_report')}", grn_pdf_grn_path(:id => @grn_report.id),:target => '_blank' %>
+            </li>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% _params = [@start_date, @end_date] %>
+        <% _params += @accounts_enabled ? [@account_id] : [] %>
+        <% breadcrumb :grns_report_detail, [@grn_report, _params, @store] %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <b id="fee-report-title"><%= "#{t('inventory_transaction_report')}"%>  </b>
+
+    <div class="extender"></div>
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('raised_by')}" %></div>
+        <div class="label-output">:  <%=h @user.first_name unless @user.nil?  %></div>
+    </div>
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('grn_no')}" %></div>
+        <div class="label-output">:  <%=h @grn_report.grn_no  %></div>
+    </div>
+
+    <% supplier = @grn_report.purchase_order.supplier %>
+    <% supplier_type = supplier.nil? ? nil : supplier.supplier_type %>
+
+    <div class="extender"></div>
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('supplier_type')}" %></div>
+        <div class="label-output">:  <%=h  supplier_type.name unless supplier_type.nil? %></div>
+    </div>
+
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('supplier')}" %></div>
+        <div class="label-output">:  <%=h  supplier.name unless supplier.nil? %></div>
+    </div>
+
+
+    <div class="extender"></div>
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('purchase_order')}" %></div>
+        <div class="label-output">:  <%=h  @grn_report.purchase_order.po_no unless @grn_report.purchase_order.nil?  %></div>
+    </div>
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('store')}" %></div>
+        <div class="label-output">:  <%=h @grn_report.purchase_order.store.name %></div>
+    </div>
+
+
+    <div class="extender"></div>
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('invoice_no')}" %></div>
+        <div class="label-output">:  <%=h @grn_report.invoice_no %></div>
+    </div>
+
+
+
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('grn_date')}" %></div>
+        <div class="label-output">:  <%=h format_date(@grn_report.grn_date,:format=>:long_date) %></div>
+    </div>
+
+    <div class="extender"></div>
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('invoice_date')}" %></div>
+        <div class="label-output">:  <%=h format_date(@grn_report.invoice_date,:format=>:long_date) %></div>
+    </div>
+
+
+    <div class="label-field-show">
+        <div class="label-container1"><%= "#{t('other_charges')}" %></div>
+        <div class="label-output">:  <%=h precision_label @grn_report.other_charges  %></div>
+    </div>
+
+
+    <div class="list_table_div" style="margin-top: 20px;" >
+        <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+            <% unless @grn_report.grn_items.blank? %>
+              <tr class="main_head">
+                  <td><%= t('item') %></td>
+                  <td class="set_border_right"><%= t('quantity') %></td>
+                  <td class="set_border_right"><%= t('price') %></td>
+                  <td class="set_border_right"><%= t('discount') %></td>
+                  <td class="set_border_right"><%= t('tax') %> (%)</td>
+                  <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+              </tr>
+              <% total_net_amount = 0 %>
+              <%  @grn_report.grn_items.each_with_index do |i, p| %>
+                <tr class="row-b">
+                    <td> <%=h  i.store_item.item_name  unless i.store_item.nil? %></td>
+                    <td class="set_border_right"align="right"> <%=h  i.quantity %></td>
+                    <td class="set_border_right" align="right"> <%=h precision_label i.store_item.unit_price  %></td>
+                    <td class="set_border_right" align="right"> <%=h precision_label i.discount %></td>
+                    <td class="set_border_right" align="right"><%=h precision_label(i.tax) unless i.tax.nil?%></td>
+                    <td class="set_border_right" align="right">
+                        <%=h precision_label(i.total_amount)  %>
+                    </td>
+                </tr>
+              <% end %>
+            <% end %>
+        </table>
+        <div class="total_amount_div">
+            <label><%= t('net_expenses') %></label>
+            <% unless  @grn_report.other_charges.nil? %>
+              <label class="amount_label"><%=precision_label(@total+=  @grn_report.other_charges)%></label>
+
+            <% else  %>
+              <label class="amount_label"><%=precision_label(@total)%></label>
+            <% end %>
+        </div>
+    </div>
+</div>
+

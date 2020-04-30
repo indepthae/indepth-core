@@ -1,0 +1,63 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('vehicle_details')}"%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('view_vehicle_details')}"%></div>
+    <div id="inner-tab-menu">
+        <ul class="top_buttons">
+            <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('edit')}", edit_vehicle_path(@vehicle.id) %></li>
+            <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('vehicle_certificates.vehicle_certificates_text')}", vehicle_vehicle_certificates_path(@vehicle.id) %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :vehicles_show, @vehicle %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="vehicle_details">
+        <div class="field_details">
+            <div class="field_name"><%= t('vehicle') %></div>
+            <div class="field_val">: <%= @vehicle.vehicle_no %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('no_of_seats') %></div>
+            <div class="field_val">: <%= @vehicle.no_of_seats %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('status') %></div>
+            <div class="field_val">: <%= @vehicle.status %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('vehicle_type') %></div>
+            <div class="field_val">: <%= @vehicle.vehicle_type_text||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('vehicle_model') %></div>
+            <div class="field_val">: <%= @vehicle.vehicle_model||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('gps_number') %></div>
+            <div class="field_val">: <%= @vehicle.gps_number||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('gps_enabled') %></div>
+            <div class="field_val">: <%= @vehicle.gps_enabled.to_s.camelcase%></div>
+        </div>
+
+        <% @additional_details.each do |additional_detail| %>
+          <%if additional_detail.additional_info.present?%>
+            <div class="field_details">
+                <div class="field_name"><%= additional_detail.transport_additional_field.name %></div>
+                <div class="field_val">: <%= additional_detail.additional_info %></div>
+            </div>
+          <%end%>
+        <% end %>
+    </div>
+    <div id="routes_list">
+        <%= render :partial => "routes_list" %> 
+    </div>
+</div>

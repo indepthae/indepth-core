@@ -1,0 +1,12 @@
+<div class="label-field-pair" id="student-label"><label> Applicable Students<span class="necessary-field">*</span>  </label></div>
+<div class="fee_category_scroll" id="st-box">
+  <div class="sel-list">
+    Select: <%= link_to_function "#{t('all')}", "$$('input.students_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+    <%= link_to_function "#{t('none')}", "$$('input.students_box').each(function(checkbox) { checkbox.checked = false; });" %>
+  </div>
+  <% students.each do |s| %>
+    <div class="each_batch">
+      <%= check_box_tag "student_ids[]", s.id, !(deselected_students.include?("#{s.id}") if deselected_students.present?) ,:class=>'students_box'%> <span><%= s.full_name %></span>
+    </div>
+  <% end %>
+</div>

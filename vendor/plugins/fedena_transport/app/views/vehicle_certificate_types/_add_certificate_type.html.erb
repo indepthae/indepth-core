@@ -1,0 +1,39 @@
+<% remote_form_for @certificate_type, :url => fetch_path(@certificate_type), 
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |c| %>
+  <%= session_fingerprint_field %> 
+  <div id="vehicle_certificate_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('name') %></label>
+          <div class="text-input-bg"><%= c.text_field :name %></div>
+      </div>
+      <div class="label-checkbox-pair">
+          <label class="status" for="status"><%= t('send_reminders') %></label>
+          <div id="radio-buttons">
+              <%= c.radio_button  "send_reminders", "true", :checked => "checked" %>
+              <label class="label_for_status" for="certificate_type_send_reminders_true"><%= t('yes_text') %></label>
+
+              <%= c.radio_button  "send_reminders", "false" %>
+              <label class="label_for_status" for="certificate_type_send_reminders_false"><%= t('no_texts') %></label>
+          </div>
+      </div>
+      <div class="label-checkbox-pair">
+          <label class="status" for="status"><%= t('status') %></label>
+          <div id="radio-buttons">
+              <%= c.radio_button  "is_active", "true", :checked => "checked" %>
+              <label class="label_for_status" for="certificate_type_is_active_true"><%= t('active') %></label>
+
+              <%= c.radio_button  "is_active", "false" %>
+              <label class="label_for_status" for="certificate_type_is_active_false"><%= t('inactive') %></label>
+          </div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@certificate_type.new_record? ? t('create_vehicle_certificate_type') : t('update_vehicle_certificate_type'))}", 
+        :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

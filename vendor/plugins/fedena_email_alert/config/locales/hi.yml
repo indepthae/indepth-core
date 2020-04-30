@@ -1,0 +1,148 @@
+hi:
+  activerecord:
+    attributes: ''
+  email_send: "ईमेल"
+  to_employees: "कर्मचारियों के लिए"
+  to_students: "छात्रों के लिए"
+  to_guardians: "अभिभावकों के लिए"
+  send_email_to_employees: "कर्मचारियों को ईमेल भेजें"
+  send_email_to_students: "छात्रों को ईमेल भेजें"
+  send_email_to_guardians: "माता-पिता को ईमेल भेजें"
+  student_test: "जाँच %{name}  ईमेल %{name}"
+  student_student_creation: "प्रिय %{recipient_name},<p/> <b>%{user_school_name}</b>
+    के <b>%{full_name}</b> का ब्यौरा URL पर उपलब्ध है। <p/> उपयोगकर्ता नाम: <b>%{admission_no}</b>
+    <p/> पासवर्ड: <b>%{admission_no}123</b>"
+  parent_parent_creation: "प्रिय %{recipient_name},<p/> <b>%{user_school_name}</b>
+    के <b>%{full_name}</b> का ब्यौरा URL पर उपलब्ध है। <p/> उपयोगकर्ता नाम: <b>%{immediate_contact_user_username}</b>
+    <p/> पासवर्ड: <b>%{immediate_contact_user_username}123</b>"
+  student_transfer_batch: " प्रिय %{recipient_name},<p/><b>%{full_name}(%{admission_no})</b>
+    को <b>%{new_batch}</b> से <b>%{old_batch}</b> में स्थानांतरित किया गया।<p/>अधिक
+    जानकारी के लिए URL देखें।"
+  parent_transfer_batch: " प्रिय %{recipient_name},<p/><b>%{full_name}(%{admission_no})</b>
+    को  <b>%{new_batch}</b> से <b>%{old_batch}</b> में स्थानांतरित किया गया।<p/>अधिक
+    जानकारी के लिए URL देखें।"
+  student_examination_schedule_publishing: "प्रिय %{recipient_name},<p/> <b>%{recipient_name}</b>
+    की परीक्षा <b>%{school_name}</b> पर आयोजित होगी।<p/>परीक्षा का नाम: <b>%{name}
+    </b><p/>अधिक जानकारी के लिए URL में लॉगिन करें"
+  parent_examination_schedule_publishing: "प्रिय %{recipient_name},<p/> <b>%{student_name}</b>
+    की परीक्षा <b>%{school_name}</b> में आयोजित की जाएगी।<p/>परीक्षा का नाम: <b>%{name}
+    </b><p/>अधिक जानकारी के लिए URL में लॉगिन करें"
+  student_examination_result_publishing: "प्रिय %{recipient_name},<p/> <b>%{name}</b>
+    के लिए <b>%{recipient_name}</b> का परीक्षा परिणाम प्रकाशित किया गया।<p/>अधिक जानकारी
+    के लिए URL में लॉगिन करें"
+  parent_examination_result_publishing: "प्रिय %{recipient_name},<p/> <b>%{name}</b>
+    के लिए <b>%{student_name}</b> का परीक्षा परिणाम प्रकाशित किया गया। <p/>अधिक जानकारी
+    के लिए URL में लॉगिन करें"
+  student_daily_wise_attendance_registration: "प्रिय %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    को <b>%{leave_info} %{month_dates}</b><p/> को अनुपस्थित चिह्नित किया गया, जिसका
+    कारण है: <b>%{reason}</b><p/> अधिक जानकारी के लिए URL में लॉगिन करें"
+  parent_daily_wise_attendance_registration: "प्रिय %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    को <b>%{leave_info} %{month_dates} </b><p/>को अनुपस्थित चिह्नित किया गया, जिसका
+    कारण है: <b>%{reason}</b><p/> अधिक जानकारी के लिए URL में लॉगिन करें।"
+  student_subject_wise_attendance_registration: "प्रिय %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    को विषय:<b>%{subject_name}</b>के लिए कक्षा के समय <b> %{class_timing_name}</b>पर
+    अनुपस्थित चिह्नित किया गया है, <p/>जिसका कारण था: <b>%{reason}</b><p/> अधिक जानकारी
+    के लिए URL पर जाएँ।"
+  parent_subject_wise_attendance_registration: "प्रिय %{recipient_name},<p/><b> %{student_full_name}(%{student_admission_no})</b>
+    को विषय:<b>%{subject_name}</b>के लिए कक्षा के समय <b> %{class_timing_name}</b>पर
+    अनुपस्थित चिह्नित किया गया है, <p/>जिसका कारण था: <b>%{reason}</b><p/> अधिक जानकारी
+    के लिए URL पर जाएँ।"
+  employee_employee_creation: "प्रिय %{recipient_name},<p/> आपका विवरण अब URL<p/> उपयोगकर्ता
+    नाम: <b>%{username}</b> <p/>पासवर्ड: <b>%{username}123</b> पर उपलब्ध है"
+  student_fee_collection_creation: "प्रिय %{recipient_name},<p/>  कृपया <b>%{student_user_school_name}</b>
+    पर <b>%{finance_fee_collection_name}</b> का भुगतान करें <p/> नियत देयता तिथि: <b>%{due_date}</b><p/> अधिक
+    जानकारी के लिए URL पर जाएँ।"
+  parent_fee_collection_creation: "प्रिय %{recipient_name},<p/>  कृपया <b>%{student_user_school_name}</b>
+    पर <b>%{finance_fee_collection_name}</b> का भुगतान करें <p/> नियत देयता तिथि: <b>%{due_date}</b><p/> अधिक
+    जानकारी के लिए URL पर जाएँ।"
+  student_fee_submission: "प्रिय %{recipient_name},<p/> हमें <b>%{name_of_collection}</b>
+    के लिए <b>%{date_of_transaction}</b> को शुल्क के रूप में <b>%{currency_name} %{amount_to_f}</b>
+    मिला।"
+  parent_fee_submission: "प्रिय %{recipient_name},<p/> हमें <b>%{name_of_collection}</b>
+    के लिए <b>%{date_of_transaction}</b> को शुल्क के रूप में <b>%{currency_name} %{amount_to_f}</b>
+    मिला।"
+  members_common_event_creation: "प्रिय %{recipient_name},<p/> <b>%{event_days}</b>को
+    एक ईवेंट <b>%{title}</b> का कार्यक्रम निर्धारित किया गया है <p/> अधिक जानकारी
+    के लिए URL पर जाएँ।"
+  student_event_creation_for_batch: "प्रिय %{recipient_name},<p/>  <b>%{event_event_days}</b>
+    को एक ईवेंट <b>%{event_title}</b> का कार्यक्रम निर्धारित किया गया है <p/> अधिक
+    जानकारी के लिए URL पर जाएँ।"
+  parent_event_creation_for_batch: "प्रिय %{recipient_name},<p<b>%{event_event_days}</b>को
+    एक ईवेंट <b>%{event_title}</b> का कार्यक्रम निर्धारित किया गया है <p/> अधिक जानकारी
+    के लिए URL पर जाएँ।"
+  employee_event_creation_for_employee: "प्रिय %{recipient_name},<p/> on <b>%{event_event_days}</b>
+    को एक ईवेंट <b>%{event_title}</b> का कार्यक्रम निर्धारित किया गया है <p/> अधिक
+    जानकारी के लिए URL पर जाएँ।"
+  employee_leave_creation: "प्रिय %{recipient_name},<p/><b>%{employee_full_name}(%{employee_employee_number})</b>
+    ने <b>%{leave_days}</b> को <p/> कारण: <b>%{reason}</b> से अवकाश के लिए आवेदन किया
+    है<p/> अनुरोध स्वीकार या अस्वीकार करने के लिए URL पर जाएँ।"
+  employee_leave_approval: "प्रिय %{recipient_name},<p/>दिनांक <b>%{leave_days}</b>
+    को <b>%{reason}</b> कारण से दिया गया आपका अवकाश आवेदन <b>%{leave_status}</b> है<p/>
+    अधिक जानकारी के लिए URL पर जाएँ।"
+  members_poll_creation: "प्रिय %{recipient_name},<p/> <b>%{poll_question_poll_creator_school_name}</b>
+    पर एक नया चुनाव ''<b>%{poll_question_title}</b>'' तैयार किया गया है।<p/> कृपया
+    भाग लेने के लिए URL पर जाएँ।"
+  event_creation_for_batch: "%{event_start_date_to_date} से %{event_end_date_to_date}
+    तक एक ईवेंट %{event_title} का कार्यक्रम निर्धारित किया गया है"
+  event_creation_for_employee: " %{event_start_date_to_date} से %{event_end_date_to_date}
+    तक एक ईवेंट %{event_title} का कार्यक्रम निर्धारित किया गया है"
+  student_subject_student_creation: "%{user_school_name} में %{full_name}का लॉगिन
+    विवरण"
+  student_subject_examination_schedule_publishing: "%{school_name} में %{recipient_name}
+    की परीक्षा का कार्यक्रम निर्धारित किया गया है"
+  parent_subject_examination_schedule_publishing: "%{student_name} की परीक्षा %{school_name}
+    में होगी"
+  student_subject_examination_result_publishing: "%{name} के लिए %{recipient_name}
+    का परीक्षा परिणाम प्रकाशित हो गया है"
+  parent_subject_examination_result_publishing: "%{name} के लिए %{recipient_name}
+    का परीक्षा परिणाम प्रकाशित हो गया है"
+  student_subject_daily_wise_attendance_registration: "%{month_dates} में %{student_full_name}
+    अनुपस्थित है"
+  parent_subject_daily_wise_attendance_registration: "%{month_dates} में %{student_full_name}
+    अनुपस्थित है"
+  student_subject_subject_wise_attendance_registration: "%{month_date} में %{student_full_name}
+    अनुपस्थित है"
+  parent_subject_subject_wise_attendance_registration: "%{month_date} में %{student_full_name}
+    अनुपस्थित है"
+  employee_subject_employee_creation: "%{school_name} में %{full_name}का लॉगिन विवरण"
+  student_subject_fee_collection_creation: "%{student_user_school_name} में %{finance_fee_collection_name} "
+  parent_subject_fee_collection_creation: "%{student_user_school_name} में %{finance_fee_collection_name} "
+  student_subject_fee_submission: "%{currency_name} %{amount_to_f} शुल्क के रूप में
+    भुगतान किया गया"
+  parent_subject_fee_submission: "%{currency_name} %{amount_to_f} शुल्क के रूप में
+    भुगतान किया गया"
+  employee_subject_leave_creation: "%{employee_full_name} का अवकाश आवेदन"
+  employee_subject_leave_approval: "%{leave_days} के लिए अवकाश आवेदन %{leave_status} "
+  members_subject_poll_creation: "%{poll_question_poll_creator_school_name} में एक
+    नया चुनाव ''%{poll_question_title}'' तैयार किया गया "
+  members_subject_common_event_creation: "%{event_days} पर  %{school_name} में नया
+    ईवेंट %{title}"
+  student_subject_event_creation_for_batch: "%{event_event_days} पर %{event_school_name}
+    में नया ईवेंट %{event_title}"
+  parent_subject_event_creation_for_batch: "%{event_event_days} पर %{event_school_name}
+    में नया ईवेंट %{event_title}"
+  employee_subject_event_creation_for_employee: "%{event_event_days} पर %{event_school_name}
+    में नया ईवेंट %{event_title}"
+  student_subject_transfer_batch: "%{user_school_name} में %{full_name} का बैच स्थानांतरित
+    किया गया"
+  parent_subject_transfer_batch: "%{user_school_name} में %{full_name} का बैच स्थानांतरित
+    किया गया"
+  parent_subject_parent_creation: "%{user_school_name} में %{full_name} का लॉगिन विवरण"
+  mail_sent_successfully: "मेल सफलतापूर्वक भेजा गया"
+  footer: "<p><font size=1> %{school_details}</font>"
+  send_email_privilege: "ईमेल भेजें"
+  email_alert_settings_privilege: "ईमेल अलर्ट सेटिंग"
+  dear: "प्रिय"
+  unsubscription_list: "सदस्यता हटाने की सूची"
+  list_of_unsuscribed_students: "सदस्यता हटाए गए छात्रों की सूची"
+  invalid_unsubscription_link: "सदस्यता हटाने का अमान्य लिंक"
+  unsubscribed: "आपने ईमेल अलर्ट की सदस्यता हटा दी है। सदस्यता लेने के लिए व्यवस्थापक
+    से संपर्क करें"
+  no_students_unsubscribed_yet: "अभी तक किसी छात्र ने सदस्यता नहीं हटाई!"
+  select_date: "तिथि का चयन करें"
+  unsubscribe: "सदस्यता हटाएँ"
+  unsubscription_success: "सफलतापूर्वक सदस्यता हटाई गई"
+  you_will_no_longer_get_updates_from: "अब आपको इससे अपडेट नहीं मिलेगा"
+  to_subscribe_again_contact_administrator: "पुनः सदस्यता लेने के लिए संस्थान के अधिकारियों
+    से संपर्क करें"
+  email_settings_saved: "ईमेल सेटिंग सहेजा गया"

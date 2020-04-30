@@ -1,0 +1,19 @@
+<% @notifications.each do |notification| %>
+  <div class="notifications_strip">
+      <div class="notification_header">
+          <%=show_notification_icon(notification.initiator)%>
+          <div class="notification_intiator"><%= notification.initiator %></div>
+          <div class="notification_date">
+              <% date = notification.created_at %>
+              <% if date < Date.today.beginning_of_year %>
+                <%= format_date(date,:format => :short) %>
+              <% elsif(date.to_date - Date.today).to_i < 0 %>
+                <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M %p")  %>
+              <% else %>
+                <%=  change_time_to_local_time(date).strftime("%I:%M %p")  %>
+              <% end %>
+          </div>
+      </div>
+      <div class="notification_content"><%=notification.content%></div>
+  </div>
+<% end %>

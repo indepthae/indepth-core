@@ -1,0 +1,3 @@
+<%  if @assigned_batches_count > 0%>
+  <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('show_student_record_form_preview')}", :url => { :action => 'student_record_preview',:id=>@course.id },:method=>:get %></li>
+<%end%>

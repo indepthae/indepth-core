@@ -1,0 +1,12 @@
+page << "if($('modal-box') == null){x = new Element('div',{id: 'modal-box'}); document.body.appendChild(x)}"
+page.replace_html 'modal-box', :partial => 'credit_by_leave_groups_modal'
+page << "Modalbox.show($('modal-box'), {title: '#{t('credit_leaves')}', width: 540});"
+page << "if(c= $('MB_modal-box')) {c.remove();}"
+page << "if(c= $('modal-box')) {c.remove();}"
+page << "window.scrollTo(0, 0);"
+page << "var month_names = '#{I18n.t('date.month_names').compact.join(',')}';"
+page << "
+        j(document).on({
+                  click : function(){
+                  new CalendarDateSelect( this.previous(), {date_format:'#{date_format}', locale_months:month_names, popup:'force', year_range:10} );
+        }},'.calendar_label')"

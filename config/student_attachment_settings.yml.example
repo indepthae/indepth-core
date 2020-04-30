@@ -1,0 +1,8 @@
+# max_file_size can be set a numeric value in BYTES, 
+## example#1 for 10 TB ( 10 * 1024 * 1024 * 1024 * 1024 = 10 * 1024 GB = 10 * 1024 * 1024 MB = 10 * 1024 * 1024 * 1024 MB = 10 * 1024 * 1024 * 1024 * 1024 Bytes)
+## example#2 for 10 GB ( 10 * 1024 * 1024 * 1024 = 10 * 1024 MB = 10 * 1024 * 1024 KB = 10 * 1024 * 1024 * 1024 Bytes)
+## example#3 for 10 MB ( 10 * 1024 * 1024 = 10 * 1024 KB = 10 * 1024 * 1024 Bytes)
+## example#4 for 5 KB ( 5 * 1024 = 5 KB = 5 * 1024 Bytes)
+## example#5 for 512 Bytes ( 512 Bytes)
+## max_file_size should be min 5 MB
+max_file_size: FILE_SIZE_IN_BYTES

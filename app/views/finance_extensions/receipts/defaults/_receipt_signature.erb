@@ -1,0 +1,5 @@
+<div class="signature_part">
+    <% unless default_configs.try(:pdf_receipt_signature).to_i.zero? %>
+      <%= default_configs.try(:pdf_receipt_signature_name) || t('signature') %>
+    <% end %>
+</div>

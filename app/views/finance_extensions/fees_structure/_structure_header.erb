@@ -1,0 +1,30 @@
+<div class="details">    
+    <div class="name normal_font"><%= t('fees_collection_date_name') %></div>
+    <div class="val ">
+        <span>:</span>
+        <div class="val-align"><%= @date.name.capitalize %></div>
+    </div>        
+    <% unless @fee_category.nil? %>
+      <div class="name normal_font"><%= t('fee_category_name') %></div>
+      <div class="val">
+          <span>:</span>
+          <div class="val-align"><%= @fee_category.name.capitalize %></div>
+      </div>
+    <% end %>
+
+    <div class="name normal_font">
+        <%= t('start_date') %>
+    </div>
+    <div class="val ">
+        <span>:</span>
+        <div class="val-align"><%= format_date(@date.start_date) %></div>
+    </div>
+    <div class="name normal_font">
+        <%= t('due_date') %>
+    </div>
+    <div class="val ">
+        <span>:</span>
+        <div class="val-align"><%= format_date(@date.due_date) %></div>
+    </div>
+    <br/>
+</div>

@@ -1,0 +1,93 @@
+<% additional_params = {:batch_id => @batch.id} %>
+<div id="date_filter" class="date_box" style="display: none;">
+    <%= render :partial => "filter_dates" , :locals => {:additional_params => additional_params} %>
+</div>
+<div class="list_table_div">
+  <div class="main_head_label" style="margin-bottom: 15px">
+      <b id="fees_report_title">
+        <label><%= t('batch_name') %></label>
+        <span>:</span>
+        <label class="head_label_value"><%= @batch.name %></label>
+      </b>
+
+      <div class="date_align right">
+          <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+          <%= format_date(@start_date) %> &nbsp;
+          <label class="to_date"><%= t('small_to') %></label> &nbsp;
+          <%= format_date(@end_date) %>
+          <span id="show_date" class="themed_hover_text">
+              <%= t('change_date') %>
+          </span>
+      </div>
+  </div>
+
+</div>
+<% total_amount = 0 %>
+<% if @student_fee_collections_by_batch.present? %>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+      <td class="set_border_right" ><%= t('student_name') %></td>
+      <td class="set_border_right" >
+        <span class="show_amount" ><%= t('amount') %> (<%= currency %>)</span>
+      </td>
+      <td class="set_border_right" ><%= t('receipt_no') %></td>
+      <td class="set_border_right" ><%= t('date_of_payment') %></td>
+      <td class="set_border_right" ><%= t('payment_mode') %></td>
+      <td class="set_border_right" ><%= t('payment_notes') %></td>
+    </tr>
+    <% @student_fee_collections_by_batch.each do |collection| %>
+      <tr class="row-b">
+        <td class="set_border_right" ><%= fetch_student_name(collection.student_id) %></td>
+        <td class="set_border_right" ><%= collection.amount.to_f %></td>
+        <td class="set_border_right" ><%= collection.receipt_no %></td>
+        <td class="set_border_right" ><%= format_date(collection.transaction_date) %></td>
+        <td class="set_border_right" ><%= collection.payment_mode %></td>
+        <td class="set_border_right" ><%= collection.payment_note %></td>
+      </tr>
+      <% total_amount += collection.amount.to_f %>
+    <% end %>
+  </table>
+
+    <div class="total_amount_div">
+        <label><%= t('net_income') %></label>
+        <label class="amount_label"><%= precision_label(total_amount.to_f) %></label>
+    </div>
+    <%= will_paginate @student_fee_collections_by_batch, :params => {:batch_id => @batch.id, :start_date => @start_date,
+      :end_date => @end_date, :date_tag => params[:date_tag]}, :renderer => 'RemoteLinkRenderer' %>
+    <div class="seprater_div_bottom">
+        <div id="inner-tab-menu">
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'>
+                    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                      :csv_report_type => "advance_fees", :report_format_type => "csv",
+                      :start_date => @start_date, :end_date => @end_date,
+                      :batch_wise_expense => 1, :batch_id => @batch.id, :page => params[:page]} %>
+                </li>
+            </ul>
+        </div>
+    </div>
+  <% else %>
+    <div class="no_entries"><%= t('no_transactions_present') %></div>
+  <% end %>
+  <script type="text/javascript">
+
+      j('.calendar_label').on('click', function () {
+          var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+          new CalendarDateSelect(this.previous(), {
+              date_format: "<%= date_format %>",
+              locale_months: month_names,
+              popup: 'force', year_range: 10
+          });
+      });
+
+      j("#hide_date_filter").click(function () {
+          j(".date_box").hide();
+          j("#show_date").show();
+      });
+
+      j("#show_date").click(function () {
+          j(".date_box").show();
+          j("#show_date").hide();
+      });
+
+  </script>

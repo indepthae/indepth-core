@@ -1,0 +1,23 @@
+<% remote_form_for @events, :url => {:action => "create"}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |lg| %>
+  <%= session_fingerprint_field %> 
+  <div id="leave_group_form">
+      <%if @att.present?%>
+        <div id ="description"><%= t('event_warning_1') %>
+        <div class="label-field-pair"><%= t('event_warning_2') %></div></div>
+      <%end%>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "#{(@att.present? ? t('proceed_and_create_event') : t('proceed_and_create_event'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button", :onclick => "submit_form(); return false;"%>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('.submit-button').attr('disabled', false);
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  j('#description').css('padding-bottom', '50px');
+  j('#description').css('margin-left', '20px');
+  window.scrollTo(0, 0);
+  
+  
+</script>

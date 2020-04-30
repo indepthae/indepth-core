@@ -1,0 +1,23 @@
+<% remote_form_for :search, :url => fetch_report_transport_reports_path(:type => @type), :before=>"$('submit_button').disable(); j('#report_results').hide(); j('#loading').show()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},2000); j('#loading').hide(); j('#report_results').show()", :html => {:id => 'search-form'} do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="addl_detail_form">
+      <%= render :partial => 'academic_year', :locals => {:s => s} %>
+      <%= s.submit t('view_report'), :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+  var valid;
+  function validate_search_form() {
+      valid = true;
+      j('.wrapper').hide();
+      check_validation("search_academic_year_id");
+      return valid;
+  }
+  function check_validation(id) {
+      if ((j('#' + id).val() == "") || (j('#' + id).val() == null)) {
+          valid = false;
+          j('#' + id).siblings('.wrapper').show();
+      }
+  }
+</script>

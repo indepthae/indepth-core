@@ -1,0 +1,74 @@
+<div class="content">
+  <div class="generated_id_cards">
+    <table class="primary">
+      <tr>
+        <th><%= t('sl_no') %></th>
+        
+        <th> <%= t('date_text') %> </th>
+        <th  class="links"> </th>
+      </tr>
+      
+      <%if @bulk_generated_id_cards.present? %>
+      <%sl_no = ((params[:page].present? ? params[:page].to_i - 1 : 0)* @per_page ) + 1 %>
+      <%@bulk_generated_id_cards.each do |c|%>
+      <tr <%= "class='currently_created'" if params[:currently_created].present? && c.id == params[:currently_created].to_i %> >
+        <td  class="center_text"><%= sl_no %></td>
+        <%sl_no = sl_no + 1%>
+        <td class="center_text"><%= format_date(c.issued_on) %>
+        <td class="center_text">
+          <%if c.generated_pdfs.present? %>
+            <% a4_link = c.generated_pdfs.select{|g| g.style=="a4"}.first.pdf.url(:original,false) %>
+            <% card_size_link = c.generated_pdfs.select{|g| g.style=="card_size"}.first.pdf.url(:original,false) %>
+          <%else%>
+            <% a4_link = generate_bulk_export_pdf_id_card_templates_path(:bulk_generated_id_card_id=>c.id) %>
+            <% card_size_link =  generate_bulk_export_pdf_id_card_templates_path(:bulk_generated_id_card_id=>c.id, :single_page_enabled=>true) %>
+          <%end%>
+            <%=link_to t('a4_canvas'), a4_link, :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+            <%=link_to t('single_card_size'), card_size_link, :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+            <%=link_to t('delete'), delete_bulk_generated_id_card_id_card_templates_path(:id=>c.id,:page=>params[:page]), :class=>"themed_text delete_links_bulk" %>
+        </td>
+      </tr>
+      <%end%>
+      <%else%>
+      <tr>
+        <td class="center_text" colspan="3"> <%= t('no_bulk_generated_id_card_present') %> </td>
+      </tr>
+      <%end%>
+      </table>
+      <div class="paginate_box">
+        <%= will_paginate @bulk_generated_id_cards, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "id_card_templates",:action => "bulk_generated_id_cards_list",
+          :id_card_template_id => params[:id_card_template_id], :academic_year_id => params[:academic_year_id] }%>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  var pass_through = false;
+  function delete_confirmed(elem) {
+    (function () {
+
+      var e = elem;
+
+      j('#yes').click(function () {
+        remove_popup_box();
+        pass_through = true;
+        e.click();
+        pass_through = false;
+      });
+    })();
+  }
+
+  j(".delete_links_bulk").click(function (e) {
+    if (pass_through == false) {
+      e.preventDefault();
+    }
+    make_popup_box(this, 'confirm', "<%=t('delete_generated_id_card_desc')%> ", {
+      'ok': "<%=t('delete')%>",
+      'cancel': "<%=t('cancel')%>",
+      'title': "<%=t('delete_generated_id_card')%>",
+      'popup_class': 'remove_lt',
+      'return_status': true
+    });
+    return delete_confirmed(this);
+  });
+  </script>

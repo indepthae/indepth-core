@@ -1,0 +1,106 @@
+<%@discipline_comments.each do |comment|%>
+  <div id="com_<%= "#{comment.id}" %>"
+       <li id='comment_<%= "#{comment.id}" %>' class="comment" >
+
+      <div class="comment_details">
+        <br></br>
+        <div class="themed_text commenter">
+
+          <%= comment.user.nil? ? t('deleted_user'):comment.user.full_name  %>:
+        </div>
+        <%unless @discipline_complaint.action_taken==true %>
+          <%if (comment.user_id ==@current_user.id or @current_user.admin?) or @current_user.privileges.map{|p| p.name}.include?("Discipline")%>
+            <div class="delete-comment">
+              <%=link_to_remote "#{t('delete_text')}",:url=>{:controller=>"discipline_complaints", :action => "destroy_comment",:id1=>comment.id },:confirm => "#{t('delete_confirm_msg')}"%>
+            </div>
+          <%end%>
+        <%end%>
+
+      </div>
+      <div id="comment_content" >
+        <%= comment.body %>
+      </div>
+      <div class="comment-base">
+        <div class="comment-posted-at">
+          <%= format_date(I18n.l(FedenaTimeSet.current_time_to_local_time(comment.updated_at)),:format=>:long)%>
+        </div>
+        <%unless @discipline_complaint.action_taken==true %>
+          <%if (@privilege) or (@current_user.privileges.collect(&:name).include?("Discipline")) %>
+            <div class="c_reply" id="c_reply<%=comment.id%>">
+              <%if comment.commentable_type=="DisciplineComplaint"%>
+
+                <div id="cancel<%=comment.id%>"></div>
+                <%= link_to_remote("#{t('reply')}", {:url=>{:controller=>"discipline_complaints",:action=>"reply",:id=>comment.id }}, {:class=>"themed_text",:id=>"re#{comment.id}",:onclick=>"reply('#{comment.id}')"})%>
+              <%end%>
+            </div>
+          <%end%>
+        <%end%>
+
+      </div>
+      <div id="errors<%=comment.id%>"></div>
+      <p id="reply<%=comment.id%>"></p>
+
+      <div class="line1"></div>
+
+      <div id="reply"></div>
+      <ul>
+
+
+        <div id="nested-comments<%= comment.id %>" class="nested_comment">
+          <% if comment %>
+            <% unless comment.replies.empty? %>
+
+              <ul class="comment_list">
+                <%comment.replies.each do|comment|%>
+                  <div id="com_<%= "#{comment.id}" %>">
+                    <div class="comment_details">
+                      <br></br>
+                      <div class="themed_text commenter">
+
+                        <%=comment.user.nil? ? t('deleted_user'): comment.user.full_name  %>:
+                      </div>
+                      <%unless @discipline_complaint.action_taken==true %>
+                        <%if (comment.user_id ==@current_user.id or @current_user.admin?) or @current_user.privileges.collect(&:name).include?("Discipline")%>
+                          <div class="delete-comment">
+                            <%=link_to_remote "#{t('delete_text')}",:url=>{:controller=>"discipline_complaints", :action => "destroy_comment",:id1=>comment.id },:confirm => "#{t('delete_confirm_msg')}"%>
+                          </div>
+                        <%end%>
+                      <%end%>
+
+                    </div>
+                    <div id="comment_content" >
+                      <%= comment.body %>
+                    </div>
+                    <div class="comment-base">
+                      <div class="comment-posted-at">
+                        <%= format_date(I18n.l(FedenaTimeSet.current_time_to_local_time(comment.updated_at)),:format=>:long)%>
+                      </div>
+                      <%unless @discipline_complaint.action_taken==true %>
+                        <%unless @privilege_admin.nil?%>
+                          <div class="c_reply">
+                            <%if comment.commentable_type=="DisciplineComplaint"%>
+                              <%= link_to_remote "#{t('reply')}", :url=>{:controller=>"discipline_complaints",:action=>"reply",:id=>comment.id }, :option=>{:class=>"themed_text"}%>
+                            <%end%>
+                          </div>
+                        <%end%>
+                      <%end%>
+                    </div>
+                    <div class="line"></div>
+
+                  </div>
+                <%end%>
+              </ul>
+            <%end%>
+
+
+          <% end %>
+        </div>
+
+      </ul>
+
+    </li>
+
+
+  </div>
+<%end%>
+<%= will_paginate @discipline_comments, :previous_label=>"<", :next_label=>">", :renderer => 'RemoteLinkRenderer' ,:remote => { :loading =>  "$('loader').show();",:complete =>"$('loader').hide();"  }, :params => {:controller=>:discipline_complaints,:action => "list_comments",:id=>@discipline_complaint.id} %>

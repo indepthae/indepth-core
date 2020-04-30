@@ -1,0 +1,93 @@
+<%#= stylesheet_link_tag 'bootstrap-combobox.css' %>
+<%= javascript_include_tag 'bootstrap-combobox'%>
+<%= stylesheet_link_tag 'jquery-ui.css' %>
+<script type="text/javascript">
+  var q = jQuery.noConflict();
+  q(document).ready(function(){
+    q(".datepicker").datepicker({
+      showOn: "button",
+      buttonImage: "/images/transparent.png",
+      buttonImageOnly: true,
+      changeMonth: true,
+      changeYear: true,
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      buttonText: 'Select Date',
+      dateFormat: "yy-mm-dd",
+      minDate: new Date()
+    }).next(".ui-datepicker-trigger").addClass("float-left-datepicker");
+
+    q('.combobox').combobox({bsVersion: '2'});
+  });
+
+</script>
+<% can_assign_to_ms = @owner.present? ? (@owner.class.name=="ClientSchoolGroup" ? @owner.can_create_multi_school : false) : true %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Assign Package - <%= @sms_package.name %></h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+  <% if @owner.present? %>
+    <% owner_object = @owner.class.name.underscore.to_sym %>
+    <% form_path = "assign_package_#{owner_object}_sms_package_path" %>
+  <% end %>
+  <% form_for @assigned_package,:url=>(@owner.present? ? send(form_path, @owner) : {:controller=>"sms_packages",:action=>"assign_package"}),:html=>{:class=>'form'} do|f| %>
+    <fieldset>
+      <%= error_string_for(f) %>
+      <%= f.error_message_on :base %>
+    </fieldset>
+    <fieldset>
+      <% if @owner.nil? %>
+        <label>Client</label>
+        <%= f.hidden_field :assignee_type,:value=>"SchoolGroup" %>
+        <div class="text-input-bg"><%= f.select :assignee_id, @available_assignees.map{|a|[a.name,a.id]},{:prompt=>'Enter Client Name - Type Ahead'},{:class=>'combobox'} %></div>
+      <% else %>
+        <% if @owner.class.name == 'ClientSchoolGroup' %>
+          <% if @owner.can_create_multi_school %>
+            <label>Assignee</label>
+            <div class="text-input-bg">
+              <%= f.select :assignee_type, [['School','School'],['Multischool Group','SchoolGroup']],{},{:onChange => "#{remote_function(:url => {:controller=>"sms_packages",:action => "update_assignee_list",:client_school_group_id=>@owner.id}, :with => "'assignee_type='+value" )}"} %>
+              <div id="assignee_list">
+                <%= f.select :assignee_id, @available_assignees.map{|a|[a.name,a.id]},{:prompt=>'Enter Name - Type Ahead'},{:class=>'combobox margin-left-15'} %>
+              </div>
+            </div>
+          <% else %>
+            <label>School</label>
+            <%= f.hidden_field :assignee_type,:value=>"School" %>
+            <div class="text-input-bg"><%= f.select :assignee_id, @available_assignees.map{|a|[a.name,a.id]},{:prompt=>'Enter School Name - Type Ahead'},{:class=>'combobox'} %></div>
+          <% end %>
+        <% else %>
+          <label>School</label>
+          <%= f.hidden_field :assignee_type,:value=>"School" %>
+          <div class="text-input-bg"><%= f.select :assignee_id, @available_assignees.map{|a|[a.name,a.id]},{:prompt=>'Enter School Name - Type Ahead'},{:class=>'combobox'} %></div>
+        <% end %>
+      <% end %>
+    </fieldset>
+    <fieldset>
+      <label>Message Limit</label>
+      <div class="text-input-bg"><%= f.text_field :sms_count %></div><% if @assigned_row.sms_count.present? %> <label style="color:#999;margin-left:22px;">Available SMS - <%= @assigned_row.sms_count - @assigned_row.sms_used %></label><% end %>
+    </fieldset>
+    <fieldset>
+      <label>Valid Till</label>
+      <div class="text-input-bg"><%= f.text_field :validity, :value=>(@assigned_package.validity.present? ? @assigned_package.validity : nil), :class => "datepicker" %></div><% if @assigned_row.validity.present? %> <label style="color:#999;width:auto !important;">Package validity - <%= @assigned_row.validity %></label><% end %>
+    </fieldset>
+    <% if @assigned_row.enable_sendername_modification %>
+      <fieldset>
+        <label>Sender Name</label>
+        <div class="text-input-bg"><%= f.text_field :sendername, :value=>@assigned_row.sendername %></div>
+      </fieldset>
+      <% if can_assign_to_ms %>
+        <fieldset>
+          <label>Sender name modification</label>
+          <div class="text-input-bg">
+            <%= f.radio_button :enable_sendername_modification,true %><label class="width-50">Enable</label>
+            <%= f.radio_button :enable_sendername_modification,false %><label class="width-50">Disable</label>
+          </div>
+        </fieldset>
+      <% end %>
+    <% end %>
+    <fieldset>
+  <%#= link_to 'Cancel', "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list_custom_date(); return false;'}%>
+      <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    </fieldset>
+  <% end %>
+</div>

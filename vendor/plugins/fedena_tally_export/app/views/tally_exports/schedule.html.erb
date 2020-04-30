@@ -1,0 +1,112 @@
+
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('schedule_export') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('schedule_a_bulk_export_for_tally') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "View Scheduled Jobs", scheduled_task_path(:job_object=>"TallyBulkExportJob",:job_type=>"1") %></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash_box">
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="grading-levels-form">
+
+    <% form_for :bulk_export do |f| %>
+
+      <div id="form-errors">
+        <% unless @errors.blank? %>
+          <div class="errorExplanation" id="errorExplanation">
+            <h2><%= @errors.size %> error<%= 's' if @errors.size > 1 %> prohibited this from being saved</h2>
+            <ul>
+              <% @errors.each do |error| %>
+                <li><%= error %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+      <div id="right-side-inputs">
+        <div class="label-field-pair category_list">
+          <div class="label-container">
+            <label><%= t('select_ledgers') %>:
+              <b class="sel-list">
+                <%= link_to_function t('all'), "$$('input.category_select').each(function(checkbox) { checkbox.checked = true; });" %>,
+                <%= link_to_function t('none'), "$$('input.category_select').each(function(checkbox) { checkbox.checked = false; });" %>
+              </b>
+            </label>
+          </div>
+          <div class="categories">
+
+            <% @ledgers.each do |ledger| %>
+              <div class="each_category">
+                <%= check_box_tag "bulk_export[ledger_ids][]", ledger.id, false, :class=>"category_select" %> <label><%= "#{ledger.ledger_name}" %></label>
+              </div>
+            <% end %></div>
+        </div>
+      </div>
+      <div id="left-side-inputs">
+        <div class="label-field-pair">
+          <div class="label-container"><%= f.label "#{t('start_date')}" %></div>
+          <div class="input-container">
+            <% start_date=I18n.l(Date.today - 1.month, :format=> :default) %>
+            <% if params[:bulk_export].present? and params[:bulk_export][:start_date].present? %>
+              <% start_date=params[:bulk_export][:start_date] %>
+            <% end %>
+            <%= calendar_date_select_tag 'bulk_export[start_date]', start_date  ,
+              :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+          </div>
+        </div>
+
+        <div class="label-field-pair">
+          <div class="label-container"><%= f.label "#{t('end_date')}" %></div>
+          <div class="input-container">
+            <% end_date=I18n.l(Date.today, :format=> :default) %>
+            <% if params[:bulk_export].present? and params[:bulk_export][:end_date].present? %>
+              <% end_date=params[:bulk_export][:end_date] %>
+            <% end %>
+            <%= calendar_date_select_tag 'bulk_export[end_date]', end_date,
+              :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+          </div>
+        </div>
+
+      </div>
+
+      <%=  submit_tag "► #{t('schedule_text')}",:class=>'submit_button' %>
+
+    <% end %>
+  </div>
+
+</div>

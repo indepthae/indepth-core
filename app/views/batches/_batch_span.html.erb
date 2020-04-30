@@ -1,0 +1,6 @@
+<%if @batch.present?%>
+  <div id="batch_range_and_tutor">
+    <label><%= t('calendar_range') %></label>
+    <%="#{format_date(@batch.start_date,:format=>:long_date)} - #{format_date(@batch.end_date,:format=>:long_date)}"%>
+  </div>
+<%end%>

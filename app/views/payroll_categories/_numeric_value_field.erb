@@ -1,0 +1,6 @@
+<%- fields_for object_name, hr_formula do |f| %>
+  <div class="label-field-pair" id="numeric_field">
+    <label for="numeric_value"><%= t('amount') %></label>
+    <div class="text-input-bg"><%= f.text_field :default_value %></div>
+  </div>
+<% end %>

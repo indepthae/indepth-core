@@ -1,0 +1,11 @@
+<div class="label-field-pair-gateway">
+  <label><%= t('payment_gateway') %></label>
+  <div class = "gateway-list">
+    <% @gateways.each do|custom_gateway| %>
+      <div class="value gateway-button">
+        <%= check_box_tag "payment_settings[fedena_gateway][]",custom_gateway.id, (@active_gateway.include? custom_gateway.gateway_id),:id => "checkbox_#{custom_gateway.id}" %>
+        <label for="custom_gateway_<%= custom_gateway.id %>"><%= custom_gateway.name %></label>
+      </div>
+    <% end %>
+  </div>
+</div>

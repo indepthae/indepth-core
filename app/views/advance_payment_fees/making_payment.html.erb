@@ -1,0 +1,32 @@
+<%= stylesheet_link_tag 'payment_settings/initialize_payment.css' %>
+
+<div class="waiting-div">
+    <h2 style="margin-top:50px;text-align:center;">Initializing payment process</h2>
+    <div class="wait-div"><span class="wait-text">Please wait</span> <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: block; margin-top: 1px; float: left; margin-left: 5px;" ) %></div>
+    <div class="warn-div">Please do not press <b>Refresh</b> or <b>Back</b> button.</div>
+</div>
+
+<% form_for :custom_gateway_online_pay ,:url => @custom_gateway.gateway_parameters[:config_fields][:target_url],:html=>{:name=>"payment_form"} do |f| %>
+  <%unless PaymentConfiguration.is_encrypted(@custom_gateway)==true%>
+    <% hidden_field_tag :gateway_name, @custom_gateway.name %>
+    <% @custom_gateway.gateway_parameters[:config_fields].each_pair do|k,v| %>
+      <% unless k == "target_url" %>
+        <%= hidden_field_tag k.to_sym,v,:readonly => true%>
+      <% end %>
+    <% end %>
+    <%=make_payment_params%>
+    <%= hidden_field_tag :current_school, current_school_name ,:readonly => true %>
+  <%else%>
+    <%= hidden_field_tag :hash, @encrypted_hash %>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+    window.onload = function(){
+    document.forms['payment_form'].submit()
+
+    }
+</script>

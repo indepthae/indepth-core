@@ -1,0 +1,50 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('transport_text')}"%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('vehicle_maintenance_text')}"%></div>
+    <div id="inner-tab-menu">
+        <ul class="top_buttons">
+            <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('edit')}", edit_vehicle_maintenance_path(@maintenance_record.id) %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :vehicle_maintenances_show, @maintenance_record %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="vehicle_details">
+        <div class="field_details">
+            <div class="field_name"><%= t('vehicle') %></div>
+            <div class="field_val">: <%= @maintenance_record.vehicle.vehicle_no %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('name_of_maintenance') %></div>
+            <div class="field_val">: <%= @maintenance_record.name%></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('notes') %></div>
+            <div class="field_val">: <%= @maintenance_record.notes||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('maintenance_date') %></div>
+            <div class="field_val">: <%= format_date(@maintenance_record.maintenance_date) %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('next_maintenance_date') %></div>
+            <div class="field_val">: <%= format_date(@maintenance_record.next_maintenance_date) %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('amount') %></div>
+            <div class="field_val">: <%= precision_label(@maintenance_record.amount) %></div>
+        </div>
+
+    </div>
+    <div id="routes_list">
+        <%= render :partial => "attachments_list" %> 
+    </div>
+</div>

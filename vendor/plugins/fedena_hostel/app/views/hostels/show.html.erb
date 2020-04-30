@@ -1,0 +1,123 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('view_hostel_details')}"%></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('manage_wardens')}", hostel_wardens_path(@hostel.id) %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_room')}", :controller=>'room_details',:action => 'new',:hostel_id => @hostel.id%></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit_text')}", edit_hostel_path(@hostel)%></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('delete_text')}", @hostel, :confirm => "#{t('delete_confirm_msg')}", :method => :delete, :class => 'delete_link'%></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :hostels_show, @hostel %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="detail_box">
+    <span class="row_">
+      <div class="name"><%= "#{t('hostel_name')}"%></div><div class="val"><span class="themed_text">:</span><span class="cont themed_text"><%= @hostel.name %></span></div>
+    </span>
+    <span class="row_">
+      <div class="name"><%= "#{t('hostel_type')}"%></div><div class="val"><span class="themed_text">:</span><span class="cont themed_text"><%= t("#{@hostel.hostel_type.downcase}") %></span></div>
+    </span>
+    <span class="row_">
+      <div class="name"><%= "#{t('other_information')}"%></div><div class="val"><span class="themed_text">:</span><span class="cont themed_text"><%= @hostel.other_info %></span></div>
+    </span>
+    <span class="row_">
+      <div class="name"><%= "#{t('total_no_of_rooms')}"%></div><div class="val"><span class="themed_text">:</span><span class="cont themed_text"><%= @total_rooms %></span></div>
+    </span>
+    <span class="row_">
+      <div class="name"><%= "#{t('warden')}"%></div><div class="val"><span class="themed_text">:</span><span class="cont themed_text">
+          <% @warden.each_with_index do |w,i| %>
+            <% if w.employee_details.present? %>
+              <%= w.employee_details.full_name%> <%= ',' if @warden.size>i+1 %>
+            <% end %>
+          <% end %>
+        </span>
+      </div>
+    </span>
+    <% @additional_details.each do |additional_detail| %>
+      <%if additional_detail.additional_info.present?%>
+        <span class="row_">
+          <div class="name"><%= additional_detail.hostel_room_additional_field.name %></div><div class="val"><span>:</span><span class="taglist themed_text"><%=h additional_detail.additional_info %></span></div>
+        </span>
+      <%end%>
+    <% end %>
+  </div>
+  <div class="extender"></div>
+  <br/>
+  <div id="room-list">
+    <% unless flash[:message].blank? %>
+      <p class="flash-msg"> <%= flash[:message] %> </p>
+    <% end %>
+    <% unless flash[:message2].blank? %>
+      <div id="error-box" class="errorExplanation"><ul><li> <%= flash[:message2] %> .</li></ul></div>
+    <% end %>
+    <%if @room_details.present?%>
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td>
+            <%= "#{t('sl_no')}"%>
+          </td>
+          <td>
+            <%= "#{t('room_number')}"%>
+          </td>
+          <td>
+            <%= "#{t('students_per_room')}"%>
+          </td>
+          <td>
+            <%= "#{t('availability')}"%>
+          </td>
+          <td>
+            <%= "#{t('rent')}"%>
+          </td>
+          <td>
+
+          </td>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <% @room_details.each_with_index do |r,i| %>
+          <% @occupied = r.get_room_allocation %>
+
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-3">
+              <%= ((params[:page].to_i==0 ? 0 : params[:page].to_i-1) * 20) + (i + 1) %>
+            </td>
+            <td class="col-7">
+              <%=  link_to r.room_number, r %>
+            </td>
+            <td class="col-7">
+              <%= r.students_per_room %>
+            </td>
+            <td class="col-7">
+              <%= r.students_per_room - @occupied.size %>
+            </td>
+            <td class="col-3">
+    <%#= r.rent %>
+              <%= precision_label(r.rent) %>
+            </td>
+            <td class="col-4">
+              <small>
+                <%= link_to "#{t('edit_text')}", edit_room_detail_path(r) %>
+                |
+                <%= link_to t('delete_text'), {:action=>"room_delete",:id=>r}, :confirm =>t('delete_confirm_msg') %>
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+      </table>
+      <%= will_paginate @room_details%>
+    <%else%>
+      <p class="flash-msg"> <%= t('room_details.no_rooms') %> </p>
+    <%end%>
+  </div>
+</div>

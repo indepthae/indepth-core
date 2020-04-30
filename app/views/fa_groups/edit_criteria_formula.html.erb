@@ -1,0 +1,59 @@
+<% content_for :head do  %>
+  <%= stylesheet_link_tag("observation_groups/edit_criteria_formula.css") %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>Formative Assessment</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Edit Criteria Formula</div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :fa_groups_edit_criteria_formula,@fa_group %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% form_for(@fa_group, :url => {:action=> 'update_criteria_formula',:id=>@fa_group.id}, :html=> {:multipart=>true}) do |fa| %>
+    <%= error_messages_for 'fa_group', :header_message => nil %>
+    <div id="formula-fields">
+      <div id="calculation">
+        <div id="text_area_info">Create formula using the formula keys</div>
+        <div class="label-field-pair-text-area">
+          <label for="formula">Formula</label>
+          <div class="textarea-input-bg"><%= fa.text_area :criteria_formula,:cols => 30, :rows => 5,:class => 'fa_calcutaion-textarea',:placeholder=>"Enter the formula" %></div>
+          <div id="submit-button">
+            <%=  submit_tag "► #{t('create_text')}",:class=>'submit_button',:disable_with => "► Please Wait.." %>
+          </div>
+        </div>
+      </div>
+      <div class="formula_help">
+        <%=render :partial=>'example_key_pair',:locals=>{:fa=>fa}%>
+      </div>
+    </div>
+    <div class="extender"></div>
+  <%end%>
+  <div id="modal-box" style="display:none;"></div>
+  <div id="example_text" style="display:none;"><%=render :partial=>'formula_examples'%></div>
+</div>
+<script type="text/javascript">
+  j('.indicator_list').append("<div class='div_1'></div>");
+  j('.indicator_list').append("<div class='div_2'></div>");
+  var i=1;var k=1;
+  j('.list_pair1').each(function(){
+    j('.div_'+k).append(this);
+    i=i+1;
+    if(i==((Math.ceil(j('.list_pair1').length/2))+1)){
+      k=2;
+    }
+  });
+  j('#indicator_lists').css('display','block');
+  j('#link_tab2 span').click(function(){
+    j('#cdm').hide();
+    j('#modal-box').append(j('#example_text').show());
+    Modalbox.show($('modal-box'), {title: 'Formula Examples', width: 760});
+  });
+</script>

@@ -1,0 +1,122 @@
+<table>
+  <tr class="tr-head <%=  "sub-head" unless params[:dept_id].nil? or params[:dept_id] == "All"%>">
+    <td class="emp_name"><%= t('employee_name') %></td>
+    <td class="pg_name"><%= t('payroll_group') %></td>
+    <td class="recent_date"><%= t('payment_frequency') %></td>
+    <td class="upcoming_date"><%= t('recent_payslip') %></td>
+    <td class="actions"></td>
+  </tr>
+  <% if @employees.present? %>
+    <% @employees.each do |dept_name,employees| %>
+      <% if params[:dept_id].nil? or params[:dept_id] == "All" %>
+        <tr class="sub-head"><td colspan = "6"><%= dept_name %></td></tr>
+      <% end %>
+      <% employees.each do |e| %>
+        <tr class="bg_light_grey">
+          <td class="emp_name"><%= e.full_name + " &#x200E;(" + e.employee_number + ")&#x200E;" %></td>
+          <td class="pg_name"><%= e.payroll_group.try(:name) || '-' %></td>
+          <td class="recent_date"><%= e.payroll_group.present? ? "#{e.payroll_group.salary_type_value} - #{e.payroll_group.payment_period_value}" : "-" %></td>
+          <td class="upcoming_date"><%= payslip_range(e.payroll_group,e.start_date, e.end_date, e.payment_period.to_i) %></td>
+          <td class="actions">
+            <% unless params[:finance].present? or params[:archived].present? %>
+              <% if e.payroll_group.present? %>
+                <%= e.employee_salary_structure.current_group ? "<span class='substitute'></span>" : "<span class='warning_sym'  tooltip='#{t('outdated_payroll')}'></span>" %>
+                <% if permitted_to? :generate_employee_payslip, :employee_payslips %>
+                  <%= link_to t('generate_payslip').capitalize, {:action => "generate_employee_payslip", :employee_id => e.id} %>
+                <% end %>
+              <% else %>
+                <span class='warning_sym' tooltip='<%= t('no_payroll') %>'></span>
+                <% if permitted_to? :create_employee_payroll, :payroll %>
+                  <div class="div_link" onclick="showForm('<%= e.id %>', '<%= e.full_name.gsub(/(?:\n\r?|\r\n?)/, '') %>')"><%= t('update_payroll') %></div>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% if permitted_to? :view_employee_past_payslips, :employee_payslips %>
+              <% if e.payslips_count.to_i > 0 %>
+                <%= link_to t('view_payslips') , {:action => "view_employee_past_payslips", :employee_id => e.id, :finance => params[:finance], :archived => params[:archived]}%>
+              <% else %>
+                <div class="info_wrapper"><div class="info_header" tooltip="<%= t('no_payslips_generated') %>"><%= t('view_payslips') %></div></div>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% else %>
+    <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+  <% end %>
+</table>
+<%= pagination_status(@employees_list) %>
+
+<% if @employees_list.present? %>
+  <%= will_paginate @employees_list,:renderer => 'RemoteLinkRenderer', :params => {:id => params[:id], :is_assigned => params[:is_assigned], :value => params[:value], :dept_id => params[:dept_id], :finance => params[:finance], :archived => params[:archived], :name => params[:name]} %>
+<% end %>
+<div id="overlay"></div>
+<div id="modalMsg"  class="HideModal"></div>
+<script type="text/javascript">
+  function showForm(id, name)
+  {
+    j('#overlay').attr('class', 'OverlayEffect');
+    j('#modalMsg').attr('class', 'ShowModal');
+    generateModalBox(id, name)
+    if(j('html').attr('dir') == 'ltr')
+      j('#modalMsg').css({left : (j('body').width() - j('#modalMsg').width())/2});
+    else
+      j('#modalMsg').css({right : (j('body').width() - j('#modalMsg').width())/2});
+  }
+
+  function hideForm()
+  {
+    j('#overlay').attr('class', '');
+    j('#modalMsg').empty();
+  }
+
+  function generateModalBox(id, name)
+  {
+    par_div = j('#modalMsg');
+    mb_frame = j('<div></div>', {'id' : 'MB_frame'});
+    mb_header = j('<div></div>', {'id' : 'MB_header'});
+    mb_caption = j('<div></div>', {'id' : 'MB_caption', 'text' : '<%= t('update_payroll') %>' + ' - ' + name});
+    mb_close = j('<div></div>', {'id' : 'MB_close', 'onclick' : 'hideForm()'});
+    mb_header.append(mb_caption);
+    mb_header.append(mb_close);
+    mb_frame.append(mb_header);
+    mb_content = j('<div></div>', {'id' : 'MB_content'});
+    desc = j('<div></div>', {'class' : 'description', 'text' : "<%= t('update_payroll_description') %>"});
+    mb_content.append(desc);
+    field = j('<div></div>', {'class' : 'label-field-pair'});
+    label = j('<label></label>', {'for' : 'group', 'text' : '<%= t('payroll_group') %>'});
+    input_bg = j('<div></div>', {'class' : 'text-input-bg'});
+    select = j('<select></select>', {'id' : 'payroll_group', 'name' : 'payroll_group'});
+    select.append("<option value='All' selected='selected'><%= t('select_payroll_group') %></option>");
+<% @payroll_groups.each do |p| %>
+      select.append("<option value='<%= p.id %>'><%= p.name %></option>");
+<% end %>
+    field.append(label);
+    input_bg.append(select);
+    field.append(input_bg);
+    wrapper = j('<div></div>', {'class' : 'wrapper'});
+    err_icon = j('<div></div>', {'class' : 'error-icon'});
+    err_msg = j('<div></div>', {'class' : 'error-msg', 'text': "<%= t('cant_be_blank') %>"});
+    wrapper.append(err_icon);
+    wrapper.append(err_msg);
+    field.append(wrapper);
+    mb_content.append(field);
+    submit = j('<div></div>', {'class' : 'submit-button', 'text' : '<%= t('add_to_payroll_group') %>', 'onclick' : "validate_and_redirect("+id+")"});
+    mb_content.append(submit);
+    mb_frame.append(mb_content);
+    par_div.append(mb_frame);
+  }
+  
+  function validate_and_redirect(id, name)
+  {
+    if(j('#payroll_group').val() == "All")
+      j('#MB_frame .wrapper').show()
+    else
+    {
+      var url = location.protocol + '//' + location.host + '/payroll/' + j('#payroll_group').val() +'/create_employee_payroll?employee_id='+ id + '&from=payslip_for_employees';
+      j(location).attr('href',url);
+    }
+  }
+</script>
+

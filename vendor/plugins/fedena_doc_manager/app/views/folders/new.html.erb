@@ -1,0 +1,163 @@
+<script type="text/javascript" >
+
+  function show_members_if_exists(){
+    if($('members').value != ''){
+      members = $('members').value;
+<%= remote_function(:url => update_member_list_folders_path , :with => "'members='+members" ) %>
+    }
+  }
+  function add_member(member) {
+    var member_list = new Array();
+    if($('members').value != '')
+      member_list = $('members').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      member_list.push(member);
+    }
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => update_member_list_folders_path , :with => "'members='+members" ) %>
+  }
+
+  function add_all_member(member) {
+    var member_list = new Array();
+    if($('members').value != '')
+      member_list = $('members').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(k=0; k<member_list.length; k++)
+        if(member_list[k] == new_list[i])
+          member_exists = true;
+      if(!member_exists) member_list.push(new_list[i]);
+    }
+
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => update_member_list_folders_path , :with => "'members='+members" ) %>
+  }
+
+
+  function remove_member(member) {
+
+    members = $('members').value;
+    var member_list = new Array();
+    member_list = $('members').value.split(',');
+
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member)
+    {
+      member_list.splice(i,1);
+      break;
+    }
+
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => update_member_list_folders_path , :with => "'members='+members" ) %>
+
+  }
+
+  function update_name(attachment_id){
+    name_id = attachment_id.id.substring(0,attachment_id.id.length-10) + 'name'
+    $(name_id).value = $(name_id).value == "" ? attachment_id.files[0].name.substring(0,attachment_id.files[0].name.lastIndexOf('.')) : $(name_id).value;
+  }
+
+</script>
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('doc_manager_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('create_shareable')}"%></div>
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'> <%= link_to "#{t('doc_manager_text')}", doc_managers_path %>  </li>
+  </ul>
+</div>
+<% content_for :head do %>
+  <%= javascript_include_tag "folder" %>
+<% end %>
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% form_for(@folder,:url=>create_folder_path(:folder_type => params[:folder_type]), :html=> {:multipart=>true}) do |s| %>
+    <%= error_messages_for 'folder', :header_message => nil %>
+    <%= hidden_field_tag :members, @members.present? ? @members : nil %>
+    <div id="create_folder_form">
+
+      <script><%= "show_members_if_exists();" %></script>
+      <div class="fields-wrap">
+        <div class="fields-wrap1">
+          <div class="span-sub-heading">
+            <div class="themed_text themed_text_doc"><%= t('make_folder') %></div>
+            <div class="label-field-pair">
+              <label for="folder_name"><%= t('folder_name') %><span class="necessary-field">*</span></label>
+              <div class="text-input-bg"><%= s.text_field :name %></div>
+            </div>
+          </div>
+          <div class="span-sub-heading">
+
+            <div class="themed_text themed_text_doc"><%= t('add_members') %></div>
+
+            <div id="select-employee-department">
+              <%= render "select_employee_department" %>
+            </div>
+
+            <div class="label-field-to">
+              <div id="to_users">   </div>
+            </div>
+
+            <div class="extender"></div>
+
+            <div id="select-student-course">
+              <%= render "select_student_course" %>
+            </div>
+            <div class="label-field-to">
+              <div id="to_users2"> </div>
+            </div>
+            <div class="extender"></div>
+
+          </div>
+        </div>
+        <div id="fields-wrap2" >
+          <div id="member-list" ></div>
+        </div>
+      </div>
+      <div class="extender" ></div>
+      <div class="fields-wrap">
+        <div class="span-sub-heading">
+          <div class="themed_text themed_text_doc"><%= t('add_documents') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</div>
+        </div>
+
+        <% s.fields_for :documents,build_documents(@folder) do |d| %>
+          <%= render "document_fields", :s => d %>
+        <% end %>
+        <div class="extender" >
+          <%= link_to_add_fields "#{image_tag("/images/buttons/add_2.png",:border => 0)} #{t('add_file')}", s, :documents %>
+        </div>
+        <div  >
+          <%= submit_tag "", :value => "#{t('submit_button')}", :class => "submit_button", :disable_with => "#{t('please_wait')}" %>
+        </div>
+      </div>
+      <div class="extender"></div>
+    </div>
+  <% end %>
+</div>

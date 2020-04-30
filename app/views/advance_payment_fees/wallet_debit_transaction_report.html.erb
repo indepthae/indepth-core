@@ -1,0 +1,46 @@
+<% if rtl? %>
+<%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+<%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<div id="content-header">
+<%= show_header_icon %>
+<h1><%= t('advance_fee_report') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('advance_fee_report') %></div>
+</div>
+
+<div id="page-yield">
+<div class="bread_crumb">
+  <%= make_breadcrumb %>
+  <%= render_breadcrumbs %>
+</div>
+
+<div id="wallet_monthly_expense_report_section">
+  <%= render :partial => "monthly_wallet_expense_report_course_wise" %>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">
+
+    j('.calendar_label').on('click', function () {
+        var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+        new CalendarDateSelect(this.previous(), {
+            date_format: "<%= date_format %>",
+            locale_months: month_names,
+            popup: 'force', year_range: 10
+        });
+    });
+
+    j("#hide_date_filter").click(function () {
+        j(".date_box").hide();
+        j("#show_date").show();
+    });
+
+    j("#show_date").click(function () {
+        j(".date_box").show();
+        j("#show_date").hide();
+    });
+
+</script>

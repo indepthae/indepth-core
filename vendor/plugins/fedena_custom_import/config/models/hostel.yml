@@ -1,0 +1,39 @@
+ hostel:
+    primary_keys:
+      name: "Hostel Name"
+      hostel_type: "Hostel Type"
+    overrides:
+    associations:
+    mandatory_columns:
+     - :name
+     - :hostel_type
+    associated_columns:
+    filters:
+     - :school_id
+     - :employee_id
+    joins:
+    join_column_search:
+    mandatory_joins:
+    associates:
+      hostel_room_additional_detail: "hostel_room_additional_field"
+    associate_columns:
+      hostel_room_additional_detail: "additional_info"
+    associate_column_search:
+      hostel_room_additional_field: "name"
+    associate_primary_keys:
+      hostel_room_additional_detail:
+        hostel_room_additional_field_id: 
+    additional_join:
+      - :HostelRoomAdditionalField
+    options_join:
+      - :hostel_additional_field_options
+    instructions:
+      Name:
+          Type: "Alphanumeric."
+          Input Instruction and example: "Enter Name of the Hostel."
+      Hostel type:
+          Type: "Alphanumeric"
+          Input Instruction and example: "Enter Common or Gents or Ladies to set the hostel type"
+      Other info: 
+          Type: "Alphanumeric"
+          Input Instruction and example: ""

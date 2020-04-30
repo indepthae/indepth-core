@@ -1,0 +1,26 @@
+<div id="course_name"><%=@course.full_name%></div>
+<div id="edit_link"><%=t('change_course')%></div>
+<%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none" ) %>
+
+<script type="text/javascript">
+  j('#edit_link').click(function(){
+    j(this).hide();
+    j.ajax({
+      type: 'GET' ,
+      url: "/student_records/get_courses_list",
+      data : {
+        id : <%=@course.id%><%if params[:rg_id].present?%>,
+          rg_id : <%=params[:rg_id]%><%end%>
+      },
+      beforeSend : function() {
+        j("#loader").show();
+      },
+      success : function(data) {
+        j('#show_course_select').html(data);
+        j('#advance_time').addClass('margin_bottom_30');
+        j('.hor_line').css('display','block');
+        j("#loader").hide();
+      }
+    });
+  });
+</script>

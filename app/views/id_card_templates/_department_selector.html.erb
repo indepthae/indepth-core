@@ -1,0 +1,17 @@
+<div class="field_section">
+  <div class="field_head">
+    <%= t('department')%>
+  </div>
+  <div class="field">
+    <%= select_tag "department",
+    options_for_select([t('select_department')]+@departments.map{|b| [b.name,b.id]}), :class=>"input_box", :id=>"department_selector",
+    :onchange => "#{remote_function(:url => {:action => "department_employees"},:with => "'department_id='+value",
+    :before => "Element.show('loader')",:success => "Element.hide('loader')" )}" %>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+
+<script>
+ j('#bulk_export').attr('action', '<%= generate_bulk_export_pdf_employee_id_card_templates_path %>');
+</script>

@@ -1,0 +1,31 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('report') %></div>
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%  breadcrumb :placementevents_report,@placementevent%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <h3><%= "#{@type.capitalize}  #{t('students')} " %>  </h3>
+  <% unless @students.empty?  %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">    <td>   <%= t('student_text') %> </td>  <td>  <%= t('batch') %>  </td> </tr>
+      <tr class="tr-blank"></tr>
+
+
+      <% @students.each do |s| %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">        <td class="col-2">  <%= s.full_name %></td>        <td class="col-2"><%= s.batch.full_name %></td> </tr>
+      <% end %>
+    </table>
+    <div id="pdf-button"><%= link_to "#{t('pdf_report')}",{:action=>:report_pdf ,:id=> @placementevent.id,:report=>{:type=>@type},:page_height=>1200},:class=>"submit-button",:target=>:blank%></div>
+  <% else %>
+    <p class="flash-msg">There is no student under <%= "#{@type}"%> category </p>
+  <% end %>
+</div>

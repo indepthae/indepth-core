@@ -1,0 +1,177 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_types') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('employee_leave_balance').titleize %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :employee_edit_leave_balance, @employee %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h4><%= "#{t('employee_leave_balance').titleize}" %></h4>
+
+    <div class="employee_name">
+        <div class="label">
+            <%= t('employee_name')  %>
+        </div>
+        <div class="text"><%= @employee.full_name + "&nbsp;(#{@employee.employee_number})&#x200E;" %></div>
+    </div>
+
+    <div class="reset_date">
+        <div class="label">
+            <%= t('recent_leave_reset') %>
+        </div>
+        <div class="text"><%= format_date(@employee.last_reset_date, :format => :short_date) %></div>
+    </div>
+
+    <div class="reset_date">
+        <div class="label">
+            <%= t('recent_leave_credit') %>
+        </div>
+        <% last_credit_date = @employee.last_credit_date.present? ? @employee.last_credit_date : @employee.last_reset_date %>
+        <div class="text"><%= format_date(last_credit_date, :format => :short_date) %></div>
+    </div>
+    
+    <div class="dpt_name">
+        <div class="label">
+            <%= t('employee_department')  %>
+        </div>
+        <div class="text"><%= @employee.employee_department.name %></div>
+    </div>
+
+    <hr></hr>
+    <div id="error_div_"> 
+    </div>
+    <div id="lg_details">
+        <div class="label">
+            <%= t('leave_group')  %>
+        </div>
+        <div class="text">: <%= (@leave_group.present? ? @leave_group.name : '-') %></div>
+    </div>
+    <% if @remaining_leave_types.present? %>
+      <%= link_to_remote "+ #{t('add_a_special_leave_type')}", :url => {:controller => "employee", :action => "add_individual_leave", :id => @employee.id}, :method => :get, :html => {:class => "add_link"} %>
+    <% end %>
+    <table>
+        <tr class="tr-head">
+            <td class="col-1"><%= t('leave_type') %></td>
+            <td class="col-2"><%= t('available_leaves') %></td>
+            <td class="col-3"></td>
+        </tr>
+        <% if @employee_leaves.present? %>
+          <% @employee_leaves.each_with_index do |leave_type,i|  %>
+            <tr>
+                <td><%= leave_type.name %></td>
+                <td id="<%= "leave_count_#{leave_type.id}" %>"><%= leave_type.leave_count %></td>
+                <td>
+                    <% if leave_type.is_additional and @apply_leaves[leave_type.employee_leave_type_id].nil? and @employee_attendances[leave_type.employee_leave_type_id].nil? and @additional_leaves[leave_type.employee_leave_type_id].nil? %>
+                      <%= link_to t('remove'), {:action => "remove_individual_leave", :id => leave_type.id}, :class => "remove" \
+                    , :onclick => "return make_popup_box(this, 'confirm', '#{t('remove_special_leave_type_confirmation_message', {:name => leave_type.name})}',{'ok' : '#{t('remove')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('remove_special_leave_type')}'});"%>
+                    <% end %>
+                    <div class="edit"><%= t('edit') %></div>
+                    <div id="form" style="display:none;">
+                        <% remote_form_for :leave do |f| %>
+                          <%= hidden_field_tag :el_id , leave_type.id %>
+                          <div class="label-field-pair">
+                              <div class="text-input-bg">
+                                  <%= text_field_tag(:leave_count,"", :placeholder => "E.g., 0.5, 1, 3.5, etc.") %>
+                              </div>
+                          </div>
+                          <%= submit_tag t('save'), :id => "submit_button", :class=> "submit", :onclick => "return validate(this)"%>
+                          <div class="cancel"><%=  t('cancel') %></div>
+                        <%end%>
+                    </div>
+                    <div class="wrapper" id="live-val" style="display:none;">
+                        <div class="error-icon"></div>
+                        <div class="error-msg" id="not_zero" style="display:none;"><%=  t('please_enter_a_value_greater_than_or_equal_to_zero')%></div>
+                        <div class="error-msg" id="whole_num" style="display:none;"><%=  t('leave_count_must_be_a_whole_number_or_multiple')%></div>
+                    </div>
+                </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+              <td colspan="3"><%= t('no_leave_types_are_assigned') %></td>
+          </tr>
+        <% end %>
+    </table>
+
+
+</div>
+
+<script type="text/javascript">
+  j(".edit").click(function (e) {
+      j(this).hide();
+      j(this).siblings("#form").css("display", "block");
+  })
+
+  j(".cancel").click(function (e) {
+      j(this).parents("td").children(".edit").show();
+      j(this).parents("#form").hide();
+      j(this).parents("td").children(".wrapper").hide();
+  })
+
+
+
+
+  function validate(e) {
+      value = j(e).siblings(".label-field-pair").children(".text-input-bg").children("input").val();
+      error_msg = j(e).parents("td").children("#live-val");
+      not_zero = j(error_msg).children('#not_zero');
+      whole_num = j(error_msg).children('#whole_num');
+
+      j(error_msg).hide();
+      if (parseFloat(value) >= 0 && parseFloat(value) % 0.5 == 0) {
+          j(e).parents("#form").hide();
+          j(e).parents("td").children(".edit").show();
+          return true
+      } else
+      {
+          j(error_msg).show();
+          if ((value == "") || (parseFloat(value) <= 0)) {
+              not_zero.show();
+              whole_num.hide();
+          } else if (parseFloat(value) % 0.5 != 0) {
+              not_zero.hide();
+              whole_num.show();
+          }
+          return false
+      }
+  }
+
+  function change_leave_count(elm) {
+      j('#employee_leave_leave_count').val(json_data[j(elm).val()]);
+  }
+
+  function validate_leave() {
+      lev_type = j('#employee_leave_employee_leave_type_id').val();
+      lev_count = j('#employee_leave_leave_count').val();
+      lev_type_warn = j('#employee_leave_employee_leave_type_id').parents(".text-input-bg").children("#live-val");
+      lev_count_warn = j('#employee_leave_leave_count').parents(".text-input-bg").children("#live-val");
+      lev_not_zero = j(lev_count_warn).children('#not_zero');
+      lev_whole_num = j(lev_count_warn).children('#whole_num');
+      if ((lev_type != "") && (parseFloat(lev_count) >= 0) && (parseFloat(lev_count) % 0.5 == 0)) {
+          return true
+      } else {
+          if (lev_type == "") {
+              lev_type_warn.show();
+              lev_count_warn.hide();
+          } else if ((lev_count == "") || (parseFloat(lev_count) <= 0)) {
+              lev_type_warn.hide();
+              lev_count_warn.show();
+              lev_not_zero.show();
+              lev_whole_num.hide();
+          } else if (parseFloat(lev_count) % 0.5 != 0) {
+              lev_type_warn.hide();
+              lev_count_warn.show();
+              lev_not_zero.hide();
+              lev_whole_num.show();
+          }
+          return false;
+      }
+  }
+</script>

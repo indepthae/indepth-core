@@ -1,0 +1,38 @@
+<%# For manual serial no %>
+<% if @certificate_template.manual_serial_no == true %>
+<div class="field_section">
+  <div class="field_head">
+    <%= "#{t("serial_no")}"%>
+  </div>
+  <div class="field">
+    <%= text_field "","manual_serial_no", :id=>"manual_serial_no" %>
+  </div>
+</div>
+<script>
+  j('#manual_serial_no').on('change paste keyup',function(){
+    template_app.serial_no = ''+j(this).val();
+    generation_serial_no = j(this).val();
+  });
+</script>
+<%end%>
+
+<%if @custom_fields.present? %>
+<%@custom_fields.each do |c|%>
+  <%key = "custom_#{c.key}".to_sym%>
+  <%if @keys[key].present?%>
+    <div class="field_section">
+      <div class="field_head">
+        <%= "#{c.name}"%>
+      </div>
+      <div class="field">
+        <%= text_field "",key, :id=>key %>
+      </div>
+    </div>
+    <script>
+    j('#<%="custom_#{c.key}"%>').on('change paste keyup',function(){
+      template_app.<%="custom_#{c.key}"%> = j(this).val();
+    });
+    </script>
+  <%end%>
+<%end%>
+<%end%>

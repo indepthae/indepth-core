@@ -1,0 +1,34 @@
+<li>
+    <%= link_to_remote "#{t('my_docs')}", :url => my_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+</li>
+<li>
+  <%= link_to_remote "#{t('shared_docs')}", :url => shared_docs_doc_managers_path,
+    :before => "Element.show('loader3')",
+    :success => "Element.hide('loader3')" %>
+</li>
+<% if permitted_to? :privileged_docs, :doc_managers or (@current_user.admin or @current_user.uploadable_privileged_folders.present? or (@current_user.student_record.batch.course.privileged_folders.present? unless @current_user.student_record.nil?) or (@current_user.employee_record.employee_department.privileged_folders.present? unless @current_user.employee_record.nil?)) %>
+  <li>
+    <%= link_to_remote "#{t('privileged_docs')}", :url=> privileged_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+  </li>
+<% end %>
+<li>
+  <%= link_to_remote "#{t('favorite_docs')}", :url=> favorite_docs_doc_managers_path,
+    :before => "Element.show('loader3')",
+    :success => "Element.hide('loader3')" %>
+</li>
+<li>
+  <%= link_to_remote "#{t('recent_docs')}", :url=> recent_docs_doc_managers_path,
+    :before => "Element.show('loader3')",
+    :success => "Element.hide('loader3')" %>
+</li>
+<% if permitted_to? :user_docs, :doc_managers and (@current_user.admin or @current_user.privileges.map(&:name).include? "DocumentManager") %>
+  <li>
+    <%= link_to_remote "#{t('user_docs')}", :url=> user_docs_doc_managers_path,
+      :before => "Element.show('loader3')",
+      :success => "Element.hide('loader3')" %>
+  </li>
+<% end %>

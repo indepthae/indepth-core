@@ -1,0 +1,100 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('subject_skill_set') %></div>
+    <div id="inner-tab-menu">
+        <% if @set.subject_skills.present? and (permitted_to? :add_skills , :subject_skill_sets) %>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to "#{t('edit_subject_skills')}", 
+                    {:controller => "subject_skill_sets", :action => 'add_skills', :id => @set.id} %>
+              </li>
+          </ul>
+        <% end %>
+        <% unless @set.dependencies_present? %>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'>
+                  <%= link_to t('delete_skill_set'), '#' , :onclick => "make_popup_box(this, 'confirm', '#{t('delete_skill_set_confirmation')}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_skill_set')}', 'popup_class' : 'delete_confirmation'}); return load_set_delete_method();" %>
+              </li>
+          </ul>
+        <% end %>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :subject_skill_sets_show, @set %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('subject_skill_set') %></div>
+    <div class="details">
+        <div class="details_strip">
+            <div class="label"><%= t('skill_set') %></div>
+            <div class="field bold"><%= @set.name %></div>
+            <div class="edit_field"><td><%= link_to_remote t('edit_skill_set'), :url => edit_subject_skill_set_path(@set), :method => :get %></div>
+        </div>
+        <% if @set.formula %>
+          <div class="details_strip">
+              <div class="label"><%= t('subject_mark_derivation') %></div>
+              <div class="field"><%= @set.formula_text %></div>
+          </div>
+        <% end %>
+    </div>
+    <hr>
+    <% if @set.subject_skills.present? %>
+      <table>
+          <tr class="tr-head">
+              <td class="name"><%= t('skill_name') %></td>
+              <td class="result"><%= t('formula') %></td>
+              <td class="desc"><%= t('actions') %></td>
+          </tr>
+          <% @set.subject_skills.each do |skill| %>
+            <% count = skill.sub_skills.count%>
+            <tr class="parent">
+                <td><%= skill.name %></td>
+                <td rowspan="<%= count + 1%>"><%= skill.formula_text %></td>
+                <td rowspan="<%= count + 1%>">
+                    <% if @set.exam_dependencies_present? and (count == 0)%>
+                      <%= "<strike>#{t('add_sub_skills')}</strike>" %>
+                    <% else %>
+                      <%= link_to (count > 0 ? "#{t('manage_sub_skills')}" : "#{t('add_sub_skills')}"), 
+                        {:controller => "subject_skill_sets", :action => 'add_sub_skills', :id => skill.id} %>
+                    <% end %>
+                </td>
+            </tr>
+            <% skill.sub_skills.each do |sub_skill| %>
+              <tr class="nested">
+                  <td><%= sub_skill.name %></td>
+              </tr>
+            <% end  %>
+          <% end %>
+      </table>
+    <% else %>
+      <div class="add_activity_blank">
+          <div class="add_activity_helper"><%=t('add_grades_text')%></div>
+          <div class="add_activity_button"><%= link_to t('add_subject_skills'), 
+                {:controller=>'subject_skill_sets', :action => 'add_skills', :id => @set.id},
+                :class=>'submit-button' %></div>
+      </div>
+    <% end %>
+    <% if @set.dependencies_present?%>
+        <div id="warning"><span id="info-symbol"></span><span id="info-text"><%= t('this_set_has_dependencies') %></span></div>
+    <% end %>
+</div>
+<script type="text/javascript">
+      load_set_delete_method = function () {
+      j('.submit-button#yes').on('click', function () {
+        set_id = <%=@set.id%>
+          j.ajax({
+              type: 'DELETE',
+              url: '/subject_skill_sets/'+set_id
+          });
+      })
+  }
+</script>

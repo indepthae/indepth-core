@@ -1,0 +1,320 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('employee_attendance_text') %></h1>
+    <div class='header-sep'>|</div>
+    <% if params[:action] == 'my_leaves' %>
+      <div class='sub-header'><%= t('my_leaves').titleize %></div>
+    <% elsif params[:action] == "reportees_leaves" %>
+      <div class='sub-header'><%= t('reportees_leaves').titleize %></div>
+    <% else %>
+      <div class='sub-header'><%= t('employee_leave_details').titleize %></div>
+    <% end  %>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if (permitted_to? :edit_leave_balance,:employee) && @active_leave_types.present? %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('employee_leave_balance')}", :controller=>"employee", :action=>"edit_leave_balance", :id => @employee.id %></li>
+            <% end %>
+            <% if permitted_to? :my_leave_applications,@employee.user,:context => :employee_attendance%>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('my_leave_applications')}", :controller=>"employee_attendance", :action=>"my_leave_applications", :id => @employee.id, :from => :employee %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% if params[:action] == 'my_leaves' %>
+          <% breadcrumb :employee_attendance_my_leaves, @employee %>
+          <%= render_breadcrumbs  %>
+        <% elsif params[:from] == "reportees_leaves" %>
+          <% breadcrumb :employee_attendance_additional_leave_detailed, ["",@current_employee, params[:from]] %>
+          <%= render_breadcrumbs  %>
+        <% elsif params[:from] == "leave_balance_report" %>
+          <% breadcrumb :employee_attendance_additional_leave_detailed, ["",@current_employee, params[:from]] %>
+          <%= render_breadcrumbs  %>
+        <% else %>
+          <%breadcrumb :employee_attendance_additional_leave_detailed,[@employee,""]%>
+          <%=render_breadcrumbs%>
+        <% end %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% if params[:action] == 'my_leaves' %>
+      <h4><%= t('my_leaves') %></h4>
+    <% else %>
+      <h4><%= t('employee_leave_details').titleize%></h4>
+    <% end %>
+
+    <div class="employee_name">
+        <div class="label">
+            <%= t('employee_name')  %>
+        </div>
+        <div class="text"><%= @employee.full_name + " (#{@employee.employee_number})&#x200E;" %></div>
+    </div>
+
+    <div class="reset_date">
+        <div class="label">
+            <%= t('recent_leave_reset') %>
+        </div>
+        <div class="text"><%= format_date(@recent_reset_date, :format => :short_date) %></div>
+    </div>
+      <% config = leave_reset_configuration %>
+    <% if config == "1" and @recent_credit_date.present? %>
+      <div class="reset_date">
+          <div class="label">
+              <%= t('recent_leave_credit') %>
+          </div>
+          <div class="text"><%= format_date(@recent_credit_date, :format => :short_date)%></div>
+      </div>
+    <% end %>
+
+    <div class="dpt_name">
+        <div class="label">
+            <%= t('employee_department')  %>
+        </div>
+        <div class="text"><%= @employee.employee_department.name %></div>
+    </div>
+    <hr class="hr1"></hr>
+    <div id="filters" style="margin-bottom: 30px;">
+        <div id="filter_text"><%= t('filters') %></div>
+        <div class="label-field-pair" id ="leave_category">
+            <label for="display_type_select"><%= t('leave_group') %></label>
+
+            <div class="text-input-bg">
+                <% if @leave_group.present? %>
+                  <%= select_tag 'display_type', options_for_select([[@leave_group.name,"leave_group"],[t('all'), "all"]]),  :selected => "leave_group" %>
+                <% else %>
+                  <%= select_tag 'display_type', options_for_select([[t('all'), "all"]]),  :selected => "leave_type" %>
+                <% end %>
+            </div>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader3", :style =>"display: none;" ) %>
+
+        </div>
+    </div>
+    <div id="filters">
+        <div id = "leave_type_select">
+            <%= render :partial => 'leave_type_leave_criteria_select' %>
+        </div>
+    </div>
+    <div id ="date_filters" style="display:none;">
+        <hr class="hr1"></hr>
+        <label><%= t('filter_by_date')%></label>
+        <div class="label-field-pair">
+            <label for="leave_type"><%= t('from') %></label>
+            <div class="text-input-bg start_date">
+                <%= calendar_date_select_tag 'date[start_date]' ,"",:popup=>:force, :id => "start_date"  %>
+            </div>
+        </div>
+        <div class="label-field-pair">
+            <label for="end_date"><%= t('to') %></label>
+            <div class="text-input-bg end_date">
+                <%= calendar_date_select_tag 'date[end_date]' ,"",:popup=>:force, :id => "end_date"   %></div>
+        </div>
+        <%= submit_tag "", :value => "#{t('view')}", :class => "submit_button" , :id => 'submit_button' %>
+        <div id="cancel"><%= t('cancel') %></div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+        <div class="error-msg" style="display:none;"><div class="error-icon"></div><%= t('select_valid_date')%></div>
+
+    </div>
+    <hr class="hr2" id="hr3" style="display:none;"></hr>
+    <div id="date_range"  style="display:none;">
+        <div class="label-field-pair">
+            <label for="leave_type"><%= t('date_text') %></label>
+            <div class="text-input-bg start_date_text">
+            </div>
+        </div>
+        <div class="label-field-pair">
+            <label for="end_date"><%= t('to') %></label>
+            <div class="text-input-bg end_date_text">
+            </div>
+
+        </div>
+        <div id="change_date"><%= t('change_date') %></div>
+        <div id="reset"><%= t('reset') %></div>
+    </div>
+    <hr class="hr2" id="hr2"></hr>
+    <div id ="advance_search"><%= t('filter_with_dates') %></div>
+    <hr class="hr2"></hr>
+    <div id="leave_summary">
+        <%= render :partial => 'leave_summary'  %>
+    </div>
+    <div id="report">
+        <%= render :partial => 'leave_detailed_report'  %>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  j("select#department_id").val("All");
+  j("select#leave_criteria").val("All");
+
+  width = j("#leave_summary").width();
+  if (width > 980) {
+      j("#leave_summary").css({"overflow-x": "scroll", "width": "980"})
+  }
+  ;
+
+  function resetFilters() {
+      j("#filter_lop_status").val("All")
+      j("#filter_category").val("All")
+      pageurl = '?end_date=' + j("#end_date").val() + '&start_date=' + j("#start_date").val();
+      window.history.pushState({path: pageurl}, '', pageurl);
+  }
+
+  j("#display_type").change(function () {
+      var display_type = j("#display_type").val();
+      var start_date = j("#start_date").val();
+      var end_date = j("#end_date").val();
+      var dpt_id = j("#department_id").val();
+      var leave_criteria = j("#leave_criteria").val();
+      var id = <%=  params[:id] %>
+      j("#loader3").show();
+      new Ajax.Request('/employee_attendance/<%= params[:action]%>', {
+          parameters: {
+              display_type: display_type,
+              id: id,
+              start_date: start_date,
+              end_date: end_date,
+              department_id: dpt_id,
+              leave_criteria: leave_criteria,
+              from: '<%= params[:from] %>'
+          },
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onComplete: function (resp) {
+              j("#loader3").hide();
+          }
+      });
+  })
+
+
+
+  j("#submit_button").click(function () {
+      if (validate_dates()) {
+          var display_type = j("#display_type").val();
+          var start_date = j("#start_date").val();
+          var end_date = j("#end_date").val();
+          var dpt_id = j("#department_id").val();
+          var leave_criteria = j("#leave_criteria").val();
+          var id = <%=  params[:id] %>
+          j("#loader").show();
+          new Ajax.Request('/employee_attendance/<%= params[:action]%>', {
+              parameters: {
+                  start_date: start_date,
+                  end_date: end_date,
+                  department_id: dpt_id,
+                  leave_criteria: leave_criteria,
+                  display_type: display_type,
+                  id: id,
+                  from: '<%= params[:from] %>'
+              },
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onComplete: function (resp) {
+                  j("#loader").hide();
+                  j("#advance_search").hide();
+                  j("#hr2").hide();
+                  j("#date_range").show();
+                  j("#hr3").show();
+                  j(".start_date_text").text(formattedDate(start_date));
+                  j(".end_date_text").text(formattedDate(end_date));
+                  j("#date_filters").hide();
+              }
+          });
+
+      } else
+          j(".error-msg").show();
+      return false;
+  })
+
+  function validate_dates() {
+      valid = true;
+      if (j("#start_date").val() == "")
+          valid = false;
+      if (j("#end_date").val() == "")
+          valid = false;
+      if (j("#end_date").val() < j("#start_date").val())
+          valid = false;
+      return valid
+  }
+
+  j("#advance_search").click(function () {
+      j("#date_filters").show();
+      j(this).hide();
+      j("#hr2").hide();
+  })
+
+  j("#cancel").click(function () {
+      reset_dates();
+      j(".error-msg").hide();
+      if (j("#start_date").val() == "" || j("#end_date").val() == "") {
+          j("#date_filters").hide();
+          j("#advance_search").show();
+          j("#hr2").show();
+      }
+      else
+      {
+          j("#date_range").show();
+          j("#hr3").show();
+          j("#date_filters").hide();
+      }
+
+  })
+
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click', function () {
+      new CalendarDateSelect(this.previous(), {date_format: "<%= date_format %>", locale_months: month_names, popup: 'force', year_range: 10});
+  });
+
+  j("#change_date").click(function () {
+      j("#date_filters").show();
+      j("#date_range").hide();
+      j("#hr3").hide();
+  })
+
+  j("#reset").click(function () {
+      location.reload();
+  })
+
+  function reset_dates() {
+      j('#start_date.calendar_label').val("");
+      j('#start_date.calendar_field').val("");
+      j('#end_date.calendar_label').val("");
+      j('#end_date.calendar_field').val("");
+  }
+
+  function formattedDate(date) {
+      var d = new Date(date || Date.now()),
+              month = '' + (d.getMonth() + 1),
+              day = '' + d.getDate(),
+              year = d.getFullYear();
+
+      if (month.length < 2) {
+          month = '0' + month
+      }
+      ;
+      if (day.length < 2) {
+          day = '0' + day
+      }
+      ;
+      date_format = <%= @format %>;
+
+      if (date_format == 1) {
+          return [day, month, year].join('<%= @seperator.to_s %>');
+      }
+
+      if (date_format == 2) {
+          return [month, day, year].join('<%= @seperator.to_s %>');
+      }
+
+      if (date_format == 3) {
+          return [year, month, day].join('<%= @seperator.to_s %>');
+      }
+
+  }
+
+</script>

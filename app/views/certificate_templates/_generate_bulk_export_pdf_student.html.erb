@@ -1,0 +1,124 @@
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% if params[:d].present? %>
+  <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% end %>
+<script type="text/javascript">
+  var j = jQuery.noConflict();
+  VAppCounter = 0;
+
+  actMet=(function() {
+    if(VAppCounter == <%=@students.count%> ){
+      var pdf_content = [];
+      var issued_for_ids = [];
+      var serial_nos = [];
+      var children = j("#hidden_generation").children();
+      children.each(function(index,val) {
+        var html = j(val).wrap('<p/>').parent().html();
+        pdf_content.push(html);
+        j(val).unwrap();
+        issued_for_ids.push(j(val).data("issued_for_id"));
+        serial_nos.push(j(val).data("serial_no"));
+      } );
+
+      j.ajax({
+        url: "save_bulk_generated_certificate",
+        type: 'POST',
+        data:  {
+          pdf_html:pdf_content,
+          issued_for_ids: issued_for_ids,
+          serial_nos: serial_nos,
+          batch_id:get_batch_id(),
+          certificate_template_id: get_certificate_id()
+        },
+        success: function(data, textStatus, jqXHR)
+        {
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+        }
+      });
+
+    }
+
+  });
+</script>
+
+<% auto_serial_no = @next_serial_no.to_i %>
+<%@students.each_with_index do |s,i|%>
+<div id="preview<%=i%>" class="preview exclude_font new-page keep-together break-after" data-issued_for_id=<%=s.s_id %> data-issued_for_type="Student" data-serial_no = <%= auto_serial_no %>  >
+<div class="css_container">
+  <style scoped>
+  @import "/stylesheets/pdf_normalize.css";
+  </style>
+  <%= @base_template_data %>
+</div>
+</div>
+  <script>
+  var template_app;
+  var template_app<%=i%> = new Vue({
+   el: '#preview<%=i%>',
+   data: {
+     <% index = 0 %>
+     <%@keys.each do |key,val|%>
+       <%=key%>: ''<%=',' if index != (@keys.count-1) %>
+       <% index = index + 1 %>
+     <%end%>
+   },
+   beforeDestroy: function(){
+     VAppCounter = VAppCounter + 1;
+     actMet();
+
+   }
+  });
+  template_app = template_app<%=i%>;
+
+  <%@student = s%>
+  <%@pdf_mode = true%>
+  <%   @additional_field_values = BaseTemplate.get_student_additional_values(@student) %>
+  <%@container = "#preview#{i}" %>
+  <%=render "templates/set_common_keys.js.erb"%>
+  <%=render "templates/set_student_keys.js.erb"%>
+  <%full_serial_no = "#{@prefix}#{auto_serial_no}"%>;
+  template_app.serial_no = "<%= full_serial_no%>";
+  <%auto_serial_no = auto_serial_no + 1%>
+  Vue.nextTick(function () {
+    template_app<%=i%>.$destroy();
+  });
+  </script>
+
+<%end%>
+
+<script>
+
+
+var j = jQuery.noConflict();
+    j(".preview").each(function(index, element){
+
+      //set layout size
+      j(element).css("width",'<%=@template_resolution[:width].to_i%>mm');
+      <% if @template_resolution[:height] < @template_resolution[:width] %>
+        j(element).css("height",'<%=@template_resolution[:height].to_i-1%>mm');
+      <% else %>
+        j(element).css("height",'<%=@template_resolution[:height].to_i%>mm');
+      <% end %>
+
+      //set padding
+      j(element).css('padding-top'," <%=@certificate_template.top_padding.to_i%>px");
+      j(element).css('padding-left', "<%=@certificate_template.left_padding.to_i%>px");
+      j(element).css('padding-right', "<%=@certificate_template.right_padding.to_i%>px");
+      j(element).css('padding-bottom', "<%=@certificate_template.bottom_padding.to_i%>px");
+
+      //set background_image
+      <% if @certificate_template.background_image.present? %>
+      <% img_url = FedenaSetting.s3_enabled? ? @certificate_template.background_image.url(:original,false) : File.join(RAILS_ROOT,@certificate_template.background_image.path) %>
+      j(element).css("background-image", "url('<%= img_url %>')");
+      <%end%>
+    });
+
+
+
+</script>

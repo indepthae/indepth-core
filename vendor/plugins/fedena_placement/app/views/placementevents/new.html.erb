@@ -1,0 +1,26 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('placements') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('new_placement_event') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%=make_breadcrumb%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% form_for @placementevent do |f| %>
+    <%= f.error_messages %>
+    <div id="new_placementevent_form">
+      <div class="label-field-pair"><label for="title"><%= t('title') %><span class="necessary-field">*</span></label><div class="text-input-bg"><%= f.text_field :title   %></div></div>
+      <div class="label-field-pair"> <label for="date"><%= t('date_text') %><span class="necessary-field">*</span></label><div class="text-input-bg"> <%= calendar_date_select_tag "placementevent[date]",I18n.l(1.week.since(FedenaTimeSet.current_time_to_local_time(Time.now).to_date),:format=>"%Y-%m-%d") ,:class=>"text-input-bg" ,:readonly=>true,:popup=>"force"%></div></div>
+      <div class="label-field-pair"><label for="company"><%= t('company') %><span class="necessary-field">*</span></label><div class="text-input-bg"><%= f.text_field :company   %></div></div>
+      <div class="label-field-pair" id="placementevent-description"><label for="description"><%= t('description') %></label><div class="text-input-bg"><%= f.text_area :description %></div></div>
+      <%= f.submit "#{t('create_placement_event')}" ,:class=>"submit-button", :disable_with => "#{t('please_wait')}" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<% mail_attachment = c.object %>
+<div class="fields">
+	<% if mail_attachment.new_record? %>
+		<div class="label-field-pair">
+			<div class="text-input-bg" id="browse-style">
+				<%= c.paperclip_file_field :attachment %>
+			</div>
+		</div>
+	<% else %>
+		<% unless mail_attachment.attachment_file_name.nil? or c.object.id.nil? %>
+			<div class="left-attachment">
+				<span class="attachment_icon_img"></span>
+				<%=link_to truncate(mail_attachment.attachment_file_name, :length => 25,:ommision => '...') , mail_attachment.attachment.url(:original,false)  %>
+			</div>
+		<% end %>
+	<% end %>
+	<div class="remove-field">
+		<%= link_to_remove_fields '', c %>
+	</div>
+</div>

@@ -1,0 +1,18 @@
+<div class="com_block">
+    <p class="messages">The report header will include your institution name and address that you’ve entered in General Settings.<%= link_to 'General Settings',{:controller=>"configuration",:action=>"settings"},:target=>'_blank' if permitted_to? :settings, :configuration%></p>
+</div>
+<div id="full_header">
+    <div class="header">
+        <span class="logo header_parts">
+            <%if current_school_detail.logo.present?%>
+              <%= image_tag current_school_detail.logo.url(:original, false) %>
+            <%else%>
+              <img  alt="Dummy Logo" src="/images/application/dummy_logo.png" ></img>
+            <%end%>
+        </span>
+        <span class="header-content header_parts">
+            <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+            <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+        </span>
+    </div>
+</div>

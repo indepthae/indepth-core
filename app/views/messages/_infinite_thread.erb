@@ -1,0 +1,98 @@
+<% @message_threads.each do |thread| %>
+  <% if thread.is_group_message_for @current_user.id %>
+    <% recipient_count = thread.recipients_count %>
+    <% has_unread_messages = thread.has_unread_messages? %>
+    <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+        <td class="thread_entry">
+            <div class="thread_entry">
+                <div class="entry-thumbnail">
+                    <%= image_tag "group_icon.png" %>
+                </div>
+                <div class="entry_detail">
+                    <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= thread.subject %></div>
+                    <div class="subject">
+                        <%=recipient_count%> <%= t('recipients') %>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+  <% else %>
+    <% recipient = get_recipient(thread) %>
+    <% entry = get_entry(recipient) %>
+    <% has_unread_messages = thread.has_unread_messages? %>
+    <% if entry.present? %>
+      <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+          <td class="thread_entry">
+              <div class="thread_entry">
+                  <div class="entry-thumbnail">
+                      <% if !recipient.parent? %>
+                        <%= image_tag entry.photo.url(:original, false) %>
+                      <% else %>
+                        <%= image_tag "single_user.png" %>
+                      <% end %>
+                  </div>
+                  <div class="entry_detail">
+                      <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= entry.full_name %></div>
+                      <div class="sec_info">
+                          <%if recipient.student?%>
+                            <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                          <%elsif recipient.parent?%>
+                            <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                          <%else%>
+                            <%= "#{t('department')} : #{entry.department}" %>
+                          <%end%>
+                      </div>
+                      <div class="subject"><%= thread.subject %></div>
+                  </div>
+              </div>
+          </td>
+      </tr>
+    <% else %>
+      <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+          <td class="thread_entry">
+              <div class="thread_entry">
+                  <% if recipient and recipient.admin? and !recipient.is_deleted%>
+                    <div class="entry-thumbnail"><%= image_tag "single_user.png" %></div>
+                    <div class="entry_detail">
+                        <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= recipient.full_name %></div>
+                        <div class="sec_info"><%=recipient.user_type%></div>
+                        <div class="subject"><%= thread.subject %></div>
+                    </div>
+                  <%else%>
+                    <div class="entry-thumbnail">
+                        <%= image_tag "blocked_user.png" %>
+                    </div>
+                    <div class="entry_detail">
+                        <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= t('deleted_user')%></div>
+                        <div class="subject"><%= thread.subject %></div>
+                    </div>
+                  <%end%>
+              </div>
+          </td>
+      </tr> 
+    <% end %>
+  <% end%>
+<%end%>
+
+<script>
+  j('tr.th_entry').each(function () {
+      j(this).click(function () {
+          j(".coloured_background").removeClass('coloured_background');
+          j(this).addClass('coloured_background');
+          j.ajax({
+              type: 'GET',
+              url: "/messages/update_conversation",
+              data: {
+                  thread_id: j(this).attr('data-id'),
+                  filter: "<%=@filter %>"
+              },
+              beforeSend: function () {
+              },
+              success: function () {
+              }
+          });
+      });
+  });
+
+</script>

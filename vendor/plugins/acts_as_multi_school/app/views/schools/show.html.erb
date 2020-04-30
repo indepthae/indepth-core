@@ -1,0 +1,35 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= @school.name %></h1>
+  <%= link_to 'Delete School', @school, :confirm => 'Are you sure?', :method => :delete ,:class => 'button-red float-right' if permitted_to? :destroy,@school,:context=>:schools%>
+</fieldset>
+<div class="content-div">
+  <div class="nav-vertical width-15-pc">
+    <ul >
+      <% if permitted_to? :profile, @school, :context=>:schools %>
+        <li><%= link_to 'Profile',profile_school_path(@school),:class=>"active" %></li>
+      <% end %>
+      <% if permitted_to? :domain, @school, :context=>:schools %>
+        <li><%= link_to 'Domain',domain_school_path(@school)%></li>
+      <% end %>
+      <% if permitted_to? :plugin_list, :available_plugins %>
+        <li><%= link_to 'Plugins',plugin_list_school_available_plugin_path(@school) %></li>
+      <% end %>
+      <% if permitted_to? :settings_list, :additional_settings %>
+        <li><%= link_to 'Email',settings_list_additional_setting_path('school',@school.id,"smtp_setting") %></li>
+        <li><%= link_to 'Sms setting',package_list_school_sms_packages_path(@school) %></li>
+      <% end %>
+      <% if saas? and permitted_to? :index,@school,:context=>:snapshots%>
+        <li><%= link_to 'Snapshot',snapshots_path(@school), :class=>'non-partial'%></li>
+      <% end %>
+      <% if @school.allowed_plugins.include?("fedena_pay") and permitted_to? :index,@school,:context=>:payment_gateways %>
+        <li><%= link_to 'Gateways',school_payment_gateways_path(@school), :class=>'non-partial' %></li>
+      <% end %>
+      <% if saas? and permitted_to? :task_list, :support_engines %>
+        <li><%= link_to 'Support Tasks',task_list_support_engine_path(@school.id), :class=>'non-partial'%></li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="detail_list" class="detail-list width-80-pc bg-light shadow grey-border">
+    <%= render "profile.html" %>
+  </div>
+</div>

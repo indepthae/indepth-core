@@ -1,0 +1,239 @@
+label.check_label{
+    font-size: 12px;
+    color: #333;
+    padding-left: 15px;
+    cursor: pointer;
+    user-select: none;
+    float: right;
+}
+
+select.drop_select{
+    height:30px;
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    width:290px;
+    border-radius: 2px;
+    padding: 5px 10px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+}
+
+select.drop_select:focus{
+    border-color: #333;
+}
+
+div.intermediate_selector{
+    margin-bottom: 75px;
+}
+.calendar_label {
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2); 
+    font-size: 13px;
+    padding: 5px !important;
+    top: -2px !important;
+    position: relative;
+}
+
+div.user_type_selector{
+    margin-bottom: 45px;
+}
+
+div.user_selector {
+    display: inline-block;
+    width: 490px;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
+div.sms_creation {
+    display: inline-block;
+    width: 480px;
+    box-sizing: border-box;
+}
+
+h5.field_head {
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 10px;
+    margin-top: 15px;
+}
+
+div.field_set textarea{
+    width: 400px;
+    padding: 10px 10px;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 2px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+    resize: none;
+}
+
+div.field_set textarea:focus{
+    border-color: #333;
+}
+
+label{  
+    font-size: 13px;
+    color: #333;
+}
+
+div.field_set label.head_label{
+    font-weight: bold;
+    display: block;
+}
+
+
+div.field_set input[type="text"]{
+    height: 30px;
+    padding: 3px 10px;
+    width: 350px;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 2px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+}
+
+div.field_set input[type="text"]:focus{
+    border-color: #333 !important;
+}
+
+
+div.field_set select{
+    height:30px;
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    width:290px;
+    border-radius: 2px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+}
+
+div.field_set select:focus{
+    border-color: #333;
+}
+
+.template_new_message_switcher {
+    margin-bottom: 30px;
+    width: 100%;
+    float: left;
+}
+
+.solid_button{
+    padding: 10px 20px 10px 20px;
+    background-color: #333;
+    color:#ffffff;
+    border-radius: 4px;
+    border-width: 0px;
+    cursor: pointer;
+    font-weight: bold;
+    cursor:pointer;
+    text-decoration: none;
+    font-size: 14px;
+    height: 36px;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+}
+
+#page-yield .solid_button:hover{
+    background-color: #626262;
+    color: #fff !important;
+}
+
+input.check{
+    vertical-align: bottom;
+    margin-bottom: 2px;
+}
+
+div.submit_controls {
+    margin-top: 30px;
+}
+
+.error-icon {
+    width: 15px;
+    height: 12px;
+    background: url(/images/iconsprite-1.png);
+    background-position: -42px -344px;
+    margin-left: 2px;
+    display: inline-block;
+    margin-top: 1px;
+    vertical-align: top;
+}
+.error-msg {
+    color: red;
+    font-size: 13px;
+    font-style: italic;
+    display: inline-block;
+    vertical-align: top;
+}
+.wrapper {
+    margin-bottom: 16px;
+    margin-right: 0 !important;
+}
+
+div.selector_box {
+    margin-bottom: 10px;
+}
+.select_date { }
+.select_batch { }
+.send_copy { display: flex; }
+.send_parents{
+    float: right;
+    font-size: 12px;
+    margin: -1px 14px 0px 21px;
+}
+.send_immediate {}
+.copy_all{
+    font-size: 13px;
+    color: #333;
+    float: right;
+    font-weight: bold; 
+    margin: 0px 0px 0px 4px;
+}
+
+
+@-moz-document url-prefix() {
+    .copy_all {
+        margin: 6px 0px 0px 4px;
+    }
+}
+.calendar_date_select {
+    font-size: 12px;
+    color: #ffffff;
+    border: #777 1px solid;
+    display: block;
+    width: 195px;
+    z-index: 10001;
+   -webkit-margin-before: 10px;
+   margin-top: 5px;
+}
+.sms_notes{
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 17px;
+}
+#sms_count {
+   margin: 0px 0px 8px 1px;
+    font-size: 13px;
+    color: #999;
+}
+#sms_word_count {
+    float: right;
+    margin-left: 5px;
+}

@@ -1,0 +1,9 @@
+<div class="section-header">
+  <span><%= t('master_discounts_text') %></span>
+  <%= link_to_remote t('new_master_discount'), {:url => new_master_discount_master_fees_path} %>
+</div>
+<div class="section-description"><%= t('master_discounts_desc') %></div>
+
+<div id="discounts_list">
+  <%= render :partial => "master_discounts" %>
+</div>

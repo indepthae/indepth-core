@@ -1,0 +1,9 @@
+<div class="label-field-pair section">
+  <label for="academic_year"><%= t('financial_year_name') %></label>
+  <div class="text-input-bg">
+    <%= form.select :financial_year_id, financial_year_options,
+                    {:selected => @current_financial_year[:id], :include_blank => t('select')},
+                    {:onchange => "update_dates(this)"}%>
+    <%= error_message_box(t('cant_be_blank')) %>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('fees_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('fees_receipt_settings') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h3><%= t('pdf_receipt_settings') %></h3>
+    <div class="description"><%= t('pdf_receipt_settings_descr') %></div>
+    <% form_for 'configuration', :url => {:action => "pdf_receipt_settings"} do |f| %>
+      
+    <h4><%= t('alignment_of_institution_details') %></h4>
+      <div class="label-radio-pair">
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_halignment", "left", :checked => (@config[:pdf_receipt_halignment].nil? or (@config[:pdf_receipt_halignment].present? and @config[:pdf_receipt_halignment]=="left"))%>
+          <label class="label_for_status right-margin"><%= t('left_align') %></label></div>
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_halignment", "center", :checked => (@config[:pdf_receipt_halignment].present? and @config[:pdf_receipt_halignment]=="center") %>
+          <label class="label_for_status right-margin"><%= t('center_align') %></label></div>
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_halignment", "right", :checked => (@config[:pdf_receipt_halignment].present? and @config[:pdf_receipt_halignment]=="right") %>
+          <label class="label_for_status"><%= t('right_align') %></label></div>
+      </div>
+      
+      <h4><%= t('signature') %></h4>
+      <div class="label-radio-pair label-radio-pair_signature">
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_signature", "1", :checked => (@config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1")%>
+          <label class="label_for_status right-margin"><%= t('enable_signature_for_reciepts') %></label></div>
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_signature", "0", :checked => (@config[:pdf_receipt_signature].nil? or (@config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="0")) %>
+          <label class="label_for_status"><%= t('disable_signature') %></label></div>
+      </div>
+
+      <div class="label-field-pair" id="signature_text" style="display:<%= (@config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1") ? 'block' : 'none' %>;">
+          <label for="category_name"><%= t('signature_name') %></label>
+          <div class="text-input-bg"><%= f.text_field :pdf_receipt_signature_name, :value => @config[:pdf_receipt_signature_name], :placeholder => t('cashier_signature') %></div>
+      </div>
+
+
+      <h4><%= t('amount_in_words') %></h4>
+      <div class="label-radio-pair label-radio-pair_amount">
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_atow", "1", :checked => (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") %>
+          <label class="label_for_status right-margin"><%= t('enable') %></label></div>
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_atow", "0", :checked => (@config[:pdf_receipt_atow].nil? or (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="0")) %>
+          <label class="label_for_status"><%= t('disable') %></label></div>
+      </div>
+
+      
+      <h4 id="numbering_system" style="display:<%= (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") ? 'block' : 'none' %>;"><%= t('amount_wording_system') %></h4>
+      <div class="label-radio-pair" id="number_system" style="display:<%= (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") ? 'block' : 'none' %>;">
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_nsystem", "1", :checked => (@config[:pdf_receipt_nsystem].nil? or (@config[:pdf_receipt_nsystem].present? and @config[:pdf_receipt_nsystem]=="1"))%>
+          <label class="label_for_status right-margin"><%= t('indian') %></label></div>
+          <div class="radio_pair_main_float"><%= f.radio_button  "pdf_receipt_nsystem", "0", :checked => (@config[:pdf_receipt_nsystem].present? and @config[:pdf_receipt_nsystem]=="0") %>
+          <label class="label_for_status"><%= t('western') %></label></div>
+      </div>
+
+      <div class="custom_footer">
+          <span id="optional_span"><%= t('custom_footer_text') %></span>&nbsp;&#x200E;(<%= t('optional') %>)&#x200E;
+      </div>
+
+      <div class="footer_desc"><%= t('custom_footer_text_descr') %></div>
+      <div class="status-textarea"><%= f.text_area :pdf_receipt_custom_footer, :value => @config[:pdf_receipt_custom_footer],  :placeholder => t('custom_footer_placeholder'), :maxlength => 255 %></div>
+
+      <hr/>
+      <%= submit_tag "#{t('save_settings')}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :onsubmit=>"return validate()" %>
+    <% end %>
+</div>
+
+
+<script type ="text/javascript">
+  j('.label-radio-pair_signature input').change(function () {
+
+      if (j('.label-radio-pair_signature input:checked').val() == "0") {
+          j("#signature_text").hide();
+          j("#signature_text input").prop('disabled', true);
+      } else {
+          j("#signature_text").show();
+          j("#signature_text input").prop('disabled', false);
+      }
+
+  });
+  j('.label-radio-pair_amount input').change(function () {
+
+      if (j('.label-radio-pair_amount input:checked').val() == "0") {
+          j("#number_system").hide();
+          j("#numbering_system").hide();
+          j("#numbering_system input").prop('disabled', true);
+          j("#number_system input").prop('disabled', true);
+      } else {
+          j("#number_system").show();
+          j("#numbering_system").show();
+          j("#numbering_system input").prop('disabled', false);
+          j("#number_system input").prop('disabled', false);
+      }
+
+  });
+</script>

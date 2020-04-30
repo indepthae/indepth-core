@@ -1,0 +1,79 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('rejected_payslips_for_payroll_group') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :employee_payslips_rejected_payslips, [@payroll_group, [params[:start_date], params[:end_date]]]%>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="header">
+    <%= t("rejected_payslips").titleize %>
+  </div>
+
+  <div class="pay_period">
+    <div class="label-field-pair">
+      <label><%= t('payroll_group') %>: </label>
+      <div class="text-input-bg">
+        <%= @payroll_group.name %>
+      </div>
+    </div>
+  </div>
+  <div class="pay_period">
+    <div class="label-field-pair">
+      <label><%= t('pay_period') %>: </label>
+      <% date_range = @payslips_date_range.date_range %>
+      <div class="text-input-bg">
+        <%= date_range %>
+      </div>
+    </div>
+  </div>
+
+  <div class="payment_frequency">
+    <div class="label-field-pair">
+      <label><%= t('payment_frequency') %>: </label>
+
+      <div class="text-input-bg">
+        <%= "#{@payroll_group.salary_type_value} - #{@payroll_group.payment_period_value}" %>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="description">
+    <%= t('rejected_payslips_for_payroll_group_description') %>
+  </div>
+  <table>
+    <tr class="tr-head">
+      <td class="emp_name"><%= t('employee_text')%></td>
+      <td class="dpt_name"><%= t('department_name') %></td>
+      <td class="remarks"><%= t('remark') %></td>
+      <td class="actions"></td>
+    </tr>
+    <% if @employees.present? %>
+      <%  @employees.each do |employee| %>
+
+        <tr>
+          <td class="emp_name"><%= "#{employee.first_and_last_name} &#x200E;(#{employee.employee_number})&#x200E;" %></td>
+          <td class="dpt_name"><%= employee.name %></td>
+          <td class="remarks"><%= employee.reason %></td>
+          <td class="actions">
+            <div id="edit_link"><%= link_to t('edit_payslip'), {:action => "edit_payslip", :id => employee.payslip_id, :from => 'rejected_payslips'} %></div>
+            <div id="delete_link"><%= link_to t('delete_payslip'), {:action => "revert_employee_payslip", :id => employee.payslip_id, :from => 'rejected_payslips', :pg_id => @payroll_group.id, :start_date => params[:start_date], :end_date => params[:end_date]}, :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_payslip_confirmation_message', {:name => employee.first_and_last_name, :pay_period => date_range})}',{'ok' : '#{t('delete_payslip')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_payslip')}'});" %></div>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="6"><%= t('nothing_to_list') %></td></tr>
+    <% end %>
+  </table>
+  <%= pagination_status(@employees) %>
+  <%= will_paginate @employees %>
+</div>

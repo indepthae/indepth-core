@@ -1,0 +1,18 @@
+
+  <% help_wizard('Update', 'HR has been updated recently. There are few important things you should know.') do %>
+      <p>If you are looking to create payslip or employee payslips, please carefully go through the following before proceeding.</p>
+
+      <h3>Payroll Groups</h3>
+      <p>We have introduced payroll groups to group employees with similar payroll structure, pay    frequency (monthly, weekly, bi-weekly and daily), Loss of Pay criteria. This will help you organize employees of your institution based on their payroll.</p>
+      <p>Now all your payroll categories and employees are linked to a payroll group. <%= link_to('View Payroll groups', payroll_groups_path, {:target=>:_blank}) if permitted_to?(:index, :payroll_groups) %> </p>
+
+      <h3>Generate Payslips</h3>
+      <p>Now that all your employees are linked to a payroll group, all payslips related activities happen inside a payroll group. <%= link_to('Payslips for payroll groups', payslip_for_payroll_group_employee_payslips_path, {:target=>:_blank}) if permitted_to?(:payslip_for_payroll_group, :employee_payslips) %></p>
+      <p>If you are looking to generate payslips for employees individually, you can browse employees by department and generate their payslips <%= link_to('Payslips for Employees', payslip_for_employees_employee_payslips_path, {:target=>:_blank}) if permitted_to?(:payslip_for_employees, :employee_payslips) %></p>
+
+      <h3>One click Payslip generate</h3>
+      <p>Generating payslips for multiple employees at once is now possible only in payroll groups. Unlike the one click payslip generator, now you can see all payroll details of each employee in a single view before generating payslips for them. <%= link_to('Payslips for Payroll groups', payslip_for_payroll_group_employee_payslips_path, {:target=>:_blank}) if permitted_to?(:payslip_for_payroll_group, :employee_payslips) %></p>
+
+      <h3>Payroll Categories</h3>
+      <p>Now, Payroll categories can have variable values (not just numerical values) based on formulas and conditions. eg: Basic = Gross*0.4  <%= link_to('View Payroll Categories', payroll_categories_path, {:target=>:_blank}) if permitted_to?(:index, :payroll_categories) %></p>
+  <% end %>

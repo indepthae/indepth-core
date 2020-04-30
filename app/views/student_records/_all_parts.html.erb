@@ -1,0 +1,100 @@
+<%= stylesheet_link_tag 'jquery-ui_1.css' %>
+<div id="student_details">
+  <%=render :partial=>'student_information'%>
+</div>
+<%if @record_groups.present? %>
+  <div id="student_record_form">
+    <%@record_groups.each do |rg|%>
+      <%@record_group=rg%>
+      <h3 class="record_groups_list"><span class="record_group_name_label"><%=@record_group.name%></span><span id="status_<%=@record_group.id%>"><%=render :partial=>'head_span'%></span></h3>
+      <div id="individual_student_<%=@record_group.id%>">
+        <%if @record_group.student_records.count(:conditions=>{:batch_id=>params[:batch_id],:student_id=>@student.id}) > 0%>
+          <%=render :partial=>'student_records_display'%>
+        <%else%>
+          <%=render :partial=>'record_fields'%>
+        <%end%>
+      </div>
+    <%end%>
+  </div>
+<%else%>
+  <div class="no_entries"><%=t('no_record_groups_assigned')%></div>
+<%end%>
+<script type="text/javascript">
+  function remove_fields(link){
+    delete_confirm=confirm('<%=t('delete_confirm_msg')%>');
+    if(delete_confirm===true){
+      $(link).previous("input[type=hidden]").value='1';
+      $(link).up(".fields").hide();
+      j(link.up(".fields")).attr('class',"new_class")
+    }
+  }
+  function set_form_status() {
+    j('.record_groups_list').each(function(){
+      status_span=j(this).children()[2];
+      filled_fields_count=j(this).attr('filled')
+      total_fields=j(this).attr('nf')
+      count = (total_fields-filled_fields_count)
+      if(count>0) {
+        message="<span class='unfilled'>"+count.toString()+"</span>"
+        message+=" <%= t('not_filled')%>";
+        j(status_span).html(message);
+        j(status_span).addClass("form_status_active");
+      }
+    });
+  }
+  j(function() {
+    var icons = {
+      header: "down-arrow-img",
+      activeHeader: "up-arrow-img"
+    };
+    j("#student_record_form").accordion({
+      icons: icons,
+      heightStyle: "content",
+      collapsible: true,
+      // workaround to allow multipple tabs open
+      beforeActivate: function(event, ui) {
+        // The accordion believes a panel is being opened
+        if (ui.newHeader[0]) {
+          var currHeader  = ui.newHeader;
+          var currContent = currHeader.next('.ui-accordion-content');
+          // The accordion believes a panel is being closed
+        } else {
+          var currHeader  = ui.oldHeader;
+          var currContent = currHeader.next('.ui-accordion-content');
+        }
+        // Since we've changed the default behavior, this detects the actual status
+        var isPanelSelected = currHeader.attr('aria-selected') == 'true';
+
+        // Toggle the panel's header
+        currHeader.toggleClass('ui-corner-all',isPanelSelected).toggleClass('ui-accordion-header-active ui-state-active ui-corner-top',!isPanelSelected).attr('aria-selected',((!isPanelSelected).toString()));
+
+        // Toggle the panel's icon
+        currHeader.children('.ui-icon').toggleClass('down-arrow-img',isPanelSelected).toggleClass('up-arrow-img',!isPanelSelected);
+
+        // Toggle the panel's content
+        currContent.toggleClass('accordion-content-active',!isPanelSelected)
+        if (isPanelSelected) { currContent.slideUp(); }  else { currContent.slideDown(); }
+
+        return false; // Cancels the default action
+      }
+    });
+  });
+  
+  j(".edit_student").submit(function (event) {
+    event.preventDefault();
+    formdata = new FormData(this);
+    j.ajax({
+      url: '/student_records/create',
+      type: 'POST',
+      data: formdata,
+      async: false,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function () {
+      },
+      error: function(){
+      }
+    });
+  });
+</script>

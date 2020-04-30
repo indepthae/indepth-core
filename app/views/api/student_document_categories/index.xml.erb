@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.categories{
+  @categories.each do |category|
+    @category = category
+    @xml.category do
+      @xml.id(@category.category_id)
+      @xml.name(@category.attachment_category_name)
+    end
+  end
+}%>
+
+

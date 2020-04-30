@@ -1,0 +1,33 @@
+<% unless @books.present?%>
+  <p class="flash-msg"> <%= "#{t('no_books_found_try_again')}"%></p>
+<% else %>
+  <table  id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td><%= "#{t('book_number')}"%></td>
+      <td><%= "#{t('barcode')}"%></td>
+      <td><%= "#{t('book_title')}"%></td>
+      <td><%= "#{t('author')}"%></td>
+
+      
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @books.each do |b| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-3"><%= b.book_number %></td>
+        <td class="col-4"><%= b.barcode.present? ? b.barcode : "-" %></td>
+        <%if params[:controller]=="book_movement" and params[:action]=="return_book"%>
+          <td class="col-2"><%= link_to b.title,:controller=>"book_movement",:action=>params[:action],:book_id=>b.id%></td>
+        <%elsif params[:controller]=="book_movement" and params[:action]=="direct_issue_book"%>
+          <td class="col-2"><%= link_to b.title,:controller=>"book_movement",:action=>"issue_book",:id=>b.id%></td>
+        <%elsif params[:controller]=="book_movement" and params[:action]=="renewal"%>
+          <td class="col-2"><%= link_to b.title,:controller=>"book_movement",:action=>params[:action],:book_id=>b.id%></td>
+        <%end%>
+        <td class="col-2"><%= b.author %></td>
+
+
+      </tr>
+      <div id="availability-<%= b.id  %>"></div>
+    <% end  %>
+  </table>
+  <%#= will_paginate @books, :renderer => 'RemoteLinkRenderer',  :params => {:controller=>"book_movement",:action => "return_book"} %>
+<% end %>

@@ -1,0 +1,70 @@
+<% form_for @school,:html=>{:class=>"form"} do |f| %>
+  <% if params[:client_school_group].present? %>
+    <%= hidden_field_tag :client_school_group, params[:client_school_group] %>
+  <% end %>
+  <fieldset>
+    <%= error_string_for(f) %>
+    <%= f.error_message_on :base %>
+  </fieldset>
+
+  <fieldset>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </fieldset>
+  <% unless action_name == 'edit' or action_name == 'update' %>
+    <fieldset>
+      <%= f.label :code, "School Code" %>
+      <%= f.text_field :code %>
+    </fieldset>
+  <% end %>
+
+  <fieldset>
+    <label></label>
+    <%#*<div class="check-box-cell">%>
+      <%#= f.check_box :inherit_sms_settings %>
+      <%#= f.label :inherit_sms_settings, "Inherit sms settings" %>
+    <%#*</div>%>
+    <div class="check-box-cell">
+      <%= f.check_box :inherit_smtp_settings %>
+      <%= f.label :inherit_smtp_settings, "Inherit email settings" %>
+    </div>
+     <div class="check-box-cell">
+      <%= f.check_box :edit_sms_template %>
+      <%= f.label :edit_sms_template, "Enable SMS Template Edit" %>
+    </div>
+     <% if @school.school_group.gps_enabled?  %>
+    <div class="check-box-cell">
+      <%= f.check_box :gps_enabled %>
+      <%= f.label :gps_enabled, "Enable GPS" %>
+    </div>
+    <%end%>
+  </fieldset>
+  <fieldset>
+    <th>Assigned Domains</th>
+  </fieldset>
+  <% f.fields_for :school_domains do |ff|  %>
+    <fieldset>
+      <% dom = ff.object.domain.present? ? ff.object.domain : @school_group.whitelabel_setting && @school_group.whitelabel_setting.settings_to_sym[:company_url].present? ? @school_group.whitelabel_setting.settings_to_sym[:company_url].delete(" ").gsub(/http:\/\//,"") : ".#{set_domain(@school_group,request.host_with_port)}" %>
+
+      <label>Domain name</label>
+      <%= ff.text_field :domain,:value=>dom %>
+    </fieldset>
+  <% end %>
+
+
+  <fieldset>
+    <th>Assign Plugins</th>
+    <div class="float-right margin-right-30 link-box-red"><a href="#" id="select_all_plugin">All</a><p class="vertical-line">|</p><a href="#" id="select_no_plugin">None</a></div>
+  </fieldset>
+
+  <%= (hidden_field_tag "school[available_plugin_attributes][id]", @school.available_plugin.id) unless @school.available_plugin.new_record?%>
+  <% @school_group.allowed_plugins.each do |plugin| %>
+    <div class="plugin-cell main-bg-color">
+      <%= check_box_tag "school[available_plugin_attributes][plugins][]",plugin, @school.available_plugin.plugins.include?(plugin), :id=>"school_"+plugin %> <label for="school_<%= plugin %>"><%= plugin == "fedena_google_sso" ? "Google SSO" : plugin.sub(/^fedena_/,'').titleize.titleize %></label>
+    </div>
+
+  <% end %>
+  <fieldset>
+    <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+  </fieldset>
+<% end %>

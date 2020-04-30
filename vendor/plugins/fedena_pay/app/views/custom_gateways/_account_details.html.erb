@@ -1,0 +1,73 @@
+<% form_for @gateway, :url=>update_accounts_custom_gateway_path(@gateway), :html=>{:method=>:post} do|f| %>
+  <table id="assessments">
+      <tr class="tr-head">
+          <td class="name"><%= t('collection') %></td>
+          <td class="name"><%= t('assigned_batches') %></td>
+          <% @gateway.account_wise_parameters.each do|p| %>
+            <td class="marks"><%= p %></td>
+          <% end %>
+      </tr>
+      <% i=0 %>
+      <% if @finance_collections.present? %>
+        <tr>
+            <td class="fee-type" colspan=<%= (@gateway.account_wise_parameters.count + 2).to_s %>><%= t('finance_fee_collections') %></td>
+        </tr>
+        <% @finance_collections.each do |c| %>
+          <% f.fields_for :payment_accounts, (@gateway.payment_accounts.detect{|a| a.collection_id == c.id and a.collection_type == "FinanceFeeCollection"}||@gateway.payment_accounts.build(:collection_id=>c.id,:collection_type=>"FinanceFeeCollection")) do |field| %>
+            <% m_obj = field.object %>
+            <tr>
+                <%= field.hidden_field :collection_id %>
+                <%= field.hidden_field :collection_type %>
+                <td class="name"><%= c.name %></td>
+                <td class="name"><%= c.batches.map{|b| b.full_name}.join(", ") %></td>
+                <% @gateway.account_wise_parameters.each do|p| %>
+                  <td class="marks"><%= text_field_tag "custom_gateway[payment_accounts_attributes][#{i}][account_params][#{p}]", (m_obj.account_params.present? ? m_obj.account_params[p] : "") %></td>
+                <% end %>
+            </tr>
+          <% end %>
+          <% i=i+1 %>
+        <% end %>
+      <% end %>
+      <% if @hostel_collections.present? %>
+        <tr>
+            <td class="fee-type" colspan=<%= (@gateway.account_wise_parameters.count + 2).to_s %>><%= t('hostel_fee_collections') %></td>
+        </tr>
+        <% @hostel_collections.each do |c| %>
+          <% f.fields_for :payment_accounts, (@gateway.payment_accounts.detect{|a| a.collection_id == c.id and a.collection_type == "HostelFeeCollection"}||@gateway.payment_accounts.build(:collection_id=>c.id,:collection_type=>"HostelFeeCollection")) do |field| %>
+            <% m_obj = field.object %>
+            <tr>
+                <%= field.hidden_field :collection_id %>
+                <%= field.hidden_field :collection_type %>
+                <td class="name"><%= c.name %></td>
+                <td class="name"><%= c.batch.try(:full_name) %></td>
+                <% @gateway.account_wise_parameters.each do|p| %>
+                  <td class="marks"><%= text_field_tag "custom_gateway[payment_accounts_attributes][#{i}][account_params][#{p}]", (m_obj.account_params.present? ? m_obj.account_params[p] : "") %></td>
+                <% end %>
+            </tr>
+          <% end %>
+          <% i=i+1 %>
+        <% end %>
+      <% end %>
+      <% if @transport_collections.present? %>
+        <tr>
+            <td class="fee-type" colspan=<%= (@gateway.account_wise_parameters.count + 2).to_s %>><%= t('transport_fee_collections') %></td>
+        </tr>
+        <% @transport_collections.each do |c| %>
+          <% f.fields_for :payment_accounts, (@gateway.payment_accounts.detect{|a| a.collection_id == c.id and a.collection_type == "TransportFeeCollection"}||@gateway.payment_accounts.build(:collection_id=>c.id,:collection_type=>"TransportFeeCollection")) do |field| %>
+            <% m_obj = field.object %>
+            <tr>
+                <%= field.hidden_field :collection_id %>
+                <%= field.hidden_field :collection_type %>
+                <td class="name"><%= c.name %></td>
+                <td class="name"><%= c.batches.map{|b| b.full_name}.join(", ") %></td>
+                <% @gateway.account_wise_parameters.each do|p| %>
+                  <td class="marks"><%= text_field_tag "custom_gateway[payment_accounts_attributes][#{i}][account_params][#{p}]", (m_obj.account_params.present? ? m_obj.account_params[p] : "") %></td>
+                <% end %>
+            </tr>
+          <% end %>
+          <% i=i+1 %>
+        <% end %>
+      <% end %>
+  </table>
+  <%= submit_tag t('save_changes'), :class => 'submit-button'%>
+<% end %>

@@ -1,0 +1,71 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_regi_label') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('search') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+        </ul>
+    </div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0" style="display:block;max-height:400px;overflow:auto;">
+        <tr class="tr-list_head">
+            <td style="width:10%">
+                <%= t('regi_no') %>
+            </td>
+            <td style="width:15%">
+                <%= t('course_name') %>
+            </td>
+            <td style="width:25%">
+                <%= t('applicant_name') %>
+            </td>
+            <td style="width:15%">
+                <%= t('date_format') %>
+            </td>
+            <td style="width:20%">
+                <%= t('status') %>
+            </td>
+            <td>
+                <%= t('has_paid_fees') %>
+            </td>
+        </tr>
+        <% if @applicants.present? %>
+          <% @applicants.each do |applicant| %>
+            <tr class="row-<%=cycle('b', 'a')%>">
+                <td class="batch"><%= applicant.reg_no %></td>
+                <td class="batch"><%= applicant.registration_course.try(:course).try(:full_name) %></td>
+                <td class="name"><%= link_to applicant.full_name, :action=>:view_applicant,:id=>applicant.id%></td>
+                <td><%= format_date(applicant.created_at.to_date,:format=>:long) unless applicant.created_at.nil? %></td>
+                <td><%= applicant.application_status.is_default == true ? (applicant.application_status.name == "alloted" ? (applicant.batch_id.present? ? "#{t('alloted')} - #{applicant.batch.full_name}" : "#{t('alloted')}") : t(applicant.application_status.name)) : applicant.application_status.name %></td>
+                <td><%= applicant.has_paid? ? t('y_es') : t('n_o') %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr class='row-b'><td colspan='0'><%= t('no_search_result') %></td></tr>
+        <% end %>
+    </table>
+
+    <div id = "button">
+        <%= link_to "Pdf Report", {:controller=>"applicants_admins", :action => "search_by_registration_pdf",:reg_no => params[:search][:registration_no],:report_format_type => "pdf", :applicants => @applicants, :page_height => 750}, :target => '_blank', :class => "user_button" %>
+        <%= link_to "CSV Export", {:controller=>"csv_export", :action => "generate_csv", :csv_report_type => "search_by_registration", :reg_no => params[:search][:registration_no],:report_format_type => "csv", :applicants => @applicants}, :class => "user_button" %>
+    </div>
+</div>
+
+

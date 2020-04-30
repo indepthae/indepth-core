@@ -1,0 +1,477 @@
+*{
+    /*    margin-top: 20px;*/
+}
+
+body{
+    position: relative;
+    /*margin: 0px !important;*/
+}
+
+#page-yield {
+    width:1070px;
+    margin: 0 auto;
+    float: left;
+    overflow: hidden;
+}
+
+
+
+.hor_line{
+    width:1070px;
+    background: #ffffff;
+    height: 1px;
+}
+
+h2.heading{
+    text-align: center;
+    margin:5px;
+}
+
+#main_info h4{
+    color: #555555;
+    margin-top: 18px;
+    font-weight: normal;
+}
+
+#main_info h2{
+    margin-bottom: 2px;
+    font-weight: normal;
+
+}
+
+
+.odd{
+    height:auto;
+    background: #EEEEEE;
+
+}
+
+.even{
+
+    height:auto;
+    background: #fff;
+    page-break-after:auto;
+    page-break-inside: avoid;
+
+
+}
+.even_2{
+    /*page-break-inside: avoid !important;*/    
+}
+
+.col-pdf{
+    text-overflow: ellipsis;
+}
+div.even{
+    width:100%;
+    float:left;
+    clear: both;
+    border-bottom:1px solid #ADACAB;
+    border-top:1px solid #ADACAB;
+    border-left:1px solid #ADACAB;
+    border-right:1px solid #ADACAB;
+    /*    margin-top: -1px;*/
+    margin-bottom: -2px;
+
+
+}
+div.even:last-child {
+    border-bottom: 1px solid #adacab;
+    margin-bottom: -1px;
+}
+
+div.odd{
+    width:100%;
+    float:left;
+
+}
+
+.even div{
+    border-right:1px solid #ADACAB;
+    border-bottom:1px solid #ADACAB;
+    border-top:1px solid #ADACAB;
+    float:left;
+    margin-top: -1px;
+    margin-bottom: 0px;
+    padding: 4px 6px 4px 6px;
+    /*border-color: cyan !important;*/
+}
+
+.odd div{
+    padding: 6px 6px 6px 6px;
+    border-bottom:1px solid #ADACAB;
+    border-right:1px solid #ADACAB;
+    border-top:1px solid #ADACAB;
+    float:left
+
+
+}
+
+.table-header div{
+    padding: 6px 3px 6px 6px;
+    /*    border-top: 1px solid #ADACAB;*/
+    color: #97080e;
+    background: #ffffff;
+}
+
+#pdf-table{
+    /*    border-top: 1px solid #ADACAB;*/
+    /*    border-collapse:collapse*/
+    float:left;
+    width: 100%;
+    border-bottom: 0px; // solid #adacab;
+    position: relative !important;
+    position: absolute !important;
+    /*border-color: green !important;*/
+}
+
+
+#page-extender{
+    width:100%;
+    height :300px;
+
+}
+#page-extender1{
+    width:100%;
+    height :500px;
+
+}
+div#pdf_header {
+    height: 20px;
+}
+#pdf-info{
+    width: 100%;
+    margin-top: 10px;
+    padding-right: -1px;
+    /*display: inline-block;*/
+    display: block;
+    background-color: #fff;
+}
+.report{
+    /*    min-height: 1000px;*/
+    margin: 0 auto;
+    font-size: 11px;
+    font-family: Arial;
+    float:left;
+    /*border:1px solid #ADACAB;*/
+    margin-bottom:10px;
+    width: 1084px;
+}
+/*
+#signature{
+    text-align: right;
+    width: 700px;
+    margin: 0 auto;
+    color: #999999;
+    font-size: 18px;
+}*/
+
+
+#page-yield h2{
+    /*    text-align: center;*/
+}
+
+
+.page-break td{
+    height: 300px;
+}
+.page_break_before_always{
+    page-break-before: always !important;
+}
+.legends{
+    position: relative;
+    float: none;
+    width: 1071px;
+    border: 0px;
+    clear: both;
+    page-break-inside: avoid;
+}
+.legends .legend_right{
+    vertical-align: top;
+    text-align: right;
+    width: 105px;
+    float: right;
+}
+.legends .legend_left{
+    width: 945px;
+    float: left;
+}
+.legend-break-indicator-area{
+    
+}
+.legend-break-indicator{
+    clear: both;
+    float: right;
+    width: 50%;
+    /*width: 100%;*/
+    height: 13px;
+    line-height: 13px;
+    padding: 0px;
+    margin-top: 20px;
+    font-size: 16px;
+    /*background: #efefef;*/
+}
+.legend-break-indicator .break-indicator{
+    float: right;
+}
+.legend-break-indicator .break-marker {
+    float: right;
+    padding: 3px 2px 3px 1px;
+    /*width: 11px;*/
+    height: 6px;
+    background: #ccc;
+    border: 1px solid #ADACAB;
+    margin-left: 10px;
+    /*margin-top: 1px;*/
+    /*margin-right: 369px;*/
+}
+.electives,.legend_tte_group{
+/*    margin-top: 15px;
+    margin-bottom: 20px;*/
+    padding-top: 15px;
+    padding-bottom: 20px;
+    font-size: 12px !important;
+    float: left;
+    /*margin-left: 30px;*/
+    padding-left: 30px;
+    display: block;
+    page-break-inside: avoid;
+}
+.legend_tte_subject{
+    clear: both;
+}
+.legend_class_timing_separator{
+    text-decoration: none !important;
+}
+.legend_weekday, .legend_class_timing, .legend_class_timing_separator{
+    float: left;
+}
+.legend_class_timing{
+    white-space: nowrap;
+}
+.subject{
+    float: left;
+    width: 150px;
+}
+.employee{
+    float: left;
+    white-space: nowrap;
+}
+.main-blank{
+    height: 20px;
+    width: 100%;
+}
+.legend_heading{
+    width: 100%;
+}
+.legend_text{
+    /*    float: left;
+        width: 50%;*/
+}
+/*.legend-break-indicator{
+    float: right;
+    width: 50%;*/
+/*border: 1px solid #000*/
+/*}*/
+.legend_group_names .legend_weekday, .legend_group_names .legend_class_timing{
+    text-decoration: underline;
+}
+.group_names,.legend_group_names{
+    font-weight: bold;
+}
+.subject-employees{
+    clear: both;
+}
+.col-pdf-slots{
+    height:86px !important;    
+    width: 102px !important;  
+    border-left: 0px !important;
+    border-top: 0px !important;
+    border-bottom: 0px !important;  
+    /*border-right: 1px !important;*/
+    /*border-color: blue !important;*/
+}
+.common_period .col-pdf-slots{
+    /*height: 56px !important;*/
+}
+.col-pdf-slots span{
+    font-size:10px !important;
+    font-weight:normal !important;
+}
+span.pdf_period{
+    min-width:105px !important;
+    word-break: break-all;
+    height: 24px !important;
+    display: block;
+    font-size:10px !important;
+    font-weight:bold !important;
+    margin-top: 5px;
+    margin-bottom: 5px;    
+    min-width:82px !important;
+    
+    max-width: 102px;
+/*    max-height: 24px;
+    overflow: hidden;*/
+    /*margin-bottom: 6px;*/
+}
+span.pdf_teacher{    
+    line-height: 18px;
+    font-size: 11px !important;
+}
+#outer_table{
+}
+div.col-pdf-break{
+    background-color: #ccc !important;
+    min-height: 88px;
+    padding: 3px 2px 3px 1px;
+    /*border-top: 1px solid #ADACAB;*/
+    border-top: 0px;
+    /*border-bottom: 1px solid #ADACAB;*/
+    border-bottom: 0px;
+    /*border-color: red !important;*/
+}
+.common_period .col-pdf-break {
+    /*min-height: 58px;*/
+}
+.col-pdf_weekday{
+    min-height:86px !important;
+    width: 14px;
+    padding: 4px 2px !important;
+    position: relative;
+    text-align: center;
+    border: 0px !important;
+    border-right: 1px solid #ccc !important;
+}
+.common_period .col-pdf_weekday{
+    /*min-height: 56px !important;*/
+}
+.col-pdf_weekday .weekday_name{
+    /*    text-align: center;
+        -webkit-transform: translateX(-42%) translateY(275%) rotate(-90deg);
+        text-align: center;*/
+    min-height: 6px;
+    border: 0px !important;
+    width: 84px;
+    padding: 1px 4px;
+
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+.common_period .col-pdf_weekday .weekday_name{
+    /*width: 56px !important;*/
+    /*-webkit-transform: translateX(-40%) translateY(164%) rotate(-90deg) !important;*/
+}
+#batch_name{
+    float:right;
+    font-size:17px;
+    font-weight:bold;
+}
+#tt_name{
+    float:left;
+    font-size:17px;
+    font-weight:bold;
+}
+.legend_tte_heading{
+    font-size: 14px;
+    font-family: Arial;
+}
+.legend_tte_heading .legend_tte_timing{
+    text-decoration: underline;
+}
+.page-break {
+    float:none;
+    display:block;
+    page-break-after:always;
+}
+.period_name, .period_time{
+    text-align: center;
+    float: none;
+    display: block;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.even:last-child .row-col {
+    border-bottom: 0px;
+}
+.last-row-col-no-right-border{
+    border-right: 0px !important;
+}
+
+#periods {
+    margin-left: 18px;
+    height: 40px;
+    width: calc(100% - 18px);
+}
+#periods .col-pdf-slots {
+    height: 34px !important;
+}
+#periods .col-pdf-break {
+    min-height: 36px !important;
+}
+
+/** adjustments for week row **/
+/** week row spanning in 2 rows **/
+.even_2 .col-pdf-slots, .even_2 .col-pdf-break, .even_3 .col-pdf-slots, .even_3 .col-pdf-break, .even_4 .col-pdf-slots, .even_4 .col-pdf-break{
+    border-bottom: 1px solid #adacab !important;
+}
+.even_2 .col-pdf_weekday{
+    height: 180px !important;
+}
+.even_2_last_row .col-pdf_weekday{
+    height: 179px !important;
+}
+/** week row spanning in 3 rows **/
+.even_3 .col-pdf_weekday{
+    height: 270px !important;    
+}
+.even_3_last_row .col-pdf_weekday{
+    height: 269px !important;
+}
+/** week row spanning in 4 rows **/
+.even_4 .col-pdf_weekday{
+    height: 360px !important;        
+}
+.even_4_last_row .col-pdf_weekday{
+    height: 359px !important;
+}
+/*.even:last-child{*/
+.even{
+    page-break-inside: avoid !important;
+/*        page-break-after: always !important;
+        page-break-before: always !important;*/
+    position: relative;
+}
+.col-pdf_weekday_zoom {
+    border-right: 1px solid #adacab !important;
+}
+/*#pdf-info, .even{
+    background: transparent;
+}
+#pdf-table{
+    background: transparent;
+}
+#report{
+    background: transparent;
+}
+*/
+
+#body_margin{
+    clear: both;
+    display: block;
+    position: relative;
+}
+#legends{    
+    position: relative;
+    display: block;
+}
+.legends_higher_resolution{
+    display: inline-block !important;    
+}
+.legend_component:last-child{
+    padding-bottom: 0px !important;
+}

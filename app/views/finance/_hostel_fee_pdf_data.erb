@@ -1,0 +1,154 @@
+<% i=0 %>
+<div class="particalars_list_item">
+    <div class="slno"><%= i+=1 %>.</div>
+    <div class="particalar_name"><%= t('rent') %></div>
+    <% hostel_fee=v['finance'] %>
+    <div class="particalar_amount"><%= precision_label(hostel_fee.rent.to_f) %></div>
+</div>
+<% if has_tax?(v) %>
+  <div class="subsection">
+      <div class="light_hor_line"></div>
+      <div id="sub_text_left"><%= t('tax_text') %></div>
+      <div id="sub_text_right"><%= t('amount') %> (<%= currency %>)</div>
+      <div class="light_hor_line"></div>
+      <div class="extender"></div>
+  </div>
+  <% v['tax_slab_collections'].each_pair do |slab, slab_gp| %>
+    <div class="particalars_list_item">
+        <div class="slno"><%= i+=1 %>.</div>          
+        <div class="particalar_name">
+            <%= "#{slab.name} &#x200E;(#{precision_label(slab.rate)}%)&#x200E;" %>
+        </div>
+        <% tax_sum = slab_gp.map(&:tax_amount).sum.to_f %>
+        <div class="particalar_amount"><%= precision_label(tax_sum) %></div>
+    </div>
+  <% end %>
+<% end %>
+<% total_fine=0 %>
+<% finance_transaction=v['finance_transaction'] %>
+<% finance_transaction.previous_fine_transactions_for_hostel.each do |ft| %>
+  <div class="subsection">
+      <div class="light_hor_line"></div>
+      <div id="sub_text_left"><%= t('fine') %></div>
+      <div id="sub_text_right"><%= t('amount') %> (<%= currency %>)</div>
+      <div class="light_hor_line"></div>
+      <div class="extender"></div>
+  </div>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= t('fine_on') %> <%= format_date(ft.transaction_date) %></div>
+      <div class="particalar_amount">
+          <%= precision_label(ft.fine_amount) %>
+      </div>
+  </div>
+  <% total_fine+=ft.fine_amount %>
+<% end %>
+
+
+<div class="subsection summary-line">
+    <div class="light_hor_line"></div>
+    <div id="sub_text_left"><%= t('summary') %></div>
+    <div id="sub_text_right"><%= t('amount') %> (<%= currency %>)</div>
+    <div class="light_hor_line"></div>
+    <div class="extender"></div>
+</div>
+<% i=0 %>
+<div class="particalars_list_item">
+    <div class="slno"><%= i+=1 %>.</div>
+    <div class="particalar_name"><%= "#{t('total')} #{t('fees_text')}" %></div>
+    <div class="particalar_amount"><%= precision_label(hostel_fee.rent.to_f) %></div>
+</div>
+<% if has_tax?(v) %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('tax_text')}" %></div>
+      <div class="particalar_amount"><%= precision_label(v['total_tax'].to_f) %></div>
+  </div>
+<% end %>
+<% if total_fine > 0 %>
+  <div class="particalars_list_item">
+      <div class="slno"><%= i+=1 %>.</div>
+      <div class="particalar_name"><%= "#{t('total')} #{t('fine')}" %></div>
+      <div class="particalar_amount"><%= precision_label(total_fine.to_f) %></div>
+  </div>
+<% end %>
+
+<!-- <div class="subsection">
+  <div class="light_hor_line"></div>
+</div> -->
+<div class="receipt-footer-bottom">
+    <div class="left_info">
+        <div class="left_info_label"><%= t('payment_mode') %></div>
+        <div class="left_info_value"><%= finance_transaction.payment_mode %></div>
+        <% if finance_transaction.reference_no.present? %>
+          <div class="left_info_label"><%= t(finance_transaction.get_payment_mode) %></div>
+          <div class="left_info_value"><%= finance_transaction.reference_no %></div>
+        <% end %>
+
+        <% if finance_transaction.payment_mode == "Cheque" %>
+          <div class="left_info_label"><%= t('cheque_date') %></div>
+          <div class="left_info_value">
+              <%= finance_transaction.cheque_date.present? ? finance_transaction.cheque_date : '-'%>
+          </div>
+          <div class="left_info_label"><%= t('bank_name') %></div>
+          <div class="left_info_value">
+              <%= finance_transaction.bank_name.present? ? finance_transaction.bank_name : '-'%>
+          </div>
+        <% end %>
+
+        <% if finance_transaction.payment_note.present? %>
+          <div class="left_info_label"><%= t('notes') %></div>
+          <div class="left_info_value"><%= finance_transaction.payment_note %></div>
+        <% end %>
+        <% if has_tax?(v) %>
+          <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+            <div class="left_info_label"><%= @tax_config[:finance_tax_identification_label] %></div>
+            <div class="left_info_value"><%= @tax_config[:finance_tax_identification_number] %></div>
+          <% end %>
+        <% end %>
+    </div>
+    <div class="right_total">
+        <% total = hostel_fee.rent.to_f+total_fine %>
+        <% total += v['total_tax'] if has_tax?(v) %>
+        <div class="right_total_label"><%= t('total_amount_to_pay') %></div>
+        <div class="right_total_amount"><%= precision_label(total) %></div>
+
+        <% unless finance_transaction.hostel_fee_finance_transaction.previous_payments==0 %>
+          <div class="right_total_label"><%= t('previous_payments') %></div>
+          <div class="right_total_amount"><%= precision_label(finance_transaction.hostel_fee_finance_transaction.previous_payments) %></div>
+        <% end %>
+        <% if finance_transaction.hostel_fee_finance_transaction.transaction_balance==0 %>
+          <b>
+              <div class="right_total_label"><%= t('total_amount_paid') %></div>
+              <% balance = hostel_fee.rent.to_f-hostel_fee.balance.to_f+total_fine %>
+              <% balance += v['total_tax'] if has_tax?(v) %>
+              <div class="right_total_amount"><%= precision_label(balance) %></div>
+          </b>
+        <% else %>
+          <div class="right_total_label"><%= t('total_due_amount') %></div>
+          <div class="right_total_amount"><%= precision_label(finance_transaction.hostel_fee_finance_transaction.transaction_balance.to_f) %></div>
+        <% end %>
+    </div>
+</div>
+
+<div class="receipt-footer-bottom words_bottom">
+    <% show_amount_in_words = (@config[:pdf_receipt_atow].present? and @config[:pdf_receipt_atow]=="1") %>
+    <div class="left_info amount_margin">
+        <% if show_amount_in_words %>
+          <span style="font-weight: bold;"><%=t('amount_in_words')%></span> : 
+          <%= NumberToWord.convert(precision_label(v["amount"].to_f), @config[:pdf_receipt_nsystem], @default_currency) %>
+          <br/>
+        <% end %>
+        <% if @invoice_enabled and v["collection"].invoice_enabled %>
+          <span style="font-weight: bold;">
+              <%=t('payment_for_invoice')%></span> : 
+          <%= v["invoice_no"] %>
+        <% end %>
+    </div>    
+    <div class="right_total">
+        <div class="right_total_label"><%= t('amount_paid') %></div>
+        <div class="right_total_amount"><%= precision_label(finance_transaction.amount.to_f) %></div>
+    </div>
+</div>
+
+

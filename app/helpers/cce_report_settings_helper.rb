@@ -1,0 +1,2 @@
+module CceReportSettingsHelper
+end

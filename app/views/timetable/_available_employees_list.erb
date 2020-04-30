@@ -1,0 +1,50 @@
+<% if @employees.present? %>
+  <table border="0" class="employee-table" >
+    <thead id="available-employees-list-head">
+      <tr class="employee-header-row employee-row">
+        <th class="employee-col-1"> <%= t('employee_name') %> </th>
+        <th class="employee-col-2"> <%= t('alloted_working_hours') %> </th>
+        <th class="employee-col-3"> &nbsp; </th>
+      </tr>
+    </thead>
+    <tbody id="available-employees-list-body">
+      <% @employees.each do |emp| %>
+
+        <tr class="employee-row">
+          <% emp_hours = emp.employee_hours %>
+          <% emp_hours_text = (emp_hours > 0) ? " #{t('of')}&nbsp;&rlm;  #{emp_hours}" : "" %>
+          <td class="employee-col-1">
+            <%= "#{emp.full_name} (&rlm;#{emp.employee_number})" %>
+            <% if emp.active_subject_hours > 0 %>
+              <table class="employee_allocation_tooltip">
+                <tr class="employee_allocation_tooltip_row">
+                  <td class="emp-coltip-01"><%= "#{t('course_text')}-#{t('batch')}" %></td>
+                  <td class="emp-coltip-02"><%= "#{t('subject_name')}" %></td>
+                  <td class="emp-coltip-03"></td>
+                </tr>
+                <% emp.active_subjects.each do |subject| %>
+                  <tr class="employee_allocation_tooltip_row">
+                    <td class="emp-coltip-01"><%= "#{subject.batch.full_name}" %></td>
+                    <td class="emp-coltip-02"><%= "#{subject.name}" %></td>
+                    <td class="emp-coltip-03"><%= "(&rlm;#{subject.max_weekly_classes})" %></td>
+                  </tr>
+                <% end %>
+              </table>
+            <% end %>
+          </td>
+          <td class="employee-col-2"> <%= "#{emp.active_subject_hours}#{emp_hours_text}" %></td>
+          <td class="employee-col-3">
+            <%= link_to_remote t('assign'), :url => {:controller => :timetable, :action => :assign_employee, :emp_id => emp.id, :subject_id => @subject.id}, :html => {:class => "themed_hover_text"}, :before => "j('#remove_emp_#{emp.id}').show()" %>
+            <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "remove_emp_#{emp.id}", :style =>"display: none;" ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+
+  </table>
+  <%= "<script>verifyAvailableEmployeesListScroll()</script>" %>
+<% else %>
+  <p>
+    <%= flash[:notice] %>
+  </p>
+<% end %>

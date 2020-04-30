@@ -1,0 +1,50 @@
+
+<div class="edit-form">
+  <% remote_form_for :remark, @remark, :url=>"",:html => {:id=>"edit_custom_remarks_#{@object_id}"} do |f| %>
+    <div class="label-field-pair" id="subject-field">
+      <%=label_tag 'subject', nil, :id => 'remark_subject_label'%>
+      <div class="text-input-bg" id="remark_subject_text_box"><%= f.text_field :remark_subject %></div>
+    </div>
+    <div class="label-field-pair" id="remark-by-field">
+      <%=label_tag 'remarked_by', nil, :id => 'remarked_by_label'%>
+      <div class="text-input-bg" id="remarked_by_text_box"><%= f.text_field :remarked_by %></div>
+    </div>
+    <div class="remark-text-area">
+      <%= f.text_area :remark_body %>
+    </div>
+    <%=f.hidden_field :student_id,:value=>@student.id%>
+    <%= f.submit t('submit')%>
+    <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link cancel_for_custom_remark_edit",:id=>"close_#{@object_id}",:student_id=>@student.id%>
+  <% end %>
+  <div class="extender"></div>
+</div>
+<script type="text/javascript">
+  j('form#edit_custom_remarks_<%=@object_id%>').submit(function(e){
+<%= "var student_id = '#{@student.id}'" %>
+<%="var object_id = '#{@object_id}'"%>
+    var parametrs={student_id:student_id,object_id:object_id}
+    e.preventDefault();
+    var fo=this
+    new Ajax.Request('/remarks/update_custom_remarks',{
+      parameters:this.serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j('#add_remark_link_for_<%=@object_id%>').show();
+        j('#add_remark_link_for_<%=@object_id%>').html(resp.responseText);
+        
+        j(fo).parents('.edit-form').remove();
+        j('hr.custom_hr_<%=@object_id%>').remove();
+      }
+    });
+  });
+
+  j('#close_<%=@object_id%>').click(function(){
+    j('#add_remark_link_for_<%=@object_id%>').children().eq(1).attr('onclick','edit_custom_remark(this)')
+    j('#add_remark_link_for_<%=@object_id%>').show();
+    j('#close_<%=@object_id%>').parents('.edit-form').remove();
+    j('hr.custom_hr_<%=@object_id%>').remove();
+
+  });
+</script>

@@ -1,0 +1,65 @@
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('advance_payment_for_student') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('advance_fee_categories_text') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('create_category')}", :url => {:action => 'advance_fees_category_new'} %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "/finance/financial_year_info.erb" %>
+    </div>
+  </div>
+
+  <% if flash[:notice].present? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="category_list">
+    <%= render :partial => "category_list" %>
+  </div>
+
+</div>
+
+<div id="modal-box" style="display:none;"></div>
+<script type="text/javascript">
+  activate_the_batch = function (elem, id) {
+    if (j(elem).is(":checked")){
+      j('#batches_'+id+'_is_active').val(true);
+    } else {
+      j('#batches_'+id+'_is_active').val(false);
+    }
+  }
+  
+  select_all_batches = function () {
+    j('.batch-select').each(function (i, obj) {
+      if (!j('.batch-status'+j(obj).attr('index')).is(':disabled')){
+        j('.batch-status'+j(obj).attr('index')).prop('checked', true)
+        j(obj).val(true);
+      }
+    });
+  }
+  
+  deselect_all_batches = function () {
+    j('.batch-select').each(function (i, obj) {
+      if (!j('.batch-status'+j(obj).attr('index')).is(':disabled')){
+        j('.batch-status'+j(obj).attr('index')).prop('checked', false)
+        j(obj).val(false);
+      }
+    });
+  }
+</script>

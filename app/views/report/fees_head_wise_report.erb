@@ -1,0 +1,40 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('reports_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('fees_head_wise_report') %></div>
+
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+<div class="box">
+  <div class="link-box">
+    <div class="link-heading"><%= link_to "#{t('batch_wise_report')}" ,:action=>'batch_fees_headwise_report' %></div>
+    <div class="link-descr"><%= "#{t('generates')} #{t('batch')} #{t('fees_head_wise_report')}"  %></div>
+  </div>
+</div>
+  <div class="box">
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('fee_collection_wise_report')}" ,:action=>'fee_collection_head_wise_report' %></div>
+      <div class="link-descr"><%= "#{t('generates')} #{t('collection')} #{t('fees_head_wise_report')}"  %></div>
+    </div>
+  </div>
+<div class="box">
+  <div class="link-box">
+    <div class="link-heading"><%= link_to "#{t('student_wise_report')}" ,:action=>'search_student' %></div>
+    <div class="link-descr"><%= "#{t('generates')} #{t('students')} #{t('fees_head_wise_report')}"  %></div>
+  </div>
+</div>
+<div class="box">
+  <div class="link-box">
+    <div class="link-heading"><%= link_to "#{t('collection_report')}" ,:action=>'fee_collection_report' %></div>
+    <div class="link-descr"><%= " #{t('collection_report_description')}"  %></div>
+  </div>
+</div>
+
+
+</div>

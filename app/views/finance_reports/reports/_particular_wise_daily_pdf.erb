@@ -1,0 +1,50 @@
+<% if @report_hash.present? and @report_hash[:dates].present? %>
+    <div id="report-data">
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="report_result">
+        <tr class="tr-head">
+          <td class="col1 sl_no fixed-header fee_header"><%= t('sl_no') %></td>
+          <td class="col1 date_col fixed-header fee_header"><%= t('date_text') %></td>
+          <td class="col1 row_total fixed-header fee_header"><%= t('total') %></td>
+
+          <% @report_hash[:particulars].each_pair do |pi, pname| %>
+              <td class="col1 amount_col"><%= pname %></td>
+          <% end %>
+        </tr>
+        <% i = 0 %>
+        <% @report_hash[:dates].each_with_index do |date, i| %>
+            <% d = date.date %>
+            <% i += 1 %>
+            <tr>
+              <td class="col1 sl_no"><%= i %></td>
+
+              <td class="col1 date_col"><%= format_date(d) %></td>
+              <td class="col1 row_total"><%= @report_hash[:particulars_data][d][:total] %></td>
+
+              <% @report_hash[:particulars].each_pair do |pi, pname| %>
+                  <td class="col1 amount_col">
+                    <% v = @report_hash[:particulars_data][d][:particular_totals][pi] %>
+                    <%= v.is_a?(Hash) ? '-' : precision_label(v) %>
+                  </td>
+              <% end %>
+            </tr>
+        <% end %>
+
+
+        <!-- grand totals -->
+        <tr>
+          <td class="col1 grand-total-col" colspan="2">
+            <%= t('grand_total') %>
+          </td>
+          <td class="col1 row_total report-total-col"><%= precision_label(@report_hash[:grand_totals][:total]) %></td>
+
+          <% @report_hash[:particulars].each_pair do |pi, pname| %>
+              <td class="col1 amount_col report-total-col">
+                <%= precision_label(@report_hash[:grand_totals][:particular_totals][pi]) %>
+              </td>
+          <% end %>
+        </tr>
+      </table>
+    </div>
+<% else %>
+    <%= t('no_results_found') %>
+<% end %>

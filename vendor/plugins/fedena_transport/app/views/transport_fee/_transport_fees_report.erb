@@ -1,0 +1,137 @@
+<div class="list_table_div">
+    <div class="main_head_label">
+        <b id="fees_report_title">
+            <%= t('transport_fees_report') %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>            
+        </b>
+        <div class="date_align right">
+            <label class="date_tag">
+                <%= params[:date_tag] %>
+            </label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp; 
+            <label class="to_date"><%= t('to') %></label> &nbsp; 
+            <%= format_date(@end_date) %>
+            <span id="show_date" class="themed_hover_text" >
+                <%= t('change_date') %>
+                <!--
+                < %=link_to_remote t('change_date'),:url => {:controller => "transport_fee",
+                  :action =>"show_date_filter",:target_action=>@target_action,:id=>params[:id],
+                  :date_tag=>params[:date_tag],:start_date=>@start_date,:end_date=>@end_date}%> -->
+            </span>
+        </div>
+    </div>
+    <% unless @transport_fee_collections.empty? %>
+      <% total = 0 %>
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <% tax_enabled_present = @transport_fee_collections.map(&:tax_enabled).uniq.include?(true) %>
+          <tr class="main_head">
+              <td><%= t('transport_fee_collections') %></td>
+              <td colspan="3" class="set_border_right width210">
+                  <span class="show_amount">
+                      <%= t('amount') %> (<%= currency %>)
+                  </span>
+              </td>
+          </tr>
+          <% @transport_fee_collections.each do |collection| %>
+            <tr class="tr-list_head">
+                <td>
+                    <%= link_to  collection.collection_name, {:action => 'category_wise_collection_report',
+                      :id => collection.id, :date_tag => params[:date_tag],
+                      :start_date => @start_date, :end_date => @end_date}.merge(url_params) %>
+                </td>
+                <td></td>
+                <td></td>
+                <td align="right"> <%= precision_label collection.amount %> </td>
+            </tr>
+
+            <% total += precision_label(collection.amount).to_f %>
+
+            <tr class="row-b bold_font">
+                <td><%= t('particulars') %></td>
+                <td class="width70"><%= t('discount_applied') %></td>
+                <td class="width70"><%= t('amount_received') %></td>
+                <td class="width70"><%= t('total_amount') %></td>
+            </tr>
+            
+            <tr class="row-b">
+                <td><%= t('transport_fee.bus_fare') %></td>
+                <td class="set_border_right" align="right">
+                    <%= precision_label(@ftd_hash[collection.id]["discount"].to_f) %>
+                </td>
+                <td class="set_border_right" align="right"><%= precision_label(collection.amount.to_f) %></td>
+                <td class="set_border_right" align="right"> 
+                    <%= precision_label(collection.amount.to_f + @ftd_hash[collection.id]["discount"].to_f) %>
+                </td>
+            </tr>
+
+            <tr class="row-b">
+                <td><b><%= t('total_discount') %></b></td>
+                <td  colspan="3" class="set_border_right width210" align="right">
+                    <b><%= precision_label(@ftd_hash[collection.id]["discount"].to_f) %></b>
+                </td>
+            </tr>
+            
+            <% if tax_enabled_present %>
+              <tr class="row-b">
+                  <td><b><%= t('total_tax') %></b></td>
+                  <td  colspan="3" class="set_border_right width210" align="right">
+                      <b>
+                          <%= collection.tax_amount != '-' ? precision_label(collection.tax_amount) : 
+                            collection.tax_amount %>
+                      </b>
+                  </td>
+              </tr>
+            <% end %>
+              
+            <tr class="row-b">
+                <td><b><%= t('total_fine_amount') %></b></td>
+                <td  colspan="3" class="set_border_right width210" align="right"> 
+                    <b><%= precision_label(collection.total_fine) %></b>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+    
+      <%= will_paginate  @transport_fee_collections, :params => {:id => params[:id],
+        :date_tag => params[:date_tag], :start_date => @start_date, :end_date => @end_date}.
+        merge(url_params), :renderer => 'RemoteLinkRenderer'  %>
+    
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%= precision_label(total) %></label>
+      </div>
+    
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", { :controller => "transport_fee", 
+                        :action => "transport_fees_report_csv",:id => params[:id],
+                        :start_date => @start_date, :end_date => @end_date }.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%=t('no_transactions_present')%></div>
+    <% end %>
+</div>
+<script>
+  j('.date_box').hide();
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+</script>

@@ -1,0 +1,37 @@
+<% form_remote_for @category,:url => student_document_category_path(@category) ,:method => 'delete' do |form| %>
+  <div id="form-errors"></div>
+  <div class="deletion_dialog_heading">
+      <span class='category_title'>
+          <%= "#{t('document_category')}: " %>
+          <b><%= @category.attachment_category_name %></b>
+      </span>
+  </div>
+  <div class="deletion_description_text">
+      <%= "#{t('delete_category_confirm_text')} " %>
+  </div>
+  <div class="deletion_description_text">
+      <div class='text'><%= "#{t('delete_category_description')}: " %></div>
+      <% "all files delete option" %>
+      <div class="label-field-pair category_delete_option">
+          <div class="input-container"><%= radio_button_tag :delete_option, 0 %></div>
+          <div class="label-container"><%= label_tag :delete_option_0,t('delete_all_files') %></div>
+      </div>  
+      <%  "move all files to particular category" %>
+      <% "div class='label-field-pair category_delete_option' " %>
+          <% "div class='input-container'><%= radio_button_tag :delete_option, 1, :selected => true % ></div" %>
+          <% "div class='label-container'><%= label_tag :delete_option_1,t('move_all_to_default_category') % ></div" %>
+      <% " /div" %>  
+      <%  "move all files to particular category" %>
+      <div class="label-field-pair category_delete_option">
+          <div class="input-container"><%= radio_button_tag :delete_option, 2, :selected => true %></div>          
+          <div class="label-container"><%= label_tag :delete_option_2,t('move_all_to_a_category') %></div>
+      </div>  
+      <div class="label-field-pair category_delete_option">
+          <div class="input-container"> 
+              <%= select_tag :category, options_for_select(@categories.collect {|category| [category.attachment_category_name, category.category_id]}), :prompt => t('select_category') %>
+          </div>
+      </div>  
+  </div>
+
+  <%= form.submit  "", :value => "#{t('delete_category')}", :class => "submit_button delete_submit_button", :id => "submit_button" %>
+<% end %>

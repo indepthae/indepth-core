@@ -1,0 +1,202 @@
+<%- # Fedena
+    #Copyright 2010 Foradian Technologies Private Limited
+    #
+    #This product includes software developed at
+    #Project Fedena - http://www.projectfedena.org/
+    #
+    #Licensed under the Apache License, Version 2.0 (the "License");
+    #you may not use this file except in compliance with the License.
+    #You may obtain a copy of the License at
+    #
+    #  http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #Unless required by applicable law or agreed to in writing,
+    #software distributed under the License is distributed on an
+    #"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    #KIND, either express or implied.  See the License for the
+    #specific language governing permissions and limitations
+    #under the License.  -%>
+
+<% if params[:d].present? %>
+    <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% end %>
+
+<%#= javascript_include_tag 'jquery/jquery-ui.min.js' %>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<script type="text/javascript">
+    var j = jQuery.noConflict();
+</script>
+<div id="page-yield">
+  <div class="hor_line"></div>
+  <h2><%= t('finance_transaction_report') %></h2>
+
+  <div class="hor_line"></div>
+  <div class="extender"></div>
+  <div class="report">
+    <div id="main_info">
+      <h4>
+        <%= "#{t('from')} ( #{format_date(@data_hash[:start_date])}) #{t('to')} ( #{format_date(@data_hash[:end_date])})" %>
+        <% if @data_hash[:accounts_enabled] %>
+            <%= "#{t('for')}: #{@account_name || @data_hash[:account_name]}" %>
+        <% end %>
+      </h4>
+    </div>
+    <div id="pdf-info">
+      <table id="pdf-table" width="100%" cellspacing="0">
+        <tr class="table-header">
+          <td class="col-pdf"><%= t('finance_categories') %></td>
+          <td class="col-pdf3"><%= "#{t('amount')}(#{currency})" %></td>
+        </tr>
+        <% i = 0 %>
+        <% income_total = 0 %>
+        <% expenses_total = 0 %>
+        <tr class="table-header">
+          <td colspan="1" class="col-pdf"><%= t('income') %></td>
+          <td class="col-pdf3" id="inc_amount">&nbsp;</td>
+        </tr>
+        <% c= 'even' %>
+        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+          <td class="col-pdf2"><%= t('donations') %></td>
+          <td class="col-pdf3">&nbsp;<%= precision_label(@data_hash[:donations_total]) %>
+            <% income_total+=@data_hash[:donations_total].to_f %>
+          </td>
+        </tr>
+        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+          <td class="col-pdf2"><%= t('student_fees') %></td>
+          <td class="col-pdf3">&nbsp;<%= precision_label(@data_hash[:transactions_fees]) %>
+            <% income_total+=@data_hash[:transactions_fees].to_f %>
+          </td>
+        </tr>
+        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+          <td class="col-pdf2"><%= t('advance_fees_credit_text') %></td>
+          <td class="col-pdf3">&nbsp;<%= precision_label(@data_hash[:wallet_income]) %>
+            <% income_total+=@data_hash[:wallet_income].to_f %>
+          </td>
+        </tr>
+        <% FedenaPlugin::FINANCE_CATEGORY.each do |category| %>
+            <% plugin_present="#{category[:plugin_name]}".present? ? FedenaPlugin.can_access_plugin?("#{category[:plugin_name]}") : true %>
+            <% if plugin_present == true %>
+                <% if @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount].to_f>0 %>
+                    <% if @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:category_type] == "income" %>
+                        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                          <td class="col-pdf2"><%= "#{t(category[:category_name].underscore.gsub(/\s+/, '_')+'_fees')}" %> </td>
+                          <td class="col-pdf3"><%= precision_label @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount] %>
+                            <% income_total+=@data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount].to_f %>
+                          </td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            <% end %>
+        <% end %>
+        <% i+= 2 %>
+        <% @data_hash[:other_transaction_categories].each_with_index do |t, i| %>
+            <% income = t.total_income(@data_hash[:start_date], @data_hash[:end_date]) %>
+            <% if income>0 and t.is_income %>
+                <% if i == 19 %>
+                    <% i= 0 %>
+                    <% c= 'even' %>
+                    <%#*<tr class="page-break"><td colspan="3"></td></tr>%>
+
+                <% end %>
+                <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                  <td class="col-pdf2"> <%= t.name %> </td>
+                  <td class="col-pdf3"><%= precision_label(income) %></td>
+                </tr>
+                <% i+= 1 %>
+                <% income_total +=income %>
+            <% end %>
+        <% end %>
+
+        <tr class="table-header">
+          <td colspan="1" class="col-pdf"><%= t('expense') %></td>
+          <td class="col-pdf3" id="exp_amount">&nbsp;</td>
+        </tr>
+        <% c= 'even' %>
+        <% unless @data_hash[:hr].nil? %>
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+              <td class="col-pdf2"><%= t('employee_salary') %></td>
+              <td class="col-pdf3">&nbsp;
+                <%= precision_label(@data_hash[:salary]) %>
+                <% expenses_total+=@data_hash[:salary].to_f %>
+              </td>
+            </tr>
+            <% i+= 1 %>
+        <% end %>
+        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+          <td class="col-pdf2"><%= t('advance_fees_debit_text') %></td>
+          <td class="col-pdf3">&nbsp;<%= precision_label(@data_hash[:wallet_expense]) %>
+            <% expenses_total+=@data_hash[:wallet_expense].to_f %>
+          </td>
+        </tr>
+        <% FedenaPlugin::FINANCE_CATEGORY.each do |category| %>
+            <% plugin_present="#{category[:plugin_name]}".present? ? FedenaPlugin.can_access_plugin?("#{category[:plugin_name]}") : true %>
+            <% if plugin_present == true %>
+                <% unless @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:category_type] == "income" %>
+                    <% if @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount].to_f>0 %>
+                        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                          <td class="col-pdf2"><%= "#{t(category[:category_name].underscore.gsub(/\s+/, '_')+'_fees')}" %> </td>
+                          <td class="col-pdf3">
+                            <%= precision_label @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount] %>
+                            <% expenses_total+= @data_hash[:category_transaction_totals]["#{category[:category_name]}"][:amount].to_f %>
+                          </td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            <% end %>
+        <% end %>
+        <% i+= 2 %>
+
+        <% if @data_hash[:refund].to_f > 0 %>
+
+            <% expense = @data_hash[:refund].to_f %>
+
+            <% if i == 19 %>
+                <% i= 0 %>
+                <% c= 'even' %>
+            <% end %>
+
+            <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+              <td class="col-pdf2"> <%= @data_hash[:refund_cat_name] %> </td>
+              <td class="col-pdf3"><%= precision_label(expense) %></td>
+              <% expenses_total+=expense %>
+            </tr>
+            <% i+=1 %>
+        <% end %>
+
+        <% @data_hash[:other_transaction_categories].each_with_index do |t, i| %>
+            <% expense = t.total_expense(@data_hash[:start_date], @data_hash[:end_date]) %>
+            <% unless t.is_income %>
+                <% if i == 19 %>
+                    <% i= 0 %>
+                    <% c= 'even' %>
+                    <%#*<tr class="page-break"><td colspan="3"></td></tr>%>
+
+                <% end %>
+                <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+                  <td class="col-pdf2"> <%= t.name %> </td>
+                  <td class="col-pdf3"><%= precision_label(expense) %></td>
+                  <% expenses_total+=expense %>
+            <% end %>
+            </tr>
+            <% i+=1 %>
+        <% end %>
+        <% grand_total=income_total-expenses_total %>
+        <tr class="<%= cycle(c, (["odd", "even"]-[c]).first) %>">
+          <td class="col-pdf1" colspan="1"><%= t('grand_total') %></td>
+          <td class="col-pdf3">&nbsp;
+            <%= precision_label(grand_total) %>
+          </td>
+        </tr>
+      </table>
+      <%= hidden_field_tag 'hd_income', income_total, :id => "h_income" %>
+      <%= hidden_field_tag 'h_expense', expenses_total, :id => 'h_expense' %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+    var inc = j("#h_income").val();
+    var exp = j("#h_expense").val();
+    j("#inc_amount").html(inc);
+    j("#exp_amount").html(exp);
+</script>

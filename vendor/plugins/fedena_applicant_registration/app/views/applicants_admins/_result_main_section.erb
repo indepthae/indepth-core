@@ -1,0 +1,77 @@
+<div id="search-section">
+    <div id="search-top-section">
+        <div id="search-box">
+            <div class="label-field-pair">
+                <div class="text-input-bg">
+                    <%= text_field_tag :search, @search_params, :name => "search[registration_no]",:placeholder => "#{t('search_by_name_or_reg_no')}" %>
+                </div>
+            </div>
+            <%= link_to t('search_text'),"#",:onclick=>"search_by_name(); return false;",:class=>"user_button1" %>
+            <% if @search_params.present? %><a href="#" onclick="clear_name_search(); return false;" id="clear-button" class='page-link'><%= t('clear_text') %></a><% end %>
+            <%= hidden_field_tag "search_params", @search_params %>
+        </div>
+
+        <div id="date-show-box">
+            <% if @start_date.present? and @end_date.present? %>
+              <label><%= t('filter_by_date') %> : </label>
+              <label class='bold-black'><%= format_date(@start_date,:format=>:short_date) %> <%= t('to_text') %> <%= format_date(@end_date,:format=>:short_date) %></label>
+              <a href="#" onclick="show_date_filter(); return false;" id="date-change-button" class='page-link'><%= t('change') %></a>
+              <a href="#" onclick="clear_date_search(); return false;" id="date-clear-button" class='page-link'><%= t('clear_text') %></a>
+            <% else %>
+              <a href="#" onclick="show_date_filter(); return false;" id="show-date-filter" class='page-link'><%= t('filter_by_date') %></a>
+            <% end %>
+            <%= hidden_field_tag "start_date_params", @start_date %>
+            <%= hidden_field_tag "end_date_params", @end_date %>
+        </div>
+    </div>
+    <div id="date_box" class='date_box' style='display:none;'>
+        <div class="set_fixed_range">
+            <%=link_to t('today'),"#", :id=>"show_today", :onclick=>"show_todays_applicants(); return false;"%>
+            <%=link_to t('last_10_days'),"#", :id=>"show_last_ten_days", :onclick=>"show_ten_days_applicants(); return false;"%>
+            <%=link_to t('last_30_days'),"#", :id=>"show_last_ten_days", :onclick=>"show_thirty_days_applicants(); return false;"%>
+        </div>
+        <div class="set_border"></div>
+        <div class="user_set_date">
+            <div>
+                <label><%= t('start_date') %></label>
+                <%= calendar_date_select_tag 'start_date', @start_date.present? ? I18n.l(@start_date,:format=>:default) : nil ,:popup=>:force%>
+            </div>
+            <div> 
+                <label><%= t('end_date') %></label>
+                <%= calendar_date_select_tag 'end_date', @end_date.present? ? I18n.l(@end_date,:format=>:default) : nil ,:popup=>:force%>
+            </div>
+        </div>
+        <div class='filter-buttons'>
+            <%=  link_to_function "#{t('filter_applicants')}","filter_by_date();",{:class=>'user_button1',:style=>"color:#000 !important"} %>
+            <%=  link_to_function "#{t('cancel')}","hide_date_filter(); return false;",{:class=>'user_button1',:style=>"color:#000 !important"} %>
+        </div>
+
+    </div>
+</div>
+<div id='result-section'>
+    <div id='status-list'>
+        <% if @selected_status.present? %>
+          <div class='each-status'><%= link_to "#{t('all')} (#{@filtered_applicants.count})","#",:onclick=>"show_applicants_list(this); return false;" %></div>
+        <% else %>
+          <div class='each-status selected-status'><%= link_to "#{t('all')} (#{@filtered_applicants.count})","#",:onclick=>"show_applicants_list(this); return false;" %></div>
+        <% end %>      
+        <% @active_statuses.each do|status| %>
+          <% if (@selected_status.present? and @selected_status.id == status.id) %>
+            <div class='each-status selected-status'>
+                <%= link_to (status.is_default==true ? "#{t(status.name)} (#{@filtered_applicants.select{|s| s.status.to_i == status.id }.count})" : "#{truncate(status.name,:length=>9,:omission=>"..")} (#{@filtered_applicants.select{|s| s.status.to_i == status.id }.count})"),"#",:onclick=>"show_applicants_list(this); return false;" %>
+                <%= hidden_field_tag "status_id",status.id,:class=>"status-id-field" %>
+            </div>
+          <% else %>
+            <div class='each-status'>
+                <%= link_to (status.is_default==true ? "#{t(status.name)} &#x200E;(#{@filtered_applicants.select{|s| s.status.to_i == status.id }.count})&#x200E;" : "#{truncate(status.name,:length=>9,:omission=>"..")} &#x200E;(#{@filtered_applicants.select{|s| s.status.to_i == status.id }.count})&#x200E;"),"#",:onclick=>"show_applicants_list(this); return false;" %>
+                <%= hidden_field_tag "status_id",status.id,:class=>"status-id-field" %>
+            </div>
+          <% end %> 
+        <% end %>
+        <%= hidden_field_tag "selected_status", @selected_status.present? ? @selected_status.id : ""  %>
+    </div>
+    <div id='list-section'>
+      <%= render :partial=>"applicants_list" %>
+    </div>
+
+</div>

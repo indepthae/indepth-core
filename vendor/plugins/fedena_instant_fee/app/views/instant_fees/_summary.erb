@@ -1,0 +1,24 @@
+<tr class="tr-blank"></tr>
+<tr class="tr-head" cellpadding="1" cellspacing="1">
+  <td class="col-1"></td>
+  <td class="col-1 bold_font" colspan="<%= col_span -1 %>"><span><%= t('summary') %></span></td>
+</tr>
+<% ci = 0 %>
+<tr class="tr-<%= cycle("odd", "even") %> ">
+  <td class="col-1 normal_font"><%= ci = ci.next %> </td>
+  <td class="col-2 normal_font" colspan="<%= col_span - 3 %>"><%= "#{t('total')}  #{t('fees_text')}" %></td>
+  <td class="col-6 normal_font" colspan="2" id="gross_fees"> <%= precision_label(total_fees) %></td>
+</tr>
+<tr class="tr-<%= cycle("odd", "even") %> ">
+  <td class="col-1 normal_font"><%= ci = ci.next %> </td>
+  <td class="col-2 normal_font" colspan="<%= col_span - 3 %>"><%= "#{t('total')} #{t('discount')}" %></td>
+  <td class="col-6 normal_font" colspan="2" id="total_discount"> <%= precision_label(total_discounts) %></td>
+</tr>
+<% if @tax_enabled %>
+    <tr class="tr-<%= cycle("odd", "even") %> ">
+      <td class="col-1 normal_font"><%= ci = ci.next %> </td>
+      <td class="col-2 normal_font" colspan="<%= col_span - 3 %>"><%= "#{t('total')} #{t('tax_text')}" %></td>
+      <td class="col-6 normal_font" colspan="2" id="total_tax"> <%= precision_label(tax_slab_amounts.values.sum) %></td>
+    </tr>
+<% end %>
+<tr class="tr-blank"></tr>

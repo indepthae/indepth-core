@@ -1,0 +1,124 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('id_cards') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('id_card_templates') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_template')}", new_id_card_template_id_card_templates_path %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%if !@student_templates.present? && !@employee_templates.present?  && !@parent_templates.present? %>
+  <p class="flash-msg"> <%= t('no_id_card_templates_present') %> </p>
+  <%else%>
+  <div id="box">
+    <div class="head">
+      <%= t('id_card_templates') %>
+    </div>
+    <div class="sub_text">
+      <%= t('manage_the_certificate_templates') %>
+    </div>
+    <div class="content">
+      <div class="student_templates">
+        <%if @student_templates.present? %>
+        <table class="primary">
+          <tr>
+            <th> <%= t('student_templates') %> </th>
+            <th  class="links"></th>
+          </tr>
+          <%@student_templates.each do |t|%>
+            <tr>
+              <td><%= t.name %></td>
+              <td class="center_text"><%=link_to t('edit'),  t.generation_done? ? "#" : edit_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{'strike_through' if t.generation_done?}"%> &nbsp; | &nbsp;
+            <%=link_to t('delete'),t.generation_done? ? "#" :  delete_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{ t.generation_done? ? 'strike_through' : 'delete_links' }"%></td>
+            </tr>
+          <%end%>
+
+        </table>
+        <%end%>
+      </div>
+
+      <div class="employee_templates">
+        <%if @employee_templates.present? %>
+        <table class="primary">
+          <tr>
+            <th> <%= t('employee_templates') %> </th>
+            <th  class="links"></th>
+          </tr>
+          <%@employee_templates.each do |t|%>
+            <tr>
+              <td><%= t.name %></td>
+              <td class="center_text"><%=link_to t('edit'),  t.generation_done? ? "#" : edit_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{'strike_through' if t.generation_done?}"%> &nbsp; | &nbsp;
+            <%=link_to t('delete'),t.generation_done? ? "#" :  delete_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{ t.generation_done? ? 'strike_through' : 'delete_links' }"%></td>
+            </tr>
+          <%end%>
+
+        </table>
+        <%end%>
+      </div>
+
+      <div class="parent_templates">
+        <%if @parent_templates.present? %>
+        <table class="primary">
+          <tr>
+            <th> <%= t('parent_templates') %> </th>
+            <th class="links"></th>
+          </tr>
+          <%@parent_templates.each do |t|%>
+            <tr>
+              <td><%= t.name %></td>
+              <td class="center_text"><%=link_to t('edit'),  t.generation_done? ? "#" : edit_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{'strike_through' if t.generation_done?}"%> &nbsp; | &nbsp;
+            <%=link_to t('delete'),t.generation_done? ? "#" : delete_id_card_template_id_card_templates_path(:id=>t.id), :class=>"themed_text #{ t.generation_done? ? 'strike_through' : 'delete_links' }"%></td>
+            </tr>
+          <%end%>
+
+        </table>
+        <%end%>
+      </div>
+    </div>
+<script>
+  var pass_through = false;
+  function delete_confirmed(elem) {
+    (function () {
+
+      var e = elem;
+
+      j('#yes').click(function () {
+        console.log(e);
+        remove_popup_box();
+        pass_through = true;
+        e.click();
+        pass_through = false;
+      });
+    })();
+  }
+
+  j(".delete_links").click(function (e) {
+    if (pass_through == false) {
+      e.preventDefault();
+    }
+    make_popup_box(this, 'confirm', "<%=t('delete_id_card_desc')%> ", {
+      'ok': "<%=t('delete')%>",
+      'cancel': "<%=t('cancel')%>",
+      'title': "<%=t('delete_id_card_template')%>",
+      'popup_class': 'remove_lt',
+      'return_status': true
+    });
+    return delete_confirmed(this);
+  });
+</script>
+
+  </div>
+  <%end%>
+</div>

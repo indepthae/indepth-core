@@ -1,0 +1,82 @@
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+
+<% @total_fees =0 %>
+<% @total_amount_to_pay=0 %>
+<% @unpaid_collections = 0 %>
+
+<% form_for :multi_fees_transaction, :url => {:controller => "student_fees", 
+  :action => 'initialize_pay_all_fees', :id => @student.id,:batch_id=>@current_batch.id}, :html => {:id => "fees_form"} do |form| %>
+  <% locals = {:total_fees => @total_fees, :total_amount_to_pay => @total_amount_to_pay, :form => form} %>
+  <div id="payment_form" class="<%= @finance_fees.present? ? '' : 'margin-bottom-10'  %>">
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <% if @active_gateway==0 or !CustomGateway.available_gateways.present? %>
+
+            <tr class="row-c">
+                <td>
+                    <p style="color:#333!important; margin:0px;font-size:14px;font-weight:300"> 
+                        <%= t('online_payment_is_currently_disabled') %>
+                    </p>
+                </td>
+            </tr>
+
+          <% elsif @finance_fees.present? %>
+            <% fee_head_col_span = @is_tax_present ? 5 : 4 %>
+            <% locals.merge!({:fee_head_col_span => fee_head_col_span}) %>
+
+            <%= render :partial => "finance_extensions/pay_all_form/all_fees", :locals => locals %>
+            <%= render :partial => "payment_and_summary", :locals => locals.merge({:total_fees => @total_fees, 
+                :total_amount_to_pay => @total_amount_to_pay}) %>
+
+          <% else %>
+            <tr class="tr-head">
+                <td>
+                    <% if (@available_gateways.present? and 
+                          PaymentConfiguration.config_value("enabled_fees").present? and 
+                          PaymentConfiguration.op_enabled? and @active_gateway.present?) %>
+                      <p style="color:#333!important; margin:0px;font-size:14px;font-weight:300"> 
+                          <%= t('no_pending_fees') %>
+                      </p>
+                    <% else %>
+                      <p style="color:#333!important; margin:0px;font-size:14px;font-weight:300"> 
+                          <%= t('online_payment_is_currently_disabled') %>
+                      </p>
+                    <% end %>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+  <%#
+  <% unless @finance_fees.present? % >
+  < %= link_to "► #{t('print_summary')}", {:controller => "finance_extensions", 
+  :action => "pay_all_fees_receipt_pdf", :id => @student.id, 
+  :batch_id => @current_batch.id}, :target => '_blank', :class => 'user_button' % >
+  < % end % >
+  %>
+  </div>
+<% end %>
+
+<% if @paid_fees.present? or @other_transactions.present? %>
+  <div id="pay_fees1">
+      <%= render :partial => 'finance_extensions/recently_paid_fees' %>
+  </div>
+
+<% end %>
+
+<script>
+  j(function () {
+      update_pay_amount();
+      if (<%= precision_label(@total_amount_to_pay).to_f == 0%>) {
+          update_cols();
+      }
+  });
+  function update_cols() {
+      var ph_span = j('.particular_heading').attr('colspan');
+      var pc_span = j('.particular_col').attr('colspan');
+      j('.check_col').hide();
+      j('.particular_heading').attr('colspan', parseInt(ph_span) + 1).removeClass('padding_left_10'); //addClass('set_border_right').
+      pc_span === undefined ? j('.particular_col').attr('colspan', 2) : j('.particular_col').attr('colspan', pc_span);
+      j('.particular_col').addClass('set_border_right').removeClass('padding_left_10');
+  }
+</script>

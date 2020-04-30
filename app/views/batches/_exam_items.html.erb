@@ -1,0 +1,111 @@
+<%if !params[:link_id].present? or  params[:link_id]=="0"%>
+  <%if @subject_wise_normal.present?%>
+    <table id="exam_details_table">
+      <tr>
+        <th><%=t('subject')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods')%></th>
+        <th><%=t('employee_text')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods_by_employee')%></th>
+      </tr>
+      <% @subject_wise_normal.each_value do |subject| %>
+        <tr>
+          <td rowspan="<%=subject[:employee_count]%>"><%=subject[:subject_name]%></td>
+          <td rowspan="<%=subject[:employee_count]%>"><%=subject[:total_periods]%></td>
+          <%subject[:employees].each_value do |employee|%>
+            <%if employee[:periods_present] == true and employee[:employee_name].nil?%>
+              <td><%="#{t('no_teacher')}"%></td>
+            <%else%>
+              <td><%=employee[:employee_name].nil? ? "-" : employee[:employee_name]%></td>
+            <%end%>
+            <td><%=employee[:emp_periods]%></td></tr><tr>
+          <%end%>
+        </tr>
+      <% end %>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_normal_present')%></div>
+  <%end%>
+
+  <div class="table_seperator"></div>
+
+  <% if @grouped_elective_subjects.present?%>
+    <table id="exam_details_table">
+      <tr>
+        <th id="timetable_subject_th"><%=t('elective_group')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods')%></th>
+        <th id="timetable_subject_th"><%=t('subject')%></th>
+        <th id="timetable_subject_th"><%=t('employee_text')%></th>
+      </tr>
+      <%@grouped_elective_subjects.each do |elective_id,elective_subjects|%>
+        <tr>
+          <td class="col-1" rowspan="<%=elective_subjects.count%>"><%= elective_subjects.first.name %></td>
+          <td class="col-1" rowspan="<%=elective_subjects.count%>"><%=@elective_sub_counts[elective_id]||0%></td>
+          <%@elec_subs=elective_subjects.group_by{|s| s.sname}%>
+
+          <%@elec_subs.each do |subject_name,subjects|%>
+            <td class="col-1" rowspan="<%=subjects.count%>"><%="#{subject_name}"%></td>
+            <%subjects.each do |subject|%>
+              <td><%=subject.ename.present? ? subject.ename : "-"%></td></tr><tr>
+            <%end%>
+          <%end%>
+        </tr>
+      <%end%>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_elective_present')%></div>
+  <%end%>
+<%else%>
+  <%if @employee_wise_normal.present?%>
+    <table id="exam_details_table">
+      <tr>
+        <th><%=t('employee_text')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods')%></th>
+        <th><%=t('subject')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods_by_employee')%></th>
+      </tr>
+      <%@employee_wise_normal.each_value do |employee|%>
+        <tr>
+          <td rowspan="<%=employee[:subjects_count]%>"><%=employee[:emp_name].present? ? employee[:emp_name] : "#{t('no_teacher')}" %></td>
+          <td rowspan="<%=employee[:subjects_count]%>"><%=employee[:total_periods]%></td>
+          <%employee[:subjects].each_value do |subject| %>
+          <td><%=subject[:subject_name]%></td>
+          <td><%=subject[:subject_count]%></td></tr><tr>
+          <%end%>
+        </tr>
+      <%end%>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_normal_present')%></div>
+  <%end%>
+  <div class="table_seperator"></div>
+  <% if @elelctive_employees_hash.present?%>
+    <table id="exam_details_table">
+      <tr>
+        <th id="timetable_subject_th"><%=t('employee_text')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods')%></th>
+        <th id="timetable_subject_th"><%=t('elective_group')%></th>
+        <th id="class_timing_th"><%=t('total_no_of_periods_by_employee')%></th>
+      </tr>
+      <%@elelctive_employees_hash.each_value do |elec_hash|%>
+        <tr>
+          <td class="col-1" rowspan="<%=elec_hash[:elective_groups].count%>"><%=elec_hash[:employee_name]%></td>
+          <td class="col-1" rowspan="<%=elec_hash[:elective_groups].count%>"><%=elec_hash[:total]%></td>
+          <%if elec_hash[:elective_groups].count > 0%>
+            <%elec_hash[:elective_groups].each_value do |eg|%>
+              <td><%="#{eg[:group_name]}&#x200E;(#{eg[:subjects].join(',')})&#x200E;"%></td>
+              <td><%=eg[:count]%></td></tr><tr>
+            <%end%>
+
+          <%else%>
+            <td>-</td>
+            <td>-</td>
+          <%end%>
+
+        </tr>
+      <%end%>
+
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_elective_present')%></div>
+  <%end%>
+<%end%>

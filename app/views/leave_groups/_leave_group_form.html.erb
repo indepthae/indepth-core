@@ -1,0 +1,22 @@
+<% remote_form_for @leave_group, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |lg| %>
+  <%= session_fingerprint_field %> 
+  <div id="leave_group_form">
+      <div id ="description"><%= t('leave_groups_create_description') %></div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('name_of_leave_group') %></label>
+          <div class="text-input-bg"><%= lg.text_field :name %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="description"><%= t('description') %></label>
+          <div class="text-input-bg"><%= lg.text_area :description %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{(@leave_group.new_record? ? t('create_leave_group') : t('update_leave_group'))}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

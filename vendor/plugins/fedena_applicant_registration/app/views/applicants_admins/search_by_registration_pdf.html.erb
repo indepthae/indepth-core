@@ -1,0 +1,38 @@
+<div id = "page-yield" class="available_sections1">
+  <div class= "page1"></div>
+    <div class= "section1 row">
+      <center>
+        <div class="hor_line"></div>
+        <h2><%= t('applicant_regi_label') %></h2>
+        <div class="hor_line"></div>
+        <div class="extender"> </div>
+      </center>
+    </div>
+  <div class="section1 row" id="table-headers" >
+      <center>
+        <table id="pdf-table" width="100%">
+        <thead><tr class="table-header">
+          <td class="col-pdf1 name"><%= t('regi_no') %></td>
+          <td class="col-pdf1 name"><%= t('course_name') %></td>
+          <td class="col-pdf1 name"><%= t('applicant_name') %></td>
+          <td class="col-pdf1 date"><%= t('date_format') %></td>
+          <td class="col-pdf1 applicant_status"><%= t('status') %></td>
+          <td class="col-pdf1 status"><%= t('has_paid_fees') %></td>
+       </tr></thead>
+      <% @applicants.each do |applicant| %>
+        <% c =cycle('even','odd ') %>
+        <tr class="<%= "#{c}" %>">
+        <td class="name"><%= applicant.reg_no %></td>
+        <td class="name"><%= applicant.registration_course.try(:course).try(:full_name) %></td>
+        <td class="name"><%= applicant.full_name%></td>
+        <td class ="date"><%= format_date(applicant.created_at.to_date,:format=>:long) unless applicant.created_at.nil? %></td>
+        <td class="applicant_status"><%= applicant.application_status.is_default == true ? (applicant.application_status.name == "alloted" ? (applicant.batch_id.present? ? "#{t('alloted')} - #{applicant.batch.full_name}" : "#{t('alloted')}") : t(applicant.application_status.name)) : applicant.application_status.name %>
+        </td>
+        <td class= "status"><%= applicant.has_paid? ? t('y_es') : t('n_o') %></td>
+      </tr>
+      <% end %>
+      </table>
+      </center>
+     </div>
+
+  </div>

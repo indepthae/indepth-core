@@ -1,0 +1,23 @@
+
+<% unless @members.empty? %>
+<div class="member-list">
+  <div class="themed_text themed_text_doc label_text" >
+  <%= t('upload_privileged_members') %>
+</div>
+<div class="label-field-pair">
+  <div class ="scrolable" >
+    <% x = '<span> x </span>' %>
+    <div class="scroll-inside2">
+<% @members.each do |m|  %>
+  <div class="hover">
+    <%=  %> <%= link_to shorten_string(m.full_name,18) + x, "#", :onClick => "remove_member(#{m.id})", :class=> 'individual',
+    :before => "Element.show('loader')",
+      :success => "Element.hide('loader')" %>
+    </div>
+<% end %>
+    </div>
+  </div>
+</div>
+</div>
+<div class="extender"></div>
+<% end %>

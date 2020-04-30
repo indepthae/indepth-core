@@ -1,0 +1,99 @@
+<% additional_params = {:category_id => @advance_fee_category.id} %>
+<div id="date_filter" class="date_box" style="display: none;">
+    <%= render :partial => "filter_dates" , :locals => {:additional_params => additional_params} %>
+</div>
+<div class="list_table_div">
+  <div class="main_head_label" style="margin-bottom: 15px">
+      <b id="fees_report_title">
+        <label><%= t('category_name') %></label>
+        <span>:</span>
+        <label class="head_label_value"><%= @advance_fee_category.name %></label>
+      </b>
+
+      <div class="date_align right">
+          <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+          <%= format_date(@start_date) %> &nbsp;
+          <label class="to_date"><%= t('small_to') %></label> &nbsp;
+          <%= format_date(@end_date) %>
+          <span id="show_date" class="themed_hover_text">
+              <%= t('change_date') %>
+          </span>
+      </div>
+  </div>
+
+</div>
+<% total_amount = 0 %>
+<% if @course_details.present? %>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+        <td class="set_border_right"><%= t('batch')%></td>
+        <td colspan="3" class="set_border_right" style="width: 20%;">
+            <span class="show_amount"><%= t('amount') %> (<%= currency %>
+                )</span>
+        </td>
+    </tr>
+    <% @a.uniq.each do |course| %>
+        <tr class="tr-list_head">
+          <td><%= fetch_course_name(course) %></td>
+          <td></td>
+        </tr>
+        <% i = 0 %>
+        <% @course_details.each do |batch| %>
+          <tr class="row-b">
+            <% if batch["course_id"] == course  %>
+              <td class="set_border_right"><%= link_to_remote "#{i += 1 }.#{batch["batch_name"]}", :url => {:controller => "advance_payment_fees",
+                          :action => "batch_wise_monthly_income_report", :start_date => @start_date, :end_date => @end_date,
+                          :batch_id => batch["batch_id"], :course_id => course, :category_id => @advance_fee_category.id, :fee_account_id => @account_id} %></td>
+              <td class="set_border_right" ><%= batch["amount"] %></td>
+              <% total_amount += batch["amount"].to_f %>
+            <% end %>
+          </tr>
+        <% end %>
+    <% end %>
+  </table>
+
+    <div class="total_amount_div">
+        <label><%= t('net_income') %></label>
+        <label class="amount_label"><%= precision_label(total_amount.to_f) %></label>
+    </div>
+    <% if false %>
+    <%= will_paginate @collections, :params => {:id => params[:id], :start_date => @start_date,
+      :end_date => @end_date, :date_tag => params[:date_tag]}.merge(url_params),
+      :renderer => 'RemoteLinkRenderer' %>
+    <% end %>
+    <div class="seprater_div_bottom">
+        <div id="inner-tab-menu">
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'>
+                    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                      :csv_report_type => "advance_fees", :report_format_type => "csv",
+                      :start_date => @start_date, :end_date => @end_date, :category_id => @advance_fee_category.id, :collection_wise => 1, :fee_account_id => @account_id} %>
+                </li>
+            </ul>
+        </div>
+    </div>
+  <% else %>
+    <div class="no_entries"><%= t('no_transactions_present') %></div>
+  <% end %>
+  <script type="text/javascript">
+
+      j('.calendar_label').on('click', function () {
+          var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+          new CalendarDateSelect(this.previous(), {
+              date_format: "<%= date_format %>",
+              locale_months: month_names,
+              popup: 'force', year_range: 10
+          });
+      });
+
+      j("#hide_date_filter").click(function () {
+          j(".date_box").hide();
+          j("#show_date").show();
+      });
+
+      j("#show_date").click(function () {
+          j(".date_box").show();
+          j("#show_date").hide();
+      });
+
+  </script>

@@ -1,0 +1,3 @@
+page.replace_html 'modal-box', :partial => 'edit'
+page.replace_html 'form-errors', :partial => 'errors', :object => @category if @category.errors.present?
+page << "Modalbox.show($('modal-box'), {title: '#{t('update_category_title')}', width: 500});" 

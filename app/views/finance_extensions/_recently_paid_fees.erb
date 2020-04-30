@@ -1,0 +1,151 @@
+<%= javascript_include_tag("receipt_printer") %>
+
+<div id="payments_details">
+    <% unless @finance_fees.present? %>
+      <div class="payment_history">
+          <label><%= t('payment_history') %> </label>
+      </div>
+    <% if false %>
+      <%= link_to "► #{t('print_summary')}",
+        {:controller => "finance_extensions", :action => "pay_all_fees_receipt_pdf", :id => @student.id, 
+        :batch_id => @current_batch.id}, :target => '_blank', :class => 'user_button', :style => "margin-top: 5px;" %>
+    <% end %>
+    <% else %>
+      <div class="payment_history">
+          <label><%= t('payment_history') %> </label>
+      </div>
+    <% end %>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="main-head tr-list_head">
+            <td><%= t('receipt_no') %></td>
+            <td class="set_border_right"><%= t('fee_collections') %></td>
+            <td class="set_border_right"><%= t('date_text') %></td>
+            <td class="set_border_right"><%= t('mode') %></td>
+            <% unless @current_user.student? %>
+              <td class="set_border_right"><%= t('cashier') %></td>
+            <% end %>
+            <td class="set_border_right"><%= t('payment_notes') %></td>
+            <td class="set_border_right"><%= t('amount') %> (<%= currency %>)</td>
+            <td class="set_border_right col-3" style="width:2%;"></td>
+        </tr>
+        <% i=(params[:page].present?) ? (params[:page].to_i-1)*10 : 0 %>
+        <!--<tr class="tr-blank"></tr>-->
+        <% @paid_fees.each do |f| %>
+          <tr class="row-b" id="mft<%= f.id %>">
+              <%= show_more_in_paid_fees(f.receipt_no) %>             
+              <%= show_more_in_paid_fees(f.collection_name,["set_border_right"], '||',/^(.*?)[|]{2}/) %>
+
+              <td class="set_border_right left_align"><%= format_date(f.transaction_date) %></td>
+              <% if f.reference_no.present? %>
+                <td class="set_border_right left_align transaction_mode">
+                    <div tooltip="<%= "#{get_payment_mode_text(f.payment_mode)}-#{f.reference_no}" %>" delay="10">                        
+                        <%= f.payment_mode %>
+                    </div>
+                </td>
+              <% else %>
+                <td class="set_border_right left_align"><%= f.payment_mode %></td>
+              <% end %>
+              <% unless @current_user.student? %>
+                <td class="set_border_right left_align">
+                    <%= f.cashier.nil? ? '' : (f.payment_mode=='Online Payment' ? f_cashier_name(f.usersid) : f.cashier) %>
+                </td>
+              <% end %>
+              <td class="set_border_right left_align"style="word-break:break-word"><%= f.payment_note %>
+              </td>
+              <td class="set_border_right align_right">
+                  <%= precision_label(f.amount.to_f) %>
+              </td>
+              <td class="set_border_right col-3 receipt-actions">
+                  <%# tids=f.finance_transactions.present? ? f.finance_transactions.all.collect(&:id).sort : [f.id] %>
+                  <%= receipt_buttons_for_pay_all_fees(@student.id, f.id,@current_batch.id) %>
+                  <% if can_access_request? :delete_multi_fees_transaction, :finance_extensions %>
+                    <% if f.refund_exists.to_i==1 %>
+                      <div class="disabled-link" tooltip="Fees Refunded. You can't revert the transaction!">  
+                          <%= link_to_remote raw(' <div class="revert_icon_img inactive-delete"></div>'), 
+                            {:url => {:controller => :finance_extensions, :action => :delete_multi_fees_transaction, 
+                              :id => @student.id, :transaction_id => f.id, :type => 'other_transaction'}, 
+                            :confirm => "#{t('are_you_sure_want_delete_this_transaction')}"}, 
+                            {:class =>"disable_link",:tooltip=>t('revert_transaction')} %>
+                      </div>
+                    <% else %>
+                      <% if f.is_waiver == true %>
+                        <% if f.transaction_type == "multi_fees_transaction" %>
+                          <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                          :onclick => "return MakeBox(#{f.id},'#{f.transaction_type}',#{i});", 
+                          :class => "themed_text", :tooltip => t('revert_transaction') %>
+                        <% else %>
+                          <span class="waiver_info" tooltip="<%= t("waiver_revert_block_pay_all") %>"></span>
+                        <% end %>
+                      <% else %>
+                        <%= link_to raw('<span class="revert_icon_img"></span>'), '#', 
+                          :onclick => "return MakeBox(#{f.id},'#{f.transaction_type}',#{i});", 
+                          :class => "themed_text", :tooltip => t('revert_transaction') %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+              </td>
+          </tr>
+        <% end %>
+    </table>
+    <%= will_paginate @paid_fees, :params => {:controller => '', :action => "paginate_paid_fees", 
+      :id => @student.id, :batch_id => @current_batch.id}, :renderer => 'RemoteLinkRenderer' %>
+</div>
+
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>
+
+<script type="text/javascript">
+
+<% if can_access_request? :delete_multi_fees_transaction, :finance_extensions %>
+    MakeBox = function (f, tt, i) {
+        remove_popup_box();
+        options = {
+            'popup_class': 'revert_transaction_box',
+            'submit': '<%=t('revert_transaction')%>',
+            'cancel': '<%=t('cancel')%>',
+            'field_name': 'reason',
+            'input_type': 'text_area',
+            'title': '<%=t('revert_transaction')%>'
+        };
+        build_modal_box(options);
+        build_prompt_popup_box('<%=t('reason')%>', options)
+        j('#popup_window #popup_footer > #yes').click(function () {
+            if(j(this).attr('disabled') == undefined) {
+                j(this).attr('disabled', 'disabled');
+                j.ajax({
+                    url: '/finance_extensions/delete_multi_fees_transaction',
+                    type: 'post',
+                    data: {
+                        'id': <%=@student.id%>,
+                        'si_no': i,
+                        'page': <%=params[:page]||1%>,
+                        'transaction_id': f,
+                        'batch_id': <%= @current_batch.id%>,
+                        'type': tt,
+                        'reason': j('#popup_content #prompt_value').val(),
+                        'session_fingerprint': '<%= session_fingerprint %>'
+                    },
+                    success: function () {
+                        remove_popup_box();
+                    }
+                })
+            }
+        });
+    };
+<% end %>
+
+  j(function () {
+      //  if (updatedChromeVersion()) {
+      if (<%= rtl?%>) {
+          j('.receipt-box').css('margin-right', '-20px');
+      } else {
+          j('.receipt-box').css('margin-left', '-20px');
+      }
+      //  }
+  });
+
+  function updatedChromeVersion() {
+      var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+      return (raw && parseInt(raw[2], 10) > 54)
+  }
+
+</script>

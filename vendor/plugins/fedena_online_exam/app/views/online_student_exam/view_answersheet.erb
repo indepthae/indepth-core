@@ -1,0 +1,93 @@
+<%= load_latex_preview %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_answersheet') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :online_student_exam_view_answersheet, @exam_attendance  %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <% unless @exam_questions.nil? or @exam_questions.empty? %>
+
+      <div class="student-name"><%= "#{@student.full_name} (#{@student.admission_no})" %></div>
+      <div class="exam-name">
+        <div class="name-left"><%= @exam.name %></div>
+        <div class="name-right"><%= t('total_score_text') %> : <b><%= @exam_attendance.total_score.to_f %></b> / <%= @max_marks %></div>
+      </div>
+      <div class="exam-name">
+        <div class="name-left"><%= @student.batch.full_name %></div>
+        <div class="name-right">
+          <%= t('status') %> :
+          <b><% if @exam_attendance.is_passed %>
+              <%= t('passed') %>
+            <% else %>
+              <%= t('failed') %>
+            <% end %></b>
+        </div>
+      </div>
+      <% @exam_questions.each do |question| %>
+        <div class="outer-qa-div">
+          <div class="qn"><%= t('question_text') %></div>
+          <div class="question-main">
+            <div class="question-div">
+              <%= question.online_exam_question.question %>
+            </div>
+            <div class="marks-div">
+              <%= question.mark %> <%= t('marks') %>
+            </div>
+          </div>
+          <div class="answer-main">
+            <div class="an"><%= t('answer') %></div>
+
+            <div class="answer-div">
+              <% if @answers[question.online_exam_question_id].present? %>
+                <% if question.online_exam_question.question_format=="descriptive" %>
+                  <%= @answers[question.online_exam_question_id].first.answer %>
+                <% else %>
+                  <% @answers[question.online_exam_question_id].each do|s| %>
+                    <%= s.online_exam_option.option %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </div>
+            <div class="mark-div">
+              <label class="themed_text"><%= t("marks") %> : </label>
+              <% if @answers[question.online_exam_question_id].present? %>
+                <% if question.online_exam_question.question_format=="descriptive" %>
+                  <label class="total"><%= @answers[question.online_exam_question_id].first.marks_obtained.to_f %></label>
+                <% else %>
+                  <label class="total"><%= @exam_attendance.individual_question_score(question.online_exam_question_id).to_f %></label>
+                <% end %>
+              <% else %>
+                <label class="total"><%= "0".to_f %></label>
+              <% end %>
+              <label class="total"> / <%= question.mark %></label>
+            </div>
+            <% if question.online_exam_question.question_format=="objective" %>
+              <%if @exam_attendance.individual_question_score(question.online_exam_question_id).to_f==0.0 %>
+                <%answers=OnlineExamOption.get_correct_answer(question)%>
+                <div class="correct-ans-div">
+                  <label class="themed_text"><%= t("correct_answer") %> : </label>
+                  <label class="corr_ans"><%answers.each do |answer|%>
+                      <%=answer.option%>
+                    <%end%>
+                  </label>
+                </div>
+              <%end%>
+            <%end%>
+          </div>
+        </div>
+      <% end %>
+      <%= will_paginate @exam_questions %>
+    <% else %>
+      <p class="flash-msg"> <%= t('no_answers_found') %> </p>
+    <% end %>
+  </div>
+</div>

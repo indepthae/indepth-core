@@ -1,0 +1,47 @@
+<span class="table_info"><%= t('showing_last_logs',{:count => @imports.count}) %></span>
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="logs">
+    <tr class="tr-head">
+        <td class="course_name"><%= t('import_from') %></td>
+        <td class="course_name"><%= t('import_to') %></td>
+        
+        <td class="count"><%= t('planners') %></td>
+        <td class="count"><%= t('import_exam_groups') %></td>
+        <td class="count"><%= t('import_course_associations') %></td>
+        <td class="count"><%= t('import_report_settings') %></td>
+        <td class="course_name"><%= t('status') %></td>
+        <td class="course_name actions"><%= t('actions') %></td>
+    </tr>
+    <% @imports.each do |import| %>
+      <tr>
+          <% import_from = @academic_years.find{|a| a.id == import.import_from} %>
+          <% import_to = @academic_years.find{|a| a.id == import.import_to} %>
+          <% plans = @plans.select{|a| import.assessment_plan_ids.include? a.id.to_s } %>
+          <td class="course_name"><%= import_from.try(:name) %></td>
+          <td class="course_name"><%= import_to.try(:name) %></td>
+          <td class="count">
+              <span class="name">
+                <%= import.assessment_plan_ids.count %>
+              </span>
+              <% if plans.present? %>
+                <span class="tool_link" tooltip="<%= array_to_li(plans.collect(&:name)) %>">View</span>
+              <% end %>
+          </td>
+          <td class="count"><%= "#{'✔' if import.import_exam_group}"  %></td>
+          <td class="count"><%= "#{'✔' if import.import_courses}" %></td>
+          <td class="count"><%= "#{'✔' if import.import_report_settings}" %></td>
+          <td class="course_name status">
+            <span class="name"><%= import.importing_status %></span>
+            <% if import.last_error.present?%>
+              <span id="info-symbol" tooltip="<%= import.error_text %>"></span>
+            <% end %>
+          </td>
+          <td class="course_name actions">
+            <% if import.status == 3 and import.last_error.present?%>
+              <%= link_to t('re_import'), reimport_planner_assessment_plans_path(:import_id => import.id), :method => :post %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>

@@ -1,0 +1,81 @@
+<% index = 0 %>
+<div id="page-yield" class="available_sections1">
+  <div class="page1"></div>
+  <div class="section1 row">
+    <div class="hor_line"></div>
+    <h2><%= t('instant_fee_reciept') %></h2>
+    <div class="hor_line"></div>
+    <div class="extender"> </div>
+  </div>
+  <div class="section1 row">`
+    <div class="report">
+      <div id ="main_info">
+        <div id="info-left">
+          <h4> <%= "#{t('payee_name')}: #{@instant_fee.payee_name}" %></h4>
+          <h4> <%= "#{t('category_name')} : #{@instant_fee.category_name}" %></h4>
+          <h4> <%= "#{t('category_description')} : #{@instant_fee.category_description}" %></h4>
+          <%if @instant_fee.payee_type=="Student" %>
+            <h4> <%= "#{t('course')} : #{@instant_fee.payee.nil? ? ArchivedStudent.find_by_former_id(@instant_fee.payee_id).batch.course.course_name : @instant_fee.payee.batch.course.course_name}" %></h4>
+            <h4> <%= "#{t('batch')} : #{@instant_fee.payee.nil? ? ArchivedStudent.find_by_former_id(@instant_fee.payee_id).batch.full_name : @instant_fee.payee.batch.full_name}" %></h4>
+          <% end %>
+        </div>
+        <div id="info-right">
+          <% if @instant_fee.finance_transaction.present? %>
+            <h4> <%= "#{t('receipt_no')} : #{@instant_fee.finance_transaction.receipt_number}" %></h4>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section1 row" id ="table-headers">
+    <center>
+      <table id="pdf-table" width="100%">
+        <thead><tr class="table-header">
+            <td class="col-pdf sl_no"><%= t('sl_no') %></td>
+            <td class="col-pdf name"><%= t('particular_name') %></td>
+            <td class="col-pdf amnt"><%= t('amount') %></td>
+            <td class="col-pdf amnt"><%= t('discount') %>(%)</td>
+            <td class="col-pdf amnt"><%= t('net_amount') %></td>
+          </tr></thead>
+        <% total_amount = 0 %>
+        <% total_net_amount = 0 %>
+        <% @instant_fee_details.each do |detail| %>
+          <tr class="<%= cycle('even','odd') %>">
+            <td class="col-pdf sl_no"><%=  index += 1 %></td>
+            <td class="col-pdf name"><%= detail.particular_name %></td>
+            <td class="col-pdf amnt"> <%= precision_label(detail.amount) %></td>
+            <td class="col-pdf amnt"><%= precision_label(detail.discount) %></td>
+            <td class="col-pdf amnt"><%= precision_label(detail.net_amount) %></td>
+          </tr>
+          <% total_amount += detail.amount unless detail.amount.nil? %>
+          <% total_net_amount += detail.net_amount unless detail.net_amount.nil? %>
+        <% end %>
+      </table>
+  </div>
+  <div class="section1 row">
+    <table id ="pdf-table" width ="100%" cellspacing ="0">
+      <tr class="<%= cycle('even','odd') %>">
+        <td class="col-pdf sl_no"></td>
+        <td class="col-pdf name"><b><%= "Total" %></b></td>
+        <td class="col-pdf amnt"><%= precision_label(total_amount) %></td>
+        <td class="col-pdf amnt"></td>
+        <td class="col-pdf amnt"><%= precision_label(total_net_amount) %></td>
+      </tr>
+    </table>
+  </div>
+  <div class="section1 row">
+    <div id ="main_info">
+      <% if @instant_fee.finance_transaction.present? %>
+        <%if @instant_fee.finance_transaction.reference_no.present?%>
+          <h4> <%= "#{t('payment_mode')} : #{@instant_fee.finance_transaction.payment_mode} - #{@instant_fee.finance_transaction.reference_no}" %></h4>
+        <%else%>
+          <h4> <%= "#{t('payment_mode')} : #{@instant_fee.finance_transaction.payment_mode}" %></h4>
+        <%end%>
+        <% unless @instant_fee.finance_transaction.payment_note.nil? or @instant_fee.finance_transaction.payment_note.blank?  %>
+          <h4> <%= "#{t('payment_notes')}"%> : <p><%=" #{@instant_fee.finance_transaction.payment_note}"%> </p</h4>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+</div>

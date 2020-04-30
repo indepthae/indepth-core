@@ -1,0 +1,59 @@
+<% remote_form_for @financial_year, :url => fetch_obj_path(@financial_year), :before => "$('submit_button').disable()",
+                   :complete => "setTimeout(function(){$('submit_button').enable();},5000)" do |fy| %>
+    <%= session_fingerprint_field %>
+    <div id="year_form">
+      <div class="label-field-pair date_field">
+        <label for="start_date"><%= t('start_date') %></label>
+
+        <div class="text-input-bg">
+          <% if !@financial_year.new_record? and @financial_year.dependencies_present? %>
+              <%= text_field_tag :start_date, format_date(@financial_year.start_date), :disabled => true %>
+          <% else %>
+              <%= calendar_date_select_tag 'financial_year[start_date]',
+                                           I18n.l(@financial_year.start_date.to_date, :format => :default),
+                                           :year_range => 15.years.ago..5.years.from_now, :readonly => true,
+                                           :popup => "force", :onchange => "change_name(this);",
+                                           :id => 'start_date', :errors => @financial_year.errors["start_date"] %>
+          <% end %>
+        </div>
+      </div>
+      <div class="label-field-pair date_field">
+        <label for="end_date"><%= t('end_date') %></label>
+
+        <div class="text-input-bg">
+          <% if !@financial_year.new_record? and @financial_year.dependencies_present? %>
+              <%= text_field_tag :end_date, format_date(@financial_year.end_date), :disabled => true %>
+          <% else %>
+              <% e_msg = [] %>
+              <% e_msg << @financial_year.errors["end_date"] if @financial_year.errors["end_date"].present? %>
+              <% e_msg << @financial_year.errors["date_range"] if @financial_year.errors["date_range"].present? %>
+              <% e_msg = e_msg.join(',') %>
+              <% e_msg = nil unless e_msg.present? %>
+
+              <%= calendar_date_select_tag 'financial_year[end_date]',
+                                           I18n.l(@financial_year.end_date.to_date, :format => :default),
+                                           :year_range => 15.years.ago..5.years.from_now, :readonly => true,
+                                           :popup => "force", :onchange => "change_name(this);", :id => 'end_date',
+                                           :errors => e_msg %>
+          <% end %>
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="name"><%= t('financial_year_name_text') %></label>
+
+        <div class="text-input-bg"><%= fy.text_field :name, :placeholder => t('financial_year_example') %></div>
+      </div>
+    </div>
+    <div id="popup_footer">
+      <%= submit_tag t(fetch_obj_title(@financial_year)), :disable_with => "#{t('please_wait')}",
+                     :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlfy').click(remove_popup_box);
+
+</script>

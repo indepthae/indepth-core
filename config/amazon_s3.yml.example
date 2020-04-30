@@ -1,0 +1,26 @@
+#Edit with appropriate values
+
+defaults: &defaults
+  access_key_id: 'your access key id'
+  secret_access_key: 'your secret access key'
+  cloudfront_signing_key_path: '/path/to/key'
+  cloudfront_signing_key_pair_id: 'xxxxxxxxxxxx'
+  cloudfront_public: '<CLOUDFRONT_URL_FOR_PUBLIC_BUCKET>'
+  cloudfront_private: '<CLOUDFRONT_URL_FOR_PRIVATE_BUCKET_WITH_SIGNING_BEHAVIOUR>'
+  s3_end_point_url: 'S3_END_POINT.amazonaws.com'
+  s3_url: 'https://<CLOUDFRONT_URL_WITH_RESTRICTED_ACCESS_TO_PRIVATE_BUCKET_WITHOUT_SIGNING_BEHAVIOUR>'
+  s3_url_public: 'https://<CLOUDFRONT_URL_FOR_PUBLIC_BUCKET>'
+
+development:
+  <<: *defaults
+  bucket_private: '<PUBLIC_BUCKET_NAME>'
+  bucket_public: '<PRIVATE_BUCKET_NAME>'
+
+test:
+  <<: *defaults
+  bucket: your_development_bucket_name
+
+production:
+  <<: *defaults
+  bucket_private: '<PUBLIC_BUCKET_NAME>'
+  bucket_public: '<PRIVATE_BUCKET_NAME>'

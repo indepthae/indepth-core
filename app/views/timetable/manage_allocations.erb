@@ -1,0 +1,144 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('timetable_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('timetable_allocations') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if @batches.present? or @timetable.timetable_summary.present? %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('summary_timetable')}", :action => "summary", :id => @timetable %></li>
+      <% end %>
+      <li class='themed_bg themed-dark-hover-background'>
+        <%= link_to t('manage_batches'),:controller=>:timetable,:action => "manage_batches",:id=>@timetable.id %>
+      </li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= breadcrumb :timetable_manage_allocations, @timetable  %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <% if @batches.present? %>
+    <div class="manage_timetable_allocation_header">
+      <div class="timetable_heading">
+        <span class="timetable_range">
+          <%="#{format_date(@timetable.start_date,:format=>:long)}  -  #{format_date(@timetable.end_date,:format=>:long)}"%>
+        </span>
+        <span class="edit_link">
+          <%= link_to t('edit_timetable'),:controller=>:timetable,:action=>:update_timetable,:id=>@timetable %>
+        </span>
+      </div>
+    </div>
+
+    <div class="accordion-courses-table">
+      <div class="accordion-courses-heading">
+        <div class="accordion-column-1">
+          <%= t('courses_text') %>
+        </div>
+        <div class="accordion-column-2">
+          <%= t('batches_text') %>
+        </div>
+        <div class="accordion-column-3">
+          <%= t('allocation_status') %>
+        </div>
+      </div>
+      <div id="accordion-courses">
+        <% @courses.sort_by{|x,y| x.course_name.downcase }.each do |course_batches| %>
+          <% course = course_batches.first %>
+          <% batches = course_batches.last.sort_by{|x| x.name.downcase} %>
+          <% status_arr = [] %>
+          <% batches.map {|x| x.allocation_status = x.tte_status(@timetable); status_arr << x.allocation_status[:eligibility_code]} %>
+          <% status_group = status_arr.group_by {|x| x} %>
+          <% status_keys = status_group.keys %>
+          <div class="accordion-course-heading">
+            <div class="accordion-column-1">
+              <%= course.full_name %>
+            </div>
+            <div class="accordion-column-2">
+              <%= blength = batches.length %>
+            </div>
+            <div class="accordion-column-3">
+              <% tooltip_str = (status_keys.include? 0 and status_keys.length > 1) ? "tooltip='#{t('timetable_not_eligible_batch_warning')}'" : ''  %>
+              <% if status_keys.include?(3) and status_group[3].length == blength %>
+                <span class="full"><%= t('completely_allocated') %></span>                
+              <% elsif status_keys.include?(1) and status_group[1].length == blength %>
+                <span class="not_allocated"><%= t('not_allocated') %></span>
+              <% elsif status_keys.include?(0) and status_group[0].length == blength %>
+                <span class="not_eligible"><%= t('not_eligible') %></span>                
+              <!-- % elsif status_arr.select {|x| (x == 1 || x == 2 || x == 3 ) }.length == blength %-->
+              <% else %>
+                <span class="partial" <%= tooltip_str %> ><%= t('partially_allocated') %></span>
+                <% if status_keys.include? 0 and status_keys.length > 1 %>
+                  <span class="status_warning"></span>            
+                <% end %>
+                <!-- span class="not_eligible">< %= t('not_eligible') %></span-->
+              <% end %>
+            </div>
+          </div>
+          <div class="accordion-course-batches-table">
+            <div class="batch-row-header">
+              <div class="batch-column-1">
+                <%= t('batches_text') %>
+              </div>
+              <div class="batch-column-2">
+                <%= t('allocation_status') %>
+              </div>
+              <div class="batch-column-3">
+
+              </div>
+            </div>
+            <% batches.each do |batch| %>
+              <div class="batch-row">
+                <div class="batch-column-1">
+                  <%= batch.name %>
+                </div>
+                <div class="batch-column-2">
+                  <%= batch.allocation_status[:status_text]  %>
+                </div>
+                <div class="batch-column-3">
+                  <%= batch.allocation_status[:eligibility_code] != 0 ? (link_to t('manage_allocations'),{:controller=>:timetable_entries,:action => "new",:timetable_id=>@timetable, :batch_id => batch.id},:class => "") : "#{batch.allocation_status[:reason]}" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <script>
+      var icons = {header: "down-arrow-img",activeHeader: "up-arrow-img" };
+      j('#accordion-courses').accordion({
+        icons: icons,
+        collapsible: true,
+        active: false, // enable it to prevent first loaded accordion from uncollapsing
+        heightStyle: "content"
+      });
+    </script>
+  <% end %>
+
+
+</div>

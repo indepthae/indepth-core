@@ -1,0 +1,19 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+      <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20">
+    <h1 class="content-head">Available Support Tasks</h1>
+    <%= link_to 'Task Status', task_status_support_engines_path(:id=>params[:id]),:class => 'button-red float-right'%>
+</fieldset>
+<div class="content-div container-width">
+    <div class='content-list'>
+        <% @available_script_details.each_with_index do |info, i| %>
+          <fieldset class="bg-light grey-border shadow">
+              <h4><%=link_to info[0].titleize, task_details_support_engines_path(:id=>params[:id], :script=>i) %></h4>
+              <label><%= info[1].titleize %></label>
+          </fieldset>
+        <% end %>
+    </div>
+</div>

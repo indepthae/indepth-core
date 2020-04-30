@@ -1,0 +1,187 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('messages') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%#= "#{t('create_text')} #{t('group')} #{t('message')}" %><%= "#{t('message')} #{t('settings')}"%></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= breadcrumb :message_settings %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div class="settings_box">
+        <div class="box_header"><%=t('settings')%></div>
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+
+        <div class="box_sub_header"><%=t('create_permission')%></div>
+        <div class="box_sub_header_desc"><%=t('create_permission_desc')%></div>
+        <% form_for :message_settings, :url=>{:controller=>'messages',:action=>'message_settings'} do |f| %>
+          <div class="permissions">
+              <div class="permission">
+                  <%= check_box_tag 'employee', '', (@employee_permissions.count == 8), {:class=>"check_all_employee #{'indeterminate' if @employee_permissions.count.between?(1,7) }",:onChange=>"privilege_check_all_or_none(this);"} %>
+                  <label for="employee"><%=t('employees')%></label>
+                  <div class="permission_options">
+                      <div class="permission_options_head"><%=t('recipient_permission')%></div>
+                      <div class="permission_options_subhead"><%=t('to_whom_permission_employee')%></div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[all_employees]',1, @employee_permissions.include?('all_employees'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_all_employees"><%="#{t('all')} #{t('employees')}"%></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[all_students]',1, @employee_permissions.include?('all_students'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_all_students"><%="#{t('all')} #{t('students')}"%></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[all_parents]',1, @employee_permissions.include?('all_parents'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_all_parents"><%="#{t('all')} #{t('guardians_text')}"%></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[batch_students]',1, @employee_permissions.include?('batch_students'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_batch_students"><%="#{t('batch')} #{t('students')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[parents_of_batch_students]',1, @employee_permissions.include?('parents_of_batch_students'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_parents_of_batch_students"><%= t('parents_of_batch_students') %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[subject_students]',1, @employee_permissions.include?('subject_students'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_subject_students"><%="#{t('subject')} #{t('students')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[parents_of_subject_students]',1, @employee_permissions.include?('parents_of_subject_students'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_parents_of_subject_students"><%="#{t('guardians_text')} #{t('of')} #{t('subject')} #{t('students')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'employee_permissions[administrator]',1, @employee_permissions.include?('administrator'),{:class=>'employee',:onChange=>"privilege_check(this);"} %>
+                          <label for="employee_permissions_administrator"><%= t('administrator') %></label>
+                      </div>
+                  </div>
+              </div>
+              <div class="permission">
+                  <%= check_box_tag 'student', '',(@student_permissions.count == 4),{:class=>"check_all_students #{'indeterminate' if @student_permissions.count.between?(1,3)}",:onChange=>"privilege_check_all_or_none(this);"}%>
+                  <label for="student"><%=t('students')%></label>
+                  <div class="permission_options">
+                      <div class="permission_options_head"><%=t('recipient_permission')%></div>
+                      <div class="permission_options_subhead"><%=t('to_whom_permission_student')%></div>
+                      <div class="values">
+                          <%= check_box_tag 'student_permissions[subject_teachers]',1, @student_permissions.include?('subject_teachers'),{:class=>'students',:onChange=>"privilege_check(this);"}%>
+                          <label for="student_permissions_subject_teachers"><%=t('subject_teachers')%></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'student_permissions[batch_students]',1, @student_permissions.include?('batch_students'),{:class=>'students',:onChange=>"privilege_check(this);"} %>
+                          <label for="student_permissions_batch_students"><%="#{t('batch')} #{t('students')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'student_permissions[batch_tutor]',1, @student_permissions.include?('batch_tutor'),{:class=>'students',:onChange=>"privilege_check(this);"} %>
+                          <label for="student_permissions_batch_tutor"><%="#{t('batch')} #{t('tutor')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'student_permissions[administrator]',1, @student_permissions.include?('administrator'),{:class=>'students',:onChange=>"privilege_check(this);"} %>
+                          <label for="student_permissions_administrator"><%=t('administrator')%></label>
+                      </div>
+                  </div>
+              </div>
+              <div class="permission">
+                  <%= check_box_tag 'parent', '',(@parent_permissions.count == 3),{:class=>"check_all_parents #{'indeterminate' if @parent_permissions.count.between?(1,2)}",:onChange=>"privilege_check_all_or_none(this);"}%>
+                  <label for="parent"><%=t('guardians_text')%></label>
+                  <div class="permission_options">
+                      <div class="permission_options_head"><%=t('recipient_permission')%></div>
+                      <div class="permission_options_subhead"><%=t('to_whom_permission_parent')%></div>
+                      <div class="values">
+                          <%= check_box_tag 'parent_permissions[batch_tutor]',1, @parent_permissions.include?('batch_tutor'),{:class=>'parents',:onChange=>"privilege_check(this);"}%>
+                          <label for="parent_permissions_batch_tutor"><%="#{t('batch')} #{t('tutor')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'parent_permissions[subject_teachers]',1, @parent_permissions.include?('subject_teachers'),{:class=>'parents',:onChange=>"privilege_check(this);"} %>
+                          <label for="parent_permissions_subject_teachers"><%=t('subject_teachers')%></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'parent_permissions[administrator]',1, @parent_permissions.include?('administrator'),{:class=>'parents',:onChange=>"privilege_check(this);"} %>
+                          <label for="parent_permissions_administrator"><%= t('administrator') %></label>
+                      </div>
+                  </div>
+              </div>
+              <div class="permission">
+                  <%= check_box_tag 'administrator', '', true, {:disabled=>true}%>
+                  <label for="administrator"><%=t('administrator')%></label>
+                  <div class="permission_options">
+                      <div class="permission_options_head"><%=t('recipient_permission')%></div>
+                      <div class="permission_options_subhead"><%=t('to_whom_permission_admin')%></div>
+                      <div class="values">
+                          <%= check_box_tag 'administrator_permissions[all_employees]',1, true,{:disabled=>true}%>
+                          <%= hidden_field_tag 'administrator_permissions[all_employees]',1%>
+                          <label for="administrator_permissions_all_employees"><%="#{t('all')} #{t('employees')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'administrator_permissions[all_parents]',1, true,{:disabled=>true}%>
+                          <%= hidden_field_tag 'administrator_permissions[all_parents]',1%>
+                          <label for="administrator_permissions_all_parents"><%="#{t('all')} #{t('guardians_text')}" %></label>
+                      </div>
+                      <div class="values">
+                          <%= check_box_tag 'administrator_permissions[all_students]',1, true,{:disabled=>true}%>
+                          <%= hidden_field_tag 'administrator_permissions[all_students]',1%>
+                          <label for="administrator_permissions_all_students"><%="#{t('all')} #{t('students')}" %></label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div id="sub-button"><%= submit_tag "", :value => "#{t('save')} #{t('settings')}", :class => "submit-button" %></div> 
+        <%end%>
+    </div>
+
+
+    <div class="extender">
+    </div>
+</div>
+<script type="text/javascript">
+  privilege_check = function (e) {
+      if(j(e).attr('id') == 'student_permissions_batch_tutor'){
+        $$('#student_permissions_batch_tutor').first().checked = true
+      }
+      if(j(e).attr('id') == 'student_permissions_administrator'){
+        $$('#student_permissions_administrator').first().checked = true
+      }
+      
+      var context_class = j(e).attr('class');
+      if(context_class == 'students'){
+        check_student_mandatory()
+      }
+      var flag = 0;
+      var count = 0;
+      $$('.' + context_class).each(function (check) {
+          if (check.checked == false) {
+              flag = 1;
+              count = count + 1;
+          }
+      });
+      if (flag == 0) {
+          $$('.check_all_' + context_class).first().indeterminate = false;
+          $$('.check_all_' + context_class).first().checked = true;
+      } else if (count == j('.' + context_class).length) {
+          $$('.check_all_' + context_class).first().indeterminate = false;
+          $$('.check_all_' + context_class).first().checked = false;
+      } else {
+          $$('.check_all_' + context_class).first().indeterminate = true;
+      }
+  }
+  
+  check_student_mandatory = function(){
+    $$('#student_permissions_batch_tutor').first().checked = true
+    $$('#student_permissions_administrator').first().checked = true
+  }
+
+  privilege_check_all_or_none = function (e) {
+      field_value = e.checked
+      var class_name = j(e).attr('class').split('_').last().split(' ').first();
+      $$('.' + class_name).each(function (check) {
+        console.log(check)
+          check.checked = field_value;
+      })
+  }
+  
+  $$('.indeterminate').each(function(e){e.indeterminate = true})
+
+</script>

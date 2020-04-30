@@ -1,0 +1,172 @@
+<% page =@controller.action_name=="student_fees_headwise_report" ? :report : :profile %>
+<div id="fees_list">
+  <% @batches.each do |batch| %>
+    <div class="batch_item">
+      <h3 class="fees_list_title">
+          <span class="batch_full_name"><%=batch.complete_name %></span>
+          <span class="payment_status"> <%= t('all_fees_paid') %> </span>
+      </h3>
+      <div class="fees_list_item">
+        <table class="fees_table">
+          <thead>
+              <th class="class44">
+                <%= t('fees_name') %>
+              </th>
+              <th class="class13">
+                <%= t('status') %>
+              </th>
+              <th class="class13">
+                <%= t('amount') %>
+                <%= "(#{currency})" %>
+              </th>
+              <th class="class20">
+                <%= t('date_text') %>
+              </th>
+          </thead>
+          <!--% unless @student.fees_list_by_batch(batch.id).empty? %-->
+          <% unless @student_batch_fees[batch.id].empty? %>
+            <tr class="table_subtitle">
+              <td colspan="4" ><%= t('general_fees') %></td>
+            </tr>
+          <% end %>
+          <!--% @student.fees_list_by_batch(batch.id).each do |fee| %-->
+          <% @student_batch_fees[batch.id].each do |fee| %>
+            <tr class="item">
+                <td class="fee_name">
+                <% if permitted_to? :fee_details ,:student %>
+                  <%= link_to "#{fee.name}", {:controller=>:student,:action=>:fee_details, :id=>@student.id, :id2=>fee.id}, :class=>"themed_hover_text" %>
+                <% else %>
+                  <%= fee.name %>
+                <% end %>
+              </td>
+              <%if fee.is_fine_waiver == "1"%>
+                <%fine_to_pay = 0.0%>
+              <% elsif Configuration.is_fine_settings_enabled? && fee.balance.to_f<=0 && !fee.is_paid? && fee.balance_fine.present? %>
+                <%fine_to_pay = fee.balance_fine.to_f%>
+              <%else%>
+                <% fine_amount = fee.is_amount == "0" ? (fee.actual_amount.to_f*fee.fine_amount.to_f)/100 : fee.fine_amount if fee.is_amount.present? %>
+                <% fine_to_pay = fine_amount.present? ? (fine_amount.to_f - fee.automatic_fine_paid.to_f) : 0 %>
+              <%end%>
+              <% paid = (fee.is_paid or ((precision_label(fee.balance.to_f+fine_to_pay.to_f))==precision_label(0))) %>
+              <% paid = paid.to_i if paid.class.to_s == "String" %>
+              <% if  paid == true || paid ==1 %>
+                <td class="status_cell" data-status="paid">
+                    <%=  t('paid') %>
+                </td>
+                <td>
+                  <%= precision_label(fee.paid_amount) %>
+                </td>
+                <td>
+                  <%= t('paid_on') %>
+                  <%= format_date(fee.last_transaction_date) %>
+                </td>
+              <% else %>
+                <% patially_paid_amount=fee.try(:paid_amount) %>
+                <% amount_to_pay=fee.balance.to_f+fine_to_pay.to_f %>
+                <% total_amount=patially_paid_amount.to_f+amount_to_pay %>
+                <td class="status_cell" data-status="unpaid" data-amount-to-pay="<%= amount_to_pay %>" data-partialy-paid-amount="<%= patially_paid_amount %>" >
+                  <%=  t('unpaid') %>
+                </td>
+                <td>
+                  <%= precision_label(amount_to_pay)+ "  /  " + precision_label(total_amount) %>
+                </td>
+                <td>
+                  <%= t('due_on') %>
+                  <%= format_date(fee.due_date) %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          <% FedenaPlugin.deliver_registered_hook(:student_profile_fees).each do |mod| %>
+            <%= render :partial=>mod.camelize.constantize.send("student_profile_fees_by_batch_hook"),:locals=>{:student=>@student,:batch=>batch,:page=>page} %>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  <% end %>
+  <!-- batch less  -->
+  <div class="batch_item">
+    <h3 class="fees_list_title other_fees"> <span class="batch_full_name"> <%= t('others') %></span><span class="payment_status"><%= t('all_fees_paid') %></span></h3>
+    <div class="fees_list_item ">
+      <table class="fees_table">
+        <thead>
+              <th class="class44">
+                <%= t('fees_name') %>
+              </th>
+              <th class="class13">
+                <%= t('status') %>
+              </th>
+              <th class="class13">
+                <%= t('amount') %>
+                <%= "(#{currency})" %>
+              </th>
+              <th class="class20">
+                <%= t('date_text') %>
+              </th>
+          </thead>
+        <% FedenaPlugin.deliver_registered_hook(:student_profile_fees).each do |mod| %>
+          <%= render :partial=>mod.camelize.constantize.send("student_profile_fees_by_batch_hook"),:locals=>{:student=>@student,:batch=>nil,:page=>page} %>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  // j("#fees_list").accordion();
+  function set_paid_count_status() {
+    j(".fees_list_title").each( function( index, value ){
+      accodian_head=j(value);
+      status_span=accodian_head.children()[1];
+      status_cells=accodian_head.next().find(".status_cell")
+      count=0;
+      status_cells.each(function (index,value){
+        status_cell=j(value)
+        if(status_cell.data("status")==="unpaid") {
+          count+=1;
+        }
+      });
+      if(count>0) {
+        message="<span class='unpaid_count'>"+count.toString()+"</span>"
+        message+=" <%= t('unpaid_fees')%>";
+        j(status_span).html(message);
+        j(status_span).addClass("payment_status_active");
+      }
+      // console.log(accodian_head.next().find(".status_cell").length);
+    });
+  }
+  function disable_empty_tab () {
+    j(".fees_list_title").each( function( index, value ){
+      accodian_head=j(value);
+      status_span=accodian_head.children()[2];
+      status_cells=accodian_head.next().find(".status_cell");
+      if(status_cells.length <= 0) {
+        message="<%= t('no_fees_to_pay') %>";
+        j(status_span).html(message);
+        accodian_head.addClass("ui-state-disabled");
+        // workaround to remove content of first ac
+        accodian_head.removeClass("ui-accordion-header-active");
+        accodian_head.next().hide();
+        //hide other_fees accordian head if contents are nil
+        if (accodian_head.hasClass("other_fees")) {
+          accodian_head.hide();
+        }
+        // hide down button for inactive tabs
+        // icon_span=accodian_head.children()[0];
+        // j(icon_span).hide();
+      }
+      // console.log(accodian_head.next().find(".status_cell").length);
+    });
+  }
+  function remove_links() {
+    j('a').contents().unwrap();
+  }
+  function hide_blank_other_fees_tab() {
+    // nothing
+  }
+  j(function() {
+    set_paid_count_status();
+    disable_empty_tab();
+    remove_links();
+    hide_blank_other_fees_tab();
+  });
+</script>

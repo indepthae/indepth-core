@@ -1,0 +1,144 @@
+<div class="list_table_div">
+    <div class="main_head_label" style="margin-bottom: 15px">
+        <b id="fees_report_title">
+            <%= t('student_fee_report') %>
+            <% if @accounts_enabled %>
+              <%= "#{t('for')}: #{@account_name}" %>
+              <% url_params = {:fee_account_id => @account_id} %>
+            <% else %>
+              <% url_params = {} %>
+            <% end %>
+        </b>
+
+        <div class="date_align right">
+            <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+            <%= format_date(@start_date) %> &nbsp;
+            <label class="to_date"><%= t('small_to') %></label> &nbsp; 
+            <%= format_date(@end_date) %>
+            <span id="show_date" class="themed_hover_text">
+                <%= t('change_date') %>
+                <!--
+                < % link_to_remote t('change_date'), :url => {:controller => "finance", :action => "show_date_filter", 
+                  :target_action => @target_action, :id => params[:id], :date_tag => params[:date_tag], 
+                  :start_date => @start_date, :end_date => @end_date}.merge(url_params) %> -->
+            </span>
+        </div>
+    </div>
+    <% unless @collections.empty? %>
+      <% total =0 %>
+      <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+          <tr class="main_head">
+              <td><%= t('fee_collections_and_particulars') %></td>
+
+              <td colspan="3" class="set_border_right width210">
+                  <span class="show_amount"><%= t('amount') %> (<%= currency %>
+                      )</span>
+              </td>
+          </tr>
+
+          <% @collections.each do |b| %>
+            <tr class="tr-list_head">
+                <td>
+                    <%= link_to b.collection_name, {:action => 'course_wise_collection_report', :id => b.collection_id, 
+                      :start_date => @start_date, :end_date => @end_date, :date_tag => params[:date_tag]}.
+                      merge(url_params) %>
+                </td>
+                <td></td>
+                <td></td>
+                <td align="right"> <%= "#{precision_label(b.amount)}" %></td>
+            </tr>
+
+            <% i=0 %>
+            <% discount_paid=0 %>
+            <% if @collection_and_particulars[b.collection_id.to_s].present? %>
+              <tr class="row-b bold_font">
+                  <td><%= t('particulars') %></td>
+                  <td class="width70"><%= t('discount_applied') %></td>
+                  <td class="width70"><%= t('amount_received') %></td>
+                  <td class="width70"><%= t('total_amount') %></td>
+              </tr>
+              <% @collection_and_particulars[b.collection_id.to_s].each do |c| %>
+                <tr class="row-b">
+                    <% discount_paid += c.discount_paid.to_f %>
+                    <td><%= "#{i=i+1}. " %><%= c.name %></td>
+                    <td class="set_border_right" align="right">
+                        <%= precision_label(c.discount_paid.to_f) %>
+                    </td>
+                    <td class="set_border_right" align="right">
+                        <%= precision_label(c.amount_paid.to_f - c.discount_paid.to_f) %>
+                    </td>
+                    <td class="set_border_right" align="right">
+                        <%= precision_label(c.amount_paid.to_f) %>
+                    </td>
+                </tr>
+              <% end %>
+            <% end %>
+            <tr class="row-b bold_font">
+                <td><%= t('total_discount') %></td>
+                <td  colspan="3" class="set_border_right width210" align="right">
+                    <%= precision_label(discount_paid) %>
+                </td>
+            </tr>
+            <% if b.tax_enabled? %>
+              <tr class="row-b bold_font">
+                  <td><%= t('total_tax') %></td>
+                  <td  colspan="3" class="set_border_right width210" align="right">
+                      <%= precision_label(b.total_tax.to_f) %>
+                  </td>
+              </tr>
+            <% end %>
+            <tr class="row-b bold_font">
+                <td><%= t('total_fine_amount') %></td>
+                <td  colspan="3" class="set_border_right width210" align="right"> 
+                    <%= precision_label(b.total_fine.to_f) %>
+                </td>
+            </tr>
+
+
+          <% end %>
+      </table>
+
+      <div class="total_amount_div">
+          <label><%= t('net_income') %></label>
+          <label class="amount_label"><%= precision_label(@grand_total) %></label>
+      </div>
+
+      <%= will_paginate @collections, :params => {:id => params[:id], :start_date => @start_date, 
+        :end_date => @end_date, :date_tag => params[:date_tag]}.merge(url_params), 
+        :renderer => 'RemoteLinkRenderer' %>
+
+      <div class="seprater_div_bottom">
+          <div id="inner-tab-menu">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", 
+                        :csv_report_type => "finance_fee_collection_report", :report_format_type => "csv", 
+                        :start_date => @start_date, :end_date => @end_date}.merge(url_params) %>
+                  </li>
+              </ul>
+          </div>
+      </div>
+    <% else %>
+      <div class="no_entries"><%= t('no_transactions_present') %></div>
+    <% end %>
+</div>
+
+<script>
+
+  j('.date_box').hide();
+
+  if (j('#hide_date_filter').is(":visible")) {
+      j('#show_date').hide();
+  }
+
+  j("#show_date").click(function () {
+      j(".date_box").show();
+      j("#show_date").hide();
+  });
+
+  j("#hide_date_filter").click(function () {
+      j(".date_box").hide();
+      j("#show_date").show();
+  });
+
+</script>

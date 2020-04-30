@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.vehicle_members{
+  @students.each do |student|
+    @student = student
+    @xml.student do
+      @xml.student_name(@student.full_name)
+      @xml.batch_name(@student.batch.name)
+      @xml.admission_date(@student.admission_date)
+      @xml.admission_no(@student.admission_no)
+      @xml.gender(@student.gender)
+      @xml.guardian_name(@student.immediate_contact.try(:full_name))
+      @xml.immediate_contact_no(@student.immediate_contact.try(:mobile_phone))
+    end
+  end
+
+  @employees.each do |employee|
+    @employee = employee
+    @xml.employee do
+      @xml.employee_name(@employee.full_name)
+      @xml.employee_position(@employee.employee_position.try(:name))
+      @xml.employee_department(@employee.employee_department.try(:name))
+      @xml.employee_number(@employee.employee_number)
+      @xml.gender(@employee.gender)
+      @xml.mobile_phone(@employee.mobile_phone)
+    end
+  end
+}%>
+
+

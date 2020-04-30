@@ -1,0 +1,5 @@
+<% if type.present? and type == 'recipients' %>
+  <%= will_paginate @recipients %>
+<%else%>
+  <%= will_paginate @message_threads %>
+<%end%>

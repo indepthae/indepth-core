@@ -1,0 +1,358 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.      -%>
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/finance_extensions/pay_all_fees_receipt_pdf.css', :media => "all" %>
+  <% else %>
+    <%= stylesheet_link_tag 'finance_extensions/pay_all_fees_receipt_pdf.css', :media => "all" %>
+  <% end %>
+<% end %>
+<div id="page-yield" class="available_sections" xmlns="http://www.w3.org/1999/html">
+    <div class="section">
+        <center>
+            <div class="hor_line"></div>
+            <h2><%= t('fee_summary') %></h2>
+
+            <div class="hor_line"></div>
+            <div class="extender"></div>
+        </center>
+        <% total_paid = 0 %>
+        <% total_balance = 0 %>
+        <% actual_total=0 %>
+        <% total_fees =0 %>
+        <% total_tax = 0 %>
+        <% total_amount_to_pay=0 %>
+        <div id="main_info">
+            <div class="col-a">
+                <h4 style="width:505px;"> <%= "#{t('name')}: #{@student.full_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('admission_no')} : #{@student.admission_no}" %></h4>
+                <% if roll_number_enabled? %>
+                  <h4 style="width:505px;"> <%= "#{t('roll_no')} : #{@student.roll_number}" %></h4>
+                <% end %>
+                <h4 style="width:505px;"> <%= "#{t('course_text')} : #{@current_batch.course.course_name}" %></h4>
+                <h4 style="width:505px;"> <%= "#{t('batch')} : #{@current_batch.full_name}" %></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <table id="pdf-table" width="100%" cellspacing="0">
+            <% if @finance_fees.present? %>
+              <% if @is_tax_present %>
+                <% colspan = 6 %>
+                <% collection_css = "collection-td-2" %>
+                <% amount_css = "amount-td-2" %>
+                <% tax_amount_css = "tax-amount-2" %>
+              <% else %>
+                <% colspan = 5 %>
+                <% collection_css = "collection-td" %>
+                <% amount_css = "amount-td" %>
+                <% tax_amount_css = "tax-amount" %>
+              <% end %>
+
+              <tr class="table-header">
+                  <td class="sl-td"><%= t('sl_no') %></td>
+                  <td class="<%= collection_css %>"><%= t('fee_collections') %></td>
+                  <td class="<%= amount_css %> align_center"> <%= "#{t('actual')} #{t('amount')}" %> (<%= currency %>)</td>
+                  <% if @is_tax_present %>
+                    <td class="<%= amount_css %> align_center"><%= "#{t('tax_text')} #{t('amount').downcase}" %>
+                        (<%= currency %>)
+                    </td>
+                  <% end %>
+                  <td class="<%= amount_css %> align_center"> <%= "#{t('amount_to_pay')} #{t('with')} #{t('fine')}" %>
+                      (<%= currency %>)
+                  </td>
+                  <td class="<%= amount_css %> align_center" style="min-width: 100px;"> <%= "#{t('fees_paid')}" %>
+                      (<%= currency %>)
+                  </td>
+              </tr>
+
+              <% k =7 %>
+              <% i = 0 %>
+              <% c = 'even' %>
+
+              <% @finance_fees.group_by(&:fee_type).each do |fees| %>
+
+                <tr class="table-header">
+                    <td colspan="<%= colspan %>">
+                        <%= fees.first %>
+                    </td>
+                </tr>
+
+                <% i = 0 %>
+                <% k = 0 %>
+                <% c = 'even' %>
+
+                <% fees.last.each do |finance_fee| %>
+                  <% reset_cycle("even_odd") if k == 0 %>
+
+                  <tr class="<%= cycle(c, (["even", "odd"]-[c]).first, :name => "even_odd") %>">
+                      <td class="sl-td"><%= i+=1 %></td>
+                      <% k += 1 %>
+                      <td class="<%= collection_css %>"><%= finance_fee.collection_name %></td>
+                      <td class="<%= amount_css %> align_right">&nbsp;<%= "#{precision_label(finance_fee.actual_amount)}" %></td>
+
+                      <% if @is_tax_present %>
+                        <td class="<%= tax_amount_css %> align_right">
+                            <%= finance_fee.tax_enabled ? precision_label(finance_fee.tax_amount.to_f) : '-' %>
+                        </td>
+                      <% end %>
+
+                      <% paid_fine = (finance_fee.paid_fine.to_f > 0 ? finance_fee.paid_fine.to_f : 0) %>
+                      <%if finance_fee.is_fine_waiver == true%>
+                        <%fine_to_pay = 0.0%>
+                      <% elsif Configuration.is_fine_settings_enabled? && finance_fee.balance<=0 && !finance_fee.is_paid? && finance_fee.balance_fine.present?%>
+                        <%fine_amount = precision_label(finance_fee.balance_fine).to_f%>
+                      <%else%>  
+                        <% fine_amount =  (finance_fee.is_amount? ? 
+                           finance_fee.fine_amount.to_f : ((finance_fee.actual_amount.to_f) * (finance_fee.fine_amount.to_f / 100).to_f )) %>
+                         <% fine_amount = precision_label(finance_fee.is_paid? ? 0 : ((fine_amount - paid_fine) > 0 ?  (fine_amount - paid_fine) : 0)).to_f %> 
+                      <%end%>
+                      <% total_fees = total_fees + finance_fee.actual_amount.to_f + fine_amount.to_f %>
+
+                      <td class="<%= amount_css %> align_right">&nbsp;
+                          <% unless finance_fee.is_paid? %>
+                            <%= precision_label(finance_fee.balance.to_f + fine_amount.to_f) %>
+                          <% else %>
+                            0
+                          <% end %>
+                      </td>
+
+                      <% to_be_paid = finance_fee.actual_amount.to_f %>
+                      <% to_be_paid += finance_fee.tax_amount.to_f if finance_fee.tax_enabled %>
+
+                      <% if finance_fee.is_paid? %>
+                        <% paid = (to_be_paid.to_f + fine_amount.to_f + paid_fine.to_f - finance_fee.balance.to_f) %>
+                      <% else %>
+                        <% paid = (to_be_paid.to_f - finance_fee.balance.to_f +  paid_fine.to_f) %>
+                      <% end %>
+
+                      <td class="<%= amount_css %> align_right">
+                          <% paid += finance_fee.manual_paid_fine.to_f %>
+                          <%= "#{precision_label(paid.to_f < 0 ? 0 : paid)}" %>
+                      </td>
+                  </tr>
+
+                  <% total_paid += paid %>
+
+                  <% total_amount_to_pay += (finance_fee.balance.to_f + fine_amount.to_f) %>
+                  <% total_tax += finance_fee.tax_amount.to_f if finance_fee.tax_enabled? %>
+
+                <% end %>
+              <% end %>
+
+              <% unless @current_user.student? %>
+                <!-- discounts list -->
+                <% if @multi_fee_discounts.present? %>
+                  <tr class="table-header">
+                      <td colspan="<%= colspan %>">
+                          <%= t('discounts') %>
+                      </td>
+                  </tr>
+                  <% @multi_fee_discounts.each_with_index do |m_discount, i| %>
+                    <% reset_cycle("even_odd") if i == 0 %>
+
+                    <tr class="<%= cycle(c, (["even", "odd"]-[c]).first, :name => "even_odd") %>">
+                        <td class="sl-td"><%= i + 1 %></td>
+                        <td class="<%= collection_css %>" colspan="<%= colspan - 2 %>">
+                            <%= m_discount.name %>
+                            <%= " - #{m_discount.discount} % " unless m_discount.is_amount %>
+
+                            <% if m_discount.fee_type.present? %>
+                              <span class="discount-collection-details">
+                                  <% if m_discount.fee_type == "FinanceFee" %>
+                                    <% collection_name = m_discount.fee.finance_fee_collection.name %>
+                                    <% collection_name += " - #{m_discount.master_receiver.name}" if m_discount.
+                                      master_receiver_type == "FinanceFeeParticular" %>
+                                    <%= "&rlm;(#{collection_name}&rlm;)" %>
+                                  <% elsif m_discount.fee_type == "TransportFee" %>
+                                    <%= "&rlm;(#{m_discount.fee.transport_fee_collection.name}&rlm;)" %>
+                                  <% end %>
+                              </span>
+                            <% end %>
+                        </td>
+                        <td>
+                            <%= precision_label(m_discount.is_amount ? m_discount.discount.to_f : m_discount.total_discount.to_f) %>
+                        </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+                <!-- fines list -->
+                <% if @multi_transaction_fines.present? %>
+                  <tr class="table-header">
+                      <td colspan="<%= colspan %>">
+                          <%= t('fines') %>
+                      </td>
+                  </tr>
+                  <% @multi_transaction_fines.each_with_index do |mtf, i| %>
+                    <% reset_cycle("even_odd") if i == 0 %>
+
+                    <tr class="<%= cycle(c, (["even", "odd"]-[c]).first, :name => "even_odd") %>">
+                        <td class="sl-td"><%= i + 1 %></td>
+                        <td class="<%= collection_css %>" colspan="<%= colspan - 2 %>">
+                            <%= t('fine_on') %>
+                            <%= format_date(mtf.created_at.to_date) %>
+                            <span class="discount-collection-details">
+                                <%= "&rlm;(#{mtf.name}&rlm;)" %>
+                            </span>
+                        </td>
+                        <td>
+                            <%= precision_label(mtf.amount) %>
+                        </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+              <% end %>
+
+              <tr class="<%= cycle(c, (["odd", "even"]-[c]).first, :name => "even_odd") %>">
+                  <td class="total align_center" colspan="2"><%= t('total') %></td>
+                  <td class="<%= amount_css %> align_right">
+                      <%= precision_label(total_fees).to_f == 0 ? precision_label(0) :
+                        precision_label(total_fees).to_f %>
+                  </td>
+
+                  <% if @is_tax_present %>
+                    <td class="<%= tax_amount_css %> align_right">
+                        <%= precision_label(total_tax).to_f == 0 ? precision_label(0) :
+                          precision_label(total_tax).to_f %>
+                    </td>
+                  <% end %>
+
+                  <td class="<%= amount_css %> align_right">
+                      <%= precision_label(total_amount_to_pay).to_f == 0 ? precision_label(0) :
+                        precision_label(total_amount_to_pay).to_f %>
+                  </td>
+                  <td class="<%= amount_css %> align_right">
+                      <%= precision_label(total_paid < 0 ? 0 : total_paid) %>
+                  </td>
+              </tr>
+
+            <% else %>
+              <tr class="table-header">
+                  <td class="sl-td"><%= t('no pending fees collection is avilable') %></td>
+              </tr>
+            <% end %>
+
+        </table>
+
+        <div class="height_fix" style="height:10px;"></div>
+
+        <div id="pdf-info" class="section">
+
+            <% page_val=24 %>
+            <% k=19 %>
+            <% if @paid_fees.present? %>
+              <div class="section">
+                  <h4><%= "#{t('payment_history')}" %></h4>
+
+                  <table id="pdf-table" width="100%" cellspacing="0">
+                      <% c= 'even' %>
+                      <tr class="table-header">
+                          <td class="date-td"> <%= t('receipt_no') %></td>
+                          <td class="collection-td"><%= t('fee_collections') %></td>
+                          <td class="date-td"> <%= t('date_text') %></td>
+                          <td class="mode-td"> <%= t('mode') %></td>
+                          <td class="note-td"> <%= t('payment_notes') %></td>
+                          <td class="date-td"> <%= t('cashier') %></td>
+                          <td class="amount-td align_center"> <%= t('amount') %> (<%= currency %>)</td>
+                      </tr>
+                      <% i=0 %>
+                      <% @paid_fees.each do |p| %>
+                        <% klass=i%2 == 0 ? "even" : "odd" %>
+                        <% transactions_length = p.finance_transactions.length %>
+                        <% t_b_border_css = transactions_length > 1 ? "no_bottom_border" : '' %>
+                        <% multi_receipt_mode = (p.transaction_mode == 'MULTIPLE') %>
+                        <% receipt_numbers = [] %>
+                        <% k = 0 %>
+                        <% rc_group = @transactions[p.id].group_by { |x| x.receipt_number } %>
+                        <% row_amount = @transactions[p.id].map(&:amount).sum %>
+                        <% @transactions[p.id].each_with_index do |ft, j| %>
+
+                          <tr class="<%= klass %>">
+                              <% a_t_b_border = j > 0 ? ((j+1 != transactions_length) ? (t_b_border_css + ' no_top_border') : 'no_top_border') : t_b_border_css %>
+                              <% unless receipt_numbers.include?(ft.receipt_number) %>
+                                <% k = 0 %>
+                                <% receipt_numbers << ft.receipt_number %>
+                              <% else %>
+                                <% k += 1 %>
+                              <% end %>
+
+                              <% receipt_css = ((k+1 == rc_group[ft.receipt_number].length) ? '' :
+                                  k > 0 ? a_t_b_border : 'no_bottom_border') %>  
+
+                              <td class="date-td align_center <%= receipt_css %>">
+                                  <% if multi_receipt_mode or j == 0 or k == 0 %>
+                                    <%= ft.receipt_number %>
+                                  <% end %>
+                              </td>
+
+                              <% collection_css = (k == 0 && 
+                                  rc_group[ft.receipt_number].length >= 1 && 
+                                  (k == rc_group[ft.receipt_number].length) ? 
+                                  'no_bottom_border' : a_t_b_border) %>
+
+                              <td class="collection-td <%= collection_css %> ">
+                                  <%= ft.finance.name %>
+                              </td>
+
+                              <% if j == 0 %>
+
+                                <td class="date-td <%= a_t_b_border %>"><%= format_date(p.transaction_date) %></td>
+
+                                <% if p.reference_no.present? %>
+                                  <td class="mode-td <%= a_t_b_border %>"> <%= p.payment_mode %>
+                                      - <%= p.reference_no %></td>
+                                <% else %>
+                                  <td class="mode-td <%= a_t_b_border %>"> <%= p.payment_mode %></td>
+                                <% end %>
+
+                                <td class="note-td <%= a_t_b_border %>"> <%= p.payment_note %></td>
+                                <% cachier_name= p.payment_mode=='Online Payment' ? p.finance_transactions.first.try(:get_cashier_name) : p.finance_transactions.first.try(:cashier_name) %>
+                                <td class="date-td <%= a_t_b_border %>"><%= p.finance_transactions.present? ? cachier_name : '' %></td>
+                                <td class="amount-td align_right <%= a_t_b_border %>"><%= precision_label row_amount.to_f %></td>
+
+                              <% else %>
+                                <td class="date-td <%= a_t_b_border %>  left_border"></td>
+                                <td class="mode-td <%= a_t_b_border %> "></td>
+                                <td class="note-td <%= a_t_b_border %> "></td>
+                                <td class="date-td <%= a_t_b_border %> "></td>
+                                <td class="amount-td <%= a_t_b_border %> right_border"></td>
+                              <% end %>
+
+                          </tr>
+                        <% end %>
+                      <% end %>
+                  </table>
+              </div>
+            <% end %>
+
+            <% if @is_tax_present %>
+              <% if @tax_config.present? and @tax_config[:finance_tax_identification_label].present? %>
+                <div class="section">
+                    <h4 class="no_bold">
+                        <%= @tax_config[:finance_tax_identification_label] %> :
+                        <%= @tax_config[:finance_tax_identification_number] %>
+                    </h4>
+                </div>
+              <% end %>
+            <% end %>
+        </div>
+
+    </div>
+</div>

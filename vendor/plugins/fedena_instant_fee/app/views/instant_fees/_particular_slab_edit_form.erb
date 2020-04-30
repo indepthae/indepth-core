@@ -1,0 +1,28 @@
+<label class="head_label"><%= t('update_instant_particular_for_fees')  %><span></span></label>
+
+
+<div id="grading-levels-form">
+
+    <% form_remote_for @instant_particular, :url=>{:action=>'update_particular_slab',:id => @instant_particular.id} do |f| %>
+
+      <div id="form-errors"></div>
+
+      <div class="label-field-pair">
+          <div class="label-container"><%= f.label "#{t('name')}" %></div>
+          <div class="input-container"><%= f.text_field :name, :readonly => true %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <div class="label-container"><%= f.label "#{t('select_category')}" %></div>
+          <% tax_slab_id = @instant_particular.tax_slabs.try(:last).try(:id) %>
+          <div class="input-container"> <%= f.select(:tax_slab_id, @tax_slabs .map { |slab| 
+                  ["#{slab.name} - #{precision_label(slab.rate)}%", slab.id]}, :selected => tax_slab_id, 
+                :include_blank => t('select_a_tax_slab'))
+            %></div>
+      </div>
+
+      <%=  submit_tag "► #{t('save')}",:class=>'submit_button' %>
+
+    <% end %>
+</div>
+

@@ -1,0 +1,6 @@
+if @flag 
+  page << "build_modal_box({'title' : '#{(@att.present? ? t('attendance_warning') : t('delete_confirm_msg'))}'})" 
+  page.replace_html 'popup_content', :partial => 'confirmation_form'
+else
+  page.replace_html 'page-yield', :partial => 'new_form'
+end

@@ -1,0 +1,63 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fedena_custom_export_label') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('all_exports') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "View Scheduled Jobs", scheduled_task_path(:job_object=>"DataExport",:job_type=>"1") %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('new_text'), new_data_export_path %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box">
+    <% unless flash[:notice].nil? %>
+        <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% unless @data_exports.empty? %>
+      <div class="box">
+        <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+            <td class="sl_no"><%= t('serial_no') %></td>
+            <td class="name"><%= t("model_name") %></td>
+            <td class="created_at"><%= t("created_at") %></td>
+            <td class="status"><%= t("status") %></td>
+            <td class="format"><%= t("format") %></td>
+            <td class="options"><%= t("options") %></td>
+          </tr>
+          <% @data_exports.each_with_index do |export,index| %>
+              <tr class="tr-<%= cycle('odd', 'even') %>">
+                <td class="sl_no"><%= ((@data_exports.current_page - 1) * @data_exports.per_page) + index + 1 %></td>
+                <td class="name">
+                  <%= export.export_structure.model_name.humanize %>
+                </td>
+                <td class="created_at"><%= format_date(FedenaTimeSet.current_time_to_local_time(export.created_at),:format=>:long) %></td>
+                <td class="status">
+                  <%= export.status_message.capitalize %>
+                </td>
+                <td class="format">
+                  <%= export.export_file_file_name.present? ? export.export_file_file_name[-3,3].upcase : "NA" %>
+                </td>
+                <td class="options">
+                  <%= link_to t('download_file'),export.export_file.url(:original,false) if export.export_file.present? %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+        <%= will_paginate @exports %>
+      </div>
+  <% else %>
+      <div id="flash-box">
+        <p class="flash-msg">No Exports present</p>
+      </div>
+  <% end %>
+
+</div>

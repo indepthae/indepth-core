@@ -1,0 +1,15 @@
+<label  class="core_label" for="configuration_currency_type">Health Status</label>
+<%if @health_status_rg.present?%>
+  <div class="com_block">
+    <p>“Health Status” section details in CCE reports are retrieved from the record group - <span><%=@health_status_rg.name%></span><%= link_to 'View record group',record_group_records_path(@health_status_rg.id),:target=>'_blank' if permitted_to? :index, :records%></p>
+    <p>Please ensure that this record group is linked will the required classes and batches, and then enter the details for each student.<%= link_to 'Enter Student Records',:controller=>"student_records",:action=>'handle_record_groups',:id=>@health_status_rg.id,:target=>'_blank' if permitted_to? :handle_record_groups,@current_user,:context=>:student_records%></p>
+    <%= link_to_remote 'Change record group',:url =>{:action=>'settings',:id=>"1"},:method=>:get,:html=>{:id=>'submit_like_link'} %>
+    <%= link_to_remote ' Unlink record group',:url =>{:action=>'unlink',:id=>"1"},:method=>:get,:html=>{:id=>'unlink_link'},:confirm=>"Are you sure you want to unlink this record group from “Health Status” section?" %>
+  </div>
+<%else%>
+  <div class="com_block">
+    <p>Enter the “Health Status” section details in CCE reports for each student using the Student Records module.<%= link_to 'Student Records',student_records_path,:target=>'_blank' if can_access_request? :index, @current_user,:context=>:student_records%></p>
+    <p>In the Student Records module, you will have to create a record group with the required records, and then enter the details for each student.</p>
+    <%= link_to_remote 'Link record group',:url =>{:action=>'settings',:id=>"1"},:method=>:get,:html=>{:id=>'submit_like_link'}%>
+  </div>
+<%end%>

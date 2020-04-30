@@ -1,0 +1,205 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="page-yield">
+    <div class="box">
+        <% form_remote_for :tc_template_field_student_details,:url=>{:controller=>"tc_template_student_details",:action=>'update_field'},:before=>"$('submit_button').disable()", :html => { :method => :post }, :complete=>"setTimeout(function(){$('submit_button').enable();},1000)" do |f| %>
+        <%=  session_fingerprint_field %>  
+        <div id="form-errors"></div>
+          <%= error_messages_for :tc_template_field_student_details %>
+          <div class="label-field-pair parent_field_name">
+              <label for="category_name"><%= "#{t('parent_field')}" %></label>
+              <div class="parent_field"><%= select_tag "tc_template_field_student_details[field_info][parent_id]", options_for_select(@student_details.collect{|field| [field.field_name,field.id ]},:selected=> @parent.id),:class=>"input-type-select" %></div>
+          </div>
+          <div class="label-field-pair field_name">
+              <label for="category_name"><%= "#{t('field_name')}" %></label>
+              <div class="text-input-bg"><%= f.text_field :field_name, :value=>@field.field_name %></div>
+          </div>
+          <div class="radio">   
+              <div class="radio_one"><%= radio_button_tag("tc_template_field_student_details[field_info][type]","system", (@field.field_info.field_type== "system"))%> <label for="tc_template_field_student_details_field_info_type_system"> <%="#{t('map_to_system_details')}"%> </label></div>
+              <div class="radio_two"><%= radio_button_tag("tc_template_field_student_details[field_info][type]","custom",(@field.field_info.field_type != "system"))%> <label for="tc_template_field_student_details_field_info_type_custom"><%="#{t('custom_field')}"%> </label> </div>
+          </div>
+          <div class="check_box">
+            <div class="label-field-pair">
+                  <% if @field.field_info.is_mandatory == "1" %>
+                    <div class="input-container">  <%= f.check_box "[field_info][is_mandatory]",:checked=>true %></div>
+                  <%else%>
+                     <div class="input-container">  <%= f.check_box "[field_info][is_mandatory]" %></div>
+                  <%end%>
+                  <div class="label-container check"><%= f.label :is_mandatory, t('is_mandatory') %></div>
+              </div>
+            </div>
+          <div class="system_fields">
+              <%if @field.field_info.field_type == "system" %>
+                <%= select_tag "tc_template_field_student_details[field_info][system_field_type_name]", grouped_options_for_select([[t('student_details'),TcTemplateVersion::SYSTEM_FIELDS.sort.map {|k,v| [t(v[:name]),k]}],[t('additional_details'), @student_additional_fields.collect {|v| [ v.name, "#{v.name}.#{v.id}" ] }]],@selected_field_value) %>
+                <div class="date">
+                 <%if @field.field_info.is_in_words_enabled== true || @field.field_info.is_in_figures_enabled== true %>
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words]","1",(@field.field_info.is_in_words_enabled== true )) %> <label for="tc_template_field_student_details_field_info_in_words"><%=  "#{t('in_words')}"%> </label> </div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures]","1",(@field.field_info.is_in_figures_enabled== true ))%> <label for="tc_template_field_student_details_field_info_in_figures"><%= "#{t('in_figures')}" %> </label> </div>  
+  
+                 <%else%>
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words]" ) %><label for="tc_template_field_student_details_field_info_in_words"><%=  "#{t('in_words')}"%> </label></div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures]")%> <label for="tc_template_field_student_details_field_info_in_figures"><%= "#{t('in_figures')}" %> </label> </div>  
+                  <%end%>
+              </div>
+              <%else%>
+                <%= select_tag "tc_template_field_student_details[field_info][system_field_type_name]", grouped_options_for_select([[t('student_details'),TcTemplateVersion::SYSTEM_FIELDS.sort.map {|k,v| [t(v[:name]),k]}],[t('additional_details'), @student_additional_fields.collect {|v| [ v.name, "#{v.name}.#{v.id}" ] }]])  %>
+                <div class="date">
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words]" ) %> <label for="tc_template_field_student_details_field_info_in_words"><%=  "#{t('in_words')}"%> </label></div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures]")%> <label for="tc_template_field_student_details_field_info_in_figures"><%= "#{t('in_figures')}" %> </label></div>  
+              </div>
+              <%end%>
+          </div>
+          <div class="custom_fields">
+             <%= "#{t('value_type')}" %>
+              <%if @field.field_info.field_type != "system" %>
+              <%= select_tag "tc_template_field_student_details[field_info][custom_field_type_name]", options_for_select(TcTemplateVersion::CUSTOM_FIELDS.sort.map {|k,v| [v[:name].camelize,k]}, :selected=> @selected_field_value) %>
+              <div class="date_for_custom">
+                    <%if @field.field_info.is_in_words_enabled== true || @field.field_info.is_in_figures_enabled== true %>
+                      <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words_custom]","1",(@field.field_info.is_in_words_enabled== true ) ) %> <label for="tc_template_field_student_details_field_info_in_words_custom"><%=  "#{t('in_words')}"%> </label></div>
+                      <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures_custom]","1",(@field.field_info.is_in_figures_enabled== true ))%> <label for="tc_template_field_student_details_field_info_in_figures_custom"><%= "#{t('in_figures')}" %> </label></div>  
+                    <%else%>
+                      <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words_custom]" ) %> <label for="tc_template_field_student_details_field_info_in_words_custom"><%=  "#{t('in_words')}"%> </label></div>
+                      <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures_custom]")%> <label for="tc_template_field_student_details_field_info_in_figures_custom"><%= "#{t('in_figures')}" %> </label></div>  
+                    <%end%>
+                </div>
+              <%else%>
+              <%= select_tag "tc_template_field_student_details[field_info][custom_field_type_name]", options_for_select(TcTemplateVersion::CUSTOM_FIELDS.sort.map {|k,v| [v[:name].camelize,k]}) %>
+               <div class="date_for_custom">
+                  <div class="radio_one"><%= check_box_tag("tc_template_field_student_details[field_info][in_words_custom]" ) %> <label for="tc_template_field_student_details_field_info_in_words_custom"><%=  "#{t('in_words')}"%> </label></div>
+                  <div class="radio_two"><%= check_box_tag("tc_template_field_student_details[field_info][in_figures_custom]")%> <label for="tc_template_field_student_details_field_info_in_figures_custom"><%= "#{t('in_figures')}" %> </label></div>  
+              </div>
+             <%end%>
+          </div>
+          <%if @field.field_info.additional_field.length > 0 %>
+          <% flag = 0 %>
+          <div class="select_box" >
+          <% @field.field_info.additional_field.each do |field| %>
+              <div class="label-field-pair" style="height: 40px;">
+            <span class="cb_value"><%= text_field_tag "tc_template_field_student_details[field_info][additional_field][#{field.value}]","#{field.value}" %></span><a class="delete_button_img" onclick="remove_entry(this)"></a>
+            </div>
+          <%end%>
+             </div> 
+          <div class="add-button"><a class="add-field" onclick="create_row()"><%= "#{t('add')}" %></a></div>
+          <%else%>
+          <div class="select_box" style="display:none"></div>
+          <div class="add-button" style="display:none"><a class="add-field" onclick="create_row()"><%= "#{t('add')}" %></a></div>
+          <%end%>
+          
+         <%=hidden_field_tag "tc_template_field_student_details[priority]",@field.priority%>
+          <%=hidden_field_tag "tc_template_field_student_details[id]",@field.id%>
+          
+          <div class="submit_button new">
+              <%= f.submit "", :value => "Update", :class => "submit-button", :id=>"submit_button" %>
+          </div>
+          <%= hidden_field_tag 'flash', 'edit_sub_field_updated' %>
+        <% end %>
+        <div class="extender"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+ if (j("input[name='tc_template_field_student_details[field_info][type]']:checked").val() === "system") {
+      j(".system_fields").show();
+      j(".custom_fields").hide();
+      j(".date_for_custom").hide(); 
+      var system_text = j("#tc_template_field_student_details_field_info_system_field_type_name :selected").val();
+        if (system_text == 2 | system_text == 14) {
+         j(".date").show();
+      }else
+      {
+        j(".date").hide();
+      }    
+  } else {
+      var custom_text = j("#tc_template_field_student_details_field_info_custom_field_type_name :selected").val();
+        if (custom_text == 5) {
+         j(".date_for_custom").show();
+      }else
+      {
+        j(".date_for_custom").hide();
+      }   
+      j(".system_fields").hide();
+      j(".custom_fields").show();
+      j(".date").hide();
+  }
+
+  j(document).on('change', "input[name='tc_template_field_student_details[field_info][type]']:radio", function () {
+      if (j("input[name='tc_template_field_student_details[field_info][type]']:checked").val() === "system") {
+        j('.select_box').hide();
+        j('.add-button').hide();
+        j(".system_fields").show();
+        j(".custom_fields").hide(); 
+        j(".date_for_custom").hide(); 
+        var system_text = j("#tc_template_field_student_details_field_info_system_field_type_name :selected").val();
+        if (system_text == 2 | system_text == 14) {
+         j(".date").show();
+      }else
+      {
+        j(".date").hide();
+      }
+    
+      } else
+      {
+        var text = j("#tc_template_field_student_details_field_info_custom_field_type_name :selected").val();
+        if (text == 4) {
+          j('.select_box').show();
+          j('.add-button').show();
+        }
+        if (text == 5){
+          j(".date_for_custom").show();
+        }
+        else{
+          j(".date_for_custom").hide();
+        }
+          j(".system_fields").hide();
+          j(".custom_fields").show();
+          j(".date").hide();
+      }
+  });
+    
+
+  j(document).on("change", "#tc_template_field_student_details_field_info_system_field_type_name", function () {
+      var system_text = j("#tc_template_field_student_details_field_info_system_field_type_name :selected").val();
+      if (system_text == 2 | system_text == 14) {
+          j(".date").show();
+      }else
+      {
+        j(".date").hide();
+      }
+      
+  });
+  
+  j(document).on("change", "#tc_template_field_student_details_field_info_custom_field_type_name", function () {
+      var text = j("#tc_template_field_student_details_field_info_custom_field_type_name :selected").val();
+      if (text == 4) {
+        j('.select_box').empty();
+        j('.select_box').show();
+        j('.add-button').show();
+        j(".date_for_custom").hide();
+      }
+     else if (text == 5){
+        j(".date_for_custom").show();
+        j('.select_box').hide();
+        j('.add-button').hide();
+      }
+       
+    else{
+        j('.select_box').hide();
+        j('.add-button').hide();
+        j(".date_for_custom").hide();
+      }
+      
+  });
+
+</script>
+

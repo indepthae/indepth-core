@@ -1,0 +1,28 @@
+<div class="label-field-pair">
+    <label for="batch_id" class="label-batch"><%= t('batch') %></label>
+    <span class="batch_selector">
+        <% if @report_type == "subject_report" %>
+          <%= select :subject_report,:batch, @batches.map{|b| [b.name, b.id]},
+            {:include_blank=>t('select_batch')},
+            {:onChange => "#{remote_function(:url => {:action => "reload_subjects"},
+            :with => "'batch_id='+ value"
+            )}"}%>
+        <% elsif @report_type == "student_report" %>
+          <%= select :student_report,:batch, @batches.map{|b| [b.name, b.id]},
+            {:include_blank=>t('select_batch')},
+            {:onChange => "#{remote_function(:url => {:action => "reload_reports"},
+            :with => "'batch_id='+ value"
+            )}"}%>
+        <% elsif @report_type == 'consolidated_exam_report' %>
+          <%= select :consolidated_exam_report,:batch, @batches.map{|b| [b.name, b.id]},
+            {:include_blank=>t('select_batch')},
+            {:onChange => "#{remote_function(:url => {:action => "reload_consolidated_exams"},
+            :with => "'batch_id='+ value"
+            )}"}%>
+        <% else %>
+          <%= select :stuent_report,:batch, @batches.map{|b| [b.name, b.id]},
+            {:include_blank=>t('select_batch')}
+        %>
+        <% end %>
+    </span>
+</div>

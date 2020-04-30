@@ -1,0 +1,171 @@
+<%  if (rtl?) %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: (link_off.left)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function () {
+        j(".drop_header").hover(
+                function () {
+                    link_off = j(this).offset();
+                    link_width = j(this).width();
+                    link_height = j(this).height();
+                    menu_box = j(this).find(".more-menu-div");
+                    box_width = menu_box.width();
+                    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+                    menu_box.css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                    menu_box.css("display", "block");
+                },
+                function () {
+                    j(this).find(".more-menu-div").css("display", "none");
+                });
+    });
+  </script>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('student_info') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_details') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('student_profile')}", :controller => 'student', :action => 'profile', :id => @student.id %></li>
+            <% if permitted_to? :reports,:student %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('reports_text')}", :controller => 'student',
+                    :action => 'reports', :id => @student %></li>
+            <%end%>
+            <% if permitted_to? :guardians,:student %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('guardians_text')}", :controller => "student",
+                    :action => "guardians", :id => @student.id %></li>
+            <% end %>
+            <% if permitted_to? :email,:student %>
+              <% if @config == 'Online'  %>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('send_email')}", :controller => "student",
+                      :action => "email", :id => @student.id %></li>
+              <%  end %>
+            <%  end %>
+            <% if permitted_to? :remove, :student or permitted_to? :admission1, :student %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('delete_text')}", :controller => 'student',
+                    :action => 'remove', :id => @student.id %></li>
+            <% end %>
+            <li class='drop_header themed_bg themed-dark-hover-background'>
+                <a href="#" class="drop_header_link"><%= t('more') %>&#9660;</a>
+                <ul id="box_1" class="more-menu-div" style="display:none;">
+                    <% if @available_modules.include?('Finance') and permitted_to? :fees, :student%>
+                      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('fees_text')}", :controller => 'student',:action => 'fees', :id => @student.id %></li>
+                    <% end %>
+                    <% FedenaPlugin::ADDITIONAL_LINKS[:student_profile_more_menu].each do |mod| %>
+                      <% if can_access_request? "#{mod[:destination][:action]}".to_sym,"#{mod[:destination][:controller]}".to_sym  %>
+                        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t(mod[:title])}" ,mod[:destination].merge(:id=>@student.id) %></li>
+                      <% end %>
+                    <% end %>
+                    <% if permitted_to? :custom_remark_list, :remarks %>
+                      <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('remarks')}", :controller => 'remarks', :action => 'custom_remark_list' ,:student_id => @student.id%></li>
+                    <% end %>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :transport_student_transport_details, @student %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+
+    <div id="student_profile_heading">
+
+        <div id="profile_picture_display">
+            <% if @student.photo.file? %>
+              <%= image_tag @student.photo.url(:original, false) %>
+            <% else %>
+              <%= image_tag "master_student/profile/default_student.png" %>
+            <% end %>
+        </div>
+
+        <div id ="student_main_info">
+            <h3> <%= @student.full_name %>  </h3>
+            <h4> <%= t('course_text') %> : <%= @student.batch.course.full_name %> </h4>
+            <h4> <%= t('batch') %> : <%= @student.batch.name %> </h4>
+            <h4> <%= t('adm_no') %> : <%= @student.admission_no %> </h4>
+            <% if roll_number_enabled? %>
+              <h4><%= t('roll_no') %> : <%=  @student.roll_number.nil? ? "-" : @student.roll_number  %> </h4>
+            <% end %>
+        </div>
+
+        <div class="extender"> </div>
+
+    </div>
+
+    <% unless flash[:message].nil? %>
+      <p class="flash-msg"> <%= flash[:message] %> </p>
+    <% end %>
+    <div class="extender"> </div>
+    <% unless @transport.nil? %>
+      <div id="new_profile_info_top">
+
+          <div class="profile_info_label_top2"><%= t('mode') %></div>
+          <div class="profile_info_text_top2">
+              <%= @transport.mode_text  %>
+          </div>
+          <% unless (@transport.mode == 3) %>
+            <div class="profile_info_label_top"><%= t('pickup_route') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.pickup_route.name %>
+            </div>
+            
+            <div class="profile_info_label_top"><%= t('pickup_stop') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.pickup_stop.name %>
+            </div>
+            
+            <div class="profile_info_label_top"><%= t('pickup_vehicle') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.pickup_route.vehicle.try(:vehicle_no)||'-' %>
+            </div>
+          <% end %>
+
+          <% unless (@transport.mode == 2) %>
+            <div class="profile_info_label_top"><%= t('drop_route') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.drop_route.name %>
+            </div>
+
+            <div class="profile_info_label_top"><%= t('drop_stop') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.drop_stop.name %>
+            </div>
+            
+            <div class="profile_info_label_top"><%= t('drop_vehicle') %></div>
+            <div class="profile_info_text_top">
+                <%= @transport.drop_route.vehicle.try(:vehicle_no)||'-' %>
+            </div>
+          <% end %>
+
+          <div class="profile_info_label_top"><%= t('fare') %></div>
+          <div class="profile_info_text_top">
+              <%=precision_label @transport.bus_fare%>
+          </div>
+      </div>
+    <% else %>
+      <p class="flash-msg"><%= t('student_did_not_avail_transport') %></p>
+    <% end %>
+
+</div>

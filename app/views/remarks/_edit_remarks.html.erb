@@ -1,0 +1,61 @@
+<%if @target.remark_type=="simple"%>
+  <% form_for :remark, @remark, :url=>"",:html => {:id=>"edit_remarks_#{@object_id}"} do |f| %>
+    <%= f.text_field @symbolized_field_name,:id => "remark_text"%>
+    <%= f.submit t('ok'), :id => 'exam_wise_remarks_submit_button'%>
+    <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link common_remarks_cancel_for_transcript",:id=>"close_#{@object_id}",:object_id=>@object_id,:student_id=>@student_id,:target_id=>@target_id,:onclick=>"close_me1(this)"%>
+  <% end %>
+<%else%>
+  <% form_for :remark, @remark, :url=>"" do |f| %>
+    <%= f.text_field @symbolized_field_name%>
+    <%=f.text_field :remarked_by%>
+    <%= f.submit %>
+  <% end %>
+<%end%>
+<script type="text/javascript">
+  j('form#edit_remarks_<%=@object_id%>').submit(function(e){
+<%= "var target_name = '#{@target_name}'" %>
+<%= "var object_id = '#{@object_id}'" %>
+<%= "var student_id = '#{@student_id}'" %>
+<%= "var page = '#{@page}'" %>
+<%= "var params_hash = '#{@params_hash.to_json}'" %>
+<%= "var general = '#{@target.general}'" %>
+<%= "var load_object_id = '#{@load_object_id}'"%>
+    var parametrs={target_name:target_name,object_id:object_id,student_id:student_id,page:page,params_hash:params_hash,load_object_id:load_object_id}
+    e.preventDefault();
+    var fo=this
+    new Ajax.Request('/remarks/update_remarks',{
+      parameters:this.serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        if(general == 'false')
+        {
+          j('#add_remark_link_for_<%=@object_id%>').replaceWith(resp.responseText);
+        }
+        else
+        {
+          j('#all-remarks').replaceWith(resp.responseText)
+        }
+      }
+    });
+  });
+
+  function close_me1(elm)
+  {
+<%="var object_id = j(elm).attr('object_id')"%>
+    j('#close_'+object_id).parent().prevAll('script').remove();
+    j('#close_'+object_id).parent().remove();
+    if (j('#add_remark_link_for_'+object_id).children().size()==2){
+
+
+      j('#add_remark_link_for_'+object_id).children().first().attr('onclick','completeReq(this)')
+    }
+    else{
+      j('#add_remark_link_for_'+object_id).children().closest('.disabled_link').attr('onclick','edit_normal_remark(this)')
+    }
+    j('#add_remark_link_for_'+object_id).children().show();
+  }
+
+  
+</script>

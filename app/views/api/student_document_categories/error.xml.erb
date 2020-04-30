@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.errors{
+  if @category.present?
+    @category.errors.full_messages.each do |msg|
+      @xml.error(msg)
+    end
+  else
+    @xml.error(t('student_document_categories.not_found'))
+  end
+  }
+%>

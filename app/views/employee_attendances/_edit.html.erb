@@ -1,0 +1,96 @@
+<label class="head_label">
+  <%= t('leave_tracking') %>
+</label>
+
+<% form_remote_for @attendance do |f| %>
+    <%= session_fingerprint_field %>
+  <div id="ajax-edit">
+    <div id="form-errors"></div>
+    <% if @attendance.apply_leave_id.nil? and (@attendance.attendance_date >= @employee_leave.reset_date && @attendance.created_at >= @employee_leave.reseted_at)%>
+      <div class="label-field-pair" id="emp_name">
+        <label for="leave_type"><%= t('employee_name') %></label>
+        <div class="text-input-bg"><b><%= @employee.first_name %></b>
+        </div>
+      </div>
+
+      <div class="label-field-pair" id="date">
+        <label for="leave_type"><%= t('date_text') %></label>
+        <div class="text-input-bg"><%= format_date(@date, :short) + (@attendance.is_half_day ? "&nbsp;(#{t('half_day')})" : "") %>
+        </div>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="leave_type"><%= t('leave_type') %></label>
+        <div class="text-input-bg"><%= f.select :employee_leave_type_id, @leave_types.map {|c| [c.name, c.id]} ,{} ,:onchange => "show_additional_leave_warning();"%></div>
+      </div>
+
+      <div class="status">
+        <div class="label-field-pair">
+          <div class="opt"><%= radio_button("employee_attendance","is_half_day",false,
+              { :onchange => "show_additional_leave_warning();", :id => 'full_day'}) %>
+            <label for="full_day"><%= t('full_day') %></label></div>
+          <div class="opt"> <%= radio_button("employee_attendance","is_half_day",true, {:onchange => "show_additional_leave_warning();", :id => 'half_day'}) %>
+            <label for="half_day"><%= t('half_day') %></label></div>
+        </div>
+      </div>
+
+      <%if @is_additional.present?%>
+        <div class="additional_leave_notification"><div class="error-icon"></div>
+          <div class="error-msg"><%= t('additional_leave_notification') %></div>
+          <% if  @lop_status && @deducted%>
+            <div class="info"><%= t('lop_is_deducted') %></div>
+          <% elsif @lop_status && @attendance.attendance_date >= @employee_leave.reset_date && @attendance.created_at >= @employee_leave.reseted_at%>
+            <div class="label-checkbox-pair">
+              <%= hidden_field_tag 'employee_additional_leave[is_deductable]', false %>
+              <%= check_box_tag 'employee_additional_leave[is_deductable]', true, @deductable%>
+              <label for="employee_additional_leave_is_deductable"><%= t('deduct_lop_for_additional_leaves') %></label>
+            </div>
+          <% end %>
+          <%= hidden_field_tag :is_additional_leave %>
+        </div>
+      <% end %>
+
+      <div id="reason">
+        <div class="label-field-pair">
+          <label for="leave_type"> <%= t('reason') %></label>
+          <div class="text-area-bg"><%= f.text_area :reason, :rows => 20, :cols => 20 %></div>
+        </div>
+      </div>
+      <div class="extender"></div>
+      <hr></hr>
+      <div class="center">
+        <%= f.submit "#{t('submit')}", :class => 'submit-button', :confirm => "#{t('delete_confirm_msg')}" %>
+        <div id="delete-button"><%= link_to_remote("#{t('delete_text')}",:url => employee_attendance_path(@attendance),:method =>'delete',:confirm => "#{t('delete_confirm_msg')}") %></div>
+      </div>
+    <% elsif @attendance.apply_leave_id.nil? and !(@attendance.attendance_date >= @employee_leave.reset_date && @attendance.created_at >= @employee_leave.reseted_at) %>
+      <%= render :partial => 'view_attendance' %>
+      <% if @employee_leave.is_active and @attendance.employee_leave_type.is_active %>
+        <div class="center">
+          <div id="delete-button"><%= link_to_remote("#{t('delete_text')}",:url => employee_attendance_path(@attendance),:method =>'delete',:confirm => "#{t('delete_confirm_msg')}") %></div>
+        </div>
+      <% end %>
+    <% else %>
+      <%= render :partial => 'leave_application_edit' %>
+    <% end %>
+
+
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  emp_leaves = <%= @employee_leaves %>
+  half_day = <%= @attendance.is_half_day %>
+  emp_leaves = <%= @employee_leaves %>
+  emp_leave_types = <%= @employee_leave_types %>
+  payroll_group = <%= @payroll_group_lop_status %>
+  if (half_day)
+    checked = true
+  else
+    checked = false
+
+  if (checked)
+    j("input#half_day").attr("checked", true)
+  else
+    j("input#full_day").attr("checked", true)
+</script>

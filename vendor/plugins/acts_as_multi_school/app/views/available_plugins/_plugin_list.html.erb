@@ -1,0 +1,31 @@
+<% edit_path = "edit_#{owner_type}_available_plugin_path" %>
+<% add_path = "new_#{owner_type}_available_plugin_path" %>
+<div class="grid-list">
+  <% unless @owner.class.name!="School" and @owner.admin_user.nil? and @owner.parent_group.nil? %>
+    <% if @owner.available_plugin && !@owner.available_plugin.new_record? %>
+      <% @owner.available_plugin.plugins.each_with_index do |plugin,i| %>
+        <label>
+          <%= plugin == "fedena_google_sso" ? "Google SSO" : plugin.sub(/^fedena_/,'').titleize %>
+        </label>
+      <% end %>
+      <% if permitted_to? :edit, @available_plugin, :context=>:available_plugins %>
+        <fieldset class="width-auto">
+          <%= link_to "Edit", send(edit_path,@owner), :class=>"button-grey-small float-right-with-margin" %>
+        </fieldset>
+      <% end %>
+    <% else %>
+      <fieldset>
+        <label>No assigned plugins.</label>
+        <% if permitted_to? :new, @available_plugin, :context=>:available_plugins %>
+          <%= link_to "Add", send(add_path,@owner), :class=>"button-grey-small float-right-with-margin" %>
+        <% end %>
+      </fieldset>
+    <% end %>
+  <% else %>
+    <% @owner.class.all_plugins.each_with_index do |plugin,i| %>
+      <label>
+        <%= plugin == "fedena_google_sso" ? "Google SSO" : plugin.sub(/^fedena_/,'').titleize %>
+      </label>
+    <% end %>
+  <% end %>
+</div>

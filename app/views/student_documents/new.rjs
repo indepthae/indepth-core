@@ -1,0 +1,12 @@
+category_id = @category.new_record? ? (@category.registered ? 'registered' : 'nil') : @category.id
+if @initial || @errors.present?
+  page.replace_html "document_upload_form_#{category_id}", :partial => 'new'
+  page.replace_html "form-errors_#{category_id}", :partial => 'errors', :object => @document if @document.errors.present?
+  page << "after_form_load('#{category_id}');"
+elsif @saved.present?  
+#  render :partial => 'documents_table', :locals => {:documents => documents, :category => category} 
+  page.replace_html "category_table_#{category_id}", :partial => "documents_table", :locals => {:documents => @documents, :category => @category}
+  page.replace_html 'flash_box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+  page << "after_form_save('#{category_id}');"
+#  page << "Modalbox.hide();"
+end

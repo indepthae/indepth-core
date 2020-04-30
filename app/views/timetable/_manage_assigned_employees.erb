@@ -1,0 +1,97 @@
+<% subjects = @batch.subjects if @batch.present? %>
+<% if(@subject.present? or subjects.present?) %>
+  <% @subject = subjects.first if subjects.present? %>
+  <div class="manage-heading"> 
+      <!--%= "#{t('subject')} - #{@subject.name}" %--> 
+
+      <div class="subject_title_label">
+          <label>
+              <%= t('subject') %>
+          </label>
+          <div class="subject_title">
+              <%= @subject.name %>
+          </div>
+      </div>
+
+      <div class="subject_hour_label">
+          <label>
+              <%= t('max_weekly_classes') %>
+          </label>
+          <div class="subject_hours">
+              <%= @subject.max_weekly_classes %>
+          </div>
+      </div>
+  </div>
+  <div class="employees-box">
+      <% if @subject.employees.present?  %>
+        <div class="assigned_employees">
+            <div class="heading"> <%= t('assigned_employees') %> </div>
+            <table border="1" class="employee-table" >
+                <tr class="employee-header-row employee-row">
+                    <th class="employee-col-1"> <%= t('employee_name') %> </th>
+                    <th class="employee-col-2"> <%= t('alloted_working_hours') %> </th>
+                    <th class="employee-col-3"> &nbsp; </th>
+                </tr>
+                <% emp_ids = @subject.employees.map(&:id) %>
+                <% @subject.employees.each do |emp| %>
+
+                  <tr class="employee-row">
+                      <td class="employee-col-1"> 
+                          <%= "#{emp.full_name} (&rlm;#{emp.employee_number})" %> 
+                          <% if emp.active_subject_hours > 0 %>
+                            <table class="employee_allocation_tooltip">
+                                <tr class="employee_allocation_tooltip_row">
+                                    <td class="emp-coltip-01"><%= "#{t('course_text')}-#{t('batch')}" %></td>
+                                    <td class="emp-coltip-02"><%= "#{t('subject_name')}" %></td>
+                                    <td class="emp-coltip-03"></td>
+                                </tr>
+                                <% emp.active_subjects.each do |subject| %>
+                                  <tr class="employee_allocation_tooltip_row">
+                                      <td class="emp-coltip-01"><%= "#{subject.batch.full_name}" %></td>
+                                      <td class="emp-coltip-02"><%= "#{subject.name}" %></td>
+                                      <td class="emp-coltip-03"><%= "(&rlm;#{subject.max_weekly_classes})" %></td>
+                                  </tr>
+                                <% end %>
+                            </table>
+                          <% end %>
+                      </td>
+                      <% emp_hours = emp.employee_hours %>
+                      <% emp_hours_text = emp_hours > 0 ? " #{t('of')} &rlm;#{emp_hours}" : "" %>
+                      <!-- td class="employee-col-2"> < %= "#{@subject.max_weekly_classes}#{emp_hours_text}" %></td -->
+                      <td class="employee-col-2"> <%= "#{emp.active_subject_hours}#{emp_hours_text}" %></td>
+                      <td class="employee-col-3">                
+                          <%= link_to_remote t('remove'), :url => {:controller => :timetable, :action => :remove_employee, :emp_id => emp.id, :subject_id => @subject.id}, :html => {:class => "themed_hover_text"}, :before => "j('#remove_emp_#{emp.id}').show()" %>
+                          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "remove_emp_#{emp.id}", :style =>"display: none;" ) %>
+                      </td>
+                  </tr>
+                <% end %>
+            </table>
+        </div>
+      <% end %>
+
+      <% if @employee_departments.present? %>
+        <div class="available_employees">
+            <div class="heading"> <%= t('available_employees') %> </div>
+            <div class="department_selector">
+                <div class="label">
+                    <%= t('department') %>
+                    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader_dept", :style =>"display: none;" ) %>
+                </div>
+                <div class="list">
+                    <%= select :employee_department, :id,
+                      @employee_departments.map {|c| [c.name, c.id] },
+                      {:prompt => t('select_a_department')},
+                      {
+                      :onchange => "#{remote_function(
+                      :url => { :action => 'update_employee_list' },
+                      :with => "'employee_department_id='+value+'&'+'subject_id='+#{@subject.id}",
+                      :before => "Element.show('loader_dept')",
+                      :success => "Element.hide('loader_dept')"  )}"} %>
+                </div>
+            </div>
+            <div id="available-employees-list"> </div>
+        </div>
+      <% end %>
+  </div>
+<% end %>
+

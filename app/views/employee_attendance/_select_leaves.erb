@@ -1,0 +1,92 @@
+<div id="MB_lop_frame">
+  <div class="part" id="MB_header_part">
+    <a class="remove-icon" href="#" onclick="hideLopModalBox(this)" id="close"></a>
+    <h4><%= "#{t('loss_of_pay')} - #{t('additional_leaves')}" %></h4>
+  </div>
+
+  <div class="part">
+    <div class="fields-details">
+      <div class="field-label"><%= t('employee_text') %></div>
+      <div class="fields-val"><%= @employee.full_name %></div>
+    </div>
+    <div class="fields-details" id="add_leaves">
+      <div class="field-label"><%= t('total_deductable_lop_leaves') %></div>
+      <div class="fields-val"><%= @leave_count %></div>
+    </div>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="check_all"><input type="checkbox" class="select_all" onclick="checkAll()" checked="true"/></td>
+        <td class="from"><%= t('date_text') %></td>
+      </tr>
+      <% @additional_leaves.each do |leave| %>
+        <tr class="tr-<%= cycle('even', 'odd')%>">
+          <td class="check_all"><input type="checkbox" value="<%= leave[:record] %>" checked="<%= leave[:is_half_day]%>" class="select_leave" onclick="update_selected_count();" day ="<%= leave[:day]%>"/></td>
+          <td class="from"><%= "#{format_date(leave[:record], :short)}" + (leave[:half_day]  ? "&nbsp;(#{t('half_day')})" : "")  %></td>
+        </tr>
+      <% end %>
+
+    </table>
+  </div>
+
+  <div class="part" id="MB_footer">
+    <% count = @additional_leaves.count %>
+    <div id="selected-leaves" class="fields-details"><%= "#{count} #{t('additional_leave_text', {:count => @leave_count})}" %></div>
+    <div class="submit_button" id ="submit_button"><%= t('select_leaves') %></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  update_selected_count();
+  count = 0;
+  function checkAll(){
+    if (j(".select_all").prop("checked")){
+      j("#MB_window input.select_leave").prop('checked', true);
+    }else{
+      j("#MB_window input.select_leave").prop('checked', false);
+    }
+    update_selected_count();
+  }
+
+  j(".check_all").click(function(){
+    update_field();
+  })
+
+  j(".select_all").click(function(){
+    update_field();
+  })
+  function update_field(){
+    var selected_dates = [];
+    var dedutable_dates = []
+    j("#MB_window input.select_leave").each(function(i,v){
+      var hsh = {};
+      hsh[j(v).val()] = j(v).prop("checked");
+      selected_dates.push(hsh);
+      if(j(v).prop("checked"))
+      dedutable_dates.push(j(v).val());
+    })
+    j("#applied_leave_deductable_dates").val(JSON.parse(JSON.stringify(selected_dates)));
+    j("#dates").val(JSON.parse(JSON.stringify(dedutable_dates)));
+  }
+
+  function update_selected_count(){
+    count = 0;
+    j("#MB_window input:checked.select_leave").each(function(i,v){
+      count+= parseFloat(j(v).attr("day"));
+    });
+    if (count == j("#MB_window input.select_leave").length) {
+      j(".select_all").prop("checked", true);
+    }
+
+    if (count == 0){
+      j(".select_all").prop("checked", false);
+    }
+    j('#selected-leaves').text(count + " "+ '<%= t('additional_leave_text',{:count => count}) %>');
+    j('#select_status').text(count + " "+ '<%= t('additional_leave_text',{:count => count}) %>');
+  }
+
+  j("#MB_footer #submit_button").click(function(){
+    hideLopModalBox();
+
+  })
+
+</script>

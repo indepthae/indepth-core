@@ -1,0 +1,35 @@
+<fieldset>
+  <label>School Name</label>
+  <label class="value">
+    <%=h @school.name %>
+  </label>
+  <%= link_to "Edit",edit_school_path(@school), :class=>"button-grey-small float-right-with-margin" if permitted_to? :edit, @school, :context=>:schools %>
+</fieldset>
+
+<fieldset>
+  <label>Inherit Email Settings</label>
+  <label class="value">
+    <%=h @school.inherit_smtp_settings %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Inherit SMS Settings</label>
+  <label class="value">
+    <%=h @school.inherit_sms_settings %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>GPS Enabled</label>
+  <label class="value">
+    <%=h @school.gps_enabled %>
+  </label>
+</fieldset>
+
+<fieldset>
+  <label>Owned by</label>
+  <label class="value">
+    <%=link_to @school.school_group.name, :controller=>@school.school_group.type.pluralize.underscore, :action=>:show, :id=>@school.school_group_id %>
+  </label>
+</fieldset>

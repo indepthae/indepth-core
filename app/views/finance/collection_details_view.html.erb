@@ -1,0 +1,213 @@
+<%- # Fedena
+    #Copyright 2010 Foradian Technologies Private Limited
+    #
+    #This product includes software developed at
+    #Project Fedena - http://www.projectfedena.org/
+    #
+    #Licensed under the Apache License, Version 2.0 (the "License");
+    #you may not use this file except in compliance with the License.
+    #You may obtain a copy of the License at
+    #
+    #  http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #Unless required by applicable law or agreed to in writing,
+    #software distributed under the License is distributed on an
+    #"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    #KIND, either express or implied.  See the License for the
+    #specific language governing permissions and limitations
+    #under the License.   -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('fees_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('collection_details') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :finance_collection_details_view, @fee_collection %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div class="info">
+    <div class="field-pair">
+      <div class="name"><%= t('fee_collection_name') %></div>
+      <div class="val themed_text"><span>:</span><%= @fee_collection.name %></div>
+    </div>
+    <div class="field-pair">
+      <div class="name"><%= t('fee_category_name') %></div>
+      <div class="val themed_text">
+        <span>:</span><%= @fee_collection.fee_category.name %>
+      </div>
+    </div>
+    <% if @fee_collection.fine %>
+        <div class="field-pair">
+          <div class="name"><%= t('fine_name') %></div>
+          <div class="val themed_text"><span>:</span><%= @fee_collection.fine.name %></div>
+        </div>
+    <% end %>
+    <div class="field-pair">
+      <div class="name"><%= t('start_date') %></div>
+      <div class="val themed_text">
+        <span>:</span><%= format_date(@fee_collection.start_date) %>
+      </div>
+    </div>
+    <div class="field-pair">
+      <div class="name"><%= t('due_date') %></div>
+      <div class="val themed_text">
+        <span>:</span><%= format_date(@fee_collection.due_date) %>
+      </div>
+    </div>
+    <% if @fee_collection.fee_account.present? %>
+    <div class="field-pair">
+          <div class="name"><%= t('fee_account_text') %></div>
+      <div class="val themed_text">
+            <span>:</span><%= @fee_collection.fee_account.name %>
+      </div>
+    </div>
+    <% end %>
+    <div class="field-pair">
+      <div class="name"><%= t('financial_year_name') %></div>
+      <div class="val themed_text">
+        <span>:</span><%= @fee_collection.financial_year.try(:name) || t('financial_years.default_financial_year') %>
+      </div>
+    </div>
+    <div class="extender"></div>
+  </div>
+
+
+  <% unless @particulars.empty? %>
+      <div class="particulars">
+        <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+            <%
+               case date_format
+                 when 2
+                   dateformat = 'MDY'
+                 when 3
+                   dateformat = 'YMD'
+                 else
+                   dateformat = 'DMY'
+               end
+            %>
+            <td><%= t('sl_no') %></td>
+            <td><%= t('particulars') %></td>
+            <td><%= t('master') %></td>
+            <% if @fee_collection.tax_enabled? %>
+                <td><%= t('tax_slab_text') %></td>
+            <% end %>
+            <td><%= t('student_category') %></td>
+            <td><%= t('student_name') %></td>
+            <td><%= t('amount') %> (<%= currency %>)</td>
+            <td><%= t('created_date') %></td>
+          </tr>
+          <tr class="tr-blank"></tr>
+          <% @total_fee=0 %>
+          <% table_col_width = @fee_collection.tax_enabled? ? 'col-3' : 'col-3-2' %>
+          <% table_col_width_2 = @fee_collection.tax_enabled? ? 'col-4' : 'col-4-2' %>
+          <% @particulars.each_with_index do |fees, i| %>
+              <tr class="tr-<%= cycle("odd", "even") %>">
+                <td class="col-5"><%= i+1 %></td>
+                <td class="<%= table_col_width_2 %>">
+                  <%= fees.name %>
+                </td>
+                <td class="<%= table_col_width_2 %>">
+                  <%= fees.master_fee_particular.try(:name) || '-' %>
+                </td>
+                <% if @fee_collection.tax_enabled? %>
+                    <td class="col-10">
+                      <%= fees.try(:slab_name) || '-' %>
+                    </td>
+                <% end %>
+                <td class="<%= table_col_width %>">
+                  <% if fees.receiver_type == "StudentCategory" %>
+                      <%= fees.receiver.name %>
+                  <% else %> -
+                  <% end %>
+                </td>
+                <td class="<%= table_col_width %>">
+                  <% if fees.receiver_type == "Student" %>
+                      <%= fees.student_name %>
+                  <% else %> -
+                  <% end %>
+                </td>
+                <td class="<%= table_col_width %>">
+                  <%= precision_label(fees.amount) %>
+                </td>
+                <% @total_fee=@total_fee+fees.amount %>
+                <td class="<%= table_col_width %>" title="<%= format_date(fees.created_at, :format => :long_date) %>">
+                  <%= format_date(fees.created_at, :format => :short_date) %>
+                </td>
+
+              </tr>
+          <% end %>
+
+
+        </table>
+      </div>
+  <% end %>
+
+
+  <% unless @discounts.blank? %>
+
+      <div class="discount">
+
+        <table id="listing">
+          <tr class="tr-head">
+            <td><%= t('name') %></td>
+            <td><%= t('master') %></td>
+            <td><%= t('student_category') %></td>
+            <td><%= t('student_name') %></td>
+            <td><%= t('particular') %></td>
+            <td><%= t('discount') %></td>
+          </tr>
+
+          <% @discounts.each do |f| %>
+              <tr class="tr-<%= cycle('odd', 'even') %> ">
+                <td class="col-3"><%= f.name %></td>
+                <% if f.master_receiver_type == "StudentCategory" %>
+                    <td class="col-3">
+                      <%= f.master_fee_discount.try(:name) || '-' %>
+                    </td>
+                    <td class="col-3"><%= f.category_name %></td>
+                    <td class="col-3"></td>
+                    <td class="col-3"></td>
+                <% elsif f.master_receiver_type == "Student" %>
+                    <td class="col-3">
+                      <%= f.master_fee_discount.try(:name) || '-' %>
+                    </td>
+                    <td class="col-3"></td>
+                    <td class="col-3"><%= f.student_name %></td>
+                    <td class="col-3"></td>
+                <% elsif f.master_receiver_type == "Batch" %>
+                    <td class="col-3">
+                      <%= f.master_fee_discount.try(:name) || '-' %>
+                    </td>
+                    <td class="col-3"></td>
+                    <td class="col-3"></td>
+                    <td class="col-3"></td>
+                <% elsif f.master_receiver_type == "FinanceFeeParticular" %>
+                    <td class="col-3">
+                      <%= f.master_fee_discount.try(:name) || '-' %>
+                    </td>
+                    <td class="col-3">
+                      <%= f.receiver_type=='StudentCategory' ? f.receiver.name : '' %>
+                    </td>
+                    <td class="col-3">
+                      <%= f.receiver_type=='Student' ? f.receiver.full_name : '' %>
+                    </td>
+                    <td class="col-3"><%= f.master_receiver.name %></td>
+                <% end %>
+                <td class="col-3">
+                  <%= "#{precision_label(f.discount.to_f)} #{(f.is_amount? ? "" : '(%)')}" %>
+                </td>
+
+              </tr>
+          <% end %>
+        </table>
+      </div>
+  <% end %>
+
+</div>
+
+

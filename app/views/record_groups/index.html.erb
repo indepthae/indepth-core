@@ -1,0 +1,48 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_record_groups') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <%  if permitted_to? :new,:record_groups %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_record_group')}", :url => { :action => 'new' } %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-box"></div>
+  <div id="rg_text"><%=t('record_groups')%></div>
+  <div id="rg_desc"><%=t('record_group_desc')%></div>
+  <div id="record_group"><%=render :partial=>'record_groups'%></div>
+  <div id="modal-box" style="display:none;"></div>
+</div>
+
+
+<script type="text/javascript">
+  j("#sortable tbody").sortable({
+    start: function( event, ui ) {
+      j(this).children('tr.category').addClass('my_class');
+    },
+    stop: function( event, ui ) {
+      j(this).children('tr.category').removeClass('my_class');
+
+      updateSortorder();
+
+    },
+    items: "tr:not(.disable_sort)"
+  }).disableSelection();
+
+  function updateSortorder(){
+
+    j('tr:visible.category').each(function (i) {
+      j(this).attr({id : i + 1});
+      j(this).children('#sort_order').val(i+1);
+    });
+  }
+</script>

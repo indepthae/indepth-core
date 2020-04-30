@@ -1,0 +1,60 @@
+<%content_for :head do%>
+  <%= javascript_include_tag "jquery/fa_scores.min.js" %>
+  <%= javascript_include_tag "render_pdf.js" %>
+<%end%>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%=t('student_reports')%></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :batch_reports, @student %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div class="report_container_box">
+        <div class="header"><%= t('previous_batch_reports') %></div> 
+
+        <div class="batch_student">
+            <div class="label-field-pair">
+                <label for="batch_id"><%= t('course') %></label>
+                <span class="student_details">: <%= @batch.course.full_name%></span>
+            </div>  
+            <div class="label-field-pair">
+                <label for="batch_id"><%= t('batch') %></label>
+                <span class="student_details">: <%= @batch.name%></span>
+            </div>  
+            <div class="label-field-pair">
+                <label for="batch_id"><%= t('student_text') %></label>  
+                <span class="student_details">: <%= @student.full_name %></span>
+            </div>
+        </div>  
+        <div class="select_report">
+            <div class="label-field-pair">
+                <label for="batch_id"><%= t('report_type') %></label>
+                <span class="student_details">
+                    <%=  select_tag :report_type, options_for_select([
+                        ["#{t('select_report_type')}","select"],
+                        ["#{t('exam_report')}","exam_report"],
+                        ["#{t('term_report')}","term_report"],
+                        ["#{t('planner_report')}","plan_report"]],
+                      :selected => "select"),
+                      {:onChange => "#{remote_function(:url =>select_report_assessment_reports_path,:method=>:get,
+                      :with => "'report_type='+ value +'&student_id=#{@student.id}'+'&batch_id=#{@batch.id}'"
+
+                      )}"} %>
+                </span>
+            </div>  
+            <div id="report_selector" class="label-field-pair"></div>
+        </div>
+    <div id='student_report'></div>
+        <div id="remarks_section"></div>
+    </div> 
+    <div class="extender"></div>
+    <div class="edit-pdf-group" id="pdf_link"></div>
+</div>  
+
+<script type="text/javascript">
+    j('#add_remark_link').hide();
+</script>

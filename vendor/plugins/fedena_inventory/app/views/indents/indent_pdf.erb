@@ -1,0 +1,105 @@
+
+<div id="page-yield">
+
+
+
+  <div class="hor_line"></div>
+  <div id ="main_info">
+    <h2><%= t('indent') %>  </h2>
+  </div>
+  <div class="hor_line"></div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('user_text')}" %></div>
+    <div class="label-output">:  <%=h @indent.user.first_name %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('store')}" %></div>
+    <div class="label-output">:  <%=h  @indent.store.name unless @indent.store.nil? %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('indent_no')}" %></div>
+    <div class="label-output">:  <%=h @indent.indent_no %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('expected_date')}" %></div>
+    <div class="label-output">:  <%=h format_date(@indent.expected_date,:format=>:long_date) %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('status')}" %>:</div>
+    <div class="label-output">:  <%=h @indent.status %></div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('employee_department')}" %></div>
+    <div class="label-output">:
+      <%=h @indent.user.employee_record.employee_department.name unless @indent.user.nil?  %>
+    </div>
+  </div>
+
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('manager')}" %></div>
+    <div class="label-output">:  <%=h @indent.manager.first_name unless @indent.manager.nil? %></div>
+  </div>
+
+  <div class="label-field-show">
+    <div class="label-container1"><%= "#{t('description')}" %></div>
+    <div class="label-output">:  <%=h @indent.description %></div>
+  </div>
+
+
+  <div class="label-container1"></div>
+
+
+
+
+
+  <table id="pdf-table" width="100%" cellspacing="0">
+    <tr class="table-header">
+      <td class="col-pdf"><%= t('sl_no') %></td>
+      <td class="col-pdf"><%= t('item') %></td>
+      <td class="col-pdf"><%= t('required') %></td>
+      <td class="col-pdf"> <%= t('quantity') %></td>
+      <td class="col-pdf"> <%= t('issued') %></td>
+      <td class="col-pdf"> <%= t('issued_type') %></td>
+      <td class="col-pdf"><%= t('price') %></td>
+      <td class="col-pdf"><%= t('total') %></td>
+    </tr>
+    <% p = 0  %>
+    <% c= 'even' %>
+    <% @indent.indent_items.each_with_index do |i, p| %>
+      <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+        <td class="col-pdf"><%= p+=1 %></td>
+        <td class="col-pdf"> <%=h  i.store_item.item_name  unless i.store_item.nil? %></td>
+        <td class="col-pdf"> <%=h  i.required %></td>
+        <td class="col-pdf"> <%=h  i.quantity %></td>
+        <td class="col-pdf"> <%=h  i.issued  %></td>
+        <td class="col-pdf"><%=h i.issued_type %></td>
+        <td class="col-pdf"><%=h precision_label i.price %></td>
+        <td class="col-pdf"><%=h precision_label(i.required *  i.price + (i.required * i.price * i.store_item.tax * 0.01)) %></td>
+      </tr>
+    <% end %>
+
+    <tr class="<%= cycle(c,(["odd","even"]-[c]).first) %>">
+      <td colspan="7" class="col-8"><%= t('grand_total') %></td>
+      <td class="col-pdf"> <%=h precision_label @total %></td>
+    </tr>
+  </table>
+
+
+
+</div>

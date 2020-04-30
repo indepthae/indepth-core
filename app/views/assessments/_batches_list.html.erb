@@ -1,0 +1,27 @@
+<div class="label-field-pair">
+    <label for="exam_group"><%= t('batches_text') %></label>
+    <div class="text-input-bg">
+        <%= select_tag :batch_id, options_for_select([["#{t('all_batches')}",'All']] + (@batches||[]).map { |c| [c.name, c.id] }, :selected => @batch.try(:id)||"All"), :disabled => @batches.blank? %>
+    </div>
+    
+</div>
+<% if @batches.present? %>
+  <div class="submit-button" onClick="render_timetable();"><%= t('view_exam_timetable') %></div>
+  <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader3",
+      :style =>"display: none;" ) %>
+<% else %>
+  <div class="submit-button disabled-button"><%= t('view_exam_timetable') %></div>
+<% end %>
+<script type="text/javascript">
+  render_timetable = function () {
+    <%=
+        "#{remote_function(:url => {:action => "fetch_timetables"},
+        :with => "'batch_id='+$('batch_id').value+'&course_id='+'#{@course.id}'+'&group_id='+'#{@assessment_group.id}'",
+        :before => "Element.show('loader3')",
+        :success => "Element.hide('loader3')")}"
+      %>
+  }
+</script>

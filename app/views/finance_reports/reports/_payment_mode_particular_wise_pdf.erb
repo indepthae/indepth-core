@@ -1,0 +1,48 @@
+<% if @report_hash.present? and @report_hash[:master_particulars].present? %>
+    <div id="report-data">
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="report_result">
+        <tr class="tr-head">
+          <td class="col1 sl_no fixed-header fee_header"><%= t('sl_no') %></td>
+          <td class="col1 batch_name fixed-header fee_header"><%= t('finance_reports.particular_head') %></td>
+          <td class="col1 row_total fixed-header fee_header"><%= t('total') %></td>
+
+          <% @report_hash[:payment_modes_list].each do |mode_name| %>
+              <td class="col1 amount_col"><%= mode_name %></td>
+          <% end %>
+        </tr>
+        <% i = 0 %>
+        <% @report_hash[:master_particulars].each_with_index do |master_particular, i| %>
+            <% i += 1 %>
+            <tr>
+              <td class="col1 sl_no"><%= i %></td>
+              <td class="col1 batch_name"><%= master_particular.name %></td>
+              <td class="col1 row_total">
+                <%= precision_label(@report_hash[:payment_modes_data][master_particular.id][:total]) %>
+              </td>
+
+              <% @report_hash[:payment_modes_list].each do |mode_name| %>
+                  <td class="col1 amount_col">
+                    <% v = @report_hash[:payment_modes_data][master_particular.id][:mode_totals][mode_name] %>
+                    <%= v.is_a?(Hash) ? '-' : precision_label(v) %>
+                  </td>
+              <% end %>
+            </tr>
+        <% end %>
+        <!-- grand totals -->
+        <tr>
+          <td class="col1 grand-total-col" colspan="2">
+            <%= t('grand_total') %>
+          </td>
+          <td class="col1 row_total report-total-col"><%= precision_label(@report_hash[:grand_totals][:total]) %></td>
+
+          <% @report_hash[:payment_modes_list].each do |mode_name| %>
+              <td class="col1 amount_col report-total-col">
+                <%= precision_label(@report_hash[:grand_totals][:mode_totals][mode_name]) %>
+              </td>
+          <% end %>
+        </tr>
+      </table>
+    </div>
+<% else %>
+    <%= t('no_results_found') %>
+<% end %>

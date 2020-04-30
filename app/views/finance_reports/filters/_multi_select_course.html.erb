@@ -1,0 +1,20 @@
+<div id="list_courses">
+    <div class="label-field-pair">
+        <label for="course"><%= t('course') %></label>
+        <div class="text-input-bg">
+            <%= select_tag "transaction_report[course_id]", options_from_collection_for_select(@courses, "id", "course_name"),
+              {:multiple => true, :id => 'course_filter', :onchange => "update_batch_list(this)"} %>
+            <%= error_message_box(t('cant_be_blank')) %>
+        </div>
+    </div>
+</div>    
+<div id="list_batches">
+</div>
+
+<script type="text/javascript">
+  j('#course_filter').multipleSelect({
+      placeholder: '<%= t('select_course') %>',
+      countSelected: '# <%= t('courses_text') %>',
+      noMatchesFound: '<%= t('no_courses_present') %>'
+  });
+</script>

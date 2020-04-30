@@ -1,0 +1,25 @@
+<div class="text-input-bg spl_position"><%= select :record_group, :id, @record_groups.map { |rg| [rg.name, rg.id] },{:prompt => "#{t('any_record_group')}"} %>
+  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+</div>
+<script type="text/javascript">
+  j('#record_group_id').change(function(){
+    if(j(this).val() != ""){
+      j('#form_type').val('specific');
+    }
+    j.ajax({
+      type: 'POST' ,
+      url: "/student_records/new",
+      data : {
+        rg_id : j(this).val(),
+        batch_id: <%=@batch.id%>,
+        id: j('#student_id').val()
+      },
+      beforeSend : function(){
+        j('#loader1').show();
+      },
+      success : function() {
+        j('#loader1').hide();
+      }
+    });
+  });
+</script>

@@ -1,0 +1,40 @@
+
+<h1><%= @school_group.name %></h1>
+<% form_for :whitelabel_config do |f| %>
+  <%= f.error_messages %>
+  <h2>WhiteLabel Settings</h2>
+
+  <%= hidden_field_tag "id", @school_group.id %>
+
+  <%= f.label :company_name %>
+  <%= f.text_field 'company_name', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['company_name'], :class=>'text', :id=>'username' %>
+
+  <%= f.label :company_url %>
+  <%= f.text_field 'company_url', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['company_url'], :class=>'text', :id=>'company_url' %>
+
+
+  <div class='form-actions'>
+    <%= f.submit 'Save', :class  => 'default btn', :onClick=>"return check_before_submit();" %>
+    <%= link_to 'Delete', { :action=>'remove_whitelabel_settings', :id=>@school_group.id }, :confirm=>"Are you sure?",:class  => 'btn-danger btn' %> <br/>
+  </div>
+
+
+<% end %>
+
+<script type="text/javascript">
+
+ function check_before_submit()
+ {
+   var th_is=$("#company_url");
+   if((th_is.val().indexOf("http://") ==-1) && (th_is.val().indexOf("https://") ==-1))
+   {
+     alert("URL should begin with http:// or https://");
+     return false;
+   }
+   else
+   {
+     return true;
+   }
+ }
+</script>
+

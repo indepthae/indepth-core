@@ -1,0 +1,33 @@
+<label for="_report_type" class="select-box-label"><%= t('report') %></label>
+<%= select '', :report_type, @report_types, :prompt => t('select_report') %>
+<%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader3",
+                :class => "loader_style",
+                :style =>"display: none;" ) %>
+
+<script text="script/javascript">
+    j('#_report_type').change(function () {
+      j.ajax({
+          url: "update_reportable",
+          type: 'POST',
+          data: {
+              batch_id: get_batch_id(),
+              report_type: get_report_type(),
+              assessment_plan_id: get_assessment_plan_id(),
+          },
+          beforeSend: function()
+          {
+              j('#loader3').show();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j('#loader3').hide();
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+</script>

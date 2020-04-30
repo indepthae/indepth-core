@@ -1,0 +1,48 @@
+<%if params[:d].present? %>
+  <%=stylesheet_link_tag 'cce_reports/cce_full_exam_report.css'%>
+<%end%>
+<div id ="student_full_report">
+    <div id="report_head" class="hedder_div">
+        <%if @general_records["ReportHeader"] == "0"%>
+          <div id="school_logo" class="school_logo">
+              <%if current_school_detail.logo.present?%>
+                <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+              <%else%>
+                <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+              <%end%>
+          </div>
+          <div id="school_details" class="school_details">
+              <div id="school_name_header"><span> <%=@config[:institution_name]%></span></div>
+              <div class="details_label"> <label class="width_100">Address</label><span>:</span><label class="long_label"><%=@config[:institution_address]%></label> </div>
+              <div class="details_label"> <div class="details_label_left"><label class="width_100">Affiliation No</label><span>:</span><label class="affliation_text"><%=@general_records['AffiliationNo']%></label></div> <div class=<%=@config[:institution_phone_no].present? ? "details_label_right" : "details_label_left_margin_60_left"%>>Phone No. : <%=@config[:institution_phone_no]%></div>  </div>
+              <div class="details_label full_width"><label class="width_100">Email Id</label><span>:</span><label class="long_label"><%=@config[:institution_email]%></label> </div>
+              <div class="details_label full_width"> <label class="width_100">Website</label><span>:</span><label class="long_label"><%=@config[:institution_website]%></label></div>
+          </div>
+          <div id="cce_logo" class="cce_logo">
+              <img alt="CCE Logo"  src="<%=Rails.root.join('public','images','cce_logo.png')%>" ></img>
+          </div>
+        <%end%>
+    </div>
+    <div class="headding_div">
+        <p class="head_1">PERFORMANCE PROFILE</p>
+        <p class="sub_1"><%="#{@batch.course.full_name}"%> (Session: <%="#{@batch.start_date.year} - #{@batch.end_date.year}"%>)</p>
+        <p class="head_2">CONTINUOUS AND COMPREHENSIVE EVALUATION</p>
+        <p class="sub_2">(Issued by School as per the directives of Central Board of Secondary Education, Delhi)</p>
+    </div>
+
+    <div id="student_basic_info_1" class ="student_basic_info">
+        <%=render :partial=>"cce_student_full_report_page_1"%>
+        <!-- Added  First page -->
+    </div>
+    <div class="page-break"></div>
+    <div id="student_basic_info_2" class ="student_basic_info">
+        <%=render :partial=>"cce_student_full_report_page_2"%>
+    </div>
+    <%if @general_records["LastPage"] == "0"%>
+      <div class="page-break"></div>
+      <div id="student_basic_info_3" class ="student_basic_info">
+          <%=render :partial=>"cce_student_full_report_page_3"%>
+          <!-- Added  third page -->
+      </div>
+    <%end%>
+</div>

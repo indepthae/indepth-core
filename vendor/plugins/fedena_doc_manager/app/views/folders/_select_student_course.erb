@@ -1,0 +1,19 @@
+
+<div class="label-field-pair">
+  <label for="select_course">
+    <%= t('select_a_batch') %>
+    <%= image_tag("loader.gif",
+      :align => "top",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  </label>
+  <div class="text-input-bg">
+    <% batches = @batches %>
+    <%= select :course, :course_id, batches.map { |s| [s.full_name, s.id] },
+      {:prompt => "#{t('select_a_batch')}"},
+      {:onChange => "#{remote_function(:url => to_students_folders_path , :with => "'batch_id='+value",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')")}"} %>
+  </div>
+</div>

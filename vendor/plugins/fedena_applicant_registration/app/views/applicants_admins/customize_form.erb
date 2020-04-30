@@ -1,0 +1,522 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_regi_label') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('customize_form') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('add_section'), "#",{:onClick=>"show_add_section_form(); return false;"} %></li>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('reorder_sections'), "#",{:onClick=>"show_reorder_section_form(); return false;"} %></li>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div id="flash-box">
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+    </div>
+    <div class="page-heading">
+        <%= t('customize_application_form') %>
+    </div>
+    <div class="desc-text">
+        <%= t('customize_desc') %>
+    </div>
+    <% application_sections = @application_section.present? ? @application_section.section_fields : ApplicationSection::DEFAULT_FORM %>
+    <% guardian_count = @application_section.present? ? @application_section.guardian_count : 1 %>
+    <% form_for :application_section,:url=>customize_form_applicants_admins_path, :method=>:post do|f| %>
+      <div id="custom-area">
+          <% next_ind = 0 %>
+          <% next_pos = 1 %>
+          <% all_additional_sections = ApplicantAddlFieldGroup.find_all_by_registration_course_id(nil) %>
+          <% included_grps = [] %>
+          <% application_sections.sort_by{|k| k[:section_order].to_i}.each_with_index do|a,i| %>
+            <% if ((a[:applicant_addl_field_group_id].present? and all_additional_sections.collect(&:id).include?(a[:applicant_addl_field_group_id].to_i)) or a[:section_name].present?) %>
+              <%= render :partial=>"section_form",:locals=>{:a=>a, :guardian_count=>guardian_count, :i=>i} %>
+              <% next_ind = i+1 %>
+              <% next_pos = a[:section_order].to_i + 1 %>
+              <% included_grps.push(a[:applicant_addl_field_group_id].to_i) if a[:applicant_addl_field_group_id].present?  %>
+            <% end %>
+          <% end %>
+          <% remaining_sections = all_additional_sections.reject{|ag| included_grps.include?(ag.id)} %>
+          <% remaining_sections.each do|r| %>
+            <% sec_hash = Hash.new %>
+            <% sec_hash[:applicant_addl_field_group_id] = r.id %>
+            <% sec_hash[:fields] = [] %>
+            <% sec_hash[:section_order] = next_pos %>
+            <% sec_hash[:section_name] = "" %>
+            <%= render :partial=>"section_form",:locals=>{:a=>sec_hash, :guardian_count=>guardian_count, :i=>next_ind} %>
+            <% next_ind = next_ind+1 %>
+            <% next_pos = next_pos + 1 %>
+          <% end %>
+      </div>
+      <div class="hor_line"></div>
+      <%= f.submit "#{t('save_changes_text')}", :class => "submit_button" %>
+      <%= link_to "#{t('cancel')}", registration_settings_applicants_admins_path, :class=>"user_button cancel_user_button" %>
+    <% end %>
+    <div id="modal-box" style="display:none"></div>
+</div>
+<script>
+  j(document).ready(function () {
+      j(".each-section").each(function () {
+          if (j(this).find(".row-b").length > 1) {
+              j(this).find(".link-section").find(".hide-on-sort").append('<a onclick="show_reorder_fields_form(this); return false;" href="#" class="reorder_link">' + '<%= t('reorder_fields') %>' + '</a>')
+          }
+      });
+  });
+
+  function show_reorder_section_form() {
+      build_modal_box({'title': "<%= t('reorder_sections_desc') %>"});
+      j('#popup_content').html('<%= render :partial=>'reorder_sections_form' %>');
+      j('#popup_footer').html('<%= render :partial=>'reorder_sections_footer' %>');
+      var reorder_table = j("#section_list tbody")
+      j(".each-section").each(function () {
+          if (!(!(j(this).find(".section_name").length === 0) && (j(this).find(".section_name").val() === "guardian_contact_details"))) {
+              if (!(j(this).find(".section_name").length === 0) && (j(this).find(".section_name").val() === "guardian_personal_details")) {
+                  var section_name = j(".title-section").html();
+              }
+              else {
+                  var section_name = j(this).find(".name-section").html();
+              }
+              j("<tr class='row-b'><td style='width:5%'><div class='reorder-icon'></div><input class='section_order' type='hidden'></td><td class='name_of_section' style='width:95%'></td></tr>").appendTo(reorder_table);
+              reorder_table.find('tr').last().find('td').last().html(section_name);
+              reorder_table.find('tr').last().find('.section_order').val(j(this).find('.section_order').val());
+          }
+      })
+      j("#section_list tbody").sortable({
+          opacity: 0.7,
+          placeholder: "sortable-placeholder",
+          cursor: "move",
+          containment: "parent",
+          items: "tr:not(.tr-list_head)",
+          tolerance: "pointer"
+      }).disableSelection();
+  }
+
+  function save_section_order() {
+      var guardian_section = j("#section_list tbody").find(".section_order[value=" + j(".section_name[value='guardian_personal_details']").parent().find(".section_order").val() + "]").parent().parent();
+      var guardian_section_index = j("#section_list tbody").find(".row-b").index(guardian_section);      
+      j(".each-section").each(function () {
+          var prev_val = j(this).find(".section_order").val();
+          var this_elem = j(this);
+          j('#section_list tbody').find(".row-b").each(function () {
+              if (j(this).find(".section_order").val() == prev_val) {
+                  var row_ind = j("#section_list tbody").find(".row-b").index(j(this));
+                  if (row_ind <= guardian_section_index) {
+                      this_elem.find(".section_order").val(row_ind + 1);
+                  }
+                  else {
+                      this_elem.find(".section_order").val(row_ind + 2);
+                  }
+              }
+          })
+      })
+      j(".section_name[value='guardian_contact_details']").parent().find(".section_order").val(parseInt(guardian_section_index) + 2);
+      j(".each-section").sort(sort_sections).appendTo(j("#custom-area"));
+      remove_popup_box();
+  }
+
+  function reset_section_order() {
+      var sections_div = j("#section_list");
+      sections_div.find("tbody").find('tr').sort(sort_sections).appendTo(sections_div.find("tbody"));
+  }
+
+  function show_add_section_form() {
+      var last_section_order = j(".each-section").last().find(".section_order").val();
+      var section_indexes = [];
+      j(".each-section").each(function () {
+          section_indexes.push(j(this).find(".section_index").val());
+      })
+      var last_index = section_indexes.sort(function (a, b) {  return a - b;  }).last();
+      j.ajax({
+          type: 'GET',
+          url: "add_section",
+          data: {
+              last_order: last_section_order,
+              last_index: last_index
+          }
+      });
+  }
+
+  function show_edit_section_form(th_is) {
+      j("#edited-section").removeAttr('id');
+      section_id = th_is.id.replace("-edit", "");
+      j(th_is).parent().parent().parent().attr('id', 'edited-section');
+      j.ajax({
+          type: 'GET',
+          url: "edit_section/" + section_id
+      });
+  }
+
+  function delete_section(th_is) {
+      j("#deleted-section").removeAttr('id');
+      section_id = th_is.id.replace("-delete", "");
+      if (confirm("<%= t('delete_confirm_msg') %>")) {
+          j(th_is).parent().parent().parent().parent().attr('id', 'deleted-section');
+          j.ajax({
+              type: 'GET',
+              url: "delete_section/" + section_id
+          });
+      }
+  }
+
+  function show_edit_field_form(th_is) {
+      j("#edited-field").removeAttr('id');
+      field_id = th_is.id.replace("-field-edit", "");
+      field_type = j(th_is).parent().parent().parent().find(".field_type").val();
+      j(th_is).parent().parent().parent().attr('id', 'edited-field');
+      j.ajax({
+          type: 'GET',
+          url: "edit_field/" + field_id,
+          data: {
+              field_type: field_type
+          }
+      });
+  }
+
+  function delete_field(th_is) {
+      j("#deleted-field").removeAttr('id');
+      field_id = th_is.id.replace("--field-delete", "");
+      field_type = j(th_is).parent().parent().parent().find(".field_type").val();
+      if (confirm("<%= t('delete_confirm_msg') %>")) {
+          j(th_is).parent().parent().parent().attr('id', 'deleted-field');
+          j.ajax({
+              type: 'GET',
+              url: "delete_field/" + field_id,
+              data: {
+                  field_type: field_type
+              }
+          });
+      }
+  }
+
+  function show_reorder_fields_form(th_is) {
+      var section_div = j(th_is).parent().parent().parent().parent().parent();
+      var sortable_table = section_div.find(".gray_table_list");
+      section_div.find(".hide-on-sort").hide();
+      section_div.find(".invisible-div").css('display', 'block');
+      sortable_table.find("tbody").sortable({
+          opacity: 0.7,
+          placeholder: "sortable-placeholder",
+          cursor: "move",
+          containment: "parent",
+          items: "tr:not(.tr-list_head)",
+          tolerance: "pointer",
+          start: function (event, ui) {
+
+          },
+          stop: function (event, ui) {
+
+
+          }
+      }).disableSelection();
+  }
+
+  function hide_reorder_fields_form(th_is) {
+      var section_div = j(th_is).parent().parent().parent().parent().parent();
+      section_div.find(".gray_table_list tbody").find('tr').sort(sort_li).appendTo(section_div.find(".gray_table_list tbody"));
+      section_div.find(".hide-on-sort").css('display', 'block');
+      section_div.find(".invisible-div").hide();
+      section_div.find(".gray_table_list tbody").sortable("destroy").enableSelection();
+  }
+
+  function save_field_order(th_is) {
+      var section_div = j(th_is).parent().parent().parent().parent().parent();
+      section_div.find(".gray_table_list tbody").find("tr").each(function (index) {
+          j(this).find(".field_order").val(index);
+      });
+      hide_reorder_fields_form(th_is);
+  }
+
+  function sort_li(a, b) {
+      return (parseInt(j(b).find('.field_order').val())) < (parseInt(j(a).find('.field_order').val())) ? 1 : -1;
+  }
+
+  function sort_sections(a, b) {
+      return (parseInt(j(b).find('.section_order').val())) < (parseInt(j(a).find('.section_order').val())) ? 1 : -1;
+  }
+
+  function show_add_field_form(th_is) {
+      j("#insert-to-section").removeAttr("id");
+      j("#row-to-remove").removeAttr("id");
+      var parent_section = j(th_is).parent().parent().parent().parent().parent();
+      parent_section.find(".gray_table_list tbody").attr("id", "insert-to-section");
+      parent_section.find(".empty-row").attr("id", "row-to-remove");
+      var last_field_order = 0;
+      var last_field_index = -1;
+      var group_id = 0;
+      var section_name = "";
+      var field_section_index = parent_section.find(".section_index").val();
+      var field_rows = parent_section.find(".row-b");
+      if (!(field_rows.length === 0)) {
+          var field_indexes = [];
+          parent_section.find(".row-b").each(function () {
+              field_indexes.push(j(this).find(".field_index").val());
+          })
+          last_field_index = field_indexes.sort(function (a, b) {  return a - b;  }).last();
+          last_field_order = parent_section.find(".field_order").last().val();
+      }
+      if (!(parent_section.find(".group_id").length === 0)) {
+          group_id = parent_section.find(".group_id").val();
+      }
+      if (!(parent_section.find(".section_name").length === 0)) {
+          section_name = parent_section.find(".section_name").val();
+      }
+      j.ajax({
+          type: 'GET',
+          url: "add_field",
+          data: {
+              last_field_order: last_field_order,
+              last_field_index: last_field_index,
+              field_section_index: field_section_index,
+              group_id: group_id,
+              section_name: section_name
+          }
+      });
+  }
+
+  function toggle_field_forms() {
+      if (j('#addl_radio').is(':checked')) {
+          j("#field_form").hide();
+          j("#link_field_form").show();
+          j("#new_field_desc").hide();
+          j("#new_field_desc").hide();
+          j("#link_field_desc").show();
+      }
+      else {
+          j("#field_form").show();
+          j("#link_field_form").hide();
+          j("#new_field_desc").show();
+          j("#new_field_desc").show();
+          j("#link_field_desc").hide();
+      }
+  }
+
+  function toggle_all_checkboxes(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().parent().find(".show_field_checkbox").prop('checked', 'checked').trigger('change');
+      }
+      else {
+          j(th_is).parent().parent().parent().find(".show_field_checkbox").prop('checked', false).trigger('change');
+      }
+  }
+
+  function modify_show_field_value(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().find(".show_field").val(true);
+          var unchecked_box = j(th_is).parent().parent().parent().find(".show_field_checkbox:checkbox:not(:checked)").length;
+          if (unchecked_box === 0) {
+              j(th_is).parent().parent().parent().find(".select_all").prop('checked', 'checked');
+          }
+          else {
+              j(th_is).parent().parent().parent().find(".select_all").prop('checked', false);
+          }
+      }
+      else {
+          j(th_is).parent().parent().find(".show_field").val(false);
+          j(th_is).parent().parent().parent().find(".select_all").prop('checked', false);
+          var make_mandatory = j(th_is).parent().parent().find(".mandatory_field_checkbox");
+          if(make_mandatory.length === 1){
+            if(make_mandatory.is(':checked')){
+              make_mandatory.prop('checked', false).trigger('change');
+            }
+          }
+      }
+  }
+
+  function modify_mandatory_field_value(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().find(".mandatory_field").val(true);
+          var show_field = j(th_is).parent().parent().find(".show_field_checkbox");
+          if(show_field.is(':not(:checked)')){
+            show_field.prop('checked', true).trigger('change');
+          }
+      }
+      else {
+          j(th_is).parent().parent().find(".mandatory_field").val(false);
+      }
+  }
+
+  function select_all_fields() {
+      if (j("#select_all_addl").is(':checked')) {
+          j(".active_batch_list").prop('checked', 'checked');
+      }
+      else {
+          j(".active_batch_list").prop('checked', false);
+      }
+  }
+
+  function toggle_field_selector() {
+      var unchecked_box = j(".active_batch_list:checkbox:not(:checked)").length;
+      if (unchecked_box === 0) {
+          j("#select_all_addl").prop('checked', 'checked');
+      }
+      else {
+          j("#select_all_addl").prop('checked', false);
+      }
+  }
+
+
+
+
+
+
+
+  function get_required_fields()
+  {
+      if (j('#applicant_addl_field_temp_input_type').val() == 'singleline') {
+          j('#record_type_suffix').show();
+      }
+      else {
+          j('#record_type_suffix').hide();
+      }
+      if (j('#applicant_addl_field_temp_input_type').val() != 'multiple') {
+          j('.custom').hide();
+      }
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+          $$('.input-type-select').first().fire('change')
+          $$('select#applicant_addl_field_temp_input_type').each(function (e) {
+              toggle_custom.call(e);
+          });
+      }
+  }
+  function add_fields(link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).up().insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+      if (j('.type_select:input:checked').val() == 'multi_select') {
+          j('.radio_options').attr('type', 'checkbox').removeClass('radio_options').addClass('check_options');
+      }
+      if (j('.fields input[type="text"]:visible').length > 2) {
+          j('.delete_button_img').show();
+      }
+      else {
+          j('.delete_button_img').hide();
+      }
+  }
+
+
+  function remove_fields(link) {
+      $(link).previous("input[type=hidden]").value = '1';
+      $(link).up(".fields").hide();
+      if (j('.fields input[type="text"]:visible').length <= 2) {
+          j('.delete_button_img').hide();
+      }
+
+      if (j('.type_select').val() == 'single_select') {
+          if (j('.radio_options:visible:checked').length == 0) {
+              j('.radio_options').prop('checked', false);
+              j('.radio_options').val(0);
+              j('.no_default_rb').prop('checked', true);
+<%#*j('#no_default_select').val(true);%>
+          }
+      }
+  }
+
+  function toggle_custom(val) {
+      dest = this.up(2).select('.custom')[0]
+
+      //if(dest != null)
+      if ((this.value == 'singleline') || (this.value == 'multiline') || (this.value == 'attachment')) {
+          dest.hide();
+      }
+      else if (this.value == 'multiple') {
+          dest.show();
+      }
+      return true;
+  }
+
+
+
+  function assign_observers() {
+      j('.type_select').click(function () {
+          if (j(this).val() == 'multi_select') {
+              j('.record_type_select').val('multi_select');
+              j('.radio_options').attr('type', 'checkbox').removeClass('radio_options').addClass('check_options').prop('checked', false);
+              j('.no_default_rb').attr('disabled', true).hide();
+              j('#label_no_default_yes').hide();
+          }
+          else {
+              j('.record_type_select').val('single_select');
+              j('.check_options').attr('type', 'radio').removeClass('check_options').addClass('radio_options').prop('checked', false);
+              j('.no_default_rb').prop('checked', true);
+              j('.no_default_rb').attr('disabled', false).show();
+              j('#label_no_default_yes').show();
+          }
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+          $$('.input-type-select').first().fire('change');
+          $$('select#applicant_addl_field_temp_input_type').each(function (e) {
+              toggle_custom.call(e);
+          });
+      }
+      if (j('.type_select:input:checked').val() == 'multi_select') {
+          j('.radio_options').attr('type', 'checkbox').removeClass('radio_options').addClass('check_options');
+          j('.no_default_rb').attr('disabled', true).hide();
+          j('#label_no_default_yes').hide();
+      }
+      else {
+          j('.check_options').attr('type', 'radio').removeClass('check_options').addClass('radio_options');
+          j('.no_default_rb').attr('disabled', false).show();
+          j('#label_no_default_yes').show();
+      }
+      if (j('#applicant_addl_field_temp_input_type').val() != 'singleline') {
+          j('#record_type_suffix').hide();
+      }
+      else {
+          j('#record_type_suffix').show();
+      }
+      if (j('#applicant_addl_field_temp_input_type').val() != 'multiple') {
+          j('.custom').hide();
+      }
+      if (j('.fields input[type="text"]:visible').length > 2) {
+          j('.delete_button_img').show();
+      }
+      j(document).delegate('.radio_options', 'click', function () {
+          var h_id = "#" + j(this).attr('id').replace('_true', '');
+          j('.radio_options').prop('checked', false);
+          j('.no_default_rb').prop('checked', false);
+          j('.hidden_radio_options').attr('value', false);
+          j('.radio_options').val(false);
+          j(this).prop('checked', true);
+          j(h_id).attr('value', true);
+          j(this).val(true);
+      });
+      j('.no_default_rb').click(function () {
+          j('.radio_options').prop('checked', false);
+          j('.radio_options').val(false)
+          j('.hidden_radio_options').val(false)
+          j(this).prop('checked', true);
+      });
+      j(document).delegate('.check_options', 'change', function () {
+          var h_id = "#" + j(this).attr('id').replace('_true', '');
+          if (j(this).prop('checked') == true) {
+              j(this).prop('value', true);
+              j(h_id).attr('value', true);
+          }
+          else {
+              j(this).prop('value', false);
+              j(h_id).attr('value', false);
+          }
+      });
+  }
+
+</script>

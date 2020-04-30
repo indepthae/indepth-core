@@ -1,0 +1,35 @@
+<% assessment_groups = plan.assessment_groups %>
+<% if assessment_groups.present? %>
+<table align="center" width="100%" cellpadding="1" cellspacing="1" class="eg_table">
+      <tr class="tr-head">
+          <td class="col-2"><%= t('exams_text') %></td>
+          <td class="col-1"><%= t('exam_mode') %></td>
+          <td class="col-1"><%= t('scoring') %></td>
+          <td class="col-1 actions"><%= t('actions') %></td>
+      </tr>
+      <% assessment_groups.each do |ag|  %>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+            <td><%= ag.name %></td>
+            <td><%= ag.exam_mode %></td>
+            <td><%= ag.score_type %></td>
+            <td>
+                <%= link_to "#{t('edit_exam')}", edit_assessment_group_path(ag) %> 
+                <%= link_to "More", '#' %> 
+            </td>
+        </tr>
+      <% end %>
+  </table>
+<%else%>
+  <div class="term_box">
+      <div class="desc">
+          <div class="empty_terms">
+              <div class="empty_msg">
+                  <%= t('add_exam_desc') %>
+              </div>
+              <div class="add_link">
+                  <%= link_to "#{t('add_exams')}", new_assessment_group_path({:parent_id => plan.id, :parent_type => plan.class.to_s}), :class=>'submit-button' %>
+              </div>
+          </div>
+      </div>
+  </div>
+<% end %>

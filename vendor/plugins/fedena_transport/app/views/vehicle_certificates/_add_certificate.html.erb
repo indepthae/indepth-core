@@ -1,0 +1,55 @@
+<% form_for @certificate, :url => fetch_path(@certificate), :html=> {:id=>"certificate_form",:multipart=>true},
+  :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |c| %>
+  <%= session_fingerprint_field %> 
+  <%= c.hidden_field :vehicle_id %>
+  <div id="vehicle_certificate_form">
+      <div class="label-field-pair">
+          <label><%= t('certificate_type') %></label>
+          <div class="text-input-bg">
+              <% reminder_enabled = @certificate_types.select(&:send_reminders).collect(&:id).join(",") %>
+              <%= c.select  :certificate_type_id, @certificate_types.map{|ct| [ct.name, ct.id]}, {:include_blank => "#{t('select_a_certificate_type')}"},
+                {:reminder_enabled => reminder_enabled, :id => "vehicle_certificate_id"} %>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="certificate_no"><%= t('certificate_no') %></label>
+          <div class="text-input-bg"><%= c.text_field :certificate_no %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="date_of_issue"><%= t('date_of_issue') %></label>
+          <div class="text-input-bg start_date">
+              <%= c.calendar_date_select :date_of_issue, :popup=>"force", :id=>'date_of_issue'%>
+          </div>
+      </div>
+      <div class="label-field-pair left">
+          <label for="date_of_expiry"><%= t('date_of_expiry') %></label>
+          <div class="text-input-bg start_date">
+              <%= c.calendar_date_select :date_of_expiry, :popup=>"force", :id=>'date_of_expiry'%>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="certificate"><%= t('certificate') %></label>
+          <div class="text-input-bg"><%= c.paperclip_file_field :certificate, :size=>12, :direct => false %>
+              <%= c.hidden_field :certificate_file_size, :disabld => true %>
+              <%= c.hidden_field :certificate_content_type, :disabld => true %>
+          </div>
+          <% if !(c.object.new_record?) and c.object.certificate.present? %>
+            <label class="prev-certificate"><%=link_to c.object.certificate_file_name, c.object.certificate.url(:original,false),:target => "_blank"  %></label>
+            <div class="delete-button" onclick="delete_certificate(this);"></div>
+            <%= c.hidden_field :delete_certificate, :value=>false, :class=>"delete-certificate-field" %>
+          <% end %>
+      </div>
+      <% FedenaPlugin.deliver_registered_hook(:event_alert_form).each do |mod| %>
+        <%= render :partial=>mod.camelize.constantize.send("event_alert_form"), :locals => {:f => c} %>
+      <% end %>
+  </div>
+  <%=submit_tag t('upload_certificate'), :class => "submit-button user_button", :id => "submit_button", :disable_with => "#{t('please_wait')}" %>
+  <%= link_to t('cancel'), vehicle_vehicle_certificates_path(@vehicle), :class => "submit-button", :id => "cancel-link" %>
+<% end %>
+<script type="text/javascript">
+  function delete_certificate(elm) {
+      j(elm).parent().find(".delete-certificate-field").val(true);
+      j(elm).parent().find(".prev-certificate").remove();
+      j(elm).remove();
+  }
+</script>

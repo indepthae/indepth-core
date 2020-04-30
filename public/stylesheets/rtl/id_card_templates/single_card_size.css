@@ -1,0 +1,42 @@
+.new-page {
+  page-break-before: always;
+}
+
+.keep-together {
+    page-break-inside: avoid;
+}
+
+.break-after {
+    page-break-after: always;
+}
+div.preview{
+  position: relative;
+  box-sizing: border-box;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-size: 6pt;
+  line-height: 1.2;
+  display: inline-block;
+  vertical-align: top;
+  text-align: left;
+  -webkit-transform: scale(2.341);
+  -webkit-transform-origin: 100% 0%;
+
+}
+
+div.front_preview, div.back_preview{
+  box-sizing: border-box;
+  page-break-before: always;
+  page-break-inside: avoid;
+  page-break-after: always;
+
+}
+
+html{
+  margin: 0px;
+}
+
+body{
+  margin: 0px;
+}

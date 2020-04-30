@@ -1,0 +1,123 @@
+<%if (rtl?)%>
+  <%=stylesheet_link_tag "rtl/gray_table_design"%>
+<%else%>
+  <%=stylesheet_link_tag "gray_table_design"%>
+<%end%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_regi_label') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('archived_applications') %></div>
+
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('active_applications'), {:action => "applicants",:id=>@registration_course.id} %></li>
+        </ul>
+    </div>
+
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :applicants_admins_archived_applicants ,@registration_course%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id='flash-box'>
+        <% unless flash[:notice].nil? %>
+          <p class="flash-msg"> <%= flash[:notice] %> </p>
+        <% end %>
+    </div>
+
+    <div id="main-section">
+        <div class='main-header'><%= t('archived_applications') %></div>
+        <div class="top-info">
+            <div class="course-name"><label><%= t('course') %></label><label><b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} &#x200E;(#{@registration_course.course.code})&#x200E;" %></b></label></div>
+            <div class="applicant-count"><label><%= t('applicant_s') %></label><label><b><%= @applicants.count %> </b></label></div>
+            <div class="amount-collected"><label><b><%= currency %> <%= precision_label(@applicants.select{|a| a.has_paid==true}.sum(&:amount)) %></b></label><label><%= t('amount_collected') %></label></div>
+        </div>
+        <div class="hor_line"></div>
+        <div id='result-main-section'>
+            <%= render :partial=>"archived_result_main_section" %>
+        </div>
+    </div>
+
+    <%= hidden_field_tag "registration_course_id", @registration_course.id %>
+
+</div>
+<script>
+
+  function filter_applicants() {
+      var registration_course_id = j("#registration_course_id").val();
+      var name_search_param = j("#search_params").val();
+      var start_date = j("#start_date_params").val();
+      var end_date = j("#end_date_params").val();
+      var selected_status = j("#selected_status").val();
+      j.ajax({
+          type: 'GET',
+          url: "/applicants_admins/filter_archived_applicants",
+          data: {
+              registration_course_id: registration_course_id,
+              name_search_param: name_search_param,
+              start_date: start_date,
+              end_date: end_date,
+              selected_status: selected_status
+          }
+      })
+  }
+
+  function search_by_name() {
+      j("#search_params").val(j("#search").val());
+      filter_applicants();
+  }
+
+  function clear_name_search() {
+      j("#search_params").val("");
+      filter_applicants();
+  }
+
+  function clear_date_search() {
+      j("#start_date_params").val("");
+      j("#end_date_params").val("");
+      filter_applicants();
+  }
+
+  function show_date_filter() {
+      j("#date_box").slideDown();
+      j("#date-show-box").hide();
+  }
+
+  function show_last_months_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now - 1.months).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function show_six_months_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now - 6.months).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function show_one_year_applicants() {
+      j("#start_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now - 1.years).to_date.to_s %>');
+      j("#end_date_params").val('<%= FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s %>');
+      filter_applicants();
+  }
+
+  function filter_by_date() {
+      j("#start_date_params").val(j('[name="start_date"]').prop("value"));
+      j("#end_date_params").val(j('[name="end_date"]').prop("value"));
+      filter_applicants();
+  }
+
+  function hide_date_filter() {
+      j("#date_box").slideUp();
+      j("#date-show-box").show();
+  }
+
+  function show_applicants_list(th_is) {    
+      j("#selected_status").val(j(th_is).val());
+      filter_applicants();
+  }
+  </script>

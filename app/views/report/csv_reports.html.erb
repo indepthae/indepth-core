@@ -1,0 +1,43 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%="#{t('csv_reports')}" %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%="#{t('csv_reports')}" %></div>
+</div>
+<% unless flash[:notice].nil? %>
+  <p class="flash-msg"> <%= flash[:notice] %> </p>
+<% end %>
+<div id="information">
+  <% unless @csv_report.nil? %>
+    <div id="page-yield">
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head sub-heading">
+          <td><%= t('file_name') %></td>
+          <td><%= t('status') %></td>
+        </tr>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%=@csv_report.method_name_translation%>.csv</td>
+          <% if @jobs.empty? %>
+            <% if @csv_report.is_generated and !@csv_report.status %>
+              <td class="col-4"><%= link_to "#{t('download')}", @csv_report.csv_report.url(:original, false), { :href => "#{@csv_report.csv_report.url(:original, false)}"}%></td>
+            <% else %>
+              <td class="col-4"><%= "#{t('report_generation_failed_text')}" %></td>
+            <% end %>
+          <% else %>
+            <% @jobs.each do |job| %>
+              <% if !job.failed_at.nil? %>
+                <td class="col-4"><%="#{t('failed')}" %></td>
+              <% elsif !job.locked_by.nil? %>
+                <td class="col-4"><%="#{t('running')}"%><span class="refresh-icon" id="page-refresh" onclick="location.reload();"></td>
+              <% else %>
+                <td class="col-4"><%="#{t('in_queue')}" %><span class="refresh-icon" id="page-refresh" onclick="location.reload();"></td>
+              <% end %>
+            <% end %>
+          <% end %>
+        </tr>
+      </table>
+    </div>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_record_found') %></p>
+  <% end %>
+</div>

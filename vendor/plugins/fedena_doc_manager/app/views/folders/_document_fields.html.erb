@@ -1,0 +1,32 @@
+<div class="fields fields-wrap2" id="<%= "doc#{s.object.id if s.present? and s.object.present?}" %>">
+  <div class="label-field-pair2">
+    <label for="document_name"><%= t('document_name') %></label>
+    <div class="text-input-bg"><%= s.text_field :name %></div>
+  </div>
+  <% if s.object.id.present? %>
+    <div class="label-field-pair2">
+      <label for="document_file" class="custom_width"><%= t('document_file') %></label>
+      <div class="file_text">
+        <%= s.object.attachment_file_name %>
+      </div>
+
+      <div class="cross_link">
+       <%= link_to_remote "#{image_tag('buttons/delete_2.png')}",
+
+         :url => remove_document_path(:action_text=>@action,
+                                   :id => s.object.id),
+         :confirm => t('document_remove_from_folder_confirmation',:file_name =>s.object.attachment_file_name,:folder_name => @folder.name) %>
+      </div>
+      </div>
+
+  <% else %>
+    <div class="label-field-pair2">
+      <label for="document_file" class="custom_width"><%= t('document_file') %></label>
+      <div class="text-input-bg" id="file"><%= s.paperclip_file_field :attachment, :size=> 12 ,:onchange => "update_name(this)"%></div>
+      <%= link_to_remove_fields " ", s %>
+    </div>
+
+    <%= s.hidden_field :user_id,:value => @current_user.id %>
+  <% end %>
+  <div class="extender"></div>
+</div>

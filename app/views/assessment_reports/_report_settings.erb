@@ -1,0 +1,72 @@
+<%#= render :partial => 'assessment_plans/assessment_plan_details_min', :locals => {:plan => @plan} %>
+<% form_for :assessment_report_setting,:url => {:action => 'settings', :assessment_plan_id => @plan.id },:html => {:multipart=>true} do |c| %>
+  <%= error_messages_for :assessment_report_setting %>
+  <div class="box">
+      <div class="label_field_pair block">
+          <div class="label_pair">
+              <%= check_box :assessment_report_setting, :enable_custom_template, :checked =>@setting[:enable_custom_template]== "1", :disabled => (@report_templates.present? ? false : true), :onchange=>"toggle_custom_report_elements(this)"%>
+              <label for="assessment_report_setting_enable_custom_template" class="core_label sub-header"><%= t('enable_custom_template') %></label>
+              <div class="com_block ml35">
+                <p class="msg_desc"><%= t('custom_template_desc') %></p>
+              </div>
+          </div>         
+          
+          <!-- Select Template -->
+          <div class="select-template-conatiner" id="select-template-conatiner" style="display: <%= @setting[:enable_custom_template]== "1" ? 'block' : 'none' %>">
+              <% if @setting[:custom_template].present? %>
+                <%= render :partial => 'selected_template' %>
+              <% else %>
+                <%= render :partial => 'select_template' %>
+              <%end%>
+          </div>
+          <!-- Select Template -->
+          
+          <div class="nested_block inner_block report_cont" id="report_cont">
+              <% if @report_template.present? %>
+                <%= render :partial => 'student_details_settings' %>
+              <% elsif  @setting[:enable_custom_template] != "1" %>
+                <%= render :partial => 'template_settings' %>
+              <% end %>
+
+
+              <%#*<div id="submit_button">%>
+                  <%#= submit_tag t('save_settings').titleize ,:id=>'submit-button'%>
+              <%#*</div>%>
+          </div>
+      </div>
+  </div>
+<%end%>
+<script type="text/javascript">
+  j('.report_head').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/assessment_reports/report_header_info",
+          data: {
+              id: j(this).val(),
+              plan_id: <%= @plan.id %>
+          },
+          beforeSend: function () {
+              j('#loader1').show();
+          },
+          success: function () {
+              j('#loader1').hide();
+          }
+      });
+  });
+  j('.signature').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/assessment_reports/report_signature_info",
+          data: {
+              id: j(this).val(),
+              plan_id: <%= @plan.id %>
+          },
+          beforeSend: function () {
+              j('#loader2').show();
+          },
+          success: function () {
+              j('#loader2').hide();
+          }
+      });
+  });
+</script>

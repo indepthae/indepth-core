@@ -1,0 +1,96 @@
+
+<label class="student_profile_head_label">Student Profile </label>
+<div id="basic_info_1">
+  <div class="student_info_div">
+    <div id="main_div">
+      <div id="sub_main_div">
+        <div id="sub_main_left_div">
+          <div class ="basic_info_div">
+            <div class="info_name">Admission No.</div>
+            <span>:</span>
+            <div class="info_value">P101</div>
+          </div>
+        </div>
+        <div id="sub_main_right_div">
+          <div class ="basic_info_div">
+            <div class="info_name">Section</div>
+            <span>:</span>
+            <div class="info_value">A</div>
+          </div>
+        </div>
+      </div>
+      <div class ="basic_info_div">
+        <div class="info_name">Roll No.</div>
+        <span>:</span>
+        <div class="info_value">09</div>
+      </div>
+      <div class ="basic_info_div">
+        <div class="info_name">Registration No.</div>
+        <span>:</span>
+        <div class="info_value"> <%= "A9X37512" if @records["RegistrationNo"] == "1" %> </div>
+      </div>
+      <div class ="basic_info_div">
+        <div class="info_name">Name</div>
+        <span>:</span>
+        <div class="info_value">Glen Stephens</div>
+      </div>
+      <div class ="basic_info_div">
+        <div class="info_name">Date of Birth</div>
+        <span>:</span>
+        <div class="info_value"><%=format_date('12-09-1987'.to_date,:format=>:long)%></div>
+      </div>
+
+      <div class ="basic_info_div addl_width_800">
+        <div class="info_name">Mother's Name</div>
+        <span>:</span>
+        <div class="info_value increasable_width">Susan Stephens</div>
+      </div>
+      <div class ="basic_info_div addl_width_800">
+        <div class="info_name">Father’s Name / Guardian’s Name</div><span>:</span>
+        <div class="info_value increasable_width">James Stephens</div>
+      </div>
+      <div class ="basic_info_div addl_width_800">
+        <div class="info_name">Residential Address</div>
+        <span>:</span><div class="info_value increasable_width"></div>
+      </div>
+      <div class ="basic_info_div addl_width_800">
+        <div class="info_name">Telephone No.</div><span>:</span>
+        <div class="info_value increasable_width">8147799889</div>
+      </div>
+    </div>
+  </div>
+  <div class="student_pic">
+    <img  alt="Student Image" src="<%=Rails.root.join('public','images','master_student','profile','default_student.png')%>" ></img>
+  </div>
+</div>
+<div id="attendance_report">
+  <div class="attendance_item_name">
+    <%=label_tag 'attendance', "Attendance" ,:class=>"head_label_left"%>
+    <%=label_tag 'total_attendance_of_the_student', "Total attendance of the student"%>
+    <%=label_tag 'toatal_working_days', "Total Working days"%>
+  </div>
+  <div class="atendance_item">
+    <%=label_tag 'term1', "Term 1" ,:class=>"head_label"%>
+    <%=label_tag 'total_attendance_term_1',@records['Attendance'] == "0" ? 90 : "",:class=>'data_items'%>
+    <%=label_tag 'total_days_term_1', @records['Attendance'] == "0" ? 105 : "",:class=>'data_items'%>
+  </div>
+  <div class="atendance_item">
+    <%=label_tag 'term1', "Term 2" ,:class=>"head_label"%>
+    <%=label_tag 'total_attendance_term_1',@records['Attendance'] == "0" ? 100 : "",:class=>'data_items'%>
+    <%=label_tag 'total_days_term_1', @records['Attendance'] == "0" ? 102 : "",:class=>'data_items'%>
+  </div>
+</div>
+<label class="student_profile_head_label">Health Status</label>
+<div id="health_status_div">
+  <div class="basic_info_div">
+    <%=label_tag 'height', "Height" ,:class=>"label_health"%><p class="health_div_p medium"><%=@records['Height'].present? ? "190" : ""%></p>
+    <%=label_tag 'weight', "Weight"%><p class="health_div_p medium"><%=@records['Weight'].present? ? "55" : ""%></p>
+  </div>
+  <div class="basic_info_div">
+    <%=label_tag 'Blood_group', "Blood Group" ,:class=>"label_health"%>  <p class="health_div_p medium"><%=@records['BloodGroup'].present? ? "B+" : ""%></p>
+    <%=label_tag 'vision', "Vision (L)"%>  <p class="health_div_p small"><%=@records['VisionLeft'].present? ? "+2.25" : ""%></p> <%=label_tag 'vision (R)', "(R)"%><p class="health_div_p small"><%=@records['VisionRight'].present? ? "+2.50" : ""%></p>
+  </div>
+  <div class="basic_info_div">
+    <%=label_tag 'dental_hygiene', "Dental Hygiene",:class=>"label_health"%>  <p class="health_div_p large"><%=@records['DentalHygiene'].present? ? "Scaling is required" : ""%></p>
+  </div>
+</div>

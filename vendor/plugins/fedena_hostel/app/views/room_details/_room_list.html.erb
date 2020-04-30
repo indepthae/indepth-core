@@ -1,0 +1,67 @@
+ <% if !@room_details.empty? %>
+ <% unless flash[:message].blank? %>
+    <p class="flash-msg"> <%= flash[:message] %> </p>
+  <% end %>
+      <% unless flash[:message2].blank? %>
+    <div id="error-box" class="errorExplanation"><ul><li> <%= flash[:message2] %> .</li></ul></div>
+  <% end %>
+ <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <tr class="tr-head">
+    <td>
+      <%= "#{t('sl_no')}"%>
+    </td>
+    <td>
+      <%= "#{t('room_number')}"%>
+    </td>
+    <td>
+      <%= "#{t('students_per_room')}"%>
+    </td>
+    <td>
+      <%= "#{t('availability')}"%>
+    </td>
+    <td>
+      <%= "#{t('rent')}"%>
+    </td>
+    <td>
+
+    </td>
+  </tr>
+  <tr class="tr-blank"></tr>
+  <% @room_details.each_with_index do |r,i| %>
+    <% @occupied = r.get_room_allocation %>
+
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-3">
+        <%= ((params[:page].to_i==0 ? 0 : params[:page].to_i-1) * 20) + (i + 1) %>
+      </td>
+      <td class="col-7">
+        <%=  link_to r.room_number, r %>
+      </td>
+      <td class="col-7">
+        <%= r.students_per_room %>
+      </td>
+      <td class="col-7">
+        <%= r.students_per_room - @occupied.size %>
+      </td>
+      <td class="col-3">
+        <%= precision_label r.rent %>
+      </td>
+      <td class="col-4">
+        <small>
+          <%= link_to "#{t('edit_text')}", edit_room_detail_path(r) %>
+          |
+          <%= link_to_remote("#{t('delete_text')}",
+                :url => room_detail_path(r,:hostel_id=>params[:hostel_id]),
+                :method => 'delete',
+                :confirm => "#{t('delete_confirm_msg')}") %>
+          </small>
+      </td>
+    </tr>
+  <% end %>
+
+</table>
+  <%# if params[] %>
+<%= will_paginate @room_details, :renderer => 'RemoteLinkRenderer', :remote => { :with=>'\'hostel_id='+params[:hostel_id].to_s+'\'',:update=>'room-list'}, :params => {:controller=>"room_details",:action => "update_room_list"} %>
+<% else %>
+  <div class = "msg"><p class = "flash-msg"><%= t('no_rooms') %></p></div>
+<%end%>

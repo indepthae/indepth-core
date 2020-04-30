@@ -1,0 +1,40 @@
+<% remote_form_for @employee_leave, :url => {:controller => "employee", :action => "add_individual_leave", :id => @employee.id}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |el| %>
+  <%= el.hidden_field :employee_id, :value => @employee.id %>
+  <%= el.hidden_field :reset_date, :value => @employee.last_reset_date %>
+  <%= el.hidden_field :reseted_at, :value => @employee.last_reset_date %>
+  <%= el.hidden_field :is_additional, :value => true %>
+  <div id="add_leave_form">
+      <div id ="description"><%= t('add_a_special_leave_type_description') %></div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('leave_type') %></label>
+          <div class="text-input-bg">
+              <%= el.select :employee_leave_type_id, @leave_types.map {|p| [p.name, p.id]}, {:include_blank => t('select_leave_type')},:onchange => "change_leave_count(this)" %>
+              <div class="wrapper" id="live-val" style="display:none;">
+                  <div class="error-icon"></div>
+                  <div class="error-msg"><%=  t('select_a_leave_type')%></div>
+              </div>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label for="description"><%= t('leave_count').capitalize %></label>
+          <div class="text-input-bg">
+              <%= el.text_field :leave_count, :value => (@employee_leave.employee_leave_type_id.present? ? sprintf("%g", @employee_leave.leave_count) : "") %>
+              <div class="wrapper" id="live-val" style="display:none;">
+                  <div class="error-icon"></div>
+                  <div class="error-msg" id="not_zero" style="display:none;"><%=  t('please_enter_a_value_greater_than_or_equal_to_zero')%></div>
+                  <div class="error-msg" id="whole_num" style="display:none;"><%=  t('leave_count_must_be_a_whole_number_or_multiple')%></div>
+              </div>
+          </div>
+      </div>
+      <div id ="description" class="warning"><%= t('add_a_special_leave_type_warning') %></div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{t('add_leave_type')}", :class => "submit-button", :id => "submit_button", :onclick=>'return validate_leave();' %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  json_data = JSON.parse('<%= Hash[@leave_types.map{|e| [e.id, e.max_leave_count]}].to_json.gsub("'", %q(\\\')) %>');
+</script>

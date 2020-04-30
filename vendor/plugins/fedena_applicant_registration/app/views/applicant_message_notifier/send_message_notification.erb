@@ -1,0 +1,13 @@
+<html>
+    <body>
+        <%= @applicant_content %><br/><br/>
+        <br/><br/>
+        <% @em=Digest::SHA1.hexdigest( "#{@recipients}#{Time.now.to_s.split(//).sort_by {rand}.join}" ) %>
+        <% if FedenaSetting.company_details[:company_name].present? %>
+          <%= "#{t('powered_by')} #{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"}" %>
+        <% end %>
+        <br/>
+
+        <%= "#{@footer.gsub("URL","#{@hostname}")}#{" "}" %>
+    </body>
+</html>

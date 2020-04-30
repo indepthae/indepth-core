@@ -1,0 +1,47 @@
+<div class="list_courses_index">
+  <div class="description_head_div">
+      <%=t('course_with_exam_groups')%>
+  </div>
+  <div class="description_text_div">
+    <%=t('create_and_manage_exams_for_individual_batches')%>
+  </div>
+  <div class="academic_year_select_box"><%= render :partial => 'academic_year_select' %></div>
+  <div>
+    <%unless @courses.empty?%>
+      <table id="listing" width="100%">
+        <tr class="tr-head">
+          <td class="col-2"><%= t('course_text') %></td>
+          <td class="col-1"><%= t('batches_text') %></td>
+          <td class="col-1"><%= t('active_exams') %></td>
+          <td class="col-1"><%= t('upcoming_exam') %></td>
+          <td class="col-1"></td>
+        </tr>
+        <%@courses.each do |course|%>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-2"><%= course.course_name %></td>
+            <td class="col-1"><%= course.active_batches.count %></td>
+            <td class="col-1"><%= course.active_assessment_groups(@academic_year.id).count %></td>
+            <td class="col-1"><%= format_date(course.uc_start_date,:format => :short) + " - " + format_date(course.uc_end_date, :format => :short) %></td>
+            <td class="col-1"><%= link_to t('manage_exams'), :action=>'course_assessment_groups',:id=>course.id, :academic_year_id=>@academic_year.id %></td>
+          </tr>
+        <%end%>
+      </table>
+      <%= will_paginate  @courses,:renderer => 'RemoteLinkRenderer', :params=>{:controller => "gradebooks",:action => "exam_management",:academic_year => @academic_year.id}%>
+    <%else%>
+      <table id="listing" class="alert_msg_table" width="100%">
+        <tr class="tr-head">
+          <td class="col-2"><%= t('course_text') %></td>
+          <td class="col-1"><%= t('batches_text') %></td>
+          <td class="col-1"><%= t('active_exams') %></td>
+          <td class="col-1"><%= t('upcoming_exam') %></td>
+          <td class="col-1"></td>
+        </tr>
+        <tr class='tr-odd'>
+          <td colspan="5" >
+            <%=t('no_course_in_ac_year')%>
+          </td>
+        </tr>
+      </table>
+    <%end%>
+  </div>
+</div>

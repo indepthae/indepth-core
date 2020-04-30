@@ -1,0 +1,8 @@
+<div class="label-field-pair <%= route_type %>" style="display:<%= ((route_type == 'pickup' && mode.to_i == 3) or 
+    (route_type == 'drop' && mode.to_i == 2)) ? 'none' : 'block' %>" >
+    <label for="pickup_stop"><%= t("#{route_type}_stop") %></label>
+    <div class="text-input-bg">
+        <%= select_tag "#{@receiver_type}[transport_attributes][#{route_type}_stop_id]", 
+          options_for_select([["#{t("transport.select_a_#{route_type}_stop")}",""]] + fetch_stops(route_type).map{|r| [r.name, r.id]}, @transport.try(:send, "#{route_type}_stop_id")), :id => "#{route_type}_stop", :onchange => "j('#bus_fare').val('')" %>
+    </div>
+</div>

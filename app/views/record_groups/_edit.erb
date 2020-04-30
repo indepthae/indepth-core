@@ -1,0 +1,71 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="page-yield">
+  <div class="box">
+    <% form_remote_for @record_group,:html=>{:method=>:put,:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"} do |f| %>
+      <div id="form-errors"></div>
+      <%= error_messages_for :record_group %>
+      <div class="label-field-pair1">
+        <label for="record_group_name" id="label_record_group_name"><%=t('record_group_name')%></label>
+        <div class="text-input-bg1"><%=f.text_field :name%></div>
+      </div>
+
+      <div class="label-field-pair1">
+        <div id="status-label"><%=t('status')%></div>
+        <div class="record_group_status">
+          <div class="grouped">
+            <div class="button_label">
+              <%= f.radio_button  "is_active", true,:onclick=>'remove_text_color(this);' %><label for="record_group_is_active_true"><%=t('active')%></label>
+            </div>
+            <div class="label_desc"><%=t('available_to_all_students')%></div>
+          </div>
+          <div class="grouped addl_width">
+            <div class="button_label">
+              <%= f.radio_button  "is_active", false ,:onclick=>'add_text_color(this);'%><label for="record_group_is_active_false"><%=t('inactive')%></label>
+            </div>
+            <div>
+              <div class="label_desc addl_margin_bt inactive_entry"><%=t('not_available_to_unfilled')%></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hor_line"></div>
+      <div class="record_group_status"><div id="delete_msg"><%=t('record_group_hard_delete_conf')%> <%=link_to_remote "#{t('record_group_delete')}", :url => { :action => 'delete_warning',:id=>@record_group.id }%></div></div>
+      <div class="hor_line"></div>
+      <%= f.submit "", :value => "#{t('update_settings')}", :class => "submit_button", :id => 'submit_button' %>
+    <% end %>
+  </div>
+</div>
+<script type="text/javascript">
+  j( document ).ready(function() {
+    if(j('#record_group_is_active_false').prop('checked') == true){
+      j('.inactive_entry').addClass('red_text');
+    }
+  });
+  add_text_color = function(e)
+  {
+    j('.inactive_entry').addClass('red_text');
+  }
+  remove_text_color = function(e)
+  {
+    j('.inactive_entry').removeClass('red_text');
+  }
+
+</script>

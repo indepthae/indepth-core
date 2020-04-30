@@ -1,0 +1,23 @@
+<% if @class_timing_sets.present?  %>
+  <table id ="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class ="sl_no"><%= t('sl_no') %></td>
+      <td class="name"><%= t('name') %></td>
+      <td class="options"><%= t('options') %></td>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @class_timing_sets.each_with_index do |cts,index| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="sl_no"><%= ((@class_timing_sets.current_page - 1) * @class_timing_sets.per_page) + index + 1 %></td>
+        <td class="name"><%= cts.name %></td>
+        <td class="options">
+          <small>
+            <%= link_to t('view_class_timings'),cts %> |
+            <%= link_to t('delete'),cts,:method => "delete", :confirm => t('sure_delete_set') %>
+          </small>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @class_timing_sets %>
+<% end %>

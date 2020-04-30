@@ -1,0 +1,47 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('settings') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="box">
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('basic_settings')}", {:controller=>'transport',:action=>'settings'} %></div>
+            <div class="link-descr"><%= t('basic_transport_settings_desc') %></div>
+        </div> 
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('route_additional_details.route_additional_details_text')}", {:controller=>'route_additional_details',:action=>'index'} %></div>
+            <div class="link-descr"><%= "#{t('route_additional_details.route_additional_details_desc')}"%></div>
+        </div>
+        
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('vehicle_additional_details.vehicle_additional_details_text')}", {:controller=>'vehicle_additional_details',:action=>'index'} %></div>
+            <div class="link-descr"><%= "#{t('vehicle_additional_details.vehicle_additional_details_desc')}"%></div>
+        </div> 
+
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('vehicle_certificate_types.vehicle_certificate_type')}", {:controller=>'vehicle_certificate_types',:action=>'index'} %></div>
+            <div class="link-descr"><%= t('vehicle_certificate_types.vehicle_certificate_type_desc') %></div>
+        </div>
+        <%if Transport.gps_enabled %>
+        <div class="link-box">
+            <div class="link-heading"><%= link_to "#{t('gps_settings')}", {:controller=>'transport_gps_settings',:action=>'index'} %></div>
+            <div class="link-descr"><%= t('enable_or_disable_gps_settings') %></div>
+        </div>
+        <%end%>
+
+        <div class="extender"></div>
+    </div>
+</div>
+

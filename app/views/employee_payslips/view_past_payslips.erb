@@ -1,0 +1,33 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('generated_payslips') %></div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? %>
+      <% breadcrumb :employee_payslips_view_past_payslips, @payroll_group %>
+    <% else %>
+      <% breadcrumb :employee_payslips_view_past_payslips_finance, @payroll_group %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="header">
+    <%= "#{t('payroll_group')} - #{@payroll_group.name}" %>
+  </div>
+
+  <div class="sub_header"> <%= "#{t('payment_frequency')} : #{@payroll_group.salary_type_value} - #{@payroll_group.payment_period_value}  " %></div>
+
+  <div id="past_payslips">
+    <%= render :partial => 'past_payslips' %>
+  </div>
+
+</div>

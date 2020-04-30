@@ -1,0 +1,33 @@
+<label for="_remark_type" class="select-box-label"><%= "Remark Type" %></label>
+<%= select '',:remark_type, @remark_types, :prompt => t('select_remark_type') %>
+<%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader2",
+                :class => "loader_style",
+                :style =>"display: none;" ) %>
+
+<script type="text/javascript">
+  j('#_remark_type').change(function () {
+      j.ajax({
+          url: "update_report_type",
+          type: 'POST',
+          data: {
+              batch_id: get_batch_id(),
+              remark_type: get_remark_type(),
+              assessment_plan_id: get_assessment_plan_id(),
+          },
+          beforeSend: function()
+          {
+              j('#loader2').show();
+          },
+          success: function (data, textStatus, jqXHR)
+          {
+              j('#loader2').hide();
+          },
+          error: function (jqXHR, textStatus, errorThrown)
+          {
+          }
+      });
+  });
+</script>

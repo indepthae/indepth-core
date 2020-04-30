@@ -1,0 +1,219 @@
+<% form_for @plan,:url => {:action => 'records_and_remarks_settings' }, :html => { :method => :post } do |form| %>
+  <%= hidden_field_tag :assessment_plan_id, @plan.id %>
+  <%= form.hidden_field :assessment_plan_id, :value=>@plan.id %>
+  <div class="box">
+      <div class="label_field_pair block">
+          <div class="label_pair">
+              <%= check_box :assessment_report_settings,:enable_student_records, :checked =>@setting[:enable_student_records]== "1", :onchange=>"enable_student_records(this,#{@disable})" %>
+              <label for="records_and_remarks_settings_enable_student_records" class="core_label sub-header"><%= t('student_records').titleize %></label>
+          </div>
+          <div id="inner-tab-menu" class="manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %> ">
+              <ul>
+                  <li class='themed_bg themed-dark-hover-background'>
+                      <%= link_to t('reorder_record_groups'),'#', :onclick => "build_reorder_box();" if @plan.gradebook_record_groups.present? %>
+                  </li>
+              </ul>
+          </div>
+          <div class="nested_block inner_block">
+              <div class="record_section">
+                  <label><b><%= t('frequency') %></b></label>
+                  <div id="description"><%= t('student_record_frequency_description') %></div>
+                  <div class="radios">
+                      <%= radio_button :assessment_report_settings, :frequency ,"0", :checked =>(@type == "AssessmentGroup"), :disabled=>(@setting[:enable_student_records]== "0" || @disable), :class=>"frequency_radio", :onchange=>"load_linkable_items('AssessmentGroup','0')" %>
+                      <label class="general_label" for="assessment_plan_frequency_0"><b><%=t('exam_frequent')%></b></label>
+                      <%= radio_button :assessment_report_settings, :frequency ,"1", :checked =>(@type == "AssessmentTerm"), :disabled=>(@setting[:enable_student_records]== "0" || @disable), :class=>"frequency_radio", :onchange=>"load_linkable_items('AssessmentTerm','1')" %>
+                      <label class="general_label" for="assessment_plan_frequency_1"><b><%=t('term_frequent')%></b></label>
+                      <%= radio_button :assessment_report_settings, :frequency ,"2", :checked =>(@type == "AssessmentPlan"), :disabled=>(@setting[:enable_student_records]== "0" || @disable), :class=>"frequency_radio", :onchange=>"load_linkable_items('AssessmentPlan','2')" %>
+                      <label class="general_label" for="assessment_plan_frequency_2"><b><%=t('planner_frequent')%></b></label>
+                  </div>
+              </div>
+              <table class="linkable_items">
+                  <% form.fields_for :gradebook_record_groups do |f| %>
+                    <%= render :partial=> 'linkable_items', :locals=> {:f => f} %>
+                  <% end %>
+              </table>
+              <span class="add manage_link <%= 'hide_link' if (@setting[:enable_student_records]== "0") %> ">
+                  <div id='add-icon' class='add_button_img'></div><div id='add-text'><%= t('new_student_record')%> </div>
+  <%#= link_to_remote "<div id='add-icon' class='add_button_img'></div><div id='add-text'>#{t('new_student_record')}</div>",:url=>{:action=>'manage_links',:assessment_plan_id=>@plan.id,:type=>@type},:id => 'add-btn-link',:method=>:get %>
+              </span>
+          </div>
+      </div>
+  </div>
+  <div class="box remark_settings">
+      <div class="label_field_pair block">
+          <div class="label_pair">
+              <%= check_box :assessment_report_settings, :general_remarks, :checked =>@setting[:general_remarks]== "1", :onchange=>"general_remarks(this)" %>
+              <label for="records_and_remarks_settings_general_remarks" class="core_label sub-header"><%= t('general_remark') %></label>
+          </div>
+          <div class="nested_block inner_block">
+              <div class="section float-left">
+                  <div class="checkbox-label-pair">
+                      <%= check_box :assessment_report_settings, :exam_report_remark, :checked =>@setting[:exam_report_remark]== "1", :onchange=>"disable_remark_set(this);", :class => "remark-checkbox" %>
+                      <label class="core_label remark-checkbox-label"><%=t('exam_report')%></label>
+                  </div>
+                  <span class="remark-description"><%= t('exam_report_remark_set_descr') %></span>
+                  <div class="label-field-pair remark-label-field-pair inherit-label-field">
+                      <% unless @plan.remark_sets.present? %>
+                        <% form.fields_for :remark_sets do |f| %>
+                          <%= render :partial=> 'remark_set', :locals=> {:f => f, :target_type => "AssessmentGroup"} %>
+                        <% end %>
+                      <% else %>
+                        <% form.fields_for :remark_sets, @remark_sets_hash[:exam_remark_sets] do |f| %>
+                          <%= render :partial=> 'remark_set', :locals=> {:f => f, :target_type => "AssessmentGroup"} %>
+                        <% end %>
+                      <%end%>
+                      <span class="add manage_link m-bottom-m-left margin-left-0 margin-top-0">
+                          <%= link_to_add_remark_set  "<div id='add-remark-icon' class='add_button_img'></div><div id='add-text' class='m-top-add-remark'>#{t('add_remark_set')}</div>", form,:remark_sets, 'remark_set', 'AssessmentGroup' %>
+                      </span>
+                  </div>
+              </div>
+              <div class="section float-left add-icon-link-width">
+                  <div class="checkbox-label-pair">
+                      <%= check_box :assessment_report_settings, :term_report_remark, :checked =>@setting[:term_report_remark]== "1", :onchange=>"disable_remark_set(this);", :class => "remark-checkbox" %>
+                      <label class="core_label remark-checkbox-label"><%=t('term_report')%></label>
+                  </div>
+                  <div class="label-field-pair add-icon-link-width remark-set-name-label inherit-label-field">
+
+                      <%= check_box :assessment_report_settings, :inherit_remark_from_exam, :checked => @setting[:inherit_remark_from_exam] == "1", :class => "remark-checkbox  inherit-check" %>
+                      <label class="remark-inherit-label margin-left-10"><%=t('inherit_from_exam')%></label>
+                  </div>
+
+                  <span class="remark-description inherit-description"><%= t('inherit_from_exam_descr') %></span>
+                  <div class="label-field-pair remark-label-field-pair inherit-label-field">
+                      <span class="add manage_link m-bottom-m-left"> 
+                          <% if @remark_sets_hash[:term_remark_sets].present? %>
+                            <% form.fields_for :remark_sets, @remark_sets_hash[:term_remark_sets] do |f| %>
+                              <%= render :partial=> 'remark_set', :locals=> {:f => f, :target_type => 'AssessmentTerm'} %>
+                            <% end %>
+                          <% end %>
+                          <%= link_to_add_remark_set  "<div id='add-remark-icon' class='add_button_img'></div><div id='add-text' class='m-top-add-remark'>#{t('add_remark_set')}</div>", form,:remark_sets, 'remark_set', 'AssessmentTerm'  %>
+                      </span>
+                  </div>
+              </div>
+              <div class="section float-left add-icon-link-width">
+                  <div class="checkbox-label-pair">
+                      <%= check_box :assessment_report_settings, :planner_report_remark, :checked =>@setting[:planner_report_remark]== "1", :onchange=>"disable_remark_set(this);",:class => "remark-checkbox" %>
+                      <label class="core_label remark-checkbox-label"><%=t('planner_report')%></label>
+                  </div>
+                  <div class="label-field-pair add-icon-link-width remark-set-name-label inherit-label-field">
+                      <%= check_box :assessment_report_settings, :inherit_remark_from_term_exam, :checked => @setting[:inherit_remark_from_term_exam] == "1", :class => "remark-checkbox inherit-check" %>
+                      <label class="remark-inherit-label margin-left-10"><%= t('inherit_from_exam_term') %></label>
+                  </div>
+
+                  <span class="remark-description inherit-description"><%= t('inherit_from_exam_term_descr') %></span>
+                  <div class="label-field-pair remark-label-field-pair inherit-label-field">
+                      <span class="add manage_link m-bottom-m-left">
+                          <% if @remark_sets_hash[:planner_remark_sets].present? %>
+                            <% form.fields_for :remark_sets, @remark_sets_hash[:planner_remark_sets] do |f| %>
+                              <%= render :partial=> 'remark_set', :locals=> {:f => f, :target_type => 'AssessmentPlan'} %>
+                            <% end %>
+                          <% end %>
+                          <%= link_to_add_remark_set  "<div id='add-remark-icon' class='add_button_img'></div><div id='add-text' class='m-top-add-remark'>#{t('add_remark_set')}</div>", form,:remark_sets, 'remark_set', 'AssessmentPlan' %>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="label_pair subject-wise-remark">
+              <%= check_box :assessment_report_settings, :subject_wise_remarks, :checked =>@setting[:subject_wise_remarks]== "1" %>
+              <label for="records_and_remarks_settings_general_remarks" class="core_label sub-header"><%= t('subject_wise_remark') %></label>
+          </div>
+          <span class="remark-description subject-wise-description"><%= t('subject_wise_remark_descr') %></span>
+      </div>
+
+  </div>
+  <div class="submit_btn">
+      <%= submit_tag "", :value => "#{t('save_settings')}", :class => "submit-button", :disable_with => "► #{t('please_wait')}" %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  load_linkable_items = function (ele, id) {
+      new Ajax.Request('/assessment_reports/records_and_remarks_settings', {
+          parameters: {
+              'assessment_plan_id': <%= @plan.id %>,
+              'frequency': ele.toString(),
+              'assessment_report_settings[frequency]': id.toString(),
+              'enable_student_records': true
+          },
+          method: 'get'
+      });
+  };
+
+  build_reorder_box = function () {
+      build_modal_box({title: '<%= t('reorder_record_groups') %>', popup_class: 'reorder_form_popup'});
+      j('.reorder_form_popup #popup_content').append("<%=escape_javascript(render :partial => "reorder_form")%>");
+      j('#popup_footer.part').remove();
+  };
+
+  add_fields = function (link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+
+  };
+
+  remove_field = function (el) {
+      el.up().hide();
+      j(el).prev().val(1); //Setting _destroy to 1
+      j(el).closest('.remark-set').find("input[type='text']").val('');
+  };
+  reset_field = function (el) {
+      j(el).closest('.remark-set').find("input[type='text']").val('');
+      j(el).prev().val(1); //Setting _destroy to 1
+  };
+  //j('.remark-set').first().find('.remove_field').hide();
+
+  disable_remark_set = function (el) {
+      if (j(el).prop('checked')) {
+          j(el).parent().parent().find(".destroy_field").val(0);
+          j(el).parent().parent().find('.inherit-check').attr('disabled', false);
+          j(el).parent().parent().find('.add').show();
+      } else {
+          j(el).parent().parent().find('.inherit-check').prop('checked', false);
+          j(el).parent().parent().find(".destroy_field").val(1);
+          j(el).parent().parent().find('.inherit-check').attr('disabled', true);
+          j(el).parent().parent().find('.add').hide();
+      }
+  };
+
+  j("#add-text").click(function (e) {
+    send_request();
+  });
+
+  j('#add-icon').click(function (e) {
+    send_request();
+  });
+
+  send_request = function () {
+      if (!j("#add-text").attr('disabled')) {
+          j("#add-text").attr('disabled', true);
+          j('#add-icon').attr('disabled', true);
+          j.ajax({
+              url: "manage_links",
+              type: 'GET',
+              data: {
+                  assessment_plan_id: "<%= @plan.id%>",
+                  type: "<%= @type %>",
+                  session_fingerprint: "<%= session_fingerprint %>"
+              },
+              beforeSend: function ()
+              {
+              },
+              success: function (data, textStatus, jqXHR)
+              {
+                  j("#add-text").attr('disabled', false);
+                  j('#add-icon').attr('disabled', false);
+              },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+              }
+          });
+      }
+  };
+
+</script>

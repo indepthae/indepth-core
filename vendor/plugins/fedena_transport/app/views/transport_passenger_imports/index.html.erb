@@ -1,0 +1,43 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('import_passengers') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('download_structure')}", 
+                  {:controller => "transport_passenger_imports", :action => "download_structure"} %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div class="import-form">
+        <% form_for :import, @import , :url => {:action => 'create'}, :html=> {:multipart=>true} do |m| %>
+          <%= session_fingerprint_field %>
+          <%= m.hidden_field :academic_year_id %>
+          <div class="label-field-pair">
+              <label for="certificate"><%= t('import_csv') %></label>
+              <div class="text-input-bg"><%= m.paperclip_file_field :attachment, :direct => true %>
+                  <%= m.hidden_field :attachment_content_type, :disabled => true %>
+              </div>
+          </div>
+          <%=  m.submit "#{t('import_text')}", :class => 'submit-button', :id => 'submit_button', :disable_with => "#{t('please_wait')}" %>
+        <%end%>
+    </div>
+    <div id="import_instructions">
+        <%= render :partial => 'import_instructions' %>
+    </div>
+    <div id="import_logs">
+        <h5><%= t('import_logs') %></h5>
+        <% if @imports.present? %>
+          <%= render :partial => 'passenger_import_logs' %>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_imports_present') %> </p>
+        <% end %>
+    </div>
+</div>

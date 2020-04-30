@@ -1,0 +1,82 @@
+<div id="report-header">
+  <div class="logo">
+    <% if FedenaSetting.s3_enabled? %>
+      <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+    <% else %>
+      <%= image_tag current_school_detail.logo.url(:style => :original, :timestamp => false) %>
+    <% end %>  
+  </div>
+  <div class="header-content">
+    <p><%= Configuration.get_config_value('InstitutionName'); %></p>
+
+    <p class="institution_address"><%= Configuration.get_config_value('InstitutionAddress'); %></p>
+  </div>
+</div>
+
+<!-- report filters -->
+<div id="report-filters">
+  <div class="section">
+    <div class="hor_line"></div>
+    <h2><%= t("finance_reports.finance_reports_#{@report_type}") %></h2>
+
+    <div class="hor_line"></div>
+    <div class="extender"></div>
+    <div class="info">
+      <div class="info-left">
+        <div class="info1">
+          <label class="field-label">
+            <%= t('financial_year_name') %>
+            <span class="colon">:</span>
+          </label>
+          <label class="infolbl">
+            <%= @report_hash[:financial_year_name] %>
+          </label>
+        </div>
+      </div>
+      <div class="info-right">
+        <div class="info1">
+          <label class="field-label">
+            <%= t('date_range_text') %>
+            <span class="colon">:</span>
+          </label>
+          <label class="infolbl">
+            <%= "#{format_date(@report_hash[:start_date])} #{t('to')} #{format_date(@report_hash[:end_date])}" %>
+          </label>
+        </div>
+      </div>
+        <div class="info-left">
+        <div class="info1">
+          <label class="field-label">
+            <%= t('courses_text') %>
+            <span class="colon">:</span>
+          </label>
+          <label class="infolbl">
+            <%= @report_hash[:course_names] %>
+          </label>
+        </div>
+      </div>
+      <div class="info-left">
+        <div class="info1">
+          <label class="field-label">
+            <%= t('fee_account_text') %>
+            <span class="colon">:</span>
+          </label>
+          <label class="infolbl">
+            <%= @report_hash[:fee_account_names] %>
+          </label>
+        </div>
+      </div>
+      <div class="info-right">
+        <div class="info1">
+          <label class="field-label">
+            <%= t('batches_text') %>
+            <span class="colon">:</span>
+          </label>
+          <label class="infolbl">
+            <%= @report_hash[:batch_names] %>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

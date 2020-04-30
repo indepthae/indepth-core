@@ -1,0 +1,170 @@
+<div id="threads_container">
+    <div id="count_label">
+        <div class="message_count">
+            <%="#{t('all')} #{t('messages')}"%>
+            <span id="unread_count_thread"><%=@current_user.unread_messages_count%> Unread</span>
+        </div>
+        <div id="filter">
+            <div class="heading"><%= t('filter') %>
+                <%= image_tag("Loader-transparant.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+            </div>
+
+            <div class="label-field-pair" id="status_filter">
+                <div class="text-input-bg"><%= select_tag :thread_filter, options_for_select([["#{t('all')}",'all'],["#{t('employees')}",'employees'],["#{t('parents')}",'parents'],["#{t('students')}",'students'],["#{t('broadcast_messages')}",'group']],:selected=>@filter), :onchange =>"#{remote_function(:url => {:action => "update_thread"},
+                    :with => "'filter='+value",
+                    :before => "Element.show('loader1')",
+                    :success => "Element.hide('loader1')")}"%></div>
+            </div>
+        </div>
+    </div>
+    <div id="thread_listing_main">
+        <table id="thread_listing" width="100%" cellpadding="1" cellspacing="1">
+            <% if @message_threads.present? %>
+              <% @message_threads.each do |thread| %>
+                <% if thread.is_group_message_for @current_user.id %>
+                  <% recipient_count = thread.recipients_count %>
+                  <% has_unread_messages = thread.has_unread_messages? %>
+                  <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+                      <td class="thread_entry">
+                          <div class="thread_entry">
+                              <div class="entry-thumbnail">
+                                  <%= image_tag "group_icon.png" %>
+                              </div>
+                              <div class="entry_detail">
+                                  <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= thread.subject %></div>
+                                  <div class="subject">
+                                      <%=recipient_count%> <%= t('recipients') %>
+                                  </div>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+                <% else %>
+                  <% recipient = get_recipient(thread) %>
+                  <% entry = get_entry(recipient) %>
+                  <% has_unread_messages = thread.has_unread_messages? %>
+                  <% if entry.present? %>
+                    <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+                        <td class="thread_entry">
+                            <div class="thread_entry">
+                                <div class="entry-thumbnail">
+                                    <% if !recipient.parent? %>
+                                      <%= image_tag entry.photo.url(:original, false) %>
+                                    <% else %>
+                                      <%= image_tag "single_user.png" %>
+                                    <% end %>
+                                </div>
+                                <div class="entry_detail">
+                                    <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= entry.full_name %></div>
+                                    <div class="sec_info">
+                                        <%if recipient.student?%>
+                                          <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                                        <%elsif recipient.parent?%>
+                                          <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                                        <%else%>
+                                          <%= "#{t('department')} : #{entry.department}" %>
+                                        <%end%>
+                                    </div>
+                                    <div class="subject"><%= thread.subject %></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                  <% else %>
+                    <tr class="th_entry" data-id="<%=thread.id%>" id="thread_<%=thread.id%>">
+                        <td class="thread_entry">
+                            <div class="thread_entry">
+                                <% if recipient and recipient.admin? and !recipient.is_deleted%>
+                                  <div class="entry-thumbnail"><%= image_tag "single_user.png" %></div>
+                                  <div class="entry_detail">
+                                      <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= recipient.full_name %></div>
+                                      <div class="sec_info"><%=recipient.user_type%></div>
+                                      <div class="subject"><%= thread.subject %></div>
+                                  </div>
+                                <%else%>
+                                  <div class="entry-thumbnail">
+                                      <%= image_tag "blocked_user.png" %>
+                                  </div>
+                                  <div class="entry_detail">
+                                      <div class="name <%= 'unread_messages_name' if has_unread_messages%>"><%-if has_unread_messages%><span>•</span><%-end%><%= t('deleted_user')%></div>
+                                      <div class="subject"><%= thread.subject %></div>
+                                  </div>
+                                <%end%>
+                            </div>
+                        </td>
+                    </tr> 
+                  <% end %>
+                <% end%>
+              <%end%>
+              <% @message_threads.total_pages.to_i.times do |i| %>
+                <tbody id="infinite_thread_<%=i+2%>"></tbody>
+              <% end %>
+            <%else%>
+              <tr class="no_thread_entry">
+                  <td class="no_thread">
+                      <%=t('no_conversations')%>
+                  </td>
+              </tr>
+            <%end%>
+        </table>
+    </div>
+    <div id="infinite-scrolling">
+        <%= will_paginate @message_threads %>
+    </div>
+</div>
+<script type="text/javascript">
+  (function ($) {
+      $.fn.hasScrollBar = function () {
+          return this.get(0).scrollHeight > this.height();
+      }
+  })(jQuery);
+  if (j('tbody').hasScrollBar() == true)
+  {
+      j('.td_val').css('width', '67px');
+  }
+  else {
+      j('.td_val').css('width', '82px');
+  }
+  if (j("#thread_<%=@thread_id%>").length > 0) {
+      j("#thread_<%=@thread_id%>").addClass('coloured_background');
+  }
+  j('#thread_listing tr.th_entry').each(function () {
+      j(this).click(function () {
+          $reply_attachment_error = false;
+          j(".coloured_background").removeClass('coloured_background');
+          j(this).addClass('coloured_background');
+          j.ajax({
+              type: 'GET',
+              url: "/messages/update_conversation",
+              data: {
+                  thread_id: j(this).attr('data-id'),
+                  filter: "<%=@filter %>"
+              },
+              beforeSend: function () {
+                  j('#message_conversation').html("");
+                  j('#message_conversation').append("<img  alt='Loading...' src='/images/pk-loader.gif' style='display:none;' id='loader_4'></img>")
+                  j('#loader_4').css('display', 'block');
+              },
+              success: function () {
+              }
+          });
+      });
+  });
+
+
+  jQuery(function () {
+      if (j('#infinite-scrolling').size() > 0) {
+          j('#thread_listing_main').on('scroll', function () {
+              var more_posts_url;
+              more_posts_url = j('#infinite-scrolling .pagination .next_page').attr('href');
+              filter = '&filter=<%=@filter if @filter%>'
+              if (more_posts_url && j('#thread_listing_main').scrollTop() + j('#thread_listing_main').height() > (j('#thread_listing').height() - 200)) {
+                  j('#infinite-scrolling .pagination').html('<img src="/images/filler_ring_loader.gif" alt="Loading..." title="Loading..." />');
+                  j('#infinite-scrolling .pagination').css('display', 'block');
+                  j.getScript(more_posts_url + filter);
+              }
+          });
+      }
+  });
+
+</script>

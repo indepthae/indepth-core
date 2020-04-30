@@ -1,0 +1,51 @@
+<div class="employee_overlap_header">
+  <div class="label_pair">
+    <div class="label">
+      <%= t('timetable_text') %>
+    </div>
+    <div class="title">
+      <%= @timetable.range %>
+    </div>
+  </div>
+  <div class="header_description">
+    <%= t('employee_hour_overlap_description') %>
+  </div>
+</div>
+<div class="employee_list_table">
+  <div class="employee_overlap_table_header">
+    <div class="employee_list_column_1"> Employees </div>
+    <div class="employee_list_column_2"> Overlapping hours </div>    
+  </div>
+  <div class="employee_list_rows">
+    <% @employees.each do |employee| %>
+      <% o_data = (@overlaps[:details][employee.id] || @overlaps[:details][employee.id]).values %>
+      <% o_data.map {|x| x[:tts] }.flatten.each_with_index do |tte,i| %>
+        <% tte = @timetable_entries.find{|x| x.id == tte } %>
+        <div class="employee_overlap_row">
+          <div class="employee_list_column_1 <%= i != 0 ? 'no_top_border' : ''%>">
+            <% if i == 0 %>
+              <%= "#{employee.full_name} (#{employee.employee_number})" %>
+            <% end %>
+          </div>
+          <div class="employee_list_column_2">
+            <%= WeekdaySet.weekday_name(tte.weekday_id) %>
+            <%= "(#{format_date(tte.class_timing.start_time, :format => :time)} #{t('to')} #{format_date(tte.class_timing.end_time, :format => :time)})" %>
+            <%= "#{tte.entry.name}" %>
+            <%= "#{t('for')}" %>
+            <%= "#{tte.batch.full_name}" %>
+          </div>
+          <div class="employee_list_column_3">
+            <%= link_to t('view_allocation'),{:controller=>:timetable_entries,:action => "new",:timetable_id=>@timetable, :batch_id => tte.batch_id},:class => "allocation_links", :target => "_tab"%>
+          </div>
+        </div>
+
+      <% end %>
+    <% end %>
+  </div>
+</div>
+<style>
+  #modal-box {
+    width: 676px;
+    margin: 0px auto 20px auto;
+  }
+</style>

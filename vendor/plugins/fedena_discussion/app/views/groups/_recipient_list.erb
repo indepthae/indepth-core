@@ -1,0 +1,36 @@
+<% unless recipients.blank? %>
+  <div id="members_list">
+    <div class="label-field-pair">
+      <label for="student_grade"><%= t('member') %></label>
+      <div class ="scrolable1" >
+        <% x = "<span class='individual'></span>" %>
+        <div class="scroll-inside">
+          <% recipients.each do |r|  %>
+            <% if @group.members.collect(&:id).include?(r.id) %>
+              <% unless r.id==group.user_id or @group.admin_members.collect(&:id).include?(r.id) %>
+                <div class="hover">
+                  <%= shorten_string(r.full_name,20) %>
+                  <%= link_to  x, "#", :onClick => "remove_recipient(#{r.id})",
+                    :before => "Element.show('loader')",
+                    :success => "Element.hide('loader')",:class=>"individual"%>
+                  <%= link_to "",switch_between_admin_and_normal_group_path(:user_id=>r,:group_id=>group.id), :action=>"switch_between_admin_and_normal",:class=>"opt_switch" %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="hover">
+                <%= r.first_name %>
+                <% unless r.id==@group.user_id %>
+                  <%= link_to x, "#", :onClick => "remove_recipient(#{r.id})",
+                    :before => "Element.show('loader')",
+                    :success => "Element.hide('loader')"%>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="extender"></div>
+  </div>
+<% end %>

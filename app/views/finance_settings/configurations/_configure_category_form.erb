@@ -1,0 +1,48 @@
+<% remote_form_for :configure_category, :url => {} do |f| %>
+    <%= session_fingerprint_field %>
+    <%= hidden_field_tag :transaction_category, @transaction_category.id %>
+    
+    <div id="configure_category_form">
+      <div id="description">
+        <%= t("finance_settings.configure_category_desc") %>
+      </div>
+      <% unless flash[:notice].nil? %>
+          <p class="flash-msg" id="flash-notice"> <%= flash[:notice] %> </p>
+      <% end %>
+
+      <% if @transaction_category.name == "Fee" %>
+          <div class="label-field-pair">
+            <%= f.label :fee_category %>
+            <div class="text-input-bg">
+              <% selected = @category.present? ? {:selected => @category.id} : {} %>
+              <%= f.select :fee_category, @categories.collect { |c| [c.name, c.id] },
+                           {:include_blank => t("select_fee_category")}.merge(selected),
+                           :onchange => "#{remote_function(:url => {:action => "load_fee_category_configurations"},
+                                                           :with => "'id=' + value")}" %>
+            </div>
+          </div>
+      <% end %>
+
+      <div id="configurations">
+        <% if (@transaction_category.name == "Fee" and @category.present?) or @transaction_category.name != "Fee" %>
+            <%= render :partial => "finance_settings/configurations/configuration_setting_fields" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="popup_footer">
+      <%= submit_tag t("save"), :class => "submit-button", :id => "submit_button" %>
+      <div id="cancel_button" class="submit-button" onclick="remove_popup_box();"><%= t('cancel') %></div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+
+    j('#popup_footer.part').remove();
+    j('#popup_box_overlay').click(remove_popup_box);
+
+    <% if @transaction_category.name == "Fee" and !@category.present? %>
+    disable_cat_configure();
+    <% end %>
+
+</script>

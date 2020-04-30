@@ -1,0 +1,88 @@
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <%  if @fa_score_hash.empty?%>
+    <tr class="tr-head">
+      <td>No reports found for the search</td>
+    </tr>
+  <% else %>
+    <tr class="tr-head">
+      <td id="session">SESSION</td>
+      <td id ="batch_range"><%="#{@batch.start_date.year} - #{@batch.end_date.year}"%></td>
+      <td id="exam_text">EXAM</td>
+      <td id="batch_name"><%="#{@batch.full_name}"%></td>
+      <td id="subject_text">SUBJECT</td>
+      <td id ="subject_name"><%=@subject.name%></td>
+    </tr>
+    <tr class="tr-head">
+      <td colspan="2"> </td>
+      <% if roll_number_enabled? %>
+        <td></td>
+      <%end%>
+      <%if @assessment == "ASL1"%>
+        <td><%="SA1 - MAX"%></td>
+      <%else%>
+        <td><%="SA2 - MAX"%></td>
+      <%end%>
+      <td><%=@fa_score_hash["asl_mark"]["score"]%></td>
+      <td></td>
+      <% unless roll_number_enabled? %>
+        <td></td>
+      <%end%>
+    </tr>
+    <tr class="tr-head">
+      <td colspan="2"></td>
+      <% if roll_number_enabled? %>
+        <td></td>
+      <%end%>
+      <%if @assessment == "ASL1"%>
+        <td colspan="2"><%="SA1 - ASL"%></td>
+      <%else%>
+        <td colspan="2"><%="SA2 - ASL"%></td>
+      <%end%>
+      <td></td>
+      <% unless roll_number_enabled? %>
+        <td></td>
+      <%end%>
+    </tr>
+    <tr class="tr-head">
+      <td>BOARD REG.NO.</td>
+      <% if roll_number_enabled? %>
+        <td>ROLLNO</td>
+      <%end%>
+      <td>NAME</td>
+      <td>Obt.</td>
+      <td><%="WT - #{(@fa_score_hash["asl_convert_mark"]["score"]).round(2)}%"%></td>
+      <td></td>
+      <% unless roll_number_enabled? %>
+        <td></td>
+      <%end%>
+    </tr>
+    <% @students.each do |s| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td></td>
+        <% if roll_number_enabled? %>
+          <td class="col-2"><%= s.roll_number_in_context %> </td>
+        <% end %>
+        <td class="col-2"><%= s.full_name %> </td>
+        <% st=@fa_score_hash.find{|c,v| c==s.id} %>
+        <% if st %>
+          <td class="col-3"><%= (@fa_score_hash[s.id][@assessment]['obtained']).round(2) %></td>
+          <td class="col-3"><%= (@fa_score_hash[s.id][@assessment]['convert']).round(2) %></td>
+        <% else %>
+          <td class="col-3">-</td>
+          <td class="col-3">-</td>
+        <% end %>
+        <td></td>
+        <% unless roll_number_enabled? %>
+          <td></td>
+        <%end%>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
+<%  unless @fa_score_hash.empty?%>
+  <div class="button">
+    <div class="pdf-button">
+      <%= link_to "► CSV Export", {:controller => "cce_reports", :action => "asl_report_csv",:batch_id=>params[:assessment][:batch_id],:asl_group_name=>params[:assessment][:asl_group_name]},:style=>"color:#fff !important;",:target => '_blank' %>
+    </div>
+  </div>
+<% end %>

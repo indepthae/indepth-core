@@ -1,0 +1,10 @@
+<%@keys.each do |key,value| %>
+<div class="key">
+  <div class="key_name">
+    <%= value %>
+  </div>
+  <div class="key_code">
+    <%= " {{#{key.to_s}}} "%>
+  </div>
+</div>
+<%end%>

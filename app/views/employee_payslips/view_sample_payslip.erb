@@ -1,0 +1,163 @@
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+
+<%= stylesheet_link_tag(*get_stylesheets) %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+
+<div id="pdf-header">
+  <div class="logo">
+    <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+  </div>
+  <div class="header-content">
+    <p><%=Configuration.get_config_value('InstitutionName'); %></p>
+    <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div id="payslip">
+
+    <div class="main_info">
+      <div class="payslip_text" colspan="2"><%= t('payslip') %></div>
+      <div class="date_range" colspan="2"><%= "#{Date.today.strftime("%d %B %y")} - #{Date.today.to_date.strftime("%d %B %y")}" %></div>
+    </div>
+
+    <div class="employee_info">
+
+      <% tot_count = @header.length + @att_details.length %>
+      <% tot_att_count = @att_details.length %>
+      <% half_count = (tot_count.to_f/2).round %>
+      <% left_count =  half_count %>
+      <% right_count = tot_count - left_count%>
+      <% left_header =  @header.slice(0,left_count) %>
+      <% right_header = @header.slice(left_count,@header.length )||[] %>
+
+      <%@att_details.each do |att| %>
+        <% right_header << att %>
+      <% end %>
+      <div id="left" style="width:50%;">
+        <% left_header.each do |header| %>
+          <div class="info_left">
+            <div class="label"><%= header[:label] %></div><span>:</span>
+            <div class="text"><%= header[:text] %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <div id="right" style="width:49%;">
+        <% right_header.each do |header| %>
+          <div class="info_right">
+            <div class="label"><%= header[:label] %></div><span>:</span>
+            <div class="text"><%= header[:text] %></div>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
+
+
+
+    <div class="categories">
+
+      <div id="left" style="width:50%;">
+
+        <div class="table-header">
+          <div id="category_name"><span><%= t('earnings') %></span></div>
+        </div>
+        <% earnings = 0 %>
+        <% deductions = 0 %>
+        <% c = 'even' %>
+
+        <div class="<%= "#{c}" %>">
+          <div class="col-pdf"><%= "Basic"%></div>
+          <div id="amount_value"><%= "#{currency} #{precision_label(10000)}" %></div>
+        </div>
+
+        <div class="<%= "#{c}" %>">
+          <div class="col-pdf"><%=  "DA"%></div>
+          <div id="amount_value"><%= "#{currency} #{precision_label(5000)}" %></div>
+        </div>
+
+
+        <div class="<%= "#{c}" %>">
+          <div class="col-pdf"><%= "HRA" %></div>
+          <div id="amount_value"><%= "#{currency} #{precision_label(5000)}" %></div>
+        </div>
+
+        <div class="<%= c == 'even' ? 'odd' : 'even' %>">
+          <div class="col-pdf earning_header">
+            <%= t('total_earning') %>
+          </div>
+          <div id="amount_value" class="tot_earning"> <%= "#{currency}#{precision_label(11000)}"  %></div>
+        </div>
+      </div>
+
+
+      <div id="right" style="width:49.8%;">
+
+        <div class="table-header">
+          <div id="category_name"><span><%= t('deductions') %></span></div>
+        </div>
+
+
+        <div class="<%= "#{c}" %>">
+          <div class="col-pdf"><%= "Food coupon"%></div>
+          <div id="amount_value"><%= "#{currency} #{precision_label(2500)}" %></div>
+        </div>
+
+        <div class="<%= "#{c}" %>">
+          <div class="col-pdf"><%=  "Lop"%></div>
+          <div id="amount_value"><%= "#{currency} #{precision_label(1000)}" %></div>
+        </div>
+
+        <div class="<%= c == 'even' ? 'odd' : 'even' %>">
+          <div class="col-pdf earning_header">
+            <%= t('total_deduction') %>
+          </div>
+          <div id="amount_value" class="tot_earning"> <%= "#{currency}#{precision_label(3500)}"  %></div>
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+    <div style="width:35%;" class="net_pay">
+      <div class="even">
+        <div class="col-pdf"><%= t('net_salary') %></div>
+        <div id="amount_value"><%= "#{currency}#{precision_label(16500)}"  %></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="footnote">
+  <% if @footnote.present? %>
+      <p><%= @footnote %></p>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  j = jQuery;
+
+  j( document ).ready(function() {
+    var maxWidthLabelLeft = Math.max.apply(null, j(".info_left .label").map(function ()
+    {
+      return j(this).width();
+    }).get());
+
+    var maxWidthLabelRight = Math.max.apply(null, j(".info_right .label").map(function ()
+    {
+      return j(this).width();
+    }).get());
+
+
+
+
+    j(".info_left .label").css({"width": maxWidthLabelLeft + 10 })
+    j(".info_right .label").css({"width": maxWidthLabelRight + 10 })
+    j(j(".text")[0]).css({"font-weight":"bold"})
+  });
+
+</script>

@@ -1,0 +1,158 @@
+<% unless @students.blank? %>
+  <div class="info">
+      <div class="field_pair">
+          <div class="label1"><%= "#{t('total')} #{t('students')}" %></div>
+          <div class="label2"><%= ": #{@students.total_entries}" %></div>
+      </div>
+  </div>
+  <div class="submit-button">
+      <% batch_ids=params[:batch_id].present? ? params[:batch_id][:batch_ids] : [] %>
+      <%= link_to "#{t('export_as_csv')}", {:action => 'batch_head_wise_fees_csv',
+        :session_fingerprint=>session_fingerprint, :batch_ids => batch_ids}, :target => '_blank' %>
+  </div>
+  <div class="extender"></div>
+  <div id="page-yield">
+      <% is_tax_present = @students.map { |s|
+        s.finance_fees.map { |ff|
+          fee_account_active = !(ff.finance_fee_collection.fee_account.try(:is_deleted));
+          !ff.finance_fee_collection.is_deleted and ff.tax_enabled and ff.tax_collections.present? and fee_account_active }
+        }.flatten.compact.uniq.include?(true)
+    %>
+      <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head sub-heading">
+              <td class="s_no"><%= t('no_text') %></td>
+              <td class="name"><%= "#{t('student_name')}" %></td>
+              <td class="name"><%= "#{t('batch_name')}" %></td>
+              <td class="fee_name"><%= "#{t('fee_collection')} #{t('name')}" %></td>
+              <td class="fee_name"><%= "#{t('fee_particulars')}" %></td>
+              <td class="fee_name"><%= "#{t('fee_discounts')}" %></td>
+              <% if is_tax_present %>
+                <td class="fee_name"><%= "#{t('tax_text')}" %></td>
+              <% end %>
+              <td class="amounts"><%= "#{t('amount_to_pay')}&#x200E; (#{currency})&#x200E;" %></td>
+              <td class="amounts"><%= "#{t('paid').capitalize} #{t('amount')}&#x200E; (#{currency})&#x200E;" %></td>
+          </tr>
+          <% page_count=0 %>
+          <% @students.each_with_index do |s, @i| %>
+            <% balance=0 %>
+            <% paid_fees=0 %>
+            <%finance_fees= s.finance_fees.select{|ff| fee_account_active = !(ff.finance_fee_collection.fee_account.try(:is_deleted));
+            !ff.finance_fee_collection.is_deleted && fee_account_active && (@batch_ids.present? ? (@batch_ids.include? ff.batch_id.to_s) : true)}%>
+            <% if params[:page].present? %>
+              <% if params[:page].to_i >= 1 %>
+                <% @i = @i + (params[:page].to_i - 1) * @students.per_page.to_i %>
+              <% end %>
+            <% else %>
+              <% @i = @i %>
+            <% end %>
+            <% page_count+=1 %>
+            <% next unless finance_fees.present? %>
+            <% rowspan = finance_fees.length + 1 %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+
+                <td class="col-5 parent-style" rowspan="<%= rowspan %>"> <%= @i+1 %></td>
+                <% student_text = "(#{s.admission_no})&#x200E;"  %>
+                <td class="col-2 parent-style" rowspan="<%= rowspan %>"><%= "#{s.full_name}&#x200E; #{student_text}" %></td>
+                <td class="col-2 parent-style" rowspan="<%= rowspan %>"><%= "#{s.batch.full_name}" %></td>
+                <% finance_fees.each do |f| %>
+              <tr class="tr-<%= cycle('odd', 'even') %>">
+                  <td class="col-2"><%= f.finance_fee_collection.name %></td>
+
+                  <% paid_fees=paid_fees+f.finance_transactions.collect(&:amount).sum %>
+
+                  <td class="col-4">
+                      <% p=[] %>
+                      <% i=1 %>
+                      <% f.finance_fee_collection.collection_particulars.each { |cp|
+                        cp.finance_fee_particular.present? and
+                          ((cp.finance_fee_particular.batch_id==f.batch_id and
+                              cp.finance_fee_particular.receiver.present?) and
+                            (cp.finance_fee_particular.receiver==s or
+                              cp.finance_fee_particular.receiver==f.batch or
+                              cp.finance_fee_particular.receiver==f.student_category )) ?
+                          (p<< "#{i}. #{cp.finance_fee_particular.name} :
+          <color ='red'>#{precision_label(cp.finance_fee_particular.amount)}</color>"; i=i+1) : p= p
+                        } %>
+                      <%= p.join('<p/>') %>
+
+                  </td>
+                  <td class="col-4">
+                      <% d=[] %>
+                      <% i=1 %>
+                      <% f.finance_fee_collection.collection_discounts.each { |cd|
+                        cd.fee_discount.present? and
+                          ((cd.fee_discount.batch_id==f.batch_id and
+                              cd.fee_discount.receiver.present?) and
+                            (cd.fee_discount.receiver==s or
+                              cd.fee_discount.receiver==f.batch or
+                              cd.fee_discount.receiver==f.student_category )) ?
+                          (d<< "#{i}. #{cd.fee_discount.name} :
+          #{precision_label(cd.fee_discount.discount)}#{cd.fee_discount.is_amount ?
+                          '('+currency+')' : '%'}"; i=i+1) : d= d
+                        } %>
+                      <%= d.join('<p/>') %>
+                  </td>
+                  <% if is_tax_present %>
+                    <td class="col-4">
+                        <% if f.tax_enabled? and f.tax_collections.present? %>
+                          <% d=[] %>
+                          <% f.tax_collections.map {|tc| tc.tax_slab }.uniq.each_with_index { |slab,i|
+                            d << "#{i+1}. #{slab.name} : #{precision_label(slab.rate)}%"
+                            } %>
+                          <%= d.join('<p/>') %>
+                        <% else %>
+                          <p>-</p>
+                        <% end %>
+                    </td>
+                  <% end %>
+                  <td class="col-3"><%= precision_label(f.balance.to_f) %></td>
+                  <% balance=f.balance.to_f+balance %>
+
+
+                  <td class="col-3"><%= precision_label(f.finance_transactions.collect(&:amount).sum) %></td>
+              </tr>
+
+            <% end %>
+            <tr>
+                <td>
+
+                </td>
+                <td class="col-14" >
+                    Total
+                </td>
+
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+                <td></td>
+                <td></td>
+                <% if is_tax_present %>
+                  <td></td>
+                <% end %>
+                <td class="col-14">
+                    <%= precision_label(balance)%>
+                </td>
+                <td class="col-14">
+
+                    <%= precision_label(paid_fees) %>
+                </td>
+            </tr>
+            </tr>
+
+          <% end %>
+      </table>
+      <% unless @students.per_page.to_i > @students.total_entries.to_i %>
+        <div class="pagination_list">
+            <div class="pagination_text">
+                <%= "#{t('showing')} #{@i+1-(page_count-1)}-#{@i+1} #{t('of')} #{@students.total_entries}" %>
+            </div>
+            <%= will_paginate @students, :renderer => 'RemoteLinkRenderer', :page_links => false, :params => {:batch_id => params[:batch_id]} %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="flash-msg"> <%= "#{t('no_fee_collection_present')} #{t('found')}" %></p>
+    <% end %>
+</div>

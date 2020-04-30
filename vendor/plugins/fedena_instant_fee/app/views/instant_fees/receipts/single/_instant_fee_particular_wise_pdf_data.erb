@@ -1,0 +1,159 @@
+<!--
+< % if has_particulars?(transaction_hash) %>
+  
+  <div class="subsection">
+      <hr class="light_hor_line"/>
+      <div id="sub_text_left">< %=t('particular')%></div>
+      <div id="sub_text_right" class="">< %=t('amount')%> (< %= transaction_hash.currency %>)</div>
+      <hr class="light_hor_line"/>
+      <div class="extender"></div>
+  </div>
+< % end % >
+-->
+
+<% transaction_hash.fee_particulars.each_with_index do |particular,index| %>
+  <div class="particular_wise_item">
+      <div class="slno"><%=index+1%>.</div>
+      <div class="particalar_name"><%=particular.name%></div>
+      <div class="right_total addl_5_margin">
+          <div class="right_total_label"><%=t('actual_amount')%></div>
+          <div class="right_total_amount"><%= precision_label(particular.amount) %></div>
+          <% unless transaction_hash.finance_type == 'InstantFee'%>
+            <div class="right_total_label"><%=t('remaining_balance')%></div>
+            <div class="right_total_amount"><%= precision_label(particular.remaining_balance) %></div>
+          <% end%>
+          <% if particular_has_discount(particular) %>
+            <div class="right_total_label"><%=t('discount')%></div>
+            <div class="right_total_amount"><%= precision_label(particular.discount)%></div>
+          <% end %>
+          <% if transaction_hash.tax_enabled %>
+            <div class="right_total_label"><%=t('tax_text')%></div>
+            <div class="right_total_amount"><%= precision_label(particular.tax_amount)%></div>
+          <% end %>
+          <div class="right_total_label bold"><%=t('amount_paid')%></div>
+          <div class="right_total_amount bold"><%= precision_label(particular.amount_paid) %></div>
+          <% unless transaction_hash.finance_type == 'InstantFee'%>
+            <div class="right_total_label"><%=t('balance')%></div>
+            <div class="right_total_amount"><%= precision_label(particular.balance) %></div>
+          <% end%>
+      </div>
+  </div>
+<% end %>
+<% if transaction_hash.fine_list.present? %>
+  <div class="subsection">
+      <hr class="light_hor_line"/>
+      <div id="sub_text_left"><%=t('fine')%></div>
+      <div id="sub_text_right"><%=t('amount')%> (<%= transaction_hash.currency %>)</div>
+      <hr class="light_hor_line"/>
+      <div class="extender"></div>
+  </div>
+  <% transaction_hash.fine_list.each_with_index do |fine,i|%>
+    <div class="particulars_list">
+        <div class="slno"><%=i+=1%>.</div>
+        <div class="particalar_name"><%= fine.name %></div>
+        <div class="particalar_amount"><%= precision_label(fine.amount) %></div>
+    </div>
+  <% end%>
+<% end %>
+<!--  -->
+<div class="summary">
+    <div class="subsection summary-line">
+        <hr class="light_hor_line"/>
+        <div id="sub_text_left"><%=t('summary')%></div>
+        <div id="sub_text_right"><%=t('amount')%> (<%= transaction_hash.currency %>)</div>
+    </div>
+    <% i=0%>
+    <div class="particulars_list">
+        <div class="slno"><%=i+=1%>.</div>
+        <div class="particalar_name"><%= "#{t('total')} #{t('fees_text')}" %></div>
+        <div class="particalar_amount"><%= precision_label(transaction_hash.total_payable) %></div>
+    </div>
+    <% if has_discount?(transaction_hash) %>
+      <div class="particulars_list">
+          <div class="slno"><%=i+=1%>.</div>
+          <div class="particalar_name"><%= "#{t('total')} #{t('discount')}" %></div>
+          <div class="particalar_amount"><%= precision_label(transaction_hash.total_discount.to_f) %></div>
+      </div>
+    <% end %>
+    <% if has_fine?(transaction_hash) %>
+      <div class="particulars_list">
+          <div class="slno"><%=i+=1%>.</div>
+          <div class="particalar_name"><%= "#{t('total_fine_amount')}" %></div>
+          <div class="particalar_amount"><%= precision_label(transaction_hash.total_fine_amount) %></div>
+      </div>
+    <% end %>          
+    <% if transaction_hash.tax_enabled %>
+      <div class="particulars_list">
+          <div class="slno"><%=i+=1%>.</div>
+          <div class="particalar_name"><%= "#{t('tax_text')}" %></div>
+          <div class="particalar_amount"><%= precision_label(transaction_hash.total_tax) %></div>
+      </div>
+    <% end %>
+</div>
+<div class="receipt-footer-bottom">
+    <div class="left_info">
+        <div class="left_info_label"><%=t('payment_mode')%></div>
+        <div class="left_info_value"><%= transaction_hash.payment_mode %></div>
+        <% if transaction_hash.reference_no.present?%>
+          <div class="left_info_label"><%= transaction_hash.reference_label %></div>
+          <div class="left_info_value"><%= transaction_hash.reference_no %></div>
+        <% end%>
+        <% if transaction_hash.payment_note.present?%>
+          <div class="left_info_label"><%=t('notes')%></div>
+          <div class="left_info_value"><%= transaction_hash.payment_note %></div>
+        <% end%>              
+        <% if transaction_hash.tax_enabled %>
+          <div class="left_info_label">
+              <%= transaction_hash.default_configs.finance_tax_identification_label %>
+          </div>
+          <div class="left_info_value">
+              <%= transaction_hash.default_configs.finance_tax_identification_number %>
+          </div>
+        <%  end%>
+    </div>
+    <div class="right_total">
+        <% unless transaction_hash.finance_type == 'InstantFee'%>
+          <div class="right_total_label"><%=t('total_amount_to_pay')%></div>
+          <div class="right_total_amount"><%= precision_label(transaction_hash.total_amount_to_pay) %></div>
+          <% if has_previously_paid_fees?(transaction_hash) %>
+            <div class="right_total_label"><%=t('previous_payments')%></div>
+            <div class="right_total_amount"><%= precision_label(transaction_hash.done_amount) %></div>
+          <% end %>
+
+        <% end%>
+        <% if has_previously_paid_fees?(transaction_hash) %>
+          <div class="right_total_label"><%=t('total_amount_paid')%></div>
+          <div class="right_total_amount"><%= precision_label(transaction_hash.total_amount_paid.to_f) %></div>
+        <% end %>      
+        <% unless transaction_hash.finance_type == 'InstantFee'%>
+          <% if has_due?(transaction_hash) %>
+            <div class="right_total_label"><%=t('total_due_amount')%></div>
+            <div class="right_total_amount"><%= precision_label(transaction_hash.total_due_amount.to_f) %></div>
+          <% end %>
+        <% end%>
+    </div>
+</div>
+
+
+<div class="receipt-footer-bottom words_bottom">
+    <% show_amount_in_words = (transaction_hash.default_configs.pdf_receipt_atow.to_i == 1) %>    
+    <div class="left_info amount_margin">
+        <% if show_amount_in_words %>
+          <span style="font-weight: bold;"><%=t('amount_in_words')%></span> : 
+          <%= NumberToWord.convert(transaction_hash.amount.to_f, 
+            transaction_hash.default_configs.pdf_receipt_nsystem, 
+            transaction_hash.default_configs.default_currency) %>
+        <% end %>
+
+        <% if transaction_hash.invoice_enabled %>
+          <span style="font-weight: bold;"><%=t('payment_for_invoice')%></span> : 
+          <%= transaction_hash.invoice_no %>
+        <% end %>
+    </div>    
+    <div class="right_total amount_paid">
+        <b>
+            <div class="right_total_label"><%= t('amount_paid') %></div>
+            <div class="right_total_amount"><%= precision_label(transaction_hash.amount.to_f) %></div>
+        </b>
+    </div>
+</div>

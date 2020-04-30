@@ -1,0 +1,45 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('subject_import_logs') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :subjects_center_import_logs %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div class='page_head'><%= t('subject_import_logs') %></div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="planner_box">
+        <% if @course.subject_imports.present? %>
+          <span class="table_info"><%= t('showing_last_logs',{:count => @course.subject_imports.count}) %></span>
+          <table align="center" width="100%" cellpadding="1" cellspacing="1" id="logs">
+              <tr class="tr-head">
+                  <td class="course_name"><%= t('import_from') %></td>
+                  <td class="count"><%= t('import_date') %></td>
+                  <td class="course_name"><%= t('status') %></td>
+              </tr>
+              <% @course.subject_imports.reverse.each do |import| %>
+                <tr>
+                    <td class="course_name"><%= import.import_course_name(@imported_courses) %></td>
+                    <td class="course_name"><%= format_date(AssessmentScoreImport.default_time_zone_present_time(import.created_at),:format=>:long) %></td>
+                    <td class="course_name status">
+                        <span class="name"><%= import.importing_status %></span>
+                        <% if import.last_error.present?%>
+                          <span id="info-symbol" tooltip="<%= import.error_text %>"></span>
+                        <% end %>
+                    </td>
+                </tr>
+              <% end %>
+          </table>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_imports_present') %> </p>
+        <% end %>
+    </div>
+</div>

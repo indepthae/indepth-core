@@ -1,0 +1,79 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('route_details')}"%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= "#{t('view_route_details')}"%></div>
+    <% if params[:from].nil? %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('edit')}", edit_route_path(@route.id) %></li>
+              <li class="themed_bg themed-dark-hover-background">
+                  <%= link_to_remote "#{t('reorder_stops')}", :url => reorder_stops_route_path(@route.id), :method => :get %>
+              </li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% if params[:from].nil? %>
+          <% breadcrumb :routes_show, @route %>
+        <% else %>
+          <% breadcrumb :routes_report_show, [@route, "route_details_report"] %>
+        <% end %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% if @route.updating_fare %>
+      <p class="flash-msg"><%= t('route_details_updated_fare_updation_in_progress') %></p>
+    <% elsif flash[:notice].present? %>
+      <p class="flash-msg"><%= flash[:notice] %> </p>
+    <% end %>
+    <div class="vehicle_details">
+        <div class="field_details">
+            <div class="field_name"><%= t('name') %></div>
+            <div class="field_val">: <%= @route.name %></div>
+        </div>
+        <% if @flat_based_fee %>
+          <div class="field_details">
+              <div class="field_name"><%= t('fare') %></div>
+              <div class="field_val">: <%= (precision_label @route.fare)||'-' %></div>
+          </div>
+        <% end %>
+        <div class="field_details">
+            <div class="field_name"><%= t('vehicle') %></div>
+            <div class="field_val">: <%= @route.vehicle.try(:vehicle_no)||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('transport_employees.driver') %></div>
+            <div class="field_val">: <%= @route.driver.try(:first_and_last_name)||"-" %></div>
+        </div>
+        <div class="field_details">
+            <div class="field_name"><%= t('transport_employees.attendant') %></div>
+            <div class="field_val">: <%= @route.attendant.try(:first_and_last_name)||"-" %></div>
+        </div>
+        <% @additional_details.each do |additional_detail| %>
+          <%if additional_detail.additional_info.present?%>
+            <div class="field_details">
+                <div class="field_name"><%= additional_detail.transport_additional_field.name %></div>
+                <div class="field_val">: <%= additional_detail.additional_info %></div>
+            </div>
+          <%end%>
+        <% end %>
+        <div class="field_details">
+            <div class="field_name"><%= t('fare_updating_status') %></div>
+            <div class="field_val">: <span id="status"><%= @route.updating_status_text %></span></div>
+        </div>
+    </div>
+    <div id="stops_list">
+        <%= render :partial => "stops_list" %> 
+    </div>
+
+</div>
+<script type="text/javascript">
+  updateSortorder = function () {
+      j('.sort_table tr.list').each(function (i) {
+          j(this).children('#sort_order').val(i + 1);
+      });
+  }
+</script>

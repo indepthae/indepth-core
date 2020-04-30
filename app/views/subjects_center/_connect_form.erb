@@ -1,0 +1,142 @@
+<div class="desc"><%= t('connect_subjects_desc') %></div>
+<div class="connect_container">
+    <div class="connect_table">
+        <table align="center" width="75%" cellpadding="1" cellspacing="1" id="left_table">
+            <tr class="tr-head">
+                <td>
+                    <%= t('subjects_text') %>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <% @normal_course_subjects.each do |sub| %>
+              <tr class="<%= @subjects_relation[sub.id][:subject_id].present? ? 'disable_linking' : 'linkable' %>" course_subject_id="<%= sub.id %>" batch_id="<%= @batch.id %>">
+                  <td class="name">
+                      <div class="course_subject_name">
+                        <%= @subjects_relation[sub.id][:cs_name] %>
+                      </div>
+                      <% if @subjects_relation[sub.id][:subject_id].present? %>
+                        <div class="linked_subject">
+                            <%= @subjects_relation[sub.id][:subject_name] %>
+                        </div>
+                      <% end %>
+                  </td>
+                  <td class="action">
+                    <% if @subjects_relation[sub.id][:subject_id].present? %>
+                      <% if @subjects_relation[sub.id][:can_unlink] %>
+                        <%= link_to_remote "#{t('unlink_text')}", :url => {:action => 'unlink_subject', :subject_id => @subjects_relation[sub.id][:subject_id], :batch_id => @batch.id},
+                          :method => :post, :html => {:class => 'inline-button'} %>
+                      <% else %>
+                        <%= "<strike>#{t('unlink_text')}</strike>" %>
+                      <% end %>
+                    <% end %>
+                  </td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @elective_course_subjects.present? %>
+          <div class="headers"><%= t('elective_groups_text') %></div>
+        <% end %>
+        <% @elective_course_subjects.group_by(&:parent_id).each_pair do |group, subjects| %>
+          <table align="center" width="75%" cellpadding="1" cellspacing="1" id="left_table">
+              <tr class="tr-head">
+                  <td>
+                      <%= subjects.first.parent.name %>
+                  </td>
+                  <td>
+                  </td>
+              </tr>
+              <% subjects.each do |sub| %>
+                  <tr class="<%= @subjects_relation[sub.id][:subject_id].present? ? 'disable_linking' : 'linkable' %>" course_subject_id="<%= sub.id %>" batch_id="<%= @batch.id %>">
+                      <td class="name">
+                          <div class="course_subject_name">
+                            <%= @subjects_relation[sub.id][:cs_name] %>
+                          </div>
+                          <% if @subjects_relation[sub.id][:subject_id].present? %>
+                            <div class="linked_subject">
+                                <%= @subjects_relation[sub.id][:subject_name] %>
+                            </div>
+                          <% end %>
+                      </td>
+                      <td class="action">
+                        <% if @subjects_relation[sub.id][:subject_id].present? %>
+                          <% if @subjects_relation[sub.id][:can_unlink] %>
+                            <%= link_to_remote "#{t('unlink_text')}", :url => {:action => 'unlink_subject', :subject_id => @subjects_relation[sub.id][:subject_id], :batch_id => @batch.id},
+                              :method => :post, :html => {:class => 'inline-button'} %>
+                          <% else %>
+                            <%= "<strike>#{t('unlink_text')}</strike>" %>
+                          <% end %>
+                        <% end %>
+                      </td>
+                  </tr>
+              <% end %>
+          </table>
+        <% end %>
+    </div>
+    
+    
+    
+    <div class="connect_table" id="connectable_batch_subjects">
+    </div>
+    
+    <div class="connect_table">
+        <% if @remaining_subjects.present? %>
+          <%=link_to_function t('link_subjects'),"link_subjects(this)",{:class=>'submit-button connect_button'}%>
+          <%= link_to_remote t('cancel'), :url=>{:controller=>"subjects_center", :action=>"list_connectable_subjects", :batch_id => @batch.id}, :html => {:class => 'submit-button connect_button cancel_button'}%>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) 
+        %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  j('#left_table tr.linkable').click(function(){
+      j('#left_table tr.selected_tr').removeClass('selected_tr');
+      j(this).addClass('selected_tr');
+      course_subject_id = j(this).attr('course_subject_id')
+      batch_id = j(this).attr('batch_id')
+      new Ajax.Request('/subjects_center/list_connectable_batch_subjects', {
+          parameters: {'course_subject_id': course_subject_id, 'batch_id': batch_id},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function(){
+            j('#connectable_batch_subjects').html('');
+          },
+          onComplete: function () {
+              j('#right_table tr.connectable').addClass('linkable');
+              j('#right_table tr.selected_tr').removeClass('selected_tr');
+              j('.connect_button').hide();
+              load_clickable();
+          }
+      });
+    
+  })
+  
+  load_clickable = function(){
+    j('#right_table tr.linkable').click(function(){
+      j('#right_table tr.selected_tr').removeClass('selected_tr');
+      j(this).addClass('selected_tr');
+      j('.connect_button').show();
+    })
+  }
+  
+  link_subjects = function(elm){
+    course_subject_id = j('#left_table tr.selected_tr').attr('course_subject_id')
+    subject_id = j('#right_table tr.selected_tr').attr('subject_id')
+    batch_id = j('#right_table tr.selected_tr').attr('batch_id')
+    new Ajax.Request('/subjects_center/link_subjects', {
+          parameters: {'course_subject_id': course_subject_id, 'subject_id': subject_id, 'batch_id': batch_id},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j(elm).parent().find('#loader').show();
+          }
+      });
+  }
+  
+</script>

@@ -1,0 +1,64 @@
+<div class="extender"></div>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <% unless @discipline_complaints.blank? %>
+    <tr class="tr-head">
+      <td>
+        <%= t('sl_no') %>
+      </td>
+      <td>
+        <%=t('title')%>
+      </td>
+      <td>
+        <%=t('complaint_no')%>
+      </td>
+      <td>
+        <%=t('modified')%>
+      </td>
+      <td>
+
+      </td>
+    </tr>
+    <tr class="tr-blank">
+
+    </tr>
+    <% @discipline_complaints.each_with_index do |complaint, i| %>
+      <tr class="tr-<%= cycle('odd', 'even')%>">
+        <td class="col-1">
+          <%= i+1 %>
+        </td>
+        <td class="col-2">
+          <%=link_to complaint.subject,:controller=>"discipline_complaints",:action=>"show",:id=>complaint.id%>
+        </td>
+        <td class="col-3">
+          <%=complaint.complaint_no%>
+        </td>
+        <td class="col-3">
+          <%a=complaint.updated_at%>
+          <%=format_date(a.to_date)%>
+        </td>
+        <td class="col-3">
+          <small class="links">
+             <%if DisciplineComplaint.is_privileged_user(@current_user.id) or @current_user.admin?%>
+              <% if permitted_to? :edit, :discipline_complaints %>
+                <%= link_to "#{t('edit_text')}",:controller=>"discipline_complaints",:action=>"edit",:id=>complaint.id %> |
+              <% end %>
+              <% if permitted_to? :destroy, :discipline_complaints %>
+                <%= link_to "#{t('delete_text')}",discipline_complaint_path(complaint),:confirm => "#{t('delete_confirm_msg')}",:method => :delete %>
+              <% end %>
+            <%end%>
+          </small>
+        </td>
+      </tr>
+    <%end%>
+  <% else %>
+
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-1"><%= t('no_complaints') %></td>
+    </tr>
+  <% end %>
+</table>
+<% unless @discipline_complaints.blank? %>
+  <div class="user_button">
+      <%= link_to "#{t('csv_report')}",{:controller => "csv_export", :report_format_type => "csv",:action => "generate_csv", :csv_report_type => "discipline_complaint_report",:complaints => @discipline_complaints} %>
+  </div>
+<%end%>

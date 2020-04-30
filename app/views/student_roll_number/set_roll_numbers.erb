@@ -1,0 +1,277 @@
+<%= javascript_include_tag "sortable" %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('configuration_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_roll_numbers') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :student_roll_number_set_roll_numbers, @batch %>
+    <%=  render_breadcrumbs %>
+  </div>
+
+  <div class="box">
+    <div id="roll_no_prefix">
+      <div class="label"><%= t('roll_no_prefix') %></div>
+      <div id="value">
+        <% batch_prefix = 0 %>
+        <% if !@batch.roll_number_prefix.present? and !@batch.course.roll_number_prefix.present? %>
+          <% batch_prefix = 2 %>
+          <div id="prefix_value"><%= t('not_set') %></div>
+          <div id="edit_prefix"><%= link_to_remote "Set prefix", :url => {:controller => "student_roll_number", :action => "edit_batch_prefix", :id => params[:id]}, :html => {:class => "themed_text"}%></div>
+          <div id="reset_prefix"></div>
+        <% elsif !@batch.roll_number_prefix.present? and @batch.course.roll_number_prefix.present? %>
+          <div id="prefix_value"><%= @roll_number_prefix %></div>
+          <div id="edit_prefix"><%= link_to_remote "Edit", :url => {:controller => "student_roll_number", :action => "edit_batch_prefix", :id => params[:id]}, :html => {:class => "themed_text"}%></div>
+          <div id="reset_prefix"></div>
+        <% elsif !@batch.course.roll_number_prefix.present? and @batch.roll_number_prefix.present? %>
+          <% batch_prefix = 1 %>
+          <div id="prefix_value"><%= @roll_number_prefix %></div>
+          <div id="edit_prefix"><%= link_to_remote "Edit", :url => {:controller => "student_roll_number", :action => "edit_batch_prefix", :id => params[:id]}, :html => {:class => "themed_text"}%></div>
+          <div id="reset_prefix"></div>
+        <% else %>
+          <% batch_prefix = 1 %>
+          <div id="prefix_value"><%= @roll_number_prefix %></div>
+          <div id="edit_prefix"><%= link_to_remote "Edit", :url => {:controller => "student_roll_number", :action => "edit_batch_prefix", :id => params[:id]}, :html => {:class => "themed_text"}%></div>
+          <div id="reset_prefix">
+          <%= link_to_remote "#{t('reset_to_course_default')}", :url => {:controller => "student_roll_number", :action => "reset_batch_to_course_prefix", :id => params[:id]},:loading => "$('loader').show();", :loaded => "$('loader').hide();",:html => {:class => "themed_text",:id => "reset_to_course"}, :complete => "update_course_prefix();"%>
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none" ) %>
+         </div>
+        <% end %>
+      </div>
+
+      <% if batch_prefix == 1%>
+        <div id="batch_course_text"><%= t('batch_prefix_text') %></div>
+      <% elsif batch_prefix == 2  %>
+        <div id="batch_course_text"></div>
+      <% else %>
+        <% if @institution_type.config_value == "hd" %>
+        <div id="batch_course_text"><%= t('course_prefix_text') %></div>
+        <%else%>
+        <div id="batch_course_text"><%= t('class_prefix_text') %></div>
+        <%end%>
+      <% end %>
+    </div>
+
+    <div id="sort_by">
+      <div class="label"><%= t('sorted_based_on')  %></div>
+      <% sort_order = Configuration.roll_number_sort_order %>
+      <div id="sort_by_value"><%= t(sort_order) %></div>
+    </div>
+
+    <div>
+     <h4><%= t('list_of_students')%></h4>
+     <%= link_to_remote "#{t('reset_all')}", :url => { :controller => "student_roll_number", :action => "reset_all_roll_numbers", :id => params[:id] }, :html => {:id => "reset_all", :class => "themed_text" }%>
+    </div>
+
+    <% if @students.present? %>
+    <% form_for :students, :url => {:action => 'create_roll_numbers', :batch_id => params[:id] } do -%>
+    <table id="listing_theme" class ="subjects" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= t('sl_no') %></td>
+        <td><%= t('student_name')%></td>
+        <% if sort_order == "admission_no" %>
+        <td data-sorting-type="natural_sort"><%= t('admission_no') %> 
+            <a id="sort_it" class="sortheader" href="#"></a>
+        </td>
+        <% else %>
+        <td><%= t('admission_no') %> </td>
+        <% end %>
+        <td><%= t('roll_no') %></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <% roll_number_suffix = @roll_number_suffix %>
+      <% @students.each_with_index do |student, i| %>
+        <% fields_for "student[]", student do |stud| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>" data="<%= student.id %>">
+            <td class="col-1"><%= i+=1 %></td>
+            <td class="col-2"><%= student.full_name %></td>
+            <td class="col-3"><%= student.admission_no %></td>
+            <td class="col-4">
+              <div class="prefix_val" id="prefix_val"><%= @roll_number_prefix %></div>
+                <div class="label-field-pair">
+                  <div class="text-input-bg">
+                    <% if params[:action] == "create_roll_numbers" && @current_values.has_key?(student.id.to_s)  %>
+                      <% if @errors.include?(student.id.to_s) %>
+                      <div class="fieldWithErrors">
+                        <%= stud.text_field :roll_number, :value => @current_values[student.id.to_s] %>
+                      </div>
+                      <% else %>
+                        <%= stud.text_field :roll_number, :value => @current_values[student.id.to_s] %>
+                      <% end %>
+                    <% else %>
+                      <%= stud.text_field :roll_number, :value => roll_number_suffix, :autocomplete=>"off", :class=>"new_form" %>
+                    <% end %>
+                    <div class="reset-button themed_text" id="button-<%=student.id%>" style="display:none;"><%= "#{t('reset')}" %></div>
+                    <% if @errors and @errors.include?(student.id.to_s) %>
+                      <div class="error-icon"></div>
+                    <% end %>
+                  </div>
+
+                <%  if @current_values and @errors.include?(student.id.to_s)%>
+                  <div class="tooltip" id ="stud_tooltip_<%= student.id%>" style="display:none">
+                    <%= find_student_alloted(@current_values,student,@err_msg)  %>
+                  </div>
+              <% end %>
+          </div>
+        </td>
+        <% roll_number_suffix = roll_number_suffix.next %>
+      </tr>
+    <%end%>
+  <% end %>
+</table>
+<%= hidden_field_tag 'src', params[:src] %>
+<%=  submit_tag("#{t('apply')}", :id => 'submit_button',:class=>"submit_button float_right", :disable_with => "► #{t('please_wait')}")%>
+<%end%>
+<% else %>
+   <table id="listing_theme" class ="subjects" align="center" width="100%" cellpadding="1" cellspacing="1">
+     <tr class="tr-head"><td><%= t('no_students_found')%></td></tr>
+   </table>
+<% end %>
+
+<div id="modal-box" style="display:none;"></div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  j('.fieldWithErrors input').focusin(function(){
+    j(this).parents('.label-field-pair').children('.tooltip').show();
+  });
+
+  j('.fieldWithErrors input').focusout(function(){
+    j(this).parents('.label-field-pair').children('.tooltip').hide();
+  });
+
+  j('#reset_to_course').click(function(e){
+    j(this).hide();
+  });
+
+  function update_batch_prefix(){
+    j('.prefix_val').text("<%= @batch.roll_number_prefix %>")
+  }
+
+  function update_course_prefix(){
+   j('.prefix_val').text("<%= @batch.course.roll_number_prefix %>")
+  }
+
+  var backup = {};
+  j('.text-input-bg input').change(function(){
+  j("#button"+"-"+id).show();
+    j(j(this)).parents('.fieldWithErrors').siblings('.error-icon').hide();
+    j(j(this)).parents('.fieldWithErrors').removeClass('fieldWithErrors');
+  })
+
+  j('.text-input-bg input').click(function(){
+    id = j(this).parents("tr").attr("data");
+    backup[id] = j(this).val();
+  })
+
+j('.reset-button').click(function(){
+  id = j(this).parents("tr").attr("data");
+  old_val = backup[id];
+  j(this).parents(".text-input-bg").children("input").val(old_val);
+  j("#button"+"-"+id).hide();
+})
+
+function default_sort(lnk, clid) {
+    var td = lnk.parentNode;
+    var column = clid || td.cellIndex;
+    var t = getParent(td,'TABLE');
+    // Work out a type for the column
+    if (t.rows.length <= 1) return;
+    var itm = "";
+    var default_roll_numbers = new Array();
+    var i = 2;
+    while (i < t.tBodies[0].rows.length) {
+        itm1 = ts_getInnerText(t.tBodies[0].rows[i].cells[column]);
+        itm += trim(itm1);
+        default_roll_numbers[i-2] = t.tBodies[0].rows[i].cells[3].getElementsByTagName('input')[0].value;
+        i++;
+    }
+    if (itm == "") return;
+    var sortfn;
+    /*check for number start*/
+    if (isNumber (itm)==true)
+    {
+        sortfn = ts_sort_numeric;
+    }
+    else if (lnk.parentNode.getAttribute("data-sorting-type")=== "natural_sort") { /* workaround for natural sort*/
+        sortfn=ts_sort_natural;
+    }
+    else{
+        sortfn = ts_sort_caseinsensitive;
+    }
+    /*check for number end*/
+    /*if (itm.match(/^\d\d[\/\.-][a-zA-z][a-zA-Z][a-zA-Z][\/\.-]\d\d\d\d$/)) sortfn = ts_sort_date;
+	if (itm.match(/^\d\d[\/\.-]\d\d[\/\.-]\d\d\d{2}?$/)) sortfn = ts_sort_date;
+	if (itm.match(/^-?[£$€Û¢´]\d/)) alert(); sortfn = ts_sort_numeric;
+	if (itm.match(/^-?(\d+[,\.]?)+(E[-+][\d]+)?%?$/)) sortfn = ts_sort_numeric;*/
+    SORT_COLUMN_INDEX = column;
+    var firstRow = new Array();
+    var newRows = new Array();
+    for (k=0;k<t.tBodies.length;k++) {
+        for (i=0;i<t.tBodies[k].rows[0].length;i++) {
+            firstRow[i] = t.tBodies[k].rows[0][i];
+        }
+    }
+    for (k=0;k<t.tBodies.length;k++) {
+        if (!thead) {
+            // Skip the first row
+            for ( var j=2;j<t.tBodies[k].rows.length;j++) {
+                newRows[j-2] = t.tBodies[k].rows[j];
+            }
+        } else {
+            // Do NOT skip the first row
+            for ( var j=0;j<t.tBodies[k].rows.length;j++) {
+                newRows[j] = t.tBodies[k].rows[j];
+            }
+        }
+    }
+    newRows.sort(sortfn);
+    // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
+    // don't do sortbottom rows
+    for (i=0; i<newRows.length; i++) {
+        if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) {
+            t.tBodies[0].appendChild(newRows[i]);
+        }
+    }
+    // do sortbottom rows only
+    for (i=0; i<newRows.length; i++) {
+        if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1))
+            t.tBodies[0].appendChild(newRows[i]);
+    }
+    alternate(t);
+    reassign_sl_no_and_default_values(lnk,default_roll_numbers);
+}
+
+function reassign_sl_no_and_default_values(lnk,d) {
+    var td = lnk.parentNode;
+    var t = getParent(td,'TABLE');
+    var i = 2;
+    var new_inputs = document.getElementsByClassName("new_form");
+    var is_new_form = 0
+    if(new_inputs.length > 0){
+      is_new_form = 1
+    }
+    while (i < t.tBodies[0].rows.length) {
+        (t.tBodies[0].rows[i].cells[0]).innerHTML = i-1
+        if(is_new_form === 1){
+          t.tBodies[0].rows[i].cells[3].getElementsByTagName('input')[0].value = d[i-2];
+          t.tBodies[0].rows[i].cells[3].getElementsByTagName('input')[0].className = ""; 
+        } 
+        i++;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(event) { 
+  var b = document.getElementById("sort_it");
+  if(b !== null){
+    default_sort(b, 2);
+  }
+});
+
+</script>

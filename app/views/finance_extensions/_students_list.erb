@@ -1,0 +1,53 @@
+<table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <% unless @students.blank? %>
+      <tr class="main_head tr-list_head">
+          <td class="sl-col"><%= t('sl_no') %></td>
+          <td class="set_border_right"><%= t('student_name') %></td>
+          <td class="set_border_right"><%= t('batch') %></td>
+          <td class="set_border_right"><%= t('adm_no') %></td>
+          <% if roll_number_enabled? %>
+            <td class="set_border_right"><%= t('roll_no') %></td>
+          <% end %>
+          <td class="set_border_right"><%= t('fees_due') %></td>
+          <td class="set_border_right col-options"><%= t('pay_fees') %></td>
+      </tr>      
+      <% @students.each_with_index do |student, i| %>
+        <tr class="row-b">
+            <td class="sl-col"><%= i+1 %></td>
+            <td class="set_border_right"><%=student.fullname%></td>
+            <td class="set_border_right"><%= student.batch_full_name %></td>
+            <td class="set_border_right"><%= student.admission_no %></td>
+            <% if roll_number_enabled? %>
+              <td class="set_border_right">
+                  <%= student.roll_number.present? ? 
+                    student.roll_number : "-" %></td>
+            <% end %>
+            <td class="set_border_right">                
+                <% fee_total = student.fee_due.to_f + 
+                  student.total_automatic_finance_fee_fine(@batch_id) + 
+                  student.transport_due.to_f + student.hostel_due.to_f %>
+                
+                <%# paid_manual_fine = precision_label(fee_total).to_f == 0 ? 0 : student.paid_manual_fine(@batch_id).to_f %>
+
+                <%# precision_label(fee_total + paid_manual_fine) %>
+                <%= precision_label(fee_total) %>
+            </td>
+            <!--<td style="font-weight: bold">-->
+            <td class="set_border_right col-options">
+                <%= link_to t("collection_wise"),{:controller => :finance, 
+                  :action => :fees_student_dates, :id => student.id, 
+                  :breadcrumb_change => true} %>
+                <% batch_id=params[:fees_submission].present? ? 
+                  params[:fees_submission][:batch_id] : nil %>
+                <%= link_to t("pay_all_fees"), { :action => :pay_all_fees, 
+                  :id => student.id, :batch_id => batch_id} %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+
+      <tr class="row-b">
+          <td class="col-2"><%= t('no_students_found') %></td>
+      </tr>
+    <% end %>
+</table>

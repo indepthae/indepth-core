@@ -1,0 +1,249 @@
+<%content_for :head do%>
+  <%= stylesheet_link_tag 'jquery-ui_1.css' %>
+<%end%>
+<% form_for @student,:url=>{:controller=>'student_records',:action=>'create'},:html=> {:id=>"student_records_#{@record_group.id}",:method => :post,:multipart=>true} do |s| %>
+  <%=hidden_field_tag 'student[id]',@student.id%>
+  <%=hidden_field_tag 'record_group_id',@record_group.id%>
+  <%=hidden_field_tag 'batch_id',@batch.id%>
+  <%=hidden_field_tag 'form_type','general'%>
+  <div id="form-errors_<%=@record_group.id%>"><%= error_messages_for 'student' %></div>
+  <div id="admission1_form">
+    <% i=0 %>
+    <%student_records=@all_student_records[@record_group.id]%>
+    <%if student_records.present?%>
+      <div id="form-contents">
+        <% s.fields_for :student_records,student_records do |a| %>
+          <%if a.object.record.record_group_id == @record_group.id%>
+            <%additional=a.object.record%>
+
+            <% prev_record = student_records.nil? ? nil : student_records.find_by_additional_field_id(additional.id) %>
+            <% unless prev_record.nil? or prev_record.new_record?%>
+              <% if additional.input_type=="multi_select" %>
+                <% prev_value = prev_record.additional_info.split(", ") %>
+              <% else %>
+                <% prev_value = prev_record.additional_info %>
+              <% end %>
+            <% end %>
+            <% if additional.input_type=="single_select" %>
+              <div class="label_field_pair">
+                <label class="core_label"><%= additional.name %>
+                  <% if additional.is_mandatory %>
+                    <span class="necessary-field">*</span>
+                  <% end %>
+                </label>
+                <div class="all_radio_options">
+                  <%if additional.record_field_options.count <= 5%>
+                    <%additional.record_field_options.each_with_index do |option,i|%>
+                      <%= a.radio_button :additional_info, option.field_option, {:checked=>(option.field_option==a.object.additional_info||option.is_default),:class=>"addl_info_radio",:id=>"radio_#{option.id}_#{i}"}%><label for="radio_<%=option.id%>_<%=i%>"><%= option.field_option %></label>
+                      <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                      <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                    <%end%>
+                  <%else%>
+                    <%= a.select :additional_info, additional.record_field_options.map{|b| [b.field_option,b.field_option]},:prompt=>"#{t('select_an_option')}",:selected =>(a.object.additional_info.present? ? a.object.additional_info : (additional.record_field_options.select{|st| st.is_default == true}.present? ? additional.record_field_options.select{|st| st.is_default == true}.first.field_option : nil))%>
+                    <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                    <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                  <%end%>
+                </div>
+              </div>
+              <% i+=1 %>
+            <% elsif additional.input_type=="multi_select" %>
+              <div class="grades">
+                <div class="label-field-pair spl_case">
+                  <label class="core_label"><%= additional.name %>
+                    <% if additional.is_mandatory %>
+                      <span class="necessary-field">*</span>
+                    <% end %></label>
+                </div>
+                <%if additional.record_field_options.count > 5%>
+                  <div class="fee_category_scroll">
+                    <div class="sel-list">
+                      <%= t('select') %>: <%= link_to_function t('all'), "j(this).parents('.fee_category_scroll').find('.each_batch > input.addl_info_check').prop('checked',true)" %>,
+                      <%= link_to_function t('none'), "j(this).parents('.fee_category_scroll').find('.each_batch > input.addl_info_check').prop('checked',false)" %>
+                    </div>
+                    <% additional.record_field_options.each_with_index do |k,i| %>
+                      <div class="each_batch">
+                        <%=a.check_box :additional_info,{:id=>"multicheck_#{k.id}_#{i}",:class=>"addl_info_check",:multiple=>true,:checked=>(prev_value.present? ? prev_value.include?(k.field_option) : (additional.record_field_options.select{|st| st.is_default == true}.present? ? additional.record_field_options.select{|st| st.is_default == true}.include?(k.field_option) : nil))},k.field_option,nil%><label for="multicheck_<%=k.id%>_<%=i%>"><%= k.field_option %></label>
+                        <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                        <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                      </div>
+                    <% end %>
+                  </div>
+                <%else%>
+                  <div class="all_check_options">
+                    <% additional.record_field_options.each_with_index do |k,i| %>
+                      <%=a.check_box :additional_info,{:id=>"multicheck_#{k.id}_#{i}",:class=>"addl_info_check",:multiple=>true,:checked=>(prev_value.present? ? prev_value.include?(k.field_option) : (additional.record_field_options.select{|st| st.is_default == true}.present? ? additional.record_field_options.select{|st| st.is_default == true}.collect(&:field_option).include?(k.field_option) : nil))},k.field_option,nil%><label for="multicheck_<%=k.id%>_<%=i%>"><%= k.field_option %></label>
+                      <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                      <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                    <%end%>
+                  </div>
+                <%end%>
+              </div>
+              <% i+=1 %>
+            <% elsif additional.input_type=="multiline" %>
+              <div class="label-field-pair-text-area">
+                <label class="core_label" for="multiline_<%=additional.id%>"><%= additional.name %>
+                  <% if additional.is_mandatory %>
+                    <span class="necessary-field">*</span>
+                  <% end %></label>
+                <div class="textarea-input-bg">
+                  <%= a.text_area :additional_info,:id=>"multiline_#{additional.id}"%>
+                  <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                  <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                </div>
+              </div>
+              <% i+=1 %>
+            <%elsif additional.input_type == "date"%>
+              <div class="label-field-pair addl_margin">
+                <label for="student_admission_date" class="core_label"><%= additional.name %> <% if additional.is_mandatory %>
+                    <span class="necessary-field">*</span>
+                  <% end %></label>
+                <div class="text-input-bg w198">
+                  <%=a.calendar_date_select :additional_info,:readonly=>true,:popup=>"force"%>
+                  <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                  <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                </div>
+              </div>
+              <% i+=1 %>
+            <%elsif additional.input_type=="attachment"%>
+              <div class="attachment_contents">
+                <div class="all_additional_items">
+                  <div id="additional_label" >
+                    <div class="label-field-pair spl_case">
+                      <label class="core_label"><%= additional.name %> &#x200E;(<%= t('maxi_size') %>)&#x200E;
+                        <% if additional.is_mandatory %>
+                          <span class="necessary-field">*</span>
+                        <% end %></label>
+                    </div>
+                  </div>
+                  <div id="additional_right">
+                    <div class="addl_attachments">
+                      <% a.fields_for :record_addl_attachments do |c| %>
+                        <%= render "record_addl_attachment_fields",:f=>c%>
+                      <% end %>
+                      <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                      <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                    </div>
+                    <div class="add_addl_attachment">
+                      <%= link_to_add_addl_attachment "#{image_tag "buttons/add_image.png" } #{t('add_attachment')}", a, :record_addl_attachments %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% i+=1 %>
+            <% else %>
+              <div class="label-field-pair12">
+                <label class="core_label" for="singleline_<%=additional.id%>"><%= additional.name %>
+                  <% if additional.is_mandatory %>
+                    <span class="necessary-field">*</span>
+                  <% end %></label>
+
+                <div class="text-input-bg12">
+                  <%= a.text_field :additional_info,:id=>"singleline_#{additional.id}" %>
+                  <%=a.hidden_field :batch_id,:value=>@batch.id%>
+                  <%=a.hidden_field :additional_field_id,:value=>additional.id%>
+                </div>
+                <div class="suffix_sec"><%=additional.suffix.present? ? additional.suffix : ""%></div>
+              </div>
+              <% i+=1 %>
+            <% end %>
+          <%end%>
+        <% end %>
+      </div>
+      <div class="reset" id="cancel_button_<%=@record_group.id%>"><%=t('reset_records')%></div>
+      <div id="submit_link">
+        <%=s.submit t('save_records')%>
+      </div>
+    <%else%>
+      <p><%=t('no_records')%></p>
+    <%end%>
+  </div>
+<% end %>
+<script type="text/javascript">
+  if (j('#record_group_id').val() != ""){
+    j('#form_type').val('specific');
+  }
+  function add_fields(link, association, content){
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+    }
+  }
+
+  function add_addl_attachment(link, association, content){
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    if ($$("#additional_right").first().select("div.fields").size()==4){
+      alert("Cant add more than 4 additional attachments.");
+    }else{
+      $(link).up().insert({
+        before: content.replace(regexp, new_id)
+      });
+    }
+  }
+
+  function remove_fields(link){
+    $(link).previous("input[type=hidden]").value='1';
+    $(link).up(".fields").hide();
+    j(link.up(".fields")).attr('class',"new_class")
+  }
+
+  function toggle_custom(val){
+    dest = this.up(2).select('.custom')[0]
+    //if(dest != null)
+    if(this.value == 'text'){
+      dest.hide();
+    }
+    else{
+      dest.show();
+    }
+    return true;
+  }
+  document.observe("dom:loaded", function() {
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+      $$('.input-type-select').first().fire('change');
+      $$('select').each(function(e){
+        toggle_custom.call(e);
+      });
+    }
+  });
+  j( "div#cancel_button_<%=@record_group.id%>").click(function() {
+    resp = confirm("<%=t('student_record_reset_confirm')%>");
+    if (resp ==true){
+      j.ajax({
+        type: 'GET' ,
+        url: "/student_records/get_edit_form",
+        data : {
+          student_id : <%=@student.id%>,
+          batch_id: <%=@batch.id%>,
+          record_group_id:  <%=@record_group.id%>,
+          form_type: (j('#record_group_id').val() == "") ? "general" : "specific"
+        },
+        success : function(data) {
+          j('#individual_student_<%=@record_group.id%>').html(data);
+          j(".edit_student").submit(function (event) {
+            event.preventDefault();
+            formdata = new FormData(this);
+            j.ajax({
+              url: '/student_records/create',
+              type: 'POST',
+              data: formdata,
+              async: false,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function () {
+              },
+              error: function(){
+              }
+            });
+          });
+        }
+      });
+    }
+  });
+</script>

@@ -1,0 +1,26 @@
+<% plan.assessment_terms.each_with_index do |term, index| %>
+  <div class="assessment_terms_fields">
+      <%- fields_for "assessment_plan[assessment_terms_attributes][#{index}]", term do |f| %>
+        <div class="label-field-pair left">
+            <label for="termname"><%= "#{t('term_number',:index=>index+1)}" %></label>
+            <div class="text-area-bg">
+                <%= f.text_field  :name, :class => "formula" %>
+            </div>
+        </div>
+        <div class="right">
+            <div class="label-field-pair start_date">
+                <label for="start_date"><%= t('from') %></label>
+                <div class="text-input-bg start_date">
+                    <%= calendar_date_select_tag "assessment_plan[assessment_terms_attributes][#{index}][start_date]" ,(term.start_date.present? ? I18n.l(term.start_date.to_date,:format=>:default): ""),:popup=>:force, :id => "start_date"  %>
+                </div>
+            </div>
+            <div class="label-field-pair end_date">
+                <label for="end_date"><%= t('to') %></label>
+                <div class="text-input-bg end_date">
+                    <%= calendar_date_select_tag "assessment_plan[assessment_terms_attributes][#{index}][end_date]",(term.end_date.present? ? I18n.l(term.end_date.to_date,:format=>:default): ""),:popup=>:force, :id => "end_date"   %></div>
+            </div>
+        </div>
+        <%= f.hidden_field :academic_year_id, :value=>@academic_year.id %>
+      <% end %>
+  </div>
+<% end %>

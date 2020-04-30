@@ -1,0 +1,43 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('forms') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <% if permitted_to? :index, :form_templates %>
+        <li class='themed_bg themed-dark-hover-background'>
+          <%= link_to "#{t('form_template_text')}", form_templates_path%>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+
+  <div id="forms_list">
+    <%= render :partial => 'forms_list' %>
+  </div>
+
+
+
+
+
+</div>
+<script>
+  if(j('.pagination').length == 0){
+    j('table').addClass('narrow_border')
+  }
+</script>

@@ -1,0 +1,56 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('building') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('view_room') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('edit')}", edit_building_classroom_path(params[:building_id],params[:id]) %></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :classrooms_show, @classroom%>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="title">
+    <%= t("classroom_name") %>
+    <div class="description">:&nbsp;&nbsp;&nbsp;<%= @classroom.name %></div>
+  </div>
+  <div class="title">
+    <%= t("building_name") %>
+    <div class="description">:&nbsp;&nbsp;&nbsp;<%= @building.name %></div>
+  </div>
+  <div class="title">
+    <%= t("capacity") %>
+    <div class="description">:&nbsp;&nbsp;&nbsp;<%= @classroom.capacity %></div>
+  </div>
+
+  <h5><%= "Weekly activities" %></h5>
+
+  <div class="label-field-pair" id="course_batches">
+    <label for="student_batch"><%= "#{t('timetable_text')}" + " :" %></label>
+    <div class="text-input-bg">
+      <%= select :timetable_entry, :timetable_id, @timetables.map {|c| ["#{format_date(c.start_date,:format=>:long)}  -  #{format_date(c.end_date,:format=>:long)}", c.id]}, {:prompt=>"#{t('select_tte')}"},{:onChange => "#{remote_function(:url=>{:action=>"list_weekly_activities",:id => params[:id]}, :before => "$('loader1').show();",:success=>"$('loader1').hide();",:with => "'timetable='+value")}"} %>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+    </div>
+  </div>
+
+  <div id ="weekly"></div>
+
+  <h5><%= "Date specific activities" %></h5>
+  <div class="month">
+    <div class="label-field-pair"><label><%= t('month') %> :</label>
+      <div class="text-input-bg"><%= select :month, :id,
+      [["#{t('jan')}",'01'], ["#{t('feb')}",'02'], ["#{t('mar')}",'03'], ["#{t('apr')}",'04'], ["#{t('may')}",'05'], ["#{t('jun')}",'06'], ["#{t('jul')}",'07'], ["#{t('aug')}",'08'], ["#{t('sep')}",'09'], ["#{t('oct')}",'10'], ["#{t('nov')}",'11'], ["#{t('dec')}",'12']],
+      {:prompt => "#{t('select_a_month')}"},{:onChange => "#{remote_function(:url=>{:action=>"year",:id => params[:id]},:before=>"$('loader').show();",:success=>"$('loader').hide();", :with => "'month='+value")}"}%>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+  </div>
+  <div id="year"></div>
+  <div id ="date_specific"></div>
+</div>

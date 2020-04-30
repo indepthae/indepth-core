@@ -1,0 +1,35 @@
+<div class="list">
+  <%if !@students.present?%>
+  <p class="flash-msg"> <%= t('flash_student_notice') %> </p>
+  <%else%>
+  <table class="primary">
+    <tr>
+      <th> <span id="all" class="select_link"><%=t('all')%></span>, <span id="none" class="select_link"> <%=t('none')%></span> </th>
+      <th> <%= t('student_name')%> </th>
+      <th> <%= t('admission_no')%> </th>
+      <th> <%= t('roll_no')%> </th>
+    </tr>
+    <% @students.each do |student| %>
+    <tr>
+      <td class="center_text"> 
+        <%= check_box "", "student[#{student.s_id}]",:checked=>false, :class=>"bulk_check" %>
+        <%= hidden_field_tag "type[#{student.s_id}]", student.class.name %>
+      </th>
+      <td> <%= student.full_name %> </td>
+      <td class="center_text"> <%= student.admission_no %> </td>
+      <td class="center_text"> <%= student.roll_number %> </td>
+    </tr>
+    <%end%>
+  </table>
+  <%end%>
+</div>
+
+<script>
+j("#all").click(function(){
+  j(".bulk_check").each(function(){this.checked=true;});
+});
+
+j("#none").click(function(){
+  j(".bulk_check").each(function(){this.checked=false;});
+});
+</script>

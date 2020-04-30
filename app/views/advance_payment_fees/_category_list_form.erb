@@ -1,0 +1,15 @@
+<% @advance_fee_categories.each_with_index do |fee_category, i| %>
+  <%= hidden_field_tag "advance_fees_collection[advance_fee_category_collections_attributes][#{fee_category.id}][advance_fee_category_id]", fee_category.id,
+   :disabled => true, :class => "category_id_#{i}" %>
+  <tr>
+      <td class="sl-col fee-head-border"><%= i+1 %></td>
+      <td class="set_border_right fee-head-border" colspan="2">
+        <%= check_box_tag :particular_check, '', false,
+        {:onChange => "update_total_amount(this, #{i})"} %>
+        <%= fee_category.name %></td>
+      <td class="set_border_right fee-head-border center_align" colspan="1">
+        <%= text_field_tag "advance_fees_collection[advance_fee_category_collections_attributes][#{fee_category.id}][fees_paid]", '',
+        {:value => 0.00, :disabled => true, :class => "precision_text payment_box amount_box amount_box_idx#{i}", :onKeyUp => "update_total_amount_by_particular()"} %>
+      </td>
+  </tr>
+<% end %>

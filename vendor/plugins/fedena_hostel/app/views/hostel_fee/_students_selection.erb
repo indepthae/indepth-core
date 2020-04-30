@@ -1,0 +1,9 @@
+<% form_for @hostel_fee_collection,
+            :url => {:action => 'collection_assign_students'},:html=>{:id=>'form'} do |form| %>
+    <%= form.hidden_field :id %>
+    <%= render :partial => 'search_students',:locals=>{:form=>form} %>
+    <div class="extender"></div>
+    <div id="submit-button">
+      <%= submit_tag "► #{t('create_text')}", :class => 'submit_button' %>
+    </div>
+<% end %>

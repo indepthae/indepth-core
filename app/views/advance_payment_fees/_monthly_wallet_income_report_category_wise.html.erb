@@ -1,0 +1,69 @@
+<div id="date_filter" class="date_box" style="display: none;">
+    <%= render :partial => "finance/filter_dates" %>
+</div>
+<div class="list_table_div">
+  <div class="main_head_label" style="margin-bottom: 15px">
+      <b id="fees_report_title">
+          <%= t('students_wallet_details_by_category') if @advance_fee_categories.present? %>
+      </b>
+
+      <div class="date_align right">
+          <label class="date_tag"><%= params[:date_tag] %></label>&nbsp;
+          <%= format_date(@start_date) %> &nbsp;
+          <label class="to_date"><%= t('small_to') %></label> &nbsp;
+          <%= format_date(@end_date) %>
+          <span id="show_date" class="themed_hover_text">
+              <%= t('change_date') %>
+          </span>
+      </div>
+  </div>
+
+</div>
+<% if @advance_fee_categories.present?%>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+        <td colspan="3"><%= t('advance_fee_categories_text') %></td>
+
+        <td class="set_border_right width210">
+            <span class="show_amount"><%= t('amount') %> (<%= currency %>
+                )</span>
+        </td>
+    </tr>
+    <% total_amount = 0 %>
+    <% @advance_fee_categories.each do |b| %>
+      <tr >
+        <td>
+            <%= link_to_remote b.category_name, :url => {:controller => "advance_payment_fees", :action => 'course_wise_monthly_report', :category_id => b.advance_fee_category_id,
+              :start_date => @start_date, :end_date => @end_date, :fee_account_id => @account_id} %>
+        </td>
+        <td></td>
+        <td></td>
+        <td align="right"> <%= precision_label(b.amount).to_f %></td>
+      </tr>
+      <% i=0 %>
+      <% total_amount += precision_label(b.amount).to_f %>
+    <% end %>
+  </table>
+
+    <div class="total_amount_div">
+        <label><%= t('net_income') %></label>
+        <label class="amount_label"><%= precision_label(total_amount.to_f) %></label>
+    </div>
+
+    <%= will_paginate @advance_fee_categories, :params => {:start_date => @start_date,
+      :end_date => @end_date, :date_tag => params[:date_tag]}, :renderer => 'RemoteLinkRenderer' %>
+
+    <div class="seprater_div_bottom">
+        <div id="inner-tab-menu">
+            <ul>
+                <li class='themed_bg themed-dark-hover-background'>
+                    <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                      :csv_report_type => "advance_fees", :report_format_type => "csv",
+                      :start_date => @start_date, :end_date => @end_date, :wallet_credit_transactions => 1, :fee_account_id => @account_id} %>
+                </li>
+            </ul>
+        </div>
+    </div>
+  <% else %>
+    <div class="no_entries"><%= t('no_transactions_present') %></div>
+  <% end %>

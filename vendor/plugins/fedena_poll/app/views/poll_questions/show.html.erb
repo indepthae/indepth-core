@@ -1,0 +1,63 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('online_poll') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= t('view_poll') %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <% if permitted_to? :new,:poll_questions %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('new_poll'), new_poll_question_path %></li>
+    <% end %>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to t('view_all_polls'), poll_questions_path %></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+   <div class="bread_crumb">
+    <%breadcrumb :poll_questions_show,@poll_question%>
+    <%=render_breadcrumbs%>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="question">
+    <h3><%=h @poll_question.description.capitalize %></h3>
+  </div>
+
+  <ul id="category-list">
+    <% for option in @poll_question.poll_options %>
+      <li class="options">
+        <div class="category-name">
+          <b><label><%= h option.option %></label></b>
+          <% if @poll_votes_count[option.id].to_f != 0.0 %>
+            <%= ((100 * @poll_votes_count[option.id].to_f).to_f / @poll_question.total_poll_votes).round(2).to_s + "%" %>
+            <% end %>
+          <div class="votes">(<%= pluralize(@poll_votes_count[option.id],'vote')%>)</div>
+        </div>
+        <div class="indicator-container">
+          <% if @poll_votes_count[option.id].to_f != 0.0 %>
+            <div class="indicate" style='width:<%= ((100 * @poll_votes_count[option.id].to_f).to_f / @poll_question.total_poll_votes).round(2).to_s + "%" %>'>
+            </div>
+          <% end %>
+          </div>
+      <% end %>
+    </li>
+
+    <% if @poll_question.allow_custom_ans %>
+      <% i = 0 %>
+      <% for custom_answer in @poll_question.poll_votes %>
+        <% i +=1 unless custom_answer.custom_answer.nil? %>
+      <% end %>
+      <li class="options">
+        <div class="category-name"><b><label><%= t('others') %></label></b><b><%= ((i.to_f  * 100 )/ @poll_question.total_poll_votes).round(2).to_s + "%" unless i==0%></b><div class="votes">(<%= pluralize(i,"#{t('vote')}")%>)</div></div>
+        <div class="indicator-container"><% if i!=0 %><div class="indicate" style='width:<%= ((i.to_f  * 100 )/ @poll_question.total_poll_votes).round(2).to_s + "%" %>'></div><% end %></div>
+      </li>
+    </ul>
+  <% end %>
+  <div class="total-votes">
+    <%= t('total') %> <%=  pluralize(@poll_question.total_poll_votes,"#{t('vote')}") %>
+  </div>
+</div>

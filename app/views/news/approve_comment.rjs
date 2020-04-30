@@ -1,0 +1,3 @@
+page.replace_html 'comments-list', :partial => 'pending_comments'
+page.replace_html "approve_text", :text => "#{t('approved_comments')}(#{@news.comments.approved_comments.count})"
+page.replace_html "pending_text", :text => "#{t('pending_comments')}(#{@news.comments.pending_comments.count})"

@@ -1,0 +1,51 @@
+<% form_remote_for :report, :url => {:action => @target_action }.merge(additional_params.except(:fee_account_id)),
+            :html => {:id => "form_id"} do |form| %>
+
+  <div class="float-box width50p">
+    <div class="fields-label">
+      <%= t('select_a_date_range') %>
+    </div>
+    <div class="fields">
+      <div class="date">
+        <%= calendar_date_select_tag 'start_date', I18n.l(@start_date.try(:to_date) || Date.today,
+                                                          :format => :default), :popup => :force %>
+      </div>
+
+      <div class="date end_date">
+        <label><%= t('to') %></label>
+        <%= calendar_date_select_tag 'end_date', I18n.l(@end_date.try(:to_date) || Date.today,
+                                                        :format => :default), :popup => :force %>
+      </div>
+
+      <div id="date_error_div">
+        <% unless flash[:warn_notice].nil? %>
+          <%= render :partial => "date_error" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-box width50p">
+    <div class="fields-label">
+      <% if @accounts_enabled %>
+        <%= t('fee_account_text') %>
+      <% end %>
+    </div>
+    <div class="fields">
+      <% if @accounts_enabled %>
+        <div class="text-input-bg accounts_list">
+          <% selected = @account_id.present? ? @account_id : nil %>
+          <%= select_tag :fee_account_id, options_for_select(@accounts.map { |a| [a.name, a.id] }.
+              unshift([t("default_account"), 0]).unshift([t("all_accounts"), nil]), :selected => selected) %>
+        </div>
+      <% end %>
+
+      <div class="view_report">
+        <%= submit_tag "#{t('view_report')}", {:class => 'user_button1'} %>
+        <% if @target_action.present? %>
+          <span class="themed_hover_text" id="hide_date_filter"><%= t('cancel') %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

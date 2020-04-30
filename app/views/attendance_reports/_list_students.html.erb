@@ -1,0 +1,51 @@
+<div class="label-field-pair">
+  <label for="trial_date"><%= t('no_of_absentees') %></label>
+  <label class="bold-text">: <%= @absentees_count %> </label>
+</div>
+
+<% unless @students.empty? %>
+  <table id="custom_attendance_table" align="left" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class="s_no">
+        <%= t('sl_no') %>
+      </td>
+      <td>
+        <%=t('absentees')%>
+      </td>
+      <td>
+        <%=t('leave_session')%>
+      </td>
+    </tr>
+    <% @students.each_with_index do |student,i| %>
+      <% if params[:page].present? %>
+        <% if params[:page].to_i >= 1 %>
+          <% i = i  + (params[:page].to_i - 1) * 10 %>
+        <% end %> <%else %> <% i = i %> <% end %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1">
+          <%= i+1 %>
+        </td>
+        <td class="col-2">
+          <% if roll_number_enabled? %>
+            <%#= "&#x200E;#{student.roll_number} - #{student.full_name}&#x200E;" %>
+           <%= "&#x200E;#{student.full_name}(#{student.roll_number})&#x200E;" %>
+          <% else %>
+            <%= "&#x200E;#{student.full_name}(#{student.admission_no})&#x200E;" %>
+          <% end %>
+        </td>
+        <td>
+            <% if  @absentees[student.id][0].afternoon == @absentees[student.id][0].forenoon %>
+            <% leave = "Full day" %>
+            <% elsif @absentees[student.id][0].afternoon == true and @absentees[student.id][0].forenoon == false%>
+            <% leave = "Afternoon" %>
+            <% elsif @absentees[student.id][0].forenoon == true and @absentees[student.id][0].afternoon ==  false%>
+            <% leave = "Forenoon" %>
+            <% end %>
+        <%= leave %>
+      </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= will_paginate @students,:renderer => 'RemoteLinkRenderer',:params=>{:controller => "attendance_reports",:action => "daily_report_batch_wise",:batch_id => @batch.id,:date => @date} %>
+<% end %>
+

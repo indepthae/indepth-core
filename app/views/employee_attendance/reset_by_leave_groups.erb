@@ -1,0 +1,216 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('manage_attendance') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('reset_by_leave_group') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="form-errors"></div>
+    <h4><%= t('reset_by_leave_group') %></h4>
+    <div class="description">&#x200E;<%= t('reset_description_new') %>&#x200E;</div>
+    <% if  @leave_groups.present? %>
+      <% lt = [] %>
+      <% @leave_groups.each{ |leave_group| lt += leave_group.employee_leave_types.compact.select{|lt| lt.is_active == true} } %>
+      <% if lt.flatten.present? %>
+        <% remote_form_for :leave_group,:url=>{:action=>'reset_by_leave_groups_modal'}, :before=>"$('submit_button').disable();",:complete=>"$('submit_button').enable();"  do |form| %>
+          <div class="leave-group-container">
+              <div class="leave-group-heading">
+                  <div class="check-box-blank-column"></div>
+                  <div class="leave-group-name-column">
+                      <label><%= t('leave_group') %></label>
+                  </div>
+                  <div class="employee-count-column label-text-align-center">
+                      <label><%= t('employees') %></label>
+                  </div>
+                  <div class="leave-types-count-column label-text-align-center">
+                      <label><%= t('leave_types') %></label>
+                  </div>
+                  <div class="select-leave-types-column"></div>
+              </div>
+              <div class="leave-group-main">
+                  <% @leave_groups.each do |leave_group| %>
+                    <% if leave_group.employees.present? %>
+                      <% leave_types = leave_group.employee_leave_types.compact.select{|lt| lt.is_active == true} %>
+                      <% if leave_types.present?  %>
+                        <div class="each-leave-group-main">
+                            <div class="leave-group-sub">
+                                <div class="leave-group-sub-centered">
+                                    <div class="check-box-column-header">
+                                        <%= check_box_tag "leave_group_ids[]", leave_group.id, false, {:class => "check-box-style", :onclick => "select_checkbox(this);"}%>
+                                    </div>
+                                    <div class="leave-group-sub-content" onclick="toggle_leave_type(this);">
+                                        <div class="leave-group-name-column-header">
+                                            <label><%= leave_group.name %></label>
+                                        </div>
+                                        <div class="employee-count-column-header label-text-align-center">
+                                            <label><%= leave_group.employees.count %></label>
+                                        </div>
+                                        <div class="leave-types-count-column-header label-text-align-center">
+                                            <label><%= leave_types.count %></label>
+                                        </div>
+                                        <div class="select-leave-types-column-header">
+                                            <label class="select-leave-types-label select-label"><%= t('select_leave_types') %></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="leave-type-main" style="display: none;">
+                                <div class="leave-type-heading">
+                                    <div class="check-box-blank-column"></div>
+                                    <div class="leave-group-name-column">
+                                        <label><%= t('leave_type') %></label>
+                                    </div>
+                                    <div class="employee-count-blank-column"></div>
+                                    <div class="leave-types-count-blank-column"></div>
+                                    <div class="select-leave-types-column">
+                                        <div class="leave-type-code-sub">
+                                            <label><%= t('code') %></label>
+                                        </div>
+                                        <div class="leave-type-code-sub">
+                                            <label><%= t('leave_count_txt') %></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% leave_types.each do |leave_type| %>
+                                  <div class="leave-type-content">
+                                    <% leave_group_leave_type = leave_group.leave_group_leave_types.select{|lg_lt| lg_lt.employee_leave_type_id == leave_type.id} %>
+                                      <div class="check-box-column">
+                                  <%= check_box_tag "leave_group_leave_type_ids[#{leave_group.id}][]", leave_type.id, false, {:class => "check-box-style",:id => "leave_id" , :onclick => "leave_type_checkbox(this);" }%>
+                                      </div>
+                                      <div class="leave-group-name-column" onclick="leave_type_checkbox_select(this);">
+                                          <label><%= leave_type.name %></label>
+                                      </div>
+                                      <div class="employee-count-blank-column"></div>
+                                      <div class="leave-types-count-blank-column"></div>
+                                      <div class="select-leave-types-column">
+                                          <div class="leave-type-code-sub" onclick="leave_type_checkbox_select(j(this).parent());">
+                                              <label><%= leave_type.code %></label>
+                                          </div>
+                                          <div class="leave-type-code-sub" onclick="leave_type_checkbox_select(j(this).parent());">
+                                              <label><%= leave_group_leave_type.first.leave_count %></label>
+                                          </div>
+                                      </div>
+                                  </div>
+                                <% end %>
+                            </div>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+              </div>
+          </div>
+          <div class="reset-by-group-hint">
+              <label class="reset-leave-label"><%= t('please_note_reset_by_leave_group') %></label>
+          </div>
+          <div id="buttons-div">
+              <%= form.submit "", :value => "#{t('reset_leave')}" , :class=>"submit-button", :id => "submit_button", :onclick =>"return validate_submission();" %>
+              <%= link_to t('cancel'), { :action => 'reset_leaves' }, :class => "cancel-button" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="flash-msg"> <%= t('no_active_leave_type_in_leave_group') %> </p>
+      <% end %>
+    <% end %>
+    <div id="modal-box" style="display:none;"></div>
+</div>
+<script type="text/javascript">
+
+  function toggle_leave_type(current) {
+      parent = j(current).parent().parent().parent();
+      var flag = true;
+      if (j(parent).find("#leave_group_ids_").prop("checked") == true && j(parent).find(".leave-type-main").css('display') == 'none') {
+          j(parent).find(".leave-type-main").slideDown();
+          j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', true);
+          j(current).parent().parent().css('background-color', '#eee');
+          flag = false;
+      }
+      if (flag) {
+          if (j(parent).find("#leave_group_ids_").prop("checked") == false) {
+              j(parent).find("#leave_group_ids_").prop("checked", true);
+              j(parent).find(".leave-type-main").slideDown();
+              j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', true);
+              j(current).parent().parent().css('background-color', '#eee');
+          } else {
+              j(parent).find("#leave_group_ids_").prop("checked", false);
+              j(parent).find(".leave-type-main").slideUp();
+              j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', false);
+              j(current).parent().parent().css('background-color', '#fff');
+          }
+      }
+  }
+
+  function select_checkbox(current) {
+      parent = j(current).parent().parent().parent().parent();
+      if (j(parent).find(".leave-type-main").css("display") == "none" && j(current).is(':checked')) {
+          j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', true);
+      } else if (j(parent).find(".leave-type-main").css("display") == "none" && !j(current).is(':checked')) {
+          j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', false);
+      } else {
+          if (j(current).is(':checked'))
+              j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', true);
+          else
+              j(parent).find(".leave-type-main").find('.check-box-style').prop('checked', false);
+      }
+  }
+
+  function leave_type_checkbox(current) {
+      parent = j(current).parent().parent().parent();
+      if (j(parent).find('.check-box-style:checked').length == 0)
+          j(parent).parent().find("#leave_group_ids_").prop('checked', false)
+      else
+          j(parent).parent().find("#leave_group_ids_").prop('checked', true)
+  }
+
+  function leave_type_checkbox_select(current) {
+      if (j(current).parent().find('#leave_type_ids_').prop('checked') == true)
+          j(current).parent().find('#leave_type_ids_').prop('checked', false);
+      else
+          j(current).parent().find('#leave_type_ids_').prop('checked', true);
+      leave_type_checkbox(j(current).parent().find('#leave_type_ids_'));
+  }
+
+  function validate_submission() {
+      if (j('#leave_group_ids_:checked').length == 0) {
+          var error_group = "<%= t('leave_group_not_selected') %>";
+          j('#form-errors').html('<div id="error-box"><ul><li class="error-font-size">' + error_group + '</li></ul></div>');
+          window.scrollTo(0, 0);
+          return false;
+      }
+      if (j('#leave_id:checked').length == 0) {
+          var error_type = "<%= t('leave_type_not_selected') %>";
+          j('#form-errors').html('<div id="error-box"><ul><li class="error-font-size">' + error_type + '</li></ul></div>');
+          window.scrollTo(0, 0);
+          return false;
+      }
+      if (j('#form-errors').html() != '')
+          j('#form-errors').html('')
+      return true;
+  }
+
+</script>

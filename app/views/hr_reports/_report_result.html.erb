@@ -1,0 +1,175 @@
+<div class ="report_section" id="<%= @base_template.name %>_result">
+  <% if @report_result.present? %>
+    <% methods = @report_result.methods %>
+    <% method_types = @report_result.method_types %>
+    <% currency_sym = "&#x200E;(#{currency})&#x200E;" %>
+    <% grouped_columns = @report_result.column_grouping %>
+    <% group_values = @report_result.group_values %>
+    <% col_length = 0 %>
+    <% page_no = (params[:page]||1).to_i - 1 %>
+    <% if @report_result.values.present? or @report_values.present? %>
+      <div id="reports_table">
+        <table>
+          <% unless @report_result.column_grouping.present? %>
+            <% col_length = @report_result.methods.length %>
+            <tr class="tr-head">
+              <td class="sl_no"><%= t('sl_no') %></td>
+              <% methods.each do |method| %>
+                <td><%= "#{@report_result.header_title[method.to_s]} #{(method_types[method] == "amount" ? currency_sym: "")}" %></td>
+              <% end %>
+            </tr>
+          <% else %>
+            <tr class="tr-head">
+              <td class="sl_no" rowspan="2"><%= t('sl_no') %></td>
+              <% methods.each do |method| %>
+                <% if grouped_columns.include? method.to_s %>
+                  <% col_length += group_values.length %>
+                  <td colspan="<%= group_values.length %>"><%= "#{@report_result.header_title[method.to_s]} #{(method_types[method] == "amount" ? currency_sym: "")}" %></td>
+                <% else %>
+                  <% col_length += 1 %>
+                  <td rowspan="2"><%= @report_result.header_title[method.to_s] %></td>
+                <% end %>
+              <% end %>
+            </tr>
+            <tr class="tr-head">
+              <% grouped_columns.each do |col| %>
+                <% group_values.each do |val| %>
+                  <td><%= date_display(val) %></td>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+          <% count = 1 %>
+          <% if @report_result.grouped_values.present? %>
+            <% if @report_result.row_grouping %>
+              <% @report_result.grouped_values.each do |key, values| %>
+                <% total = @report_result.group_count.detect{|c| c.name == key}.try(:total) %>
+                <tr class="sub-head">
+                  <td colspan = "<%= col_length + 1 %>">
+                    <% unless @base_template.name == "employee_wise_estimation_report" %>
+                      <%= "#{t('pay_period')} : #{date_display(key)}" %>
+                      <span class="total_count"><%= "&#x200E;(#{total} #{t('payslips')})&#x200E;" %></span>
+                    <% else %>
+                      <% report_type = params[:inputs][:input_values][:report_type] %>
+                      <%= "#{t(report_type.gsub('_type',""))} : #{(report_type == "pay_frequency_type" ? PayrollGroup.payment_period_translation(key) : key)} " %>
+                      <span class="total_count"><%= "&#x200E;(#{t('total_cost')} : #{total})&#x200E;" %></span>
+                    <% end %>
+                  </td>
+                </tr>
+                <% values.each do |val| %>
+                  <tr>
+                    <td class="sl_no"><%= page_no*10 + count %></td>
+                    <% count += 1 %>
+                    <% methods.each do |method| %>
+                      <td class="<%= method_types[method] %>">
+                        <%= val.send(method) %>
+                      </td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              <% end %>
+            <% elsif @report_result.column_grouping.present? %>
+              <% @report_result.grouped_values.each do |key, values| %>
+                <tr>
+                  <td class="sl_no"><%= page_no*10 + count %></td>
+                  <% count += 1 %>
+                  <% res = nil
+                  values.each{|k,v| res = v.first} %>
+                  <% methods.each do |method| %>
+                    <% if grouped_columns.include? method.to_s %>
+                      <% group_values.each do |val| %>
+                        <td class="<%= method_types[method] %>"><%= values[val].present? ? values[val].first.send(method) : '-'   %></td>
+                      <% end %>
+                    <% else %>
+                      <td class="<%= method_types[method] %>"><%= res.present? ? res.send(method) : '-' %></td>
+                    <% end %>
+                  <% end %>
+                </tr>
+              <% end %>
+            <% end %>
+          <% else %>
+            <% unless @report_values.present? %>
+              <% @report_result.values.each do |val| %>
+                <tr>
+                  <td class="sl_no"><%= page_no*10 + count %></td>
+                  <% count += 1 %>
+                  <% methods.each do |method| %>
+                    <td class="<%= method_types[method] %>">
+                      <%= val.send(method) %>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
+            <% else %>
+              <% values = @report_result.values %>
+              <% @report_values.each do |val| %>
+                <% res = values.detect{|v| v["id"].to_i == val.id} %>
+                <tr>
+                  <td class="sl_no"><%= page_no*10 + count %></td>
+                  <% count += 1 %>
+                  <% if res.nil? %>
+                    <% methods.each do |method| %>
+                      <td class="<%= method_types[method] %>">
+                        <%= (method.to_s == 'name' ? val.send(method) : precision_label(0)) %>
+                      </td>
+                    <% end %>
+                  <% else %>
+                    <% methods.each do |method| %>
+                      <td class="<%= method_types[method] %>">
+                        <%= (([:name, :no_of_lop].include? method.to_sym) ? res[method.to_s] : precision_label(res[method.to_s])) %>
+                      </td>
+                    <% end %>
+                  <% end %>
+                </tr>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% if @totals.present? %>
+            <tr class="totals">
+              <td class="blank_cell"></td>
+              <% if @report_result.column_grouping.present? %>
+                <% total_methods = @totals.values.first.first.keys.map(&:to_s) %>
+                <% methods.each do |method| %>
+                  <% if grouped_columns.include? method.to_s %>
+                    <% group_values.each do |val| %>
+                      <td class="<%= ((total_methods.include? method.to_s) ? "total_cell" : "blank_cell") %>">
+                        <div class="total_text"><%= ((total_methods.include? method.to_s) ? t('total') : "") %></div>
+                        <div class="total_amt"><%= precision_label(@totals[val].present? ? @totals[val].first[method.to_s] : ((total_methods.include? method.to_s) ? '0' : ''))   %></div>
+                      </td>
+                    <% end %>
+                  <% else %>
+                    <td class="blank_cell"></td>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <% totals =  @totals.first %>
+                <% total_methods = totals.keys.map(&:to_s) %>
+                <% methods.each do |method| %>
+                  <td class="<%= ((total_methods.include? method.to_s) ? "total_cell" : "blank_cell") %>">
+                    <div class="total_text"><%= ((total_methods.include? method.to_s) ? t('total') : "") %></div>
+                    <div class="total_amt"><%= precision_label(totals[method.to_s]||"") %></div>
+                  </td>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <% action = (@custom_report.present? ? "fetch_template_reports" : "fetch_reports") %>
+      <% temp_id = (@custom_report.present? ? @custom_report.id : '') %>
+      <% if @report_result.present? %>
+        <% unless @report_values.present?  %>
+          <%= pagination_status(@report_result.values) %>
+          <%= will_paginate @report_result.values,:renderer => 'RemoteLinkRenderer', :params => {:action => action, :inputs => params[:inputs], :name => @base_template.name , :filters => params[:filters], :columns => params[:columns], :temp_id => temp_id, :type => params[:type]} %>
+        <% else %>
+          <%= pagination_status(@report_values) %>
+          <%= will_paginate @report_values,:renderer => 'RemoteLinkRenderer', :params => {:action => action, :inputs => params[:inputs], :name => @base_template.name , :filters => params[:filters], :columns => params[:columns], :temp_id => temp_id, :type => params[:type]} %>
+        <% end %>
+      <% end %>
+      <% csv_action = (@custom_report.present? ? "template_csv" : "report_csv") %>
+      <div id="csv_link"><%= link_to t('download_csv'), {:action => csv_action, :inputs => params[:inputs], :name => @base_template.name , :filters => params[:filters], :columns => params[:columns], :temp_id => temp_id}, :class => 'submit-button' %></div>
+    <% else %>
+      <div class="substitute" style="display:block;"><%= t('no_results_found') %></div>
+    <% end %>
+  <% end %>
+</div>

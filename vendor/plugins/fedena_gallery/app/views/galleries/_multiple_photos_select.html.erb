@@ -1,0 +1,27 @@
+<% @photos.each_with_index do |image,index| %>
+<% index= index+1%>
+
+<%= '<div class="row">' if ((index+2)%3) == 0  %>
+  <div class="album_photo <%= (index+1)%3 == 0 ? " photo_middle" : "" %>" style="background-image: url('<%=  image.photo.url(:thumb, false)%>');" data-value='<%=index-1%>'>
+    <div id='overlay<%=index-1%>'></div>
+    <div id='img<%=index-1%>' data-value='<%=image.id%>' data-checked=false class="check"></div>
+  </div>
+  <% #row %>
+    <%= '</div>'if (index%3) == 0%>
+
+  <%end%>
+  <% #In case row doesnt get closed - In last case where no of photos is less than 3 %>
+  <%= '</div>'if (@photos.count%3) != 0%>
+
+  <%= will_paginate @photos, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "galleries",:action => "delete_multiple_photos", :id=> @category.id ,:count=>0},:remote=>{:update=>'album_images'}%>
+
+<script>
+current_page=<%= params[:page] %>
+album_total_image_count= <%= @total_album_images %>;
+total_images=<%= @photos.count%>;
+set_image_select_listener();
+selected_count();
+j("#select_all").html("Select all");
+select_all_flag = true;
+
+</script>

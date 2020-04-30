@@ -1,0 +1,2 @@
+privilege_tag=PrivilegeTag.find_by_name_tag("system_settings")
+Privilege.find_or_create_by_name :name => "ManageRollNumber", :description => "manage_roll_number_privilege", :privilege_tag_id => privilege_tag.id, :priority => 46

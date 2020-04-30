@@ -1,0 +1,29 @@
+<div class="details">
+    <div class="details_strip">
+        <div class="label"><%= t('attribute_profile') %></div>
+        <div class="field bold"><%= @profile.name %></div>
+        <% unless @profile.dependencies_present? %>
+          <div class="edit_field"><td><%= link_to_remote t('edit_profile'), :url => edit_assessment_attribute_path(@profile), :method => :get %></div>
+        <% end %>
+    </div>
+    <div class="details_strip">
+        <div class="label"><%= t('display_name') %></div>
+        <div class="field"><%= @profile.display_name %></div>
+    </div>
+    <div class="details_strip">
+        <div class="label"><%= t('description') %></div>
+        <div class="field"><%= @profile.description %></div>
+    </div>
+    <% if @profile.formula %>
+      <div class="details_strip">
+          <div class="label"><%= t('subject_mark_derivation') %></div>
+          <div class="field"><%= @profile.formula_text %></div>
+      </div>
+    <% end %>
+    <% if @profile.maximum_marks %>
+      <div class="details_strip">
+          <div class="label"><%= t('max_subject_marks') %></div>
+          <div class="field"><%= @profile.maximum_marks %></div>
+      </div>
+    <% end %>
+</div>

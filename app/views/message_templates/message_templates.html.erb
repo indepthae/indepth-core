@@ -1,0 +1,159 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('message_templates') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'> <%= t('home') %></div>
+    <% if @tempalte_edit_setting == true %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_message_template')}", new_message_template_message_templates_path %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id="box">
+        <div class="head"><%= t('custom_message_templates') %></div>
+        <div class="sub_text"><%= t('custom_message_templates_desc') %></div>
+        <table class="primary">
+            <tr>
+                <th class="center_text"><%= t('no_text') %></th>
+                <th class="center_text"><%= t('template_name') %></th>
+                <th class="center_text"></th>
+            </tr>
+
+            <% if @custom_message_templates.present? %>
+              <% @custom_message_templates.each_with_index do |message_template, index| %>
+                <tr>
+                    <td  class="center_text"><%= index+1 %></td>
+                    <td><%= message_template.template_name %></td>
+                    <td  class="center_text">
+                        <%= link_to t('edit'), edit_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text"%> &nbsp; | &nbsp;
+                        <%= link_to t('delete'), delete_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text", :confirm =>"#{t('delete_confirm_msg')}" %> 
+                    </td>
+                </tr>
+              <%end%>
+            <%else%>
+              <tr>
+                  <td colspan="3" class="center_text"><%=  t('no_message_template_present')  %></td>
+              </tr>
+            <%end%>
+        </table>
+
+
+        <div class="head"><%= t('automated_message_templates') %></div>
+        <div class="sub_text"><%= t('automated_message_templates_desc') %></div>  
+        <table class="primary">
+            <tr>
+                <th class="center_text"><%= t('no_text') %></th>
+                <th class="center_text"><%= t('template_name') %></th>
+                <th class="center_text"></th>
+            </tr>
+            <% if @automated_message_templates.present? %>
+              <% @automated_message_templates.each_with_index do |message_template, index| %>
+                <tr>
+                    <td  class="center_text"><%= index+1 %></td>
+                    <td><%= message_template.template_name %></td>
+                    <td  class="center_text">
+                        <% if @tempalte_edit_setting == true %>
+                          <%= link_to t('edit'), edit_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text"%>
+                        <% end %>
+                    </td>
+                </tr>
+              <%end%>
+            <%else%>
+              <tr>
+                  <td colspan="3" class="center_text"><%=  t('no_message_template_present')  %></td>
+              </tr>
+            <%end%>
+        </table>
+
+        <div class="head"><%= t('birthday_message_templates') %></div>
+        <div class="sub_text"><%= t('birthday_message_templates_desc') %></div>  
+        <table class="primary">
+            <tr>
+                <th class="center_text"><%= t('no_text') %></th>
+                <th class="center_text"><%= t('template_name') %></th>
+                <th class="center_text"></th>
+            </tr>
+            <% if @birthday_message_templates.present? %>
+              <% @birthday_message_templates.each_with_index do |message_template, index| %>
+                <tr>
+                    <td  class="center_text"><%= index+1 %></td>
+                    <td><%= message_template.template_name %></td>
+                    <td  class="center_text">
+                        <%= link_to t('edit'), edit_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text"%> &nbsp; | &nbsp;
+                        <%= link_to t('delete'), delete_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text" , :confirm =>"#{t('delete_confirm_msg')}"%> 
+                    </td>
+                </tr>
+              <%end%>
+            <%else%>
+              <tr>
+                  <td colspan="3" class="center_text"><%=  t('no_message_template_present')  %></td>
+              </tr>
+            <%end%>
+        </table>
+
+        <div class="head"><%= t('reminder_message_templates') %></div>
+        <div class="sub_text"><%= t('reminder_message_templates_desc') %></div>  
+        <table class="primary">
+            <tr>
+                <th class="center_text"><%= t('no_text') %></th>
+                <th class="center_text"><%= t('template_name') %></th>
+                <th class="center_text"></th>
+            </tr>
+            <% if @reminder_message_templates.present? %>
+              <% @reminder_message_templates.each_with_index do |message_template, index| %>
+                <tr>
+                    <td  class="center_text"><%= index+1 %></td>
+                    <td><%= message_template.template_name %></td>
+                    <td  class="center_text">
+                        <%= link_to t('edit'), edit_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text"%> &nbsp; | &nbsp;
+                        <%= link_to t('delete'), delete_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text" , :confirm =>"#{t('delete_confirm_msg')}"%> 
+                    </td>
+                </tr>
+              <%end%>
+            <%else%>
+              <tr>
+                  <td colspan="3" class="center_text"><%=  t('no_message_template_present')  %></td>
+              </tr>
+            <%end%>
+        </table>
+
+        <div class="head"><%= t('transport_message_templates') %></div>
+        <div class="sub_text"><%= t('transport_message_templates_desc') %></div>  
+        <table class="primary">
+            <tr>
+                <th class="center_text"><%= t('no_text') %></th>
+                <th class="center_text"><%= t('template_name') %></th>
+                <th class="center_text"></th>
+            </tr>
+            <% if @transport_message_templates.present? %>
+              <% @transport_message_templates.each_with_index do |message_template, index| %>
+                <tr>
+                    <td  class="center_text"><%= index+1 %></td>
+                    <td><%= message_template.template_name %></td>
+                    <td  class="center_text">
+                        <%= link_to t('edit'), edit_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text"%> &nbsp; | &nbsp;
+                        <%= link_to t('delete'), delete_message_template_message_templates_path(:id=>message_template.id), :class=>"themed_text" , :confirm =>"#{t('delete_confirm_msg')}"%> 
+                    </td>
+                </tr>
+              <%end%>
+            <%else%>
+              <tr>
+                  <td colspan="3" class="center_text"><%=  t('no_message_template_present')  %></td>
+              </tr>
+            <%end%>
+        </table>
+    </div>
+</div>
+
+

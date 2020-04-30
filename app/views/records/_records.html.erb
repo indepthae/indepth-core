@@ -1,0 +1,50 @@
+<div id="student_items">
+  <%if @records.present?%>
+    <table id="student_details_table">
+      <tr class="disable_sort">
+        <th id="reorder"></th>
+        <th id="name"><%=t('record')%></th>
+        <th id="action"></th>
+      </tr>
+      <%@records.each_with_index do |r,i|%>
+        <tr class="list">
+          <td class="reorder_val"><i></i></td>
+          <td class="record_name"><%=r.name%></td>
+          <%unless r.student_records.present?%>
+            <td class="action">
+              <%=link_to "#{t('edit_text')}",edit_record_group_record_path(r.record_group_id,r.id)%>
+              <%=link_to "#{t('delete_text')}",record_group_record_path(r.record_group_id,r.id),:method=>'DELETE',:confirm => "#{t('record_delete_confirm')}"%>
+            </td>
+          <%else%>
+            <td class="action">
+              <div class="tool_edit">
+                <%=t('edit')%>
+                <div class="edit_info" style="display: none"><%=t('record_not_editable')%></div>
+              </div>
+              <div class="tool_delete">
+                <%=t('delete')%>
+                <div class="delete_info" style="display: none"><%=t('record_not_deletable')%></div>
+              </div>
+            </td>
+          <%end%>
+          <%=hidden_field_tag "record_group[records_attributes][#{i.to_s}][id]",r.id%>
+          <%=hidden_field_tag "record_group[records_attributes][#{i.to_s}][priority]",r.priority%>
+        </tr>
+      <%end%>
+    </table>
+  <%else%>
+    <div class="no_entries"><%=t('no_records_yet')%></div>
+  <%end%>
+</div>
+<script type="text/javascript">
+  j(".tool_edit").hover(function(){
+    j(this).children('.edit_info').show();
+  },function(){
+    j(this).children('.edit_info').hide();
+  });
+  j(".tool_delete").hover(function(){
+    j(this).children('.delete_info').show();
+  },function(){
+    j(this).children('.delete_info').hide();
+  });
+</script>

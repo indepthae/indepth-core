@@ -1,0 +1,17 @@
+<table id="listing" width="100%">
+
+ <tr class="tr-head">
+          <td><%= t('batch_text') %></td>
+          <td><%= t('exam_group') %></td>
+          <td><%= t('active_exams') %></td>
+          <td><%= t(' ') %></td>
+ </tr>
+   <%@batches.each do |batch|%>
+ <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-2"><%= batch.batch_name %></td>
+          <td class="col-1"><%= batch.count_exam_groups %></td>
+          <td class="col-1"><%= batch.count_active_exams %></td>
+          <td class="col-1"><%= link_to t('manage_exams'), batch_exam_groups_path(batch.batch_id) %></td>
+ </tr>
+  <%end%>
+</table>

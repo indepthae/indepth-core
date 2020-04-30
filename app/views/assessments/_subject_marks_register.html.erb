@@ -1,0 +1,239 @@
+<div class="note"><%= t('mark_submission_note') %></div>
+<% scoring_type = @subject.is_activity? ? 2 : @assessment_group.scoring_type %>
+<div id="assessment_form">
+    <div id="header">
+        <% if ([1,3].include? scoring_type) %>
+          <%= t('enter_marks_for_students') %>
+        <% end %>
+        <% if (scoring_type == 2) %>
+          <%= t('select_grades_for_students') %>
+        <% end %>  
+    </div>
+    <% form_for @assessment, :url => subject_scores_assessment_path(@assessment) do |sa| %>
+      <% roll_num_enabled = Configuration.enabled_roll_number? %>
+      <%= session_fingerprint_field %> 
+      <table id="assessments">
+          <tr class="tr-head">
+              <td class="sl_no"><%= t('no_text') %></td>
+              <td class="name"><%= t('student_text') %></td>
+              <% if roll_num_enabled %>
+                <td class="roll_no"><%= t('roll_nos') %></td>
+              <% else %>
+                <td class="roll_no"><%= t('admission_no') %></td>
+              <% end %>
+              <td class="absent"><%= t('absent') %></td>
+              <%  %>
+              <% if ([1,3].include? scoring_type) %>
+                <td class="marks"><%= t('marks') %></td>
+              <% end %>
+              <% if ([2,3].include? scoring_type) %>
+                <td class="grade"><%= t('grade') %></td>
+              <% end %>
+              <td class="result"><div id="result"><%= t('result') %></div></td>
+
+          </tr>
+          <% sa.fields_for :assessment_marks, @assessment_marks do |field| %>
+            <% m_obj = field.object %>
+            <%= field.hidden_field :student_id %>
+            <%= field.hidden_field :assessment_type %>
+            <%= field.hidden_field :assessment_id %>
+            <tr>
+                <td class="sl_no"><%= m_obj.sl_no %></td>
+                <td class="name" title="<%= m_obj.student_name %>"><%=truncate(m_obj.student_name,:length=>30) %></td>
+                <% if roll_num_enabled %>
+                  <td class="roll_no"><%= m_obj.student_roll_no %></td>
+                <% else %>
+                  <td class="roll_no"><%= m_obj.student_admission_no %></td>
+                <% end %>
+                <td class="absent"><%= field.check_box :is_absent, {:onclick => "check_absent(this)", :disabled=>@mark_entry_locked, :class=>'absent'}, 'true', 'false' %></td>
+                <% if @mark_entry_locked %>
+                  <%= field.hidden_field :is_absent %>
+                <% end %>
+                <% if ([1,3].include? scoring_type) %>
+                  <td class="marks"><%= field.text_field :marks, :class => "exam_marks precision_text", :onchange => "return validate_mark(this)", :disabled => (m_obj.is_absent or @mark_entry_locked) %></td>
+                <% end %>
+                <% if ([2,3].include? scoring_type) %>
+                  <% if scoring_type == 3 %>
+                    <td class="grade">
+                        <span class="grade_text"><%= m_obj.grade||'-' %></span>
+                        <%= field.hidden_field :grade, :class => "mark_grade" %>
+                        <%= field.hidden_field :grade_id, :class => "mark_grade_id" %>
+                    </td>
+                  <% else %>
+                    <td class="grade">
+                        <%= field.select :grade_id, [[t('select_grade'), ""]]+@grades.map{|exam| [exam.name,exam.id]}, {}, {:class => 'exam_grade', :onchange => "check_result(this)", :disabled => (m_obj.is_absent or @mark_entry_locked)} %>
+                        <%= field.hidden_field :grade %>
+                    </td>
+                  <% end %>
+                <% end %>
+                <td class="result">
+                    <% if m_obj.new_record? or m_obj.is_absent %>
+                      <%= '-' %>
+                    <% else %>
+                      <% if scoring_type == 1 %>
+                        <%= ((m_obj.marks.to_f >= @assessment.minimum_marks.to_f) ? "<span class='success'>#{t('pass_text')}</span>" : "<span class='danger'>#{t('fail_text')}</span>") %>
+                      <% else %>
+                        <%= ((m_obj.grade_details.try(:pass_criteria)) ? "<span class='success'>#{t('pass_text')}</span>" : "<span class='danger'>#{t('fail_text')}</span>") %>
+                      <% end %>
+                    <% end %>
+                </td>
+
+            </tr>
+          <% end %>
+      </table>
+      <%= submit_tag t('submit_marks'), :class => 'submit-button',:name=> 'save_and_submit_marks'%>
+      <% unless @mark_entry_locked %>   
+        <%= submit_tag t('save_marks') , :class => 'submit-button', :name=> 'save_marks' %>
+      <% end %>
+      <%= link_to "#{t('cancel')}", :back, :class => 'submit-button cancel-button' %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  var max_marks = parseFloat('<%= @assessment.maximum_marks.to_f %>');
+  var min_marks = parseFloat('<%= @assessment.minimum_marks.to_f %>');
+  var pass_grades = JSON.parse('<%= (@grades||[]).map{|g| g.name if g.pass_criteria}.compact.to_json.gsub("'", %q(\\\')) %>');
+  var grades_list = JSON.parse('<%= (@grades||[]).each_with_object({}){|g, h| h[g.id] = [g.name, g.minimum_marks.to_f]}.to_json.gsub("'", %q(\\\')) %>');
+  var grades_present = <%= @grades.present? ? true : false %>;
+  var error_entries = new Array();
+  validate_mark = function (elm) {
+      curr_id = j(elm).attr('id');
+      if (parseFloat(elm.value) > max_marks) {
+          makeError(elm, '<%= t('marks_entered_should_not_exceed_max_marks') %>');
+          if (j.inArray(curr_id, error_entries) === -1) {
+              error_entries.push(curr_id);
+          }
+          j(elm).closest('tr').find('.result').text('-');
+      } else {
+          removeError(elm);
+          if (j.inArray(curr_id, error_entries) !== -1) {
+              error_entries.splice(error_entries.indexOf(curr_id), 1);
+          }
+          check_mark_result(elm);
+
+      }
+      submit_check();
+  }
+
+  check_absent = function (elm) {
+      exam_marks = j(elm).closest('tr').find('.exam_marks');
+      if (j(elm).is(':checked')) {
+          j(elm).closest('tr').find('.exam_marks, .exam_grade').attr('disabled', true);
+          j(elm).closest('tr').find('.result span').hide();
+          if (exam_marks.length > 0)
+              removeError(exam_marks[0]);
+      } else {
+          j(elm).closest('tr').find('.result span').show();
+          j(elm).closest('tr').find('.exam_marks, .exam_grade').attr('disabled', false);
+          if (exam_marks.length > 0)
+              validate_mark(exam_marks[0]);
+      }
+  }
+
+  check_mark_result = function (elm) {
+      if (grades_present) {
+          set_grade(elm);
+      } else {
+          if (elm.value !== "") {
+              if (parseFloat(elm.value) >= min_marks)
+                  j(elm).closest('tr').find('.result').html('<span class="success">' + '<%= t('pass_text') %>' + '</span>');
+              else
+                  j(elm).closest('tr').find('.result').html('<span class="danger">' + '<%= t('fail_text') %>' + '</span>');
+          } else
+              j(elm).closest('tr').find('.result').text('-');
+      }
+  }
+
+  set_grade = function (elm) {
+      if (j(elm).val() != '') {
+          converted_mark = ((parseFloat(j(elm).val()) || 0) * 100).round(2) / max_marks;
+          grade = get_grade(converted_mark);
+          j(elm).closest('tr').find('.grade_text').text(grade.first());
+          j(elm).closest('tr').find('.mark_grade').val(grade.first());
+          j(elm).closest('tr').find('.mark_grade_id').val(grade.last());
+          set_grade_result(elm, grade.first())
+      } else {
+          j(elm).closest('tr').find('.grade_text').text('-');
+          j(elm).closest('tr').find('.mark_grade').val('');
+          j(elm).closest('tr').find('.mark_grade_id').val('');
+          j(elm).closest('tr').find('.result').text('-');
+      }
+  }
+
+  get_grade = function (mark) {
+      var grade, grade_id;
+      var smallest = 10000;
+      var least_grade;
+      var least_id;
+      var least_score = 10000;
+
+      j.each(grades_list, function (i, v) {
+          score = parseFloat(v.last())
+          if (score < least_score) {
+              least_score = score;
+              least_grade = v.first();
+              least_id = i;
+          }
+          diff = parseFloat(mark) - score;
+          if (diff >= 0 && diff < smallest) {
+              smallest = diff;
+              grade = v.first();
+              grade_id = i;
+          }
+      })
+      if (mark < least_score) {
+          grade = least_grade;
+          grade_id = least_id;
+      }
+      return [grade, grade_id]
+  }
+
+  check_result = function (elm) {
+      if (elm.value !== "") {
+          selected = j(elm).find('option:selected').text();
+          j(elm).next('input').val(selected);
+          if (j.inArray(selected, pass_grades) !== -1)
+              j(elm).closest('tr').find('.result').html('<span class="success">' + '<%= t('pass_text') %>' + '</span>');
+          else
+              j(elm).closest('tr').find('.result').html('<span class="danger">' + '<%= t('fail_text') %>' + '</span>')
+      } else {
+          j(elm).closest('tr').find('.result').text('-');
+          j(elm).next('input').val();
+      }
+  }
+
+  set_grade_result = function (elm, grade) {
+      if (elm.value !== "") {
+          if (j.inArray(grade, pass_grades) !== -1)
+              j(elm).closest('tr').find('.result').html('<span class="success">' + '<%= t('pass_text') %>' + '</span>');
+          else
+              j(elm).closest('tr').find('.result').html('<span class="danger">' + '<%= t('fail_text') %>' + '</span>');
+      } else {
+          j(elm).closest('tr').find('.result').text('-');
+      }
+  }
+
+  submit_check = function () {
+      if (error_entries.length > 0)
+          j('.submit-button').attr('disabled', 'disabled');
+      else
+          j('.submit-button').removeAttr('disabled');
+  }
+
+  makeError = function (elm, msg) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).addClass("error-field");
+      icon = j('<div></div', {'class': 'error-icon'});
+      icon.attr('tooltip', msg);
+      j(elm).parent().append(icon);
+  }
+
+  removeError = function (elm) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).removeClass("error-field");
+      idx = error_entries.indexOf(j(elm).attr("id"))
+      if (idx >= 0)
+          error_entries.splice(idx, 1);
+      submit_check();
+  }
+
+</script>

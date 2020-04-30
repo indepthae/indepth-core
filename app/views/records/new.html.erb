@@ -1,0 +1,263 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <%if @record.new_record?%>
+    <div class='sub-header'><%= t('new_record_caps') %></div>
+  <%else%>
+    <div class='sub-header'><%= t('edit_record_caps') %></div>
+  <%end%>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%if @record.new_record?%>
+      <%= breadcrumb :records_new, @record %>
+    <%else%>
+      <%= breadcrumb :records_edit, @record %>
+    <%end%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <%- form_for @record, :url=>{:action=>@record.new_record? ? "create" : "update"} do |c| -%>
+
+    <%=error_messages_for 'record', :header_message => nil %>
+    <div id="form-content">
+      <div class="label-field-pair">
+        <label for="record_name"><%= t('name_of_record') %> <span class="necessary-field">*</span></label>
+        <div class="text-input-bg"> <%= c.text_field :name %> </div>
+      </div>
+      <div class="label-field-pair" id="input_type_div">
+        <div class="label-container"> <%= c.label :input_type,"#{t('input_method')}" %></div>
+        <div class="text-input-bg">
+          <%= c.select :temp_input_type, [["#{t('singleline_text')}","singleline"],["#{t('multiline_text')}","multiline"],["#{t('multiple_text')}","multiple"],["#{t('date_text')}","date"],["#{t('attachment_text')}","attachment"]] ,{},:class=>"input-type-select",:onchange=>'get_required_fields()'%>
+
+        </div>
+      </div>
+      <div class="custom" style="display: none" >
+        <%=render "type_select",:f=>c%>
+        <div class="label_container">
+          <div class="label_row">
+            <div class="label_td"><%=t('options')%> <span>(<%=t('min_2_required')%>)</span></div>
+            <div class="label_td zero_rt_border"><%=t('default_option')%></div>
+          </div>
+        </div>
+        <% c.fields_for :record_field_options do |builder| %>
+          <%= render "record_field_option_fields" ,:c=>builder%>
+        <% end %>
+        <div class="bottom_part">
+          <%= link_to_add_options "#{image_tag "buttons/add_image.png" } #{t('add_option')}", c, :record_field_options  %>
+          <%= c.radio_button :no_default,true,:checked=>!c.object.record_field_options.collect(&:is_default).include?(true),:class=>"no_default_rb"%><label id="label_no_default_yes" for="record_no_default_true"><%=t('no_default')%></label>
+        </div>
+      </div>
+      <div id="record_type_suffix">
+        <div class="label-field-pair">
+          <div class="label-container"> <%= c.label :record_type,"#{t('record_type')}" %></div>
+          <div class="text-input-bg">
+            <%= c.select :record_type, [["#{t('alphanumerics_text')}","alpha"],["#{t('numeric_text')}","numeric"]] ,{}%>
+          </div>
+        </div>
+
+        <div class="label-field-pair">
+          <label for="record_suffix"><%= t('record_suffix') %></label>
+          <div class="text-input-bg"> <%= c.text_field :suffix %> </div>
+        </div>
+      </div>
+      <div class="label_field_pair">
+        <div class="field_type">
+          <%= c.radio_button  "is_mandatory", false, :checked => "checked" %>
+          <label class="label_for_optional_field" for="record_is_mandatory_false"> <%= t('optional_field') %></label>
+        </div>
+        <div class="field_type">
+          <%= c.radio_button  "is_mandatory", true %>
+          <label class="label_for_mandatory_field" for="record_is_mandatory_true"><%= t('mandatory_field') %></label>
+        </div>
+      </div>
+
+
+      <div id="submit-button">
+        <% unless @record.new_record? %>
+          <%=submit_tag("#{t('update_record')}", :disable_with => "#{t('please_wait')}",:id=>'submit_button') %>
+        <% else %>
+          <%=submit_tag("#{t('create_record')}", :disable_with => "#{t('please_wait')}",:id=>'submit_button') %>
+        <% end %>
+      </div>
+    </div>
+  <%- end -%>
+</div>
+<script type="text/javascript">
+  function get_required_fields()
+  {
+    if(j('#record_temp_input_type').val() == 'singleline'){
+      j('#record_type_suffix').show();
+    }
+    else{
+      j('#record_type_suffix').hide();
+    }
+    if(j('#record_temp_input_type').val() != 'multiple'){
+      j('.custom').hide();
+    }
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+      $$('.input-type-select').first().fire('change')
+      $$('select#record_temp_input_type').each(function(e){
+        toggle_custom.call(e);
+      });
+    }
+  }
+  function add_fields(link, association, content){
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    $(link).up().insert({
+      before: content.replace(regexp, new_id)
+    });
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+    }
+    if(j('.type_select:input:checked').val() == 'multi_select'){
+      j('.radio_options').attr('type','checkbox').removeClass('radio_options').addClass('check_options');
+    }
+    if (j('.fields input[type="text"]:visible').length>2){
+      j('.delete_button_img').show();
+    }
+    else{
+      j('.delete_button_img').hide();
+    }
+  }
+
+
+  function remove_fields(link){
+    $(link).previous("input[type=hidden]").value='1';
+    $(link).up(".fields").hide();
+    if (j('.fields input[type="text"]:visible').length<=2){
+      j('.delete_button_img').hide();
+    }
+    
+    if(j('.type_select').val()=='single_select'){
+      if(j('.radio_options:visible:checked').length == 0){
+        j('.radio_options').prop('checked',false);
+        j('.radio_options').val(0);
+        j('.no_default_rb').prop('checked',true);
+<%#*j('#no_default_select').val(true);%>
+      }
+    }
+  }
+
+  function toggle_custom(val){
+    dest = this.up(2).select('.custom')[0]
+    
+    //if(dest != null)
+    if((this.value == 'singleline')||(this.value == 'multiline')||(this.value== 'attachment')){
+      dest.hide();
+    }
+    else if (this.value == 'multiple'){
+      dest.show();
+    }
+    return true;
+  }
+
+
+
+  j('.type_select').click(function(){
+    if(j(this).val() == 'multi_select'){
+      j('.record_type_select').val('multi_select');
+      j('.radio_options').attr('type','checkbox').removeClass('radio_options').addClass('check_options').prop('checked',false);
+      j('.no_default_rb').attr('disabled',true).hide();
+      j('#label_no_default_yes').hide();
+    }
+    else{
+      j('.record_type_select').val('single_select');
+      j('.check_options').attr('type','radio').removeClass('check_options').addClass('radio_options').prop('checked',false);
+      j('.no_default_rb').prop('checked',true);
+      j('.no_default_rb').attr('disabled',false).show();
+      j('#label_no_default_yes').show();
+    }
+  });
+
+
+
+  document.observe("dom:loaded", function() {
+    if ($$('.input-type-select')!=""){
+      $$('.input-type-select').invoke('observe','change',toggle_custom);
+      $$('.input-type-select').first().fire('change');
+      $$('select#record_temp_input_type').each(function(e){
+        toggle_custom.call(e);
+      });
+    }
+    if(j('.type_select:input:checked').val() == 'multi_select'){
+      j('.radio_options').attr('type','checkbox').removeClass('radio_options').addClass('check_options');
+      j('.no_default_rb').attr('disabled',true).hide();
+      j('#label_no_default_yes').hide();
+    }
+    else{
+      j('.check_options').attr('type','radio').removeClass('check_options').addClass('radio_options');
+      j('.no_default_rb').attr('disabled',false).show();
+      j('#label_no_default_yes').show();
+    }
+    if(j('#record_temp_input_type').val() != 'singleline'){
+      j('#record_type_suffix').hide();
+    }
+    else{
+      j('#record_type_suffix').show();
+    }
+    if(j('#record_temp_input_type').val() != 'multiple'){
+      j('.custom').hide();
+    }
+    if (j('.fields input[type="text"]:visible').length>2){
+      j('.delete_button_img').show();
+    }
+  });
+
+
+  
+  j(document).delegate('.radio_options','click',function(){
+    var h_id="#"+j(this).attr('id').replace('_true','');
+    j('.radio_options').prop('checked',false);
+    j('.no_default_rb').prop('checked',false);
+    j('.hidden_radio_options').attr('value',false);
+    j('.radio_options').val(false);
+    j(this).prop('checked',true);
+    j(h_id).attr('value',true);
+    j(this).val(true);
+  });
+  j('.no_default_rb').click(function(){
+    j('.radio_options').prop('checked',false);
+    j('.radio_options').val(false)
+    j('.hidden_radio_options').val(false)
+    j(this).prop('checked',true);
+  });
+
+  
+
+
+  j(document).delegate('.check_options','change',function(){
+    var h_id="#"+j(this).attr('id').replace('_true','');
+    if(j(this).prop('checked') == true){
+      j(this).prop('value',true);
+      j(h_id).attr('value',true);
+    }
+    else{
+      j(this).prop('value',false);
+      j(h_id).attr('value',false);
+    }
+  });
+
+
+  
+</script>

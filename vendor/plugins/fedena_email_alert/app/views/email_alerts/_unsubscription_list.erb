@@ -1,0 +1,50 @@
+<% content_for :head do %>
+  <%if (rtl?)%>
+    <%=stylesheet_link_tag "rtl/gray_table_design"%>
+  <%else%>
+    <%=stylesheet_link_tag "gray_table_design"%>
+  <%end%>
+<% end %>
+
+<script type="text/javascript">
+  Element.hide('loader')
+</script>
+<%unless @unsubscribtion_list.empty?%>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+
+    <tr class="main_head">
+      <td><%= t('full_name') %></td>
+      <td><%= t('username') %></td>
+      <td><%= t('email') %> </td>
+      <td><%= t('user_type') %> </td>
+      <td></td>
+    </tr>
+
+    <% @unsubscribtion_list.each do |us|%>
+
+      <tr class="row-b" id="entry-<%= us.id %>">
+        <td><%= us.user.full_name%></td>
+        <td><%= us.user.username %></td>
+        <td><%= us.user.email%></td>
+        <td><%= us.user.user_type%></td>
+        <td><%= link_to_remote(t('remove_from_list'),{:url => { :action => 'remove_unsubscription', :entry_id => us.id }, :confirm => "#{t('remove_from_list')}?" }, {:class=>'remove-link'})%></td>
+      </tr>
+
+    <% end %>
+
+
+
+  </table>
+<%else%>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head" style="text-align:center">
+      <td><%=t('no_unsubscribed_users')%></td>
+    </tr>
+  </table>
+<%end%>
+
+<br/>
+<br/>
+
+<%= will_paginate @unsubscribtion_list,:renderer => 'RemoteLinkRenderer', :previous_label => t('previous'), :next_label => t('next'), :params=>{'search' => params[:search]}, :style=>"margin-right: 200px;" %>
+  

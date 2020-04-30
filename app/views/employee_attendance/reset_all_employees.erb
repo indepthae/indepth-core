@@ -1,0 +1,117 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('manage_attendance') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('reset_leaves_of_all_employees') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div id="form-errors">
+    <% if @errors.present? %>
+      <div id="error-box" style="width:510px;">
+          <ul>
+              <% @errors.each do |msg| %>
+                <li class="error-font-size"> <%= msg %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+  </div>
+    
+  <h4><%= t('reset_leaves_of_all_employees') %></h4>
+  <div class="description">&#x200E;<%= t('reset_description_new') %>&#x200E;</div>
+
+  <% form_for :log, :html=>{:id => "reset_leave_form", :onsubmit=>"return reset_leave_confirm();"} do |f| %>
+      <%= session_fingerprint_field %>
+    <div class="label-field-pair">
+      <label><%= t("no_of_employees") %></label>
+      <div class="text-input-bg"><%= @employee_count %>
+      </div>
+    </div>
+    <% if @leave_types.present? %>
+    <div class="label-field-pair">
+      <label><%= t('leave_type') %></label>
+      <div class="text-area-bg">
+      <div class="leave-type-checkboxes">
+          <div class="sel-types">
+              <%= check_box_tag "select_all", "", false, {:onclick => "select_all_fields(this);",:class=>' select_all_check'}%>
+              <label for="select_all" class="special_prop"><%= t('select_all') %></label>
+          </div>
+          <%@leave_types.each do |id,type| %>
+            <div class="each-type">
+                <%= check_box_tag "leave_type_ids[]", id, false, {:onclick => "toggle_field_selector(this);",:class=>'leave_type_list'}%>
+                <label class="special_prop no_margin_top" id="subject-name-label"><%= type %></label>
+            </div>
+          <% end %>
+      </div>
+    </div>
+    </div>
+    <% end %>
+    <div class="label-field-pair">
+      <label><%= t("reset_remarks") %></label>
+      <div class="text-area-bg"><%= f.text_area :reset_remark , :cols => 30, :rows => 5%>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <div class="reset-leave-hint-label">
+        <label class="width100 margin-top-10"><%= "#{t("reset_date")} :" %></label>
+        
+      </div>
+      <div class="text-input-bg"><%= calendar_date_select_tag "log[reset_date]" , @reset_date.present? ? @reset_date : "" , :id => "reset_date", :readonly=>true,:errors => @log.errors[:reset_date],:popup=>"force"%>
+      </div>
+      <label class="reset-date-hint"><%= t('reset_date_hint') %></label>
+    </div>
+    <%= f.hidden_field :reset_type, :value => @reset_type %>
+    <%= f.hidden_field :employee_ids, :value => @employee_ids %>
+    <%= f.submit  "", :value => "#{t('reset_leaves')}", :class => "submit_button", :id => "submit-button",:disable_with => "► #{t('please_wait')}" %>
+
+  <% end %>
+
+</div>
+
+
+<script type="text/javascript">
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+ function reset_leave_confirm(){
+   // var msg = "<%= t('reset_date_hint') %>";
+    var sure = "<%= t('are_you_completely_sure') %>";
+    var confirm_msg = sure;
+    if(j('#log_reset_remark').val() == ""){
+      return true;
+    }
+    else if(j('#reset_date').val() == ""){
+        return true;
+    }
+    else
+      return confirm(confirm_msg);
+  }
+    function select_all_fields(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().find(".leave_type_list").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".leave_type_list").prop('checked', false);
+      }
+  }
+
+  function toggle_field_selector(th_is) {
+      var unchecked_box = j(th_is).parent().parent().find(".leave_type_list:checkbox:not(:checked)").length;
+      if (unchecked_box === 0) {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', false);
+      }
+  }
+</script>

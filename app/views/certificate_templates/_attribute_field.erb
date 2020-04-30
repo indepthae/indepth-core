@@ -1,0 +1,16 @@
+<div class="activity_strip">
+    <% unless f.object.marked_for_destruction? %>
+      <%= f.label :name , t('name_text')%>
+      <%=f.text_field :name, :class=>"small_field"%>&nbsp;&nbsp;&nbsp;
+      <%= f.label :key , t('key_text')%>
+      <%=f.text_field :key, :class=>"small_field"%>
+
+
+      <div class="field">
+          <%=f.hidden_field :_destroy, :value=> 0 %>
+          <div class="remove_field" onclick="remove_field(this);"></div>
+      </div>
+    <% else %>
+      <%=f.hidden_field :_destroy %>
+    <% end %>
+</div>

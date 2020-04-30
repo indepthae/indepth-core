@@ -1,0 +1,40 @@
+<% fields_for :leave_credit_slabs do |f| %>
+  <% if @action == "edit" and @credit_frequency == 3 and @credit_type == "Slab"%>
+    <% quarter_count1 = quarter_count(@leave_type, 1) %>
+    <% quarter_count2 = quarter_count(@leave_type, 2) %>
+    <% quarter_count3 = quarter_count(@leave_type, 3) %>
+    <% quarter_count4 = quarter_count(@leave_type, 4) %>
+  <% end %>
+  <div class="quarter-1">
+      <div class="quarters">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('quarter1') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(quarter1)" , :value => quarter_count1.present? ? quarter_count1 : nil  %></div>
+          </div>
+      </div>
+  </div>
+  <div class="quarter-2">
+      <div class="quarters">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('quarter2') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(quarter2)" , :value => quarter_count2.present? ? quarter_count2 : nil %></div>
+          </div>
+      </div>
+  </div>
+  <div class="quarter-3">
+      <div class="quarters">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('quarter3') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(quarter3)" ,:value => quarter_count3.present? ? quarter_count3 : nil %></div>
+          </div>
+      </div>
+  </div>
+  <div class="quarter-4">
+      <div class="quarters">
+          <div class="label-field-pair1"  id="monthly-values">
+              <label for="jan_count"><%= t('quarter4') %> </label>
+              <div class="text-input-bg"><%= f.text_field "leave_count(quarter4)" , :value => quarter_count4.present? ? quarter_count4 : nil %></div>
+          </div>
+      </div>
+  </div>
+<% end %>

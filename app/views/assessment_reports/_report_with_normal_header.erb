@@ -1,0 +1,27 @@
+<div id="full_header">
+    <div class="header">
+        <span class="logo header_parts border_less">
+            <img  alt="Cbse Logo" src="/images/cbse-logo.png" id="cbse_logo" style="display: <%= @setting[:use_cbse_logo]== "0" ? 'none' : 'block' %>"></img>
+        </span>
+        <span class="header-content header_parts">
+            <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+            <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+            <% arr = [] %>
+            <% arr.push(Configuration.get_config_value('InstitutionPhoneNo')) if Configuration.get_config_value('InstitutionPhoneNo').present? %>
+            <% arr.push(Configuration.get_config_value('InstitutionEmail')) if Configuration.get_config_value('InstitutionEmail').present? %>
+            <% arr.push(Configuration.get_config_value('InstitutionWebsite')) if Configuration.get_config_value('InstitutionWebsite').present? %>
+            <p class="institution_address"><%= arr.join(" | ") %></p>
+        </span>
+        <span class="logo header_parts">
+            <%if current_school_detail.logo.present?%>
+              <%= image_tag current_school_detail.logo.url(:original, false) %>
+            <%else%>
+              <img  alt="Dummy Logo" src="/images/application/dummy_logo.png" ></img>
+            <%end%>
+        </span>
+    </div>
+</div>
+<div class="header_addn">
+  <%= check_box :assessment_report_setting, :use_cbse_logo , :checked =>@setting[:use_cbse_logo]== "1" ,:class=>'cbse_logo_check', :onChange => "toggleCbseLogo(this);" %>
+  <label class="general_label" for="assessment_report_setting_use_cbse_logo"><%=t('use_cbse_logo')%></label>
+</div>

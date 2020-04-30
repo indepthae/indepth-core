@@ -1,0 +1,234 @@
+<%= hidden_field_tag 'pen_payslips', @pending_payslips.collect(&:id).join(',') %>
+<%= hidden_field_tag 'approved_payslips', @approved_payslips.collect(&:id).join(',') %>
+<% date_range = @payslips_date_range.date_range %>
+<div class="outer">
+  <div class="inner">
+    <table id="payslips">
+      <% is_lop = @payslips.collect(&:days_count).compact.present? %>
+      <tr>
+        <td colspan="2"></td>
+        <td colspan ="<%= @earnings.count + 2 %>" class="header-col">
+          <div class="cat_header"><%= t('earnings') %></div>
+        </td>
+        <td colspan ="<%= @deductions.count + 2 + (is_lop ? 1 : 0) %>" class="header-col">
+          <div class="cat_header"><%= t('deductions') %></div>
+        </td>
+      </tr>
+
+      <tr class="tr-head">
+        <td class="status fixed-header"><%= t('status') %></td>
+        <td class="emp_name fixed-header"><%= t('employee_text') %></td>
+        <td class="dpt_name"><%= t('department') %></td>
+        <% @earnings.each do |e| %>
+          <td class="amount"><%= e.name %></td>
+        <% end %>
+        <td class="amount"><%= t('others') %></td>
+        <td class="tot_earning"><%= t('total_salary') %></td>
+        <% @deductions.each do |d| %>
+          <td class="amount"><%= d.name %></td>
+        <% end %>
+        <% if is_lop %>
+          <td class="amount"><%= t('lop_amount') %></td>
+          <td class="amount"><%= t('lop_days') %></td>
+        <% end %>
+        <td class="amount"><%= t('others') %></td>
+        <td class="tot_deduction"><%= t('total_deduction') %></td>
+        <td class="net_pay"><%= t('net_salary') %></td>
+        <td class="actions"></td>
+      </tr>
+      <% if @payslips_list.present? %>
+        <% @payslips_list.each do |p|%>
+          <tr id="payslip_<%= p.id %>">
+            <td class="status">
+              <div class="info_wrapper status_symbol">
+                <div class="info_header">
+                  <div class="<%= p.is_approved ? 'tick' : 'pending' %> symbol"></div>
+                </div>
+              </div>
+            </td>
+            <% first_name = (p.employee_type == 'ArchivedEmployee' ? "#{p.full_name}&#x200E;(#{p.employee_number})&#x200E;<span class='archived'> #{t('archived')}</span>" : "#{p.full_name}&#x200E;(#{p.employee_number})&#x200E;") %>
+            <% first_name_length = (p.employee_type == 'ArchivedEmployee' ? p.full_name.length + p.employee_number.length + 2 + t('archived').length : p.full_name.length + p.employee_number.length + 2) %>
+            <td class="emp_name">
+              <% if first_name_length > 30 %>
+                <div class="info_wrapper employee-name">
+                  <div class="info_header"><%= first_name %></div>
+                </div>
+              <% else %>
+                <%= first_name %>
+              <% end %>
+            </td>
+            <td class="dpt_name"><%= p.dept_name %></td>
+            <% earnings  = 0 %>
+            <% categories = p.employee_payslip_categories %>
+            <% @earnings.each do |e| %>
+              <% cat = categories.detect{|c| c.payroll_category_id == e.id} %>
+              <% unless cat.nil? %>
+                <td class="amount"><%= precision_label(cat.nil? ? 0 : cat.amount) %></td>
+                <% earnings += cat.amount.to_f %>
+              <% else %>
+                <td class="amount"><%= '-' %></td>
+              <% end %>
+            <% end %>
+            <% ind_ear_total = p.individual_earnings_total %>
+            <td class="ear_others" payslip_id ="<%= p.id %>">
+              <% if p.individual_earnings.present? %>
+                <div class="ind_earnings" payslip_id ="<%= p.id %>">
+                  <%= precision_label(ind_ear_total) %>
+                </div>
+              <% else %>
+                <%= precision_label(ind_ear_total) %>
+              <% end %>
+            </td>
+            <% earnings += ind_ear_total.to_f %>
+            <td class="tot_earning"><%= precision_label(earnings) %> </td>
+
+            <% deductions = 0 %>
+            <% @deductions.each do |d| %>
+              <% cat = categories.detect{|c| c.payroll_category_id == d.id} %>
+              <% unless cat.nil? %>
+                <td class="amount"><%= precision_label(cat.amount) %></td>
+                <% deductions += cat.amount.to_f %>
+              <% else %>
+                <td class="amount"><%= '-' %></td>
+              <% end %>
+            <% end %>
+            <% if is_lop %>
+              <td class="amount">
+                <% unless p.deducted_from_categories %>
+                  <%= p.lop.nil? ? '-' : "#{p.lop}" %>
+                <% else %>
+                  <div class="lop_info symbol" payslip_id="<%= p.id %>"></div>
+                <% end %>
+              </td>
+              <td class="amount"><%= p.days_count.nil? ? '-' : "#{p.days_count} #{t('days_text',{:count => p.days_count})}"%></td>
+            <% end %>
+            <% deductions += p.lop.to_f %>
+            <% ind_ded_total = p.individual_deductions_total %>
+            <td class="ded_others">
+              <% if p.individual_deductions.present? %>
+                <div class="ind_deductions" payslip_id ="<%= p.id %>">
+                  <%= precision_label(ind_ded_total) %>
+                </div>
+              <% else %>
+                <%= precision_label(ind_ded_total) %>
+              <% end %>
+            </td>
+            <% deductions += ind_ded_total.to_f %>
+            <td class="tot_deduction"><%= precision_label(deductions) %> </td>
+            <td class="net_pay"><%= precision_label(p.net_pay) %> </td>
+            <td class="actions">
+              <% unless params[:finance].present? %>
+                <% unless p.is_rejected or p.is_approved %>
+                  <div class="revert" payslip_id ="<%= p.id%>" emp_name ="<%= p.full_name %>"><%= t('delete_payslip')%></div>
+                <% end %>
+              <% else %>
+                <% unless p.is_rejected or p.is_approved %>
+                  <% if p.employee_type == 'Employee' %>
+                    <div class="approve" payslip_id ="<%= p.id%>" approve="<%= p.lop_leaves_validation %>" emp_name ="<%= p.full_name %>" archived="<%= p.employee_type == 'ArchivedEmployee' %>"><%= t('approve_payslip') %></div>
+                    <div class="reject" payslip_id ="<%= p.id%>"><%= t('reject_payslip') %></div>
+                  <% end %>
+                <% else %>
+                  <div class="revert_t" payslip_id ="<%= p.id%>" emp_name ="<%= p.full_name %>" archived="<%= p.employee_type == 'ArchivedEmployee' %>"><%= t('revert_payslip') %></div>
+                <% end %>
+              <% end %>
+              <% unless params[:finance].present? %>
+                <div class="view"><%= link_to t('view_payslip').capitalize, {:action => "view_payslip", :id => p.id}, :target => "_blank" %></div>
+              <% else %>
+                <div class="view"><%= link_to t('view_payslip').capitalize, {:controller => 'finance', :action => "view_employee_payslip", :id => p.id, :from => (params[:from]=='approve_payslips' ? 'approve_payslips_all' : 'payslips_list_finance')}, :target => "_blank" %></div>
+              <% end %>
+              <div class="pdf"><%= link_to t('pdf_report'), {:action => "view_payslip_pdf", :id => p.id}, :target => "_blank" %></div>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader_#{p.id}",
+                :style =>"display: none;" ) %>
+            </td>
+          </tr>
+
+        <% end %>
+      <% else %>
+        <tr>
+          <td class="status empty"><%= t('nothing_to_list') %></td>
+          <td class="emp_name empty"></td>
+          <td colspan ="<%= @categories.count + (is_lop ? 1 : 0)  + 7 %>"></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div id="pagination_section">
+  <%= pagination_status(@payslips_list) %>
+  <%= will_paginate @payslips_list, :renderer => 'RemoteLinkRenderer', :params => {:start_date => params[:start_date], :end_date => params[:end_date], :employees => params[:employees], :status => params[:status], :id => @payroll_group.id, :finance => params[:finance]} %>
+</div>
+<% if @payslips_list.present? %>
+  <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv", :csv_report_type => "view_all_payslips",:report_format_type => "csv", :start_date => params[:start_date], :end_date => params[:end_date], :employees => params[:employees], :status => params[:status], :id => @payroll_group.id},:class => "user_button"%>
+<% end %>
+<script type="text/javascript">
+  j("<style type='text/css' id='dynamic' />").appendTo("head");
+  j('.ind_deductions').hover(individual_deductions, hide_deduction_others);
+  j('.status_symbol').hover(status_info, mouse_leave);
+  j('.employee-name').hover(employee_name, mouse_leave);
+  j('.ind_earnings').hover(individual_earnings, hide_earning_others);
+  j(".revert").click(revert_individual_payslip);
+  j(".approve").click(approve_individual_payslip);
+  j(".reject").click(reject_individual_payslip);
+  j(".revert_t").click(revert_transaction);
+  j(".lop_info").hover(lop_tooltip, hide_lop_tooltip);
+  j(document).ready(function(){
+    var data = {'payroll_group_id' : <%= @payroll_group.id %>,
+      'start_date' : '<%= @start_date %>',
+      'end_date' : '<%= @end_date %>',
+      'finance' : '<%= params[:finance] %>',
+      'ind_earnings' : <%= @payslips_list.each_with_object({}){|ele, hash| hash[ele.id] = ele.individual_earnings_list}.to_json %>,
+      'ind_deductions' : <%= @payslips_list.each_with_object({}){|ele, hash| hash[ele.id] = ele.individual_deductions_list}.to_json %>
+    }
+    var translations = {'reverted' : '<%= t('reverted') %>',
+      'pending' : '<%= t('pending')  %>',
+      'approved' : '<%= t('approved')  %>',
+      'rejected' : '<%= t('rejected') %>',
+      'confirmation_message' : '<%= t('delete_confirm_msg') %>',
+      'revert_all_confirmation' : '<%= t('revert_payslips_confirmation_message',{:group_name => @payroll_group.name, :pay_period => date_range}) %>',
+      'revert_payslips' : '<%= t('delete_payslips') %>',
+      'approve_payslips': '<%= t('approve_payslips') %>',
+      'approve_payslip': '<%= t('approve_payslip') %>',
+      'reject_payslip' : '<%= t('reject_payslip') %>',
+      'revert_payslip' : '<%= t('revert_payslip') %>',
+      'delete_payslip' : '<%= t('delete_payslip') %>',
+      'all': '<%= t('all') %>',
+      'approve_all_confirmation' : '<%= t('approve_payslips_confirmation_message',{:group_name => @payroll_group.name, :pay_period => date_range}) %>',
+      'ok' : '<%= t('ok') %>',
+      'cancel' : '<%= t('cancel') %>',
+      'revert_message' : '<%= "#{t('reverting_message')} <b>#{@payroll_group.name}</b>" %>',
+      'revert_complete_message' : '<%= "#{t('reverted_message')} <b>#{@payroll_group.name}</b>" %>',
+      'approve_message' : '<%= "#{t('approving_message')}  <b>#{@payroll_group.name}</b>" %>',
+      'approve_complete_message' : '<%= "#{t('approved_message')} <b>#{@payroll_group.name}</b>" %>',
+      'date_range' : '<%= "#{t('for_pay_period')} <b>#{date_range}</b>" %>',
+      'revert_status' : "<%= "#{t('payslip_reverted')} <span id='count'>0</span> #{t('of')} <span id='total'>#{@pending_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'revert_failed_status' : "<%= "#{t('payslip_failed')} <span id='failed_count'>0</span> #{t('of')} <span id='total'>#{@pending_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'approve_status' : "<%= "#{t('payslip_approved')} <span id='count'>0</span> #{t('of')} <span id='total'>#{@pending_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'approve_failed_status' : "<%= "#{t('payslip_failed')} <span id='failed_count'>0</span> #{t('of')} <span id='total'>#{@pending_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'warning' : '<%= t('generate_payslip_bulk.pls_dont_refresh_or_press_back_button') %>',
+      'reject_employee_payslips' : '<%= t('employee_payslip_reject') %>',
+      'reason' : '<%= t('remark') %>',
+      'transaction_payslips' : '<%= t('revert_payslips') %>',
+      'transaction_all_confirmation' : '<%= t('revert_transaction_all_confirmation',{:group_name => @payroll_group.name, :pay_period => date_range}) %>',
+      'transaction_message' : '<%= "#{t('reverting_transaction_message')}  <b>#{@payroll_group.name}</b>" %>',
+      'transaction_complete_message' : '<%= "#{t('reverted_transaction_message')} <b>#{@payroll_group.name}</b>" %>',
+      'transaction_status' : "<%= "#{t('payslip_transaction_reverted')} <span id='count'>0</span> #{t('of')} <span id='total'>#{@approved_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'transaction_failed_status' : "<%= "#{t('payslip_failed')} <span id='failed_count'>0</span> #{t('of')} <span id='total'>#{@approved_payslips.count}</span> #{t('multiple_employees')}" %>",
+      'approve_failed_message': '<%= t('approve_failed_message') %>',
+      'reject_failed_message': '<%= t('reject_failed_message') %>',
+      'the_payslip_of': '<%= t('the_payslip_of') %>',
+      'for_pay_period': '<%= t('for_pay_period') %>',
+      'will_be_deleted': '<%= t('will_be_deleted') %>',
+      'will_be_reverted': '<%= t('will_be_reverted') %>',
+      'will_be_approved': '<%= t('will_be_approved') %>',
+      'pay_period': '<%= "#{date_range}" %>',
+      'archived_payslip_revert_message': '<%= t('this_is_an_archived_employee_payslip') %>',
+      'reject_error_message' : '<%= t('please_add_remarks') %>',
+      'lop_info' : '<%= t('lop_amount_info') %>'
+    }
+    initialize_variables(data, translations);
+
+  });
+</script>

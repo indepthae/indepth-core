@@ -1,0 +1,23 @@
+<div class="receipt-container">
+<%#=render :partial=>'fee_report_header',:locals=>{:v=>v}%>
+    <div id="pdf-header">
+        <% logo_visible = @domatrix.present? ? @logo_style : (ReceiptPrinter.current_settings_object.dot_matrix? ? 'none':'block') %>
+        <div class="logo" style="display: <%= logo_visible %>;">
+            <%= image_tag current_school_detail.logo.url(:original, false) %>
+        </div>
+        <% align = transaction_hash.default_configs.try(:pdf_receipt_halignment) || @config[:pdf_receipt_halignment] || "left" %>
+        <div class="header-content <%= logo_visible %>" style='text-align:<%= align %>;'>
+            <p>
+                <%= transaction_hash.default_configs.try(:institution_name) || @config[:institution_name]  %>
+            </p>
+            <p class="institution_address">
+                <%= transaction_hash.default_configs.try(:institution_address) || @config[:institution_address] %>
+            </p>
+        </div>
+
+    </div>
+
+    <%= render :partial => "_receipt_templates/a4/report_header_a4", 
+      :locals => {:transaction_hash => transaction_hash} %>
+
+</div>

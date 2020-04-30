@@ -1,0 +1,72 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% if (rtl?) %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transactions') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transaction_report') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div class="date_box" style="border-bottom: 0px">
+
+<%# 
+<div class="set_fixed_range">
+< %=link_to t('last_30_days'),{:controller => "finance",:action =>"update_monthly_report",:id=>@fee_collection,:date_tag=>t('last_30_days'),:start_date=>I18n.l(30.day.ago.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >
+< %=link_to t('last_3_months'),{:controller => "finance",:action =>"update_monthly_report",:id=>@fee_collection,:date_tag=>t('last_3_months'),:start_date=>I18n.l(3.month.ago.beginning_of_month.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >
+< %=link_to t('last_6_months'),{:controller => "finance",:action =>"update_monthly_report",:id=>@fee_collection,:date_tag=>t('last_6_months'),:start_date=>I18n.l(6.month.ago.beginning_of_month.to_date,:format=>:default),:end_date=>I18n.l(Date.today,:format=>:default)}% >          
+</div>        
+%>
+<%#*<div class="set_border"></div>%>
+
+<%#*<div class="user_set_date">%>
+
+        <%= render :partial => "filter_dates"  %>
+
+<%#*</div>%>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+  j(".user_set_date input[type='text']").css("border", "1px solid red");
+
+  j('.calendar_label').on('click', function () {
+      var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+      new CalendarDateSelect(this.previous(), {date_format: "<%= date_format %>", locale_months: month_names, popup: 'force', year_range: 10});
+  });
+
+  function submit_form() {
+      url = "/finance/update_monthly_report?start_date=" + j('#start_date')[0].value + "&end_date=" + j('#end_date')[0].value;
+      window.location.href = url;
+  }
+
+</script>
+

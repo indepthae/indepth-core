@@ -1,0 +1,5 @@
+
+<%= select :assigned_package, :assignee_id, @available_assignees.map{|a|[a.name,a.id]},{:prompt=>'Enter Name - Type Ahead'},{:class=>'combobox margin-left-15'} %>
+<script>
+  q('.combobox').combobox({bsVersion: '2'});
+</script>

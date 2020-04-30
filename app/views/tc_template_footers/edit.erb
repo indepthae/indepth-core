@@ -1,0 +1,86 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('student_details') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_footer_settings%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><p><%= flash[:warn_notice] %></p> </div>
+    <% end %>
+    <div class="box">
+        <div class="page_header_box">
+            <div class="page_header"><%= t('signature_and_clauses')%> </div>
+            <div class="page_header_desc"><%= t('tc_footer_settings_desc')%> </div>
+        </div>
+        <%- form_for :footer_config  do |f| -%>
+          <div id="form-content">
+              <div class="label-radio-pair">
+                  <div class="radio-select-options">
+                      <div class="radio-select">
+                          <%= f.radio_button 'enabled[value]', "true", :checked => ( @current_template.footer_enabled?)  %>
+                          <label for="footer_config_enabled[value]_true"><%= t('use_template_for_signature_space')%></label>
+                          <p><%= t('enable_footer_descr') %> </p>
+                      </div>
+                      <div class="radio-select">
+                          <%= f.radio_button 'enabled[value]', "false", :checked => !( @current_template.footer_enabled?) %>
+                           <label for="footer_config_enabled[value]_false"><%= t('ignore_section_leave_blank_space')%> </label>
+                          <p><%= t('disable_footer_descr') %> </p>
+                          <div class="reveal-if-active">
+                              <hr>
+                              <%= render :partial => "signaure_and_clauses", :locals=>{:f=>f} %>
+                              <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+                          </div>
+                          <div class="submit_form">
+                              <div id="submit-button">
+                                  <%=submit_tag " #{t('save_footer_preferences')}", :disable_with =>  "#{t('please_wait')}", :class=>"submit-button"%>
+                              </div>
+                          </div>
+                          <div class="prv"></div>
+                          
+                      </div>
+
+                  </div>
+              </div>
+          </div>  
+        <% end %>
+
+        <%= render :partial => "preview_box" %>
+
+    </div>
+</div>
+<script type="text/javascript">
+    if ("<%= @current_template.footer_enabled?%>" == "true") {
+      j(".reveal-if-active").show();
+      j(".footer_preview_box").show();
+      
+  } else {
+      j(".reveal-if-active").hide();
+      j(".footer_preview_box").hide();
+  }
+    j("input[name='footer_config[enabled[value]]']:radio").change(function () {
+      if (this.value == "true") {
+          j(".reveal-if-active").show();
+          j(".footer_preview_box").show();
+      }
+      if (this.value == "false") {
+          j(".reveal-if-active").hide();
+          j(".footer_preview_box").hide();
+      }
+  });
+  
+  
+</script>

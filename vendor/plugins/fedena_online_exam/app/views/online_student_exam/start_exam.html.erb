@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title><%= @title %></title>
+    <%= stylesheet_link_tag(['application', '_styles/ui.all'])%>
+    <%= stylesheet_link_tag(*get_stylesheets) %>
+    <%= javascript_include_tag :defaults, :cache => 'cache/javascripts/all' %>
+<%#= init_tinymce_hammer_if_required %>
+<%#= javascript_include_tag 'tiny_mce/plugins/asciimath/js/ASCIIMathMLwFallback.js' %>
+<%#= javascript_include_tag 'tiny_mce/plugins/asciisvg/js/ASCIIsvgPI.js' %>
+    <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+    <%= stylesheet_link_tag "redactor/redactor","redactor/style" %>
+    <script type="text/javascript">
+      var AScgiloc = 'http://www.imathas.com/imathas/filter/graph/svgimg.php';
+      var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";
+    </script>
+    <script type='text/x-mathjax-config'>MathJax.Hub.Config({tex2jax: {inlineMath: [['~~','~~']]}});</script>
+    <script type='text/javascript'  src='https://d1wab5as7kwc5w.cloudfront.net/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
+    <%= yield :head %>
+  </head>
+  <body>
+    <%= load_latex_preview %>
+    <div class="header-bg">
+      <div class="paper-head">
+        <div class="header-left">
+          <div class="exam-name"><%= @exam.name %></div>
+          <div class="batch-name"><%= @exam_attendance.student.batch.full_name %></div>
+          <div class="batch-name"><%= t('total_marks') %> : <b><%= @exam.online_exam_groups_questions.sum('mark') %></b></div>
+          <% if @exam.exam_type == "subject_specific" %>
+            <div class="batch-name"><%= t('subjects_text') %> : <b><%= @exam.subjects.map{|s| "#{s.name}(#{s.code})"}.join(", ") %></b></div>
+          <% end %>
+        </div>
+
+        <div class="header-right">
+          <div class="time"><%= t('time_left') %>
+            <p id="theTime" class="timeClass themed_text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="page-yield" class="themed_text">
+      <%= hidden_field_tag "submit_flag", "0" %>
+      <div id="questions">
+        <%= render :partial=>'exam_questions' %>
+      </div>
+    </div>
+
+    <%= periodically_call_remote(:frequency => @exam.maximum_time.minutes.to_i+7,:before => "j('#submit_flag').val('1');j('form').submit();" ) %>
+
+    <%= load_redactor_script %>
+
+    <%= yield :redactor %>
+
+    <script language="JavaScript" type="text/javascript">
+
+      <!-- Copyright 2006, Sandeep Gangadharan -->
+      <!-- For more free scripts go to http://www.sivamdesign.com/scripts/ -->
+
+      <!--
+      var sec = 1;   // set the seconds
+      var min = <%=@exam.maximum_time%>;   // set the minutes
+
+      function countDown() {
+        sec--;
+        if (sec == -01) {
+          sec = 59;
+          min = min - 1; }
+        else {
+          min = min; }
+
+        if (sec<=9) { sec = "0" + sec; }
+
+        time = (min<=9 ? "0" + min : min) + " min : " + sec + " sec ";
+
+        if (document.getElementById) { document.getElementById('theTime').innerHTML = time; }
+
+        SD=window.setTimeout("countDown();", 1000);
+        if (min == '00' && sec == '00') { sec = "00"; window.clearTimeout(SD); }
+      }
+      window.onload = function() {
+        countDown();
+        call_redactor_onload();
+      };
+      window.onbeforeunload = function() {
+        if(j("#submit_flag").attr("value")=="0"){
+          return "You are finishing exam, once finsihed you cannot redo";
+        }
+      }
+      window.onunload = function() {
+        if(j("#submit_flag").attr("value")=="0"){
+          var request = new XMLHttpRequest();
+          request.open("POST","/online_student_exam/save_final_score",false);
+          request.setRequestHeader("content-type","application/x-www-form-urlencoded");
+          request.send(j('form').serialize());
+        }
+      }
+
+      // -->
+    </script>
+
+  </body>
+
+</html>

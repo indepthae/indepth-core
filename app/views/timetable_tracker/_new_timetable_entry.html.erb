@@ -1,0 +1,87 @@
+<% tte ||= @timetable_entry %>
+<% tt_swap ||= @timetable_swap %>
+<% swap_date ||= @timetable_swap.date %>
+<% unless @timetable_swap.is_cancelled %>  
+  <div class="new_entry">
+      <div class="swaped_class">
+          <div class="subject"><%= truncate(@timetable_swap.subject.name, :length => 40, :omission => '...' )%></div>
+          <div class="teacher"><%= "#{t('teacher')} :"%> <span class="teacher_name"><%= truncate(@timetable_swap.employee.full_name, :length => 40, :omission => '...') %></span></div>
+      </div> 
+      <div class="changed_class">
+          <div class="change_title"><%= "#{t('changed_from')} "%></div>
+          <div id ="sub_<%= tte.id %>" class="subject"><%= truncate(tte.assigned_name, :length => 35, :omission => '...')%></div>
+          <% if tte.employees.count > 2 and params[:type] == "emp_wise" %>
+            <div id ="teach1_<%= tte.id %>" class="teacher" tooltip ="<%=  "#{array_to_li(tte.employees.reject{|e| e.id == params[:employee_wise_id].to_i}.drop(1).map(&:full_name))} " %>" ><%= "#{t('teacher')} :"%>
+                <span class="teacher_name" >
+                    <%=  truncate(tte.employees.present?? tte.employees.reject{|e| e.id == params[:employee_wise_id].to_i}.values_at(0).map(&:full_name).join(',') : "#{t('deleted_user')}" ,:length => 40, :omission => '...' ) %><%= "+" %><%= tte.employees.reject{|e| e.id == params[:employee_wise_id].to_i}.drop(1).count %>
+                </span>
+            </div>
+          <% elsif tte.employees.count > 1 and params[:type] == "emp_wise" %>
+            <div id ="teach1_<%= tte.id %>" class="teacher" ><%= "#{t('teacher')} :"%>
+                <span class="teacher_name" >
+                    <%=  truncate(tte.employees.present?? tte.employees.reject{|e| e.id == params[:employee_wise_id].to_i}.map(&:full_name).join(',') : "#{t('deleted_user')}" ,:length => 40, :omission => '...' ) %>
+                </span>
+            </div>
+          <% end %>
+          <% unless params[:type] == "emp_wise" %>
+            <% if tte.entry_type == 'ElectiveGroup' %>
+              <div class="hor_line"></div>
+              <% tte.active_assigned_subjects.each do |s| %>
+                <% @sub_emp = s.employees %>
+                <% unless @sub_emp.empty? %>
+                  <div class="subject"> <%= truncate(s.name, :length => 30, :omission => '...' ) unless s.nil? %></div>
+                  <% @sub_emp.each do |e| %>
+                    <div id ="teach_<%= tte.id %>" class="teacher"><%= "#{t('teacher')} :"%> <span class="teacher_name"><%= truncate(e.full_name,:length => 40, :omission => '...') %></span>
+                    </div>
+                    <div class="hor_line"></div>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <% if  tte.employees.count > 1 %> 
+                <div id ="teach1_<%= tte.id %>" class="teacher" tooltip ="<%=  "#{array_to_li(tte.employees.drop(1).map(&:full_name))} " %>" ><%= "#{t('teacher')} :"%>
+                    <span class="teacher_name" >
+                        <%=  truncate(tte.employees.present?? tte.employees.values_at(0).map(&:full_name).join(',') : "#{t('deleted_user')}" ,:length => 40, :omission => '...' ) %><%= "+" %><%= tte.employees.drop(1).count %>
+                    </span>
+                  <% else %>  
+                    <div id ="teach1_<%= tte.id %>" class="teacher"><%= "#{t('teacher')} :"%>
+                        <span class="teacher_name">
+                            <%= truncate(tte.employees.present?? tte.employees.map(&:full_name).join(',') : "#{t('deleted_user')}", :length => 40, :omission => '...' ) %>
+                        </span>
+                      <% end %> 
+                  </div>
+                <% end %>
+              <% end %>
+          </div>  
+      </div>
+      <div class="swap_options">
+          <div class="cancel_class">
+              <%= render :partial => "cancel_timetable_entry_link", :locals => {:tte => tte, :swap_date => params[:date],  :timetable_swap_id=>@timetable_swap.id, :type => params[:type], :employee_wise_id => params[:employee_wise_id] }  %>                        
+          </div> 
+          <div class="edit_link">
+              <%=link_to_remote "#{t('change')}", :url=>{:action=>'timetable_swap_from',
+                :timetable_entry_id=>params[:timetable_entry_id],:batch_id=>params[:batch_id],:date=>params[:date],
+                :timetable_swap_id=>@timetable_swap.id, :type => params[:type], :employee_wise_id => params[:employee_wise_id]},
+                :html=>{:class=>"swap_themed_text"}%>
+          </div>
+          <div class="edit_link">
+              <%=link_to_remote "#{t('revert_text')}", :url=>{:action=>'timetable_swap_delete',:timetable_entry_id=>params[:timetable_entry_id],
+                :batch_id=>params[:batch_id],:date=>params[:date],:timetable_swap_id=>@timetable_swap.id, :action_type=> 'revert',:type => params[:type], :employee_wise_id => params[:employee_wise_id]},
+                :success => "$('sub_#{params[:timetable_entry_id]}').hide(); $('teach1_#{params[:timetable_entry_id]}').hide();",
+                :html=>{:class=>"swap_themed_text"},:confirm => t('delete_confirm_msg')%>
+          </div>
+      </div>
+
+    <% else %>
+      <div id ="subject_entry_<%= tte.id %>" class="subject_title">
+          <div id ="sub_<%= tte.id %>" class="subject"><%= truncate(tte.assigned_name,:length => 45, :omission => '...')%></div>
+          <% unless  params[:type] == "emp_wise"  %>
+            <div id ="teach1_<%= tte.id %>" class="teacher"><%= "#{t('teacher')} :"%>        
+                <span class="teacher_name"><%= truncate(tte.employees.present?? tte.employees.map(&:full_name).join(',') : "#{t('deleted_user')}", :length => 40, :omission => '...' ) %></span></div>
+          <% end %>
+      </div>
+      <div id='<%= "revert_#{tte.id}" %>'  class="cancelled_class"><%= "#{t('cancelled')} "%></div>
+      <%=link_to_remote "#{t('revert_text')}", :url=>{:action=>'timetable_swap_delete',
+        :timetable_entry_id=>params[:timetable_entry_id],:batch_id=>params[:batch_id],:date=>params[:date], :employee_wise_id =>params[:employee_wise_id] ,:type => params[:type] , :action_type=>'revert',:timetable_swap_id=>@timetable_swap.id, :type => params[:type]},
+        :html=>{:class=>"swap_themed_text delete_cancel_link"},:confirm => t('delete_confirm_msg')%>  
+    <% end %>

@@ -1,0 +1,7 @@
+<div class="label-field-pair">
+    <label for="academic_year"><%= t('academic_year') %></label>
+    <div class="text-input-bg"><%= s.select :academic_year_id, 
+          options_for_select([["#{t('select_academic_year')}",'']] + @academic_years.map{|a| [a.name, a.id]}, @active_year||'') %>
+        <%= error_message_box(t('cant_be_blank')) %>
+    </div>
+</div>

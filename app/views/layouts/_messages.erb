@@ -1,0 +1,136 @@
+<div class="leg messages_leg" style="position: absolute;width:40px;clear:both;">
+    <div id="profile-menu">
+        <li class="a">
+            <div id="show-message">
+                <ul class="messages">
+                    <li class="new_message_links">
+                        <div class="ns message_count"><%="#{t('unread_messages')} <span>(#{messages_count})&#x200E;</span>"%></div>
+                        <% if @current_user.can_message? %>
+                                    <!--<div class="ns new_mesage"><%#= link_to "#{t('new_text')} #{t('message')}",'#',:onclick => "return MakeMessageBox();"%></div>-->
+                          <div class="ns new_mesage"><%= link_to_remote "#{t('new_text')} #{t('message')}", :url => {:controller => "messages", :action => "new"} %></div>
+                        <% end %>
+                    </li>
+                    <li class="new_messages">
+                        <% if messages_count > 0 %>
+                          <% @current_user.unread_messages.each do |thread| %>
+                            <% unless thread.is_group_message_for @current_user.id %>
+                              <% recipient = get_recipient thread %>
+                              <% entry = get_entry(recipient) %>
+                              <% if entry %>
+                                <div class="thread_entry" id="<%=thread.id%>">
+                                    <div class="entry-thumbnail">
+                                        <% if !recipient.parent? %>
+                                          <%= image_tag entry.photo.url(:original, false) %>
+                                        <% else %>
+                                          <%= image_tag "single_user.png" %>
+                                        <% end %>
+                                    </div>
+                                    <div class="entry_detail">
+                                        <div class="name">
+                                            <span><%= entry.full_name %></span>
+                                            <% date = thread.messages.last.created_at %>
+                                            <span>
+                                                <% if date < Date.today.beginning_of_year %>
+                                                  <%=  format_date(date,:format => :short)%>
+                                                <% elsif(date.to_date - Date.today).to_i < 0 %>
+                                                  <%=change_time_to_local_time(date).strftime("%h %e,  %I:%M%p")  %>
+                                                <% else %>
+                                                  <%=  change_time_to_local_time(date).strftime("%I:%M%p")  %>
+                                                <% end %>
+                                            </span>
+                                        </div>
+                                        <div class="sec_info">
+                                            <%if recipient.student?%>
+                                              <%= "#{t('batch')} : #{entry.batch.full_name}" %>
+                                            <%elsif recipient.parent?%>
+                                              <%= "#{t('parent')} #{t('of')} #{recipient.parent_record.full_name}" if recipient.parent_record.present?%>
+                                            <%else%>
+                                              <%= "#{t('department')} : #{entry.department}" %>
+                                            <%end%>
+                                        </div>
+                                        <div class="subject"><%= thread.subject %></div>
+                                    </div>
+                                </div>
+                              <% else %>
+                                <div class="thread_entry" id="<%=thread.id%>">
+                                    <% if recipient and recipient.admin? and !recipient.is_deleted%>
+                                      <div class="entry-thumbnail"><%= image_tag "single_user.png" %></div>
+                                      <div class="entry_detail">
+                                          <div class="name">
+                                              <span><%= recipient.full_name %></span>
+                                              <% date = thread.messages.last.created_at %>
+                                              <span>
+                                                  <% if date < Date.today.beginning_of_year %>
+                                                    <%=  format_date(date,:format => :short)%>
+                                                  <% elsif(date.to_date - Date.today).to_i < 0 %>
+                                                    <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M%p")  %>
+                                                  <% else %>
+                                                    <%=  change_time_to_local_time(date).strftime("%I:%M%p")  %>
+                                                  <% end %>
+                                              </span>
+
+                                          </div>
+                                          <div class="sec_info"><%=recipient.user_type%></div>
+                                          <div class="subject"><%= thread.subject %></div>
+                                      </div>
+                                    <%else%>
+                                      <div class="entry-thumbnail">
+                                          <%= image_tag "blocked_user.png" %>
+                                      </div>
+                                      <div class="entry_detail">
+                                          <div class="name">
+                                              <span><%= t('deleted_user') %></span>
+                                              <% date = thread.messages.last.created_at %>
+                                              <span>
+                                                  <% if date < Date.today.beginning_of_year %>
+                                                    <%=  format_date(date,:format => :short)%>
+                                                  <% elsif(date.to_date - Date.today).to_i < 0 %>
+                                                    <%= change_time_to_local_time(date).strftime("%h %e,  %I:%M%p")  %>
+                                                  <% else %>
+                                                    <%=  change_time_to_local_time(date).strftime("%I:%M%p")  %>
+                                                  <% end %>
+                                              </span>
+                                          </div>
+                                          <div class="subject"><%= thread.subject %></div>
+                                      </div>
+                                    <%end%>
+
+                                </div>
+                              <% end %>
+                            <%else%>
+                              <% recipient_count = thread.recipients_count %>
+                              <div class="thread_entry" id="<%=thread.id%>">
+                                  <div class="entry-thumbnail">
+                                      <%= image_tag "group_icon.png" %>
+                                  </div>
+                                  <div class="entry_detail">
+                                      <div class="name"><%= thread.subject %></div>
+                                      <div class="subject">
+                                          <%=recipient_count%> <%= t('recipients') %>
+                                      </div>
+                                  </div>
+                              </div>
+                            <%end%>
+                          <%end%>
+                        <%else%>
+                          <div class="no_message_flash"><%=t('no_messages')%></div>
+                        <%end%>
+                    </li>
+                    <li>
+                        <div class="ns page_link"><%= link_to 'View all Messages', {:controller=>'messages', :action=>'index'} %></div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </div>
+</div>
+<div id="new_message_container">
+<%#=  render :partial => 'messages/new' %>
+</div>
+<script>
+      j('#profile-menu .thread_entry').each(function () {
+      j(this).click(function () {
+          window.location = '/messages?thread_id=' + j(this).attr('id')
+      });
+  });
+</script>

@@ -1,0 +1,101 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('sms_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('departments') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% ms_present = MultiSchool rescue false %>
+  <% if ms_present %>
+    <% assigned_package = MultiSchool.current_school.assigned_packages.first(:conditions=>{:is_using=>true}) %>
+    <% if assigned_package.present? %>
+      <% available_sms = assigned_package.sms_count.present? ? (assigned_package.sms_count.to_i - assigned_package.sms_used.to_i) : "#{t('unlimited')}" %>
+      <% valid = assigned_package.validity.present? ? (assigned_package.validity.to_date >= Date.today ? "" : "(#{t('validity_expired')})") : "" %>
+    <% else %>
+      <% available_sms = 0 %>
+    <% end %>
+    <div class="message_balance"><%= t('available_sms') %> : <%= available_sms %> <%= valid %> </div>
+  <% end %>
+  <div class="box">
+    <div id="status-message">
+
+    </div>
+    <% remote_form_for :send_sms,
+      :before => "Element.show('loader'), $('submit_button').disable()",
+      :success => "Element.hide('loader'), setTimeout(function(){$('submit_button').enable();},5000)" do |sms| %>
+      <div id="departments_list">
+        <div id="list">
+          <div class="sel-list">
+            <%= t('select') %> : <%= link_to_function "#{t('all')}", "$$('input.right').each(function(checkbox) { checkbox.checked = true; });" %>,
+            <%= link_to_function "#{t('none')}", "$$('input.right').each(function(checkbox) { checkbox.checked = false; });" %>
+          </div>
+          <div class="list-departments">
+            <div id="scroll-inside">
+              <% @departments.each do |dept| %>
+                <div class="name_list">
+                  <li>
+                    <label>
+                      <%= check_box_tag "send_sms[dept_ids][]", dept.id,false,:disabled => (dept.employees_count == "0"),:class=>'right' %>
+                      <% unless dept.employees_count == "0" %>
+                        <div class="att_list_names"><%= dept.name %></div>
+                      <% else %>
+                        <div class="hidden_list_names"><%= dept.name %></div>
+                      <% end %>
+                    </label>
+                  </li>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="label-field-pair msg_area">
+          <div class="label-container"><label><%= t('message') %>:</label> </div>
+          <div class="text-input-bg">
+            <%= text_area :send_sms,:message, :rows=>5,:cols=>30, :onkeyup => "fetch_sms_length(this);" %><br/>
+          </div>
+          <div id="sms_count"><div id="sms_word_count">0</div><%= t('characters') %></div>
+        </div>
+        <%= submit_tag "#{t('send_sms')}",:class=>'submit_button', :id => 'submit_button' %>
+        <div class="note-area"><%= t('departments_sms_note') %></div>
+        <%= image_tag("loader2.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+
+      <% end %>
+    </div>
+  </div>
+</div>
+<script>
+  function fetch_sms_length(elm)
+  {
+    text = j(elm).val();
+    count = text.length;
+    j('#sms_word_count').text(count);
+  }
+</script>

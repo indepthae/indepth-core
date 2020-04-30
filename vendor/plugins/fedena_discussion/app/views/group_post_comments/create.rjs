@@ -1,0 +1,5 @@
+# TODO Operate on the page object
+page.replace_html :ajax,:partial=>"group_posts/comments",:locals=>{:group_post_comments=>@group_post_comments,:group_post=>@group_post}
+page.replace_html :comments_no, @group_post.group_post_comments.count.to_s+" Comments"
+page.replace_html :er, ""
+page[:comment_form].reset

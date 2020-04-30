@@ -1,0 +1,136 @@
+<div id="batches_list">
+    <div class="label-field-pair batch_details">
+        <label for="department"><%= t('batches_text') %></label>
+        <div class="text-input-bg">
+            <% batches = @assessment_group.batches_id.split(",").map(&:to_i) %>
+            <% selected_batches = batches.length %>
+            <div id="count-text">
+                <%= (selected_batches == @batches.length ? "#{t('all_batches')} &#x200E;(#{@batches.length})&#x200E;" : "#{selected_batches} #{t('batches_count', {:count => selected_batches})}") %>
+            </div>
+            <div class="div_link" onclick="showBatchModalBox()"><%= t('select_batches') %></div>
+        </div>
+    </div>
+</div>
+<div class="label-field-pair" id="academic_year_details">
+    <label for="department"><%= t('academic_year') %></label>
+    <span for="department"><%= @academic_year.try(:name) %></span>
+</div>
+<hr/>
+<div id="batch_form_content">
+    <div id="batch_form">
+        <div class="fields-details">
+            <div class="field-label"><%= t('course_text') %></div>
+            <div class="fields-val"><%= @course.course_name %></div>
+        </div>
+        <div class="fields-details" id="add_batches">
+            <div class="field-label"><%= t('total_batches') %></div>
+            <div class="fields-val"><%= "#{@batches.length}" %></div>
+        </div>
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="check_all"><input type="checkbox" class="select_all" <%= (selected_batches == @batches.length ? "checked='checked'" : "") %> onclick="checkAll()"/></td>
+                <td class="category"><%= t('batch') %></td>
+            </tr>
+            <% @batches.each do |batch| %>
+              <tr class="tr-<%= cycle('even', 'odd')%>">
+                  <td class="check_all"><input type="checkbox" id="<%= batch.id %>" class="select_batch" <%= ((batches.include? batch.id) ? "checked='checked'" : "") %>  onclick="selectBatch(this)" /></td>
+                  <td class="category"><%= batch.name %></td>
+              </tr>
+            <% end %>
+        </table>
+        <div class="wrapper"><div class="error-icon"></div><div class="error-msg"><%= t('select_atleast_one_batch') %></div></div>
+    </div>
+    <div id="popup_footer">
+        <div id="selected-batches" class="fields-details"><%= "#{selected_batches} #{t('batches_selected_text', {:count => selected_batches})}" %></div>
+        <%= submit_tag "#{t('select_batches')}", :class => 'submit-button', :id => 'submit_button', :onclick => "calculateBatches()" %>
+    </div>
+</div>
+<div id="group_form">
+    <%= render :partial => 'group_form' %>
+</div>
+<script type="text/javascript">
+  showBatchModalBox = function () {
+      j('body').css('overflow', 'hidden');
+      if (j('.batch_form_popup').length == 0) {
+          build_modal_box({title: '<%= t('select_batches') %>', popup_class: 'batch_form_popup'});
+          j('.batch_form_popup #popup_content').append(j('#batch_form_content'));
+          j('#popup_footer.part').remove();
+          j('.batch_form_popup #MB_close').attr('onclick', 'hidePopupBox()');
+          j('.batch_form_popup').prev('#popup_box_overlay').click(hidePopupBox);
+      } else {
+          j('.batch_form_popup').show();
+          j('.batch_form_popup').prev('#popup_box_overlay').show();
+      }
+      j('#batch_form .wrapper').hide();
+      selectBatches()
+  }
+  selectBatches = function () {
+      values = j('#assessment_group_batches_id').val().split(",");
+      j('.select_batch').prop('checked', false);
+      values.each(function (e) {
+          j('#' + e).prop('checked', true)
+      })
+      not_checked = j('.select_batch:not(:checked)');
+      if (not_checked.length == 0)
+          j('.select_all').prop('checked', true);
+      else
+          j('.select_all').prop('checked', false);
+  }
+  hidePopupBox = function () {
+      j('body').css('overflow', 'scroll');
+      j('.batch_form_popup').hide();
+      j('.batch_form_popup').prev('#popup_box_overlay').hide();
+  }
+  selectBatch = function (elm) {
+      count = j(".select_batch:checked").length
+      if (count == 0)
+          j('#selected-batches').html('<%= t('batches_selected_text',{:count => 0}) %>');
+      else if (count == 1)
+          j('#selected-batches').html(count + ' <%= t('batches_selected_text',{:count => 1}) %>');
+      else
+          j('#selected-batches').html(count + ' <%= t('batches_selected_text',{:count => 2}) %>');
+      allBatches();
+  }
+  allBatches = function ()
+  {
+      if (j(".select_batch").not(":checked").length > 0)
+          j('.select_all').prop("checked", false);
+      else
+          j('.select_all').prop("checked", true);
+  }
+  checkAll = function ()
+  {
+      if (j('.select_all').prop('checked') == true)
+      {
+          j('.select_batch').each(function () {
+              j(this).prop('checked', true);
+              selectBatch(this);
+          });
+      } else {
+          j('.select_batch').each(function () {
+              j(this).prop('checked', false);
+              selectBatch(this);
+          });
+      }
+  }
+  calculateBatches = function () {
+      ids = []
+      j(".select_batch:checked").each(function () {
+          ids.push(this.id)
+      })
+      not_checked = j('.select_batch:not(:checked)');
+      if (ids.length > 0) {
+          j('#assessment_group_batches_id').val(ids.join(","));
+          if (not_checked.length == 0)
+              j('#count-text').html('<%= t('all_batches') %>  &#x200E;(' + ids.length + ')&#x200E;');
+          else if (ids.length == 1)
+              j('#count-text').html(ids.length + ' <%= t('batches_count',{:count => 1}) %>');
+          else
+              j('#count-text').html(ids.length + ' <%= t('batches_count',{:count => 2}) %>');
+          hidePopupBox();
+      } else
+      {
+          j('#batch_form .wrapper').show();
+      }
+  }
+</script>

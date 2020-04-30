@@ -1,0 +1,18 @@
+@category_id = @category.new_record? ? (@category.registered ? 'registered' : 'nil') : @category.id if @category.present?
+if @initial.present? or @errors.present?
+  page.replace_html 'modal-box', :partial => 'edit', :locals  => {:document => @document, :category => @category }
+  page.replace_html "form-errors_#{@category_id}", :partial => 'errors', :locals  => {:object => @document, :document => @document, :category => @category } if @document.errors.present?
+  page << "Modalbox.show($('modal-box'), {title: '#{t('update_document_title')}', width: 500});"
+elsif @saved.present?  
+  page.replace_html "form-errors_#{@category_id}", :text => ''
+  if @new_category.present?
+    @new_category_id = @new_category.new_record? ? (@new_category.registered ? 'registered' : 'nil') : @new_category.id
+    @category_id = @category.new_record? ? (@category.registered ? 'registered' : 'nil') : @category.id
+    page.replace_html "category_table_#{@new_category_id}", :partial => "documents_table", :locals => {:documents => @new_documents, :category => @new_category}
+    page.replace_html "category_table_#{@category_id}", :partial => "documents_table", :locals => {:documents => @documents, :category => @category}
+  else
+    page.replace_html "document_row_#{@document.id}", :partial => "document_row", :locals  => {:document => @document, :category => @category }    
+  end
+  page.replace_html 'flash_box', :text=>"<p class='flash-msg'>#{flash.now[:notice]}</p>" unless flash.now[:notice].nil?
+  page << "Modalbox.hide();"
+end

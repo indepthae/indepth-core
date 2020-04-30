@@ -1,0 +1,6 @@
+<%= t('showing_text') %>
+<%#=  select_tag :search_since, options_for_select([["#{t('all')}","all"],["#{t('last_3_months')}","last_3_months"],["#{t('last_6_months')}","last_6_months"],["#{t('last_1_year')}","last_1_year"]],:selected => "all"), :onchange => "#{remote_function(:url => {:action=>"load_news"}, :with=> "'search_since='+value")}" %>
+<%=  select_tag :search_since, options_for_select([["#{t('last_3_months')}","3"],["#{t('last_6_months')}","6"],["#{t('last_1_year')}","12"],["#{t('all')}","all"]],:selected => "3"), :onchange => "#{remote_function(:url => {:action=>"load_news"}, :with=> "'search_since='+value")}" %>
+<script type="text/javascript">
+  j("#query").val("");
+</script>

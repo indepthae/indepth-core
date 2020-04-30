@@ -1,0 +1,160 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1>CCE Settings</h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'>Detailed CCE Report Setting</div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "Preview report",{ :action => 'preview',:report_format_type => "pdf"},:target=>"_blank" %></li>
+        </ul>
+    </div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="flash-box"></div>
+
+    <% form_for :cce_report_setting do |c| %>
+      <%= error_messages_for :cce_report_setting %>
+      <div class="box">
+          <div class="label_field_pair block">
+              <label class="core_label">Report Header</label>
+              <div class="messages">How would you like the header section of the CCE Reports to look like?</div>
+              <div class="ind_block">
+                  <%= radio_button  :cce_report_setting, :report_header,"0",:checked=>@setting[:report_header]=="0",:class=>'report_head'%>
+                  <label class="general_label" for="cce_report_setting_report_header_0">According to CBSE norms</label>
+                  <%= radio_button  :cce_report_setting,:report_header, "1",:checked=>@setting[:report_header]=="1",:class=>'report_head' %>
+                  <label class="general_label" for="cce_report_setting_report_header_1">Will use a customized header</label>
+                  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+              </div>
+              <div id="report_desc">
+                  <%if @setting[:report_header]=="0"%>
+                    <%=render :partial => "report_with_header"%>
+                  <%else%>
+                    <%=render :partial => "report_without_header"%>
+                  <%end%>
+              </div>
+          </div>
+
+        <div class="label_field_pair block">
+          <label class="core_label">Registration Number</label>
+          <div class="messages">How would you like to fill the student registration number?</div>
+          <div class="ind_block">
+            <%= radio_button  :cce_report_setting, :registration_no,"0",:checked=>@setting[:registration_no]=="0",:class=>'registration_no'%>
+            <label class="general_label" for="cce_report_setting_registration_no_0">Leave blank</label>
+            <%= radio_button  :cce_report_setting,:registration_no, "1",:checked=>@setting[:registration_no]=="1",:class=>'registration_no' %>
+            <label class="general_label" for="cce_report_setting_registration_no_1">From admission additional details</label>
+            <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+          </div>
+          <div id="additional_fields">
+            <%if @setting[:registration_no]=="1"%>
+                <%=render :partial => "registration_no_field"%>
+            <%end%>
+          </div>
+        </div>
+
+          <div class="label_field_pair block">
+              <label class="core_label" for="student_gender">Attendance</label>
+              <div class="messages">How would you like the student attendance to be updated in the CCE report?</div>
+              <div class="ind_block">
+                  <%= radio_button  :cce_report_setting, :attendance,"0",:checked=>@setting[:attendance]=="0"%>
+                  <label class="general_label" for="cce_report_setting_attendance_0">Auto-generate for each student</label>
+                  <%= radio_button  :cce_report_setting,:attendance, "1",:checked=>@setting[:attendance]=="1" %>
+                  <label class="general_label" for="cce_report_setting_attendance_1">Will manually enter after printing</label>
+              </div>
+          </div>
+
+          <div class="record_group_stats block" id="hs_details">
+              <%=render :partial=>'health_status_details'%>
+          </div>
+          <div class="record_group_stats block" id="sa_details">
+              <%=render :partial=>'self_awareness_details'%>
+          </div>
+
+          <div class="label_field_pair block">
+              <label class="core_label" for="student_gender">Final Result Criteria</label>
+              <div class="messages">Define the pass criteria for each class and the final result text to be displayed in the students' CCE report.</div>
+              <%= link_to_remote 'Manage criteria',:url =>{:action=>'manage_criteria'},:method=>:get,:html=>{:id=>'submit_like_link'} if can_access_request? :manage_criteria,:cce_report_settings%>
+          </div>
+
+          <div class="label_field_pair block">
+              <label class="core_label" for="student_gender">Last Page of Report</label>
+              <div class="messages">Would you like to print the CBSE Scheme of Studies on the last page?</div>
+              <div class="ind_block">
+                  <%= radio_button  :cce_report_setting, :last_page,"0",:checked=>@setting[:last_page]=="0"%>
+                  <label class="general_label" for="cce_report_setting_last_page_0">Show Last Page</label>
+                  <%= radio_button  :cce_report_setting,:last_page, "1",:checked=>@setting[:last_page]=="1" %>
+                  <label class="general_label" for="cce_report_setting_last_page_1">Hide Last Page</label>
+              </div>
+          </div>
+          <div class="hor_line"></div>
+
+          <div id="submit_button">
+              <%= submit_tag "Save settings",:id=>'submit-button'%>
+          </div>
+
+
+      </div>
+    <% end %>
+</div>
+<div id="modal-box" style="display:none;"></div>
+
+<script type="text/javascript">
+  j('.report_head').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/cce_report_settings/get_report_header_info",
+          data: {
+              id: j(this).val()
+          },
+          beforeSend: function () {
+              j('#loader1').show();
+          },
+          success: function () {
+              j('#loader1').hide();
+          }
+      });
+  });
+
+  j('.registration_no').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/cce_report_settings/get_additional_fields",
+          data: {
+              id: j(this).val()
+          },
+          beforeSend: function () {
+              j('#loader2').show();
+          },
+          success: function () {
+              j('#loader2').hide();
+          }
+      });
+  });
+</script>

@@ -1,0 +1,52 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('create_hostel_fees')}"%> </div>
+</div>
+<div id="page-yield">
+
+  <% unless flash[:notice].nil? %><p class="flash-msg"><%= flash[:notice] %></p><% end %>
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><%= flash[:warn_notice] %> </div>
+  <% end %>
+  <div class="box">
+    <% form_for(:hostel_fee_collection,:url => {:action=> 'hostel_fee_collection_create'}) do |form| %>
+      <%= error_messages_for :hostel_fee_collection %>
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('name')}"%><span class="necessary-field">*</span> :</label> </div>
+        <div class="input-container"><%= form.text_field :name %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('select_batch')}"%> :</label></div>
+  <%#= f.select :batch_id, @batches.map { |c| [c.full_name, c.id] },{:prompt => 'Select Batch'} %>
+        <div class="batches">
+          <div class="sel-list">
+            Select: <%= link_to_function "#{t('all')}", "$$('input.fee_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+            <%= link_to_function "#{t('none')}", "$$('input.fee_box').each(function(checkbox) { checkbox.checked = false; });" %>
+          </div>
+          <% Batch.active.each do |f| %>
+            <div class="each_batch">
+              <%= check_box_tag "hostel_fee_collection[batch_id][]", f.id,false,:class=>'fee_box' %> <%= f.full_name %>
+            </div>
+          <% end %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('start_date')}"%><span class="necessary-field">*</span>:</label> </div>
+        <div class="input-container"><%= calendar_date_select_tag 'hostel_fee_collection[start_date]', I18n.l(Date.today,:format=>:normal) %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('end_date')}"%><span class="necessary-field">*</span>:</label> </div>
+        <div class="input-container"><%= calendar_date_select_tag 'hostel_fee_collection[end_date]', I18n.l(Date.today,:format=>:normal) %></div>
+      </div>
+      <div class="label-field-pair">
+        <div class="label-container"><label><%= "#{t('due_date')}"%><span class="necessary-field">*</span>:</label> </div>
+        <div class="input-container"><%= calendar_date_select_tag 'hostel_fee_collection[due_date]', I18n.l(Date.today,:format=>:normal) %></div>
+      </div>
+
+      <%=  submit_tag "►#{t('save')}",:class=>'submit_button' %>
+    <% end %>
+
+
+  </div>
+</div>

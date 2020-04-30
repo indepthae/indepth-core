@@ -1,0 +1,196 @@
+<%css_path = (rtl?) ? 'rtl/indepth_student/pdf_template_for_guardian' : 'indepth_student/pdf_template_for_guardian'%>
+<%= wicked_pdf_stylesheet_link_tag css_path -%>
+<% if !@single_statement_header.nil?%>
+  <%if !@single_statement_header.is_empty?%>
+    <div class="header" style="min-height: <%=@single_statement_header.space_height%>mm;">
+    </div>
+  <%else%>
+    <div class="header">
+        <%= wicked_pdf_image_tag @single_statement_header.logo,:s3=>true,:style=>:original,:timestamp=>false, :class=>"header_image" %>
+    </div>
+  <%end%>
+  <div class="heading_div">
+      <%if !@single_statement_header.is_empty?%>
+        <p><%=t('parent_statement')%></p>
+      <%else%>
+        <p><%=@single_statement_header.title%></p>
+      <%end%>
+  </div>
+<%else%>
+  <div class="header" style="min-height: 10mm;"></div>
+  <div class="heading_div">
+      <p><%=t('parent_statement')%></p>
+  </div>
+<%end%>
+</div>
+<table style="width:100%" id="table0">
+    <tbody>
+        <tr align="center">
+            <td>
+                <table align="center" style="width:100%;margin-top: 5px;" id="table1">
+                    <th align="left"><%=t('date_text')%>: <%=@date%></th>
+                    <th align="right"><%=t('parent_code')%>: <%=@family_code%></th> 
+                </table>
+                <table align="center" style="width:100%" id="table2">
+                    <tr>
+                        <td class="table2_width_no_border bold_font"><%=t('parent_acc')%>: </td>
+                        <td class="table2_dashed"><%=@family_id%></td>
+                    </tr> 
+                    <tr>
+                        <td class="table2_width_no_border bold_font"><%=t('parent')%> <%=t('name')%>: </td>
+                        <td class="table2_dashed"><%=@guardian.full_name unless @guardian.nil?%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table2_width_no_border bold_font"><%= t('mobile_phone_no')%> : </td>
+                        <td class="table2_dashed"><%=@guardian.mobile_phone unless @guardian.nil?%></td>
+                    </tr>
+                    <tr class="blank_row">
+                        <td class="table2_bo_border" colspan="2"></td>
+                    </tr>  
+                </table>
+                <table align="center" style="width:100%" id="table3">
+                    <tr align="center">
+                        <td colspan="10" class="bold_font">Current Year Payments - <%=@financial_year_start%>-<%=@financial_year_end%></td>
+                    </tr>
+                    <tr align="center">
+                        <td class="row1 bold_font">#</td>
+                        <td class="row1 bold_font"><%=t('v_no')%></td>
+                        <td class="row1 bold_font"><%=t('v_date')%></td>
+                        <td class="row1 bold_font"><%=t('description')%></td>
+                        <td class="row1 bold_font"><%=t('amount')%></td>
+                        <td class="row1 bold_font"><%=t('cheque_no')%></td>
+                        <td class="row1 bold_font"><%=t('due_date')%></td>
+                        <td class="row1 bold_font"><%=t('bank_name')%></td>
+                        <td class="row1 bold_font"><%=t('cheque_status')%></td>
+                        <td class="row1 bold_font"><%=t('amount')%></td>
+                    </tr>
+                    <tr align="center">
+                        <td class="row1" >1</td>
+                        <td class="row1 bold_font" colspan="3"><%= t('opening_journal')%> </td>
+                        <td class="row1 currency_align"><%=precision_label(@opening_journal)%></td>
+                        <td class="row1" colspan="5"> </td> 
+                    </tr>
+                    <%@transactions.each_with_index do |transaction,i|%>
+                      <tr align="center">
+                          <td class="row1" ><%=i+2%></td>
+                          <td class="row1" align="left"><%=transaction.receipt_number%></td>
+                          <td class="row1" align="left"><%=transaction.transaction_date%></td>
+                          <td class="row1" align="left"><%=transaction.get_poly_finance_type_name%></td>
+                          <td class="row1 currency_align"><%=precision_label(transaction.amount.to_f)%></td>
+                          <td class="row1" ><%=transaction.try(:reference_no)%></td>
+                          <%if @t_array.include?(transaction.payment_mode.present? ? transaction.payment_mode.downcase : "") && transaction.can_show_column%>
+                            <td class="row1" ><%=transaction.respond_to?(:cheque_date) ? transaction.cheque_date : ''%></td>
+                            <td class="row1" ><%=transaction.respond_to?(:bank_name) ? transaction.bank_name : ''%></td>
+                            <td class="row1" ><%=transaction.try(:payment_note)%></td>
+                          <%else%>
+                            <td class="row1" colspan="3"><%=transaction.payment_mode%></td>
+                          <%end%>
+                          <td class="row1 currency_align"><%=precision_label(transaction.amount.to_f)%></td>
+                          <!-- <td class="row1"> </td> -->
+                      </tr>
+                    <%end%>
+                    <tr align="center">
+                        <td class="row1" class="bold_font" colspan="4"><%=t('total')%></td>
+                        <td class="row1 currency_align"><%=precision_label(@total_paid + @opening_journal)%></td>
+                        <td class="row1" colspan="5"> </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr align="center">
+            <td>
+                <table align="center" style="width:100%;margin-top: 5px;margin-bottom: 5px;" id="table1">
+                    <tr align="center">
+                        <th align="center">#</th>
+                        <th align="center"><%=t('code')%></th> 
+                        <th align="center"><%= t('student_name')%></th> 
+                        <th align="center"><%=t('program')%></th> 
+                        <th align="center"><%=t('class')%></th> 
+                        <th align="center"><%= t('section')%></th> 
+                        <th align="center"><%=t('status')%></th>
+                        <%@collected_fee_particulars.each do |fp|%>
+                          <th align="center"><%= fp%></th>
+                        <%end%>
+                        <% @collected_fee_discounts.each do |fd| %>  
+                          <th align="center"><%= fd %></th>
+                        <% end %>
+                        <% if @fee_fines.values.present? %>  
+                          <th align="center">Fine</th>
+                        <% end %>
+                          
+                        <th align="center"><%=t('total')%></th>
+                    </tr>
+                    <%@students.each_with_index do |s,i|%>
+                      <tr align="center">
+                          <td align="center"><%= i+1%></td>
+                          <td align="center"><%=s.admission_no%></td> 
+                          <td align="center"><%=s.full_name%></td> 
+                          <td align="center"><%= s.batch.course.course_name%></td> 
+                          <td align="center"><%= s.batch.name%></td> 
+                          <td align="center"><%= s.batch.course.section_name%></td> 
+                          <td align="center"><%= s.batch.is_active%></td> 
+                          <% total = 0 %>
+                          <%@collected_fee_particulars.each do |fp|%>
+                            <% ag = @collected_fee_details["#{s.id}"].present? ? @collected_fee_details["#{s.id}"][fp] : nil %>
+                            <td align="center" class="currency_align">
+                                <% if ag.present? %>
+                                  <%= amt = precision_label(ag) %>
+                                  <% total += amt.to_f %>
+                                <% end %>
+                            </td>
+                          <%end%>
+                          <% @collected_fee_discounts.each do |fd| %>
+                            <td align="center" class="currency_align">
+                                <% discount = @students_with_discount["#{s.id}"].present? ? @students_with_discount["#{s.id}"][fd] : nil%>
+                                <% if discount.to_f > 0 %>
+                                  <%= d = precision_label(discount)  %>
+                                  <% total -= d.to_f %>
+                                <% end %>
+                            </td>
+                          <% end %>
+                          <% if @fee_fines.values.present? %>
+                            <td align="center" class="currency_align">
+                                <%= @fee_fines["#{s.id}"].to_f if @fee_fines["#{s.id}"].present? %>
+                                <% total += @fee_fines["#{s.id}"].to_f %>  
+                            </td>
+                          <% end %>
+
+                          <td align="center" class="currency_align"> <%= precision_label(total)%></td>
+                      </tr>
+                    <%end%>
+                    <tr align="center">
+                        <td align="right" class="bold_font" colspan="<%= @col_count %>"><%=t('total')%></td>
+                        <td align="center" class="currency_align"><%= precision_label(@total)%></td>
+                    </tr>
+                    <tr align="center">
+                        <td align="right" class="bold_font" colspan="<%= @col_count%>"><%= t('total_payment')%></td>
+                        <td align="center" class="currency_align">
+                            <% if @opening_journal > 0%>
+                              <%= precision_label(@total_payment + @opening_journal)%>
+                            <% else %>
+                              <%= precision_label(@total_payment)%>
+                            <% end %>
+                        </td>
+                    </tr>
+                    <tr align="center">
+                        <td align="right" class="bold_font" colspan="<%= @col_count%>"><%=t('balance')%></td>
+                        <td align="center" class="currency_align"><%#= (@opening_journal < 0) ? precision_label(@total_payable - @opening_journal) : 
+precision_label(@total_payable.to_f + @opening_journal.to_f) %>
+                            <%= precision_label(@total_payable - @opening_journal) %>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr align="center">
+            <td><table align="center" style="width:100%;margin-top: 5px;margin-bottom: 5px;" id="table1"></table></td>
+        </tr>
+    </tbody>
+</table>
+<table style="width:100%" id="table_bottom">
+    <tr>
+        <td align="center" class="no_border1 bold_font"><%=t('accountant_sign')%></td>
+        <td align="center" class="no_border1 bold_font"><%=t('auth_sign')%></td>
+    </tr>
+</table>

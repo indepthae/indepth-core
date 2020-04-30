@@ -1,0 +1,13 @@
+<div class="list_name">
+    <%= t("students_in_batch") %>
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+</div>
+<ul class="student_list">
+    <% @students.each do |s| %>
+      <li class="student_names">
+          <a href="#" id="<%=s.id%>" class="student-link <%= "active-link" if s == @student %>" > 
+              <%= "#{s.full_name} &#x200E;(#{s.admission_no})&#x200E;" %>
+          </a>
+      </li>
+    <% end %>
+</ul>

@@ -1,0 +1,35 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="employee_details">
+    <tr class="tr-head">
+        <td class="name"><%= t('employee_name') %></td>
+        <td class="employee_no"><%= t('mobile') %></td>
+        <td class="job"><%= t('job') %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @employees.empty? %>
+      <% @grouped_employees.each do |dept, employees| %>
+        <tr>
+            <td colspan="4"><b><%= dept %></b></td>
+        </tr>
+        <% employees.each do |e|  %>
+          <tr>
+              <td><%= link_to "#{e.first_name} #{e.last_name}", {:controller => :employee, :action => :profile, :id => e.employee_id} %></td>
+              <td><%= e.mobile_phone||e.emp_phone %></td>
+              <td><%= e.fetch_task %></td>
+              <td>
+                  <%= link_to t('unassign').capitalize, remove_employee_transport_employee_path(e.id), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('unassign_transport_employee_confirmation', {:name => "#{e.first_name} #{e.last_name}"})}',
+{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('unassign_transport_employee')}', 'popup_class' : 'delete_confirmation'}); " %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4"><%= t('no_employees_assigned') %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @employees.present? %>
+  <%= pagination_status(@employees) %>
+<% end %>
+<%= will_paginate @employees %>

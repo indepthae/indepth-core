@@ -1,0 +1,86 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('student_remarks') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('remarks') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% unless @student.nil? %>
+          <% breadcrumb :remarks_remarks_history, @student %>
+        <% else %>
+          <% breadcrumb :archive_remarks_history, @archived_student %>
+        <% end %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% remarks_count = 0 %>
+    <% if @remarks.present? %>
+      <%@batches.each do |batch|%>
+        <p id="remarks_history_batch_name"><%=batch.complete_name%></p>
+        <% remarks= @remarks[batch.id] %>
+        <%if remarks.present?%>
+          <% remarks_count += remarks.length %>
+          <%remarks.each_with_index do |remark,i|%>
+            <%if i<5%>
+              <div id="remarks_history_section">
+                  <div id="add_remark_link_for_<%=remark.id%>">
+                      <div id="remarked_by_section"><%= remark.remarked_by.present? ? remark.remarked_by : '-' %></div><div id="remark_subject_section"><%=remark.remark_subject.present? ? remark.remark_subject : '-'%></div><div id="remark_body_section"><%=remark.remark_body.present? ? remark.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div><div id="submitted_by_section"><%=remark.user.present? ? remark.user.first_name : t('deleted_user')%> on <%=format_date(remark.updated_at,:format => :long_date)%></div>
+                  </div>
+              </div>
+            <%else%>
+              <div id="remarks_history_section" class="rest_remarks rest_remarks_<%=batch.id%>">
+                  <div id="add_remark_link_for_<%=remark.id%>">
+                      <div id="remarked_by_section"><%= remark.remarked_by.present? ? remark.remarked_by : '-' %></div>
+                      <div id="remark_subject_section"><%=remark.remark_subject.present? ? remark.remark_subject : '-'%></div>
+                      <div id="remark_body_section"><%=remark.remark_body.present? ? remark.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div><div id="submitted_by_section"><%=remark.user.present? ? remark.user.first_name : t('deleted_user')%> on <%=format_date(remark.updated_at,:format=>:long_date)%></div>
+                  </div>
+              </div>
+            <%end%>
+
+          <%end%>
+          <%if remarks.count>5%>
+            <%=link_to "#{t('view_more')}",'javascript:void(0);',:onclick=>"show_remaining_remarks(#{batch.id})",:class=>"show_more_button themed_text",:id=>"show_more_button_#{batch.id}"%>
+            <%=link_to "#{t('view_less')}","javascript:void(0);",:onclick=>"hide_all_but_five(#{batch.id})",:class=>"show_less_button themed_text",:id=>"show_less_button_#{batch.id}"%>
+          <%end%>
+
+        <%else%>
+          <p id="remarks_history_no_remarks_section"><%= t('no_remarks_were_added') %></p>
+          <hr/>
+        <%end%>
+      <%end%>
+    <% else %>
+      <p class='flash-msg'><%= t('no_remarks_added_yet') %></p>
+    <% end %> 
+
+</div>
+<div id="paginate">
+    <%= will_paginate @batches%>
+</div>
+<% if remarks_count > 0 %>
+  <% if @student.present? %>
+    <%= link_to t('pdf_report'), {:action => "remarks_pdf",:page_height => 680, :report_format_type => "pdf", :student_id => @student.id, :history => 1}, :class => "submit-button", :target => '_blank'  %>
+    <%= link_to t('csv_report'), {:action => "remarks_csv", :csv_report_type => "student_remarks",:report_format_type => "csv", :student_id => @student.id, :history => 1},:class => "submit-button"%>
+  <% else %>
+    <%= link_to t('pdf_report'), {:action => "remarks_pdf",:page_height => 680, :report_format_type => "pdf", :archived_id => @archived_student.id, :history => 1}, :class => "submit-button", :target => '_blank'  %>
+    <%= link_to t('csv_report'), {:action => "remarks_csv", :csv_report_type => "student_remarks",:report_format_type => "csv", :archived_id => @archived_student.id, :history => 1},:class => "submit-button"%>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+  function show_remaining_remarks(batch)
+  {
+    var b=batch
+    j('.rest_remarks_'+b).removeClass('rest_remarks')
+    j('#show_more_button_'+b).hide();
+    j('#show_less_button_'+b).show();
+
+  }
+  function hide_all_but_five(batch)
+  {
+    b=batch
+    j('.rest_remarks_'+b).addClass('rest_remarks')
+    j('#show_less_button_'+b).hide();
+    j('#show_more_button_'+b).show();
+    j('#show_more_button_'+b).focus();
+  }
+</script>

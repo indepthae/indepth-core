@@ -1,0 +1,95 @@
+<div class="content">
+  <div class="generated_certificates">
+    <table class="primary">
+      <tr>
+        <th><%= t('sl_no') %></th>
+        <% if @certificate_template.user_type == 1 %>
+          <th> <%= t('student_name') %> </th>
+          <th> <%= t('admission_no') %> </th>
+        <% elsif @certificate_template.user_type == 2 %>
+          <th> <%= t('employee_name') %> </th>
+          <th> <%= t('employee_no') %> </th>
+        <% else %>
+          <th> <%= t('guardian_name') %> </th>
+        <%end%>
+        <th> <%= t('date_text') %> </th>
+        <th  class="links"> </th>
+      </tr>
+      
+      <%if @generated_certificates.present? %>
+      <%sl_no = ((params[:page].present? ? params[:page].to_i - 1 : 0)* @per_page ) + 1 %>
+      <%@generated_certificates.each do |c|%>
+        <tr <%= "class='currently_created'" if params[:currently_created_single].present? && c.id == params[:currently_created_single].to_i %>>
+          <td class="center_text"><%= sl_no %></td>
+          <%sl_no = sl_no + 1%>
+          <%issued_for = c.get_issued_for %>
+          <% if @certificate_template.user_type == 1 %>
+            <td><%= issued_for.full_name  if issued_for.present? %></td>
+            <td  class="center_text"><%= issued_for.admission_no %>
+          <% elsif @certificate_template.user_type == 2 %>
+            <td><%= issued_for.full_name if issued_for.present? %></td>
+            <td  class="center_text"><%= issued_for.employee_number if issued_for.present?%></td>
+          <% else %>
+            <td><%= issued_for.full_name if issued_for.present?%></td>
+          <%end%>
+          <td class="center_text"><%= format_date(c.issued_on) %></td>
+          <td  class="center_text">
+            <%if c.generated_pdf.present? %>
+              <%=link_to t('download'), c.generated_pdf.pdf.url(:original,false), :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+            <%else%>
+              <%=link_to t('download'), generate_certificate_pdf_certificate_templates_path(:id=>c.id), :class=>"themed_text", :target => "_blank"%> &nbsp; | &nbsp;
+            <%end%>
+            <%=link_to t('delete'), delete_generated_certificate_certificate_templates_path(:id=>c.id,:page=>params[:page]), :class=>"themed_text delete_links_single" %>
+          </td>
+        </tr>
+      <%end%>
+      <%else%>
+      <tr>
+        <% if @certificate_template.user_type == 1 %>
+          <td class="center_text" colspan="5"> <%= t('no_generated_certificate_present') %> </td>
+        <% elsif @certificate_template.user_type == 2 %>
+          <td class="center_text" colspan="5" > <%= t('no_generated_certificate_present') %> </td>
+        <% else %>
+          <td class="center_text" colspan="4" > <%= t('no_generated_certificate_present') %> </td>
+        <%end%>
+      </tr>
+      <%end%>
+    </table>
+    <div class="paginate_box">
+      <%= will_paginate @generated_certificates, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "certificate_templates",:action => "generated_certificates_list",
+        :certificate_template_id => params[:certificate_template_id], :academic_year_id => params[:academic_year_id] }%>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var pass_through = false;
+function delete_confirmed(elem) {
+  (function () {
+
+    var e = elem;
+
+    j('#yes').click(function () {
+      remove_popup_box();
+      pass_through = true;
+      e.click();
+      pass_through = false;
+    });
+  })();
+}
+
+j(".delete_links_single").click(function (e) {
+  if (pass_through == false) {
+    e.preventDefault();
+  }
+  make_popup_box(this, 'confirm', "<%=t('delete_generated_certificate_desc')%> ", {
+    'ok': "<%=t('delete')%>",
+    'cancel': "<%=t('cancel')%>",
+    'title': "<%=t('delete_generated_certificate')%>",
+    'popup_class': 'remove_lt',
+    'return_status': true
+  });
+  return delete_confirmed(this);
+});
+</script>

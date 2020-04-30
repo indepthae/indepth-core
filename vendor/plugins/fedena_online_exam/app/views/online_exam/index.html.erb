@@ -1,0 +1,58 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('online_exam_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+    <%  if permitted_to? :new_online_exam,:online_exam  %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('new_online_exam_text')}" ,:action=>'new_online_exam' %> </div>
+        <div class="link-descr"><%= t('create_new_online_exam') %> </div>
+      </div>
+    <% end %>
+
+
+    <%  if permitted_to? :view_online_exam,:online_exam %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('view_online_exams')}" ,:action=>'view_online_exam' %> </div>
+        <div class="link-descr"><%= t('view_existing_online_exam') %></div>
+      </div>
+    <% end %>
+
+    <%  if permitted_to? :view_result,:online_exam %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('view_exam_results')}" ,:action=>'view_result' %> </div>
+        <div class="link-descr"><%= t('view_online_exam_results') %></div>
+      </div>
+    <% end %>
+
+
+    <%  if permitted_to? :reset_exam,:online_exam  %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('reset_exam')}" ,:action=>'reset_exam' %> </div>
+        <div class="link-descr"><%= t('reset_exam_for_a_student') %></div>
+      </div>
+    <% end %>
+
+
+    <%  if can_access_request? :evaluator_home,@current_user,:context=>:online_exam  %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('evaluate_online_exam')}" ,:action=>'evaluator_home' %> </div>
+        <div class="link-descr"><%= t('evaluate_online_exam_description') %></div>
+      </div>
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+</div>

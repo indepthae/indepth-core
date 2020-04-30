@@ -1,0 +1,99 @@
+<div class="bread_crumb">
+    <% breadcrumb :event_index%>
+    <%= render_breadcrumbs  %>
+</div>
+<%#= flash[:notice] %>
+<% remote_form_for :event, @events, :url => {:action => "create"},:html => {:id => "create_event"} do |f| %>
+  <%= error_messages_for 'events' %>
+  <div class="page_header_box">
+      <div class="page_header"><%= t('create_event')%> </div>
+  </div>
+  <div class="label-field-pair-title">
+      <label for="title"><%= t('title') %>:</label>
+      <div class="text-input-bg" id="event_title"><%= f.text_field :title %></div>
+  </div>
+  <div class="label-field-pair-date">
+      <label for="start-date"><%= t('start_date') %>:</label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'event[start_date]', I18n.localize(@date, :format=>("%Y-%m-%d %H:%M")), :time => true , :readonly=>true, :popup=>"force" %></div>
+  </div>
+  <div class="label-field-pair-date">
+      <label for="end-date"><%= t('end_date') %>:</label>
+      <div class="text-input-bg"><%= calendar_date_select_tag 'event[end_date]', I18n.localize(@date, :format=>("%Y-%m-%d %H:%M")), :time => true , :readonly=>true, :popup=>"force" %></div>
+  </div>
+  <div class="label-field-pair-date">
+      <%= f.check_box :is_holiday %>
+      <label for="event_is_holiday" id="is_holiday"><%= t('event_is_holiday') %></label>
+  </div>
+  <div class="label-field-pair-title">
+      <label for="description"><%= t('description') %>:</label>
+      <%= f.text_area "description" %>
+  </div>
+
+
+  <div class="page_sub_header"><%= t('event_audience')%> </div>
+
+  <div class="label-field-pair-title">              
+      <div class="radio_one"><%= radio_button_tag("is_common_users","all_users", (@events.is_common == true))%>  
+          <label for="is_common_users_all_users"> <%="#{t('all_users_of_institution')}"%> </label>
+      </div>
+      <div class="radio_two"><%= radio_button_tag("is_common_users","selected_users",(@events.is_common != true))%> 
+          <label for="is_common_users_selected_users"><%="#{t('select_applicable_users')}"%> </label>
+      </div>
+  </div>
+  <div class="extra">
+
+      <div class="select_users">
+          <div class="left_align">
+              <div class="page_sub_content"><%= t('students')%> </div>
+              <%= render :partial=> 'select_course', :locals => {:f => f} %>
+          </div>
+
+          <% @config = Configuration.available_modules%>
+          <div id="select-option"></div>
+          <% if @config.include?("HR") %>
+            <div class="right_align">
+                <div class="page_sub_content"><%= t('employees')%> </div>
+                <%= render :partial=> 'select_employee_department', :locals => {:f => f} %>
+            </div>
+          <% end %>
+
+          <div id="select-options"></div>
+
+      </div>
+
+      <%= hidden_field_tag "event[is_common]", '', :id=> 'is_common_hidden'%>
+      <%=hidden_field_tag :session_fingerprint, session_fingerprint%>
+  </div>
+  <% FedenaPlugin.deliver_registered_hook(:event_alert_form).each do |mod| %>
+    <%= render :partial=>mod.camelize.constantize.send("event_alert_form"), :locals => {:f => f} %>
+  <% end %>
+  <%= f.submit "► #{t('create_event')}", :disable_with => "► #{t('please_wait')}", :class=>'submit-button' %>
+  <div class="submit-button" id="event_submit"><%= link_to "#{t('cancel')}", :controller => 'user',:action => 'dashboard'%></div>
+<% end %>
+
+<script type="text/javascript">
+
+    if (j("input[name='is_common_users']:checked").val() === "all_users") {
+    j(".select_users").hide();
+    j('#is_common_hidden').val('1');
+    } else {
+    j(".select_users").show();
+    j('#is_common_hidden').val('0');
+    }
+
+    j(document).on('change', "input[name='is_common_users']:radio", function () {
+    if (j("input[name='is_common_users']:checked").val() === "all_users") {
+    j(".select_users").hide();
+    j('#is_common_hidden').val('1');
+    } else {
+    j(".select_users").show();
+    j('#is_common_hidden').val('0');
+    }
+    });
+
+    j('.wrapper').css('display', 'none');
+    window.scrollTo(0, 0);
+    j("#event_submit").click(function(){
+      j("#event_submit").attr("disabled",true)
+ });
+</script>

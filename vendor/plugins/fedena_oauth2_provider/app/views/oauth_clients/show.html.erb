@@ -1,0 +1,74 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= t('client_apps') %></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= @oauth_client.name %></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'>    <%= link_to t('edit_text'), edit_oauth_client_path(@oauth_client) %> </li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :oauth_clients_show, @oauth_client %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="box">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('name') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @oauth_client.name %>
+        </td>
+      </tr>
+
+      <tr class="tr-even">
+        <td class="col-1">
+          <b><%= t('client_id') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @oauth_client.client_id %>
+        </td>
+      </tr>
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('client_secret') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @oauth_client.client_secret %>
+        </td>
+      </tr>
+
+      <tr class="tr-even">
+        <td class="col-1">
+          <b><%= t('redirect_uri') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h @oauth_client.redirect_uri %>
+        </td>
+      </tr>
+
+      <tr class="tr-odd">
+        <td class="col-1">
+          <b><%= t('verified') %>:</b>
+        </td>
+        <td class="col-1">
+          <%=h (@oauth_client.verified? ? "Yes" : "No") %>
+        </td>
+      </tr>
+
+
+    </table>
+    <div class="extender"></div>
+  </div>
+</div>
+

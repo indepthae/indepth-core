@@ -1,0 +1,37 @@
+<div class="outer">
+    <div class="inner">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1" id="report_result">
+            <tr class="tr-head">
+                <td class="col1 sl_no fixed-header"><%= t('sl_no') %></td>
+                <% (@columns["#{@passenger_type.downcase}_details"]||[]).each do |col| %>
+                  <td class="col1 <%= col %> fixed-header"><%= t(col) %></td>
+                <% end %>
+                <% (@columns["transport_details"]||[]).each do |col| %>
+                  <td class="col1"><%= t(col) %></td>
+                <% end %>
+            </tr>
+            <%if @result.present?%>
+              <% @result.each_with_index do |res, i| %>
+                <tr>
+                    <% if params[:page].present? %>
+                      <% if params[:page].to_i >= 1 %>
+                        <% i = i  + (params[:page].to_i - 1) * 10 %>
+                      <% end %> <%else %> <% i = i %> <% end %>
+                    <td class="col1 sl_no"><%=  i+1 %></td>
+                    <% (@columns["#{@passenger_type.downcase}_details"]||[]).each do |col| %>
+                      <td class="col1  <%= col %>"><%= res.send(col) %></td>
+                    <% end %>
+                      <% data = TransportReport.fetch_attendance_result(res.id) %>
+                    <% (@columns["transport_details"]||[]).each do |col| %>
+                      <td class="col1"><%= data[col.to_sym] %></td>
+                    <% end %>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="7"><%= t('no_data') %></td>
+              </tr>
+            <% end %>
+        </table>
+    </div>
+</div>

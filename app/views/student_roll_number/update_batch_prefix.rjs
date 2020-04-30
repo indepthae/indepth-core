@@ -1,0 +1,6 @@
+if @error.nil?
+  page << "Modalbox.hide();"
+  page.reload
+else
+	page.replace_html 'test', :partial => 'course_errors', :object => @batch
+end

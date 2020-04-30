@@ -1,0 +1,33 @@
+<% if  @attendance_label.present? %>
+  <% @attendance_label_id = @attendance_label.id %>
+<% else %> 
+  <% @attendance_label_id = nil %>
+<% end %>
+
+
+<div class="course_filter">
+        <div class='filter_option2'><%= t('select_a_course') %></div>
+        <div class="label-field-pair3">
+            <div class="text-input-bg3">
+                <%= select :batch, :id,
+                  @courses.map {|c| [c.course_name, c.id] },
+                  {:prompt => "#{t('select_a_course')}"},
+                  {:onchange => "#{remote_function(
+                  :url => { :action => 'day_wise_report_filter_by_course' },
+                  :with => "'course_id='+value+'&date=#{@date}'+'&attendance_label_id=#{@attendance_label_id}'",
+                  :before => "Element.show('loader2')",
+                  :success => "Element.hide('loader2')")}"} %>
+                <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+            </div>
+        </div>
+    </div>
+<div class="hr-line"></div>
+<div class= "report_table" id="list">
+    <% if @attendance_label.blank? %>
+      <%= render :partial => "list_batches", :locals => {:attendance_label =>  @attendance_label} %>
+      <% elsif @attendance_label.present? and @attendance_label.attendance_type == "Late" %>
+      <%= render :partial => "late_report", :locals => {:attendance_label =>  @attendance_label} %>
+    <% else %>
+      <%= render :partial => "absent_report", :locals => {:attendance_label =>  @attendance_label} %>
+    <%end %>
+</div>

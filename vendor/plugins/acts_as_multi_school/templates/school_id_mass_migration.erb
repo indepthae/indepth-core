@@ -1,0 +1,21 @@
+class <%= migration_name.underscore.camelize %> < ActiveRecord::Migration
+  def self.up
+  <% pending_tables.each do |table_name| %>
+    add_column :<%= table_name %>, :school_id, :integer
+  <% end %>
+
+  <% pending_tables.each do |table_name| %>
+    add_index :<%= table_name %>, :school_id
+  <% end %>
+  end
+
+  def self.down
+  <% pending_tables.each do |table_name| %>
+    remove_index :<%= table_name %>, :school_id
+  <% end %>
+    
+  <% pending_tables.each do |table_name| %>
+    remove_column :<%= table_name %>, :school_id
+  <% end %>
+  end
+end

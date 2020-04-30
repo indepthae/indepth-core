@@ -1,0 +1,11 @@
+<div class="label-field-pair">
+      <label for="subject" class="label-report"><%= t('subject') %></label>
+      <span class="student_selector">
+          <%= select :subject_report, :subject,@subjects.map { |sub| [sub.name,sub.id]  },
+        {:include_blank =>t('select_subject')},
+        {:onChange => "#{remote_function(:url => {:action => "reload_exams"},
+         :with => "'subject_id='+ value +'&batch_id=#{@batch.id}'"
+        )}"}
+      %>
+      </span>
+</div>

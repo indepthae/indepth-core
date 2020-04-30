@@ -1,0 +1,86 @@
+<% offset = params[:page].nil? ? 0 : (params[:page].to_i-1)*12 %>
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1" class='<%= "#{@forms.present? ? '' : 'narrow_border'}" %>'>
+  <% if @forms.present? %>
+    <tr class="tr-head">
+      <td class="col-1">
+        <%= t('sl_no') %>
+      </td>
+      <td class="col-2">
+        <%= t('form_name') %>
+      </td>
+      <td class="col-3">
+        <%= t('type') %>
+      </td>
+      <% if permitted_to? :destroy, :forms %>
+        <td class="col-4"></td>
+      <% end %>
+    </tr>
+    <tr class="tr-blank"></tr>
+    <% @forms.each_with_index do |form,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-1">
+          <%= i+1+offset %>
+        </td>
+        <td class="col-2">
+          <%= link_to "#{form.name}", form_submission_path(form), :class => "themed_text" %>
+        </td>
+        <td class="col-3">
+          <div class="form_type">
+            <%= form.is_feedback ? t('feedback') : form.is_public ? t('public') : t('private') %>
+          </div>
+        </td>
+        <% if permitted_to? :destroy, :forms %>
+          <td class="col-4">
+            <div class="form_actions">
+              <ul>
+                <% if permitted_to? :close, :forms %>
+                  <li>
+                    <div id="form_<%= form.id%>">
+                      <% if form.is_closed %>
+                        <%= link_to_remote "#{t('reopen')}", :url => close_form_path(:id=>form.id), :confirm => t('confirm_reopen'), :html =>{:class => "themed_text"} %>
+                      <% else %>
+                        <%= link_to_remote "#{t('close')}", :url => close_form_path(:id=>form.id), :confirm => t('confirm_close'), :html =>{:class => "themed_text"} %>
+                      <% end %>
+                    </div>
+                  </li>
+                <% end %>
+                <% if permitted_to? :edit, :forms %>
+                  <li>
+                    <% if form.can_edit_or_delete?(@current_user) %>
+                      <%= link_to t('edit'), edit_form_path(form), :class => "themed_text" %>
+                    <% else %>
+                      <span class="not_allowed">
+                        <%= t('edit') %>
+                      </span>
+                    <% end %>
+                  </li>
+                <% end %>
+                <% if permitted_to? :destroy, :forms %>
+                  <li>
+                    <% if form.can_edit_or_delete?(@current_user) %>
+                      <%= link_to t('delete'), form, :confirm => t('confirm_delete'), :method => 'delete', :class => "themed_text"  %>
+                    <% else %>
+                      <span class="not_allowed">
+                        <%= t('delete') %>
+                      </span>
+                    <% end %>
+                  </li>
+                <% end %>
+
+              </ul>
+            </div>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr class="tr-odd">
+      <td class="col_1">
+        <div class="message">
+          <%= t('no_forms') %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @forms,:renderer => 'RemoteLinkRenderer', :method=>'get', :params => {:id=>params[:id],:form_type=>@form_type}%>

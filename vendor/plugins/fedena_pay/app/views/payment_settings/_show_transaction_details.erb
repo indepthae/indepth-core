@@ -1,0 +1,113 @@
+
+  <%if @payment.type =='MultiFeePayment'%>
+   <div class="detail">
+      <div class="label"><%= "#{t('fee_collection')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%=@payment.finance_payments.collect{|x| x.fee_collection.name}.join(", ")%></div>
+    </div>
+  <%end%>
+
+<% if @gateway_response.keys.include? :payment_reference %>
+  <% unless @gateway_response[:card_number].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('last_four_digit')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%=  "#{@gateway_response[:card_number]}" %></div>
+    </div>
+  <% end %>
+  <% unless @gateway_response[:merchant_reference].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('transaction_id')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= "#{@gateway_response[:merchant_reference]}" %></div>
+    </div>
+  <% end %>
+  <% unless @gateway_response[:amount].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('amount')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= "#{@gateway_response[:amount]}" %></div>
+    </div>
+  <% end %>
+  <% unless @gateway_response[:response_description].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('response_description')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= "#{@gateway_response[:response_description]}" %></div>
+    </div>
+  <% end %>
+
+  <div class="detail">
+    <div class="label"><%= "#{t('transaction_date')}" %></div>
+    <div class="seperator">:</div>
+  <div class="value"><%= format_date(change_time_to_local_time(@payment.created_at),:format=>:long) %></div>
+  </div>
+  <% unless @gateway_response[:payment_reference].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('payment_reference')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:payment_reference]}" %></div>
+    </div>
+  <% end %>
+<% elsif @gateway_response.keys.include? :transaction_id%>
+  <% unless @gateway_response[:amount].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('amount')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= "#{@gateway_response[:amount]}" %></div>
+    </div>
+  <% end %>
+  <% unless @gateway_response[:status].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('status')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:status]}" %></div>
+    </div>
+  <% end %>
+  <% unless  @gateway_response[:transaction_id].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('transaction_id')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:transaction_id]}" %></div>
+    </div>
+  <% end %>
+<% elsif @gateway_response.keys.include? :x_trans_id %>
+  <% unless @gateway_response[:x_response_code].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('response_code')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:x_response_code]}" %></div>
+
+    </div>
+  <% end %>
+  <% unless @gateway_response[:x_response_reason_text].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('response_reason')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:x_response_reason_text]}" %></div>
+    </div>
+  <% end %>
+  <% unless @gateway_response[:x_trans_id].blank?  %>
+    <div class="detail">
+      <div class="label"><%= "#{t('transaction_id')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= " #{@gateway_response[:x_trans_id]}" %></div>
+    </div>
+  <%end%>
+  <% unless @gateway_response[:x_amount].blank? %>
+    <div class="detail">
+      <div class="label"><%= "#{t('amount')}" %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= "#{@gateway_response[:x_amount]}" %></div>
+    </div>
+  <%end%>
+<% else %>
+  <% @gateway_response.each_pair do |k,v| %>
+    <div class="detail">
+      <div class="label"><%= k.to_s.humanize %></div>
+      <div class="seperator">:</div>
+      <div class="value"><%= v %></div>
+    </div>
+  <% end %>
+<% end %>
+

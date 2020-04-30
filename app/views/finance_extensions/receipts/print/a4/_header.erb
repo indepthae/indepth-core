@@ -1,0 +1,37 @@
+<% default_configs ||= nil %>
+<% if (template_id.present? and @data[:templates].has_key?(template_id.to_i)) %>
+
+  <%= render :partial => "receipt_templates/receipt_header",     
+    :locals => {:header_content => @data[:templates][template_id.to_i].try(:last), :printer => true }%>
+
+<% else %>    
+
+  <%= render :partial => "finance_extensions/receipts/defaults/receipt_header", 
+    :locals => {:default_configs => default_configs} %>
+
+<% end %>
+
+
+
+
+
+
+
+<!--
+<div id="pdf-header">
+    < % logo_visible = @domatrix.present? ? @logo_style : (ReceiptPrinter.current_settings_object.dot_matrix? ? 'none':'block') %>
+    <div class="logo" style="display: < %= logo_visible %>;">        
+        < %= image_tag current_school_detail.logo.url(:original, false) %>
+    </div>
+    < % align = transaction_hash.default_configs.try(:pdf_receipt_halignment) || @config[:pdf_receipt_halignment] || "left" %>
+    <div class="header-content < %= logo_visible %>" style='text-align:< %= align %>;'>
+        <p>
+            < %= transaction_hash.default_configs.try(:institution_name) || @config[:institution_name]  %>
+        </p>
+        <p class="institution_address">
+            < %= transaction_hash.default_configs.try(:institution_address) || @config[:institution_address] %>
+        </p>
+    </div>
+
+</div>
+-->

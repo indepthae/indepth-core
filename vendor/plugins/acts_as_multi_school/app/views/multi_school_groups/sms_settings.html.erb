@@ -1,0 +1,85 @@
+
+<h1><%= @school_group.name %></h1>
+<%# if @current_group_settings.nil? %>
+  <%#= link_to "Generate SMS Settings", :action=>:generate_settings, :id=>@school.id  %>
+<%# else %>
+  <% form_for :sms_config do |f| %>
+    <%= f.error_messages %>
+    <h2>SMS Settings</h2>
+
+    <%#*<div class="well sidebar-nav">%>
+      <%#*<h2>Request URL preview</h2>%>
+      <%#*<div id="url-preview">%>
+        <%#= @sms_url %>
+      <%#*</div>%>
+    <%#*</div>%>
+
+    <%= hidden_field_tag "id", @school_group.id %>
+
+    <%= f.label :username %>
+    <%= f.text_field 'sms_settings[username]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['sms_settings']['username'], :class=>'text', :id=>'username' %>
+
+    <%= f.label :password %>
+    <%= f.text_field 'sms_settings[password]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['sms_settings']['password'], :class=>'text', :id=>'password' %>
+
+    <%= f.label :host_url %>
+    <%= f.text_field 'sms_settings[host_url]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['sms_settings']['host_url'], :class=>'text', :id=>'host_url' %>
+
+    <%= f.label :sendername %>
+    <%= f.text_field 'sms_settings[sendername]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['sms_settings']['sendername'], :class=>'text', :id=>'sendername' %>
+
+    <%= f.label :success_code %>
+    <%= f.text_field 'sms_settings[success_code]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['sms_settings']['success_code'] %>
+
+    <h2>Parameter Mappings</h2>
+
+    <%= f.label :username %>
+    <%= f.text_field 'parameter_mappings[username]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['parameter_mappings']['username'], :class=>'text', :id=>'username_mapping' %>
+
+    <%= f.label :password %>
+    <%= f.text_field 'parameter_mappings[password]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['parameter_mappings']['password'], :class=>'text', :id=>'password_mapping' %>
+
+    <%= f.label :phone %>
+    <%= f.text_field 'parameter_mappings[phone]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['parameter_mappings']['phone'], :class=>'text', :id=>'phone_mapping' %>
+
+    <%= f.label :sendername %>
+    <%= f.text_field 'parameter_mappings[sendername]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['parameter_mappings']['sendername'], :class=>'text', :id=>'sendername_mapping' %>
+
+    <%= f.label :message %>
+    <%= f.text_field 'parameter_mappings[message]', :value=>@current_group_settings.nil? ? nil : @current_group_settings.settings['parameter_mappings']['message'], :class=>'text', :id=>'message_mapping' %>
+
+    <% unless @current_group_settings.nil? %>
+      <% @additional_param = @current_group_settings.settings['additional_parameters'].nil? ? nil : @current_group_settings.settings['additional_parameters'] %>
+    <% end %>
+
+    <%= f.label :additional_parameters %>
+    <%= f.text_field 'additional_parameters', :value=>@additional_param, :class=>'text', :id=>'additional' %>
+
+    <div class='form-actions'>
+      <%= f.submit 'Save', :class  => 'default btn' %>
+      <%= link_to 'Delete', { :action=>'remove_settings', :id=>@school_group.id }, :confirm=>"Are you sure?",:class  => 'btn-danger btn' %> <br/>
+    </div>
+
+
+  <% end %>
+<%# end %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('input.text').each(function() {
+      $('#'+this.id).change(function() {
+        update_url();
+      });
+    });
+  });
+
+  function update_url(){
+    additional = ""
+    if($('#additional').val() != null && $('#additional').val() != ""){
+      additional_params = $('#additional').val().split(',');
+      for(i=0; i< additional_params.length; i++){ additional+="&"+additional_params[i] }
+    }
+    url = $('#host_url').val()+"?"+$('#username_mapping').val()+"="+$('#username').val()+"&"+$('#password_mapping').val()+"="+$('#password').val()+"&"+$('#sendername_mapping').val()+"="+$('#sendername').val()+"&"+$('#message_mapping').val()+"=test%20message"+additional+"&"+$('#phone_mapping').val()+"=";
+    $('#url-preview').html(url)
+  }
+</script>

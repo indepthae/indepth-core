@@ -1,0 +1,76 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<% content_for :head do  %>
+  <%= stylesheet_link_tag("assessment_scores/fa_groups.css") %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1>FA Scores</h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>Select an FA </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%unless @exam_group.present?%>
+      <%if @batch.is_active%>
+        <%breadcrumb :assessment_scores_exam_fa_groups_with_exam, [@subject,@cce_exam_category]%>
+      <%else%>
+        <%breadcrumb :assessment_scores_exam_fa_groups_with_exam_inactive_batch, [@subject,@cce_exam_category]%>
+      <%end%>
+    <%else%>
+      <%if @batch.is_active%>
+        <%breadcrumb :assessment_scores_exam_fa_groups_without_exam, [[@subject,@cce_exam_category],[@exam_group]]%>
+      <%else%>
+        <%breadcrumb :assessment_scores_exam_fa_groups_without_exam_with_inactive_batches, [[@subject,@cce_exam_category],[@exam_group]]%>
+      <%end%>
+    <%end%>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless @fa_groups.empty?  %>
+    <ul id="category-list">
+      <li class="listheading">
+        <div class="heading-name">Select an FA</div>
+        <div class="heading-edit">
+        </div>
+      </li>
+      <% @fa_groups.each do |fa| %>
+        <%if can_access_request? :fa_scores,:assessment_scores%>
+          <li class="list<%=cycle('odd', 'even')%>">
+            <label>
+              <div class="category-name">
+                <%unless @exam_group.present?%>
+                  <%= link_to "#{fa.name} - #{fa.desc}",fa_scores_path(:subject_id=>@subject.id,:cce_exam_category_id=>@cce_exam_category.id,:fa_group_id=>fa.id)  %>
+                <%else%>
+                  <%= link_to "#{fa.name} - #{fa.desc}",fa_scores_with_out_exam_path(:subject_id=>@subject.id,:cce_exam_category_id=>@cce_exam_category.id,:fa_group_id=>fa.id,:exam_group_id=>@exam_group.id)  %>
+                <%end%>
+              </div>
+            </label>
+          </li>
+        <%end%>
+      <% end %>
+    </ul>
+  <% else %>
+    <ul id="category-list">
+      <li class="listheading">
+        <div class="heading-name">No Scholastic items assigned to the subject.</div>
+      </li>
+    </ul>
+  <% end %>
+</div>

@@ -1,0 +1,46 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.0.2/jszip-utils.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('planner_report') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessments_generate_planner_reports, [@report, @academic_year, @course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="header">
+        <%= t('planner_report') %>
+    </div>
+    <div class="assessments_box">
+        <div class="assessments_details">
+            <div class="field_details">
+                <div class="field_name"><%= t('course_text') %></div>
+                <div class="field_val"><%= @course.full_name %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t('report_type_text') %></div>
+                <div class="field_val"><%= t('planner_report') %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t(:planner) %></div>
+                <div class="field_val"><%= @report.name %></div>
+            </div>
+            <div class="field_details">
+                <div class="field_name"><%= t(:exam_groups_text) %></div>
+                <div class="field_val"><%= @report.connectable_assessments.count %></div>
+            </div>
+        </div>
+        <% if @batches_in_year.present? %>
+          <%= render :partial => 'report_form' %>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_batches_in_the_acedemic_year') %> </p>
+        <% end %>
+    </div>
+</div>

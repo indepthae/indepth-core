@@ -1,0 +1,16 @@
+<div class="row">
+    <div class="label-field-pair">
+      <label for="additional_field_ids"><%= t('choose_additional_fields') %></label>
+    </div>
+    <div class="fee_category_scroll">
+      <div class="sel-list">
+        <%= t('select') %>: <%= link_to_function t('all'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = true; });" %>,
+        <%= link_to_function t('none'), "$$('input.batches_box').each(function(checkbox) { checkbox.checked = false; });" %>
+      </div>
+      <% @additional_fields.each do |additional_field| %>
+        <div class="each_batch">
+          <%= check_box_tag :additional_field_ids, additional_field.id.to_s , selected_additional_field_ids.include?(additional_field.id.to_s),:name => "registration_course[additional_field_ids][]",:class=>'batches_box',:disabled => additional_field.is_mandatory,:checked => additional_field.is_mandatory  %> <label for="choose_<%= additional_field.name %>"><%= additional_field.name %></label>
+        </div>
+      <% end %>
+    </div>
+  </div>

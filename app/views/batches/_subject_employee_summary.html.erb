@@ -1,0 +1,74 @@
+<div id="highlight">
+  <%=render :partial=>'subject_teacher_highlights'%>
+</div>
+<div id="other_details">
+  <div id ="combine_portlet1">
+
+    <% if @timetables.blank? %>
+      <div class="no_entries"><%= t('no_timetable_found') %></div>
+    <% else %>
+      <div id="time_table_label"><%=t('timetable_text')%></div>
+      <%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader",
+        :style =>"display: none;" ) %>
+      <div class="text-input-bg">
+        <%= select :timetable_entry, :timetable_id, @timetables.map {|c| ["#{format_date(c.start_date,:format=>:long)}  -  #{format_date(c.end_date,:format=>:long)}", c.id]},
+          {:selected=>@timetable_id},{:onChange => "#{remote_function(
+          :url => { :action => 'batch_summary' },
+          :with => "'timetable_id='+value+'&request_id='+3+'&batch_id='+j('#batch_id').val()",
+          :before => "Element.show('loader4')",
+          :success => "get_active_link();Element.hide('loader4')")}"   }   %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader4",
+          :style =>"display: none;" ) %>
+      </div>
+    <% end %>
+  </div>
+  <% unless @timetables.blank? %>
+    <div class="summary_type_select active_link"><%=t('subject_wise_summary')%></div>
+    <div class="summary_type_select margin-left-20"><%=t('employee_wise_summary')%></div><%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader2",
+      :style =>"display: none;" ) %>
+  <%end%>
+
+  <div id="exam_items">
+    <%=render :partial=>'exam_items'%>
+  </div>
+</div>
+<script type="text/javascript">
+  function get_active_link(){
+    j('.summary_type_select').removeClass('active_link');
+    j('.summary_type_select').first().addClass('active_link');
+  }
+  j('.summary_type_select').each(function(index){
+    j(this).click(function(){
+      if(!j(this).hasClass('active_link')){
+        j('.summary_type_select').removeClass('active_link');
+        j(this).addClass('active_link');
+        j('#loader2').show()
+        j.ajax({
+          type: 'POST' ,
+          url: "/batches/batch_summary",
+          data : {
+            timetable_id : j('#timetable_entry_timetable_id').val(),
+            batch_id :j('#batch_id').val(),
+            request_id : 3,
+            link_id:index
+          },
+          success : function(data) {
+            j('#loader2').hide();
+            j('#exam_items').html(data);
+
+            
+          }
+        });
+      }
+    })
+  });
+</script>

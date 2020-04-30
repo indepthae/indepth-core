@@ -1,0 +1,28 @@
+
+  <% payroll_group = PayrollGroup.first %>
+  <% help_wizard('Update', 'HR has been updated recently. There are few important things you should know.') do %>
+      <% help_section(:controller=>:payroll_groups, :action=>:index) do %>
+      <p>Payroll groups are used to manage employees of your institution with similar payroll structure, pay frequency, and payroll categories.</p>
+      <h3>Payroll Group</h3>
+        <% if payroll_group.present? %>
+            <p>With the recent update, all your existing payroll categories and employees are linked to this default payroll group <%= link_to payroll_group.name, payroll_group_path(payroll_group) %> with pay frequency - <%= I18n.t(PayrollGroup::PAYMENT_PERIOD[payroll_group.payment_period], :locale=>:en) %>.  Payroll group details</p>
+        <% end %>
+      <p>If you haven't created payroll categories yet, first create the payroll categories here - <%= link_to('Payroll Categories', payroll_categories_path, {:target=>:blank}) %>. Then, come back here and create a payroll group and add the required payroll categories.</p>
+
+      <h3>Employee and Payroll Group association</h3>
+      <p>Employees can be added to a payroll group by specifying their payroll details. Each time an employee’s group is changed, his payroll has to be updated.</p>
+
+      <h3>Loss of Pay deduction for additional leaves</h3>
+      <p>Loss of pay can be enabled for a payroll group, thereby for its employees. If enabled, additional leaves can be marked as “Loss of Pay” deductible while marking attendance or while approving leave applications.</p>
+      <p>Loss of Pay Amount can be configured from LOP settings using one of the two modes: <b> 1. LOPA as a deduction </b> or
+        <b>2. Deduct LOPA from payroll categories</b>
+      </p>
+
+      <h3>Payroll Groups and Payroll Categories association</h3>
+      <p>Payroll categories are closely linked to their associated payroll groups. The payroll structure for employees of a payroll group is based on the categories added to that group. Every time payroll categories are added or removed from a group, the payroll details of all the employees of the group must be updated.</p>
+
+      <h3>Payslips</h3>
+      <p>Now that all your employees are linked to a payroll group, all payslips related activities happen inside a payroll group. <%= link_to('Payslips for payroll groups', payslip_for_payroll_group_employee_payslips_path, {:target=>:blank}) %></p>
+      <% end %>
+
+  <% end %>

@@ -1,0 +1,53 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('activity_profiles') %></div>
+    <% if permitted_to? :new , :assessment_activities %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('create_activity_profile')}", :url => {:controller => "assessment_activities", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_activities_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('activity_profiles') %></div>
+    <div id ="description"><%= t('activity_profiles_description') %></div>
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="name"><%= t('profile_text') %></td>
+                <td class="activity_count"><%= t('no_of_activities') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @profiles.present? %>
+              <% @profiles.each do |ap|  %>
+                <tr class="tr-<%= cycle('even', 'odd') %>">
+                    <td><%= link_to ap.name, assessment_activity_path(ap) %></td>
+                    <td class="float"><%= ap.activities_count %></td>
+                    <td><%= link_to t('view_profile'), assessment_activity_path(ap) %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="3"><%= t('create_an_activity_profile') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @profiles.present? %>
+          <%= pagination_status(@profiles) %>
+        <% end %>
+        <%= will_paginate @profiles %>
+    </div>
+</div>

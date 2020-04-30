@@ -1,0 +1,162 @@
+.main_heading {
+    font-size: 16px;
+    color: #444;
+    font-weight: bold;
+}
+.description {
+    font-size: 13px;
+    padding-top: 10px;
+    color: #A5A5A5;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.setting_block, .setting_label, .setting_options{
+    clear: both;
+}
+.setting_label {
+    font-size: 14px;
+    color: #444;
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    min-height: 16px;
+}
+.setting_label .description {
+    clear: both;
+    font-weight: normal;
+}
+.setting_options {
+    height: 30px;
+    float: left;
+    width: 100%;
+    padding: 10px 0 20px 0px;
+}
+.setting_options label {
+    font-size: 13px;
+    font-weight: normal;
+    color: #444;
+    margin-right: 20px;
+}
+.setting_options label:last-child{
+    margin-right: 0px;
+}
+.setting_options .radio_pair_main_float{
+    float: left;
+    margin-right: 20px;
+}
+.default_receipt_settings{
+
+}
+.default_receipt_settings .setting_block{
+    display: inline-block;
+}
+.default_receipt_settings .setting_block .setting_label{
+    margin-top: 0px;
+}
+.setting_options input {
+    /*    margin-top: 2px;
+        margin-right: 10px;*/
+    margin-top: 5px;
+    margin-right: 10px;
+    display: inline-block;
+    margin-bottom: 5px;
+    vertical-align: middle;
+}
+.setting_options .input_field {
+    float: none !important;
+    margin-bottom: 10px;
+}
+.setting_options .input_field label{
+    width: 300px !important;
+    line-height: 30px;
+    float: left;
+}
+.setting_options .input_field input{
+    background: #fff;
+    border: 1px solid #c6c6c6;
+    margin: 0px 0 0 6px;
+    width: 98px;
+    height: 17px;
+    text-align: left;
+    width: 200px !important;
+    padding: 5px;
+}
+#number_system{
+    display: none;
+}
+
+.submit-button {
+    margin: 20px 20px 0 0;
+    font-size: 13px;
+    padding: 7px 35px;
+}
+
+.setting_label .label, .setting_label div.tooltip_info2 {
+    float: left;
+}
+
+.tooltip_info2 {
+    /*display: none;*/
+    margin-left: 20px;
+    background: url(/images/iconsprite-1.png) no-repeat -63px -85px;
+    float: left;
+    width: 13px;
+    height: 13px;
+    margin: 2px 6px;
+    /*margin: 6px;*/
+    font-weight: normal !important;
+}
+
+.tooltip_info2 .info {
+    display: none;
+    z-index: 8;
+    position: absolute;
+    pointer-events: none;
+    color: #27292b;
+    text-align: left;
+    font-size: 13px;
+    min-width: 179px;
+    max-width: 370px;
+    padding: 10px;
+    background: #FFFFFF;
+    border: #989898 solid 1px;
+    margin-top: -12px;
+    margin-left: 22px;
+}
+.info:after, .info:before {
+    content: "";
+    position: absolute;
+    top: 11px;
+    border-style: solid;
+    border-width: 7px 10px 7px 0px;
+    display: block;
+    width: 0;
+    border-color: transparent;
+}
+.info:after {
+    left: -10px;
+    border-right-color: #fff;
+    z-index: 1;
+}
+.info:before {
+    left: -11px;
+    border-right-color: #0d0d0d !important;
+    z-index: 0;
+}
+.setting_label div.tooltip_info2:hover .info {
+    display: block;
+}
+#online_payment_student{
+  display: none;
+}
+#configuration_show_total_due_amount, #configuration_show_toatl_paid_amount{
+    width: 22px !important;
+    margin-left: 0px;
+    margin-right: 15px;
+}
+#total_amount_paid label, #total_due_amount label{
+    margin-top: -7px;
+}
+#invoice_amount_display_settings{
+    float:left;
+}

@@ -1,0 +1,15 @@
+<% unless @students.empty?  %>
+  <div class="scroll-inside">
+    <% @students.each do |s| %>
+      <div class="hover"><%= link_to "#{shorten_string(s.full_name,20)} <span>X</span>" ,"#",:onclick=>"remove_student(#{s.id})",
+          :before => "Element.show('loader')",
+          :success => "Element.hide('loader')" ,:class=>"individual" %>
+
+      </div>
+    <% end %>
+  </div>
+  <% else %>
+<div class="hover"><div class="individual"><%= t('no_students_added_yet') %></div></div>
+<% end %>
+
+

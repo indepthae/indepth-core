@@ -1,0 +1,83 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('store_items') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <%  if permitted_to? :index, :grns %><li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('grn_text')}", grns_path %> </li><%  end %>
+      <%  if permitted_to? :index, :indents %>    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('indent_text')}", indents_path %> </li><%end %>
+      <%  if permitted_to? :index, :purchase_orders %>   <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('po_text')}", purchase_orders_path %> </li><%  end %>
+      <%  if permitted_to? :new, :store_items %><li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('new_text')}", new_store_item_path %> </li><%  end %>
+    </ul>
+  </div>
+
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+
+  <% form_tag store_items_path, :method => 'get' do %>
+    <div class="label-field-pair">
+      <label><%= "#{t('search_by_store_item')}" %></label><%= image_tag('loader.gif', :align => 'absmiddle', :border=> 0, :id=>'loader', :style=>'display: none;') %>
+      <div class="text-input-bg">
+        <% if params[:search_store]==nil%>
+          <%= select :store_items, :action, @stores.map { |m| [m.name, m.id]}.push(["#{t('select_all')}","All"]),{ :prompt=> "#{t('select_store')}" },{:onChange => "#{remote_function(:url => {:action => "index"},
+            :with => "'search_store='+value",:before => "$('loader').show();",
+            :success => "$('loader').hide();")}"}  %>
+        <% elsif params[:search_store]=="All" %>
+          <%= select :store_items, :action, @stores.map { |m| [m.name, m.id]}.push(["#{t('select_all')}","All"]),{ :prompt=> "#{t('select_all')}" },{:onChange => "#{remote_function(:url => {:action => "index"},
+            :with => "'search_store='+value",:before => "$('loader').show();",
+            :success => "$('loader').hide();")}"}  %>
+        <% else %>
+          <%= select :store_items, :action, @stores.map { |m| [m.name, m.id]}.push(["#{t('select_all')}","All"]),{ :prompt=> params[:search_store] },{:onChange => "#{remote_function(:url => {:action => "index"},
+            :with => "'search_store='+value",:before => "$('loader').show();",
+            :success => "$('loader').hide();")}"}  %>
+        <% end %>
+      </div>
+      <div id="search-container">
+        <%= text_field_tag('query', params[:query], :autocomplete => 'off') %><br/>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function search_ajax(){
+        if ($('query').value.include("%")) return;
+  <%="#{remote_function(:url =>{:action=>:index} ,
+  :with => "'query='+$('query').value + '&search_store='+j('select').val()",
+  :before => "Element.show('loader')",
+  :success => "Element.hide('loader')"
+  )}"%>
+  }
+
+  document.observe("dom:loaded", function() {
+    new Form.Element.Observer('query', 1, search_ajax);
+  });
+  
+
+    </script>
+  <% end %>
+
+
+  <div id="error_and_items">
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><span><%= flash[:warn_notice] %></  span> </div>
+    <% end %>
+
+    <div id="information"></div>
+  </div>
+</div>
+<%#= render :partial=> 'search_ajax'%>
+

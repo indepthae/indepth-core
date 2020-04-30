@@ -1,0 +1,151 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<% unless @batches.blank? %>
+  <ul id="category-list">
+    <li class="listheading">
+      <div class="heading-name">
+        <div class="category-edit">
+          <%= check_box_tag "full_batches_list", "",false%>
+        </div>
+        <%= t("batches_text") %></div>
+      <div class="heading-edit">
+      </div>
+    </li>
+    <% @batches.each do |b| %>
+      <li class="list<%=cycle('odd', 'even')%>">
+        <label>
+          <div class="category-edit">
+            <%students_list = b.is_active ? b.students.collect(&:id).join(',') : b.graduated_students.collect(&:id).join(',')%>
+            <%= check_box_tag "course[batch][#{b.id}][students]", "#{students_list}", false,{:class=>'batch_list'}%>
+            <%= hidden_field_tag "course[batch][#{b.id}][students]", "#{students_list}",{:disabled=>true,:class=>'hidden_list'}%>
+          </div>
+          <div class="category-name">
+            <%= "#{b.full_name}" %>
+          </div>
+        </label>
+        <div class="category-upscale">
+          <i></i> <%="#{b.full_upscaled_students.count}" %>
+        </div>
+        <div class="category-select_student">
+          <div id="students_<%=b.id%>" class="select_students">Select Students</div>
+          <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader_#{b.id}",:class=>'sep_loader', :style =>"display: none;" ) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <ul id="category-list">
+    <li class="listheading">
+      <div class="heading-name">No batches present</div>
+      <div class="heading-edit">
+      </div>
+    </li>
+  </ul>
+<% end %>
+<script type="text/javascript">
+  j('.select_students').click(function(){
+    var arr=[];
+    var batch_id=j(this).attr('id').split("_").last();
+    arr+=j('#course_batch_'+batch_id+'_students').attr('value');
+    if(j('#batch_students_'+batch_id).length > 0){
+      j('#student_list').children().hide();
+      j('.batch_students_'+batch_id).each(function(){
+        var student_id=j(this).attr('value');
+        if(j('#course_batch_'+batch_id+'_students').prop('checked') == true && (j.inArray(student_id, arr.split(',')) != -1)){
+          j(this).prop('checked',true);
+        }
+        else{
+          j(this).prop('checked',false);
+        }
+      });
+      if(j('.batch_students_'+batch_id+':checked').length > 0 && (j('.batch_students_'+batch_id).length == j('.batch_students_'+batch_id+':checked').length)){
+        j('#full_student_list_'+batch_id).prop('checked',true);
+      }
+      else{
+        j('#full_student_list_'+batch_id).prop('checked',false);
+      }
+      
+      j('#batch_students_'+batch_id).show();
+    }
+    else{
+      j.ajax({
+        type: 'GET' ,
+        url: "/cce_reports/get_students_list",
+        data : {
+          batch_id : j(this).attr('id').split("_").last()
+        },
+        beforeSend : function(){
+          j('#loader_'+batch_id).show();
+        },
+        success : function(resp) {
+          j('#loader_'+batch_id).hide();
+          j('#student_list').children().hide();
+          j('#student_list').append(resp);
+        }
+      });
+    }
+  });
+  j('.batch_list').bind('change', function(){
+    var batch_id=j(this).attr('id').split('_')[2]
+    if(j(this).is(':checked')){
+      if(j('.batch_list').length == j('.batch_list:checked').length)
+      {
+        j('#full_batches_list').prop('checked',true);
+      }
+      j(this).attr("value",j('input[type=hidden]#'+j(this).attr('id')).val());
+      j('.batch_students_'+batch_id).each(function(e){
+        j(this).prop('checked',true);
+      });
+      j('#full_student_list_'+batch_id).prop('checked',true)
+    }
+    else{
+      j('#batch_students_'+batch_id).hide();
+      j('.batch_students_'+batch_id).each(function(){
+        j(this).prop('checked',false);
+      });
+      j('#full_student_list_'+batch_id).prop('checked',false);
+      j('#full_batches_list').prop('checked',false);
+    }
+  });
+  j('#full_batches_list').bind('change',function(){
+    if(j(this).is(':checked')){
+      j('.batch_list').each(function(){
+        var batch_id=j(this).attr('id').split('_')[2]
+        j(this).attr("value",j('input[type=hidden]#'+j(this).attr('id')).val());
+        j('.batch_students_'+batch_id).each(function(e){
+          j(this).prop('checked',true);
+        });
+        j('#full_student_list_'+batch_id).prop('checked',true)
+        j(this).prop('indeterminate', false).prop('checked',true)
+      });
+    }
+    else{
+      j('.batch_list').each(function(){
+        var batch_id=j(this).attr('id').split('_')[2]
+        j('#batch_students_'+batch_id).hide();
+        j('.batch_students_'+batch_id).each(function(){
+          j(this).prop('checked',false);
+        });
+        j('#full_student_list_'+batch_id).prop('checked',false)
+        j(this).prop('indeterminate', false).prop('checked',false)
+      });
+    }
+  });
+</script>

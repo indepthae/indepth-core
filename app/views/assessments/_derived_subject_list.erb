@@ -1,0 +1,13 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+        <td class="col-1"><%= "#{t('subject')}" %></td>
+        <td class="actions"></td>
+    </tr>
+    <% subject_list.each do  |sub| %>
+        <tr class="tr-<%= cycle('even', 'odd') %>">
+          <td><%= sub.name %></td>
+          <td><%= link_to t('view_score'), show_derived_mark_assessments_path(:ag_id=> @assessment_group.id,:course_id => @course.id, :academic_year_id=>@academic_year.id, :sub_id=>sub.id, :batch_id=>batch_id) %></td>
+        </tr>
+    <% end %>
+</table>
+        

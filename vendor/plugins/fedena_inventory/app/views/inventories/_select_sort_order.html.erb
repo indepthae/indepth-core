@@ -1,0 +1,6 @@
+<div class="label-field-pair">
+  <label for="sort"><%= t('sort_type') %></label>
+  <div class="text-input-bg margin-left-10">
+    <%=select :status,:sort_type, [["#{t('all')}", "all"],["#{t('pending')}", "pending"],["#{t('issued')}", "issued"],["#{t('rejected')}", "rejected"] ], {}  %>
+  </div>
+</div>

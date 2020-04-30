@@ -1,0 +1,25 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('store_types') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('edit_text') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= link_to "#{t('inventory')}",:controller=>"inventories",:action=>"index" %>
+    <div class = "bread-crumb-separator"> > </div>
+    <%= link_to "#{t('store_type')}", store_types_url %>
+    <div class = "bread-crumb-separator"> > </div>
+    <%= t('edit_text') %>
+  </div>
+
+
+
+
+
+
+  <%= render :partial => 'form' %>
+
+</div>

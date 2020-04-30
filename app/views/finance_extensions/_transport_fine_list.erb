@@ -1,0 +1,49 @@
+<%total_paid_fine=0%>
+<% i = 0 %>
+<% @fee.finance_transactions_with_fine.each do |ft|%>
+  <% if total_paid_fine == 0 %>
+    <tr class="tr-blank"></tr>
+    <tr class="tr-head" cellpadding="1" cellspacing="1">
+        <td class="col-1"></td>
+        <td class="col-1 bold_font" colspan="2">
+            <span><%= t('fine') %></span>
+        </td>
+    </tr>
+  <% end %>
+  <tr class="tr-blank"></tr>
+  <tr class="tr-<%= cycle("odd", "even") %>" cellpadding="1" cellspacing="1">
+      <td class="col-1 normal_font particular_index"><%= i+=1 %></td>
+      <td class="col-2"><%= "#{t('fine_on')} #{format_date(ft.transaction_date)}" %></td>
+      <td class="col-6" id="paid-fine">
+          <%= precision_label ft.fine_amount %>
+      </td>
+      <td style="width: 1%;background: #c3d9ff"></td>
+  </tr>
+  <%total_paid_fine += ft.fine_amount%>
+<% end %>
+
+<% unless @transport_fee.is_paid %>
+  <% if @fine_rule.present? and  @fine_amount > 0  %>
+    <% if total_paid_fine == 0 %>
+      <tr class="tr-blank"></tr>
+      <tr class="tr-head" cellpadding="1" cellspacing="1">
+          <td class="col-1"></td>
+          <td class="col-1 bold_font" colspan="2">
+              <span><%= t('fine') %></span>
+          </td>
+      </tr>
+    <% end %>
+    <tr class="tr-blank"></tr>
+    <tr class="tr-<%= cycle("odd", "even") %>" cellpadding="1" cellspacing="1">
+        <td class="col-1 normal_font particular_index"><%= i+=1 %></td>
+        <td class="col-2"><%= "#{t('fine_on')} #{format_date(@date.due_date.to_date+@fine_rule.fine_days.days)} #{@fine_rule.is_amount ? "" : " (#{@fine_rule.fine_amount}&#x200E;%)" }"  %></td>
+        <td class="col-6" id="paid-fine">
+            <%= precision_label @fine_amount%>
+        </td>
+        <td style="width: 1%;background: #c3d9ff"></td>
+    </tr>
+    <tr class="tr-<%= cycle("odd", "even") %>" id="show-fine" cellpadding="1" cellspacing="1">
+    </tr>
+    <%total_paid_fine +=@fine_amount%>
+  <% end %>
+<% end %>

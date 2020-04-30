@@ -1,0 +1,43 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="stop_details">
+    <tr class="tr-head">
+        <td class="name"><%= t('stop_name') %></td>
+        <td class="landmark"><%= t('landmark') %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @vehicle_stops.empty? %>
+      <% @vehicle_stops.each do |vs|  %>
+        <tr>
+            <td><%= vs.name %></td>
+            <td><%= vs.landmark%></td>
+            <td>
+                <%= link_to_remote t('edit'), :url => edit_vehicle_stop_path(vs), :method => :get  %>
+                <% if vs.route_stops.empty? %>
+                  <%= link_to t('delete'), delete_stop_vehicle_stop_path(vs, :active_status => params[:active_status]), 
+                  :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_stop_confirmation', {:name => vs.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_stop')}', 'popup_class' : 'delete_confirmation'}); " %>
+                <% else %>
+                    <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                  <% end %>
+                <% if vs.is_active %>
+                  <%= link_to t('inactivate'), inactivate_stop_vehicle_stop_path(vs, :active_status => params[:active_status]) %>
+                <% else %>
+                  <%= link_to t('activate'), activate_stop_vehicle_stop_path(vs, :active_status => params[:active_status]) %>
+                <% end %>
+            </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4">
+              <% if params[:active_status] == "1" %>
+                  <%= t('create_a_vehicle_stop') %>
+                <% else %>
+                  <%= t('no_inactive_stops_preesent') %>
+                <% end %>
+          </td>
+      </tr>
+    <% end %>
+</table>
+<% if @vehicle_stops.present? %>
+  <%= pagination_status(@vehicle_stops) %>
+<% end %>
+<%= will_paginate @vehicle_stops, :params=>{:action => "index", :active_status => params[:active_status]} %>

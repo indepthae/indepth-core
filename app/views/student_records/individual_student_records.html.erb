@@ -1,0 +1,38 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_records') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('batch_wise_student_records') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :student_records_individual_student_records,@student%>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="hider">
+    <% unless flash[:notice].nil? %>
+      <p id="flash-msg"class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div id="page_informer"><%=t('batch_wise_student_records')%></div>
+  <div id="desc_text"><%=t('individual_records_desc')%></div>
+  <div id="student_informer">
+    <div id="student_name_info">
+      <div class="slabel"><%=t('student_name')%> :</div>
+      <div class="svalue"><%=@student.full_name%></div>
+    </div>
+    <div id="student_admission_no_info">
+      <div class="slabel"><%=t('admission_no')%> :</div>
+      <div class="svalue"><%=@student.admission_no%></div>
+    </div>
+  </div>
+  <div class="content_student_record">
+    <div id="student_list">
+      <%= render  :partial=>"batches_list" %>
+    </div>
+    <div id="student_record">
+      <%=render :partial=> 'individual_student_records'%>
+    </div>
+  </div>
+</div>
+

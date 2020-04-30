@@ -1,0 +1,26 @@
+<%  f.fields_for :grn_items do |i| %>
+  <div class="fields" >
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+      <% if f.object._destroy == true %>
+        <tr class="grn_item_row" style="display:none">
+        <% else %>
+        <tr class="grn_item_row">
+        <% end %>
+        <td class="text-input" id="person_store_item_id" >
+          <%= text_field_tag "" , i.object.store_item.item_name , :disabled => true%>
+        </td>
+        <%= i.hidden_field :store_item_id %>
+        <td class="text-input"><%= i.text_field :quantity %></td>
+        <td class="text-input"><%= i.text_field :unit_price,:value=>precision_label(i.object.unit_price) ,:class => "nested_qty",:readonly => true, :class=>'precision_text' %></td>
+        <td class="text-input"><%= i.text_field :discount,:value=>precision_label(i.object.discount),:readonly => true, :class=>'precision_text' %></td>
+        <td class="text-input"><%= i.text_field :tax,:value=>precision_label(i.object.tax),:readonly => true, :class=>'precision_text' %></td>
+        <td class="text-input custom_calendar_field" >
+          <%= i.calendar_date_select :expiry_date,:popup => :force,:value => I18n.l(Date.today,:format=>:default),:year_range => 15.years.ago..5.years.from_now, :time => false, :readonly=>true %>
+        </td>
+        <td id="remove"> <%= link_to_remove_fields image_tag("/images/buttons/Delete.png",:border => 0) , i %>
+        </td>
+      </tr>
+    </table>
+  </div>
+<% end %>

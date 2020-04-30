@@ -1,0 +1,50 @@
+<!-- , :before=>"$('submit_button').disable()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)" -->
+<% remote_form_for @receipt_set, 
+  :url => @receipt_set.new_record? ? receipt_sets_path : receipt_set_path(@receipt_set),     
+  :before=>"$('submit_button').disable(); 
+$('submit_button').value='#{t('please_wait')}'; $('cancel_button')", 
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+
+  <%= session_fingerprint_field %> 
+
+  <div id="receipt_set_form">
+      <div id ="description">
+          <%= t("receipt_set_#{@receipt_set.new_record? ? 'create' : 'update'}_description") %>          
+      </div>
+      <div class="label-field-pair">
+          <%= f.label :name  %>
+          <div class="text-input-bg">
+              <%= f.text_field :name %>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <%= f.label :sequence_prefix  %>
+          <div class="text-input-bg">
+              <%= f.text_field :sequence_prefix, :value => @receipt_set.sequence_prefix || "" %>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <%= f.label :starting_number %>
+          <div class="text-input-bg">
+              <%= f.text_field :starting_number, :value => @receipt_set.starting_number || "" %>
+          </div>
+      </div>
+  </div>
+
+  <div id="popup_footer">
+      <%= submit_tag  t("#{@receipt_set.new_record? ? 'create' : 'update'}_receipt_set"), 
+        :class => "submit-button", :id => "submit_button" %>
+      <div id="cancel_button" class="submit-button" onclick="remove_popup_box();">
+          <%= t('cancel') %>
+      </div>
+  </div>
+
+<% end %>
+
+<script type="text/javascript">
+
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+
+</script>

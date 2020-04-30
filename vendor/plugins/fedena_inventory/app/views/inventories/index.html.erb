@@ -1,0 +1,115 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('inventory') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="box">
+
+
+    <%  if permitted_to? :index,:store_categories %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('store_category')}", store_categories_path %>   </div>
+        <div class="link-descr"><%= t('store_category_create') %></div>
+      </div>
+    <%  end %>
+
+    <%  if permitted_to? :index, :store_types %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('store_type')}", store_types_path %>  </div>
+        <div class="link-descr"><%= t('store_type_create') %></div>
+      </div>
+    <%  end %>
+
+    <%  if permitted_to? :index, :stores %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('store')}", stores_path %> </div>
+        <div class="link-descr"><%= t('store_create') %></div>
+      </div>
+    <%  end %>
+
+    <%  if permitted_to? :index, :item_categories %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('item_category')}", item_categories_path %>   </div>
+        <div class="link-descr"><%= t('item_category_create') %></div>
+      </div>
+    <% end %>
+    <%  if permitted_to? :index, :store_items %>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('store_items')}", store_items_path %>  </div>
+      <div class="link-descr"><%= t('store_item_create') %></div>
+    </div>
+    <% end %>
+
+
+    <%  if permitted_to? :index, :supplier_types %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('supplier_type')}", supplier_types_path %>  </div>
+        <div class="link-descr"><%= t('supplier_type_create') %></div>
+      </div>
+    <% end %>
+
+    <%  if permitted_to? :index, :suppliers %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('supplier')}", suppliers_path %>  </div>
+        <div class="link-descr"><%= t('supplier_create') %></div>
+      </div>
+    <% end %>
+
+    <% if permitted_to? :index, :indents %>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('indent')}", indents_path %>  </div>
+      <div class="link-descr"><%= t('indent_create') %></div>
+    </div>
+    <% end %>
+
+
+    <%  if permitted_to? :index,:purchase_orders %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('purchase_order')}", purchase_orders_path %>  </div>
+        <div class="link-descr"><%= t('po_create') %></div>
+      </div>
+    <% end %>
+
+    <%  if permitted_to? :index, :invoices %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('billing')}", invoices_path %>  </div>
+        <div class="link-descr"><%= t('create_invoice') %></div>
+      </div>
+    <% end %>
+    <%  if permitted_to? :index, :grns %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('grn')}", grns_path %>  </div>
+        <div class="link-descr"><%= t('grn_create') %></div>
+      </div>
+    <% end %>
+    
+    <%  if permitted_to? :index, :inventory_reports %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('reports_text')}",{:action=>'index', :controller => 'inventory_reports'} %>  </div>
+        <div class="link-descr"><%="#{t('generate')} #{t('reports_text')}" %></div>
+      </div>
+    <% end %>
+    <% if permitted_to? :taxable_discount_settings ,:inventories %>
+      <div class="link-box">
+        <div class="link-heading">
+        <%= link_to_remote "#{I18n.t('tax_settings')}", :url => { :action => 'taxable_discount_settings'} %>
+      </div>
+      <div class="link-descr"> <%=I18n.t('tax_settings_description') %></div>
+      </div>
+    <% end %>
+    <div class="extender"></div>
+  </div>
+</div>
+<div id="modal-box" style="display:none;"></div>

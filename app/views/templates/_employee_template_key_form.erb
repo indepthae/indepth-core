@@ -1,0 +1,38 @@
+<div id="template_key_app">
+<div class="field_section">
+  <div class="field_head">
+    <%= t('select_employee')%>
+  </div>
+  <div class="field">
+    <%= select "", "students",
+    options_for_select(@employees.map{|e| [e.full_name,e.id]}) ,{:include_blank=>t('select_employee')}, :class=>"input_box", :id=>"user_selector"%>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+
+</div>
+
+<script>
+j("#user_selector").change(function(){
+  j.ajax({
+    url: "/templates/set_employee_keys",
+    type: 'POST',
+    data:  {
+      base_template_id: <%= @base_template.id%>,
+      <%= "combine_template_id: #{@combine_template.id}, " if @combine_template.present? %>
+      employee_id: j(this).val()
+    },
+    success: function(data, textStatus, jqXHR)
+    {
+    },
+    error: function(jqXHR, textStatus, errorThrown)
+    {
+    }
+  });
+});
+
+<%= render "/templates/set_common_keys.js.erb"%>
+
+
+</script>

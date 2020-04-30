@@ -1,0 +1,71 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('suppliers') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('show') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'>
+        <%= link_to "#{t('edit')}",   edit_supplier_path(@supplier) %>
+      </li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :suppliers_show,@supplier %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+
+
+
+
+
+  <table width="650" align="center">
+    <tr class="odd left"><td><%= t('supplier_type') %></td>
+      <td class="right"> <%=h @supplier.supplier_type.name%></td>
+    </tr>
+    <tr class="even left">
+      <td><%= t('name') %></td>
+      <td class="right"><%=h @supplier.name %></td>
+    </tr>
+    <tr class="odd left">
+      <td><%= t('contact_no') %></td>
+      <td class="right"><%=h @supplier.contact_no %></td>
+    </tr>
+    <tr class="even left">
+      <td><%= t('address') %></td>
+      <td class="right"><%=h @supplier.address %> </td>
+    </tr>
+
+    <tr class="odd left">
+      <td><%= t('tin_no') %></td>
+      <td class="right"><%=h @supplier.tin_no %></td>
+    </tr>
+    <tr class="even left">
+      <td><%= t('region') %></td>
+      <td class="right"><%=h @supplier.region %></td>
+    </tr>
+
+    <tr class="odd left">
+      <td><%= t('help_desk') %></td>
+      <td class="right"> <%=h @supplier.help_desk %></td>
+    </tr>
+
+  </table>
+
+
+  <div class="extender"></div>
+
+</div>
+
+
+

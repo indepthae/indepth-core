@@ -1,0 +1,97 @@
+<div id="page-yield" class="available_sections">
+    <div class="section" >
+        <center>
+            <div class="hor_line"></div>
+            <h2><%= "#{t('exam_timetable')}" %></h2>
+            <div class="hor_line"></div>
+        </center>
+    </div>
+
+
+    <div class="section" >
+        <div id ="info">
+            <div class="<%= cycle('info-left', 'info-right') %>">
+                <div class="info1">
+                    <label class="field-label"><%= t('course') %></label><span>: </span>
+                    <label class="infolbl"><%= @data_hash[:course].course_name %></label>
+                </div>
+            </div>
+            <% unless @data_hash[:batch].present? %>
+              <div class="<%= cycle('info-left', 'info-right') %>">
+                  <div class="info1">
+                      <label class="field-label"><%= t('batches_text') %></label><span>: </span>
+                      <label class="infolbl"><%= @data_hash[:course].batches_in_academic_year(@data_hash[:assessment_group].academic_year_id).count %></label>
+                  </div>
+              </div>
+              <div class="<%= cycle('info-left', 'info-right') %>">
+                  <div class="info1">
+                      <label class="field-label"><%= t('students') %></label><span>: </span>
+                      <label class="infolbl"><%= @data_hash[:course].active_students_in_academic_year(@data_hash[:assessment_group].academic_year_id).count %></label>
+                  </div>
+              </div>
+            <% else %>
+              <div class="<%= cycle('info-left', 'info-right') %>">
+                  <div class="info1">
+                      <label class="field-label"><%= t('batches_text') %></label><span>: </span>
+                      <label class="infolbl"><%= @data_hash[:batch].name %></label>
+                  </div>
+              </div>
+              <div class="<%= cycle('info-left', 'info-right') %>">
+                  <div class="info1">
+                      <label class="field-label"><%= t('students') %></label><span>: </span>
+                      <label class="infolbl"><%= @data_hash[:batch].students.count  %></label>
+                  </div>
+              </div>
+            <% end %>
+            <div class="<%= cycle('info-left', 'info-right') %>">
+                <div class="info1">
+                    <label class="field-label"><%= t('exam_group') %></label><span>: </span>
+                    <label class="infolbl"><%=  @data_hash[:assessment_group].name %></label>
+                </div>
+            </div>
+            <div class="<%= cycle('info-left', 'info-right') %>">
+                <div class="info1">
+                    <label class="field-label"><%= t('maximum_marks') %></label><span>: </span>
+                    <label class="infolbl"><%=  @data_hash[:assessment_group].maximum_marks_text %></label>
+                </div>
+            </div>
+            <div class="<%= cycle('info-left', 'info-right') %>">
+                <div class="info1">
+                    <label class="field-label"><%= t('term_text') %></label><span>: </span>
+                    <label class="infolbl"><%=  @data_hash[:assessment_group].parent.name %></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section row" id="table-headers" >
+        <center>
+            <table id="pdf-table" width="100%">
+                <tr class="table-header">
+                    <td class = "date"><%= "#{t('date_text')}" %></td>
+                    <td class = "time"><%= "#{t('time_text')}" %></td>
+                    <td class = "subject"><%= "#{t('subject')} #{(@data_hash[:batch].present? ? ("- " + @data_hash[:batch].name) : '')}" %></td>
+                </tr>
+                <% unless @data_hash[:assessments].blank? %>
+                  <% @data_hash[:assessments].each do |batch,timetables| %>
+                    <% unless @data_hash[:batch].present? %>
+                      <tr class="even">
+                          <td colspan = "6" class="sub-head">
+                              <%= batch.name %>
+                          </td>
+                      </tr>
+                    <% end %>
+                    <% timetables.each do |exam| %>
+                      <tr class="even">
+                          <td class = "date"><%= format_date(exam.exam_date, :format => :long_date_and_date) %></td>
+                          <td class = "time"><%= "#{format_date(Time.parse(exam.start_time), :format => :time )} #{t('to')} #{format_date(Time.parse(exam.end_time), :format => :time )}" %></td>
+                          <td class = "subject"><%= "#{exam.subject_name} #{exam.elective_group_id.present? ? '&#x200E;('+ t('elective') +')&#x200E;' : ''}" %></td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+            </table>
+        </center>
+    </div>
+</div>

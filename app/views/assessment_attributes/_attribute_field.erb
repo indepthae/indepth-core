@@ -1,0 +1,12 @@
+<div class="activity_strip">
+    <% unless f.object.marked_for_destruction? %>
+      <div class="label"><%=f.text_field :name%></div>
+      <div class="label small"><%=f.text_field :maximum_marks, :class=>'max_mark_field',:onblur=> "return validate_mark(this)", :onkeypress => "return isNumberKey(event,this)"%></div>
+      <div class="field">
+          <%=f.hidden_field :_destroy, :value=> 0 %>
+          <div class="remove_field" onclick="remove_field(this);"></div>
+      </div>
+    <% else %>
+      <%=f.hidden_field :_destroy %>
+    <% end %>
+</div>

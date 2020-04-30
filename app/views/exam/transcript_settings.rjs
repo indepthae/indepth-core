@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'transcript_settings'
+page << "Modalbox.show($('modal-box'), {title: '#{t('transcript_settings')}', width: 740});"

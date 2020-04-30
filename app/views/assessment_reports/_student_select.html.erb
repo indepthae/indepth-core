@@ -1,0 +1,22 @@
+<div class="label-field-pair student-select-container">
+    <label for="batch_id"><%= t('student_text') %></label>
+    <div class="text-input-bg margin-left-10">
+        <% unless @is_student_report %>
+          <%= select :assessment, :student,
+            options_for_select(@students.map {|s| [s.full_name, s.s_id]}),
+            {:include_blank =>t('select_student')},
+            {:onChange => "#{remote_function(:url => {:action => "refresh_report"},
+            :with => "'student_id='+ value +'&exam_type=#{exam_type}'+'&reportable_id=#{reportable_id}'+'&batch_id=#{@batch.id}'+'&plan_id=#{@plan.id}'+'&term_id=#{@term.id}'",
+            :before => "Element.show('loader2')",
+            :success => "Element.hide('loader2')"
+            )}"} %> <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader2",
+            :style =>"display: none;" ) %>
+        <% else %>
+          <span class="student_details">: <%= @student.full_name %></span>
+        <% end %>
+    </div>
+
+</div>

@@ -1,0 +1,30 @@
+<% if grade_set.grades.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td class="col4"><%= "#{t('grade_name')} &#x200E;(#{grade_set.grades.length})&#x200E;" %></td>
+          <% unless grade_set.direct_grade? %>
+            <td class="col5"><%= t('minimum_score') %></td>
+            <% if grade_set.enable_credit_points? %>
+              <td class="col6"><%= t('credit_points') %></td>
+            <% end %>
+          <% end %>
+          <td class="col7"><%= t('result') %></td>
+          <td class="col3"><%= t('description') %></td>
+      </tr>
+      <% grade_set.grades.each do |grade|  %>
+        <tr>
+            <td><%= grade.name %></td>
+            <% unless grade_set.direct_grade? %>
+              <td><%= grade.minimum_marks %></td>
+              <% if grade_set.enable_credit_points? %>
+                <td><%= grade.credit_points %></td>
+              <% end %>
+            <% end %>
+            <td><%= grade.result_text %></td>
+            <td><%= grade.description %></td>
+        </tr>
+      <% end %>
+  </table>
+<% else %>
+  <div id="description"><%= t('no_grades_added') %></div>
+<% end %>

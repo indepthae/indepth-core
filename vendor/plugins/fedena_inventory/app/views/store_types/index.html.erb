@@ -1,0 +1,78 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('store_types') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('home') %></div>
+  <div id="inner-tab-menu"></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+  <% unless flash[:warn_notice].nil? %>
+    <div id="errorExplanation" class="errorExplanation"><span><%= flash[:warn_notice] %></span></div>
+  <% end %>
+
+
+
+
+  <% form_for(@store_type) do |f| %>
+
+    <%= f.error_messages %>
+    <div id="form-content">
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('name')}" %><span class="necessary-field">*</span></div>
+        <div class="input-container"><%= f.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <div class="label-container1"><%= "#{t('code')}" %><span class="necessary-field">*</span></div>
+        <div class="input-container"><%= f.text_field :code %></div>
+      </div>
+
+
+      <div id="submit-button">
+        <%= submit_tag "", :value => "► #{t('save')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+      </div>
+    <% end %>
+
+    <div class="extender"></div>
+  </div>
+
+
+
+
+
+
+  <div class="box">
+
+
+    <ul id="category-list">
+      <% unless @store_types.empty? %>
+        <li class="listheading"><div class="category-name"><%= "#{t('store_types')}" %></div></li>
+        <% @store_types.each do |store| %>
+          <li class="list<%=cycle('odd', 'even')%>">
+            <div class="category-name"><%= store.name %></div>
+            <div class="category-code"><%=  store.code %></div>
+            <div class="category-edit"><%= link_to t('edit_text'),  edit_store_type_path(store) if permitted_to? :edit, :store_types %></div>
+            <div class="category-delete"><%= link_to(t('delete_text'), store_type_path(store), :method => 'delete', :confirm => "#{t('delete_confirm_msg')}") if permitted_to? :destroy, :store_types %></div>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+    <div class="extender"></div>
+  </div>
+</div>
+
+
+
+
+

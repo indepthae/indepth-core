@@ -1,0 +1,37 @@
+<% if @categorized_particulars.present? or @categorized_discounts.present? %>
+    <% remote_form_for :manage_masters, :url => {:action => "manage_masters"},
+                       :html => {:class => 'manage_masters_form'} do |f| %>
+        <%= session_fingerprint_field %>
+        <%= hidden_field_tag :student_id, @student.id if @student.present? %>
+        <%= hidden_field_tag :batch_id, @batch.id if @batch.present? %>
+        <%= hidden_field_tag :fee_type, @fee_type if @fee_type.present? %>
+        <%= hidden_field_tag :cat_id, @category.id if @category.present? %>
+        <div id="manage_masters_form">
+          <div id="masters_data"></div>
+
+          <% if (@categorized_particulars.present? and @categorized_particulars.keys.include?('core')) ||
+                  (@categorized_discounts.present? and @categorized_discounts.keys.include?('core')) %>
+              <%= render :partial => "master_fees/linking_categories/core_fee" %>
+          <% end %>
+
+          <% if @categorized_particulars.present? and @categorized_particulars.keys.include?('instant') %>
+              <%= render :partial => "master_fees/linking_categories/instant_fee" %>
+          <% end %>
+
+          <% if (@categorized_particulars.present? and @categorized_particulars.keys.include?('transport')) ||
+                  (@categorized_discounts.present? and @categorized_discounts.keys.include?('transport')) %>
+              <%= render :partial => "master_fees/linking_categories/transport_fee" %>
+          <% end %>
+
+          <% if @categorized_particulars.present? and @categorized_particulars.keys.include?('hostel') %>
+              <%= render :partial => "master_fees/linking_categories/hostel_fee" %>
+          <% end %>
+
+        </div>
+
+        <%= f.submit t('submit'), :class => "submit-button", :id => "submit_button" %>
+
+    <% end %>
+<% else %>
+    Nothing to link
+<% end %>

@@ -1,0 +1,88 @@
+<%= session_fingerprint_field %>
+<div class="category_section">
+  <div class="label-field-pair">
+    <label for="category_name"><%= t('payroll_category_name') %></label>
+    <div class="text-input-bg"><%= c.text_field :name %></div>
+  </div>
+
+  <div class="label-field-pair cat-code">
+    <label for="category_name"><%= t('category_code') %></label>
+    <div class="text-input-bg"><%= c.text_field :code %>
+    </div>
+    <div class="category_attr_description description"><%= t('category_code_desc') %></div>
+  </div>
+
+  <div class="label-radio-pair">
+    <label class="status" for="status"><%= t('category_type') %></label>
+    <% cat_dependency = c.object.employee_salary_structure_components.present? or c.object.employee_payslip_categories.present? %>
+    <div id="radio-buttons">
+      <%= c.radio_button  "is_deduction", "false", :checked => "checked"%>
+      <label for="payroll_category_is_deduction_false"><%= t('earnings') %></label>
+
+      <%= c.radio_button  "is_deduction", "true"%>
+      <label for="payroll_category_is_deduction_true"><%= t('deductions') %></label>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="formula_section">
+  <h3><%= t('category_value') %></h3>
+  <div class="description" id ="formula_desc"><%= t('category_value_desc') %></div>
+  <div id="cat-val-sec">
+    <% c.fields_for :hr_formula do |f| %>
+      <% form_obj = f.object %>
+      <div class="label-field-pair" id="value_type">
+        <label for="percentage_of"><%= t('value_type') %></label>
+        <div class="text-input-bg">
+          <%= f.select :value_type, HrFormula::VALUE_TYPE.map {|key, value| [t(value), key]}, {:include_blank => t('select_value_type')}, :onchange => "render_formula_partial(this,'#{f.object_name}')"%>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+      </div>
+      <div id="formula-fields">
+        <div id ="fields">
+          <% case form_obj.value_type.to_i
+          when 1 %>
+            <%= render :partial => 'payroll_categories/numeric_value_field', :locals => {:object_name => f.object_name, :hr_formula => @category.hr_formula} %>
+          <% when 2 %>
+            <%= render :partial => 'payroll_categories/formula_field', :locals => {:object_name => f.object_name, :hr_formula => @category.hr_formula} %>
+          <% when 3 %>
+            <%= render :partial => 'payroll_categories/formula_with_condition', :locals => {:object_name => f.object_name, :hr_formula => @category.hr_formula} %>
+          <% end %>
+        </div>
+        <div class="formula_help" style ="display: <%= (form_obj.value_type.nil? or form_obj.value_type.to_i == 1) ? 'none' : 'block' %>">
+          <%= render :partial => "formula_help" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>
+<div class="label-field-pair" id="enable-round-off">
+    <div>
+        <label><%= t('round_off_category_pay') %></label>
+        <%= check_box "", :to_round_up, :checked => @enable_round_off == "1" , :onChange=>"to_show_select()"%>
+    </div>
+</div>
+<div class="label-field-pair" id="rounding-type">
+    <label for="percentage_of"><%= t('rounding_type') %></label>
+    <div class="text-input-bg">
+        <%= c.select :round_off_value, PayrollCategory::ROUND_OFF.except(1).map {|key,value| [t(value) , key]}, {:include_blank => t('select_rounding_type')} %>
+    </div>
+</div>
+<script type="text/javascript">
+  j("#rounding-type").hide();
+    function to_show_select(){
+      if(j('#_to_round_up').is(":checked"))
+        j("#rounding-type").show();
+      else{
+        j("#rounding-type").hide();
+        j("#payroll_category_round_off_value").val(0);
+      }
+    }
+    j(document).ready(function(){
+     if(j('#_to_round_up').is(":checked"))
+        j("#rounding-type").show(); 
+  });
+</script>

@@ -1,0 +1,21 @@
+<%if @result.present? %>
+  <div id="column_div">
+        <%= link_to_remote "#{t('customize_columns')}", :url => {:action => "fetch_columns", :type => @type, :search => @search_params, :columns => @selected_columns}, :html => {:id => 'column_link'} %>
+  </div>
+  <div id="report_section">
+      <%= render :partial => "#{@type}" %>
+      <% if @result.present? %>
+        <%= pagination_status(@result) %>
+      <% end %>
+      <%= will_paginate @result, :renderer => 'RemoteLinkRenderer', :params => {:type => @type, :search => @search_params, :columns => @selected_columns} %>
+      <div id="buttons">
+          <% if @type == "transport_fee_report" %>
+            <%= link_to "#{t('csv_report')}", {:action => "report_csv", :csv_report_type => "transport",:report_format_type => "csv",:type => @type, :search => @search_params, :columns => @selected_columns},:class => "submit-button",:target => '_blank'%>
+          <%else%>
+            <%= link_to "#{t('csv_report')}", {:action => "report_csv", :csv_report_type => "transport",:report_format_type => "csv",:type => @type, :search => @search_params, :columns => @selected_columns},:class => "submit-button"%>
+          <%end%>
+      </div>
+  </div>
+<% else %>
+  <p class="flash-msg"> <%= t('no_reports') %> </p>
+<% end %>

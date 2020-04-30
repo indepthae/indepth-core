@@ -1,0 +1,80 @@
+<% if @route.present? %>
+  <hr/>
+  <div class="vehicle_details">
+      <div class="field_details">
+          <div class="field_name"><%= t('vehicle') %></div>
+          <div class="field_val"><%= @route.vehicle.try(:vehicle_no)||"-" %></div>
+      </div>
+      <div class="field_details">
+          <div class="field_name"><%= t('transport_employees.driver') %></div>
+          <div class="field_val"><%= @route.driver.try(:first_and_last_name)||"-" %></div>
+      </div>
+      <div class="field_details">
+          <div class="field_name"><%= t('total_capacity') %></div>
+          <div class="field_val"><%= @route.vehicle.try(:no_of_seats)||"-" %></div>
+      </div>
+  </div>
+  <% form_for @attendance_form, :url => {:controller => 'transport_attendance', :action => 'create'} do |f| %>
+    <%= session_fingerprint_field %>
+    <% marked =  @attendance_form.transport_attendances.select{|a| a.marked == 1 } %>
+    <% disabled =  @attendance_form.transport_attendances.select{|a| !a.disable_mark } %>
+    <div class="label_pair">
+        <%= f.check_box :all_present, :checked => @attendance_form.all_present, :disabled => (marked.present? or disabled.empty?), :id => 'all_present', :onchange => "enable_submit()" %>
+        <label class="general_label" for="all_present"><%= t('all_present') %></label>
+    </div>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="passenger_listing">
+        <tr class="tr-head">
+            <td class="col-1"><%= t('no_text') %></td>  
+            <td class="col-2"><%= (@attendance_form.passenger == 'Student' ? t('student_name') : t('employee_name')) %></td>  
+            <td class="col-3"><%= (@attendance_form.passenger == 'Student' ? t('batch') : t('employee_department')) %></td>  
+            <td class="col-4"><%= t('routes.stop') %></td>
+            <td class="col-5"><%= t('mark_absent') %></td>
+        </tr>
+
+        <% if @attendance_form.transport_attendances.present? %>
+          <%= f.hidden_field :attendance_date %>
+          <%= f.hidden_field :route_id %>
+          <%= f.hidden_field :route_type %>
+          <%= f.hidden_field :passenger %>
+          <% i = 1 %>
+          <% attendances = @attendance_form.transport_attendances.sort_by{|at| at.name.downcase} %>
+          <% f.fields_for :transport_attendances, attendances do |ta| %>
+            <% attendance = ta.object %>
+            <tr class="<%= ('disable_mark' if attendance.disable_mark) %>" onclick="<%= ('mark_attendance(this)' unless attendance.disable_mark) %>">
+                <td><%= i %></td>
+                <td><%= attendance.name %></td>
+                <td><%= attendance.dept %></td>
+                <td><%= attendance.stop %></td>
+                <td class="icon">
+                    <%= ta.hidden_field :attendance_date %>
+                    <%= ta.hidden_field :receiver_id %>
+                    <%= ta.hidden_field :receiver_type %>
+                    <%= ta.hidden_field :route_id %>
+                    <%= ta.hidden_field :route_type %>
+                    <%= ta.hidden_field :marked, :class => 'mark_attendance', :disble_mark => attendance.disable_mark %>
+                    <% unless attendance.disable_mark %>
+                      <span class="<%= ('marked' if attendance.marked == 1) %> mark_icon" ></span>
+                    <% end %>
+                </td>
+            </tr>
+            <% i += 1 %>
+          <% end %>
+        <% else %>
+          <tr><td colspan="5">  <%=t('transport.no_passengers_found')%> </td></tr>
+        <% end %>
+    </table>
+    <% marked = @attendance_form.transport_attendances.select{|a| a.marked == 1}.count %>
+    <div class="field_details selected">
+        <div class="field_name"><%= t('absentees') %> :</div>
+        <div class="field_val selected_count"><%= marked %></div>
+    </div>
+    <div id="disable_note"><%= t('attendance_marking_disable_note') %></div>
+    <%= f.submit t('save_attendance'), :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button", :disabled => true %>
+  <% end %>
+<% else %>
+  <% if params[:search][:attendance_date].to_date > Date.today %>
+    <p class="flash-msg"> <%= t('future_attendance_cannot_be_marked') %> </p>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_route_selected') %> </p>
+  <% end %>
+<% end %>

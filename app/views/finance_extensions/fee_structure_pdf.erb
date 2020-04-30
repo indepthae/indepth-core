@@ -1,0 +1,32 @@
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/finance/generate_fee_receipt_pdf.css', :media => "all" %>
+  <% else %>
+    <%= stylesheet_link_tag 'finance/generate_fee_receipt_pdf.css', :media => "all" %>
+  <% end %>
+<% end %>
+
+<% total_fees =0 %>
+<div id="page-yield">
+    <%= render :partial => 'fee_structure_header' %>
+    <div class="subsection">
+        <div class="light_hor_line"></div>
+        <div id="sub_text_left"><%= t('particulars') %></div>
+        <div id="sub_text_right"><%= t('amount') %> (<%= @inv_data["currency"] %>)</div>
+        <div class="light_hor_line"></div>
+        <div class="extender"></div>
+    </div>
+    <%= render :partial=>"#{@inv_data['finance_type'].underscore}_structure_data",
+      :locals=>{:total_fees=>total_fees}%>
+    <div class="small_hor_line"></div>  
+    <div id="pdf-footer-second">
+        <div class="note_part"><%= @config[:pdf_receipt_custom_footer] %></div>    
+        <div class="signature_part">
+            <% if @config[:pdf_receipt_signature].present? and @config[:pdf_receipt_signature]=="1" %>
+              <%= @config[:pdf_receipt_signature_name].blank? ? t('signature') :  @config[:pdf_receipt_signature_name] %>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="page-break"></div>
+

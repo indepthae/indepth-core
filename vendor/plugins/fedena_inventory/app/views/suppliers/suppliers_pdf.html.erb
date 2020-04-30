@@ -1,0 +1,104 @@
+ <div id="page-yield" class="available_sections1">
+  <div class="page1"></div>
+  <div class="section1 row" >
+    <div class="hor_line"></div>
+    <h2><%= "Suppliers" %></h2>
+    <div class="hor_line"></div>
+    <div class="extender"> </div>
+  </div>
+  <div class="section1 row" id="table-headers" >
+    <center>
+ <table id="pdf-table" align="center" width="100%" cellspacing="0">
+      <tr class="table-header">
+        <td class= "col-pdf sl_no">
+          <%= t('sl_no') %></td>
+
+        <td class="col-pdf name">  <%= t('supplier_name') %></td>
+        <td class= "col-pdf type">
+          <%= t('supplier_type') %>
+        </td>
+        <td class= "col-pdf contact">
+          <%= t('contact_no') %>
+        </td>
+        <td class= "col-pdf tin">   <%= t('tin_no') %></td>
+        <td class ="col-pdf region">   <%= t('region') %></td>
+      </tr>
+      </table>
+      </center>
+      </div>
+      <% i = 0%>
+      <%  @suppliers.each do |s| %>
+        <% c= cycle('odd', 'even')%>
+
+      <div class="section1 row" >
+    <center>
+      <table id="pdf-table" width="100%" cellspacing="0">
+        <tr class="<%= "#{c}" %>">
+          <td class="sl_no"><%= i+=1 %></td>
+          <td class="name"><%=  s.name %></td>
+          <td class="type"><%=  s.supplier_type.name unless s.supplier_type.nil?   %></td>
+          <td class="contact"><%= s.contact_no  %></td>
+          <td class="tin"><%= s.tin_no  %></td>
+          <td class="region"><%= s.region %></td>
+
+          
+
+        </tr>
+        </table>
+        </center>
+        </div>
+      <% end %>
+      </div>
+
+    
+<% if params[:page_height] %>
+  <script type="text/javascript">
+    var body = document.body,
+    html = document.documentElement;
+    var pg_height = parseInt(<%= params[:page_height] %>);
+    var header = $("table-headers")
+    var page = new Element('div',{'class' : 'page1'});
+    var pageBreak = new Element('div',{'class' : 'page-break1'});
+    var insertPageBreak = function(){body.appendChild(pageBreak.cloneNode(true))};
+    var insertPage = function(){body.appendChild(page.cloneNode(true));};
+    var currPage = function(){return $$('.page1').last()};
+    var insertHeader = function(){
+      header1 = header.cloneNode(true);
+      header1.style.marginTop="50px";
+      currPage().appendChild(header1.cloneNode(true));};
+    var current_page_height=0;
+    var i=0
+    $$('.available_sections1 .section1').each(function(el){
+      a = parseInt(el.getHeight());
+      //el.innerHTML = a + el.innerHTML;
+      try{
+        var height_element = el.children[0].children[0]
+        if(height_element.id=="pdf-table")
+        {
+          height_element.style.height=a+"px";
+        }
+      }
+      catch(e){
+
+      }
+      c=current_page_height+a;
+      current_page_height=c;
+      if(c>pg_height){
+        current_page_height=a
+        body.appendChild(new Element('div',{'id' : 'page-blank_'+i, 'class' : 'page-blank'}))
+        document.getElementById('page-blank_'+i).style.height= (c-pg_height)+'px';
+        document.getElementById('page-blank_'+i).innerHTML="&nbsp;"/* if a div doesnt have any content it may not display.. set height will not work */
+        i+=1
+
+        //el.style.marginTop="50px"; /* for this border-top is coming, top section of each page */
+        insertPageBreak();
+        /* insertHeader(); */
+        insertPage();
+        insertHeader();
+        current_page_height = (current_page_height + header.getHeight() + 50)
+
+      }
+      currPage().appendChild(el);
+    });
+  </script>
+<% end %>      

@@ -1,0 +1,80 @@
+<% unless @owner.nil? %>
+  <% owner_object = @owner.class.name.underscore %>
+<% end %>
+<% unless owner_object.nil? %>
+  <% assign_path = "assign_package_#{owner_object}_sms_package_path" %>
+
+  <% settings_path = "edit_#{owner_object}_sms_package_path" %>
+  <% assigned_settings_path = "edit_assigned_#{owner_object}_sms_package_path" %>
+  <% if owner_object == "client_school_group" %>
+    <% header_text = "Multischool Groups and Schools" if @owner.can_create_multi_school%>
+    <% header_text = "Schools" if @owner.can_create_multi_school == false%>
+    <% link_text = "Multischool Group / School" if @owner.can_create_multi_school%>
+    <% link_text = "School" if @owner.can_create_multi_school == false%>
+  <% else %>
+    <% header_text = "Schools" %>
+    <% link_text = "School" %>
+  <% end %>
+<% else %>
+  <% assign_path = nil %>
+  <% link_text = "Client" %>
+  <% header_text = "Clients" %>
+  <% settings_path = nil %>
+<% end %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= "#{header_text} - #{@sms_package.name}" %></h1>
+  <%= link_to "Add a #{link_text}",assign_path.nil? ? assign_package_sms_package_path(@sms_package) : send(assign_path,@owner,@sms_package) ,:class => 'button-red float-right' if permitted_to? :assign_package,(@owner.present? ? @owner : School.new),:context=> :sms_packages%>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+  <div class="header-info">
+    <div class="float-right">
+      <% if @assigned_row.is_owner %>
+        <%= link_to "Settings",settings_path.nil? ? edit_sms_package_path(@sms_package) : send(settings_path,@owner,@sms_package) ,:class => '' if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :sms_packages%>
+      <% else %>
+        <%= link_to "Settings",send(assigned_settings_path,@owner,@sms_package) ,:class => '' if permitted_to? :edit_assigned,(@owner.present? ? @owner : School.new),:context=> :sms_packages%>
+      <% end %>
+    </div>
+    <table style="width:100% !important;">
+      <tr>
+        <td rowspan="2" style="font-size:16px;vertical-align:middle;" class="width-30pc"><%= @sms_package.name %></td>
+        <td class="width-25-pc"><div class="float-left width-100">SMS Limit</div><div class="float-left" style="font-weight: bold;"><%= @assigned_row.sms_count.present? ? @assigned_row.sms_count : "Unlimited" %></div></td>
+        <td class="width-25pc"><div class="float-left" style="width:90px !important;">Allotted SMS</div><div class="float-left" style="font-weight: bold;"><%= @assigned_row.sms_count.present? ? @assigned_row.sms_used : "N/A" %></div></td>
+        <td class="width-20pc"><div class="float-left width-70">Validity</div><div class="float-left" style="font-weight: bold;"><%= @assigned_row.validity.present? ? @assigned_row.validity : "Lifetime" %></div> <% if @assigned_row.validity.present? %><div class="soft-text float-right" style="margin-right:25px !important;"><%= @assigned_row.validity < Date.today ? "Package Expired" : "#{distance_of_time_in_words(Date.today.to_time,(@assigned_row.validity + 1).to_time)} left" %></div><% end %> </td>
+      </tr>
+      <tr>
+        <td><div class="float-left width-100">Available SMS</div><div class="float-left" style="font-weight: bold;"><%= available_sms = @assigned_row.sms_count.present? ? (@assigned_row.sms_count.to_i - @assigned_row.sms_used.to_i) : "Unlimited" %></div> <% if @assigned_row.sms_count.present? %><div class="soft-text margin-left-5 float-left"><%= "#{((available_sms.to_f*100)/@assigned_row.sms_count.to_i).to_f.round(4)}%" %></div><% end %></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+  <hr style="width:100%;border-color:#ccc;"></hr>
+  <fieldset>
+    <label style="width:auto !important;margin-left:25px;" class="soft-text">List of <%= "#{header_text}" %> using this SMS package.</label>
+  </fieldset>
+  <table width="95%" style="margin:25px;">
+    <tr>
+      <td class="table-head"><%= "#{link_text}" %> Name</td>
+      <td class="table-head">Validity</td>
+      <td class="table-head">Allotted SMS</td>
+      <td class="table-head">Available SMS</td>
+      <td class="table-head"></td>
+    </tr>
+    <% if @assigned_packages.empty? %>
+      <td colspan="5" class="table-data soft-text">No assigned <%= "#{link_text}" %> found.</td>
+    <% else %>
+      <% @assigned_packages.each do|a| %>
+        <tr>
+          <td class="table-data width-30pc"><%= a.assignee.name %></td>
+          <td class="table-data width-20pc soft-text"><%= a.validity ? a.validity : "Lifetime" %></td>
+          <td class="table-data width-20pc soft-text"><%= a.sms_count ? a.sms_count : "Unlimited" %></td>
+          <td class="table-data width-20-pc soft-text"><%= av = a.sms_count ? (a.sms_count.to_i - a.sms_used.to_i) : "Unlimited" %><% if a.sms_count %> - <%= "#{((av*100)/a.sms_count.to_i).to_f.round(2)}%" %><% end %> </td>
+          <td class="table-data width-10pc soft-text">
+            <% edit_assigned_path = "edit_assigned_#{a.assignee.class.name.underscore}_sms_package_path" %>
+            <%= link_to 'Settings', send(edit_assigned_path,a.assignee,@sms_package), :class=>'float-right' if permitted_to? :edit_assigned,a.assignee,:context=> :sms_packages %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>

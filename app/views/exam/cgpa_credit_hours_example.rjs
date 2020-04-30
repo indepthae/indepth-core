@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'cgpa_credit_hours_example'
+page << "Modalbox.show($('modal-box'), {title: '#{t('calculation_by_credit_hours')}', width: 740, class: 'themed_text'});"

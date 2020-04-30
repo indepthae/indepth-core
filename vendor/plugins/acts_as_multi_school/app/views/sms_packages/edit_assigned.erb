@@ -1,0 +1,103 @@
+<%= stylesheet_link_tag 'jquery-ui.css' %>
+<script type="text/javascript">
+  var q = jQuery.noConflict();
+  q(document).ready(function(){
+    q(".datepicker").datepicker({
+      showOn: "button",
+      buttonImage: "/images/transparent.png",
+      buttonImageOnly: true,
+      changeMonth: true,
+      changeYear: true,
+      showOtherMonths: true,
+      selectOtherMonths: true,
+      buttonText: 'Select Date',
+      dateFormat: "yy-mm-dd",
+      minDate: new Date()
+    }).next(".ui-datepicker-trigger").addClass("float-left-datepicker");;
+
+    q('.combobox').combobox({bsVersion: '2'});
+  });
+
+</script>
+<% owner_object = @owner.class.name.underscore %>
+<% user_type = 'normal' %>
+<% user_type = "owner" if admin_user_session.school_group.nil? %>
+<% user_type = "owner" if admin_user_session.school_group.class.name == "ClientSchoolGroup" and (@owner.class.name == 'MultiSchoolGroup' or @owner.class.name == 'School') %>
+<% user_type = "owner" if admin_user_session.school_group.class.name == "MultiSchoolGroup" and @owner.class.name == 'School' %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= "#{@assigned_package.assignee.name} - #{@sms_package.name}" %></h1>
+  <% if user_type == "owner" %><%= link_to "Remove SMS Package", send("remove_package_#{owner_object}_sms_package_path",@owner,@sms_package) , :confirm => "Are you sure you want to remove this SMS package?", :class => 'button-red float-right' if permitted_to? :remove_package,(@owner.present? ? @owner : School.new),:context=> :sms_packages%><% end %>
+</fieldset>
+
+<div class="content-div  bg-light grey-border shadow">
+
+  <% form_path = "edit_assigned_#{owner_object}_sms_package_path" %>
+  <% form_for @assigned_package,:url=>(send(form_path, @owner)),:html=>{:class=>'form'} do|f| %>
+    <fieldset>
+      <%= error_string_for(f) %>
+      <%= f.error_message_on :base %>
+    </fieldset>
+    <fieldset>
+      <% if owner_object == "client_school_group" %>
+        <label>Client</label>
+      <% elsif owner_object == "multi_school_group" %>
+        <label>Multischool Group</label>
+      <% else %>
+        <label>School</label>
+      <% end %>
+      <label style="width:auto !important;"><%= @assigned_package.assignee.name %></label>
+    </fieldset>
+    <fieldset>
+      <label>Message Limit</label>
+      <% if user_type=="owner" %>
+        <div class="text-input-bg"><%= f.text_field :sms_count %></div><% if @assigned_row.sms_count.present? %><label style="color:#999;margin-left:22px;">Available SMS - <%= @assigned_row.sms_count - @assigned_row.sms_used %></label><% end %>
+      <% else %>
+        <label style="width:auto !important;"><%= @assigned_package.sms_count ? @assigned_package.sms_count : "-" %></label>
+      <% end %>
+    </fieldset>
+    <fieldset>
+      <label>Valid Till</label>
+      <% if user_type=="owner" %>
+        <div class="text-input-bg"><%= f.text_field :validity, :value=>@assigned_package.validity, :class => "datepicker" %></div><% if @assigned_row.validity.present? %> <label style="color:#999;width:auto !important;">Package validity - <%= @assigned_row.validity %></label><% end %>
+      <% else %>
+        <label style="width:auto !important;"><%= @assigned_package.validity ? @assigned_package.validity : "-" %></label>
+      <% end %>
+    </fieldset>
+    <% if @assigned_row.enable_sendername_modification %>
+      <% if user_type == "owner" or @assigned_package.enable_sendername_modification %>
+        <fieldset>
+          <label>Sender Name</label>
+          <div class="text-input-bg"><%= f.text_field :sendername %></div>
+        </fieldset>
+      <% end %>
+      <% unless owner_object == 'school' %>
+        <fieldset>
+          <label>Sender name modification</label>
+          <% if user_type=="owner" %>
+            <div class="text-input-bg">
+              <%= f.radio_button :enable_sendername_modification,true %><label class="width-50">Enable</label>
+              <%= f.radio_button :enable_sendername_modification,false %><label class="width-50">Disable</label>
+            </div>
+          <% else %>
+            <label><%= @assigned_package.enable_sendername_modification ? "Enabled" : "Disabled" %></label>
+          <% end %>
+        </fieldset>
+      <% end %>
+    <% end %>
+    <% if owner_object == "school" and user_type == "owner" %>
+      <fieldset>
+        <label>Status</label>
+        <div class="text-input-bg">
+          <%= f.radio_button :is_using,true %><label class="width-50">Active</label>
+          <%= f.radio_button :is_using,false %><label class="width-50">Inactive</label>
+        </div>
+      </fieldset>
+    <% end %>
+    <% if user_type == "owner" or @assigned_package.enable_sendername_modification %>
+      <fieldset>
+    <%#= link_to 'Cancel', "#", {:class  => 'grey-button-large', :id => 'palette-list-cancel', :onClick=>'hide_list_custom_date(); return false;'}%>
+        <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+      </fieldset>
+    <% end %>
+  <% end %>
+</div>

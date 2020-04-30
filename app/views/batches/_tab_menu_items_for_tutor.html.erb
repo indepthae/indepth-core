@@ -1,0 +1,9 @@
+<% permitted_to? :set_roll_numbers, @batch,:context=>:student_roll_number do %>
+  <ul>
+    <% if @batch.roll_number_generated? %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('manage_roll_numbers'),:controller => "student_roll_number", :action => "edit_roll_numbers", :id=>@batch,:src=>"batch_list" %></li>
+    <% else %>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('manage_roll_numbers'),:controller => "student_roll_number", :action => "set_roll_numbers", :id=>@batch,:src=>"batch_list" %></li>
+    <% end %>
+  <ul>
+<% end %>

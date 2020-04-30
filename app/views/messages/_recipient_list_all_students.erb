@@ -1,0 +1,16 @@
+<div class="label-field-pair_column">
+  <span class="scrolable-left-label"><%= "#{t('students')} (<span id='selected_students_count'>#{@to_students.count}</span>)" %></span>
+  <span class="right" onclick="remove_all_students(this)"><%= t('remove_all') %></span>
+  <div class ="scrolable" >
+    <% x = '<span class="add-span"> x </span>' %>
+    <div class="scroll-inside">
+        <div class="hover">
+          <%= "#{t('all')} #{t('students')}"  %>
+        </div>
+    </div>
+  </div>
+</div>
+<div class="extender"></div>
+<script type="text/javascript">
+  insert_all_students("<%= @to_students.inject('') { |arr, u| arr + u.to_s + ',' }.chomp(',') %>");
+</script>

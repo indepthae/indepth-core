@@ -1,0 +1,105 @@
+<div class="each-section">
+    <%= hidden_field_tag "#{i}_section_index", i, {:class=>"section_index"} %>
+    <%= hidden_field_tag "application_section[section_fields][#{i}][section_order]", a[:section_order], {:class=>"section_order"}  %>
+    <% if a[:applicant_addl_field_group_id].present? %>
+      <% field_group = ApplicantAddlFieldGroup.find(a[:applicant_addl_field_group_id]) %>
+      <% additional_fields = ApplicantAddlField.find(:all,:conditions=>{:applicant_addl_field_group_id=>field_group.id,:is_active=>true,:registration_course_id=>nil}) %>
+      <% st_additional_fields = ApplicantStudentAddlField.find(:all, :joins=>:student_additional_field,:conditions=>{:applicant_addl_field_group_id=>field_group.id,:registration_course_id=>nil}) %>
+      <% additional_field_ids = additional_fields.collect(&:id) %>
+      <% st_additional_field_ids = st_additional_fields.collect(&:student_additional_field_id) %>
+      <%= hidden_field_tag "application_section[section_fields][#{i}][applicant_addl_field_group_id]", a[:applicant_addl_field_group_id], {:class=>"group_id"}  %>
+    <% else %>
+      <% if a[:section_name] == "attachments" %>
+        <% additional_attachment_fields = ApplicantAddlAttachmentField.find(:all,:conditions=>{:registration_course_id=>nil}) %>
+        <% additional_field_ids = additional_attachment_fields.collect(&:id) %>
+      <% else %>
+        <% additional_fields = ApplicantAddlField.find(:all,:conditions=>{:section_name=>a[:section_name],:is_active=>true,:registration_course_id=>nil}) %>
+        <% st_additional_fields = ApplicantStudentAddlField.find(:all, :joins=>:student_additional_field, :conditions=>{:section_name=>a[:section_name],:registration_course_id=>nil},:include=>:student_additional_field) %>
+        <% additional_field_ids = additional_fields.collect(&:id) %>
+        <% st_additional_field_ids = st_additional_fields.collect(&:student_additional_field_id) %>    
+      <% end %>
+      <%= hidden_field_tag "application_section[section_fields][#{i}][section_name]", a[:section_name], {:class=>"section_name"}  %>
+      <%= hidden_field_tag "application_section[section_fields][#{i}][section_description]", a[:section_description], {:class=>"section_description"}  %>
+    <% end %>
+    <% next_field_ind = 0 %>
+    <% next_field_pos = 1 %>
+    <% included_addl_fields = [] %>
+    <% included_stu_addl_fields = [] %>
+
+    <% if a[:section_name] == "guardian_personal_details" %>
+      <div class="guardian-section">  
+          <div class="title-section">
+              <%= t("guardian_details") %>
+          </div>
+          <div class="desc-section"><%= t("guardian_details_desc") %></div>
+          <label><%= t("guardian_count_text") %></label>
+          <%= select :application_section, :guardian_count, [0,1,2,3], :selected=>guardian_count %>
+      </div>
+
+    <% end %>
+    <div class="sec-head">
+        <%= render :partial=>"section_header", :locals=>{:a=>a,:field_group=>field_group} %>
+    </div>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+        <tr class="tr-list_head">
+            <td style="width:5%"><%= check_box_tag "select_all",1,false,{:class=>"select_all hide-on-sort",:onclick=>"toggle_all_checkboxes(this);"} %>
+                <div class="reorder-icon invisible-div"></div></td>
+            <td style="width:55%"><div class="hide-on-sort"><%= t('select_fields') %></div><div class="invisible-div"><%= t('reorder_fields') %></div></td>
+            <td style="width:40%"><div class="hide-on-sort"><%= t('mandatory') %></div></td>
+        </tr>
+        <% unless a[:section_name] == "attachments" %>
+          <% if ((a[:fields].present? and a[:fields].count > 0) or (additional_fields.present?) or (st_additional_fields.present?)) %>
+            <% if a[:fields].present? %>
+              <% a[:fields].sort_by{|k| k[:field_order].to_i}.each_with_index do|f,indx| %>
+                <% if ((f[:field_type]=="default") or (f[:field_type] == "applicant_additional" and additional_field_ids.include?(f[:field_name].to_i)) or (f[:field_type] == "student_additional" and st_additional_field_ids.include?(f[:field_name].to_i)))%>
+                  <%= render :partial=>"each_field",:locals=>{:f=>f,:indx=>indx,:i=>i} %>
+                  <% included_addl_fields.push(f[:field_name].to_i) if (f[:field_type].present? and f[:field_type] == "applicant_additional") %>
+                  <% included_stu_addl_fields.push(f[:field_name].to_i) if (f[:field_type].present? and f[:field_type] == "student_additional") %>
+                  <% next_field_ind = indx+1 %>
+                  <% next_field_pos = f[:field_order].to_i+1 %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% additional_fields.reject{|af| included_addl_fields.include?(af.id.to_i)}.each do|aaf| %>
+              <% af = {:field_order=>next_field_pos,:field_name=>aaf.id,:field_type=>"applicant_additional",:show_field=>false,:mandatory=>aaf.is_mandatory} %>
+              <%= render :partial=>"each_field",:locals=>{:f=>af,:indx=>next_field_ind,:i=>i} %>
+              <% next_field_ind = next_field_ind+1 %>
+              <% next_field_pos = next_field_pos+1 %>
+            <% end %>
+            <% st_additional_fields.reject{|sf| included_stu_addl_fields.include?(sf.student_additional_field_id.to_i)}.each do|saf| %>
+              <% sf = {:field_order=>next_field_pos,:field_name=>saf.student_additional_field_id,:field_type=>"student_additional",:show_field=>false,:mandatory=>(saf.student_additional_field.is_mandatory==true ? "default_true" : false)} %>
+              <%= render :partial=>"each_field",:locals=>{:f=>sf,:indx=>next_field_ind,:i=>i} %>
+              <% next_field_ind = next_field_ind+1 %>
+              <% next_field_pos = next_field_pos+1 %>
+            <% end %>
+          <% else %>
+            <tr class="row-b empty-row">
+                <td colspan="3"><%= t('no_fields_added') %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <% if ((a[:fields].present? and a[:fields].count > 0) or (additional_attachment_fields.present?)) %>
+            <% if a[:fields].present? %>
+              <% a[:fields].sort_by{|k| k[:field_order]}.each_with_index do|f,indx| %>
+                <% if ((f[:field_type]=="default") or (f[:field_type] == "applicant_attachment" and additional_field_ids.include?(f[:field_name].to_i))) %>
+                  <%= render :partial=>"each_field",:locals=>{:f=>f,:indx=>indx,:i=>i} %>
+                  <% included_addl_fields.push(f[:field_name].to_i) if f[:field_type].present? and f[:field_type] == "applicant_attachment" %>
+                  <% next_field_ind = indx+1 %>
+                  <% next_field_pos = f[:field_order].to_i+1 %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% additional_attachment_fields.reject{|af| included_addl_fields.include?(af.id.to_i)}.each do|aaf| %>
+              <% af = {:field_order=>next_field_pos,:field_name=>aaf.id,:field_type=>"applicant_attachment",:show_field=>false,:mandatory=>aaf.is_mandatory} %>
+              <%= render :partial=>"each_field",:locals=>{:f=>af,:indx=>next_field_ind,:i=>i} %>
+              <% next_field_ind = next_field_ind+1 %>
+              <% next_field_pos = next_field_pos+1 %>
+            <% end %>
+          <% else %>
+            <tr class="row-b empty-row">
+                <td colspan="3"><%= t('no_fields_added') %></td>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+</div>

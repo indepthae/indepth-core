@@ -1,0 +1,6 @@
+if @error_text.nil?
+  page.hide "tr-#{params[:id]}"
+  page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+else
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:error]}</p>" unless flash[:error].nil?
+end

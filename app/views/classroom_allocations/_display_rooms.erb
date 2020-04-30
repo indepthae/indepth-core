@@ -1,0 +1,44 @@
+
+<ul class="test">
+  <% @rooms.each do |r| %>
+    <li class="themed_text" data ="<%=  r.id%>" id ="r<%= r.id %>">
+      <div id="room_name"><%= r.name %></div>
+      <div class ="room_tooltip" style="display:none"><span class="rname"><%= r.name  %></span></div>
+    </li>
+  <% end %>
+
+</ul>
+
+<%= will_paginate @rooms,:previous_label=>"", :next_label=>"", :renderer => 'RemoteLinkRenderer' ,:remote=>{:update=>'room_select'},:params=> {:building_id => @rooms.first.building.id,:controller => "classroom_allocations", :action => "display_rooms"} , :page_links => false %>
+
+<script type="text/javascript">
+  if (j('.pagination').length > 0){
+    j('.pagination .disabled').hide();
+  }
+
+   j('ul.test li').hover(
+  function () {
+       originalBg =j(this).css("background-color");
+    j(this).css({'background-color' : '#ffffcd'});
+  },
+  function () {
+    j(this).css({'background-color' : originalBg});
+  }
+      );
+  
+            
+  j('li').draggable({
+     helper: 'clone',
+     start: function(event, ui) { (ui.helper.children('.room_tooltip').css("display","none"))}
+  });
+
+  j('.test li').hover(function(){
+      j(this).children('.room_tooltip').css("display","inline-block");
+    },function() {
+      j(this).children('.room_tooltip').hide();
+  })
+
+  j('.pagination a.next_page').append("<div id ='next_link'></div>");
+  j('.pagination a.prev_page').append("<div id ='prev_link'></div>");
+  
+</script>

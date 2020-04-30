@@ -1,0 +1,18 @@
+<div class="tabs">
+  <ul class="ui-widget-content">
+    <li class="active_tab" attr-data="fields">
+      fields
+    </li>
+    <li attr-data="field_settings">
+      settings
+    </li>
+  </ul>
+</div>
+<div class="tab_form">
+  <div class="fields_tab" attr-data="fields_tab">
+      <%= render :partial => 'fields_tab' %>
+  </div>
+  <div class="field_settings_tab" attr-data="field_settings_tab" style="display:none;">
+      <%= render :partial => 'field_settings_tab' %>
+  </div>
+</div>

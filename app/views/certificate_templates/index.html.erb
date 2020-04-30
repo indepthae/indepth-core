@@ -1,0 +1,50 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('certificates') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'> <%= t('home') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div id="box">
+
+    <% if permitted_to? :certificate_templates %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('certificate_templates')}", certificate_templates_certificate_templates_path %></div>
+        <div class="link-descr"><%= t('certificate_templates_link_desc') %></div>
+      </div>
+    <% end %>
+
+    <% if permitted_to? :generate_certificate %>
+      <div class="link-box">
+        <div class="link-heading"><%= link_to "#{t('generate_individual_certificates')}", generate_certificate_certificate_templates_path %></div>
+        <div class="link-descr"><%= t('generate_individual_certificates_link_desc') %></div>
+      </div>
+    <% end %>
+    
+    <% if permitted_to? :bulk_export %>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('bulk_generate_certificates')}", bulk_export_certificate_templates_path %></div>
+      <div class="link-descr"><%= t('bulk_generate_certificates_link_desc') %></div>
+    </div>
+    <% end %>
+    
+    <% if permitted_to? :generated_certificates  %>
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('generated_certificates')}", generated_certificates_certificate_templates_path %></div>
+      <div class="link-descr"><%= t('genearted_certificates_link_desc') %></div>
+    </div>
+    <% end %>
+    
+    
+
+  </div>
+</div>

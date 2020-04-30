@@ -1,0 +1,71 @@
+<div class="list_batches_index">
+  <div class="description_text_div">
+    <%=t('create_and_manage_exam_groups_for_individual_batches')%>
+  </div>
+  <div>
+    <div class="exam_group_count">
+      <div class="item_count_div">
+        <%= radio_button_tag 'select_batch_type','true',params[:batch_type]=='true'%>
+        <label for='select_batch_type_true'> <%=t('active_batches')%> </label>
+      </div>
+      <div class="item_count_div">
+        <%= radio_button_tag 'select_batch_type','false',!(params[:batch_type]=='true')%>
+        <label for='select_batch_type_false'> <%=t('inactive_batches')%> </label>
+      </div>
+      <div class="item_count_div for_loader">
+        <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "batch_select_loader", :style =>"display: none;" ) %>
+      </div>
+    </div>
+    <%unless @batches.empty?%>
+      <table id="listing" width="100%">
+        <tr class="tr-head">
+          <td class="col-2"><%= t('batch') %></td>
+          <td class="col-1"><%= t('exam_groups_text') %></td>
+          <td class="col-1"><%= t('active_exams') %></td>
+          <td class="col-1"></td>
+        </tr>
+        <%@batches.each do |batch|%>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-2"><%= batch.batch_name %></td>
+            <td class="col-1"><%= batch.count_exam_groups %></td>
+            <td class="col-1"><%= batch.count_active_exams %></td>
+            <td class="col-1"><%= link_to t('manage_exams'), batch_exam_groups_path(batch.batch_id) %></td>
+          </tr>
+        <%end%>
+      </table>
+      <%= will_paginate  @batches,:renderer => 'RemoteLinkRenderer' ,:params=>{:action=>"list_exam_batches",:course_id=>params[:course_id],:batch_type=>params[:batch_type]}%>
+    <%else%>
+      <table id="listing" class="alert_msg_table" width="100%">
+        <tr class="tr-head">
+          <td class="col-2"><%= t('batch') %></td>
+          <td class="col-1"><%= t('exam_groups_text') %></td>
+          <td class="col-1"><%= t('active_exams') %></td>
+          <td class="col-1"></td>
+        </tr>
+        <tr class='tr-odd'>
+          <td colspan="5" >
+            <%=t('no_exams_created')%>
+          </td>
+        </tr>
+      </table>
+    <%end%>
+  </div>
+</div>
+<script>
+
+
+</script>
+
+
+
+<script type="text/javascript">
+  j("input[name='select_batch_type']:radio").change(function () {
+    var params='?course_id='+<%=params[:course_id]%>+'&batch_type='+j(this).val();
+    j('#batch_select_loader').show();
+    j.get('/course_exam_groups/list_exam_batches'+params, function( data,status ) {
+      if (status=='success'){
+        j('#batch_select_loader').hide();
+      }
+    })
+  });
+</script>

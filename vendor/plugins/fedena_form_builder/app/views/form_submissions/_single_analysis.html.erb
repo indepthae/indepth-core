@@ -1,0 +1,144 @@
+
+<% overall = [] %>
+<% cnt = 0 %>
+<% if @analysis_hash.present? %>
+  <% @fields.each do |field| %>
+    <% unless field.field_type == 'hr' %>
+      <div class="question">
+        <% cnt = cnt.next %>
+        <%= "#{t('question')} #{cnt}" %> : <%= field.label %>
+
+        <div class="question_response">
+          <% if ['select','radio','checkbox'].include? field.field_type%>
+            <label>
+              <%= t('responses') %> :
+            </label>
+            <div class="graph">
+              <div class="graph_index">
+                <ul>
+                  <% rating = 0 %>
+                  <% count = 0 %>
+                  <% field.form_field_options.each do |opt| %>
+                    <li>
+                      <%= opt.label %>
+                      <span class="sub">
+                        <%= "#{t('wt')} #{opt.weight}" %>
+                      </span>
+                    </li>
+                    <% count += @analysis_hash[field.id][opt.id]['count'] if @analysis_hash[field.id][opt.id].present? %>
+                  <% end %>
+                </ul>
+              </div>
+              <div class="vertical_stripes">
+                <ul>
+                  <% weight = [] %>
+                  <% field.form_field_options.each do |opt| %>
+                    <% if @analysis_hash[field.id][opt.id].present? %>
+                      <% if opt.weight.present? %>
+                        <% rating += opt.weight * @analysis_hash[field.id][opt.id]['count'] %>
+                        <% per = (@analysis_hash[field.id][opt.id]['count']*100)/count %>
+                      <% end %>
+                      <li style="width: <%= "calc( #{per}% - 1px )" %>">
+                        <div class="data">
+                          <%= @analysis_hash[field.id][opt.id]['count'] %>
+                        </div>
+                      </li>                      
+                    <% else %>
+                      <li style="width:0%">
+                        <div class="data">
+                          <%= "0" %>
+                        </div>
+                      </li>
+                    <% end %>
+                    <% weight << opt.weight unless opt.weight== nil %>
+                  <% end %>
+                  <% rating = (weight.present? and !count.zero?) ? (rating/count.to_f).round(2) : t('na') %>
+                  <% overall << (rating * 100 / weight.max.to_f) unless rating.is_a? String%>
+                </ul>
+              </div>
+            </div>
+            <div class="wt_avg">
+              <% if weight.present? %>
+                <%= "#{t('weighted_average')} : #{rating}" %>
+              <% end %>
+            </div>
+          <% else %>
+            <div attr_href="<%= field.id %>" class="themed_text toggle">
+              <%= "#{@analysis_hash[field.id].count} #{t('responses')}" %>
+            </div>
+            <% unless @analysis_hash[field.id].count.zero? %>
+              <div id="<%= field.id %>" class="hiden">
+                <table class="response_list">
+                  <thead>
+                    <tr>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @analysis_hash[field.id].each do |name,response_value| %>
+                      <tr class="response_text">
+                        <td class="resp_value">
+                          <%= response_value %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+
+                </table>
+
+              </div>
+            <% end %>
+          <% end %>
+
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% elsif(@target.present?) %>
+  <div class="message_notifier">
+    <p class="flash-msg">
+      <%= t('no_submission_for_target') %>
+    </p>
+  </div>
+<% else %>
+  <div class="message_notifier">
+    <p class="flash-msg">
+      <%= t('select_a_target') %>
+    </p>
+  </div>
+<% end %>
+<script>
+  submission_check = "<%= @analysis_hash.present? ? @analysis_hash.count : 0 %>"
+  j('.response_list').each(function(a,b){
+    x = j(b).find('.response_text').length;
+    if(x > 10){ // <%# display pagination if more than 10 responses are present%>
+      j(b).dataTable({
+        "language": {
+          "paginate": {
+            "next": "<%= t('next_text') %>", //<%# applying translation to next link %>
+            "previous": "<%= t('previous_text') %>" //<%# applying translation to previous link %>
+          }
+        },
+        "sPaginationType": "simple_numbers",
+        "iDisplayLength": 10,
+        "bLengthChange": false,
+        'bFilter': false,
+        'bInfo': false
+      });
+    }
+  });
+  j('.dataTables_paginate').addClass('pagination');
+  var overall = "<%= overall.count > 0 ? (overall.sum/overall.count.to_f).round(2) : 'NA'%>";
+  if (submission_check == 0){   
+    overall  = 0
+  }
+
+  console.log("after check"+submission_check);
+  if(overall != 'NA' && overall > 0){
+    j('#overall_rating').html(overall+' %');
+  }else if(overall == 'NA'){
+    j('#overall_rating').html('NA');
+  }else{
+    j('#overall_rating').html('');
+  }
+</script>

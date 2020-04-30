@@ -1,0 +1,18 @@
+<% if @folder.present? %>
+  <% if @folder.user_id == @current_user.id%><%# and @folder.type == "ShareableFolder" %>
+    <p><%= link_to_remote @folder.is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs'? 'doc_manager' :'folders', :id => "#{@folder.id}", :action_text => @action, :type => 'folder'} %></p>
+  <% elsif @folder.type == "ShareableFolder" %>
+    <p><%= link_to_remote @folder.shareable_folder_users.find_by_user_id(@current_user.id).is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs'? 'doc_managers' : 'folders', :id => "#{@folder.id}", :action_text => @action, :type => 'folder'} %></p>
+  <% else %>
+    <p class="col_icons"></p>
+  <% end %>
+
+<% elsif @document.present? %>
+  <% if @document.user_id == @current_user.id %>
+    <p><%= link_to_remote @document.is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs' ? 'doc_manager' : 'documents', :id => "#{@document.id}", :type => 'document'} %></p>
+  <% elsif (@document.folder.class.to_s == "ShareableFolder" or @document.folder_id.nil?) and @document.document_users.find_by_user_id(@current_user.id).present?  %>
+    <p><%= link_to_remote @document.document_users.find_by_user_id(@current_user.id).is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs' ? 'doc_managers' : 'documents', :id => "#{@document.id}", :action_text => @action, :type => 'document'} %></p>
+  <% else %>
+    <p class="col_icons"></p>
+  <% end %>
+<% end %>

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="<%= (rtl?) ? 'rtl' : 'ltr' %>">
+  <head>
+    <%= javascript_include_tag :defaults, :cache => 'cache/javascripts/all' %>
+    <%= javascript_include_tag 'jquery/jquery.min.js' %>
+    <%= stylesheet_link_tag(*get_custom_stylesheets) %>
+    <%= javascript_include_tag 'document' %>
+    <script type="text/javascript">
+
+      var j = jQuery.noConflict();
+      document.observe("dom:loaded", function() {
+        $$('.level-1')[0].hide();
+      });
+
+      function update_name(attachment_id){
+        name_id = attachment_id.id.substring(0,attachment_id.id.length-10) + 'name'
+        $(name_id).value = $(name_id).value == "" ? attachment_id.files[0].name.substring(0,attachment_id.files[0].name.lastIndexOf('.')) : $(name_id).value;
+      }
+      function verify(){
+        var myPosts = document.getElementById("add").getElementsByTagName("input");
+        for (var i = 0; i < myPosts.length; i++) {
+          //omitting undefined null check for brevity
+          if (myPosts[i].id.lastIndexOf("name") != -1) {
+            if(myPosts[i].value == ""){
+              alert("<%= "#{t('flash12')}" %>");
+              myPosts[i].focus();
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+    </script>
+    <%  if FedenaSetting.s3_enabled? %>
+      <script>
+        <%= "var s3_url= '#{Config.s3_url}';" %>
+      </script>
+      <%= javascript_include_tag 's3_upload' %>
+    <% else %>
+      <%=  javascript_include_tag 'normal_upload' %>
+    <% end %>
+  </head>
+  <body>
+
+    <%= error_messages_for 'document', :header_message => nil %>
+    <div id="all_files" class="span-sub-heading">
+      <% form_for(@document, :url => add_iframe_files_doc_managers_path(:id=> @folder, :page => params[:page], :action_text => @action, :user_id=> @user.present? ? @user.id : nil), :html=> {:multipart=>true}) do |s| %>
+        <div id="add">
+
+          <% unless  params[:document_attributes].present? %>
+            <%= render :partial => 'documents/document_fields' %>
+          <% else %>
+            <% params[:document_attributes].each_pair do |a,b| %>
+              <%= render :partial =>"documents/document_fields2", :locals => {:k => a,:v => b} %>
+            <% end %>
+          <% end %>
+
+        </div>
+        <div id="link" class="add_button_img" onclick="parent.iframe_height(document.documentElement.getHeight()+60);">
+          <%= link_to_remote "#{image_tag("/images/buttons/add_2.png",:border => 0)} #{t('add_file')}", :url => add_document_fields_documents_path %>
+        </div>
+        <%= s.hidden_field :user_id,:value => @current_user.id %>
+        <div>
+          <%= submit_tag "", :value => "#{t('submit_button')}", :class => "submit_button",:id=>'save_document',:onclick=>"return false" %>
+        </div>
+      <% end %>
+      <% if request.post? and @error==false %>
+        <script type="text/javascript">
+          parent.update_all("<%= params[:id]%>","<%= params[:user_id] %>","<%= params[:page]%>","<%= params[:action_text]%>");
+        </script>
+      <% end %>
+    </div>
+  </body>
+</html>
+<% if @error %>
+  <script type="text/javascript" >
+    parent.iframe_height(document.documentElement.getHeight());
+  </script>
+<% end %>
+<script>
+  jQuery('#save_document').on("click",function(){
+    console.log('hjk');
+    if(verify()){
+      jQuery(this).attr('value','<%= "► #{t('please_wait')}" %>');
+      jQuery(this).attr('disabled','disabled');
+      jQuery('#new_document').submit();
+    }
+  });
+</script>

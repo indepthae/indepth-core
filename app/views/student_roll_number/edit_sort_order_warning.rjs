@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'edit_sort_order_warning'
+page << "Modalbox.show($('modal-box'), {title: '#{t('edit_sorting_order')}', width: 500});"

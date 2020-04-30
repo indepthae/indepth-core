@@ -1,0 +1,942 @@
+.label-field-pair {
+    height: 40px;
+    width: 285px;
+    padding-top: 3px;
+    float: right;
+}
+#loader{
+    margin-right:5px
+}
+.teacher_status{
+    float: right;
+    margin-left: 10px;
+    margin-top: 15px;
+}
+.teacher_status span{
+    font-weight: 100 !important;
+    margin-right: 10px;
+}
+.swap{
+    padding:  9px 16px 8px 16px  !important;
+    border-radius: 0px !important;
+    margin-top: 5px;
+}
+.swap_themed_text_form{
+    background-color: white !important;
+    border: 1px solid;
+    padding: 6px 13px 6px 13px;
+    margin-left: 20px;
+}
+.swap_form{
+    height: 77px;   
+}
+.cancel_class{
+    float:left;
+    margin-top:10px;    
+}
+.table-head{
+    padding:12px;
+}
+.subject_title{
+    float: right;
+    width: 224px;
+}
+
+.subject_title_1{
+    float: right;
+    width: 481px;
+}
+
+.subject{
+    font-weight:bold;
+    font-size:14px;
+    padding-bottom: 3%;
+    word-break: normal;
+    padding-left: 10px;
+    padding-left: 2px;
+}
+.cancel_subject{
+    font-weight:bold;
+    font-size:14px;
+    padding-bottom: 3%;
+    word-break: normal;
+    padding-left: 10px;
+    padding-top: 5%;
+}
+
+.subject_emp{
+    font-weight:bold;
+    font-size:14px;
+    float: right;
+    padding-bottom: 3%;
+    word-break: normal;
+    padding-left: 10px;
+    width: 214px;
+}
+.teacher{
+    margin-top:5px;
+    font-size:14px;
+    margin-bottom: 4px;
+    clear: both; 
+    color: #979A9A;
+    word-break: normal;
+}
+.teacher_name{
+    font-size:14px;
+    color: black !important;
+    word-break: normal;
+}
+.swapped_subject{
+    float: left;
+    color: #c6c6c6;
+    border-right: 1px solid #cfcfcf;
+    padding-right: 45px;
+    font-size: 13px;
+    margin-top: -13px;
+    padding-bottom: 29px;
+    margin-bottom: -13px;
+    padding-top: 20px;
+    padding-right: 5px;
+}
+.swapped_subject_msg{
+    float: left;
+    color: #c6c6c6;
+    border-right: 1px solid #cfcfcf;
+    padding-right: 45px;
+    font-size: 13px;
+    margin-top: -13px;
+    padding-bottom: 29px;
+    margin-bottom: -13px;
+    padding-top: 20px;
+    width: 497px;
+    padding-right: 5px;
+}
+
+.extra_class{
+    display: flex;
+}
+.changed_class{
+    float: right;
+    margin-right: 11px;
+    border-left: 1px solid  #bfbfbf;
+    padding-right: 5px;
+    margin-top: -13px;
+    padding-top: 15px;
+    width: 240px;
+    margin-bottom: -13px;
+    padding-bottom: 13px;
+}
+.emp_changed_class{
+    float: right;
+    margin-right: 11px;
+    border-left: 1px solid #bfbfbf;
+    padding-right: 5px;
+    margin-top: -13px;
+    padding-top: 15px;
+    width: 240px;
+    margin-bottom: -13px;
+    padding-bottom: 13px;
+}
+.swaped_class{
+    float: right;
+    border-left: 1px solid  #bfbfbf;
+    margin-top: -13px;
+    margin-bottom: -14px;
+    padding-top: 16px;
+    padding-bottom: 8px;
+    width: 224px;
+}
+#batch_wise_table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 15px;
+    margin: 30px 0;
+}
+#batch_wise_table   td{
+    padding: 13px; 
+    border-left: 1px solid #bfbfbf;
+    border-right: 1px solid #bfbfbf;
+    border-bottom: 1px solid #bfbfbf;
+    font-size: 16px;
+    width: 10%;
+}
+#batch_wise_table .tr-head{
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important;
+    font-size: 16px;
+}
+#batch_wise_table tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+#batch_wise_table table a, #batch_wise_table table a:hover {
+    color: black !important;
+}
+#batch_wise_table td.col-2{
+    width:81%;
+}
+table#batch_wise_table td a {
+    text-decoration: underline;
+    color: black;
+    font-size:15px;
+}
+table#batch_wise_table td.col-1 {
+    width: 19%;   
+}
+table#batch_wise_table td.col-2 {
+    word-break: break-all;
+}
+table#batch_wise_table td.col-3 {
+    width: 51%;
+}
+table#batch_wise_table td a {
+    font-size: 15px;
+}
+
+table#batch_wise_table .tr-odd {
+    font-weight: 100;
+}
+table#batch_wise_table .tr-even {
+    font-weight: 100;
+}
+#batch_wise_table table a:hover{
+    text-decoration: underline !important;
+    color: black !important;
+}
+#batch_wise_table table td.a{
+    text-decoration: underline !important;
+}
+#emp_wise_table {
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 15px;
+    margin: 30px 0;
+}
+#emp_wise_table   td{
+    padding: 13px; 
+    border-left: 1px solid #bfbfbf;
+    border-right: 1px solid #bfbfbf;
+    border-bottom: 1px solid #bfbfbf;
+}
+
+#emp_wise_table .tr-head{
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important
+}
+#emp_wise_table tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+#emp_wise_table table a, #emp_wise_table table a:hover {
+    color: black !important;
+}
+#emp_wise_table td.col-2{
+    width:30%;
+}
+#emp_wise_table td.col-1{
+    width:6%;
+}
+table#emp_wise_table td a {
+    text-decoration: underline;
+    color: black;
+    font-size:15px;
+}
+table#emp_wise_table td.col-1 {
+    width: 6%;   
+}
+table#emp_wise_table td.col-2 {
+    word-break: break-all;
+}
+table#emp_wise_table td.col-3 {
+    width: 51%;
+}
+table#emp_wise_table td a {
+    font-size: 13px;
+}
+
+table#emp_wise_table .tr-odd {
+    font-weight: 100;
+}
+table#emp_wise_table .tr-even {
+    font-weight: 100;
+}
+#emp_wise_table table a:hover{
+    text-decoration: underline !important;
+    color: black !important;
+}
+#emp_wise_table table td.a{
+    text-decoration: underline !important;
+}
+#timetable{
+    margin-top: 11%;
+    margin-bottom:85px;
+}
+.text-input-bg1 select {
+    background-color: white;
+    border: 1px solid #c6c6c6;
+    margin: 12px 0px 0 0;
+    font-size:15px;
+    width: 100%;
+    height: 33px;
+    padding: 3px 6px;
+}
+.text-input-bg1 {
+    background: transparent;
+    margin-top: 2px;
+    width: calc(100% - 5px);
+    float: right;
+}
+.text-input-bg1-sub {
+    background: transparent;
+    margin-top: 2px;
+    width: calc(100% - 5px);
+    float: right;
+}
+.sub{
+    margin-top: -16px; 
+}
+.label-field-pair1 {
+    padding-top: 3px;
+    float: right;
+    width: 238px;
+    padding-top: 3px;
+    float: right;
+    margin-left: 22px;
+    margin-right: 2px;
+    width: 29%;
+}
+.label-field-pair-sub{
+    padding-top: 3px;
+    float: right;
+    width: 238px;
+    padding-top: 3px;
+    float: right;
+    margin-left: 22px;
+    margin-right: 2px;
+    width: 229px;
+}
+.label-field-pair_notify{
+    margin-top: 20px;
+    float: left;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 274px;
+}
+.text-input-bg1_notify {
+    background: transparent;
+    margin-top: 9px;
+    width: calc(100% - 5px);
+    float: right;
+}
+.label-field-pair1-larger {
+    width: 174px !important;
+}
+.image_loading{
+    float:right;
+    width: 18px;
+    margin-top: 35px;
+    margin-left: 3px;
+}
+.image_loading img {
+    margin-top: 5px;
+}
+.submit_button {
+    padding: 6px 10px;
+    color: #fff;
+    background: #27292B;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 11px;
+    border: none;
+    font-family: arial;
+    cursor: pointer;
+    width: 100%;
+}
+.submit_button[disabled] {
+    cursor: pointer; 
+    opacity: 0.30;
+}
+.submit{
+    margin-top: 10px;
+    clear: right;
+    margin-bottom: 10px;
+    float: right;
+    min-width: 50px;
+    margin-left: 5px;
+}
+.new_entry{
+    float:right;
+    display: flex;
+}
+.change_title{
+    float:right;
+    font-size:13px;    
+    color: gray;
+    margin-left:5px;
+}
+.edit_link {
+    float: left;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+.cancel_link {
+    margin-right: 10px;
+    margin-top: 14px;
+    float: right;
+}
+.submit, .cancel_link{    
+    margin-left: 13px;
+    float: left;
+}
+.delete_cancel_link{
+    float: left;
+    margin-top: 0px;
+    line-height: 25px;
+    margin-left: 20px;
+}
+.errorExplanation {
+    width: 400px;
+}
+.hor_line {
+    margin-top: 10px;
+    clear: both;
+}
+.submit-button {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: #27292B;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 210px 0 0;
+    padding: 5px;
+    float: right;
+    cursor: pointer;
+    float: left;
+    margin-bottom: 22px;
+    margin-left: 12px;
+    padding-right: 13px;
+    padding-left: 10px;
+}
+.submit-button a {
+    text-decoration: none;
+    color:#fff;
+    font-size: 14px;
+}
+.submit-button a:hover{
+    color:#fff !important
+}
+#page-yield1 {
+    margin: 30px 0;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+/* cancel class */
+.tte_changed{
+    width: 100%;
+}
+.tte_changed,.tte_change, .tte_cancel {
+    float: right;
+    margin-left: 20px;
+}
+.tte_change{
+    margin-left: 0px;
+}
+.tte_change, .tte_cancel {
+    float: left;
+    margin-left: 20px;
+    margin-top:10px;
+}
+.tte_cancelled{    
+    width: 100%;
+    margin-left: 0px;
+}
+.employee_swap_overlap_validation {    
+    margin-right: 30px;
+    width: calc(100% - 50px);
+    display: table;
+    min-height: 40px;
+    margin-top: 12px;
+    display: none;
+}
+.employee_swap_overlap_validation span {
+    background: #fff;
+    max-width: 300px;
+    font-size: 12px;
+    color: #444;
+    line-height: 20px;
+    width: 100%;
+}
+.error-icon {    
+    background: url(/images/iconsprite-1.png);
+    background-position: -42px -344px;
+    width: 15px;
+    height: 12px;
+    float: right;
+    margin-top: 3px;
+    margin-left: 2px;
+}
+.swap_notify {
+    width: 360px;
+}
+.submit_buttons {
+    margin-top: 11px;
+}
+.swap_notify, .submit_buttons, .swap_notify .label-field-pair1 {
+    float: right;
+}
+.submit_buttons {
+    float: left;
+}
+.swap_notify .label-field-pair1 {
+    margin-top: 10px;
+    margin-right: 27px;    
+    width: calc(100% - 20px);
+}
+.notify {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+#popup_footer .submit-button, #popup_footer .submit-button:hover {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #27292B;
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0px 0px 22px 10px !important;
+    padding: 5px 13px 5px 10px;
+    float: right;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+#popup_footer .prompt_ok, body #popup_footer .prompt_ok:hover{
+    margin-right: 0px !important;
+}
+.popup-description {
+    font-size: 13px;
+    float: right;
+    padding-top: 10px;
+    color: #000;
+    width: 100%;
+    margin: 0px;
+}
+#popup_content .label-field-pair span {    
+    width: 300px;
+    display: block;
+    line-height: 17px;
+}
+#popup_content .label-field-pair input[type="checkbox"] {
+    float: right;
+    width: 20px;
+    margin: 0px 0px 0px 5px;
+}
+#popup_content .label-field-pair label {
+    font-weight: normal;
+    font-size: 13px;
+    min-width: 100px;
+    max-width: 150px;
+}
+.swap_title{
+    margin-bottom: 24px;
+    font-weight: bold;
+    padding-top: 15px;
+}
+.swap_button{
+    margin-bottom: 30px;
+}
+.batch_wise1{
+    margin-left: 7px;
+}
+
+.batch_wise2{
+    margin-left: 7px;
+    margin-right: 30px;
+}
+.label-field-pair2 {
+    height: 40px;
+    width: 250px;
+    padding-top: 3px;
+    float: right;
+    margin-left: 36px;
+}
+.label-field-pair-swap {
+    height: 0px;
+    width: 880px;
+    padding-top: 3px;
+}
+.text-input-bg-swap {
+    background: transparent;
+    height: 28px;
+    width: 293px;
+    float: right;
+}
+.label-field-pair-swap label {
+    color: #444;
+    display: block;
+    font-size: 14px;
+    margin: 0 0 0px 0;
+    width: 200px;
+    padding-top: 10px;
+    font-weight: 600;
+}
+.label-field-pair-swap input {
+    background: white;
+    border: 1px solid #c6c6c6;
+    margin: 14px 0px 0 0;
+    width: 250px;
+    height: 17px;
+    padding: 7px !important;
+}
+.label-field-pair-swap input[type="checkbox"] {
+    background: #ffffff !important;
+}
+.text-input-bg-swap select {
+    background-color: white;
+    border: 1px solid #c6c6c6;
+    margin: 14px 0px 0 0;
+    width: 250px;
+    font-size: 15px;
+    height: 33px;
+    padding: 3px 6px;
+}
+
+.label-checkbox-pair {
+    float: right;
+    padding: 30px 10px 0 0;
+    width: 250px;
+}
+#batch_wise_swap{
+    margin-top:42px;
+
+}
+#employee_wise_swap{
+    margin-top:42px;
+}
+.emp_subject{
+    font-weight: bold;
+    font-size: 14px;
+    float: right;
+}
+.bread_crumb .text-input-bg{
+    float:left;
+    width:auto;
+}
+.assessment_plans_box .head{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.float{
+    text-align: left;
+}
+.new_s{
+    font-weight:bold;
+    font-size:14px;
+    float: right;
+    padding-bottom: 7%;
+}
+.swap_submit_section .tooltip_info {
+    width: 320px;
+    padding: 5px;
+    top: 100%;
+    display: inline-block;
+    margin-top: 7px;
+    z-index: 254;
+    left: 0;
+    position: absolute;
+    background-color: white !important;
+    border: 1px solid #fff !important;
+    box-shadow: 0px 1px 5px 3px lightgrey;
+    pointer-events: none;
+    color: #000000;
+    text-align: right;
+    font-size: 13px;
+    border-radius: 3px;
+}
+.swap_submit_section .tooltip_info:after, .tooltip_info:before {
+    bottom: 100%;
+    right: 85%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.swap_submit_section .tooltip_info:after {
+    border-color: rgba(255, 255, 255, 0);
+}
+.swap_submit_section .tooltip_info:before {
+    border-bottom-color: #fff;
+    border-width: 9px;
+    margin-right: -9px;
+    margin-left: -1px; 
+}
+.swap_submit_section .tooltip_wrapper {
+    position: relative;
+    cursor: pointer;
+    float: right;
+    width: auto;
+    color: black; 
+}
+.swap_submit_section .upside_down {
+    margin-top: 7px;
+}
+
+.swap_submit_section .upside_down:after {
+    border-bottom-color: transparent;
+}
+.swap_submit_section .upside_down:before {
+    border-top-color: #fff;
+    border-bottom-color: transparent;
+}
+.swap_submit_section .tooltip_content{
+    font-weight: 100 !important;
+    padding: 6px 11px 6px 11px;
+    line-height: 2; 
+}
+.emp_name{
+    float:right;
+    font-weight: bold !important;
+}
+.current_date{
+    float:left;
+}
+#timetable1 {
+    margin-top: 100px;
+}
+.select-row{
+    background-color: #D6EAF8;
+}
+.status {
+    font-weight:bold;
+}
+.teacher_status_title {
+    font-weight:bold;
+    float: right;
+    margin-right: 12px;
+    margin-top: 15px;
+}
+#status_record {
+    margin-top: 31px;
+}
+.batch_lists {
+    width: 23%;
+    border-left: 0;
+    padding: 14px;   
+}
+.sub_row{
+    padding:18px;
+}
+.batch_name{
+    font-weight:bold;
+    height: 31px;
+}
+.classes{
+    width: 100%;
+    border-bottom: 1.5px solid lightgray;
+    margin-bottom: 7px;
+    padding-bottom: 0px;
+    display: inline-block;
+}
+.class_subject {
+    float:left;
+    width: 116px;
+}
+.class_time {
+    float: right;
+    width: 50%;
+    height: 55px;
+}
+.subject_name {
+    float: left;
+    width: 50%;
+    height: 55px;
+    word-break: normal;
+}
+.tooltip_head {
+    height:31px;
+    width: 100%;
+    margin-bottom: 3%;
+}
+.tooltip_headings{
+    color: gray;
+}
+.events_list{
+    width: 100%;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+.event_time{
+    float: right;
+    width: 50%;
+}
+.event_name{
+    width: 50%;
+    float: left;
+    margin-bottom: 2px;
+}
+.event_title{
+    word-break: normal;
+    float: left;
+    width: 50%;
+    padding-top: 2px;
+    line-height: 1.5;
+    height: 39px;
+}
+.event_date_time{
+    float: right; 
+    width: 50%;
+    height: 39px;
+}
+.overlap_class{
+    color:red;
+}
+.swap_options{
+    float: right;
+    margin-right: 3%; 
+}
+.class_subject_title{
+    float:left;
+    width: 50%;
+}
+.class_time_title{
+    float: right;
+    width: 50%;
+}
+.tooltip_swapped_class{
+}
+
+.available_teacher{
+    word-break: normal;
+    border-bottom: 1.5px solid lightgray;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+.occupied{
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+
+.loading{
+    float: right;
+    padding-top: 15px;
+}
+
+.cancelled_class{
+    float: right;
+    padding-top: 24px;
+    border-right: 1px solid #cfcfcf;
+    margin-top: -13px;
+    padding-bottom: 67px;
+    margin-bottom: -13px;
+    padding-right: 16px;
+    font-size: 13px;
+    color: gray;
+}
+.changed_class .tooltip_info{
+    width: 200px;
+    padding: 5px;
+    top: 100%;
+    display: inline-block;
+    margin-top: 7px;
+    z-index: 254;
+    left: 0;
+    position: absolute;
+    background-color: white !important;
+    border: 1px solid #fff !important;
+    box-shadow: 0px 1px 5px 3px lightgrey;
+    pointer-events: none;
+    color: #000000;
+    text-align: right;
+    font-size: 13px;
+    border-radius: 3px;
+    word-break:normal;
+}
+.changed_class .tooltip_content {
+    font-weight: 100 !important;
+    padding: 6px 11px 6px 11px;
+    line-height: 2;
+}
+.tooltip_info ul{
+    padding-right:20px;
+    word-break:normal;
+}
+.changed_class .tooltip_info:after {
+    border-color: rgba(255, 255, 255, 0);
+}
+.changed_class .tooltip_info:before {
+    border-bottom-color: #fff;
+    border-width: 9px;
+    margin-right: -9px;
+    margin-left: -1px; 
+}
+.changed_class .tooltip_info:after, .tooltip_info:before {
+    bottom: 100%;
+    right: 85%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.emp_changed_class .tooltip_info{
+    width: 200px;
+    padding: 5px;
+    top: 100%;
+    display: inline-block;
+    margin-top: 7px;
+    z-index: 254;
+    left: 0;
+    position: absolute;
+    background-color: white !important;
+    border: 1px solid #fff !important;
+    box-shadow: 0px 1px 5px 3px lightgrey;
+    pointer-events: none;
+    color: #000000;
+    text-align: right;
+    font-size: 13px;
+    border-radius: 3px;
+    word-break:normal;
+}
+.emp_changed_class .tooltip_content {
+    font-weight: 100 !important;
+    padding: 6px 11px 6px 11px;
+    line-height: 2;
+}
+
+.emp_changed_class .tooltip_info:after {
+    border-color: rgba(255, 255, 255, 0);
+}
+.emp_changed_class .tooltip_info:before {
+    border-bottom-color: #fff;
+    border-width: 9px;
+    margin-right: -9px;
+    margin-left: -1px; 
+}
+.emp_changed_class .tooltip_info:after, .tooltip_info:before {
+    bottom: 100%;
+    right: 85%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.cancel_subject_title{
+    
+    float: right;
+    width: 224px;
+
+}

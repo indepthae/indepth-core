@@ -1,0 +1,29 @@
+<% if batch.present? %>
+  <% instant_fee_list=student.find_instance_fees_by_batch(batch.id) %>
+<% else %>
+  <% instant_fee_list=student.find_instance_fees_by_batch(nil) %>
+<% end %>
+<% unless instant_fee_list.empty? %>
+  <tr class="table_subtitle">
+      <td colspan="4"><%= t('instant_fees_text') %></td>
+  </tr>
+  <% instant_fee_list.each do |instant_fee| %>
+    <tr class="item">
+        <td>
+            <% if permitted_to? :instant_fee_created_detail ,:instant_fees %>
+              <%= link_to instant_fee.category_name, {:controller=>:instant_fees,:action=>:instant_fee_created_detail, :id=>instant_fee.id},{:class=>:themed_hover_text,:target=>:_blank} %>
+            <% else %>
+              <%= instant_fee.category_name %>
+            <% end %>
+        </td>
+        <td class="status_cell" data-status="paid">
+            <%= t('paid') %>
+        </td>
+        <td> <%= precision_label(instant_fee.amount) %></td>
+        <td>
+            <%= t('paid_on') %>
+            <%= format_date(instant_fee.transaction_date) %>
+        </td>
+    </tr>
+  <% end %>
+<% end %>

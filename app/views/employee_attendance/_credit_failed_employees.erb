@@ -1,0 +1,35 @@
+<div class="description"><%= "#{t('employee_credit_logs_desc', {:failed => @failed})}" %></div>
+<table>
+  <tr class="tr-head">
+    <td class="employees"><%= t('employees') %></td>
+    <td class="department"><%= t('department') %></td>
+      <td><%= t('reason') %></td>
+  </tr>
+  <% @failed_employee_logs.each do |log| %>
+    <tr>
+      <td class="employees"><%= "#{log.first_name} (#{log.employee_number})&#x200E;" %></td>
+      <td class="remarks"><%= log.name %></td>
+        <% failure_reason = [] %>
+        <% if log.reason.present? %>
+          <% log.reason.each do |r| %>
+            <% unless r.include? ":" %>
+              <% failure_reason << r %>
+            <% else %>
+              <% reason = r.split(":") %>
+              <% failure_reason << reason[0] +" : "+ reason[1].strip %>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if failure_reason.count > 1 %>
+          <td>
+            <% failure_reason.each do |r| %>
+              <%= " #{r} <br>" %>
+            <% end %>
+          </td>
+        <% else %>
+          <td><%= failure_reason.join("<br>") %></td>
+        <% end %>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @failed_employee_logs, :renderer => "RemoteLinkRenderer", :params => {:id => params[:id], :success => false} %>

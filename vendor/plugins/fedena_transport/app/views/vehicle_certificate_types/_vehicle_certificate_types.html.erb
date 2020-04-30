@@ -1,0 +1,52 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="certificate_details">
+    <tr class="tr-head">
+        <td class="name"><%= t('name') %></td>
+        <td class="reminders"><%= t('reminders_text') %></td>
+        <td class="status"><%= t('status') %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @active_certificates.empty? and @inactive_certificates.empty? %>
+      <% unless @active_certificates.empty? %>
+        <tr><td colspan="4"><b><%= t('active_certificate_type') %></b></td></tr>
+        <% @active_certificates.each do |ct|  %>
+          <tr>
+              <td><%= ct.name %></td>
+              <td><%= ct.send_reminders_text %></td>
+              <td><%= ct.status %></td>
+              <td>
+                  <%= link_to_remote t('edit'), :url => edit_vehicle_certificate_type_path(ct), :method => :get  %>
+                  <% if ct.vehicle_certificates.empty? %>
+                  <%= link_to t('delete'), delete_certificate_vehicle_certificate_type_path(ct), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_certificate_type_confirmation', {:name => ct.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_certificate_type')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% else %>
+                    <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                  <% end %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+      <% unless @inactive_certificates.empty? %>
+        <tr><td colspan="4"><b><%= t('inactive_certificate_type') %></b></td></tr>
+        <% @inactive_certificates.each do |ct|  %>
+          <tr>
+              <td><%= ct.name %></td>
+              <td><%= ct.send_reminders_text %></td>
+              <td><%= ct.status %></td>
+              <td>
+                  <%= link_to_remote t('edit'), :url => edit_vehicle_certificate_type_path(ct), :method => :get  %>
+                  <% if ct.vehicle_certificates.empty? %>
+                  <%= link_to t('delete'), delete_certificate_vehicle_certificate_type_path(ct), 
+                    :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_certificate_type_confirmation', {:name => ct.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_certificate_type')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% else %>
+                    <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                  <% end %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4"><%= t('create_a_vehicle_certificate_type') %></td>
+      </tr>
+    <% end %>
+</table>

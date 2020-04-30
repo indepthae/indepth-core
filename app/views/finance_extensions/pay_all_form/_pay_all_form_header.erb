@@ -1,0 +1,16 @@
+<tr class="main_head tr-list_head">
+    <td class="sl-col"><%= t('sl_no') %></td>
+    <td class="set_border_right particular-header" colspan="2"><%= t('fee_collection') %></td>
+    <td class="set_border_right amount-cols">
+        <%= "#{t('actual')} #{t('amount').downcase}" %> (<%= currency %>)
+    </td>
+    <% if @is_tax_present %>
+      <td class="set_border_right amount-cols">
+          <%= "#{t('tax_text')} #{t('amount').downcase}" %> (<%= currency %>)
+      </td>
+    <% end %>
+    <td class="set_border_right amount-cols">
+        <%= "#{t('amount_to_pay')} #{t('with')} #{t('fine').downcase}" %> (<%= currency %>)
+    </td>
+    <td class="set_border_right amount-cols"><%= t('pay_fees') %> (<%= currency %>)</td>
+</tr>

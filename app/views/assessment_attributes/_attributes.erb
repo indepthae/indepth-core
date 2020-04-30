@@ -1,0 +1,16 @@
+<table>
+    <tr class="tr-head">
+        <td class="col-4"><%= t('attributes') %></td>
+        <td class="col-3"><%= t('max') %></td>
+    </tr>
+    <% @attributes.each do |attribute| %>
+      <tr>
+          <td class="col-4"><%= attribute.name %></td>
+          <td class="col-3"><%= attribute.maximum_marks %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @attributes.present? %>
+  <%= pagination_status(@attributes) %>
+<% end %>
+<%= will_paginate @attributes, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "assessment_attributes",:action => "load_attributes"}%>

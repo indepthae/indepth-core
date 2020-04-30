@@ -1,0 +1,38 @@
+<table>
+  <tr class="tr-head">
+    <% unless params[:action] == "my_leave_applications" %>
+      <td class="col-2"><%= t('employee_text') %></td>
+    <% end %>
+    <td class="col-1"><%= t('start_date') %></td>
+    <td class="col-1"><%= t('end_date') %></td>
+    <td class="col-1"><%= t('no_of_days') %></td>
+    <td class="col-1"><%= t('leave_type') %></td>
+    <td class="col-1"><%= t('leave_status') %></td>
+    <td class="col-2"><%= t('reason') %></td>
+    <% if params[:action] == "my_leave_applications" %>
+      <td class="col-1"></td>
+    <% end %>
+  </tr>
+  <% if @leave_applications.present? %>
+    <% @leave_applications.each do |application| %>
+      <tr>
+        <% unless params[:action] == "my_leave_applications" %>
+          <td><%= link_to "#{application.employee.full_name} (#{application.employee.employee_number})&#x200E;", {:controller =>"employee_attendance" , :action => "leave_application" , :id => application.app_id, :from => params[:action]} %></td>
+        <% end %>
+        <td><%= format_date(application.start_date, :short) %></td>
+        <td><%= format_date(application.end_date, :short) %></td>
+        <td><%= days_count(application) %></td>
+        <td><%= application.employee_leave_type.name %></td>
+        <td><%= application_status(application).capitalize%></td>
+        <td><%= application.reason %></td>
+        <% if params[:action] == "my_leave_applications" %>
+          <td><%= link_to t('view'), {:controller =>"employee_attendance" , :action => "leave_application" , :id => application.app_id, :from => params[:action]} %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr><td colspan="7"><%= t('no_results_found') %></td></tr>
+  <% end %>
+</table>
+<% p = params %>
+<%= will_paginate @leave_applications,  :renderer => 'RemoteLinkRenderer',:params => {:id => p[:id],:start_date => p[:start_date],:end_date => p[:end_date],:status=>p[:status],:employee=>p[:employee], :department_id=>p[:department_id]} %>

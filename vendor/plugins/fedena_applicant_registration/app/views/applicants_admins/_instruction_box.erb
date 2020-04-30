@@ -1,0 +1,27 @@
+<div id="flash"></div>
+<% form_remote_for instruction,:url=>save_instruction_applicants_admins_path,:html=>{:method=>:post,:id=>"in_form"} do |f| %>
+  <% if instruction.present? and instruction.skip_instructions == true %>
+    <div id="instruction_desc_text_field_bg" style="display:none;">
+      <%= f.redactor :description %>
+    </div>
+  <% else %>
+    <div id="instruction_desc_text_field_bg">
+      <%= f.redactor :description %>
+    </div>
+  <% end %>
+  <%= f.hidden_field :skip_instructions %>
+  <%= hidden_field_tag "type_of_action" %>
+  <div class="update-links">
+    <% if instruction.present? and instruction.skip_instructions == true %>
+      <%= link_to "#{t('save_application_instructions')}","#",:id=>"save_instructions",:class=>"instruction_link user_button",:style=>"display:none;",:onclick=>"unskip_and_save(); return false;" %>
+      <%= link_to "#{t('skip_application_instructions')}","#",:id=>"skip_instructions",:class=>"instruction_link margin-top-6",:style=>"display:none;",:onclick=>"skip_and_save(); return false;" %>
+      <%= link_to "#{t('show_application_instructions')}","#",:id=>"show_instructions",:class=>"instruction_link",:onclick=>"show_and_save(); return false;" %>
+    <% else %>
+      <%= link_to "#{t('save_application_instructions')}","#",:id=>"save_instructions",:class=>"instruction_link user_button",:onclick=>"unskip_and_save(); return false;" %>
+      <%= link_to "#{t('skip_application_instructions')}","#",:id=>"skip_instructions",:class=>"instruction_link margin-top-6",:onclick=>"skip_and_save(); return false;" %>
+      <%= link_to "#{t('show_application_instructions')}","#",:id=>"show_instructions",:class=>"instruction_link",:style=>"display:none;",:onclick=>"show_and_save(); return false;" %>
+    <% end %>
+  </div>
+<% end %>
+<div class="hor-line"></div>
+<%= load_redactor_script %>

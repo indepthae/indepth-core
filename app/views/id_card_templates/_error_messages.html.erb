@@ -1,0 +1,11 @@
+<div id='errorExplanation' class='errorExplanation'>
+  <p><%=t('field_errors_head') %>:</p>
+  <ul>
+  <% @errors.each do |error| %>
+    <li> <%= error %> </li>
+  <% end %>
+</ul>
+</div>
+<script>
+j("#error_messages")[0].scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+</script>

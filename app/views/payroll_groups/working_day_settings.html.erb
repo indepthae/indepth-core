@@ -1,0 +1,72 @@
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('employee_management_text')}" %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('working_day_settings') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <h3><%= t('no_of_working_days') %></h3>
+    <div class="description"><%= t('working_day_settings_desc') %></div>
+    <div onclick="reset_dates()" id="reset-date-link"><%=  t("reset_to_common_dates")%></div>
+    <% form_for 'salary_working_days', :url => {:action => "update_working_day_settings"} do |f| %>
+      <% @salary_working_days_without_months.each_with_index do |day,index| %>
+        <div class="label-field-pair" id=<%= "payment_period-#{@payment_periods[day.payment_period]}" %> >
+            <label for="period_type"><%= t(@payment_periods[day.payment_period]) %></label>
+            <div class="text-input-bg">
+                <%= text_field_tag "salary_working_days[#{index}]working_days", day.working_days %>
+                <%= hidden_field_tag "salary_working_days[#{index}]payment_period", day.payment_period %>
+                <%= hidden_field_tag "salary_working_days[#{index}]id", day.id%>
+            </div>
+            <span class="days_text"><%= t('days') %></span>
+            <% if @errors.present? and @errors[day.id].present? %>
+              <div class="wrapper" id="salary_exceeds<%= "#{@payment_periods[day.payment_period]}" %>" style="">
+                  <div class="error-icon"></div><div class="error-msg"><%= @errors[day.id].join(', ') %></div>
+              </div>
+            <% end %>
+        </div>
+        <% if index == 0 %>
+          <% @salary_working_days_with_months.each_with_index do |day,i| %>
+            <div class="label-field-pair" id="<%= cycle('even','odd')%>"  >
+                <label for="period_type"><%= t((Date::MONTHNAMES[day.month_value]).downcase) %></label>
+                <div class="text-input-bg">
+                    <%= text_field_tag "salary_working_days[#{index}#{i}]working_days", day.working_days %>
+                    <%= hidden_field_tag "salary_working_days[#{index}#{i}]payment_period", day.payment_period %>
+                    <%= hidden_field_tag "salary_working_days[#{index}#{i}]id", day.id%>
+                    <% if day.month_value.present? %><%= hidden_field_tag "salary_working_days[#{index}#{i}]month_value", day.month_value%><% end %>
+                </div>
+                <% if @errors.present? and @errors[day.id].present? %>
+                  <div class="wrapper" id="salary_exceeds<%= day.month_value%>" style="">
+                      <div class="error-icon"></div><div class="error-msg"><%= @errors[day.id].join(', ') %></div>
+                  </div>
+                <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+      <hr/>
+      <%= submit_tag "#{t('save_changes')}", :disable_with => "#{t('please_wait')}", :class => "submit-button" %>
+    <% end %>
+</div>
+
+<script type="text/javascript">
+  function reset_dates() {
+      var default_value = j('#salary_working_days_0working_days').val();
+      if (/^[1-9](\.)?[5]$|^[1-9]$|^[1-2]\d$|^[1-2]\d(\.)?[5]$|^3[0-1]$|^3[0](\.)?[5]$/.test(default_value)) {
+          var i;
+          for (i = 0; i <= 12; i++) {
+              j('#salary_working_days_0' + i + 'working_days').val(default_value)
+          }
+      } else {
+          alert('The number of working days must be a number between 1 and 31.');
+      }
+  }
+</script>

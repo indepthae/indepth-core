@@ -1,0 +1,13 @@
+page << "build_modal_box({title: '#{t('add_fine')}', popup_class: 'manual_fine_box'});" unless params[:multi_transaction_fine].present?
+page.replace_html 'popup_content', :partial => "finance_extensions/pay_all_form/pay_all_manual_fine_form"
+page << "document.body.scrollTop = document.documentElement.scrollTop = 0;"
+#if  params[:multi_transaction_fine].present? and @multi_transaction_fine.fee_type.present? and @multi_transaction_fine.fee_id.present?
+#  page << "var fee_type = '#{@multi_transaction_fine.fee_type}';"
+#  page << "var fee_type_lbl = '#{@multi_transaction_fine.fee_type.humanize}';"
+#  page << "var fee_type_lbl = #{@multi_transaction_fine.fee_id};"
+#  page << "set_collection();"    
+  #  page << "j('#multi_transaction_fine_fee_id').find('optgroup[label="' + #{fee_type_lbl} + '"]').find('option[value=' + <%= fee_id  %> + ']').attr('selected', 'selected');"
+  #  page << "j('#fee_type').val('<%= fee_type%>');"
+  #else
+  #  page << "console.log('why not happening')"
+#end

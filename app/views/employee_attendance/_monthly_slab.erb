@@ -1,0 +1,25 @@
+<% fields_for :leave_credit_slabs do |f| %>
+  <div class="left-side">
+
+      <% (1..6).each do |month| %>
+        <% if @action == "edit" and @credit_frequency == 2 and @credit_type == "Slab"%>
+          <% @leave_count = leave_count(@leave_type, month) %>
+        <% end %>
+        <div class="label-field-pair1"  id="monthly-values-<%= month %>">
+            <label for="month_count"><%= t(month_name(month).downcase) %> </label>
+            <div class="text-input-bg"><%= f.text_field "leave_count(#{month_name(month).downcase})", :value => @leave_count.present? ? @leave_count : nil, :onchange => "validate_data();"%></div>
+        </div>
+      <% end %>
+  </div>
+  <div class="right-side">
+      <% (7..12).each do |month| %>
+        <% if  @action == "edit" and @credit_frequency == 2  and @credit_type == "Slab"%>
+          <% @leave_count = leave_count(@leave_type, month) %>
+        <% end %>
+        <div class="label-field-pair1"  id="monthly-values-<%= month %>">
+            <label for="month_count"><%= t(month_name(month).downcase) %> </label>
+            <div class="text-input-bg"><%= f.text_field "leave_count(#{month_name(month).downcase})", :value => @leave_count.present? ? @leave_count : nil %></div>
+        </div>
+      <% end %>
+  </div>
+<% end %>

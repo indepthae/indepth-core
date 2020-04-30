@@ -1,0 +1,331 @@
+#page-yield {
+    width:1070px;
+    margin: 0 auto;
+    float: left;
+    overflow: hidden;
+}
+
+.hor_line{
+    width:1070px;
+    background: #ffffff;
+    height: 1px;
+}
+
+h2.heading{
+    text-align: center;
+    margin:5px;
+}
+
+#main_info h4{
+    color: #555555;
+    margin-top: 18px;
+    font-weight: normal;
+}
+
+#main_info h2{
+    margin-bottom: 2px;
+    font-weight: normal;
+
+}
+
+.even{
+    height:auto;
+    background: #fff;
+    /*page-break-after:auto;*/
+    /*page-break-inside: avoid;*/
+    page-break-inside: avoid !important;
+    position: relative;
+}
+.col-pdf{
+    text-overflow: ellipsis;
+}
+div.even{
+    width:100%;
+    float:left;
+    clear: both;
+    border:1px solid #ADACAB;
+    /*    border-top:1px solid #ADACAB;
+        border-left:1px solid #ADACAB;
+        border-right:1px solid #ADACAB;*/
+    margin-bottom: -2px;
+    padding: 0px 6px 0px 6px;
+    padding: 0px;
+}
+div.even:last-child {
+    border-bottom: 1px solid #adacab;
+    margin-bottom: -1px;
+}
+
+.even div{
+    border-right:1px solid #ADACAB;
+    border-bottom:1px solid #ADACAB;
+    border-top:1px solid #ADACAB;
+    float:left;
+    margin-bottom: 0px;
+    padding: 0px 6px 0px 6px;
+}
+
+.even .col-pdf_weekday:last-child {
+    border-bottom: 0px;
+}
+
+.table-header div{
+    padding: 6px 3px 6px 6px;
+    color: #97080e;
+    background: #ffffff;
+}
+
+#pdf_header {
+    display: block;
+    height: 30px;
+}
+
+#pdf-table{
+    float:left;
+    width: 100%;
+    border-bottom: 1px solid #adacab;
+    position: absolute !important;
+}
+
+#page-extender{
+    width:100%;
+    height :300px;
+}
+#page-extender1{
+    width:100%;
+    height :500px;
+
+}
+#pdf-info{
+    width: 100%;
+    margin-top: 10px;
+    padding-right: -1px;
+    display: inline-block;
+    background-color: #fff;
+}
+.report{
+    margin: 0 auto;
+    font-size: 11px;
+    font-family: Arial;
+    float:left;
+    width: 1071px;
+}
+
+.col-pdf-slots{
+    /*min-width: 110px;*/
+    width: auto;
+    height:96px !important;
+    width: 102px !important;    
+    margin-top: -1px;
+}
+.col-pdf-slots span{
+    font-size:10px !important;
+    font-weight:normal !important;
+}
+.class_timing span{
+    display: block !important;
+    max-height: 11px;
+}
+span.pdf_period{
+    width:110px !important;
+    width:102px !important;
+    word-break: break-all;
+    display: block;
+    font-size:10px !important;
+    font-weight:bold !important;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 30px !important;
+    margin-top: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;    
+    min-width:82px !important;
+
+    /* to avoid line break to next line */
+    max-height: 27px;
+    max-width: 110px;
+    max-width: 102px;
+    margin-bottom: 9px;
+}
+.col-pdf-slots.splitted span.pdf_period {
+    margin-top: 5px;
+}
+span.pdf_teacher{    
+    line-height: 18px;
+    font-size: 11px !important;
+}
+span.batch_name {
+    width: 110px;
+    max-height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    word-break: break-all;
+    margin-bottom: 5px;
+    
+    max-width: 102px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+div.col-pdf-break{
+    background-color: #ccc !important;
+    min-height:90px;
+    padding:5px 5px 6px 5px;
+    border-top:1px solid #ADACAB;
+    border-bottom:1px solid #ADACAB;
+}
+#pdf-info{
+    background-color: #fff;
+}
+/*.col-pdf_weekday{
+    min-height:88px !important;
+    width: 14px;
+    padding: 4px 2px !important;
+}
+.col-pdf_weekday .weekday_name{        
+    text-align: center;
+    -webkit-transform: translateX(-45%) translateY(255%) rotate(-90deg);
+    min-height: 6px;
+    border: 0px !important;
+    width: 88px;
+    padding: 1px 4px;
+}*/
+
+.col-pdf_weekday{
+    min-height:88px !important;
+    width: 14px;
+    padding: 4px 2px !important;
+    position: relative;
+    text-align: center;
+    border: 0px !important;
+    border-right: 1px solid #ccc !important;
+}
+.col-pdf_weekday .weekday_name{
+    min-height: 6px;
+    border: 0px !important;
+    width: 86px;
+    padding: 1px 4px;
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+#batch_name{
+    float:right;
+    font-size:17px;
+    font-weight:bold;
+}
+#tt_name{
+    float:left;
+    font-size:17px;
+    font-weight:bold;
+}
+.col-pdf-slots.splitted {
+    padding: 0px;
+    /*min-width: 110px !important;*/
+    min-width: 102px !important;
+    width: auto !important;
+    height: 96px !important;
+    border-bottom: 1px solid #adacab !important;
+}
+.col-pdf-slots.splitted span {
+    width: 100%;
+    display: block;
+}
+.class_timing{
+    display: block;
+    float: none !important;
+    width: auto;
+    border: 0px !important;
+    text-align: center;
+    padding: 5px 0px 0px 0px !important;
+}
+.col-pdf-slots.splitted .class_timing{
+    padding-bottom: 5px !important;
+}
+.col-pdf-slots.splitted .warning {
+    float: left;
+    width: 12px;
+    height: 12px;
+    padding: 0px;
+    border: 0px;
+    margin-top: 2px;
+    margin-left: 45px;
+    /* old
+    /*    margin-left: 45px;
+        margin-right: -56px;*/
+    /* new*/    
+    margin-left: calc(50% - 70px);
+    margin-right: -50%;
+    /* */
+    color: #f7262f;
+    font-weight: bold;
+    font-size: 14px !important;
+}
+.split_slot {
+    width: 110px;
+    width: 102px;
+    /*    height: 69px;*/
+    height: 78px; /* old */
+    height: 63px; /* new*/
+    border-bottom: 0px !important;
+}
+.splitted .split_slot:last-child{
+    border-right: 0px;
+}
+.elective_text,.elective_sub{
+    font-weight: normal !important;
+    border: 0px !important;
+    padding: 0px !important;
+    padding-top: 1px !important;
+}
+.elective_sub{
+    float: none !important;
+    font-weight: bold !important;
+}
+.elective_text {
+    margin-top: 2px;
+}
+.even:last-child .row-col {
+    border-bottom: 0px;
+}
+.last-row-col-no-right-border{
+    border-right: 0px !important;
+}
+.row-col {
+    /*border-top: 0px !important;*/
+    /*border-bottom: 0px !important;*/
+}
+
+/** adjustments for week row **/
+/** week row spanning in 2 rows **/
+.even_2 .col-pdf-slots, .even_2 .col-pdf-break, .even_3 .col-pdf-slots, .even_3 .col-pdf-break, .even_4 .col-pdf-slots, .even_4 .col-pdf-break{
+    border-bottom: 1px solid #adacab !important;
+}
+.even_2 .col-pdf_weekday{
+    height: 186px !important;
+}
+/*.even_2_last_row .col-pdf_weekday{
+    height: 180px !important;
+}*/
+/** week row spanning in 3 rows **/
+.even_3 .col-pdf_weekday{
+    height: 284px !important;    
+}
+/*.even_3_last_row .col-pdf_weekday{
+    height: 269px !important;
+}*/
+/** week row spanning in 4 rows **/
+.even_4 .col-pdf_weekday{
+    height: 381px !important;        
+}
+/*.even_4_last_row .col-pdf_weekday{
+    height: 359px !important;
+}*/
+.even:last-child {
+    margin-bottom: -1px !important;
+}

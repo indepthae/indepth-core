@@ -1,0 +1,207 @@
+
+<div class="form_container">
+    <%  unless  @subjects.present? and @students.present? and @fa_score_hash.present?%>
+      <div id="hider">
+          <p class="flash-msg">No reports found for the search</p>
+      </div>
+    <% else %>
+      <table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+          <tr>
+              <td id="firstTd"></td>
+              <td rowspan="2">
+                  <div id="divHeader" style="">
+                      <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                          <tr id="main_heading"> 
+                              <%if @assessment_group=="ASL1" or @assessment_group=="ASL2" or @assessment_group=="ASLO"%>
+                                <td colspan="<%=@assessment_group=="ASLO" ? 7 : 3%>">
+                                    <div class="tableHeader th_0"><%=@subjects.first.name %></div>
+                                </td>
+                              <% else %>
+                                <% @subjects.each_with_index do |s,i| %>
+                                  <td colspan="2">
+                                      <div class="tableHeader th_<%=i%>"><%=s.name %></div>
+                                  </td>
+                                <% end %>
+                              <% end %>
+                          </tr>
+
+                          <%if @assessment_group=="ASL1" or @assessment_group=="ASL2" or @assessment_group=="ASLO"%>
+                            <tr id="sub_header">
+    <%#*<td>%>
+    <%#*<div class="tableSubHeader"></div>%>
+    <%#*</td>%>
+                                <%if @assessment_group=="ASL1"%>
+                                  <td colspan="3">
+                                      <div class="tableSubHeader">SA1</div>
+                                  </td>
+                                <%end%>
+                                <%if @assessment_group=="ASL2"%>
+                                  <td colspan="3">
+                                      <div class="tableSubHeader">SA2</div>
+                                  </td>
+                                <%end%>
+                                <%if @assessment_group=="ASLO"%>
+                                  <td colspan="3">
+                                      <div class="tableSubHeader">SA1</div>
+                                  </td>
+                                  <td colspan="3">
+                                      <div class="tableSubHeader">SA2</div>
+                                  </td>
+                                  <td>
+                                      <div class="tableSubHeader"></div>
+                                  </td>
+                                <%end%>
+                            </tr>
+                          <%end%>
+                          <tr id="sub_header">
+                              <% i = 0 %>
+                              <%if @assessment_group=="ASL1" or @assessment_group=="ASL2" or @assessment_group=="ASLO"%>
+                                <% i = i+1 %>
+                                <% claz = "tableSubHeader tsh_#{i}" %>
+                                <td>
+                                    <div class="<%=claz%>">Speaking Skills (20.0)</div>
+                                </td>
+                                <td>
+                                    <div class="<%=claz%>">Listening Skills (20.0)</div>
+                                </td>
+                                <td>
+                                    <div class="<%=claz%>"><%="Marks Obtained (#{@fa_score_hash['asl_mark']['score']})"%></div>
+                                </td>
+                                <%if @assessment_group=="ASLO"%>
+                                  <% claz = "tableSubHeader tsh_#{i}" %>
+                                  <td><div class="<%=claz%>">Speaking Skills (20.0)</div></td>
+                                  <td><div class="<%=claz%>">Listening Skills (20.0)</div></td>
+                                  <td><div class="<%=claz%>">Marks Obtained (<%=@fa_score_hash['asl_mark']['score']%>)</div></td>
+                                  <td><div class="<%=claz%>">Overall (Grade)</div></td>
+                                <%end%>
+                              <%else%>
+                                <% @subjects.each do |s| %>
+                                  <% i = i + 1 %>
+                                  <% claz = "tableSubHeader tsh_#{i}" %>
+                                  <td><div class="<%=claz%>">Grade</div></td>
+                                  <td><div class="<%=claz%>">Mark(%)</div></td>
+                                <% end %>
+                              <%end%>
+                          </tr>
+                      </table>
+                  </div>
+              </td>
+          </tr>
+          <tr>
+              <td id="firstSubTd">Student</td>
+          </tr>
+          <tr>
+              <td valign="top">
+                  <div id="firstcol">
+                      <table width="250px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                          <%@students.each do |student|%>
+                            <% if @config == "admission_no" %>
+                              <% student_text = "#{student.full_name} (#{student.admission_no})" %>
+                            <%elsif @config == "roll_number" %>
+                              <% if student.roll_number.present? %>
+                                <% student_text = "#{student.full_name} (#{student.roll_number})"%>
+                              <%else%>
+                                <% student_text = "#{student.full_name} (-)" %>
+                              <%end%>
+                            <%else%>
+                              <% if Configuration.enabled_roll_number? %>
+                                <% if student.roll_number.present? %>
+                                  <% student_text = "#{student.full_name} (#{student.roll_number})"%>
+                                <%else%>
+                                  <% student_text = "#{student.full_name} (-)" %>
+                                <%end%>
+                              <%else%>
+                                <% student_text = "#{student.full_name} (#{student.admission_no})" %>
+                              <%end%>
+                            <% end %>
+                            <tr class="<%=cycle('odd', 'even')%>">
+                                <td class="tableFirstCol" id="st_<%=student.id%>"><div class="student_names"><%= student_text %> </div></td>
+                            </tr>
+                          <%end%>
+                      </table>
+                  </div>
+              </td>
+              <%reset_cycle%>
+              <td valign="top">
+                  <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                      <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                          <%@students.each_with_index do |s,i|%>
+                            <% st= @fa_score_hash.find{|c,v| c==s.id} %>
+                            <tr class="<%=cycle('odd', 'even')%> st_<%=s.id%>" id=<%= i ==0 ? "firstTr" : "" %>>
+                                <% if st %>
+                                  <%if @assessment_group=="ASL1"%>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['speaking'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['listening'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['convert'] %></div></td>
+                                  <%elsif @assessment_group=="ASL2"%>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['speaking'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['listening'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['convert'] %></div></td>
+                                  <% elsif @assessment_group=="ASLO"%>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['speaking'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['listening'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL1']['convert'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['speaking'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['listening'] %></div></td>
+                                    <td><div class="scores"><%= @fa_score_hash[s.id]['ASL2']['convert'] %></div></td>
+                                    <%if @fa_score_hash[s.id]['ASL2']['overall'].present?%>
+                                      <td><div class="scores"><%= "#{@fa_score_hash[s.id]['ASL2']['overall']} (#{@fa_score_hash[s.id]['ASL2']['grade']})"%></div></td>
+                                    <%else%>
+                                      <td><div class="scores"><%= "#{@fa_score_hash[s.id]['ASL1']['overall']} (#{@fa_score_hash[s.id]['ASL1']['grade']})"%></div></td>
+                                    <%end%>
+                                  <%else%>
+                                    <% @subjects.each do |sub| %>
+                                      <% sc=@fa_score_hash[s.id][sub.id] %>
+                                      <% if sc.present?  %>
+                                        <td><div class="scores"><%= @fa_score_hash[s.id][sub.id]['grade'] %></div></td>
+                                        <td><div class="scores"><%= @fa_score_hash[s.id][sub.id]['mark'] %></div></td>
+                                      <% else %>
+                                        <td><div class="scores">-</div></td>
+                                        <td><div class="scores">-</div></td>
+                                      <% end %>
+                                    <% end %>
+                                  <%end%>
+                                <% else %>
+                                  <% @subjects.each do |s| %>
+                                    <td><div class="scores">-</div></td>
+                                    <td><div class="scores">-</div></td>
+                                    <%if @assessment_group=="ASL1" or @assessment_group=="ASL2" or @assessment_group=="ASLO"%>
+                                      <td><div class="scores">-</div></td>
+                                    <%end%>
+                                    <%if @assessment_group=="ASLO"%>
+                                      <td><div class="scores">-</div></td>
+                                      <td><div class="scores">-</div></td>
+                                      <td><div class="scores">-</div></td>
+                                      <td><div class="scores">- (-)</div></td>
+                                    <%end%>
+                                  <% end %>
+                                <% end %>
+                            </tr>
+                          <%end%>
+                      </table>
+                  </div>
+              </td>
+          </tr>
+      </table>
+    <% end %>
+    <%  if  @subjects.present? and @students.present? and @fa_score_hash.present?%>
+      <div class="button">
+          <div class="pdf-button">
+              <%= link_to "► CSV Export", {:controller => "cce_reports", :action => "generated_report_csv",:batch_id=>params[:assessment][:batch_id],:student_category_id=>params[:assessment][:student_category_id],:assessment_group=>params[:assessment][:assessment_group],:gender=>params[:assessment][:gender],:exam_group_id=>params[:assessment][:exam_group_id]},:style=>"color:#fff !important;",:target => '_blank' %>
+          </div>
+          <div class="pdf-button">
+              <%= link_to "► PDF Report", {:controller => "cce_reports", :action => "generated_report_pdf",:batch_id=>params[:assessment][:batch_id],:student_category_id=>params[:assessment][:student_category_id],:assessment_group=>params[:assessment][:assessment_group],:gender=>params[:assessment][:gender],:exam_group_id=>params[:assessment][:exam_group_id],:page_height=>800},:style=>"color:#fff !important;",:target => '_blank' %>
+          </div>
+      </div>
+    <% end %>
+</div>
+<div class="overlay">
+    <div id="loading_big"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader1") %>
+        <span><%= "#{t('loading')}.." %></span>
+    </div>
+</div>
+<script type="text/javascript">
+    j(document).ready(function () {
+    fnAdjustTable();
+    });
+</script>

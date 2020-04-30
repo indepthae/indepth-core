@@ -1,0 +1,24 @@
+<% owner_object = @owner.class.name.underscore.to_sym %>
+<% form_path = ("#{owner_object}_available_plugin_path") %>
+<% later_path = ("#{owner_object}_path") %>
+<% form_for(@available_plugin, :url=>(send form_path, @owner),:html=>{:class=>'form'}) do |f| %>
+  <fieldset class="float-left width-100-pc">
+    <div class="float-right margin-right-30 link-box-red"><a href="#" id="select_all_plugin">All</a><p class="vertical-line">|</p><a href="#" id="select_no_plugin">None</a></div>
+  </fieldset>
+  <div class="float-left width-100-pc" id="plugin_grid">
+    <% (admin_user_session.allowed_plugins & FedenaPlugin.selectable_plugins).each do |plugin| %>
+      <div class="plugin-cell main-bg-color">
+        <%= check_box_tag "available_plugin[plugins][]",plugin, @owner.available_plugin.plugins.include?(plugin), :id=>"school_"+plugin %>
+        <label for="school_<%= plugin %>"><%= plugin=="fedena_google_sso" ? "Google SSO" : plugin.sub(/^fedena_/,'').titleize.titleize %></label>
+      </div>
+    <% end %>
+  </div>
+  <fieldset class="float-left width-100-pc">
+    <% if action_name=='new' %>
+      <%= link_to 'Later', "#{(send later_path,@owner)}", {:class  => 'button-grey-large float-right-with-margin'}%>
+      <%= f.submit 'Finish', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    <% else %>
+      <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    <% end %>
+  </fieldset>
+<% end %>

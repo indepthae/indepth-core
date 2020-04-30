@@ -1,0 +1,59 @@
+<% if @transport_fee_discounts.present? %>
+
+  <tr class="row-a">
+      <td class="sl-col col-1"></td>
+      <td class="col-1 bold_font" colspan="3">
+          <span><%= t('discount') %></span>
+      </td>
+  </tr>
+
+  <% @transport_fee_discounts.each do |tfd| %>
+
+    <% tfd.is_amount ?  (discount_amt = tfd.discount) : (discount_amt =
+        (total_fees*(tfd.discount/100))) %>
+
+    <tr class="row-b">
+        <td class="sl-col normal_font particular_index"><%= i += 1 %></td>
+        <td class="set_border_right particular-col normal_font">
+            <%= "#{tfd.name}" %><%= tfd.is_amount ? "" : " - #{tfd.discount}%" %>
+        </td>
+        <td class="set_border_right amount-col normal_font align_right">
+            <%= precision_label discount_amt %>
+        </td>
+        <td class="cancel-disc cancel-color">
+
+            <% unless tfd.multi_fee_discount.present? %>
+              <% unless @receiver_profile.present? %>
+                <% unless transport_fee.is_paid %>
+                  <!--<td id="delete-instant-discount" class="cancel-disc cancel-color">-->
+                  <% unless transport_fee_discount_has_active_transaction?(tfd) %>
+                  <%= link_to_remote "x",
+                    :url => {:action => 'delete_instant_discount',
+                    :transport_fee => transport_fee.id, :transport_fee_discount => tfd.id},
+                    :confirm => t('delete_confirm_msg')%>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+
+        </td>
+    </tr>
+  <% end %>
+<% end %>
+<% balane = @transport_fee.tax_enabled ? (@transport_fee.balance.to_f - @transport_fee.tax_amount.to_f) : @transport_fee.balance.to_f %>
+<% unless @transport_fee.is_paid %>
+  <% unless @prevent_instant.present? %>
+    <% if (balane.to_f > 0) %>
+    <tr class="row-a">
+        <td colspan="3">
+            <div class="instant-particular">
+                <%= link_to_remote "+ #{t('add_discount')}",
+                  :url => {:action => 'create_instant_discount',
+                  :id => transport_fee.id},:method => :get %>
+            </div>
+        </td>
+        <td class="cancel-disc"></td>
+    </tr>
+    <% end %>
+  <% end %>
+<% end %>

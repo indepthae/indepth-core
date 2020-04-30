@@ -1,0 +1,17 @@
+<div class="default_cts_section"><%=t('class_timing_set_name')%></div><div class="default_cts_section">:</div><div  id="default_class_timing_set_name" class="default_cts_section"><span><%=@class_timing_set.name%></span></div>
+<div class="themed_text" id="edit_link">Edit</div>
+
+<script type="text/javascript">
+  j('#edit_link').click(function(){
+    this.hide();
+    j('#default_class_timing_set_name').children().first().hide();
+    new Ajax.Request('/class_timing_sets/<%=@class_timing_set.id%>/edit',{
+      asynchronous:true,
+      evalScripts:true,
+      method:'get',
+      onComplete:function(resp){
+        j('#default_class_timing_set_name').append(resp.responseText);
+      }
+    });
+  })
+</script>

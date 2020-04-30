@@ -1,0 +1,17 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="additional_field_box">
+    <tr class="institution_details_row" style="height: 40px;">
+        <td><div class ="close-field">X</div><span class="cb_value"><%= text_field_tag "additional_field" %></span></td>
+    <div class="institution_details_form_input">
+        <td colspan="2">
+            <span class="text_color_select"><%= select_tag "text_size", options_for_select([["#{t('select_text_size')}", '']]+["Large","Small","Normal","Medium","Very Small"]) %></span>
+            <span class="text_size_select"><%= select_tag "text_color", options_for_select([["#{t('select_text_color')}", '']]+["Grey","Black"]) %></span>
+        </td>
+    </div>
+</tr>
+</div>

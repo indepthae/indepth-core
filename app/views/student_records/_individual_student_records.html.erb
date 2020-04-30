@@ -1,0 +1,114 @@
+<div id="student_record_data_holder">
+  <div id="top">
+    <%=hidden_field_tag :current_batch ,@batch.id%>
+    <div id="<%=@previous_batch.id unless @previous_batch.nil?%>" class="previous_student"><span id="previous"></span></div>
+    <div id="top_section_full">
+      <div class="heading_sec_50">
+        <div class="header_name"><%=t('batch')%></div>
+        <div class="header_value bold_text"><%=@batch.full_name%></div>
+      </div>
+      <%if roll_number_enabled?%>
+        <div class="heading_sec_50_right">
+          <div class="header_name"><%=t('roll_nos')%></div>
+          <div class="header_value"><%=@batch.is_active==true ? @student.roll_number.present? ? @student.roll_number : "-" : @student.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number.present? ? @student.batch_students.last(:conditions=>{:batch_id=>@batch.id}).roll_number : "-"%></div>
+        </div>
+      <%end%>
+    </div>
+    <div id="<%=@next_batch.id unless @next_batch.nil?%>" class="next_student"><span id="next"></span></div>
+  </div>
+  <div id="main_section_full">
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader_1", :style =>"display: none" ) %>
+    <%if @student_records.present?%>
+      <%@student_records.each do |record_group,records|%>
+        <div class="record_group_wise">
+          <div class="record_group_name"><%=record_group%></div>
+          <%i=0%>
+          <%records.sort{|a,b| a[:priority]<=>b[:priority]}.each do |record|%>
+            <div class="record_detail_set">
+              <div class="sl_no"><%=i+=1%>.</div>
+              <div class="record_name"><%=record.name%></div>
+            </div>
+            <%if (["singleline","multiline"].include? record.input_type)%>
+              <div class="data_list"><%=record.additional_info.strip.gsub(/\n/, "<br/>")%> <%=(record.additional_info.present? and record.input_type == "singleline" and record.record.suffix.present?) ? record.record.suffix : ""%></div>
+            <%elsif record.input_type == "date"%>
+              <div class="data_list"><%=format_date(record.additional_info.to_date)%></div>
+            <%elsif record.input_type == "multi_select"%>
+              <%datas = record.additional_info.split(", ")%>
+              <%if datas.present?%>
+                <%datas.each do |data|%>
+                  <div class="data_list"><span>-</span> <%=data%></div>
+                <%end%>
+              <%end%>
+            <%elsif record.input_type == "single_select" and !record.additional_info.blank?%>
+              <div class="data_list"><span>-</span> <%=record.additional_info%></div>
+            <%else%>
+              <%attachments=record.record_addl_attachments%>
+              <%if attachments.present?%>
+                <% attachments.each do |att| %>
+                  <div class="data_list"><%= link_to truncate(att.attachment_file_name, :length => 15,:ommision => '...'),att.attachment.url(:original, false),:target=>"blank" %></div>
+                <% end %>
+              <%else%>
+                <div class="data_list"><%="<span>#{t('not_attachments_added_yet')}</span>"%></div>
+              <%end%>
+            <%end%>
+          <%end%>
+        </div>
+        <div class="hor_line"></div>
+      <%end%>
+    <%else%>
+      <p id="no_records"><%=t('no_student_records')%></p>
+    <%end%>
+  </div>
+</div>
+<script type="text/javascript">
+  j('.previous_student').click(function(){
+    j.ajax({
+      type: 'POST' ,
+      url: "/student_records/individual_student_records",
+      data : {
+        batch_id : j('.previous_student').attr('id'),
+        id: <%=@student.id%>
+      },
+      beforeSend : function(){
+        j('#main_section_full').children().not('img').hide();
+        j('#loader_1').show();
+      },
+      success : function(data) {
+        j('tr.st_entry').removeClass('coloured_background');
+        j('tr#'+j('#current_student').val()).addClass('coloured_background');
+        j('#loader_1').hide();
+        j('#main_section_full').children().not('img').show();
+      }
+    });
+  });
+  j('.next_student').click(function(){
+    j.ajax({
+      type: 'POST' ,
+      url: "/student_records/individual_student_records",
+      data : {
+        batch_id : j('.next_student').attr('id'),
+        id: <%=@student.id%>
+      },
+      beforeSend : function(){
+        j('#main_section_full').children().not('img').hide();
+        j('#loader_1').show();
+      },
+      success : function(data) {
+        j('tr.st_entry').removeClass('coloured_background');
+        j('tr#'+j('#current_student').val()).addClass('coloured_background');
+        j('#loader_1').hide();
+        j('#main_section_full').children().not('img').show();
+      }
+    });
+  });
+  j('tr.st_entry').click(function(){
+    j('tr.st_entry').removeClass('coloured_background')
+    j(this).addClass('coloured_background');
+  });
+  j(document).ready(function(){
+    j('tr.st_entry').removeClass('coloured_background');
+    j('tr#'+j('#current_batch').val()).addClass('coloured_background');
+  });
+ 
+  
+</script>

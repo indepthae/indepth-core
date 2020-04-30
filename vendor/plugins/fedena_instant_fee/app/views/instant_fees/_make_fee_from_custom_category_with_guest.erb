@@ -1,0 +1,22 @@
+
+
+<% total_fees =0 %>
+<% form_for :fees, :url => {:action => 'create_instant_fee'},:complete=> 'assign_amt()',:html => {:onsubmit => "return validate_make_fee_for_guest_from_custom_category()"}do |form| %>
+  <div class="guest_category_pair">
+    <div class="select_guest">
+      <div class="label-field-pair">
+        <label for="payee" ><%= t('guest_name') %></label>
+        <div id ="guest_payee" class="text-input-bg_guest"><%= text_field_tag 'guest_payee' %>
+        </div>
+      </div>
+    </div>
+    <div class="select_guest_category">
+      <%= render :partial => 'select_category_type' %>
+    </div>
+  </div>
+  <div class="extender"></div>
+  <div id="fee_window"></div>
+<%end%>
+
+
+

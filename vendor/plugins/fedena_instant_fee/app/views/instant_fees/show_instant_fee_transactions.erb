@@ -1,0 +1,41 @@
+<%= javascript_include_tag("receipt_printer") %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('instant_fees_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('transactions') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div class="filter_category">
+    <label for="category" id="label-member4"><%= t('select_category') %>
+    </label>
+    <div class="text-input-bg">
+      <%= select :select_category, :category, @instant_fee_categories.map { |s| [s.name, s.id] } << ["#{t('custom')}","Custom"],
+        {:prompt => "#{t('select_category')}"},
+        {:onChange => "#{remote_function(:url => {:action => "list_instant_fee_transactions"}, :with => "'category_id='+value",
+        :before => "Element.show('loader3')",
+        :success => "Element.hide('loader3')")}"} %><%= image_tag("loader.gif",
+        :align => "absmiddle",
+        :border => 0,
+        :id => "loader3",
+        :style =>"display: none;" ) %>
+    </div>
+
+
+
+    <div id="show_transactions">
+
+    </div>
+  </div>
+</div>
+<script>
+
+  function date(){
+    $$('#date_search_form')[0].request();
+  }
+</script>
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>

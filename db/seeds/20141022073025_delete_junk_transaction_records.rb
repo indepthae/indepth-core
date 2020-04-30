@@ -1,0 +1,1 @@
+ActiveRecord::Base.connection.execute("delete ft from finance_transactions ft LEFT JOIN monthly_payslips on ft.id=monthly_payslips.finance_transaction_id where ft.title='Monthly Salary' and monthly_payslips.finance_transaction_id IS NULL;")

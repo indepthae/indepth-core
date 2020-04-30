@@ -1,0 +1,12 @@
+<label for="employee_total-experience"><%= t('import_to_ay') %></label>
+<div class="text-input-bg">
+    <%= select :import_transport, :import_to_id, options_for_select(@academic_years_to.map{|a| [a.name, a.id]}, @import.try(:import_from_id).try(:to_i) ),
+      {:include_blank => t('select_an_academic_year')}, {:onchange => "#{remote_function(:url => {:action => "update_import_form"},:with => "'academic_year_id='+value+'&import_from='+#{@import_from}",
+      :before => "Element.show('loader2')",:success => "Element.hide('loader2')")}"} %>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader2",
+      :style =>"display: none;" ) 
+    %>
+</div>

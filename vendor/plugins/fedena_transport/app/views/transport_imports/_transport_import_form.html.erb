@@ -1,0 +1,20 @@
+<hr/>
+<div class="ind_block pull_left">
+    <% TransportImport::IMPORT_LIST.each do |i| %>
+    <%= puts "#{i.to_s.inspect}" %>
+      <div class="label_pair">
+          <%= check_box_tag 'import_transport[imports][]',i.to_s,false, {:checked => @transport_import.send(i), :disabled => @completed_imports.include?(i.to_s),:id=>"import_transport_imports_"+"#{i.to_s}"} %>
+          <label class="general_label" for="import_transport_imports_<%= i.to_s %>"><%=t(i)%></label>
+      </div>
+    <% end %>
+</div>
+<% if @transport_import.errors.present? and @transport_import.errors[:imports].present? %>
+  <div class="wrapper">
+      <div class="error-icon"></div>
+      <div class="error-msg">
+          <%= @transport_import.errors[:imports] %>
+      </div>
+  </div>
+<% end %>
+<hr/>
+<%=submit_tag "#{t('import_transport')}", :class => "submit-button", :id => "submit_button" %>

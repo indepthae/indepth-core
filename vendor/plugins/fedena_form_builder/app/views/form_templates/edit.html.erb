@@ -1,0 +1,76 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form_templates.create') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('form_templates')}", form_templates_path%></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <% form_for @form_template do |template| %>
+    <%= javascript_include_tag "form_templates/template" %>
+    <div class="form_template_container">
+      <div class="template_element_selection">
+        <%= render :partial => 'elements_pane' %>
+      </div>
+      <div class="template_form">
+        <%= render :partial => 'template_form_edit', :locals => {:template => template} %>
+      </div>
+    </div>
+    <div id="dragplaceholder"></div>
+    <div id="dragged_fields"></div>
+    <div class="settings_data">
+
+    </div>
+    <div id="submit_result"></div>
+  <% end %>
+</div>
+<style>
+  #template_drag_area:after{
+    content: "<%= t('drag_here') %>"
+  }
+  .template_blank_form{
+    display: none;
+  }
+</style>
+<script>
+  j('.field_set').find('input, textarea, select').each(function(a,b) {
+    j(b).attr('disabled','');
+    j(b).css('background-color','#fff');
+  });
+  j('#template_fields').sortable();
+  if(j('#template_fields').find('.field_set').length == 0){
+    j('.template_blank_form').attr('style','display:block');
+  }
+  j(document).ready(function(){
+    j('select').each(function(a,b){
+      j(this).find('option').each(function(x,y){
+        splt = j(y).val().split(':field_option_id');
+        splt2 = splt[1].split('_field_option_weight');
+        if(splt2.length == 2){
+          j(y).attr('attr_id',splt2[0]);
+          j(y).attr('data_weight',splt2[1]);
+        }else if(splt2.length == 1){
+          j(y).attr('attr_id',splt2[0]);
+        }
+        j(y).val(splt[0]);
+        
+      });
+    });
+  });
+</script>

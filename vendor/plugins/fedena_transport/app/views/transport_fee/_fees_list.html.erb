@@ -1,0 +1,146 @@
+<div id="fees_list">
+    <div class="top-div">
+        <div class="question-text">
+            <input type="checkbox" class='select_all' >
+            <%= t('fee_collections') %></div>
+    </div>
+    <div id="right-panel-loader" style="display:none"><label>Loading ...</label></div>
+    <% if @receiver.transport.present? %>
+      <% if @fee_collection_dates.present? %>
+        <div id="right-panel-bottom">
+            <% remote_form_for :fees_list, :url => {:controller => 'transport_fee', :action => 'allocate_or_deallocate_fee_collection'}, :authenticity_token => true, 
+              :html=>{:method=>:post,:id=>'allocation_form'},:before=>"$('submit_button').disable()",
+              :complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |form1| %>
+              <%= hidden_field_tag :session_fingerprint, session_fingerprint %>
+              <%= hidden_field_tag :recepient, @receiver.class.name.pluralize.downcase %>
+              <%= form1.hidden_field :financial_year_id, :value => @current_financial_year[:id] %>
+              <%= form1.hidden_field :receiver_id, :value => @receiver.id %>
+              <%= form1.hidden_field :user_id, :value => @receiver.user_id %>
+              <%= hidden_field_tag :batch_id, @batch.id %>
+
+              <% @fee_collection_dates.each do|date| %>
+                <div class="option-main">
+                    <div class="option-div">                        
+                        <% is_paid = @transport_fees[date.id].present? ? 
+                          (@transport_fees[date.id].last.transaction_id_present == "0" ? false : true) : false %>                        
+                        <% assigned = @transport_fees[date.id].present? ? 
+                          (@transport_fees[date.id].last.collection_active == "0" ? false : true) : false %>                        
+                        <% is_disabled = true if assigned and @transport_fees[date.id].present? and @disabled_fee_ids.present? and 
+                          @disabled_fee_ids.include?(@transport_fees[date.id].last.fee_id.to_i) %>
+
+                        <% if is_paid %>
+                          <% tooltip_msg = 'fee_already_paid' %>
+                        <% elsif (assigned and is_disabled) %>
+                          <% tooltip_msg = 'pay_all_discount_exists' %>
+                        <% else %>
+                          <% tooltip_msg = "" %>
+                        <% end %>
+
+                        <label class="collection_check">                        
+                            <%= check_box_tag 'fees_list[collection_ids][]', date.id, assigned, 
+                              {:class => 'collection_box', :disabled => (is_paid or is_disabled) } %>
+
+                            <div class="att_list_names">                                 
+                                &nbsp;  
+                                <%= date.name %>
+                            </div>  
+                        </label>
+                        <% if tooltip_msg.present? %>
+                          <span class="help_info" tooltip="<%= t(tooltip_msg) %>"></span>
+                        <% else %>
+                          <span class="help_info help_info_hide"></span>
+                        <% end %>
+                    </div>
+                </div>
+              <% end %>
+      <%#= form1.submit "#{t('assign_fees')}", :class => "submit_button" %>
+            <% end %>
+        </div>
+      <% else %>
+        <div id="right-panel-no-route"><label>No fee collections</label></div>
+      <% end %>
+    <% else %>
+      <div id="right-panel-no-route"><label>No route assigned</label></div>
+    <%end%>
+</div>
+
+<script type="text/javascript">
+
+  j('.submit_button').click(function () {
+
+
+      j('.submit_button').text('<%="► #{t("please_wait")}"%>')
+      j('.submit_button').text('<%="#{t("update")}"%>')
+      j('html, body').animate({scrollTop: 0}, 100);
+  });
+  j(document).ready(function () {
+      if (j('.collection').length >= 1) {
+          j('.sel-list').show();
+      }
+      var update_visible_transport = '<%= @receiver.transport.present? %>';
+      var update_visible_fee_collection = '<%= @fee_collection_dates.present? %>';
+      if (update_visible_transport == 'true' && update_visible_fee_collection == 'true')
+          j('button.submit_button').prop('disabled', false);
+      else {
+          j('button.submit_button').prop('disabled', true);
+          j('button.submit_button').css('background', '#373B3F');
+      }
+
+      check_box_selection()
+  })
+
+  j(document).delegate('.collection_box', 'click', function () {
+      check_box_selection()
+  })
+  j(document).delegate('.select_all', 'click', function () {
+      select_all(this);
+  })
+
+  var total_check_box = 0, total_disabled_check_box = 0;
+  j.map(j('.collection_box'), function (val, i) {
+      total_check_box = total_check_box + 1;
+  });
+  j.map(j('.collection_box:disabled'), function (val, i) {
+      total_disabled_check_box = total_disabled_check_box + 1;
+  });
+  if (total_check_box == total_disabled_check_box)
+      j('.select_all').prop('disabled', true)
+
+  function check_box_selection() {
+      var l0 = 0, l1 = 0, l2 = 0;
+      j.map(j('.collection_box'), function (val, i) {
+          l0 = l0 + 1;
+      });
+      j.map(j('.collection_box:disabled'), function (val, i) {
+          l1 = l1 + 1;
+      });
+      j.map(j('.collection_box:checked'), function (val, i) {
+          if (j(val).prop('disabled') == false) {
+              l2 = l2 + 1;
+          }
+      });
+      if (l2 == (l0 - l1))
+          j('.select_all').prop("checked", true);
+      else
+          j('.select_all').prop("checked", false);
+  }
+  function select_all(current) {
+      if (j(current).prop('checked') == true)
+      {
+          j.map(j('.collection_box'), function (val, i) {
+              if (j(val).prop('disabled') == false) {
+                  j(val).prop('checked', true);
+              }
+          });
+      } else {
+          j.map(j('.collection_box'), function (val, i) {
+              if (j(val).prop('disabled') == false) {
+                  j(val).prop('checked', false);
+              }
+          });
+      }
+  }
+<%#*MathJax.Hub.Queue(["Typeset",MathJax.Hub,"right-panel"]);%>
+  j("#right-panel").find('iframe').attr("width", "340px");
+  j("#right-panel").find('iframe').attr("height", "191px");
+</script>

@@ -1,0 +1,31 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('derived_exam_report') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :derived_exam_show, [@assessment_group,@academic_year,@course] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+      
+    <div class="assessments_box">
+        <div class="assessments_details">
+            <%= render :partial=> 'assessment_group_details_short' %>
+            <%= render :partial=> 'derived_assessment_details' %>
+            
+        </div>
+        <div id="mark_register">
+            <% if @students.present? or true %>
+              <%= render :partial => 'derived_mark_list'  %>
+            <% else %>
+              <p class="flash-msg"> <%= t('no_students_found') %> </p>
+            <% end %>
+        </div>
+    </div>
+</div>
+

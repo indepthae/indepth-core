@@ -1,0 +1,58 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('buildings') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_buildings') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_building')}", :controller => "buildings",:action => 'new' %></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"><%= flash[:notice] %> </p>
+  <% end %>
+
+  <%  unless @buildings.empty? %>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td><%= t('sl_no') %> </td>
+        <td><%= t('buildings') %> </td>
+        <td><%= t('num_rooms') %></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <%  count = ((params[:page] || 1).to_i - 1) * 10 %>
+      <% @buildings.each_with_index do |b,i| %>
+      <tr class="tr-<%= cycle('odd', 'even') %>" id ="building-<%= b.id %>">
+        <td class="col-1"><%= count + i + 1 %></td>
+        <td class="col-2"><%= link_to "#{b.name}", building_path(b.id) %></td>
+        <td class="col-2">
+          <div id ="count"><%= b.classrooms.length %>
+            <div class="links">
+              <div id="edit"><%= link_to "#{t('edit')}",edit_building_path(b.id),{:class => 'themed_text'}%> </div>
+              <div id ="delete">
+                <%=  link_to "#{t('delete')}", building_path(b.id), :method => :delete, :class => "delete themed_text", :confirm => "Are you sure ?"%>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+  <% else%>
+    <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-<%= cycle('odd', 'even') %>">
+        <td class="col-2"><%= "#{t('no_buildings')}" %></td>
+      </tr>
+    </table>
+  <% end %>
+  <%= will_paginate @buildings %>
+</div>
+

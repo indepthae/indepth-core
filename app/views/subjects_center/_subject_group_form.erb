@@ -1,0 +1,60 @@
+<% remote_form_for @component, :url => {:action => @component.new_record? ? 'create_component' : 'update_component', :type => 'subject_group', :id => @component.id, :course_id => @course.id}, :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |sg| %>
+  <%= session_fingerprint_field %> 
+  <%= sg.hidden_field :course_id %>
+  <div id="subject_group_form">
+      <div class="label-field-pair">
+          <label for="name"><%= t('subject_group_name') %></label>
+          <div class="text-input-bg"><%= sg.text_field :name  %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="name"><%= t('calculation_text') %></label>
+          <div class="grade_type">
+              <%= sg.radio_button :calculate_final, 1, :checked => sg.object.calculate_final, :onchange => 'toggle_formula(this)' %>
+              <label for="subject_skill_set_calculate_final_1"><%= t('calculate_subject_group_scores') %></label>
+              <div id ="description"><%= t('calculate_subject_group_scores_desc') %></div>
+          </div>
+          <div class="grade_type">
+              <%= sg.radio_button :calculate_final, 0, :checked => !sg.object.calculate_final, :onchange => 'toggle_formula(this)' %>
+              <label for="subject_skill_set_calculate_final_0"><%= t('dont_calculate_subject_group_scores') %></label>
+              <div id ="description"><%= t('dont_calculate_subject_group_scores_desc') %></div>
+          </div>
+      </div>
+      <div class="attribute_formula <%= sg.object.calculate_final ? '' : 'no_show' %>">
+          <div class="formula_head"><%=t('subject_group_derivation_formula')%></div>
+          <div class="formula_box">
+              <div class="formula_select_pair">
+                  <%= sg.radio_button :formula, 'sum', :class=>'choose_formula', :onchange=>"", :checked=> true  %>
+                  <label class="label_for_formula" for="profile_formula_sum"><%=t('sum')%></label>
+                  <div class="desc_for_formula"><%=t('subject_group_sum_formula_desc')%></div>
+              </div>
+              <div class="formula_select_pair">
+                  <%= sg.radio_button :formula, 'average', :class=>'choose_formula', :onchange=>""  %>
+                  <label class="label_for_formula" for="profile_formula_average"><%=t('average')%></label>
+                  <div class="desc_for_formula"><%=t('subject_group_average_formula_desc')%></div>
+              </div>
+              <div class="formula_select_pair">
+                  <%= sg.radio_button :formula, 'bestof', :class=>'choose_formula', :onchange=>""  %>
+                  <label class="label_for_formula" for="profile_formula_bestof"><%=t('best_of')%></label>
+                  <div class="desc_for_formula"><%=t('subject_group_bestof_formula_desc')%></div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag "#{head}", :disable_with => "#{t('please_wait')}", :class => "submit-button", :id => "submit_button" %>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  
+  toggle_formula = function (e) {
+    console.log('called'+j(e).prop('checked'))
+      if (j('#subject_group_calculate_final_1').prop('checked') == true) {
+          j('.attribute_formula').removeClass('no_show');
+      } else {
+          j('.attribute_formula').addClass('no_show');
+      }
+  }
+</script>

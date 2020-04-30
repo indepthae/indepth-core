@@ -1,0 +1,33 @@
+<!-- , :before=>"$('submit_button').disable()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)" -->
+<% remote_form_for @fee_account, :before=>"$('submit_button').disable(); $('submit_button').value='#{t('please_wait')}'; $('cancel_button')",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |f| %>
+
+  <%= session_fingerprint_field %> 
+  <div id="fee_account_form">
+      <div id ="description">
+          <%= t("fee_account_#{@fee_account.new_record? ? 'create' : 'update'}_description") %>          
+      </div>
+      <div class="label-field-pair text-field">
+          <%= f.label :name %>
+          <div class="text-input-bg"><%= f.text_field :name %></div>
+      </div>      
+      <div class="label-field-pair">
+          <%= f.label :description %>
+          <div class="text-input-bg"><%= f.text_area :description %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%=submit_tag  t("#{@fee_account.new_record? ? 'create' : 'update'}_fee_account"), 
+         :class => "submit-button", :id => "submit_button" %>
+      <div id="cancel_button" class="submit-button" onclick="remove_popup_box();"><%= t('cancel') %></div>
+  </div>
+
+<% end %>
+
+<script type="text/javascript">
+
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+
+</script>

@@ -1,0 +1,45 @@
+
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('exam_group') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('exam_group') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <%if (can_access_request? :edit,:course_exam_groups) && (@course_exam_group.exam_groups_mode == :active)%>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to_remote t('edit_exam_group'), :url => { :controller=>"course_exam_groups",:action => 'edit',:id=>@course_exam_group.id},:method=>"GET" %></li>
+      <%end%>
+      <%unless @show_batch_button%>
+        <%if (can_access_request? :new_batches,:course_exam_groups) && (@course_exam_group.exam_groups_mode == :active)%>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to_remote t('add_batch'), :url => { :controller=>"course_exam_groups",:action => 'new_batches',:id=>@course_exam_group.id} %></li>
+        <%end%>
+      <%end%>
+      <%if @show_add_exam_button%>
+        <%if (can_access_request? :add_exams,:course_exam_groups) && (@course_exam_group.exam_groups_mode == :active)%>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('add_exam')}", {:controller => "course_exam_groups", :action => "add_exams",:id=>@course_exam_group.id} %></li>
+        <%end%>
+      <%end%>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :course_exam_groups_show, @course_exam_group %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div id="show_error_flash_messages">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div id="course_exam_group_details">
+    <%=render :partial=>"course_exam_group_details"%>
+  </div>
+  <div class="extender set_border_bottom"></div>
+</div>
+<div id="div_batch_list">
+  <%=  render :partial=>"course_exam_group_batch_list" ,:object=>@batches%>
+</div>
+<div id="modal-box" style="display:none;"></div>
+</div>

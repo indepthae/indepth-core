@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.hostel_detail{
+  @hostels.each do |hostel|
+    @hostel = hostel
+    @xml.hostel do
+      @xml.name(@hostel.name)
+      @xml.hostel_type(@hostel.hostel_type)
+      @xml.other_info(@hostel.other_info)
+      @xml.wardens(@hostel.wardens.map(&:employee).flatten.compact.map(&:full_name).join(', '))
+    end
+  end
+}%>
+
+

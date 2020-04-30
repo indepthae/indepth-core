@@ -1,0 +1,7 @@
+<div class="grid-list">
+  <% @multi_school_group.allowed_plugins.each_with_index do |plugin,i| %>
+  <label>
+    <%= plugin.classify %>
+  </label>
+  <% end %>
+</div>

@@ -1,0 +1,61 @@
+<% hostel_fees_list = student.hostel_fees_by_batch(batch.try(:id),order="finance_transaction_id ,hfc.due_date ASC") %>
+<% unless hostel_fees_list.empty? %>
+  <tr class="table_subtitle">
+      <td colspan="4"><%= t('hostel_fees') %></td>
+  </tr>
+  <% hostel_fees_list.each do |fee| %>
+    <% collection=fee.hostel_fee_collection %>
+    <% next if collection.is_deleted? %>
+
+    <tr class="item">
+        <td>
+            <% if page == :report && (permitted_to? :student_hostel_fee, :hostel_fee) %>
+              <%= link_to "#{fee.name}", {:controller => :hostel_fee, :action => :student_hostel_fee, :id => @student.id, :collection_id => collection.id}, :class => "themed_hover_text", :target => :_blank %>
+            <% elsif permitted_to? :student_profile_fee_details, :hostel_fee %>
+              <%= link_to collection.name, {:controller => :hostel_fee, :action => :student_profile_fee_details, :student_type => student.class.name,:id => student.id, :id2 => collection.id}, :class => "themed_hover_text" %>
+            <% else %>
+              <%= collection.name %>
+            <% end %>
+        </td>
+
+        <% if fee.is_paid? %>
+          <td class="status_cell" data-status="paid">
+              <%= t('paid') %>
+          </td>
+          <td>
+              <% paid_amount =  fee.rent.to_f + fee.fine_amount.to_f %>  
+              <% paid_amount +=  fee.tax_amount.to_f if fee.tax_enabled? %>  
+              <%= precision_label(paid_amount) %>
+          </td>
+          <td>
+              <%= t('paid_on') %>
+              <%= format_date(fee.finance_transactions.last.transaction_date) %>
+          </td>
+        <% else %>
+
+          <% partially_paid_amount = fee.rent.to_f-fee.balance.to_f %>          
+          <% amount_to_pay = fee.balance.to_f %>
+          <% total_amount = fee.rent.to_f+fee.fine_amount.to_f  %>
+          <% if fee.tax_enabled? %>  
+            <% partially_paid_amount += fee.tax_amount.to_f %>  
+            <% total_amount +=  fee.tax_amount.to_f %>  
+          <% end %>
+          <td class="status_cell" data-status="unpaid" data-amount-to-pay="<%= amount_to_pay %>" data-partialy-paid-amount="<%= partially_paid_amount %>">
+              <%= t('unpaid') %>
+          </td>
+          <td>
+              <%= precision_label(amount_to_pay)+ "  /  " + precision_label(total_amount) %>
+          </td>
+          <td>
+              <%= t('due_on') %>
+              <%= format_date(collection.due_date) %>
+          </td>
+        <% end %>
+    </tr>
+
+  <% end %>
+<% end %>
+
+
+
+

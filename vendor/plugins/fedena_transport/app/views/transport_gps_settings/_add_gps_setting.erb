@@ -1,0 +1,35 @@
+<% remote_form_for @transport_gps_setting,:url=>fetch_path(@transport_gps_setting), :before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |v| %>
+  <%= session_fingerprint_field %>
+  <div id="vehicle_stop_form">
+      <% if @transport_gps_setting.errors[:base].present?%>
+        <div class="wrapper">
+            <div class="error-icon"></div>
+            <div class="error-msg">
+                <%= @transport_gps_setting.errors[:base] %>
+            </div>
+        </div>
+      <% end %>
+      <div class="label-field-pair">
+          <label for="vendor_name"><%= t('transport_gps_settings.vendor_name') %></label>
+          <div class="text-input-bg"><%= v.text_field :vendor_name %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="client_id"><%= t('transport_gps_settings.client_id') %></label>
+          <div class="text-input-bg"><%= v.text_field :client_id %></div>
+      </div>
+      <div class="label-field-pair">
+          <label for="client_secret"><%= t('transport_gps_settings.client_secret') %></label>
+          <div class="text-input-bg"><%= v.text_field :client_secret %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "#{t('save')}", :class => "submit-button", :disable_with => "#{t('please_wait')}",:id => "submit_button"%>
+      <div class="submit-button" onclick="remove_popup_box()"><%= t('cancel') %></div>
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+</script>

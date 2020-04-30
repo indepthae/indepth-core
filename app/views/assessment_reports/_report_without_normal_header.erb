@@ -1,0 +1,16 @@
+<div class="com_block">
+    <p class="messages">Specify the space from top of the sheet required to be left blank for the printed header section.</p>
+</div>
+<div class="label-field-pair">
+    <div class="text-input-bg">
+        <%= text_field :assessment_report_setting, :header_space, :value => @setting[:header_space],  :onkeypress => "return isNumberKey(event,this)" %><span>millimeters</span>
+    </div>
+</div>
+<script type='text/javascript'>
+    function isNumberKey(evt,element){
+      var charCode = (evt.which) ? evt.which : event.keyCode
+       if ((charCode != 46 || j(element).val().indexOf('.') != -1) && (charCode < 48 || charCode > 57) && charCode != 8)
+          return false;
+       return true;
+    }
+</script>

@@ -1,0 +1,24 @@
+<div id="pdf-header" style="display:none">
+  <div class="logo">
+    <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+  </div>
+  <div class="header-content">
+    <p><%=Configuration.get_config_value('InstitutionName'); %></p>
+    <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+  </div>
+</div>
+<style >
+  #pdf-header {
+    height:105px;
+  }
+</style>
+<script type="text/javascript">
+    var headerCheck = function() {
+      var x=document.location.search.substring(1).split('&');
+      for (var i in x) {
+        if(x[i] == "page=1")
+        document.getElementById("pdf-header").style.display = "block";
+          // document.getElementsByClassName("headerContent")[0].style.display = "block";
+       }
+     }();
+</script>

@@ -1,0 +1,6 @@
+#if @success
+  #page.call "remove_deleted_elective_group", @elective_group.id
+  #page.call "reset_elective_group_table"
+  #page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{flash[:notice]}</p>" unless flash[:notice].nil?
+#end
+page.redirect_to :action => 'index', :batch_id => @batch.id

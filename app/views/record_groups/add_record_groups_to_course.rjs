@@ -1,0 +1,2 @@
+page.replace_html 'modal-box', :partial => 'add_record_groups_to_course'
+page << "Modalbox.show($('modal-box'), {title: '#{t('record_group_settings')}', width: 650});"

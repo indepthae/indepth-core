@@ -1,0 +1,32 @@
+<div class="desc-section left-right-padding-20"><%= t("attachment_field_desc") %></div>
+<%- form_remote_for @applicant_addl_attachment_field, :url=>@applicant_addl_attachment_field.new_record? ? create_attachment_field_registration_courses_path : update_attachment_field_registration_course_path(@applicant_addl_attachment_field),:html=>{:method=>:post},:before=>"$('submit_button').disable()",:complete=>"setTimeout(function(){$('submit_button').enable();},5000)" do |c| -%>
+  <div id="form-content">
+      <div class="form-box">
+          <div id="input-form-errors"></div>
+          <div class="label-field-pair fields">
+              <label><%= t('name') %> <span class="necessary-field">*</span></label>
+              <div class="text-input-bg"> <%= c.text_field :name %> </div>
+          </div>
+          <div class="label_field_pair fields">
+              <div class="field_type">
+                  <%= c.radio_button  "is_mandatory", false, :checked => "checked" %>
+                  <label class="label_for_optional_field" for="applicant_addl_attachment_field_is_mandatory_false"> <%= t('optional_field') %></label>
+              </div>
+              <div class="field_type">
+                  <%= c.radio_button  "is_mandatory", true %>
+                  <label class="label_for_mandatory_field" for="applicant_addl_attachment_field_is_mandatory_true"><%= t('mandatory_field') %></label>
+              </div>
+          </div>
+      </div>
+  </div>
+  <%= c.hidden_field :registration_course_id %>
+  <%= hidden_field_tag 'field_order',field_order %>
+  <%= hidden_field_tag 'field_index',field_index %>
+  <%= hidden_field_tag 'field_section_index',field_section_index %>
+  <div class="hor-line"></div>
+  <% unless @applicant_addl_attachment_field.new_record? %>
+    <%=submit_tag("#{t('update_field')}",:id=>'submit_button',:class=>"submit_button") %>
+  <% else %>
+    <%=submit_tag("#{t('create_field')}",:id=>'submit_button',:class=>"submit_button") %>
+  <% end %>
+<%- end -%>

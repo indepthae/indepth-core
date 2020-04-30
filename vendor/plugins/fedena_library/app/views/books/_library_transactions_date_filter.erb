@@ -1,0 +1,117 @@
+<script>
+    Element.hide('loader_date');
+</script>
+<%if @transactions.present?%>
+  <div id="payments_details">
+
+      <table id="listing1" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td><%= t('sl_no') %></td>
+              <td><%= t('name') %></td>
+              <td><%= t('admission_no') %></td>
+              <% if roll_number_enabled? %>
+                <td><%= t('roll_no') %></td>
+              <% end %>
+              <td><%= t('amount') %> </td>
+              <td><%= t('payment_date') %></td>
+
+
+              <td class="col-3" style="width:1%;"></td>
+          </tr>
+          <%k=0%>
+          <%k=(@page.to_i-1)*10 unless @page.nil?%>
+          <tr class="tr-blank"></tr>
+          <% @transactions.each_with_index do |f , i| %>
+            <tr class="tr-<%= cycle("odd","even") %>" id="row<%=f.id%>">
+                <td class="col-1"><%= k+=1 %></td>
+                <%if f.payee%>
+                  <td class="col-2"><%= "#{f.fetch_payee.first_name}"%>  (<%= "#{f.finance.book.book_number}" %>)&#x200E;</td>
+                <%else%>
+                  <td class="col-2"><%= "#{f.fetch_payee.full_name}" %>  (<%= "#{f.finance.book.book_number}" %>)&#x200E;</td>
+                <%end%>
+                <td class="col-4" ><%= "#{f.fetch_payee.admission_no}" %></td>
+                <% if roll_number_enabled? %>
+                  <td class="col-3"><%= f.fetch_payee.roll_number.nil? ? "-" : f.fetch_payee.roll_number %></td>
+                <% end %>
+                <td class="col-3" ><%= precision_label(f.amount.to_f) %></td>
+                <td class="col-4"><%= format_date(f.transaction_date) %></td>
+
+
+                <td class="col-5">
+                    <div class="cancel" >
+                        <%=link_to raw('<span class="pdf_icon_img"></span>'),{ :action => "generate_library_fine_receipt_pdf",:transaction_id=>f.id},{:target => '_blank',:tooltip=>"View PDF receipt"}%>
+                    </div>
+                    <div class="cancel" >
+                        <%= link_to_function "<span class='print_icon_img'></span>", "show_library_print_dialog(#{f.id})",{:tooltip=>"Print Receipt"} %>
+                    </div>
+                    <div class="cancel" >
+                        <%= link_to raw('<span class="revert_icon_img"></span>'), '#', :onclick => "return MakeBox(#{f.id});",:class=>"themed_text",:tooltip=>t('revert_transaction') %>
+                    </div>
+                </td>
+            </tr>
+          <% end %>
+      </table>
+      <div class="pagination_div"><div class="div1"><%= will_paginate @transactions, :previous_label=>"<", :next_label=>">", :renderer => 'RemoteLinkRenderer' ,:remote => { :loading =>  "$('loader').show();",:complete =>"$('loader').hide();"  }, :params => {:controller=>:books,:action => "library_transaction_filter_by_date",:s_date=>@start_date,:e_date=>@end_date} %>
+          </div><div class="div2"><%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader",
+                :style =>"display: none; margin-bottom:10px;" ) %></div></div>
+  </div>
+<%else%>
+  <div id="payments_details">
+      <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head">
+              <td style="text-align:center;">
+                  <%=t('no_reverted_transactions_exists')%></td>
+          </tr>
+      </table></div>
+<%end%>
+<iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>
+<script type="text/javascript">
+    MakeBox = function (f) {
+    remove_popup_box();
+    options = {'submit': '<%=t('revert_transaction')%>', 'cancel': '<%=t('cancel')%>', 'field_name': 'reason', 'input_type': 'text_area', 'title': '<%=t('revert_transaction')%>'};
+    build_modal_box(options);
+    build_prompt_popup_box('<%=t('reason')%>', options)
+    j('#popup_window #popup_footer > #yes').click(function () {
+    j.ajax({
+    type: 'POST',
+    url: '/books/delete_library_transaction',
+    data: {
+    'id': f,
+    's_date': '<%=params[:s_date]%>',
+    'e_date': '<%=params[:e_date]%>',
+    'query': '<%=params[:query]%>',
+    'reason': j('#popup_content #prompt_value').val(),
+    },
+    success: function () {
+    remove_popup_box();
+    }
+    })
+    });
+    }
+</script>
+<script>
+function show_library_print_dialog() {
+    transaction_ids=Array.prototype.slice.call(arguments)[0];
+    console.log(transaction_ids);
+    var iframe = document.getElementById('receipt_printer_template_container');
+    j('#receipt_printer_template_container').unbind();
+    j('#receipt_printer_template_container').load(function(){
+      var iframe_window = (iframe.contentWindow || iframe.contentDocument);
+      result=iframe_window.document.execCommand('print', false, null) || iframe_window.print();
+    });
+    var obj={transaction_id: transaction_ids};
+    iframe.src=window.location.origin+"/books/generate_library_fine_receipt?"+j.param(obj);
+    // iframe.src=window.location.origin+"/books/generate_library_fine_receipt?transaction_id="+transaction_id;
+  }
+function set_width_in_firefox(width) {
+  var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+  if (isFirefox) {
+    j(".receipt-container").css("width",width);
+    j(".header-content").css("width","542px");
+    // j("body").css("font-size","12px");
+  }
+}
+</script>

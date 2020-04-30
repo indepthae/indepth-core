@@ -1,0 +1,91 @@
+
+<% form_for :remark,@remark, :url=>"",:html => {:id=>"add_remarks_#{@object_id}"} do |f| %>
+  <% if @target.general %>
+    <%= f.text_area :remark_body %>
+  <% else %>
+    <%= f.text_field :remark_body,:id => "remark_text"  %>
+  <% end %>
+  <%if @target.remark_type=="multiple"%>
+    <div class="label-field-pair">
+      <%=label_tag 'remarked_by', nil, :id => 'remarked_by_label'%>
+      <div class="text-input-bg" id="remarked_by_text_box"><%= f.text_field :remarked_by %></div>
+    </div>
+  <%end%>
+  <%=f.hidden_field :target_id,:value=>@target.id%>
+  <%=f.hidden_field :student_id,:value=>@student_id%>
+  <%=f.hidden_field :submitted_by,:value=>@current_user.id%>
+
+  <%@params_hash.each do |key,value|%>
+    <%f.fields_for :remark_parameters do |ff|%>
+      <%= ff.hidden_field :param_name, :value=> key %>
+      <%= ff.hidden_field :param_value, :value => value %>
+    <% end %>
+  <%end%>
+  <% if @target.general %>
+    <%= f.submit "#{t('submit')}"%>
+    <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link",:student_id=>@student_id,:target_id=>@target_id,:onclick=>'cancelreq1(this)'%>
+
+  <% else %>
+    <%= f.submit "#{t('ok')}", :id => 'exam_wise_remarks_submit_button',:class=>"trs"%>
+    <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link common_remarks_cancel_for_transcript",:student_id=>@student_id,:target_id=>@target_id,:onclick=>'cancelreq(this)'%>
+
+  <% end %>
+<% end %>
+<%if @target.remark_type=="multiple"%>
+  <div class="extender"></div>
+<%end%>
+<script type="text/javascript">
+
+
+  j(document).delegate('form','submit',function(){
+    j(this).find('input[type=submit]').attr('disabled','disabled');
+  });
+
+
+  j('form#add_remarks_<%=@object_id%>').submit(function(e){
+<%= "var target_name = '#{@target_name}'" %>
+<%= "var object_id = '#{@object_id}'" %>
+<%= "var student_id = '#{@student_id}'" %>
+<%= "var page = '#{@page}'" %>
+<%= "var params_hash = #{@params_hash.to_json}" %>
+<%= "var general = '#{@target.general}'" %>
+<%= "var load_object_id = '#{@load_object_id}'"%>
+    var parametrs={target_name:target_name,object_id:object_id,student_id:student_id,page:page,params_hash:params_hash,load_object_id:load_object_id}
+    e.preventDefault();
+    var fo=this
+    new Ajax.Request('/remarks/create_remarks',{
+      parameters:this.serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        if(general == 'false')
+        {
+          j(fo).parent().replaceWith(resp.responseText)
+        }
+        else
+        {
+          j('#all-remarks').replaceWith(resp.responseText)
+        }
+      }
+    });
+  });
+
+  function cancelreq(ele)
+  {
+    j(ele).parent().prevAll().last().attr('onclick','completeReq1(this)');
+    j(ele).parent().prevAll().last().show();
+    j(ele).parent().prevAll().last().focus();
+    j(ele).parent().remove();
+  }
+
+  function cancelreq1(elm)
+  {
+    var onclick_attr=j(elm).parent().prevAll().last().attr('onclick')
+    j(elm).parent().prevAll().last().attr('onclick',onclick_attr.substring(2, onclick_attr.length));
+    j(elm).parent().prevAll().last().show();
+    j(elm).parent().remove();
+    j('hr').remove();
+    j('html, body').animate({scrollBottom: j('.user_button').height()}, 'slow');
+  }
+</script>

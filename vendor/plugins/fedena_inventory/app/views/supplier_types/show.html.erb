@@ -1,0 +1,13 @@
+<p>
+  <b>Name:</b>
+  <%=h @supplier_type.name %>
+</p>
+
+<p>
+  <b>Code:</b>
+  <%=h @supplier_type.code %>
+</p>
+
+
+<%= link_to 'Edit', edit_supplier_type_path(@supplier_type) %> |
+<%= link_to 'Back', supplier_types_path %>

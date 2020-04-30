@@ -1,0 +1,2 @@
+ActiveRecord::Base.connection.execute("delete dup.* from student_additional_details as dup WHERE NOT EXISTS (SELECT id FROM students WHERE dup.student_id = id) AND NOT EXISTS (SELECT former_id FROM archived_students WHERE dup.student_id = former_id);")
+ActiveRecord::Base.connection.execute("delete dup.* from employee_additional_details as dup WHERE NOT EXISTS (SELECT id FROM employees WHERE dup.employee_id = id);")

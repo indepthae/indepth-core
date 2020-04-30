@@ -1,0 +1,304 @@
+<%- # Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License.  -%>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+  <%= stylesheet_link_tag "rtl/finance/_payment_form" %>
+  <%= stylesheet_link_tag "rtl/finance/_collection_layouts" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+  <%= stylesheet_link_tag "finance/_payment_form" %>
+  <%= stylesheet_link_tag "finance/_collection_layouts" %>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('fees_submission') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= @student.full_name %></div>
+</div>
+
+<div id="page-yield">
+
+    <div class="bread_crumb">
+        <% breadcrumb :finance_pay_fees_defaulters, @student %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div id="modal-box" style="display:none;"></div>
+    <% unless flash[:notice].nil? %>       
+      <p class="flash-msg"> <%= flash[:notice] %> </p>      
+    <% end %>
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation">
+          <p><%= t('there_were_pblm') %></p>
+          <ul>
+              <li><%= flash[:warn_notice] %></li>
+          </ul>
+      </div>
+    <% end %>
+    <div class="main_info">
+        <div class="details">
+            <% unless @fee_category.nil? %>
+              <div class="clear">
+                  <div class="name">
+                      <%= t('fee_category_name') %>
+                  </div>
+                  <div class="val">
+                      <span>:</span>
+
+                      <div class="val-align">
+                          <%= @fee_category.name.capitalize %>
+                      </div>
+                  </div>
+              </div>
+            <% end %>
+            <% unless @student.student_category.nil? %>
+              <div class="clear">
+                  <div class="name">
+                      <%= t('student_category') %>
+                  </div>
+                  <div class="val">
+                      <span>:</span>
+
+                      <div class="val-align">
+                          <%= @student.student_category.name.capitalize %>
+                      </div>
+                  </div>
+              </div>
+            <% else %>
+              <div class="clear">
+                  <div class="name">
+                      <%= t('student_category') %>
+                  </div>
+                  <div class="val">
+                      <span>:</span>
+
+                      <div class="val-align">
+                          <%= t('n_a') %>
+                      </div>
+                  </div>
+              </div>
+            <% end %>
+            <div class="clear">
+                <div class="name">
+                    <%= t('fees_collection_date_name') %>
+                </div>
+                <div class="val">
+                    <span>:</span>
+
+                    <div class="val-align">
+                        <%= @date.name.capitalize %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% total_fees =0 %>
+        <% unless @particular_wise_paid %>
+          <% unless @payer_type.present? and @payer_type=="Archived Student"%>
+            <% unless @financefee.is_paid or (@total_payable-@total_discount==0) %>
+              <%= render :partial => 'defaulters_fine_submission' if @fine.blank? || @fine.zero? %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <div class="height-fixer"></div>        
+        <div class="extender"></div>
+        <div id="fees_detail">
+        <% form_for :fees, :url => {:action => 'pay_fees_defaulters', :student => @student.id, 
+          :date => @date.id, :fine => @fine, :special_fine => @fine_amount, :batch_id => @batch.id}, 
+          :html => {:id => "fees_form", :onSubmit => "return validate_payment_mode();"} do |form| %>
+
+          <input type="hidden" id="fine_amount" value="0">
+
+          <% locals = {:form => form} %>
+          <% unless @fee_particulars.nil? %>
+
+            <table class="gray_table_list" cellpadding="0" cellspacing="0">
+                <tr class="main_head tr-list_head">
+                    <td class="sl-col"><%= t('sl_no') %></td>
+                    <td class="set_border_right"><%= t('particulars') %></td>
+                    <td class="set_border_right" colspan="2">
+                        <%= t('amount') %>
+                        (<%= currency %>)
+                    </td>
+                </tr>
+
+                <% i = 0 %>
+
+                <%= render :partial => 'finance/fees_payment/particular_list', :locals => {:i => i} %>          
+
+                <% @total_fine = 0 %>
+                <% total_fees1 = 0 %>
+
+                <%= render :partial => 'finance/fees_payment/discount_list',  :locals => {:i => i, 
+                  :total_fees => total_fees} %>
+
+                <% if @financefee.tax_enabled? and @financefee.tax_collections.present? %>
+                  <%= render :partial => 'finance/fees_payment/tax_list', :locals => {:i => i, 
+                    :total_tax => total_fees } %>          
+                <% end %>
+                <% @defaulter_fine = true %>
+                <%= render :partial => 'finance/fees_payment/fine_list', :locals => {:i => i, 
+                  :total_fees => total_fees, :payment_date => @payment_date} %>
+
+                <% balance = @financefee.balance.to_f + @fine.to_f %>
+
+                <%= render :partial => 'finance/fees_payment/summary', :locals => {:i => i, 
+                  :total_fine => @total_fine.to_f} %>
+
+                <%= render :partial => "finance/fees_payment/payment_block", :locals => locals.merge({:i => i, 
+                    :balance => balance, :total_fees1 => total_fees1, :payer_type => @payer_type,
+                    :onchange => "change_transaction_date()"}) %>
+
+              <% end %>
+          </table>
+
+        <% end %>
+
+        <%= render :partial => 'finance/fees_payment/paid_fees', :locals => {:batch_id => @batch.id, 
+          :delete_action => 'delete_transaction_fees_defaulters'} %>
+       </div>
+      </div>
+    </div>
+
+<script type="text/javascript">
+
+  function validate_payment_mode() {
+      $("fees_form").setAttribute("onsubmit", "return false");
+      button = document.getElementById('submit_button');
+      if ($('fees_payment_mode') != null) {
+          if ($('fees_payment_mode').select('input')[0].value == "") {
+              alert('<%= "#{t('select_one_payment_mode')}" %>');
+              return false;
+          } else {
+              button.value = '<%= "► #{t('please_wait')}" %>';
+              button.disabled = true;                                 //prevent double click
+              return true;
+          }
+      } else {
+          button.value = '<%= "► #{t('please_wait')}" %>';
+          button.disabled = true;                                 //prevent double click
+          return true;
+      }
+  }
+
+  function validate_fine() {
+      if (isNaN($('fine_fee').value) == false) {
+          if ($('fine_fee').value <= 0) {
+              $('fine_fee').value = "";
+              alert("Please enter a positive value for fine");
+              return false;
+          } else if ($('fine_fee').value == "") {
+              alert("Please enter a positive value for fine");
+              return false;
+          } else {
+              return true;
+          }
+      } else {
+          $('fine_fee').value = "";
+          alert("Please enter a numeric value for fine");
+          return false;
+      }
+  }
+
+  j("#submit_button").click(function (e) {
+      var precision = parseInt("<%= @precision %>");
+      amount_paying = parseFloat(j("#fees_fees_paid").val());
+      payment_done = parseFloat(j(".payment_done").text());
+      amount_to_pay = parseFloat(j(".amount_to_pay").text());
+      total_fees = parseFloat(j(".total_fees").text());
+      if ((amount_paying > (total_fees - payment_done)) && amount_paying != amount_to_pay) {
+          alert("can't do partial payment for fine");
+          j("#fees_fees_paid").val(amount_to_pay.toFixed(precision));
+          e.preventDefault();
+      }
+  });
+
+  function change_transaction_date() {
+      fine_amount = j("#fine_fee").val();
+      reference_no = j("#fees_reference_no").val();
+      payment_mode = j("#fees_payment_mode").val();
+      payment_note = j("#fees_payment_note").val();
+      others_payment_mode = j('.others_payment_mode').val();
+      window.location = "/finance/pay_fees_defaulters/<%= @student.id %>?batch_id=<%= @batch.id %>" +
+              "<%= '&fine=' + @fine.to_s if @fine %>&date=<%= @date.id%>&transaction_date=" +
+              j('#transaction_date').val() + "&reference_no=" + reference_no + "&payment_mode=" +
+              payment_mode + "&payment_note=" + payment_note + "&others_payment_mode=" + others_payment_mode;
+  }
+
+  function create_temporary_fine_data() {
+      fine_amount = j("#fine_fee").val();
+      payment_note = j("#fees_reference_no").val();
+      payment_mode = j("#fees_payment_mode").val();
+      transaction_date = j("#transaction_date").val();
+      reference_no = j("#fees_payment_note").val();
+      j("#fine_amount").val(fine_amount);
+      j('#fine_transaction_date').val(transaction_date);
+      j('#fine_reference_no').val(reference_no);
+      j('#fine_payment_note').val(payment_note);
+      j('#fine_payment_mode').val(payment_mode);
+  }
+
+  j(document).delegate('#transaction_date', 'change', function(){
+      change_transaction_date();
+  })
+
+  j(document).on('click', '.particular-or-discount-deletion', function (e) {
+      if (j(this).hasClass('particular-or-discount-deletion')) {
+          e.preventDefault();
+          p_id = j(this).attr('id');
+          fee_id = j(this).attr('finance_id');
+          action = j(this).attr('target_action');
+          render_action = j(this).attr('render_action');
+          render_controller = j(this).attr('render_controller');
+          var proceed = confirm('<%=t('delete_confirm_msg') %>');
+          if (proceed) {
+              j.ajax({
+                  url: '/finance_extensions/' + action,
+                  data: {id: p_id, finance_fee_id: fee_id, current_action: render_action,
+                      current_controller: render_controller}
+              });
+          }
+      }
+  });
+  
+  function fetch_max_discount(f_id) {
+      j("#waiver_loader").show();
+      j("#submit_button_discount").attr("disabled", true);
+      j('#discount_amount').removeClass('width-50')
+      j('.post-symbol').text('<%=currency %>')
+      j('#discount_amount').addClass('width-130')
+      j('#all_students').html()
+      j.ajax({
+          type: 'GET',
+          url: "/finance_extensions/fetch_waiver_amount_collection_wise",
+          data: {
+            id: f_id,
+            student_id: j("#student_id").val(),
+            batch_id: j("#batch_id").val(),
+            collection: j("#financefeeid").val()
+          },
+          success: function (data) {
+            j("#waiver_loader").hide();
+            j("#submit_button_discount").attr("disabled", false);
+            j('#discount_amount').val(data.attributes);
+          }
+        });
+    }
+
+</script>

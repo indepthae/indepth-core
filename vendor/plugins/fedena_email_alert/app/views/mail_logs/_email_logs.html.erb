@@ -1,0 +1,10 @@
+<% @mail_logs.each do |mail_log| %>
+  <div id="message_element-<%= mail_log.id %>"  class="message_element" onclick="<%= remote_function(:url=> { :action=> 'show', :id => mail_log.id}, :method => :get )%>, update_bg(<%= mail_log.id %>);" >
+      <div class="message_head">
+          <%= mail_log.title_text %>
+      </div>
+      <div class="message_timestamp">
+          <%= format_date(change_time_to_local_time(mail_log.created_at),:format=>:long) %>
+      </div>
+  </div>
+<%end%>

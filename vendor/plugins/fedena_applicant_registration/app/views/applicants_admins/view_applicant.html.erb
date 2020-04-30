@@ -1,0 +1,287 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('applicant_s')%></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('view_details') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if (@applicant.has_paid and !(@registration_course.amount.to_i == 0 and @applicant.amount.to_i==0) and @financetransaction.present?) %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "Download Fee Receipt", generate_fee_receipt_pdf_applicants_admin_path(@applicant),:target=>"_blank" %></li>
+            <%end%>
+            <% unless (@applicant.application_status.name == "alloted") %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to t('edit_application'), edit_applicant_applicants_admin_path(@applicant) %></li>
+            <% end %>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('download_pdf'), print_applicant_pdf_applicants_admin_path(@applicant),:target=>"_blank" %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :applicants_admins_view_applicants ,@applicant%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id='top-buttons-div'>
+        <div class="course-name-display">
+            <label><%= t('course') %></label>
+            <label><b><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} &#x200E;(#{@registration_course.course.code})&#x200E;" %></b></label>
+        </div>
+        <% unless (@applicant.application_status.name == "alloted" and @applicant.application_status.is_default == true) %>
+          <div id='buttons-div'>
+              <% unless (@applicant.application_status.name == "discarded" and @applicant.application_status.is_default == true) %>
+                <%= link_to "#{t('discard')}", discard_applicant_applicants_admin_path(@applicant), :confirm => "#{t('are_you_sure_to_discard_single')}", :class=>"user_button1", :style=>"color:#000 !important" %>
+              <% end %>
+              <%= link_to_remote "#{t('allocate_applicant')}", "#", :onclick=>"show_allocation_form(); return false;", :class=>"user_button1", :style=>"color:#000 !important" %>
+              <%= link_to_remote "#{t('update_status')}", "#", :onclick=>"show_status_form(); return false;", :class=>"user_button1", :style=>"color:#000 !important" %>
+          </div>
+        <% end %>
+    </div>
+    <% unless (@applicant.application_status.name == "alloted" and @applicant.application_status.is_default == true) %>
+      <div id="update-status-div" class="operation-section" style="display:none;">
+          <% form_for :applicant, :url=>update_applicant_status_applicants_admin_path(@applicant) do|f| %>
+            <label class="desc-label"><%= t('change_status_applicant_text') %></label>
+            <div class="vertical-pair">
+                <label><%= t("application_status") %></label>
+                <%= select_tag "application_status", options_for_select([["#{t('select_a_status')}",""]] + @active_statuses.select{|s| !((s.is_default==true and ["discarded","alloted"].include?(s.name)) or (s.id == @applicant.status.to_i))}.map{|a| a.is_default==true ? ["#{t(a.name)}",a.id] : [a.name,a.id]}) %>
+            </div>
+            <div class="vertical-pair">
+                <label><%= t("has_paid_fees") %></label>
+                <div class="check-label-pair">
+                    <%= check_box_tag "has_paid", 1, @applicant.has_paid,{:disabled=>@applicant.has_paid} %>
+                    <label><%= t('paid_text') %></label>
+                </div>
+            </div>
+            <%= submit_tag "#{t('update_status')}", :class=>'user_button less-padding' %>
+    <%#=  link_to_function "#{t('update_status')}","update_status(); return false;",{:class=>'user_button'} %>
+            <%=  link_to_function "#{t('cancel')}","hide_status_form(); return false;",{:class=>'user_button'} %>
+          <% end %>
+      </div>
+      <div id="allocation-div" class="operation-section" style="display:none;">
+        <% form_for :applicant, :url=>allocate_applicant_applicants_admin_path(@applicant), :html=>{:onsubmit=>"return check_if_batch_selected();",:id=>"allocation-form"} do|f| %>
+        <div class="float_left" style="width:40%;">
+          <label class="desc-label"><%= t('select_batch_to_admit_applicant') %></label>
+        </div>
+        <div class="vertical-pair float_left" style="width:47%;">
+          <%= select_tag "batch_id", options_for_select([["#{t('select_a_batch')}",""]] + @registration_course.course.batches.all(:conditions=>{:is_active=>true,:is_deleted=>false}).map{|b| [b.full_name,b.id]}), 
+              {:onchange => "#{remote_function(:url => {:action => "fee_collection_list"}, :with => "'batch_id='+value", :before => "Element.show('loader');",
+              :success => "Element.hide('loader');")}"} %>
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+        </div>     
+        <div id="fee_collections" class="width100"></div>
+        <div class="width100" style="margin-top:20px;">
+          <div class="float_left" style="width:40%; height: 10px;"> </div>
+          <div class="vertical-pair float_left" style="width:47%;">
+            <%= submit_tag "#{t('allocate_applicant')}", :class=>'user_button less-padding', :id=>"allocation-submit-button" %>
+            <%= link_to_function "#{t('cancel')}","hide_allocation_form(); return false;",{:class=>'user_button'} %>
+          </div>
+        </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class='show-section'>
+        <div class='student-header'>
+            <% if @previous_applicant.present? %>
+
+              <a href="<%= url_for(view_applicant_applicants_admin_path(@previous_applicant)) %>">
+                  <div class='applicant-navigator'>
+                      <div class='prev-icon'></div>
+                  </div>
+              </a>
+
+            <% else %>
+              <div class='applicant-navigator'></div>
+            <% end %>
+            <div class='student-info'>
+                <div class='info-vertical-pair' style="width:300px;">
+                    <label class='info-name'><%= t('applicant_name') %></label>
+                    <label class='info-value'><%= @applicant.full_name %></label>
+                </div>
+                <div class='info-vertical-pair' style="width:285px;">
+                    <label class='info-name'><%= t('status') %></label>
+                    <label class='info-value'><%= @applicant.application_status.is_default == true ? (@applicant.application_status.name == "alloted" ? (@applicant.batch_id.present? ? "#{t('alloted')} - #{@applicant.batch.full_name}" : "#{t('alloted')}") : t(@applicant.application_status.name)) : @applicant.application_status.name %></label>
+                </div>
+                <% unless (@registration_course.amount.to_i == 0 and @applicant.amount.to_i==0) %>
+                  <div class='info-vertical-pair' style="width:140px;">
+                      <label class='info-name'><%= t('applicants.application_fee') %> <%= "(#{@currency})" %></label>
+                      <label class='info-value'><%= precision_label @applicant.amount %> (<%= @applicant.has_paid == true ? t('paid_text') : t('not_paid') %>)</label>
+                  </div>
+                <% end %>
+            </div>
+            <% if @next_applicant.present? %>
+              <a href="<%= url_for(view_applicant_applicants_admin_path(@next_applicant)) %>">
+
+                  <div class='applicant-navigator  right-float-with-border'>
+                      <div class='next-icon'></div>
+                  </div>
+              </a>
+
+            <% else %>
+              <div class='applicant-navigator  right-float-with-border'></div>
+            <% end %>
+        </div>
+        <div class="registration-info">
+            <div class="reg-data"><%= "#{t('applicants.reg_no')}" %> : <b><%= @applicant.reg_no %></b></div>
+            <div class="reg-data" style="float:right;"><%= "#{t('applicants.application_date')}" %> : <b><%= format_date(FedenaTimeSet.current_time_to_local_time(@applicant.created_at).to_date,:format=>:long) %></b></div>
+        </div>
+        <div id='application-details'>
+            <% application_sections = @application_section.present? ? @application_section.section_fields : Marshal.load(Marshal.dump(ApplicationSection::DEFAULT_FORM)) %>
+            <% @default_fields = ApplicationSection::DEFAULT_FIELDS %>
+            <% application_sections.sort_by{|k| k[:section_order].to_i}.each_with_index do|a,i| %>
+              <% field_group = nil %>
+              <% show_section = false %>
+              <% if a[:applicant_addl_field_group_id].present? %>
+                <% field_group = @field_groups.find_by_id(a[:applicant_addl_field_group_id].to_i) %>
+                <% if field_group.present? %>
+                  <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?)  %>
+                  <% section_name = field_group.name %>
+                <% end %>
+              <% else %>
+                <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+                <% section_name = t("#{a[:section_name]}") %>
+                <% if a[:section_name]=="elective_subjects" %>
+                  <% if @registration_course.is_subject_based_registration.present? %>
+                    <% show_section = true %>
+                  <% else %>
+                    <% show_section = false %>
+                  <% end %>
+                <% end %>
+    <%# show_section = false if (a[:section_name]=="elective_subjects" and @registration_course.present? and @registration_course.is_subject_based_registration == false) %>
+              <% end %>
+              <% if show_section == true %>
+                <% if a[:section_name]=="guardian_personal_details" or a[:section_name]=="guardian_contact_details" %>
+                  <% if a[:section_name]=="guardian_personal_details" %>
+                    <% guardian_ind = 0 %>
+                    <% guardian_contact_section = application_sections.find{|as| as[:section_name] == "guardian_contact_details"} %>
+                    <% show_contact_section = false %>
+                    <% show_contact_section = true if (guardian_contact_section.present? and guardian_contact_section[:fields].present? and (guardian_contact_section[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+                    <% @applicant.applicant_guardians.each do|guardian| %>
+                      <div class="section_list"><%= "#{section_name} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></div>
+
+                      <div class="section-fields">
+                          <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>guardian} %>
+                      </div>
+                      <% if show_contact_section == true %>
+                        <div class="section_list"><span class="record_group_name_label"><%= "#{t('guardian_contact_details')} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></span></div>
+                        <div class="section-fields">
+                            <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>guardian_contact_section,:field_group=>field_group,:section_object=>guardian} %>
+                        </div>
+                      <% end %>
+                      <% guardian_ind += 1 %>
+
+
+
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <div class="section_list"><%= section_name %></div>
+                  <% if a[:section_name] == "previous_institution_details" %>
+
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant.applicant_previous_data} %>
+                    </div>
+                  <% elsif ["student_personal_details","student_communication_details","elective_subjects"].include?(a[:section_name]) %>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant} %>
+                    </div>
+                  <% else %>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section", :locals=>{:a=>a,:field_group=>field_group,:section_object=>nil} %>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+
+        </div>
+        <% if (@applicant.has_paid and !(@registration_course.amount.to_i == 0 and @applicant.amount.to_i==0) and @financetransaction.present?) %>
+          <div class="section_list payment-details"><%= t('payment_details') %></div>
+          <div class="section-fields">
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('applicants.registration_amount') %> <%= "(#{@currency})" %></label>
+                  <label class='value-label'><%= precision_label @applicant.amount %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('applicants_admins.has_paid_fees') %></label>
+                  <label class='value-label'><%= @applicant.has_paid == true ? t('paid_text') : t('not_paid') %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('payment_mode') %></label>
+                  <label class='value-label'><%= @online_transaction_id.present? ? t('online') : t('offline') %></label>
+              </div>
+              <div class="label-value-pair">
+                  <label class='field-label'><%= t('receipt_no') %></label>
+                  <label class='value-label'><%= @financetransaction.receipt_number %></label>
+              </div>
+              <% if @online_transaction_id.present? %>
+                <div class="label-value-pair">
+                    <label class='field-label'><%= t('online_transaction_id') %></label>
+                    <label class='value-label'><%= @online_transaction_id %></label>
+                </div>
+              <% end %>
+          </div>
+        <% end %>
+    </div>
+
+</div>
+<script>
+
+  function show_allocation_form() {
+      j("#allocation-div").slideDown();
+      j("#buttons-div").hide();
+  }
+
+  function show_status_form() {
+      j("#update-status-div").slideDown();
+      j("#buttons-div").hide();
+  }
+
+  function hide_allocation_form() {
+      j("#allocation-div").slideUp();
+      j("#buttons-div").show();
+  }
+
+  function hide_status_form() {
+      j("#update-status-div").slideUp();
+      j("#buttons-div").show();
+  }
+  
+  function check_if_batch_selected() {
+    if(j("#batch_id").val() === ""){
+      alert("<%= t('no_allocation_batch_selected') %>");
+      j('#allocation-form').unbind('submit');
+      return false;
+    }
+    else {
+      j('#allocation-form').unbind('submit');
+      j("#allocation-submit-button").val("<%= t('please_wait_text') %>");
+      j("#allocation-submit-button").bind('click', false);
+      return true;
+    }
+  }
+      function select_all_fields(th_is) {
+      if (j(th_is).is(':checked')) {
+          j(th_is).parent().parent().find(".active_batch_list").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".active_batch_list").prop('checked', false);
+      }
+  }
+
+  function toggle_field_selector(th_is) {
+      var unchecked_box = j(th_is).parent().parent().find(".active_batch_list:checkbox:not(:checked)").length;
+      if (unchecked_box === 0) {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', 'checked');
+      }
+      else {
+          j(th_is).parent().parent().find(".select_all_check").prop('checked', false);
+      }
+  }
+
+</script>

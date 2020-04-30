@@ -1,0 +1,70 @@
+<% grouped_activity_sets = report.activity_sets.group_by{|r| r.profile_name } %>
+<% if report.exam_sets.present? %>
+  <div class="section">
+      <table class="primary condensed">
+          <tr>
+              <th><%= I18n.t('scholastic_areas') %></th>
+              <% report.term_names.each do |term_name| %>
+                <th colspan="<%=report.term_section_col_count(term_name) %>"><%= term_name%></th>
+              <%end%>
+              <% final_column = report.term_section_col_count %>
+              <% unless final_column.zero? %>
+                <th colspan="<%=  final_column %>"></th>
+              <% end %>
+          </tr>
+          <tr class="shaded_bg">
+              <%= sub_headers(report) %>
+          </tr>
+
+          <%= nested_subject_rows({:subjects => report.main_subjects, :report => report, :level => 0}) %>
+          <%= aggregate_rows %>
+
+      </table>
+  </div>
+<% end %>
+
+<% if report.student.records.present? %>
+  <div class="section">
+      <%= gradebook_records(report) %>
+  </div>
+<% end %>
+
+<div class="section">
+    <div class="six columns">
+        <% grouped_activity_sets.each do |key, activity_sets| %>
+          <table class="primary striped condensed">
+              <tr>
+                  <th><%= activity_sets.first.name %></th>
+                  <% activity_sets.each do |activity_set| %>  
+                    <th><%= activity_set.term_name %></th>
+                  <%end%>
+              </tr>
+              <%activity_sets.first.activities.each_with_index do |activity, index| %>
+                <tr>
+                    <td><%= activity.name %></td>
+                    <% activity_sets.each do |activity_set| %>
+                      <td><%= activity_set.scores[index].grade %></td>
+                    <%end%>  
+                </tr>  
+              <%end%>
+          </table>
+        <%end%>
+    </div>
+
+    <div class="six columns">
+        <table class="primary striped condensed">
+            <%= attedance_report(:type => 'term_and_consolidated') %> 
+        </table>    
+
+        <%= report_remarks(report.remarks)  %>
+    </div>
+</div>
+
+<div class="section">
+    <table class="primary striped condensed">
+        <%= attedance_report(:type => 'full') %> 
+    </table> 
+</div>
+
+
+

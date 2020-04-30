@@ -1,0 +1,60 @@
+<div class="outer">
+    <div class="inner">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1" id="report_result">
+            <tr>
+                <td class="col1 default_row" colspan="<%= (params[:columns] ? (params[:columns].values.flatten.length + 5) : 8) %>"></td>
+                <% i = 0 %>
+                <% TransportReport.get_collection_names.each do |name, method| %>
+                  <td class="col1 header-col <%= 'col-name' if i==0 %>" colspan="5"><%= name %></td>
+                  <% i += 1 %>
+                <% end %>
+            </tr>
+            <tr class="tr-head">
+                <td class="col1 sl_no fixed-header fee_header"><%= t('sl_no') %></td>
+                <% @columns["#{@passenger_type.downcase}_details"].each do |col| %>
+                  <td class="col1 <%= col %> fixed-header fee_header"><%= t(col) %></td>
+                <% end %>
+                <% (@columns["additional_details"]||{}).each do |method, col| %>
+                  <td class="col1"><%= col %></td>
+                <% end %>
+                <% [:total_fees, :total_fees_paid, :total_expected_fine, :total_fine_paid, :total_fees_due].each do |f| %>
+                  <td class="col1"><%= (f == :total_fees ? "#{t(f)} &#x200E;(#{@currency})&#x200E;" : t(f)) %></td>
+                <% end %>
+                <% TransportReport.get_collection_names.each do |name, method| %>
+                  <% [:fees_text, :fees_paid, :expected_fine, :total_fine_paid, :fees_due].each do |f| %>
+                    <td class="col1"><%= (f == :fees_text ? "#{t(f)} &#x200E;(#{@currency})&#x200E;" : t(f)) %></td>
+                  <% end %>
+                <% end %>
+            </tr>
+            <% @result.each_with_index do |res, i| %>
+              <tr>
+                  <% if params[:page].present? %>
+                    <% if params[:page].to_i >= 1 %>
+                      <% i = i  + (params[:page].to_i - 1) * 10 %>
+                    <% end %> <%else %> <% i = i %> <% end %>
+                  <td class="col1 sl_no"><%=  i+1 %></td>
+                  <% details = TransportReport.get_passenger_details(res.id) %>
+                  <% @columns["#{@passenger_type.downcase}_details"].each do |col| %>
+                    <td class="col1  <%= col %>"><%= details[col.to_sym] %></td>
+                  <% end %>
+                  <% (@columns["additional_details"]||{}).each do |method, col| %>
+                    <td class="col1"><%= details[method.to_sym] %></td>
+                  <% end %>
+                  <% data = TransportReport.get_total_data_for_cell(res.id) %>
+                  <% has_fees = (data.values.sum > 0) %>
+                  <% [:fees, :paid, :fine, :fine_paid, :due].each do |f| %>
+                    <td class="col1"><%= (has_fees ? data[f] : '-') %></td>
+                  <% end %>                  
+                  <% TransportReport.get_collection_names.each do |name, method| %>
+                    <% data = TransportReport.get_data_for_cell(res.id, method) %>
+                    <% has_fees = (data.values.sum > 0) %>
+                    <% [:fees, :paid, :fine, :fine_paid, :due].each do |f| %>
+                      <td class="col1"><%= (has_fees ? data[f] : '-') %></td>
+                    <% end %>
+                  <% end %>
+
+              </tr>
+            <% end %>
+        </table>
+    </div>
+</div>

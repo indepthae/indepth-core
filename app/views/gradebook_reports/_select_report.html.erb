@@ -1,0 +1,13 @@
+<div class="label-field-pair">
+      <label for="batch_id" class="label-report"><%= t('report') %></label>
+      <span class="student_selector">
+        <%= select :student_report, :report,
+        grouped_options_for_select(@list),
+        {:include_blank =>t('select_report')},
+        {:onChange => "#{remote_function(:url => {:action => "reload_students"},
+         :with => "'grb_id='+ value +'&batch_id=#{@batch.id}'"
+        )}"}  
+      %>
+      </span>
+</div>
+<%#*<div id="select_student" class="select_student"></div>%>

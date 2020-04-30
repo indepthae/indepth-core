@@ -1,0 +1,111 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('create_remark_bank') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :remark_banks_new %>
+        <%= render_breadcrumbs %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for @remark_bank, :url => {:action => 'create'} do |f| %>
+      <div class="template_attributes">
+          <div class="sub_head">
+              <%= t('remark_bank') %>
+          </div>
+          <div class="sub_head_desc">
+              <%= t('create_remark_in_this_reamrk_bank') %>
+          </div>
+          <div class="label-field-pair">
+              <label><%= t('remark_bank_name') %></label>
+              <%= f.text_field :name %>
+          </div>
+      </div>
+      <div class="template_attributes">
+          <div class="sub_head remarks_head">
+              <%= t('remarks') %>
+          </div>
+          <script>
+          </script>
+
+          <div class="editor">
+              <div class="readctor">
+                  <% f.fields_for :remark_templates do |c| %>
+                    <%= render :partial=> 'template_body', :locals=> {:c => c } %>
+                  <%end%>
+                  <%= link_to_add_remark_template  "<div id='add-text' class='m-top-add-remark'>#{"+ "}#{t('add_remark')}</div>", f,:remark_templates, 'template_body' %>
+                  <div class="submit_btn">
+                      <%= submit_tag "", :value => "► #{t('submit')}", :class => "submit-button", :disable_with => "► #{t('please_wait')}" %>
+                  </div>
+              </div>
+              <div class="keys">
+                  <div class="key_head">
+                      <%=t('field_codes') %>
+                  </div>
+                  <div class="key_desc">
+                      <%= "#{t('remark_keys_desc')}" %>
+                  </div>
+                  <div id="certificate_keys" class="certificate_keys">
+                      <%@keys.each do |key,value| %>
+                        <div class="key">
+                            <div class="key_name">
+                                <%= value %>
+                                <span class="add_to" onclick="add_to_textarea(this)">+<%= t('add') %></span>
+                            </div>
+                            <div class="key_code">
+                                <%= " {{#{key.to_s}}} "%>
+                            </div>
+                        </div>
+                      <%end%>
+                  </div>
+              </div>
+          </div>
+      </div>
+    <% end %>
+</div>
+
+<script type="text/javascript">
+  let last_focused_textarea;
+  add_fields = function (link, association, content) {
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g");
+    $(link).insert({
+      before: content.replace(regexp, new_id)
+    });
+    if ($$('.input-type-select') != "") {
+      $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+    }
+  };
+  remove_field = function (el) {
+    el.up().hide();
+    j(el).prev().val(1); //Setting _destroy to 1
+    j(el).closest('.template_body_container').find(".template_body").val('');
+  };
+  reset_field = function (el) {
+    el.up().hide();
+    j(el).closest('.template_body_container').find(".template_body").val('');
+    j(el).prev().val(1); //Setting _destroy to 1
+  };
+  j('.template_body_container').first().find('.remove_field').hide();
+  
+  const save_focused_id = th_is => {
+    last_focused_textarea = th_is;
+  };
+  
+  const add_to_textarea = th_is => {
+    if(typeof last_focused_textarea != 'undefined'){
+      const key = j(th_is).parent().parent().find('.key_code').text().trim();
+      let textarea_val = j(last_focused_textarea).val();
+      textarea_val = textarea_val + key;
+      j(last_focused_textarea).val(textarea_val);
+      j(last_focused_textarea).focus();
+    }
+  }
+  
+  
+</script>

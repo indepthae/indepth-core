@@ -1,0 +1,19 @@
+<% parent_links = menu_links.sort_by{|a|a.name} %>
+<div id="col_0" class="menu_cols"></div>
+<div id="col_1" class="menu_cols"></div>
+<div id="col_2" class="menu_cols"></div>
+<div id="col_3" class="menu_cols"></div>
+<% parent_links.each do|link| %>
+  <div class="parent-link">
+    <% unless link.new_tab or (request.url.match(/https/).present? and !link.link.match(/https/).present?) %>
+      <%= link_to "<div class='parent-link-area themed_hover_text'><div class='parent-text' style='margin-left:0px !important; padding-left:15px !important; padding-right:15px !important;'>#{link.name.titleize}</div></div>", app_frame_app_frame_path(link) %>
+    <% else %>
+      <%= link_to "<div class='parent-link-area themed_hover_text'><div class='parent-text' style='margin-left:0px !important; padding-left:15px !important; padding-right:15px !important;'><div class='link_name'>#{link.name.titleize}</div><div class ='popup_icon'></div></div></div>", link.link, :target => "_blank" %>
+    <% end %>
+  </div>
+<% end %>
+<% if can_access_request?(:index,:app_frames) %>
+  <div class="parent-link">
+    <%= link_to "<div class='parent-link-area themed_hover_text'><div class='parent-text themed_text' style='margin-left:0px !important; padding-left:15px !important; padding-right:15px !important;'>Manage Apps</div></div>", app_frames_path %>
+  </div>
+<% end %>

@@ -1,0 +1,68 @@
+<% own_gateways = @gateways.select{|g| g.is_owner==true} %>
+<% inherited_gateways = @gateways.select{|i| i.is_owner==false} %>
+<% owner_object = nil %>
+<% unless @owner.nil? %>
+  <% owner_object = @owner.class.name.underscore %>
+<% end %>
+<% unless owner_object.nil? %>
+  <% new_path = "new_#{owner_object}_payment_gateway_path" %>
+  <% show_path = "#{owner_object}_payment_gateway_path" %>
+  <% edit_path = "edit_#{owner_object}_payment_gateway_path" %>
+  <% delete_path = "#{owner_object}_payment_gateway_path" %>
+  <% assign_path = "assign_gateways_#{owner_object}_payment_gateways_path" %>
+<% else %>
+  <% new_path = nil %>
+  <% show_path = nil %>
+  <% edit_path = nil %>
+  <% delete_path = nil %>
+<% end %>
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Own payment gateways</h1>
+  <% unless owner_object=="school" %>
+    <%= link_to '+ New Gateway', new_path.nil? ? new_payment_gateway_path : send(new_path,@owner), :class  => 'button-red float-right' if permitted_to? :new,(@owner.present? ? @owner : School.new),:context=> :payment_gateways%>
+  <% end %>
+</fieldset>
+<div class="content-div container-width margin-bottom-35">
+  <div class='content-list'>
+    <% unless own_gateways.empty? %>
+      <% own_gateways.each do |assigned_gateway| %>
+        <% gateway = assigned_gateway.custom_gateway %>
+        <fieldset class="bg-light grey-border shadow">
+          <h4><%=link_to gateway.name, show_path.nil? ? payment_gateway_path(gateway) : send(show_path,@owner,gateway) if permitted_to? :show,(@owner.present? ? @owner : School.new),:context=> :payment_gateways %></h4>
+          <% unless owner_object=="school" %>
+            <% if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :payment_gateways %>
+              <label style="min-width:0 !important;"><%= link_to 'Edit', edit_path.nil? ? edit_payment_gateway_path(gateway) : send(edit_path,@owner,gateway) if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :payment_gateways  %></label><% if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :payment_gateways %><p class="seperator">|</p><% end %>
+              <label style="min-width:0 !important;"><%= link_to 'Delete',  delete_path.nil? ? payment_gateway_path(gateway) : send(delete_path,@owner,gateway), :confirm => "Are you sure?", :method => :delete if permitted_to? :destroy,(@owner.present? ? @owner : School.new),:context=> :payment_gateways  %></label>
+            <% end %>
+          <% end %>
+        </fieldset>
+      <% end %>
+    <% else %>
+      <fieldset class="bg-light grey-border shadow">
+        <label>No created gateways found.</label>
+      </fieldset>
+    <% end %>
+  </div>
+</div>
+<% unless @owner.nil? %>
+  <fieldset class="margin-bottom-20">
+    <h1 class="content-head">Inherited payment gateways</h1>
+    <%= link_to 'Assign Gateways', send(assign_path,@owner), :class  => 'button-red float-right' if permitted_to? :assign_gateways,(@owner.present? ? @owner : School.new),:context=> :payment_gateways%>
+  </fieldset>
+  <div class="content-div container-width">
+    <div class='content-list'>
+      <% unless inherited_gateways.empty? %>
+        <% inherited_gateways.each do |assigned_gateway| %>
+          <% gateway = assigned_gateway.custom_gateway %>
+          <fieldset class="bg-light grey-border shadow">
+            <h4><%=link_to gateway.name, send(show_path,@owner,gateway) if permitted_to? :show,(@owner.present? ? @owner : School.new),:context=> :payment_gateways %></h4>
+          </fieldset>
+        <% end %>
+      <% else %>
+        <fieldset class="bg-light grey-border shadow">
+          <label>No inherited gateways found.</label>
+        </fieldset>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,32 @@
+<div class="each-select-box-container">
+    <label for="_batch" class="select-box-label"><%= "Select Batch" %></label>
+    <%= select '',:batch_id, @batches.collect{|b| [b.full_name, b.id]}, :prompt => "Select Batch" %>
+    <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader1",
+                :class => "loader_style",
+                :style =>"display: none;" ) %>
+    <%= hidden_field '',:assessment_plan_id, :value => @assessment_plan.first.id %>
+</div>
+<div id="remark_type_select_container" class="each-select-box-container">
+    <%= render :partial => 'remark_type_select' %>
+</div>
+<div id="report_type_select_container" class="each-select-box-container">
+    <%= render :partial => 'report_type_select' %>
+</div>
+<div id="reportable_select_container" class="each-select-box-container">
+    <%= render :partial => 'reportable_select' %>
+</div>
+<div id="remarkable_select_container" class="each-select-box-container">
+    <%#= render :partial => 'remarkable_select' %>
+</div>
+
+<script type="text/javascript">
+
+  j('#_remarkable_id').change(function () {
+      const remark_set_name = j('#_remarkable_id option:selected').text();
+      j('#_remark_set_name').val(remark_set_name);
+  });
+
+</script>

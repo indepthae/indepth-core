@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.student_detail{
+  @student = @students.first
+  @additional_data = @students.second
+  @biometric_id = @students.third
+  @xml.student do
+    @xml.student_name(@student.full_name)
+    @xml.batch_name(@student.batch.full_name)
+    if @enabled_roll_number
+      @xml.roll_number(@student.roll_number)
+    end
+    @xml.admission_date(@student.admission_date)
+    @xml.blood_group(@student.blood_group)
+    @xml.gender(@student.gender)
+    @xml.date_of_birth(@student.date_of_birth)
+    @xml.nationality(@student.nationality.try(:full_name))
+    @xml.language(@student.language)
+    @xml.category(@student.student_category.try(:name))
+    @xml.religion(@student.religion)
+    @xml.address("#{@student.address_line1} #{@student.address_line2}")
+    @xml.city(@student.city)
+    @xml.state(@student.state)
+    @xml.country(@student.country.try(:full_name))
+    @xml.phone(@student.phone1)
+    @xml.mobile(@student.phone2)
+    @xml.email(@student.email)
+    @xml.biometric_id(@biometric_id)
+    @xml.is_sms_enabled(@student.is_sms_enabled)
+    @xml.is_email_enabled(@student.is_email_enabled)
+    @xml.photo do
+      begin
+        if @student.photo.file?
+          logo_url = @student.photo.url(:original, false)
+          if Paperclip::Attachment.default_options[:storage].to_s=="filesystem"
+            logo_file = File.read(@student.photo.path)
+          else
+            uri=URI(logo_url)
+            http = Net::HTTP.new(uri.host, uri.port)
+            if uri.scheme == "https"
+              http.use_ssl = true
+              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+            end
+            request = Net::HTTP::Get.new(uri.request_uri)
+            response = http.request(request)
+            logo_file = response.body
+          end
+          @xml.image("data:#{@student.photo_content_type};base64," + ActiveSupport::Base64.encode64(logo_file))
+        end
+      rescue Errno::ENOENT
+        logger.info "Binary data not found"
+      end
+    end
+    @xml.immediate_contact("#{@student.immediate_contact.try(:full_name)}" + "#{(@student.immediate_contact.nil? or @student.immediate_contact.try(:mobile_phone).empty?) ? '' : "(#{@student.immediate_contact.mobile_phone})"}" )
+    @xml.student_additional_details do
+      @additional_data.each_pair do |key,value|
+        @xml.additional_field do
+          @xml.name(key)
+          @xml.value(value)
+        end
+      end
+    end
+  end
+}%>

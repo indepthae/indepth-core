@@ -1,0 +1,38 @@
+
+<% help_wizard('Update', 'HR has been updated recently. There are few important things you should know.') do %>
+  <p>If you are looking to employee leave reset or manage employee leaves, please carefully go through the following before proceeding.</p>
+  <% help_section :controller => :employee, :action => :employee_attendance do %>
+    <p> Now you can use the new leave year based Automatic Leave Reset feature to fasten the whole leave process system. 
+        This helps to keep a better track of the leaves. User has the flexibility to perform automatic or manual crediting of the leaves.</p>
+    <p>This feature will not be enabled by default, you can decide when to use it. If you wish to activate this in the mid of a year, 
+        first create a leave year within the current year. Once you switch to the new leave year based Automatic Leave Reset feature, 
+        there is no option to revert.
+    </p>
+    <p>To enable the new leave year based Automatic Leave Reset feature, select Automatic Leave reset feature from the
+        <%= link_to 'Leave reset type', {:controller=> :leave_years, :action=> :reset_setting}, {:target=>:_blank} %> .</p>
+    <p>Once this mode is activated, you will have to follow certain steps to use it. Firstly, create credit frequency and credit type for 
+        each existing leave type.
+    <%#= link_to 'Edit Leave types ', {:controller=> :employee_attendance, :action=> :list_leave_types}, {:target=>:_blank} %> 
+    </p>
+    
+    <p>To manage the leaves, create a new leave year and activate it. Then, select the date on which the last leave reset was carried out 
+        (reference for the upcoming leave credit).
+    <%= link_to 'Leave Year', {:controller=> :leave_years, :action=> :index}, {:target=>:_blank} %>
+    </p>
+    
+    <p>With this update, you no longer have to manually do the entire process. By using the  
+        <%= link_to 'Leave Credit Settings', {:controller=> :leave_years, :action=> :autocredit_setting}, {:target=>:_blank} %>, 
+        switch to the automatic mode of crediting the leaves. The manual method will be selected by default if this setting is not configured.
+    </p>
+    
+    <p>Decide when the leaves will be credited. To enable user-defined mode, we have custom based. 
+        To credit the leaves according to the calendar, that is on 1st of any set duration, we have Calendar based.
+        <%= link_to 'Leave Credit Date Settings', {:controller=> :leave_years, :action=> :credit_date_setting}, {:target=>:_blank} %>
+    </p>
+    <p>After the configuration is completed, the leaves will be automatically processed within a leave year. However, 
+        you will have to conduct an end year process to calculate the leaves that can be carried forward to the upcoming leave year.
+    </p>
+    
+    <p>If you are unsure how to proceed with a settings, contact your support team.</p>
+  <% end %>
+<% end %>

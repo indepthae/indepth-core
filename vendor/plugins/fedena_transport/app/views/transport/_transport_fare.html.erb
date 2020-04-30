@@ -1,0 +1,16 @@
+<div class="label-field-pair pickup bus_fare">
+    <label for="fare"><%= "#{t('fare')} &#x200E;(#{@currency})&#x200E;" %></label>
+    <div class="text-input-bg">
+        <%= text_field_tag "#{@receiver_type}[transport_attributes][bus_fare]", @bus_fare||@transport.bus_fare, :class => 'precision_text', :id => "bus_fare" %>
+        <div id="fare_calculate" onclick="<%= remote_function(:url => {:controller => "transport", :action => "calculate_fare"},
+               :with => "'mode='+$('trans_mode').value+'&pickup_route='+$('pickup_route').value+
+  '&drop_route='+j('#drop_route').val()+'&pickup_stop='+$('pickup_stop').value+'&drop_stop='+$('drop_stop').value+'&receiver_type='+'#{@receiver_type}'",
+               :before => "Element.show('loader6');",
+               :success => "Element.hide('loader6')") %>"><%= t('calculate_fare') %></div>
+             <%= image_tag("loader.gif",
+               :align => "absmiddle",
+               :border => 0,
+               :id => "loader6",
+               :style =>"display: none;" ) %>
+    </div>
+</div>

@@ -1,0 +1,176 @@
+<% if (rtl?) %>
+  <script>
+    j(document).ready(function () {
+        j("#drop_header").hover(
+                function () {
+                    link_off = j("#drop_header").offset();
+                    link_width = j("#drop_header").width();
+                    link_height = j("#drop_header").height();
+                    box_width = j("#box_1").width();
+                    j("#box_1").css({top: (link_off.top + link_height), left: (link_off.left)});
+                    j("#box_1").css("display", "block");
+                },
+                function () {
+                    j("#box_1").css("display", "none");
+                });
+    });
+  </script>
+<% else %>
+  <script>
+    j(document).ready(function () {
+        j("#drop_header").hover(
+                function () {
+                    link_off = j("#drop_header").offset();
+                    link_width = j("#drop_header").width();
+                    link_height = j("#drop_header").height();
+                    box_width = j("#box_1").width();
+                    j("#box_1").css({top: (link_off.top + link_height), left: ((link_off.left + link_width) - box_width)});
+                    j("#box_1").css("display", "block");
+                },
+                function () {
+                    j("#box_1").css("display", "none");
+                });
+    });
+  </script>
+<% end %>
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_year_name') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_leave_years') %></div>
+    <% if permitted_to? :new , :leave_years %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('new_leave_year')}", :url => {:controller => "leave_years", :action => "new"} %></li>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('leave_year_record')}", :url => {:controller => "leave_years", :action => "leave_records", :leave_record => 'leave_record'} %></li>
+              <li id="drop_header" class='themed_bg themed-dark-hover-background sibling-small-drop'>
+                  <a href="#" id="drop_header_link"><%=t('more')%> &#9660;</a>
+                  <ul id="box_1" class="more-menu-div" style="display:none;">
+                      <li class="themed_bg themed-dark-hover-background"><%= link_to "#{t('leave_process_settings')}", :controller=>"employee_attendance", :action=>"settings" %></li>
+                  </ul>
+              </li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :leave_years_index %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div id ="header"><%= t('leave_years_text') %></div>
+    <% if @active_year.nil? and @leave_years.present? %>
+      <div id="active_year">
+          <div id ="description"><%= t('active_leave_year_description') %></div>
+          <%= link_to_remote "#{t('set_active_leave_year')}", :url => set_active_leave_years_path, :method => :get, :html => {:class => 'submit-button'} %>
+      </div>
+    <% elsif @active_year.present? %>
+      <div id ="description"><%= t('active_leave_year_description') %></div>
+      <div id="active_year1">
+          <div id ="description1"><%= t('active_leave_year') %> : <span class = "active_year_name"><%= @active_year.start_date.to_date.year %> -  <%= @active_year.end_date.to_date.year %> </span>
+              <div class="year_range"> <%= t('start_date')%> : <span class = "active_year_start_date"><%= format_date(@active_year.start_date) %></span> <div class="end_date_year"><%= t('end_date')%> : <span class = "active_year_end_date"><%= format_date(@active_year.end_date) %></span></div></div>
+          </div>
+          <% if @active_year.end_date == Date.today or  @active_year.end_date < Date.today %>
+            <div id="description3"> <%= link_to "#{t('process_leave')}", {:action => "leave_process", :id => @active_year.id}, :class => 'submit-button' %></div>
+          <% else %>
+            <div id="description3" class="tooltip_button"  tooltip='<%= t('text_of_end_year_process') %>' onclick ="return false" > <%= link_to "#{t('process_leave')}", {:action => "leave_process"},  :class => 'submit-button' %></div>
+          <% end %>
+          <div id="description2"><%= t('leave_process_desc') %></div>
+      </div>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="aca_years">
+          <tr class="tr-head">
+              <td class="name"><%= t('active_leave_year') %></td>
+              <td class="start_date"><%= t('start_date') %></td>
+              <td class="end_date"><%= t('end_date') %></td>
+              <td class="action"></td>
+          </tr>
+          <tr>
+              <td><%= @active_year.name %></td>
+              <td><%= format_date(@active_year.start_date) %></td>
+              <td><%= format_date(@active_year.end_date) %></td>
+              <td>
+                  <%= link_to_remote t('edit'), :url => edit_leave_year_path(@active_year), :method => :get  %>
+                  <%= link_to_remote t('change_active_leave_year'), :url => set_active_leave_years_path, :method => :get  %>
+              </td>
+          </tr>
+      </table>
+    <% end %>
+    <div id ="description"><%= t('leave_year_description') %></div>
+    <div id ="leave_group_list">
+        <table align="center" width="100%" cellpadding="1" cellspacing="1" id="aca_years">
+            <tr class="tr-head">
+                <td class="name"><%= t('inactive_leave_years') %></td>
+                <td class="start_date"><%= t('start_date') %></td>
+                <td class="end_date"><%= t('end_date') %></td>
+                <td class="action"></td>
+            </tr>
+            <% if @leave_years.present? %>
+              <% @leave_years.each do |ay|  %>
+                <tr>
+                    <td><%= ay.name %></td>
+                    <td><%= format_date(ay.start_date) %></td>
+                    <td><%= format_date(ay.end_date) %></td>
+                    <td>
+                        <% unless check_dependencies(ay) %>
+                          <%= link_to_remote t('edit'), :url => edit_leave_year_path(ay), :method => :get  %>
+                          <%= link_to t('delete'), delete_year_leave_year_path(ay), :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_leave_year_confirmation', {:name => ay.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_leave_year')}', 'popup_class' : 'delete_confirmation'}); " %>
+                        <% else %>
+                        <span class="disabled_link"> <%= t('edit') %> </span>
+                        <span class="disabled_link"> <%= t('delete') %></span>
+                        <% end %>
+                    </td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                  <td colspan="4"><%= @active_year.present? ? t('no_inactive_leave_years') : t('create_an_leave_year') %></td>
+              </tr>
+            <% end %>
+        </table>
+        <% if @leave_years.present? %>
+          <%= pagination_status(@leave_years) %>
+        <% end %>
+        <%= will_paginate @leave_years %>
+    </div>
+</div>
+<script type="text/javascript">
+  fetch_year_details = function (elm) {
+      new Ajax.Request('/leave_years/fetch_details', {
+          parameters: {'id': elm.value},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j(elm).parent().next('#loader').show();
+          },
+          onComplete: function (resp) {
+              j('#active_year_msg').hide();
+              j('#active_year_details').html(resp.responseText);
+              j(elm).parent().next('#loader').hide();
+          }
+      });
+  }
+
+  validate = function () {
+      if (j('#leave_year_year_id').val() == "") {
+          j('#active_year_msg').show();
+          return false;
+      } else {
+          j('#active_year_msg').hide();
+          return true;
+      }
+  }
+  change_name = function (elm) {
+      start_date = j('#start_date').val();
+      end_date = j('#end_date').val();
+      start_year = (new Date(start_date)).getFullYear();
+      end_year = (new Date(end_date)).getFullYear();
+      j('#leave_year_name').val(start_year + ' - ' + end_year);
+  }
+</script>

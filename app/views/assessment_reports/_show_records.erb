@@ -1,0 +1,13 @@
+<% if records.present? %>
+  <% records.each do |record_table| %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table records_table">
+        <% record_table.each do |row| %>
+          <tr>
+              <% row.each do |cell| %>
+                <td colspan="<%= cell.first %>"><%= cell.last %></td>
+              <% end %>
+          </tr>
+        <% end %>
+    </table>
+  <% end %>
+<% end %>

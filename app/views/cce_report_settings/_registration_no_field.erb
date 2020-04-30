@@ -1,0 +1,9 @@
+<div class="label-field-pair">
+  <label  class ="general_label" for="configuration_currency_type">Choose an additional field to map from</label>
+  <div class="text-input-bg">
+    <%= select :cce_report_setting, :registration_no_val, options_for_select(@student_additional_fields.map{|b| [b.name,b.id]},@setting[:registration_no_val].to_i),{:include_blank=>t('select_an_option')} %>
+  </div>
+</div>
+<div class="com_block">
+  <p class="messages no_bottom_margin">The options will contain only <i>active</i> additional details which are of input method <i>textbox</i>, configured in Admission Additional Details. <%= link_to 'Admission Additional Details',{:controller=>"student", :action => "add_additional_details"},:target=>'_blank' if permitted_to? :settings, :configuration%></p>
+</div>

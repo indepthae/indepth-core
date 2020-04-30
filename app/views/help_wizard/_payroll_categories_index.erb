@@ -1,0 +1,13 @@
+
+  <% help_wizard('Update', 'HR has been updated recently. There are few important things you should know.') do %>
+      <p>Payroll categories are components under which the emoluments are paid to the employees.</p>
+
+      <h3>Formulas and conditions based values</h3>
+      <p>Now, payroll categories can have variable values (not just numerical values) based on formulas and conditions. Eg: Basic = Gross*0.4</p>
+
+      <h3>Payroll Category Codes</h3>
+      <p>Each payroll category is assigned a code (eg: category - Basic Pay, code - BPSP). The code will be the unique identifier of a payroll category. Payroll categories can have variable values based on formulas created using other payroll category codes. (eg: Basic Pay = Gross*0.4)</p>
+
+      <h3>Payroll Groups and Payroll Categories association</h3>
+      <p>Payroll categories are closely linked to their associated payroll groups. The payroll structure for employees of a payroll group is based on the categories added to that group. And make sure that the payroll category details are right before adding them to a payroll group, because after a payroll category is added to the group, it cannot be edited.</p>
+  <% end %>

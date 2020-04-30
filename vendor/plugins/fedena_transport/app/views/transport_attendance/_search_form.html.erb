@@ -1,0 +1,46 @@
+<% remote_form_for :search, :url => search_passengers_transport_attendance_path, :before=>"$('submit_button').disable(); j('#loading').show()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},2000); j('#loading').hide()", :html => {:id => 'search-form'} do |s| %>
+  <%= session_fingerprint_field %> 
+  <div id="addl_detail_form">
+      <div class="label-field-pair section">
+          <label class="status" for="status"><%= t('transport.passenger') %></label>
+          <div id="radio-buttons">
+              <%= s.radio_button  "passenger", "Student", :checked => "checked" %>
+              <label class="label_for_status" for="passenger_student"><%= t('student_text') %></label>
+
+              <%= s.radio_button  "passenger", "Employee" %>
+              <label class="label_for_status" for="passenger_employee"><%= t('employee_text') %></label>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <label class="status" for="status"><%= t('route_type') %></label>
+          <div id="radio-buttons">
+              <%= s.radio_button  "route_type", "pickup", :checked => "checked" %>
+              <label class="label_for_status" for="route_type_pickup"><%= t('pickup') %></label>
+
+              <%= s.radio_button  "route_type", "drop" %>
+              <label class="label_for_status" for="route_type_drop"><%= t('drop') %></label>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <%= s.label :route, t('routes.route') %>
+          <div class="text-input-bg">
+              <%= s.select :route_id, @routes.map{|r| [r.name, r.id]},
+                {:include_blank =>"#{t('select_a_route')}"}, {} %>
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader",
+                :style =>"display: none;" ) %>
+          </div>
+      </div>
+      <div class="label-field-pair">
+          <%= s.label :attendance_date, t('attendances.select_date') %>
+          <div class="text-input-bg">
+              <%= calendar_date_select_tag 'search[attendance_date]', I18n.l(Date.today,:format=>:default),
+                :year_range => 15.years.ago..5.years.from_now, :readonly=>true, :popup=>"force" %>
+          </div>
+      </div>
+      <%= s.submit t('search_passengers'), :class => "submit-button", :id => "submit_button" %>
+  </div>
+<% end %>

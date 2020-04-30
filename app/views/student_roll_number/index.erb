@@ -1,0 +1,43 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('students_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('manage_roll_numbers') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="box">
+    <% if Configuration.roll_number_sort_order %>
+      <div id="label"><%= t('sort_students_based_on') %></div>
+    <%end%>
+
+    <%= render :partial => "current_sort_order" %>
+    <% if Configuration.roll_number_sort_order %>
+      <table id="listing_theme" class ="subjects" align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td><%= "#{t('course_name')}" %></td>
+          <td><%= "#{t('roll_no_prefix')}" %></td>
+          <td><%= "#{t('options')}" %></td>
+        </tr>
+        <tr class="tr-blank"></tr>
+        <% @courses.each do |course| %>
+          <tr class="tr-<%= cycle('odd', 'even') %>">
+            <td class="col-2"><%= course.full_name %></td>
+            <td class="col-1"><div id="prefix-<%=course.id%>"><%= course.roll_number_prefix.present? ? course.roll_number_prefix : "-" %></div></td>
+            <td class="col-3" id="links-<%=course.id%>">
+              <%= render :partial => "set_edit_course_prefix" , :locals => {:id => course.id, :roll_number_prefix => course.roll_number_prefix }%>
+            </td>
+          </tr>
+        <%end%>
+      </table>
+      <%= will_paginate @courses %>
+    <%end%>
+    <div id="modal-box" style="display:none;"></div>
+   </div>
+</div>

@@ -1,0 +1,75 @@
+<h5 ><%= "Batch 1" %></h5>
+<table id="pdf-table">
+  <tr class="header">
+    <td><%= "#{t('subject_code')}" %></td>
+    <td><%= "#{t('subject_title')}" %></td>
+    <td><%= "#{t('credit_hours')}" %></td>
+    <td><%= "#{t('credit_points')}" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "Eng" %></td>
+    <td><%= "English" %></td>
+    <td><%= "3" %></td>
+    <td><%= "3" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "Mat" %></td>
+    <td><%= "Mathematics" %></td>
+    <td><%= "1" %></td>
+    <td><%= "2.5" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "CS" %></td>
+    <td><%= "Computer Science" %></td>
+    <td><%= "2" %></td>
+    <td><%= "4" %></td>
+  </tr>
+</table>
+<div class="cgpas">
+  <div class="batch-wise"><div class="title"><%= t('batch_wise_cumulative_grade_point_average') %> &nbsp; : </div><div class="val themed_text">&nbsp; 3.25</div> </div>
+  <div class="course-wise"><div class="title"><%= t('course_wise_cumulative_grade_point') %> &nbsp;: </div><div class="val themed_text">&nbsp; 3.25</div></div>
+</div>
+
+<h5 id="batch"><%= "Batch 2" %></h5>
+
+<table>
+  <tr class="header">
+    <td><%= "#{t('subject_code')}" %></td>
+    <td><%= "#{t('subject_title')}" %></td>
+    <td><%= "#{t('credit_hours')}" %></td>
+    <td><%= "#{t('credit_points')}" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "Eng" %></td>
+    <td><%= "English" %></td>
+    <td><%= "3" %></td>
+    <td><%= "3" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "Mat" %></td>
+    <td><%= "Mathematics" %></td>
+    <td><%= "1" %></td>
+    <td><%= "4" %></td>
+  </tr>
+
+  <tr>
+    <td><%= "CS" %></td>
+    <td><%= "Computer Science" %></td>
+    <td><%= "2" %></td>
+    <td><%= "4" %></td>
+  </tr>
+</table>
+
+<div class="cgpas">
+  <div class="batch-wise"><div class="title"><%= t('batch_wise_cumulative_grade_point_average') %>  &nbsp; : </div><div class="val themed_text">&nbsp; 3.5</div></div>
+  <div class="course-wise"><div class="title"><%= t('course_wise_cumulative_grade_point') %>  &nbsp;   : </div><div class="val themed_text">&nbsp; 3.38 </div></div>
+</div>
+
+<script type="text/javascript">
+  j("#MB_caption").addClass('themed_text');
+</script>

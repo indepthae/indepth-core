@@ -1,0 +1,13 @@
+<div class="batch_selector_section">
+    <div class="select_course" id="select_course"></div>
+    <div class="select_batch" id="select_batch"></div>
+</div>
+<div class="sms_notes"><%= t('sms_notes') %></div>
+<div class="sms_creation"><%=render "sms/sms_creation.html.erb"%></div>
+
+<script>
+  var grouped_batches = <%= raw @final_values.to_json %>;
+  user_selector.generate_select("name", {}, [], ["select_course", "select_batch"], 0, ["<%=t('batch')%>", "<%=t('template_keys_set.student')%>"], ["<%=t('template_keys_set.student')%>"]);
+  user_selector.build_complete(grouped_batches);
+
+</script>

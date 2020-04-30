@@ -1,0 +1,9 @@
+<% form_for @transport_fee_collection,
+            :url => {:action => 'collection_assign_students'},:html=>{:id=>'form'} do |form| %>
+    <%= form.hidden_field :id %>
+    <%= render :partial => 'search_students',:locals=>{:form=>form} %>
+    <div class="extender"></div>
+    <div id="submit-button">
+      <%= submit_tag "► #{t('create_text')}", :class => 'submit_button', :disable_with => "► #{t('please_wait')}",:onclick=>'return function submit()' %>
+    </div>
+<% end %>

@@ -1,0 +1,193 @@
+<% content_for :nav_button do %>
+  <%= link_to image_tag("/images/fedena_mobile/back.png",:border => 0,:style=>"width:66px;"), :controller=>:student,:action=>:mobile_fee, :id=>@current_user.student_record.id %>
+<% end %>
+<table class="table table-condensed header-table">
+    <tr>
+        <td style="width:75%;">
+            <label class="name"><%= @fee_collection.name %> - <%= @student.original_fee_collection_batch(@fee_collection.id,"hostel").complete_name %> </label>
+        </td>
+        <td rowspan="2" align="right" style="padding-left:0px !important;">
+            <div class="right-float">
+                <% unless @hostel_fee.is_paid? %>
+                  <%= image_tag("/images/fedena_mobile/unpaid.png",:border => 0,:style=>"margin-left:16px;margin-right:14px;width:20px;margin-top:-1px;") %>
+                  <label class="unpaid_fees" style="margin-top:10px;"><%= t('not_paid') %></label>
+                <% else %>
+                  <%= image_tag("/images/fedena_mobile/paid.png",:border => 0,:style=>"margin-left:3px;margin-right:3px;width:20px;margin-top:-1px;") %>
+                  <label style="margin-top:11px;"><%= t('paid_text') %></label>
+                <% end %>
+            </div>
+        </td>
+    </tr>
+    <% unless @hostel_fee.is_paid? %>
+      <tr>
+          <td><label class="unpaid_fees"><b><%= t('due_date') %> : </b><%= format_date(@fee_collection.due_date,:format=>:short) %></label></td>
+      </tr>
+    <% else %>
+      <% last_payment_date = @paid_fees.collect(&:transaction_date).sort.last %>
+      <tr>
+          <td><label class="paid_fees"><%= t('paid_on') %> : <%= format_date(last_payment_date) %></label></td>
+      </tr>
+    <% end %>
+</table>
+
+<table class="table table-condensed header-table">
+    <tr>
+        <td><%= t('single_student') %> :</td>
+        <td><b><%= @student.full_name %></b></td>
+    </tr>
+    <tr>
+        <td><%= t('course_text') %> :</td>
+        <td><%= @student.batch.complete_name %></td>
+    </tr>
+    <tr>
+        <td style="min-width:100px;"><%= t('admission_no') %> :</td>
+        <td><%= @student.admission_no %></td>
+    </tr>
+</table>
+
+<table class="table table-condensed header-table" style="border-bottom:1px solid #dddddd !important;">
+    <tr>
+        <th><%= t('particulars') %> </th>
+        <th align="right" class="right-float"><%= t('amount') %> (<%= currency %>)</th>
+    </tr>
+    <% i = 0 %>
+    <tr>
+        <td><%= "#{i +=1}."%>  <%= t('rent') %></td>
+        <td align="right" class="right-float">
+            <%= precision_label @hostel_fee.rent.to_f %>
+        </td>
+    </tr>
+    <% if @hostel_fee.tax_enabled? and @tax_collections.present? %>
+      <% @tax_collections.each_pair do |slab, slab_gp| %>
+        <tr>
+            <td><%= i +=1 %>. <%= slab.name %></td>
+            <td align="right" class="right-float">
+                <% slab_tax = slab_gp.map(&:tax_amount).sum.to_f %>
+                <%= precision_label slab_tax %>
+            </td>
+        </tr>
+      <% end %>
+    <% end %>
+    <%total_paid_fine=0%>
+    <% @hostel_fee.finance_transactions_with_fine.each_with_index do |ft,ind| %>
+      <tr>
+          <td><%= ind+i %>. <%= "#{t('fine')}" %></td>
+          <td align="right" class="right-float">
+              <%paid_fine= [ft.fine_amount.to_f, ft.amount.to_f].min %>
+              <%= precision_label [ft.fine_amount.to_f, ft.amount.to_f].min %>
+          </td>
+      </tr>
+      <%total_paid_fine +=paid_fine%>
+    <% end %>
+
+</table>
+<table class="table table-condensed header-table">
+    <tr>
+        <td><b><%= t('total_amount_to_pay') %></b></td>
+        <td align="right" class="right-float">
+            <% amount_to_pay =  (@hostel_fee.rent.to_f + total_paid_fine.to_f) %>
+            <% amount_to_pay +=  @total_tax.to_f if @hostel_fee.tax_enabled? %>
+            <b><%= precision_label amount_to_pay %></b>
+        </td>
+    </tr>
+
+    <tr>
+        <td><b><%= t('total_amount_paid') %></b></td>
+        <td align="right" class="right-float">
+            <b>
+                <% if @hostel_fee.is_paid? %>
+                  <%= image_tag("/images/fedena_mobile/paid.png",:border => 0,:style=>"float:left;margin-right:5px;width:20px;margin-top:-1px;") %> <label style="float:left; color:#27ae60; font-weight:bold;"><%= precision_label(@paid_fees.collect(&:amount).sum) %></label>
+                <% else %>
+                  <% if @paid_fees.present? %>
+                    <%= precision_label(@paid_fees.collect(&:amount).sum) %>
+                  <% else %>
+                    <%= precision_label("0".to_f) %>
+                  <% end %>
+                <% end %>
+            </b>
+        </td>
+    </tr>
+
+
+    <% unless @hostel_fee.is_paid? %>
+      <tr style="color:#a20000 !important;">
+          <td><b><%= t('total_due_amount') %></b></td>
+          <td align="right" class="right-float">
+              <% total_fees = @student.hostel_fee_balance(params[:id2]) %>
+              <b><%= precision_label(total_fees) %></b>
+          </td>
+      </tr>
+    <% end %>
+</table>
+
+<% unless @paid_fees.empty? %>
+  <table class="table table-condensed header-table" style="border-bottom:0 !important">
+      <tr>
+          <th>
+      <div style="width:100%;float:left;box-sizing:border-box;">
+          <%= image_tag("/images/fedena_mobile/receipt.png",:border => 0,:style=>"float:left;margin-right:10px;margin-left:-2px;width:24px;") %>
+          <label class="name left-float" style="margin-top:4px;margin-bottom:0 !important;"><%= t('payment_receipts') %> </label>
+      </div>
+  </th>
+  <th></th>
+  </tr>
+  <tr>
+      <td colspan="2">
+          <label class="paid_fees"><%= t('can_download_receipt') %></label>
+      </td>
+  </tr>
+  <% @paid_fees.each_with_index do |f , i| %>
+    <% if permitted_to? :generate_fee_receipt_pdf,:finance %>
+      <tr>
+          <%if f.trans_type=="collection_wise"%>
+            <td colspan="2" class="clickable-cell" style="padding:0 !important;border-bottom:1px solid #dddddd !important;border-top:1px solid #dddddd !important;border-collapse:collapse;"><% link_to({:controller=> "finance",:action => "generate_fee_receipt_pdf",:transaction_id=>f.id},:target => '_blank',:style=>"width:100%;float:left;box-sizing:border-box;") do %>
+                  <div style="width:100%;float:left;box-sizing:border-box;padding:10px 15px;">
+                      <div class="left-float" style="padding-right:15px">
+                          <label style="color:#444 !important;"><%= "#{t('receipt_no')} : #{f.receipt_number}" %></label>
+                          <label class="paid_fees"><%= t('paid_on') %> : <%= format_date(f.transaction_date) %></label>
+                      </div>
+                      <div class="right-float"><%= image_tag("/images/fedena_mobile/chevron-right.png",:border => 0,:style=>"margin-left:10px;margin-top:10px;margin-right:-7px;width:20px;") %></div>
+                      <div class="right-float" style="text-align:right">
+                          <label class="name"><%= "#{currency} #{precision_label(f.amount.to_f)}" %></label>
+                          <label class="paid_fees"><%= f.payment_mode %></label>
+                      </div>
+                  </div>
+                <% end %>
+            </td>
+          <%else%>
+            <td colspan="2" class="clickable-cell" style="padding:0 !important;border-bottom:1px solid #dddddd !important;border-top:1px solid #dddddd !important;border-collapse:collapse;"><% link_to({:controller=> "finance",:action => "generate_fee_receipt_pdf",:particular_wise=>true,:transaction_id=>f.id},:target => '_blank',:style=>"width:100%;float:left;box-sizing:border-box;") do %>
+                  <div style="width:100%;float:left;box-sizing:border-box;padding:10px 15px;">
+                      <div class="left-float" style="padding-right:15px">
+                          <label style="color:#444 !important;"><%= "#{t('receipt_no')} : #{f.receipt_number}" %></label>
+                          <label class="paid_fees"><%= t('paid_on') %> : <%= format_date(f.transaction_date) %></label>
+                      </div>
+                      <div class="right-float"><%= image_tag("/images/fedena_mobile/chevron-right.png",:border => 0,:style=>"margin-left:10px;margin-top:10px;margin-right:-7px;width:20px;") %></div>
+                      <div class="right-float" style="text-align:right">
+                          <label class="name"><%= "#{currency} #{precision_label(f.amount.to_f)}" %></label>
+                          <label class="paid_fees"><%= f.payment_mode %></label>
+                      </div>
+                  </div>
+                <% end %>
+            </td>
+          <%end%>
+      </tr>
+    <%end%>
+  <% end %>
+  </table>
+<% end %>
+
+<% unless (@current_user.admin? or @current_user.employee?) %>
+  <% if @hostel_fee.is_paid? %>
+
+    <%#= link_to "#{t('download_summary')}",
+    {:controller => "hostel_fee", :action => "student_fee_receipt_pdf", :id => @hostel_fee.id},:target => '_blank', :class=> 'mobile_user_button green_button', :style=>'margin-top:25px;' %>
+
+  <% else %>
+
+    <% if (FedenaPlugin.can_access_plugin?("fedena_pay") and PaymentConfiguration.config_value("enabled_fees").present? and PaymentConfiguration.is_hostel_fee_enabled?) %>
+      <% unless PaymentConfiguration.first_active_gateway==0 %>
+        <%= custom_gateway_intermediate_button(total_fees, "false", 0.00, params[:id], params[:id2], @hostel_fee.hostel_fee_collection.name, @current_user.id, 'hostel_fee') %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

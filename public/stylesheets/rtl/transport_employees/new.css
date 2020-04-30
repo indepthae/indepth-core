@@ -1,0 +1,141 @@
+#header{
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 40px;
+    color: #444;
+}
+#description{
+    color: grey;
+    font-size: 13px;
+    margin: 20px 0px 20px 0px;
+}
+
+#employee_list{float: right; width: 100%;}
+.employees_table {
+    position: relative;
+    border: 1px solid #bfbfbf;
+    padding-top: 35px;
+    background: #e8e8e8;
+    float: right;
+    font-size: 13px;
+    width: 100%;
+    margin: 30px 0 20px 0;
+}
+.employees_table.positioned {
+    position: absolute;
+    top:100px;
+    right:100px;
+    width:800px;
+    box-shadow: 0 0 15px #333;
+}
+.container {
+    overflow-y: auto;
+    max-height: 600px;
+}
+table {
+    border-spacing: 0;
+    width:100%;
+}
+td + td {
+    border-right: 1px solid #bfbfbf;
+}
+td, th {
+    border-bottom: 1px solid #bfbfbf;
+    background: white;
+    color: #000;
+    padding: 10px;
+}
+th {
+    height: 0;
+    line-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    color: transparent;
+    border: none;
+    white-space: nowrap;
+    border-bottom: 1px solid #bfbfbf;
+}
+th div, th input{
+    position: absolute;
+    background: transparent;
+    color: black;
+    padding: 10px;
+    top: 1px;
+    margin-right: -10px;
+    line-height: normal;
+    border-right: 1px solid #bfbfbf;
+}
+th:first-child div{
+    border: none;
+}
+th.name, td.name{width: 27%;}
+th.employee_no, td.employee_no{width: 15%;}
+th.position, td.position{width: 15%;}
+th.category, td.category{width: 15%;}
+th.job, td.job{width: 10%;}
+th.mobile, td.mobile{width: 18%;}
+td.mobile input{
+    width: 140px;
+    -webkit-border-radius: .3em;
+    padding: 5px;
+    height: 17px;
+    float: right;
+    background: #eee;
+    border: 1px solid #c6c6c6;
+}
+.select_all{
+    right: 25px;
+    top: 8px;
+}
+tbody  tr:last-child td {border-bottom: 0;}
+.label-field-pair label {
+    font-weight: normal;
+    font-size: 13px;
+}
+.text-input-bg input, .text-input-bg select {
+    margin-right: 0;
+    -webkit-border-radius: .3em;
+    width: 215px;
+    float: right;
+}
+#loader{
+    margin: 9px;
+}
+#employee_list ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+}
+#employee_list ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+}
+#employee_list ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+#employee_list ::-webkit-scrollbar {
+    width: 10px;
+}
+
+#employee_list ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+#employee_list ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+td select {
+    background-color: #eee;
+    border: 1px solid #c6c6c6;
+    width: 150px;
+    height: 27px;
+    padding: 3px 6px;
+    -moz-border-radius: .3em;
+    -webkit-border-radius: .3em;
+}
+.submit-button {
+    margin: 0px 20px 0px 0px !important;
+    text-decoration: none;
+    font-size: 13px;
+    float: left;
+}

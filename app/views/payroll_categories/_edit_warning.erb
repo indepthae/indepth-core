@@ -1,0 +1,46 @@
+<div id="MB_frame">
+  <% name = @category.name %>
+  <div class="part" id="MB_header_part">
+    <a class="remove-icon" href="#" onclick="hideModalBox(this)" id="close"></a>
+    <h4><%= "#{t('edit_payroll_category').titleize} - #{name}" %></h4>
+  </div>
+  <div class="part">
+    <% dep_cats = @category.dependent_categories_list %>
+    <% payroll_groups = @category.payroll_groups %>
+    <div  class="description" id="warning">
+      <% if dep_cats.present? %>
+        <% if payroll_groups.present? %>
+          <%= t('dependendent_payroll_group_and_categories_present') %>
+        <% else %>
+          <%= t('dependendent_payroll_categories_present')   %>
+        <% end %>
+      <% else %>
+        <% if payroll_groups.present? %>
+          <%= t('dependendent_payroll_group_present') %>
+        <% end %>
+      <% end %>
+      <%= t('optionally_create_a_copy') %>
+    </div>
+    <% if dep_cats.present? %>
+      <div class="description"><%= t('dependent_payroll_categories_desc') %></div>
+      <ul>
+        <% dep_cats.each do |pc| %>
+          <li><%= pc.name %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if payroll_groups.present? %>
+      <div  class="description"><%= t('associated_payroll_groups_desc') %></div>
+      <ul>
+        <% payroll_groups.each do |pg|  %>
+          <li><%= pg.name %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+
+  <div class="part" id="MB_footer">
+    <%= link_to t('copy_this_category'), {:action => "new", :dup_id => @category.id}, :class => "submit-button" %>
+    <%= link_to t('create_new_category'), {:action => "new" }, :id => 'create_new' %>
+  </div>
+</div>

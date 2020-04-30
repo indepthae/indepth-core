@@ -1,0 +1,300 @@
+<% if @collection.present? %>
+  <%  %>
+  <% remote_form_for :documents, :url=> delete_checked_doc_managers_path(:user_id => params[:user_id],:action_text => @action,:page => @collection.current_page,:query => @query, :id => params[:id].present? ? params[:id]: params[:folder_id].present? ? params[:folder_id] : nil ) do |f|  %>
+    <table id="listing">
+      <tr class="tr-head">
+        <td class="col_1">
+          <% unless @user.present? %>
+            <%= check_box_tag "check_all", nil, false, {:class=>'check_all', :id=>'check_all'} %>
+          <% end %>
+        </td>
+        <td class="col_2"> <%= t('document_name') %> </td>
+        <td class="col_3"> <%= t('modified') %> </td>
+        <% if (@user.blank? or (@collection.first.class.to_s == "Document")) %>
+          <td class="col_4"></td>
+        <% end %>
+      </tr>
+      <tr class="blank"></tr>
+      <% cb=0 %>
+      <% si=0 %>
+      <% sum = (@collection.current_page - 1) * @collection.per_page %>
+      <% if @folder.present? %>
+        <% check = @folder.user_ids.include? @current_user.id if @folder.class.to_s == "PrivilegedFolder"%>
+      <% end %>
+      <% @collection.each do |col| %>
+        <%if col.class.to_s == "Document" %>
+          <% if (col.folder.class.to_s == "PrivilegedFolder" and col.users == nil) or col.folder.class == "ShareableFolder" and col.folder.user != @current_user%>
+            <% cb = 0 %>
+          <%  elsif col.folder.class.to_s == "PrivilegedFolder" and (col.folder.users.include? @current_user or @current_user.admin? or @current_user.privileges.map(&:name).include?"DocumentManager")%>
+            <% cb = cb.next %>
+          <% end %>
+        <%  end %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col_1">
+            <% if col.class.to_s == "AssignableFolder" and @action == "user_docs" %>
+              <%= sum + si.next %>
+              <% si = si.next %>
+            <% elsif (col.class.to_s == "Document" and col.folder.class.to_s == "AssignableFolder" and @action == "user_docs" ) %>
+              <%= sum + si.next %>
+              <% si = si.next %>
+            <% else %>
+              <% if col.class.to_s =="ShareableFolder" %>
+                <%= check_box_tag "folder_ids[]",col.id, false, {:class=> 'document_check'} %>
+              <% elsif col.class.to_s == "PrivilegedFolder" %>
+                <% if (@current_user.admin? or @current_user.privileges.map(&:name).include?"DocumentManager") %>
+                  <%= check_box_tag "folder_ids[]",col.id, false, {:class=> 'document_check'} %>
+                <% else %>
+                  <%= check_box_tag "folder_ids[]",col.id, false, {:disabled => true, :class=> 'document_check'} %>
+                <% end %>
+              <% elsif col.class.to_s.downcase.include? "document" %>
+                <% if col.folder.class.to_s == "PrivilegedFolder"  %>
+                  <% if (col.users.present? )  %>
+                    <% if (col.folder.user_ids.include? @current_user.id or @current_user.privileges.map(&:name).include?"DocumentManager" or @current_user.admin? ) %>
+                      <%= check_box_tag "document_ids[]",col.id, false, {:class=> 'document_check'} %>
+                    <% else %>
+                      <%= check_box_tag "document_ids[]", col.id, false, {:disabled => true, :class => 'document_check'} %>
+                    <% end %>
+                  <% elsif (col.folder.user_ids.include? @current_user.id or @current_user.privileges.map(&:name).include?"DocumentManager" or @current_user.admin? ) %>
+                    <%= check_box_tag "document_ids[]",col.id, false, {:class=> 'document_check'} %>
+                  <% else %>
+                    <%= check_box_tag "document_ids[]", col.id, false, {:disabled => true, :class => 'document_check'} %>
+                  <% end %>
+                <% elsif (col.folder.class.to_s == "ShareableFolder" and col.folder.user != @current_user) %>
+                  <%= check_box_tag "document_ids[]",col.id, false, {:disabled => true, :class=> 'document_check'} %>
+                <% else %>
+                  <%= check_box_tag "document_ids[]",col.id, false, {:class=> 'document_check'} %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </td>
+          <td class="col_2">
+            <% if col.class.to_s.downcase.include? "folder" %>
+              <%= image_tag('icons/folder.png') %>
+              <%= link_to_remote truncate(col.name, :length => 30),:url => show_folder_path(:id=>col.id,:action_text => @action,:user_id=>(@user.present? ? @user.id : nil),:query => (@query.present? ? @query.to_s : nil)  ), :before => "Element.show('loader3')", :success => "Element.hide('loader3')" %>
+              <% if (@current_user.shareable_folder_ids.include? col.id and @current_user.id != col.user_id) or (@action == "shared_docs") %>
+                <p class="shared_docs">(by <%= col.user.first_name %>)</p>
+              <% end %>
+
+            <% elsif col.class.to_s.downcase == "document" %>
+              <%= image_tag('icons/doc.png') %>
+              <%= link_to truncate(col.name,25), col.attachment.url(:original, false) %>
+              <% if @current_user.document_ids.include? col.id %>
+                <p class="shared_docs">(by <%= col.user.present? ? col.user.first_name : "Deleted User"%>)</p>
+              <% elsif @action == "privileged_docs" %>
+                <p class="shared_docs">(by <%= col.user.present? ?col.user.first_name : "Deleted User" %>)</p>
+              <% end %>
+            <% end %>
+          </td>
+          <td class="col_3"> <%= format_date(col.updated_at,:format=>:short_date) %></td>
+          <% unless col.class.to_s == "AssignableFolder" %>
+            <td class="col_4">
+              <% if col.class.class_name.to_s.downcase.include? "folder" %>
+
+                <% if (col.class.to_s == "ShareableFolder" and col.user_id == @current_user.id) %>
+                  <div id=<%= "#{col.class.to_s.first}#{col.id}" %>>
+                    <p><%= link_to_remote col.is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs'? 'doc_managers' :'folders', :id => "#{col.id}", :action_text => @action, :type => 'folder'},:before => "Element.show('loader3')", :success => "Element.hide('loader3')" %></p>
+                  </div>
+                <% elsif col.class.to_s == "ShareableFolder" %>
+                  <div id=<%= "#{col.class.to_s.first}#{col.id}" %>>
+                    <p><%= link_to_remote col.shareable_folder_users.find_by_user_id(@current_user.id).is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs'? 'doc_managers' : 'folders', :id => "#{col.id}", :action_text => @action,:type => 'folder'},:before => "Element.show('loader3')", :success => "Element.hide('loader3')" %></p>
+                  </div>
+                <% else %>
+                  <div><p class="col_icons"></p></div>
+                <% end %>
+
+
+                <% if col.class.to_s == "ShareableFolder" and col.user_id == @current_user.id %>
+                  <div><p><%= link_to "#{image_tag('icons/edit.png')}", edit_shareable_folder_path(:action_text=>@action,:id => col, :page => @collection.current_page, :query => @query) %></p></div>
+                <% elsif col.class.to_s == "PrivilegedFolder" and permitted_to? :edit_privileged, :folders %>
+                  <div><p><%= link_to "#{image_tag('icons/edit.png')}", edit_privileged_folder_path(:action_text=>@action,:id => col, :page => @collection.current_page, :query => @query) %></p></div>
+                <% else %>
+                  <div><p class="col_icons"> </p></div>
+                <% end %>
+
+                <% if (col.user.id == @current_user.id unless col.class.to_s == "PrivilegedFolder") %>
+                  <div><p><%= link_to_remote "#{image_tag('icons/delete.png')}", :url => destroy_folder_path(:action_text=>@action,:id => col, :page => @collection.current_page, :query => @query),:confirm => t('delete_confirm_msg'),:before => "Element.show('loader3')", :success => "Element.hide('loader3')"%></p></div>
+                <% elsif  col.class.to_s == "ShareableFolder" and col.user_ids.include? @current_user.id  %>
+                  <div><p><%= link_to_remote "#{image_tag('icons/delete.png')}", :url => destroy_folder_path(:action_text=>@action,:id => col, :page => @collection.current_page, :query => @query),:confirm => t('delete_confirm_msg'),:before => "Element.show('loader3')", :success => "Element.hide('loader3')"%></p></div>
+                <% elsif col.class.to_s == "PrivilegedFolder" and (permitted_to? :destroy_privileged, :folders or check) %>
+                  <div><p><%= link_to_remote "#{image_tag('icons/delete.png')}", :url => destroy_privileged_folder_path(:action_text => @action, :id => col, :page=> @collection.current_page, :query => @query),:confirm => t('delete_confirm_msg'),:before => "Element.show('loader3')", :success => "Element.hide('loader3')"%> </p></div>
+                <% else %>
+                  <div><p class="col_icons"> </p></div>
+                <% end %>
+
+              <% elsif col.class.class_name.to_s == "Document" %>
+                <% if (col.folder.class.to_s == "ShareableFolder" or col.folder_id.nil?) and col.user_id == @current_user.id  %>
+                  <div id=<%= "#{col.class.to_s.first}#{col.id}" %>>
+                    <p><%= link_to_remote col.is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs' ? 'doc_managers' : 'documents', :id => "#{col.id}", :action_text => @action, :type => 'document'},:before => "Element.show('loader3')", :success => "Element.hide('loader3')" %></p>
+                  </div>
+                <% elsif (col.folder.class.to_s == "ShareableFolder" or col.folder_id.nil?) and col.document_users.find_by_user_id(@current_user.id).present?  %>
+                  <div id=<%= "#{col.class.to_s.first}#{col.id}" %>>
+                    <p><%= link_to_remote col.document_users.find_by_user_id(@current_user.id).is_favorite? ? "#{image_tag('icons/star-yellow.png')}" : "#{image_tag('icons/star-grey.png')}", :url => { :action => 'favorite', :controller => @action == 'favorite_docs' ? 'doc_managers' : 'documents', :id => "#{col.id}", :action_text => @action, :type => 'document'},:before => "Element.show('loader3')", :success => "Element.hide('loader3')" %></p>
+                  </div>
+                <% else %>
+                  <div><p class="col_icons" ></p></div>
+                <% end %>
+
+                <% if ((col.folder.present? ? col.folder.class.to_s == "ShareableFolder" : false) and col.user_id == @current_user.id) or (col.folder_id.nil? and col.user_id == @current_user.id unless col.folder.class.to_s == "PrivilegedFolder") or (col.folder.class.to_s == "AssignableFolder" and permitted_to? :edit_userspecific, :folders) %>
+                  <div>
+                    <p>
+                      <% if(@folder.present?) %>
+                        <%= link_to "#{image_tag('icons/edit.png')}", :action => 'edit', :controller => 'documents', :id=> col, :action_text => @action, :page => @collection.current_page, :user_id => params[:user_id], :query => @query, :folder_id => @folder %>
+                      <% else %>
+                        <%= link_to "#{image_tag('icons/edit.png')}", :action => 'edit', :controller => 'documents', :id=> col, :action_text => @action, :page => @collection.current_page, :user_id => params[:user_id], :query => @query %>
+                      <% end %>
+                    </p>
+                  </div>
+                <% elsif ((col.folder.present? ? col.folder.class.to_s == "PrivilegedFolder" : false) and (permitted_to? :edit_privileged, :folders or col.folder.users.include? @current_user or @current_user.admin?)) %>
+                  <div><p><%= link_to "#{image_tag('icons/edit.png')}", :action => 'edit_privileged_document', :controller => 'documents', :id => col.id, :action_text => @action, :page => @collection.current_page, :user_id => params[:user_id], :query => @query %></p></div>
+                <% else %>
+                  <div><p class="col_icons"> </p></div>
+                <% end %>
+                <% if (col.user == @current_user) or (check) or (col.user_ids.include? @current_user.id unless col.folder.class.to_s=="PrivilegedFolder") or (col.folder.class.to_s != "ShareableFolder" and (@current_user.admin? or (@current_user.privileges.map(&:name).include? "DocumentManager") ))%>
+                  <div><p><%= link_to_remote "#{image_tag('icons/delete.png')}", :url=>document_path(:action_text=>@action,:id => col.id, :user_id=>(@user.present? ? @user.id : nil),:page => @collection.current_page,:query => @query),:confirm => t('delete_confirm_msg'),:method=>:delete,:before => "Element.show('loader3')", :success => "Element.hide('loader3')"%></p></div>
+                <% elsif (col.folder.present? ? col.folder.class.class_name.to_s == "ShareableFolder" : false) %>
+                  <div><p class="col_icons"> </p></div>
+                <% end%>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    <% unless @user.present? %>
+      <div class="check_all_send">
+        <% if @folder.present? %>
+          <% if @folder.class.to_s == "PrivilegedFolder" %>
+            <% if (@current_user.admin? or @current_user.privileges.map(&:name).include? "DocumentManager" or @folder.users.include? @current_user)%>
+              <% unless cb == 0 %>
+                <%= submit_tag "", :value=> "#{t('delete')}", :class => "themed_text themed_text_doc delete_button", :onClick => "return verify_check()", :alt=>"delete the selected folder(s)" %>
+              <% end %>
+            <% end %>
+          <% elsif @folder.class.to_s == "ShareableFolder" and @folder.user != @current_user%>
+            <%  unless cb == 0 %>
+              <%= submit_tag "", :value=> "#{t('delete')}", :class => "themed_text themed_text_doc delete_button", :onClick => "return verify_check()", :alt=>"delete the selected folder(s)" %>
+            <% end %>
+          <% else %>
+            <%= submit_tag "", :value=> "#{t('delete')}", :class => "themed_text themed_text_doc delete_button", :onClick => "return verify_check()", :alt=>"delete the selected folder(s)" %>
+          <% end %>
+        <% else %>
+          <% if @action == "privileged_docs" and (@current_user.admin? or @current_user.privileges.map(&:name).include? "DocumentManager") %>
+            <%= submit_tag "", :value=> "#{t('delete')}", :class => "themed_text themed_text_doc delete_button", :onClick => "return verify_check()", :alt=>"delete the selected folder(s)" %>
+          <% elsif @action != "user_docs" and @action != "privileged_docs" %>
+            <%= submit_tag "", :value=> "#{t('delete')}", :class => "themed_text themed_text_doc delete_button", :onClick => "return verify_check()", :alt=>"delete the selected folder(s)" %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="paging_links">
+      <% unless @user.present? %>
+        <% if @folder.present? %>
+          <%= will_paginate @collection, :renderer => "RemoteLinkRenderer", :params => {:controller => 'folders',:action => :show,:action_text => @action, :id => @folder} %>
+        <% else %>
+          <%= will_paginate @collection, :renderer => "RemoteLinkRenderer", :params => {:controller => 'doc_managers',:action => @action.to_s != 'search' ? @action : action_name, :query => params[:query]} %>
+        <% end %>
+      <% else %>
+        <% if @action == "user_docs" %>
+      <%if @folder.present?%>
+       <%= will_paginate @collection, :renderer => "RemoteLinkRenderer", :params => {:controller => 'folders',:action => :show,:action_text => @action, :id => @folder,:user_id => @user.id} %>
+        <% else %>
+          <%= will_paginate @collection, :renderer => "RemoteLinkRenderer", :params => {:controller => 'doc_managers',:action => :update_userspecific_docs, :action_text => @action, :user_id => @user.id} %>
+        <%#= will_paginate @collection, :renderer => "RemoteLinkRenderer", :params => {:controller => 'folders',:action => :show, :action_text => @action, :id => @folder, :user_id => @user.id} %>
+        <% end %>
+      <%end%>
+      <% end %>
+    </div>
+    <div id="add_files">
+      <div class="themed_text themed_text_doc">
+        <% if @folder.present?%>
+          <% if @folder.class.to_s == "PrivilegedFolder" and (@current_user.privileges.map(&:name).include?"DocumentManager" or @folder.user_ids.include?@current_user.id or @current_user.admin? or @folder.user_id==@current_user.id)%>
+            <%= link_to "#{t('add_documents')}", {:controller => :documents, :action => 'add_privileged_document',:id => @folder.id, :query => @query, :action_text => @action, :page => 1}, :user_id => @current_user.id, :class => "themed_text themed_text_doc" %>
+          <%  elsif (@folder.user_id == @current_user.id) or (@folder.class.to_s == "AssignableFolder" and (@current_user.privileges.map(&:name).include?"DocumentManager" or @current_user.admin?))   %>
+            <%= link_to_remote "#{t('add_documents')}", :url => {:controller => :doc_managers, :action => 'add_files', :id => @folder.id, :action_text => @action, :page => 1, :query => @query, :user_id=> @user.present? ? @user.id : nil}, :html => {:class => "themed_text themed_text_doc"}  %>
+          <% end %>
+        <% end%>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <table id="listing">
+    <tr class="tr-odd">
+      <td class="col_1"><%= "#{t('warning_no_folders_or_documents')}" %></td>
+    </tr>
+  </table>
+  <div id="add_files">
+    <div class="themed_text themed_text_doc">
+      <% if @folder.present?%>
+        <% if @folder.class.to_s == "PrivilegedFolder" and (@current_user.privileges.map(&:name).include?"DocumentManager" or @folder.user_ids.include?@current_user.id or @current_user.admin? or @folder.user_id==@user.id)%>
+          <%= link_to "#{t('add_documents')}", {:controller => :documents, :action => 'add_privileged_document', :id => @folder.id, :action_text => @action, :page => 1, :query => @query}, :user_id => @current_user.id, :class=> "themed_text themed_text_doc" %>
+        <%  elsif (@folder.user_id == @current_user.id ) or (@folder.class.to_s == "AssignableFolder" and (@current_user.privileges.map(&:name).include?"DocumentManager" or @current_user.admin?) and @action!="favorite_docs")   %>
+          <%= link_to_remote "#{t('add_documents')}", :url => {:controller => :doc_managers, :action => 'add_files', :id => @folder.id, :action_text => @action, :page => 1, :query => @query, :user_id=> @user.present? ? @user.id : nil}, :html => {:class => "themed_text themed_text_doc"}  %>
+        <%  end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  function verify_check()
+  {
+    var c = false;
+    $$('.document_check').each(function(check){
+      if(check.checked){
+        c = true;
+      }
+    })
+    if (c){
+      return confirm('<%= "#{t('warning_delete')}"%>') ? true : false;
+    }
+    else{
+      alert('<%= "#{t('warning_empty_select')}"%>');
+      return false;
+    }
+
+  }
+  function check_public(){
+    var p = false;
+    $$('.document_check').each(function(check)
+    {
+      if (check.disabled == false){
+        p = true;
+        return;
+      }
+    })
+    if (p == false){
+      if($('check_all')!=null)
+        $('check_all').disabled = true;
+    }
+  }
+  $$('.check_all').invoke('observe','click',function() {
+    field_value = this.checked
+    $$('.document_check').each(function(check){
+      if (check.disabled == false){
+        check.checked = field_value;
+      }
+      if(check.checked == false){
+        $(check).up('tr').removeClassName('active')
+      }
+      else{
+        $(check).up('tr').addClassName('active')
+      }
+    })
+  });
+  $$('.document_check').invoke('observe','click',function() {
+    if(this.checked == false){
+      $$('.check_all').first().checked = false
+      $(this).up('tr').removeClassName('active')
+    }
+    else{
+      var flag=true;
+      $$('.document_check').each(function(check){
+        if (check.checked == false) flag = false;})
+      if(flag == true){
+
+        $$('.check_all').first().checked = true
+      }
+      $(this).up('tr').addClassName('active')
+    }
+
+  });
+  check_public();
+</script>

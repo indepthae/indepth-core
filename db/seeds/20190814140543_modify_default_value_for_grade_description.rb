@@ -1,0 +1,1 @@
+ActiveRecord::Base.connection.execute("update grade_sets set description_enabled = true where direct_grade = true;")

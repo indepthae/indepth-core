@@ -1,0 +1,59 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_import_logs') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <h4><%= t('transport_import_logs') %></h4>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="import_listing">
+        <tr class="tr-head">
+            <td class="col1"><%= t('import_from_ay') %></td>
+            <td class="col1"><%= t('import_to_ay') %></td>
+            <td class="col3"><%= t('created_date') %></td>
+            <td class="col2"><%= t('import_stops') %></td>
+            <td class="col2"><%= t('import_vehicles') %></td>
+            <td class="col2"><%= t('import_routes') %></td>
+            <td class="col3"><%= t('status') %></td>
+            <td class="col4"></td>
+        </tr>
+        <%if @imports.present?%>
+          <% @imports.each do |import| %>
+            <tr>
+                <td><%= import.import_from.try(:name) %></td>
+                <td><%= import.import_to.try(:name) %></td>
+                <td><%= format_date(AssessmentScoreImport.default_time_zone_present_time(import.created_at),:format=>:long) %></td>
+                <td class="status"><%= import.individual_import_status("import_stops") %></td>
+                <td class="status"><%= import.individual_import_status("import_vehicles") %></td>
+                <td class="status"><%= import.individual_import_status("import_routes") %></td>
+                <td>
+                    <span class="name"><%= import.importing_status %></span>
+                    <% if import.last_error.present?%>
+                      <span id="info-symbol" tooltip="<%= import.error_text %>"></span>
+                    <% end %>
+                </td>
+                <td>
+                    <% if [3, 4].include? import.status and import.last_error.present?%>
+                      <%= link_to t('re_import'), transport_import_path(import), :method => :put %>
+                    <% else %>
+                      -
+                    <% end %>
+                </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+              <td colspan="7"><%= t('no_imports_yet') %></td>
+          </tr>
+        <% end %>
+    </table>
+</div>

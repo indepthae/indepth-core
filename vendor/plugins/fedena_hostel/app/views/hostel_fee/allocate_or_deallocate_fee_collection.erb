@@ -1,0 +1,104 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('hostel_text') %></h1>
+
+  <div class='header-sep'>|</div>
+
+  <div class='sub-header'><%= "#{I18n.t('manage')} #{I18n.t('fee_collection')}" %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('create_fee_collection')}", {:action => 'collection_creation_and_assign'} %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <div id="financial_year_details">
+      <%= render :partial => "finance/financial_year_info" %>
+    </div>
+  </div>
+
+  <div id='flash-div'></div>
+
+  <div id="batch_or_department">
+    <%= render :partial => 'batches' %>
+  </div>
+
+  <div id="receivers"></div>
+</div>
+
+<script type="text/javascript">
+    j(document).delegate('.student-link', 'click', function () {
+        draw_report(this);
+        set_active(this);
+    })
+
+    function set_active(obj) {
+        $$('.selected').each(function (e) {
+            e.removeClassName('selected');
+        });
+        j(obj).addClass('selected');
+    }
+    function draw_report(obj) {
+        j('#right-panel-bottom').hide()
+        j('#right-panel-loader').show()
+
+        new Ajax.Request('/hostel_fee/list_fees_for_student',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    parameters: 'receiver=' + j(obj).attr('id') + '&batch_id=' + j(obj).attr('batch_id'),
+                    onSuccess: function (request) {
+                        j('#flash-div').children().remove()
+                        j('#right-panel-bottom').show()
+                        j('#right-panel-loader').hide()
+                    }
+                })
+
+    }
+    document.observe("dom:loaded", function () {
+//        $$('.student-link').invoke('observe', 'click', draw_report);
+//        $$('.student-link').invoke('observe', 'click', set_active);
+
+    });
+
+    j(document).delegate('.collection_check', 'click', function (e) {
+        colln_id = j(this).children('.collection_box').val()
+        if (j(this).children('.collection_box').prop('checked')) {
+            j('#user_' + colln_id).attr('disabled', false)
+            j('#event_' + colln_id).attr('disabled', false)
+        }
+        else {
+            j('#user_' + colln_id).attr('disabled', true)
+            j('#event_' + colln_id).attr('disabled', true)
+        }
+    });
+    function validate_assign() {
+        var flag = 0;
+        $$('.collection_box').each(function (el) {
+
+            if (el.checked == true) {
+                flag = 1;
+            }
+        });
+        if (flag == 0) {
+            alert("<%= "#{t('please_select_atleast_one_fee')}" %>");
+            return false;
+        }
+        else
+            return true;
+    }
+
+    update_select_all = function () {
+        if(j('.collection_box:enabled').length == 0){
+            j('.select_all').attr('checked', false).attr('disabled', true);
+        }else{
+            j('.select_all').attr('disabled', false);
+        }
+    }
+</script>
+

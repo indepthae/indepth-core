@@ -1,0 +1,221 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<% content_for :head do %>
+  <% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/assessment_reports/student_plan_report_pdf.css' ,:media=>"all"%>
+  <%else %>
+    <%= stylesheet_link_tag 'assessment_reports/student_plan_report_pdf.css' ,:media=>"all"%>
+  <% end %>
+<% end %>
+<% e = 'even' %>
+<div id="page-yield" class="available_sections">
+    <%if @general_records["ReportHeader"] == "0"%>
+      <div class="header">
+          <span class="logo header_parts border_less">
+              <%  if @general_records['UseCbseLogo'] == "1" %>
+                <img  alt="Cbse Logo" src="<%=Rails.root.join('public','images','cbse-logo.png')%>" id="cbse_logo"></img>
+              <% end %>
+          </span>
+          <span class="header-content header_parts">
+              <p id="school-name"><%=Configuration.get_config_value('InstitutionName'); %></p>
+              <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+              <% arr = [] %>
+              <% arr.push(Configuration.get_config_value('InstitutionPhoneNo')) if Configuration.get_config_value('InstitutionPhoneNo').present? %>
+              <% arr.push(Configuration.get_config_value('InstitutionEmail')) if Configuration.get_config_value('InstitutionEmail').present? %>
+              <% arr.push(Configuration.get_config_value('InstitutionWebsite')) if Configuration.get_config_value('InstitutionWebsite').present? %>
+              <p class="institution_address"><%= arr.join(", ") %></p>
+          </span>
+          <span class="logo header_parts">
+              <%if current_school_detail.logo.present?%>
+                <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+              <%else%>
+                <img  alt="Dummy Logo" src="<%=Rails.root.join('public','images','application','dummy_logo.png')%>" ></img>
+              <%end%>
+          </span>
+
+      </div>
+    <%else%>
+      <div style="height:<%=@general_records["HeaderSpace"].to_i%>mm"></div>
+    <%end%>
+    <div class="section">
+        <div class="hor_line"></div>
+        <h2><%= t('student_report').titleize %></h2>
+        <div class="hor_line"></div>
+        <div class="extender"> </div>
+        <div class="info">
+            <div class="info-left">
+                <%[1,3,5,7,9].each do |i|%>
+                  <%display_text = AssessmentReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= AssessmentReportSetting.get_display_value(@general_records["StudentDetail#{i}"],@student) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+            <div class="info-right">
+                <%[2,4,6,8,10].each do |i|%>
+                  <%display_text = AssessmentReportSetting.get_display_text(@general_records["StudentDetail#{i}"])%>
+                  <%unless display_text == ""%>
+                    <div class="info1">
+                        <label class="field-label"><%=display_text%></label><span class="colon">:</span><label class="infolbl"> <%= AssessmentReportSetting.get_display_value(@general_records["StudentDetail#{i}"],@student) %></label>
+                    </div>
+                  <%end%>
+                <%end%>
+            </div>
+        </div>
+    </div>
+    <div  class="section">
+        <div id="student_report">
+            <%= render :partial => 'student_plan_report_pdf' %>
+            <%@ret_val= RemarkMod.generate_common_remark_form("gradebook_plan_report",@student.id,nil,1,{:assessment_plan_id=>@assessment_plan.id,:student_id=>@student.id})%>
+            <%if @ret_val.present?%>
+              <% multiple_remark = @ret_val.count > 1 %>
+              <%@ret_val.each_with_index do |val,index|%>
+                <div class="remarks_row <%='multiple_remark' if multiple_remark and index != 0%>">
+                    <div class="remarks_label"><%= val.remarked_by.present? ? "#{t('remark_by')} #{val.remarked_by}" : t('remark') %> : </div>
+                    <div class="remarks_value"><%=val.remark_body.present? ? val.remark_body.strip.gsub(/\n/, "<br/>") : '-'%></div>
+                </div>
+              <%end%>
+            <%end%>
+        </div>
+    </div>
+    <%if @general_records["Signature"] == "0"%>
+      <div class="wrapper section">
+          <div class="footer">
+              <div id="pdf-footer">
+                  <span class="signature push_left">
+                      <div class="sign_img">
+                          <% if @general_records["SignLeftImg"].present? %>
+                            <%= wicked_pdf_image_tag @general_records["SignLeftImg"] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= @general_records["SignLeftText"] %></div>
+                  </span>
+                  <span class="signature">
+                      <div class="sign_img">
+                          <% if @general_records["SignCenterImg"].present?  %>
+                            <%= wicked_pdf_image_tag @general_records["SignCenterImg"] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= @general_records["SignCenterText"] %></div>
+                  </span>
+                  <span class="signature push_right">
+                      <div class="sign_img">
+                          <% if @general_records["SignRightImg"].present? %>
+                            <%= wicked_pdf_image_tag @general_records["SignRightImg"] ,:s3=>true,:style=>:original,:timestamp=>false %>
+                          <% end %>
+                      </div>
+                      <div><%= @general_records["SignRightText"] %></div>
+                  </span>
+              </div>
+          </div>
+      </div>
+    <%end%>
+      
+    <% if @general_records["EnableGradeScale"] == '1' %>
+      <% if @general_records['EnableScholasticGradeScale'] == '1'  and @general_records['ScholasticGradeScale'].present?%>
+        <% grade_set = @grade_sets.to_a.find{|gs| gs.id == @general_records['ScholasticGradeScale'].try(:to_i)} %>
+        <% if grade_set.present? %>
+          <% grades = grade_set.grades.sorted_marks %>
+          <div class='grade_scale_section section'>
+              <div class="head_info"><%= t('scho_grade_scale_pdf_description', {:count => grades.count}) %></div>
+              <div class="grade_info">
+                  <table align="center" width="100%" cellpadding="1" cellspacing="1" class="grade_scale_table">
+                      <tr>
+                          <td class="head"><%= t('grade') %></td>
+                          <% grades.each do |grade| %>
+                            <td class="grades"><%= grade.name %></td>
+                          <% end %>
+                      </tr>
+                      <% unless grade_set.direct_grade? %>
+                        <tr>
+                            <td class="head"><%= "#{t('minimum_score')} (%)" %></td>
+                            <% grades.each do |grade| %>
+                              <td class="grades"><%= grade.minimum_marks %></td>
+                            <% end %>
+                        </tr>
+                        <% if grade_set.enable_credit_points? %>
+                          <tr>
+                              <td class="head"><%= t('credit_points') %></td>
+                              <% grades.each do |grade| %>
+                                <td class="grades"><%= grade.credit_points %></td>
+                              <% end %>
+                          </tr>
+                        <% end %>
+                      <% else %>
+                        <tr>
+                            <td class="head"><%= t('description_text') %></td>
+                            <% grades.each do |grade| %>
+                              <td class="grades"><%= grade.description %></td>
+                            <% end %>
+                        </tr>
+                      <% end %>
+                  </table>
+              </div>
+          </div>
+        <% end %>
+      <% end %>
+      <% if @general_records['EnableCoScholasticGradeScale'] == '1' and @general_records['CoScholasticGradeScale'].present?%>
+        <% grade_set = @grade_sets.to_a.find{|gs| gs.id == @general_records['CoScholasticGradeScale'].try(:to_i)} %>
+        <% if grade_set.present? %>
+          <% grades = grade_set.grades.sorted_marks %>
+          <div class="extender"></div>
+          <div class='grade_scale_section section'>
+              <div class="head_info"><%= t('activity_grade_scale_pdf_description', {:count => grades.count}) %></div>
+              <div class="grade_info">
+                  <table align="center" width="100%" cellpadding="1" cellspacing="1" class="grade_scale_table">
+                      <tr>
+                          <td class="head"><%= t('grade') %></td>
+                          <% grades.each do |grade| %>
+                            <td class="grades"><%= grade.name %></td>
+                          <% end %>
+                      </tr>
+                      <% unless grade_set.direct_grade? %>
+                        <tr>
+                            <td class="head"><%= "#{t('minimum_score')} (%)" %></td>
+                            <% grades.each do |grade| %>
+                              <td class="grades"><%= grade.minimum_marks %></td>
+                            <% end %>
+                        </tr>
+                        <% if grade_set.enable_credit_points? %>
+                          <tr>
+                              <td class="head"><%= t('credit_points') %></td>
+                              <% grades.each do |grade| %>
+                                <td class="grades"><%= grade.credit_points %></td>
+                              <% end %>
+                          </tr>
+                        <% end %>
+                      <% else %>
+                        <tr>
+                            <td class="head"><%= t('description_text') %></td>
+                            <% grades.each do |grade| %>
+                              <td class="grades"><%= grade.description %></td>
+                            <% end %>
+                        </tr>
+                      <% end %>
+                  </table>
+              </div>
+          </div>
+        <% end %>
+      <% end %>
+      
+      
+    <% end  %>
+</div>

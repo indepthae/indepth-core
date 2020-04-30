@@ -1,0 +1,176 @@
+.accordion-courses-table a{
+    color: #333 !important;
+    text-decoration: none;
+}
+.accordion-courses-table a:hover{
+    color: #000 !important;
+    text-decoration: underline;
+}
+:focus {
+    outline: none !important;
+}
+.themed_hover_text {
+    text-decoration: none;
+    color: #333;
+}
+/** accordion **/
+.accordion-courses-table{
+    clear: both;
+    margin-bottom: 10px;
+}
+.accordion-courses-heading{
+    width: 980px;
+    color: #999;
+    font-size: 15px;
+/*    font-weight: bold;*/
+    height: 30px;
+    line-height: 30px;
+    padding: 20px 20px 0px 30px;
+}
+/*.accordion-courses-heading .accordion-column-1{
+    width: 245px;
+}
+.accordion-courses-heading .accordion-column-2{
+    width: 200px;
+}
+.accordion-courses-heading .accordion-column-3{
+    width:
+}*/
+.accordion-column-1,.accordion-column-2,.accordion-column-3{
+    float: right;
+    padding-right: 10px;
+}
+.accordion-column-1{
+    width: 522px;
+    margin-right: 0px;
+    padding-right: 0px;
+/*    width: calc(50% - 10px);*/
+}
+.accordion-column-2{
+/*    width: 162px;*/
+/*    width: calc(10% - 10px);*/
+}
+.accordion-column-2{
+    width: 307px;
+/*    width: calc(40% - 10px);*/
+}
+.accordion-course-heading{
+/*    line-height: 40px;
+    height: 40px;*/
+    height: 15px;
+    padding: 20px;
+    background: #f4f4f4 !important;
+    border: 1px solid #D4D4D4 !important;
+    margin-top: 5px;
+    font-size: 14px;
+    width: 938px;
+    color: #666;
+    cursor: pointer;
+/*    font-weight: bold;*/
+}
+.accordion-course-heading .accordion-column-1{
+    font-weight: bold;
+    color: #000;
+}
+.accordion-course-heading .accordion-column-2{
+    font-size: 13px;
+}
+.accordion-course-batches-table, .batch-row-header, .batch-row{
+    width: 978px;
+}
+.accordion-course-heading.ui-accordion-header-active{
+/*    background: #989898 !important;*/
+    border-color: #989898 !important;
+}
+/** accordion **/
+.batch-row-header .batch-column-1,.batch-row .batch-column-1{
+/*    width: calc(55% - 11px);*/
+    width: 410px;
+}
+.batch-row-header .batch-column-2,.batch-row .batch-column-2{
+/*    width: calc(25% - 11px);*/
+    width: 165px;
+}
+.batch-row-header .batch-column-3,.batch-row .batch-column-3{
+/*    width: calc(20% - 11px);*/
+    width: 160px;
+    border-left: 0px !important;
+}
+.batch-row-header .batch-column-4,.batch-row .batch-column-4{
+/*    width: calc(20% - 11px);*/
+    width: 151px;
+    border-left: 0px !important;
+}
+.batch-row-header .batch-column-1, .batch-row .batch-column-1 {
+    padding-right: 20px !important;
+}
+.batch-row-header .batch-column-1,
+.batch-row-header .batch-column-2,
+.batch-row-header .batch-column-3,
+.batch-row-header .batch-column-4,
+.batch-row .batch-column-1,
+.batch-row .batch-column-2,
+.batch-row .batch-column-3,
+.batch-row .batch-column-4{
+    float: right;
+    padding-right: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #eee;/* !important;*/
+}
+.batch-row-header{
+    font-size: 14px;
+    color: #999;
+}
+.batch-row{
+    font-size: 14px;
+    color: #333;
+}
+.accordion-course-heading.batch-row-header.ui-accordion-header-active{
+    background: #fff !important;
+}
+/*.accordion-course-batches-table {
+    height: auto;
+    clear: both;
+}
+.accordion-course-batches-table.ui-accordion-content-active{
+    display: block !important;
+}*/
+.accordion-course-batches-table.ui-accordion-content-active {
+    display: block !important;
+    height: auto;
+    clear: both;
+    margin-bottom: 5px;
+    border: 1px solid #989898 !important;
+    border-top: 0px !important;
+/*    margin-top: -5px;*/
+}
+.batch-row-header, .batch-row {
+    border-bottom: 1px solid #eee !important;
+    height: 40px;
+    line-height: 40px;
+}
+.batch-row {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 0px !important;
+    overflow: hidden;
+}
+.batch-row:last-child {
+    border: 0px !important;
+}
+.ui-state-default .ui-icon.down-arrow-img {
+  background: url('/images/iconsprite-1.png') no-repeat -67px -3px;
+  width: 10px;
+  height: 6px;
+}
+.ui-accordion-header-icon {
+    margin-top: 1px !important;
+    top: 4px !important;
+    float: left;
+    position: relative !important;
+}
+.ui-state-default .ui-icon.up-arrow-img {
+  background: url('/images/iconsprite-1.png') no-repeat -51px -3px;
+	width: 10px;
+	height: 6px;
+}

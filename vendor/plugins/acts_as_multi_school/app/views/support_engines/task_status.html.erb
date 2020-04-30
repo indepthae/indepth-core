@@ -1,0 +1,32 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+      <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+<fieldset class="margin-bottom-20">
+    <h1 class="content-head">Support Task Status</h1>
+    <%= link_to 'Support Tasks', task_list_support_engine_path(params[:id]),:class => 'button-red float-right'%>
+</fieldset>
+<div class="content-div container-width">
+    <div class='content-list'>
+        <% if @all_status.present? %>
+          <% @all_status.each do |status| %>
+            <fieldset class="bg-light grey-border shadow">
+                <label><%=h status.script_name %></label><p class="seperator">|</p>
+                <label><%=h status.task_type %></label><p class="seperator">|</p>
+                <label><%=h status.task_status %></label><p class="seperator">|</p>
+                <label><%=h status.start_time %></label><p class="seperator">|</p>
+                <label><%=h status.end_time %></label><p class="seperator">|</p>
+                <label><%=link_to "view log", view_log_support_engine_path(status.id) %></label>
+                <label><%#=h status.note %></label>
+            </fieldset>
+          <% end %>
+          <%= will_paginate @all_status %>
+        <% else %>
+          <fieldset class="bg-light grey-border shadow">
+              <label>No Support Tasks.</label>
+          </fieldset>
+        <% end %>
+    </div>
+</div>
+

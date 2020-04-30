@@ -1,0 +1,19 @@
+<% if @filters.present? %>
+  <div  id="<%= @base_template.name %>_filters">
+    <div class ="filter_section filters filters_form_sec">
+      <div class="description"><%= t("report_filters_desc") %></div>
+      <% form_for :filter_values, :url => {:action => 'fetch_reports'}, :html => {:id => "filter_form", :onsubmit => "return send_request('filters');"} do |f| %>
+        <%= render_filter_fields %>
+        <div class="div_link" onClick="return send_request('reset_filters');" id="reset"><%= t('cancel') %></div>
+        <%=submit_tag "#{t('apply_filters')}", :class => "submit-button filters_submit"  %>
+      <% end %>
+    </div>
+  </div>
+  <script type="text/javascript">
+    j(document).ready(function(){
+      build_multiselect();
+    });
+  </script>
+<% end %>
+
+

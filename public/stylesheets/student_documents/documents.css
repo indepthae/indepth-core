@@ -1,0 +1,236 @@
+.student_documents-icon {
+    background-position: -80px -260px !important;
+}
+#student_profile_heading1 {
+    clear: both;
+    float: left;
+    height: 50px;
+    margin: 20px 0px;
+    padding: 0px;
+    padding-bottom: 20px;
+    width: 100%;
+    display: inline-table;
+    border-bottom: 1px solid #ccc;
+}
+#profile_picture_display,#student_main_info1{
+    float: left;
+}
+#profile_picture_display{
+    width: 100px;
+    height: auto;
+    border: 1px solid #ccc;
+    margin-right: 20px;
+}
+#profile_picture_display img{
+    width: 100%;
+    height: 100%;
+}
+#student_main_info1{
+
+}
+#student_main_info1 span.name {
+    color: #000000;
+    float: left;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    margin: 13px 0 0;
+    padding-right: 20px;
+    width: 100%;
+    font: bold;
+}
+#student_main_info1 span.course {
+    color: #000000;
+    float: left;
+    font-size: 14px;
+    margin: 10px 0 0;
+    padding-right: 20px;
+    width: 100%;
+}
+#student_main_info1 span.adm {
+    color: #000000;
+    float: left;
+    font-size: 14px;
+    margin: 5px 0 0;
+    padding: 0;
+    width: 100%;
+}
+/*document_category_title*/
+.document_table_heading {
+    clear: both;
+    min-height: 60px;
+}
+.documents_table{
+    clear: both;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+h4.document_category_title{
+    float: left;
+    margin-top: 20px;
+    /*font-size: 13px;*/
+    font-weight: normal;
+    color: #000;
+    width: auto;
+    max-width: 700px;
+    font-weight: bold;
+}
+.add_link {
+    margin-top: 20px;
+    float: right;
+    font-size: 14px;
+    color: #000;
+}
+.add_link a, .add_link:hover, .add_link a:visited{    
+    font-weight: normal;
+    font-size: 14px;
+    margin-left: 20px;
+    text-decoration: none;
+    color: #000;
+}
+
+/* document form */
+.document_upload_form{
+    display: none;
+    min-height: 80px;
+    border: 1px solid #ccc;
+    padding: 20px 10px;
+    width: calc(100% - 22px);
+}
+.label-field-pair {
+    /*width: 40%;*/
+    width: 350px;
+    float: left;
+}
+.label-container, .input-container{
+    clear: both;
+}
+.label-field-pair label{
+    margin-left: 10px;
+}
+.input-container{
+    padding-top: 10px;
+}
+.input-container .paperclip_field{
+    width: 240px;
+    float: left;
+}
+.submit_field{
+    /*width: 20%;*/
+    min-width: 220px;
+    float: right;
+    padding-top: 29px;
+}
+.document_name_field{
+    display: none;
+}
+.reject_file{    
+    float: left;
+    background: url(/images/iconsprite-1.png) no-repeat -5px -344px;
+    width: 10px;
+    height: 10px;
+    /* margin-right: -10px; */
+    margin-top: 14px;
+    display: none;
+    cursor: pointer;
+}
+.document_file_field {
+    width: 280px;
+}
+.document_name_field{
+    width: 400px;
+}
+.document_name_field input[type=text] {
+    width: calc(100% - 20px);
+}
+.categories_list {
+    width: 100% !important;
+    padding-top: 10px;
+}
+.categories_list .label-container, .categories_list .input-container, .document_name_field_edit .label-container, .document_name_field_edit .input-container {
+    clear: none !important;
+    padding-top: 0px;
+}
+select:focus {
+    background: #fff !important;
+    border: 1px solid #9e0f15 !important;
+}
+/* document form */
+.table {
+    background: #c3d9ff;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    padding: 20px;
+    overflow: auto;
+}
+.no-documents {
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    font-size: 13px;
+    color: gray;
+}
+#listing{
+    width: 100%;
+}
+#listing .tr-head {
+    color: #000 !important;
+    font-size: 14px !important;
+}
+#listing .tr-head td {
+    padding: 5px;
+    padding-left: 10px;
+    font-weight: bold !important;
+}
+#listing .col-1, #listing .col-2, #listing .col-3  {
+    padding: 5px;
+    padding-left: 10px;
+    font-size: 13px;
+    font-weight: normal;
+}
+#listing td.col-1{
+    width: 60% !important;
+    max-width: 600px;
+}
+#listing td.col-2, #listing td.col-3{
+    width: 20% !important;
+    min-width: 100px;
+    max-width: 100px;
+}
+#listing td.col-3 a, #listing td.col-3 a:hover{
+    margin-right: 10px;
+}
+
+
+.submit_button {
+    margin-top: 15px;
+    /*margin-left: 210px;*/
+    padding: 7px 10px;
+    color: #fff;
+    background: #27292B;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+    font-family: arial;
+    cursor: pointer;
+    float: left;
+}
+.submit_button:hover {
+    background: #373B3F;
+}
+.edit_submit_button{
+    margin-left: 220px;
+}
+.cancel_link{
+    font-size: 14px;
+    color: #000;
+    cursor: pointer;
+    float: left;
+    padding-top: 15px;
+    line-height: 30px;
+    margin-left: 20px;
+}

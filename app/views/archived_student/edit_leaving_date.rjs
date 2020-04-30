@@ -1,0 +1,14 @@
+if request.post?
+  if @archived_student.update_attributes(params[:student])
+    page.replace_html 'form-errors', :text => ''
+    page.replace_html 'leaving-date', :text => "#{format_date(@archived_student.date_of_leaving,:format=>:long)}"
+    page.replace_html 'flash-box', :text=>"<p class='flash-msg'>#{t('edit_leaving_date_flash')}</p>"
+    page << "Modalbox.hide();"
+  else
+    page.replace_html 'form-errors', :partial => 'errors', :object => @archived_student
+    page.visual_effect(:highlight, 'form-errors')
+  end
+else
+  page.replace_html 'modal-box', :partial => 'edit_leaving_date'
+  page << "Modalbox.show($('modal-box'), {title: '#{t('edit_leaving_date')}', width: 500});"
+end

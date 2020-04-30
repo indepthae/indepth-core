@@ -1,0 +1,182 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('sms_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('messages') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% ms_present = MultiSchool rescue false %>
+    <% if ms_present %>
+      <% assigned_package = MultiSchool.current_school.assigned_packages.first(:conditions=>{:is_using=>true}) %>
+      <% if assigned_package.present? %>
+        <% available_sms = assigned_package.sms_count.present? ? (assigned_package.sms_count.to_i - assigned_package.sms_used.to_i) : "#{t('unlimited')}" %>
+        <% valid = assigned_package.validity.present? ? (assigned_package.validity.to_date >= Date.today ? "" : "(#{t('validity_expired')})") : "" %>
+      <% else %>
+        <% available_sms = 0 %>
+      <% end %>
+      <div class="message_balance"><%= t('available_sms') %> : <%= available_sms %> <%= valid %> </div>
+    <% end %>
+
+    <div class="head"><%= t('sms_log_page') %></div>
+    <div class="sub_text"><%= t('sms_log_page_desc') %></div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="filter-section">
+        <h5 class="field_head"><%= t('select_date_range') %></h5>
+        <div class="start_date">
+            <%= calendar_date_select_tag 'date' ,I18n.l((Date.today - 1.months),:format=>:default),  :onchange => "fetch_sms_logs();", :id => "start_date", :class => "calender-select-width",:format=>:default  %>
+        </div>
+        <div class="filter_text"><%= t('to') %></div>
+        <div class="end_date">
+            <%= calendar_date_select_tag 'date' ,I18n.l((Date.today),:format=>:default),  :onchange => "fetch_sms_logs();", :id => "end_date", :class => "calender-select-width",:format=>:default  %>
+        </div>
+    </div>
+    <div class="sms_log_conatiner">
+        <div class="messages_section">
+            <div class="container_head message_section_head">
+                <%= t('sms_text') %>
+            </div>
+            <div class="content_box">
+                <div class="switcher_container">
+                    <div class="switcher">
+                        <div id="custom_messages" class="toggle_switch toggle_active" onclick="switch_messages(false)">
+                            <%= t('custom_messages') %>
+                        </div>
+                        <div id="automatic_alerts" class="border_left toggle_switch" onclick="switch_messages(true)">
+                            <%= t('automatic_alerts') %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message_list" id="message_list">
+                    <%= render "sms_messages"%>
+                </div>
+                <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;", :class=> "loader_position" ) %>
+            </div>
+        </div>
+        <div id="logs" class="logs">
+        </div>
+    </div>
+
+    <script>
+              var automated = false;
+              var page_no = 2;
+  j('.content_box').on('scroll', function() {
+        if(j(this).scrollTop() + j(this).innerHeight() >= j(this)[0].scrollHeight) {
+      console.log('end reached');
+              j('#loader').show();
+              j.ajax({
+              url: "show_sms_messages",
+                      type: 'POST',
+                      data: {
+                      page: page_no,
+                      automated: automated,
+                      start_date: j('#start_date').val(),
+                      end_date: j('#end_date').val()
+                      },
+                      success: function (data, textStatus, jqXHR)
+                      {
+                      page_no = page_no + 1;
+                              j('#loader').hide();
+                      },
+                      error: function (jqXHR, textStatus, errorThrown)
+                      {
+                      if (page_no > 2) {
+                      page_no = page_no - 1;
+                      }
+                      j('#loader').hide();
+                      }
+              });
+      }
+      });
+
+              function switch_messages(toggle_automated) {
+              j("#logs").html("");
+              console.log(toggle_automated);
+              console.log(automated);
+                      if (toggle_automated != automated) {
+              j.ajax({
+              url: "show_sms_messages",
+                      type: 'POST',
+                      data: {
+                      page: 1,
+                      automated: toggle_automated,
+                      start_date: j('#start_date').val(),
+                      end_date: j('#end_date').val()
+                      },
+                      success: function (data, textStatus, jqXHR)
+                      {
+                      automated = toggle_automated;
+                              page_no = 2;
+                              if (toggle_automated == true)
+                      {
+                      j("#automatic_alerts").addClass("toggle_active");
+                              j("#custom_messages").removeClass("toggle_active");
+                      } else {
+                      j("#custom_messages").addClass("toggle_active");
+                              j("#automatic_alerts").removeClass("toggle_active");
+                      }
+                      },
+                      error: function (jqXHR, textStatus, errorThrown)
+                      {
+                      }
+              });
+              }
+
+
+              }
+
+      function update_bg(obj) {
+      j(".message_element").css("background-color", "white");
+              j("#message_element-" + obj).css("background-color", "rgb(242, 255, 253)");
+      }
+
+      function fetch_sms_logs() {
+        automated = false;
+      j.ajax({
+      url: "show_sms_messages",
+              type: 'POST',
+              data: {
+              start_date: j('#start_date').val(),
+              end_date: j('#end_date').val(),
+              page: 1
+              },
+      success: function (data, textStatus, jqXHR)
+      {
+      },
+              error: function (jqXHR, textStatus, errorThrown)
+              {
+              }
+      });
+      }
+
+    </script>
+
+
+</div>

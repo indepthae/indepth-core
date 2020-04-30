@@ -1,0 +1,14 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <%= stylesheet_link_tag(['application', '_styles/ui.all'])%>
+    <%= stylesheet_link_tag(*get_stylesheets) %>
+    <%= javascript_include_tag :defaults, :cache => 'cache/javascripts/all' %>
+  </head>
+  <body>
+    <div id="error-div">
+      <p class="errorExplanation"><%= t('sorry_your_answers_are_not_acepted_as_the_maximum_time_exeeded_please_contact_the_exam_admin') %> </p>
+    </div>
+  </body>
+</html>

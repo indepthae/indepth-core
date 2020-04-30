@@ -1,0 +1,3 @@
+@category_id = @category.new_record? ? (@category.registered ? 'registered' : 'nil') : @category.id
+page.replace_html "category_table_#{@category_id}", :partial => "documents_table", :locals => {:documents => @documents, :category => @category}  unless @errors.present?
+page.replace_html 'flash_box', :text=>"<p class='flash-msg'>#{flash.now[:notice]}</p>" unless flash.now[:notice].nil?

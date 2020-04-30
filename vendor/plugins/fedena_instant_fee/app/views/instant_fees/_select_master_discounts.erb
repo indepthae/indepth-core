@@ -1,0 +1,4 @@
+<%= select_tag 'master_fee_discount_id[]',
+               options_for_select(@master_discounts.map { |x| [x.name, x.id] }.unshift([t('select_a_discount'), nil]),
+                                  :include_blank => t('select_a_discount')), {:onchange => "reset_discount(this)",
+                                                                              :disabled => true} %>

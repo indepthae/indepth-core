@@ -1,0 +1,54 @@
+<div id="template_key_app">
+<div class="field_section">
+  <div class="field_head">
+    <%= t('select_course')%>
+  </div>
+  <div class="field">
+    <%= select "", "course",
+    options_for_select(@courses.map{|c| [c.full_name,c.id]}) ,{:include_blank=>t('select_course')}, :class=>"input_box", :id=>"course_selector",
+    :onchange => "#{remote_function(:url => {:action => "batch_list_for_guardian"},:with => "'course_id='+value+'&academic_year='+j('#academic_year').val()+'&base_template_id=#{@base_template.id}&combine_template_id=#{@combine_template.id if @combine_template.present?}'",
+    :before => "Element.show('loader')",:success => "Element.hide('loader')" )}" %>
+  </div>
+</div>
+
+<div id="batch_list_for_guardian" class="field_section">
+  <div class="field_head">
+    <%= t('select_batch')%>
+  </div>
+  <div class="field">
+    <%= select "", "batches",
+    [] ,{:include_blank=>t('select_batch')}, :class=>"input_box", :id=>"batch_selector"%>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+<div id="student_list_for_guardian" class="field_section">
+  <div class="field_head">
+    <%= t('select_student')%>
+  </div>
+  <div class="field">
+    <%= select "", "",
+    [] ,{:include_blank=>t('select_student')}, :class=>"input_box", :id=>"user_selector"%>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+<div id="guardian_list" class="field_section">
+  <div class="field_head">
+    <%= t('select_guardian')%>
+  </div>
+  <div class="field">
+    <%= select "", "",
+    [] ,{:include_blank=>t('select_guardian')}, :class=>"input_box", :id=>"user_selector"%>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+<%= render "/templates/set_common_keys.js.erb"%>
+
+
+</script>

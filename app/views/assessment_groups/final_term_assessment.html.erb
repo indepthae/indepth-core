@@ -1,0 +1,43 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('create_exam_group_capital') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_groups_new, [@plan, @assessment_group] %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <div id ="header"><%= t('create_final_term_assessment') %></div>
+    <div id ="description"><%= t('create_term_exam_description') %></div>
+    <% if @subject_assessments.present? or @derived_assessments.present? or @grade_exams.present?  or @activity_assessments.present?%>
+      <div id="group_form">
+          <%= render  :partial => 'final_term_assessment_group' %>
+      </div>
+    <% else %>
+      <p class="flash-msg"> <%= t('no_assessment_groups_created') %> </p>
+    <% end %>
+</div>
+
+<script type="text/javascript">
+    toggle_no_exam = function (elm) {
+      if (elm.value == 'true') {
+          j('#formula, #scoring-type, #formula-hr, #scoring_type-hr').fadeOut();
+      } else {
+          j('#formula, #scoring-type, #formula-hr, #scoring_type-hr').fadeIn();
+      }
+      const term_id = <%= @term.present? ?  @term.id : '' %>;
+      new Ajax.Request('/assessment_groups/fetch_final_term_assessment_groups_new', {
+          parameters: {'no_exam': elm.value, 'assessment_plan_id': <%=@plan.id%>, 'assessment_term_id': term_id},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onComplete: function (resp) {
+              j('#ag_group_list').html(resp.responseText);
+          }
+      });
+  }
+</script>

@@ -1,0 +1,114 @@
+<tr class="row-a tr-head">
+    <td class="sl-col col-1"></td>
+    <td class="col-1 bold_font" colspan="3">
+        <span><%= t('summary') %></span>
+    </td>
+</tr>
+
+<tr class="row-b summary-row">
+    <td class="sl-col col-1 normal_font"><%= i+= 1%></td>
+    <td class="set_border_right particular-col normal_font">
+        <%= "#{t('total')}  #{t('fees_text')}" %>
+    </td>
+    <td class="set_border_right amount-col normal_font align_right">         
+        <%= precision_label(@transport_fee.bus_fare) %>
+    </td>
+    <td class="cancel-disc cancel-color"></td>
+</tr>
+
+<tr class="row-b summary-row">
+    <td class="sl-col col-1 normal_font"><%= i+= 1%></td>
+    <td class="set_border_right particular-col normal_font">
+        <%= "#{t('total')} #{t('discount')}" %>
+    </td>
+    <td class="set_border_right amount-col normal_font align_right">
+        <%= precision_label(@discount_amount) %>
+    </td>
+    <td class="cancel-disc cancel-color"></td>
+</tr>
+
+<% if @transport_fee.tax_enabled? and @tax_slab.present? %>
+  <tr class="row-b summary-row">
+      <td class="sl-col col-1 normal_font"><%= i+= 1%></td>
+      <td class="set_border_right particular-col normal_font">
+          <%= "#{t('total')} #{t('tax_text')}" %>
+      </td>
+      <td class="set_border_right amount-col normal_font align_right">
+          <%= precision_label(@transport_fee.tax_amount) %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+<% end %>
+
+<% if total_fine != 0 %>  
+  <tr class="row-b summary-row">
+      <td class="sl-col col-1 normal_font"><%= i+= 1%></td>
+      <td class="set_border_right particular-col normal_font">
+          <%= "#{t('total')} #{t('fine')}" %>
+      </td>
+      <td class="set_border_right amount-col normal_font align_right"
+          id ="total-fine"> 
+              <%= precision_label(total_fine) %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+<% else %>
+  <tr class="row-b summary-row" id="summary-show-fine"></tr>
+<% end %>
+<!--
+<tr class="tr-<%#= cycle("odd", "even") %> ">
+  <td class="col-1 normal_font">3</td>
+  <td class="col-2 normal_font"><%#= "#{t('total')} #{t('fine')}" %></td>
+  <td class="col-6 normal_font"> <%#= precision_label(total_fine) %></td>
+</tr>
+-->
+
+
+<tr class="row-b">
+    <td class="bold_font amount-col align_right" colspan="2">
+        <%= "#{t('total_amount_to_pay')}" %>
+    </td>
+    <td class="set_border_right amount-col bold_font total_fees align_right" id="total-fees">
+        <%= precision_label (@total_fees.to_f + @total_paid_fine.to_f) %>
+    </td>
+    <td class="cancel-disc cancel-color"></td>
+</tr>
+<% total_paid_amount = @transport_fee.finance_transactions.collect(&:amount).sum %>
+
+<tr class="row-b">
+    <td class="bold_font particular-col align_right" colspan="2">
+        <%= "#{t('total_amount_paid')}" %>
+    </td>
+    <td class="set_border_right amount-col bold_font payment_done align_right">
+        <%= precision_label total_paid_amount %>
+    </td>
+    <td class="cancel-disc cancel-color"></td>
+</tr>
+
+<% unless @transport_fee.is_paid %>
+  <tr class="row-b">
+      <td class="bold_font particular-col align_right" colspan="2">
+          <%= "#{t('total_due_amount')}" %>
+      </td>
+      <% @amount_to_pay = (@total_fees.to_f + @total_paid_fine.to_f - 
+          precision_label(total_paid_amount).to_f) <= 0 ? 0 : 
+        (@total_fees + @total_paid_fine - precision_label(total_paid_amount).to_f) %>      
+      <td class="set_border_right bold_font amount-col amount_to_pay align_right"
+          id="total-due-amount">
+              <%= precision_label(@amount_to_pay) %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+<% end %>
+<% if @current_user.student and @student.advance_fee_wallet.present? and @advance_fee_used.to_f > 0 %>
+    <tr class="row-b">
+      <td class="bold_font particular-col align_right" colspan="2">
+          <%= "#{t('advance_applied')}" %>
+      </td>
+      <td class="set_border_right bold_font amount-col amount_to_pay align_right"
+          id="adf_applied">
+              <%= @advance_fee_used.to_f %>
+      </td>
+      <td class="cancel-disc cancel-color"></td>
+  </tr>
+<% end %>

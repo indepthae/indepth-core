@@ -1,0 +1,90 @@
+<% unless @owner.nil? %>
+  <% owner_object = @owner.class.name.underscore %>
+<% end %>
+<% unless owner_object.nil? %>
+  <% new_path = "new_#{owner_object}_sms_package_path" %>
+  <% edit_path = "edit_#{owner_object}_sms_package_path" %>
+  <% assigned_path = "assigned_list_#{owner_object}_sms_package_path" %>
+  <% edit_assigned_path = "edit_assigned_#{owner_object}_sms_package_path" %>
+  <% link_text = "Schools" %>
+<% else %>
+  <% new_path = nil %>
+  <% edit_path = nil %>
+  <% assigned_path = nil %>
+  <% link_text = "Clients" %>
+<% end %>
+<% unless @assigned_packages.empty? %>
+  <fieldset>
+    <label style="width:auto !important;">List of configured SMS packages.</label>
+  <%# if permitted_to? :new, @additional_setting, :context=>:additional_settings %>
+    <%= link_to 'Create an SMS Package', new_path.nil? ? new_sms_package_path : send(new_path,@owner), :class=>"button-grey-small float-right-with-margin" if permitted_to? :new,(@owner.present? ? @owner : School.new),:context=> :sms_packages %> <br/>
+  <%# end %>
+  </fieldset>
+  <table width="97%">
+    <tr>
+      <td class="table-head">Package Name</td>
+      <td class="table-head">Service Provider</td>
+      <td class="table-head">Validity</td>
+      <td class="table-head">SMS Limit</td>
+      <td class="table-head">Available SMS</td>
+      <td class="table-head"></td>
+    </tr>
+    <% unless owner_object == 'school' %>
+      <% own_packages = @assigned_packages.select{|o| o.is_owner} %>
+      <% unless @owner.nil? %>
+        <tr>
+          <td colspan="6" class="table-head table-subhead">Own Packages</td>
+        </tr>
+      <% end %>
+      <% if own_packages.empty? %>
+        <td colspan="6" class="table-data soft-text">No SMS package has been created.</td>
+      <% else %>
+        <% own_packages.each do|a| %>
+          <% package = a.sms_package %>
+          <tr>
+            <td class="table-data width-25pc"><%= package.name %></td>
+            <td class="table-data width-20pc soft-text"><%= package.service_provider %></td>
+            <td class="table-data width-10pc soft-text"><%= a.validity ? a.validity : "Lifetime" %></td>
+            <td class="table-data width-10pc soft-text"><%= a.sms_count ? a.sms_count : "Unlimited" %></td>
+            <td class="table-data width-15pc soft-text"><%= a.sms_count ? (a.sms_count.to_i - a.sms_used.to_i) : "Unlimited" %></td>
+            <td class="table-data width-20pc soft-text">
+              <%= link_to 'Settings', edit_path.nil? ? edit_sms_package_path(package) : send(edit_path,@owner,package) if permitted_to? :edit,(@owner.present? ? @owner : School.new),:context=> :sms_packages %>
+              <% unless owner_object == 'school' %><%= link_to "#{link_text}", assigned_path.nil? ? assigned_list_sms_package_path(package) : send(assigned_path,@owner,package), :class=>'margin-left-5' if permitted_to? :assigned_list,(@owner.present? ? @owner : School.new),:context=> :sms_packages %><% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+    <% unless @owner.nil? %>
+      <% inherited_packages = @assigned_packages.select{|o| o.is_owner == false} %>
+      <tr>
+        <td colspan="6" class="table-head table-subhead">Inherited Packages</td>
+      </tr>
+      <% if inherited_packages.empty? %>
+        <td colspan="6" class="table-data soft-text">No inherited SMS package found.</td>
+      <% else %>
+        <% inherited_packages.each do|a| %>
+          <% package = a.sms_package %>
+          <tr>
+            <td class="table-data width-25pc"><%= package.name %> <%= a.is_using ? "(active)" : "" %></td>
+            <td class="table-data width-20pc soft-text"><%= package.service_provider %></td>
+            <td class="table-data width-10pc soft-text"><%= a.validity ? a.validity : "Lifetime" %></td>
+            <td class="table-data width-10pc soft-text"><%= a.sms_count ? a.sms_count.to_i : "Unlimited" %></td>
+            <td class="table-data width-15pc soft-text"><%= a.sms_count ? (a.sms_count.to_i - a.sms_used.to_i) : "Unlimited" %></td>
+            <td class="table-data width-20pc soft-text">
+              <%= link_to 'Settings', send(edit_assigned_path,@owner,package) if permitted_to? :edit_assigned,(@owner.present? ? @owner : School.new),:context=> :sms_packages %>
+              <% unless owner_object == 'school' %><%= link_to "#{link_text}", assigned_path.nil? ? assigned_list_sms_package_path(package) : send(assigned_path,@owner,package), :class=>'margin-left-5' if permitted_to? :assigned_list,(@owner.present? ? @owner : School.new),:context=> :sms_packages %><% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </table>
+<% else %>
+  <fieldset>
+    <label>No SMS package found.</label>
+  <%# if permitted_to? :new, @additional_setting, :context=>:additional_settings %>
+    <%= link_to 'Create an SMS Package', new_path.nil? ? new_sms_package_path : send(new_path,@owner), :class=>"button-grey-small float-right-with-margin" if permitted_to? :new,(@owner.present? ? @owner : School.new),:context=> :sms_packages %> <br/>
+  <%# end %>
+  </fieldset>
+<% end %>

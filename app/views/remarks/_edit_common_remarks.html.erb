@@ -1,0 +1,47 @@
+<% form_for :remark, @remark, :url=>"",:html => {:id=>"edit_common_remarks_#{@object_id}"} do |f| %>
+  <%= f.text_area :remark_body%>
+  <div class="label-field-pair">
+    <% if @remark.remark_setting.remark_type=="multiple" %>
+      <%=label_tag 'remarked_by', nil, :id => 'remarked_by_label'%>
+      <div class="text-input-bg" id="remarked_by_text_box"><%= f.text_field :remarked_by %></div>
+    <% end %>
+  </div>
+  <%= f.submit "#{t('submit')}"%>
+  <%=link_to t('cancel'),"javascript:void(0);",:class=>"themed_text add_link common_remark_cancel_for_edit",:id=>"close_#{@object_id}",:object_id=>@object_id,:student_id=>@student_id,:target_id=>@target_id,:onclick=>"close_me(this)"%>
+<% end %>
+<div class="extender"></div>
+<script type="text/javascript">
+  j('form#edit_common_remarks_<%=@object_id%>').submit(function(e){
+<%= "var target_name = '#{@target_name}'" %>
+<%= "var student_id = '#{@student_id}'" %>
+<%="var load_object_id = '#{@load_object_id}'"%>
+<%="var object_id = '#{@object_id}'"%>
+<%="var params_hash = '#{@params_hash.to_json}'"%>
+    var parametrs={target_name:target_name,student_id:student_id,load_object_id:load_object_id,object_id:object_id,params_hash:params_hash}
+    e.preventDefault();
+    var fo=this
+    new Ajax.Request('/remarks/update_common_remarks',{
+      parameters:this.serialize()+'&'+j.param(parametrs),
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j('#add_remark_link_for_<%=@object_id%>').show();
+        j('#add_remark_link_for_<%=@object_id%>').html(resp.responseText);
+        fo.remove();
+        j('hr.common_hr_<%=@object_id%>').remove();
+      }
+    });
+  });
+
+  function close_me(elm)
+  {
+<%="var object_id = j(elm).attr('object_id')"%>
+    var onclick_attr=j('#add_remark_link_for_'+object_id).children().eq(1).attr('onclick')
+    j('#add_remark_link_for_'+object_id).children().eq(1).attr('onclick',onclick_attr.substring(2, onclick_attr.length))
+    j('#close_'+object_id).parents('#common_remarks_section_'+object_id).children().first().show();
+    j('#close_'+object_id).parent().remove();
+    j('#close_'+object_id).remove();
+    j('hr.common_hr_'+object_id).remove();
+  }
+</script>

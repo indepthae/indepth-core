@@ -1,0 +1,94 @@
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<% i = 0 %>
+<% if @student.present? %>
+<div class="main_head_label"style="margin-top: 13%">
+  <div class="left">
+    <div class="label_field_a">
+      <label><%= t('student_name') %></label>
+      <span>:</span>
+      <label class="head_label_value"><%= @student.full_name %></label>
+    </div></br>
+    <div class="label_field_b">
+      <label><%= t('admission_no') %></label>
+      <span>:</span>
+      <label class="head_label_value"><%= @student.admission_no %></label>
+    </div>
+  </div>
+</div>
+  <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="main_head">
+      <td style="width: 10%"><%= t('sl_no') %></td>
+      <td class="set_border_right"><%= t('transactions') %></td>
+      <td class="set_border_right" style="width: 20%"><%= t('amount') %> (<%= currency %>)</td>
+    </tr>
+
+    <tr class="tr-list_head">
+      <td colspan="2"><%= t('advance_fees_credit_category_text')%></td>
+      <td id="inc_amount" align="right"></td>
+    </tr>
+    <% unless @wallet_credit_transactions.present? %>
+      <tr class="row-b">  
+        <td></td>
+        <td class="no-info"><b><%= t('no_records')%></b></td>
+        <td></td>
+      </tr>
+    <% else %>
+      <% @wallet_credit_transactions.each do |transaction| %>
+        <tr class="row-b">
+          <td style="width: 10%"><%= i += 1 %></td>
+          <td class="set_border_right"><%= transaction["category_name"] %></td>
+          <td class="set_border_right"><%= link_to_remote transaction["amount"], :url => {:controller => "advance_payment_fees",
+            :action => "category_wise_transaction_by_student", :student_id => @student.id, :category_id => transaction.advance_fee_category.id } %></td>
+        </tr>
+      <% end %>
+    <% end %>
+      <tr class="tr-list_head">
+        <td colspan="2"><%= will_paginate @wallet_credit_transactions, :renderer => 'RemoteLinkRenderer', :param_name => 'page_1', :params => {:student_id => @student.id}%></td>
+        <td id="inc_amount" align="right"/>
+      </tr>
+
+    <tr class="tr-list_head">
+      <td colspan="2"><%= t('advance_fees_debit_reciept_text')%></td>
+      <td id="inc_amount" align="right"></td>
+    </tr>
+    <% unless @wallet_debit_transactions.present? %>
+      <tr class="row-b">  
+        <td></td>
+        <td class="no-info"><b><%= t('no_records')%></b></td>
+        <td></td>
+      </tr>
+    <% else %>
+      <% @wallet_debit_transactions.each do |transaction| %>
+        <tr class="row-b">
+          <td style="width: 10%"><%= i += 1 %></td>
+          <td class="set_border_right"><%= transaction.finance_transaction.transaction_receipt.ef_receipt_number %></td>
+          <td class="set_border_right"><%= link_to_remote transaction.amount, :url => {:controller => "advance_payment_fees",
+            :action => "wallet_deduction_transaction_report", :transaction_id => transaction.id, :student_id => @student.id} %></td>
+        </tr>
+      <% end %>
+    <% end %>
+    <tr class="tr-list_head">
+      <td colspan="2"><%= will_paginate @wallet_debit_transactions, :renderer => 'RemoteLinkRenderer', :param_name => 'page_2', :params => {:student_id => @student.id}%></td>
+      <td id="inc_amount" align="right"/>
+    </tr>
+  </table>
+  <div class="seprater_div_bottom">
+    <div id="inner-tab-menu">
+      <ul style="margin-top: 27px;">
+        <li class='themed_bg themed-dark-hover-background'>
+          <%= link_to "#{t('csv_report')}", {:controller => "csv_export", :action => "generate_csv",
+                                             :csv_report_type => "advance_fees", :report_format_type => "csv",
+                                             :id => @student.id} %>
+        </li>
+      </ul>
+    </div>
+  </div>
+<% else %>
+  <div class="no_records" align="center">
+    <p>No Records</p>
+  </div>
+<% end %>

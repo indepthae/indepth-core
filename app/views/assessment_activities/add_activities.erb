@@ -1,0 +1,63 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('add_activities') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_add_activities,@profile %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="ativity_box">
+        <div class="header"><%=t('add_activities')%></div>
+        <%= render :partial=>'profile_details' %>
+        <hr>
+        <% form_for :profile, @profile, :url=>{:controller=>'assessment_activities', :action => 'update_activities', :id=>@profile.id} do  |form |%>
+          <div class="activities">
+              <div class="activity_strip head">
+                  <div class="label"><%= t('activity_name') %></div>
+                  <div class="field"><%= t('description') %></div>
+              </div>
+              <%- form.fields_for :assessment_activities do |f|%>
+                <%= render :partial=> 'activity_field', :locals=> {:f => f} %>
+              <%  end %>
+              <%= link_to_add_activity_fields "<div id='add-icon'></div><div id='add-text'>#{t('add_activity')}</div>", form,:assessment_activities, 'activity_field'  %>
+          </div>
+          <%= form.submit "#{t('save')} #{t('activities')}",:class=>'submit-button'%>
+          <%= link_to "#{t('cancel')}",assessment_activity_path(@profile),:class=>'submit-button cancel-button' %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  add_fields = function (link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      console.log($(link));
+      console.log($(link).up());
+      $(link).insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+  }
+
+  remove_field = function (el) {
+      el.up().up().hide();
+      j(el).prev().val(1) //Setting _destroy to 1
+      if (j('.remove_field:visible').length == 1)
+          j('.remove_field:visible').attr('onclick', 'reset_field(this);')
+  }
+
+  reset_field = function (el) {
+      j(el).closest('.activity_strip').find("input[type='text']").val('')
+      j(el).prev().val(1) //Setting _destroy to 1
+  }
+</script>

@@ -1,0 +1,82 @@
+<% if rtl? %>
+    <%= stylesheet_link_tag 'rtl/module_dashboard' %>
+<% else %>
+    <%= stylesheet_link_tag 'module_dashboard' %>
+<% end %>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('finance_reports.finance_reports_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('finance_reports.finance_reports_text') %></div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+  </div>
+  <div class="box">
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to "#{t('transaction_report')}", :controller => "finance", :action => "monthly_report" %>
+      </div>
+      <div class="link-descr"><%= t('view_income_and_expense_transactions_for_all_accounts') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to "#{t('compare_transactions')}", :controller => "finance", :action => "compare_report" %>
+      </div>
+      <div class="link-descr"><%= t('compare_financial_transactions_of_two_different_periods') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to "#{t('fee_receipts')}", :controller => "finance", :action => "fee_receipts" %>
+      </div>
+      <div class="link-descr"><%= t('fee_receipts_desc') %></div>
+    </div>
+
+    <% if @tax_enabled %>
+        <div class="link-box">
+          <div class="link-heading">
+            <%= link_to "#{t('tax_report')}", :controller => "finance_extensions", :action => "tax_report" %>
+          </div>
+          <div class="link-descr"><%= t('finance_tax_report_description') %></div>
+        </div>
+    <% end %>
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to t('finance_reports.particular_wise_student_transaction_report'), particular_wise_student_transaction_finance_reports_path %>
+      </div>
+      <div class="link-descr"><%= t('finance_reports.finance_reports_particular_wise_student_desc') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to t('finance_reports.particular_wise_daily_transaction_report'), particular_wise_daily_finance_reports_path %>
+      </div>
+      <div class="link-descr"><%= t('finance_reports.particular_wise_daily_transaction_report_desc') %></div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-heading">
+        <%= link_to t('finance_reports.payment_mode_summary_report'), payment_mode_summary_finance_reports_path %>
+      </div>
+      <div class="link-descr"><%= t('finance_payment_mode_summary_report_description') %></div>
+    </div>
+
+    <% if @advance_fee_payment.config_value == "1" %>
+      <div class="link-box">
+        <div class="link-heading">
+          <%= link_to t('advance_fee_report'), :controller => "advance_payment_fees", :action => "report_index" %>
+        </div>
+        <div class="link-descr"><%= t('advance_fee_report_description') %></div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

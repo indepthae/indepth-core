@@ -1,0 +1,50 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(!params[:hr].present?) %>
+  <% if params[:hr] %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('advanced_payslip_reports') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:hr].present? %>
+      <%= make_breadcrumb %>
+    <% else %>
+      <% breadcrumb :finance_hr_report %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% if @templates.present? %>
+    <div id ="templates_list">
+      <table align="center" width="100%" cellpadding="1" cellspacing="1">
+        <tr class="tr-head">
+          <td class="name"><%= t('custom_reports_text') %></td>
+        </tr>
+        <% @templates.each do |temp|  %>
+          <tr>
+            <td><%= link_to temp.name, {:action => 'template', :controller => 'hr_reports', :id => temp.id, :hr => params[:hr]} %></td>
+          </tr>
+        <% end %>
+      </table>
+      <%= will_paginate @templates %>
+    </div>
+  <% end %>
+  <div id ="reports_list">
+    <table align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+        <td class="name"><%= t('generate_reports') %></td>
+      </tr>
+      <% @base_templates.each do |temp|  %>
+        <tr>
+          <td><%= link_to t(temp.name).capitalize, {:action => 'report', :controller => 'hr_reports', :name => temp.name, :hr => params[:hr]} %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+if @error_list.present?
+	page.replace_html 'form-errors', :partial => 'errors', :object => @advance_fee_category
+  page.insert_html :bottom, 'full_errors', :text => "#{t('select_atleast_one_batch')}" if @error_list
+  page.visual_effect(:highlight, 'form-errors')
+end

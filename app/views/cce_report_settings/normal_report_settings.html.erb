@@ -1,0 +1,147 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1>CCE Settings</h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'>Basic CCE Report Settings</div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "Preview report",{ :action => 'normal_preview',:report_format_type => "pdf"},:target=>"_blank" %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for :cce_report_setting do |c| %>
+      <%= error_messages_for :cce_report_setting %>
+      <div class="box">
+          <div class="label_field_pair block">
+              <label class="core_label">Report Header</label>
+              <div class="messages">How would you like the header section of the Basic CCE Reports to look like?</div>
+              <div class="ind_block">
+                  <%= radio_button  :cce_report_setting, :normal_report_header,"0",:checked=>@setting[:normal_report_header]=="0",:class=>'report_head'%>
+                  <label class="general_label" for="cce_report_setting_normal_report_header_0"><%=t('fedena_header_preset')%></label>
+                  <%= radio_button  :cce_report_setting,:normal_report_header, "1",:checked=>@setting[:normal_report_header]=="1",:class=>'report_head' %>
+                  <label class="general_label" for="cce_report_setting_normal_report_header_1"><%=t('customized_header_text')%></label>
+                  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %>
+              </div>
+              <div id="report_desc">
+                  <%if @setting[:normal_report_header]=="0"%>
+                    <%=render :partial => "report_with_normal_header"%>
+                  <%else%>
+                    <%=render :partial => "report_without_normal_header"%>
+                  <%end%>
+              </div>
+          </div>
+          <div class="label_field_pair block">
+              <label class="core_label">Student Details</label>
+              <div class="messages">Select the student details that you want to be shown in the report card in the required order. A few details are already added by default and if required, additional details can be selected from the drop down list.</div>
+              <div class="grey_back">
+                  <%3.times do |i|%>
+                    <%options=["<option selected ='selected'>#{t(@student_fields[i][0])}</option>"]%>
+                    <div class="label-field-pair with_border">
+                        <span><%=i+1%></span>
+                        <div class="text-input-bg">
+                            <%= select_tag "report_setting_student_detail#{i+1}",options,:disabled=>true%>
+                            <%=hidden_field_tag "report_setting[student_detail#{i+1}]",@student_fields[i][1]%>
+                        </div>
+                    </div>
+                  <%end%>
+                  <%5.times do |i|%>
+                    <div class="label-field-pair with_border">
+                        <span><%=i+4%></span>
+                        <div class="text-input-bg">
+                            <%=c.select :"student_detail#{i+4}", grouped_options_for_select([[t('student_details'),@student_fields.map{|arr| [t(arr[0]),arr[1]]}],
+                                [t('additional_details'), @student_additional_fields.collect {|v| [ v.name, "ad.#{v.name}.#{v.id}" ] }]
+                                ],@setting[:"student_detail#{i+4}"],t('select_a_student_detail'))%>
+                        </div>
+                    </div>
+                  <%end%>
+              </div>
+          </div>
+
+          <div class="label_field_pair block">
+              <label class="core_label" for="student_gender">Signature</label>
+              <div class="messages">Would you like to show the signature section in the report?</div>
+              <div class="ind_block">
+                  <%= radio_button  :cce_report_setting, :signature,"0",:checked=>@setting[:signature]=="0",:class=>'signature'%>
+                  <label class="general_label" for="cce_report_setting_signature_0">Show signature section</label>
+                  <%= radio_button  :cce_report_setting,:signature, "1",:checked=>@setting[:signature]=="1",:class=>'signature' %>
+                  <label class="general_label" for="cce_report_setting_signature_1">Hide signature section</label>
+                  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+              </div>
+              <div id="report_sign">
+                  <%if @setting[:signature]=="0"%>
+                    <%=render :partial => "report_with_signature"%>
+                  <%end%>
+              </div>
+          </div>
+
+          <div class="hor_line"></div>
+
+          <div id="submit_button">
+              <%= submit_tag "Save settings",:id=>'submit-button'%>
+          </div>
+
+
+      </div>
+    <%end%>
+
+</div>
+<script type="text/javascript">
+  j('.report_head').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/cce_report_settings/get_normal_report_header_info",
+          data: {
+              id: j(this).val()
+          },
+          beforeSend: function () {
+              j('#loader1').show();
+          },
+          success: function () {
+              j('#loader1').hide();
+          }
+      });
+  });
+  j('.signature').change(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/cce_report_settings/get_report_signature_info",
+          data: {
+              id: j(this).val()
+          },
+          beforeSend: function () {
+              j('#loader2').show();
+          },
+          success: function () {
+              j('#loader2').hide();
+          }
+      });
+  });
+</script>

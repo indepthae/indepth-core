@@ -1,0 +1,9 @@
+if @recipients.next_page
+  page.replace_html "infinite_recipient_#{params[:page]}", :partial=> 'infinite_recipients'
+  page.replace_html 'infinite-scrolling_recipients', :partial=> 'pages', :locals=>{:type=> 'recipients'}
+else
+  page.replace_html "infinite_recipient_#{params[:page]}", :partial=> 'infinite_recipients'
+  page.replace_html 'infinite-scrolling_recipients', :partial=> 'pages', :locals=>{:type=> 'recipients'}
+  page << 'j("#thread_listing_main").off("scroll");'
+  page << 'j("#infinite-scrolling_recipients .pagination").remove();'
+end

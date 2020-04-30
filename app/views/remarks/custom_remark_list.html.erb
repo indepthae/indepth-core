@@ -1,0 +1,29 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_remarks') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('remarks') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <% if @batches.present? and (permitted_to? :remarks_history, :remarks) %>
+        <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('remark_history')}", :action=>'remarks_history',:id=>@student.id %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :remarks_show_remarks, @student %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div>
+    <div id="custom_remarks_bold_label">Remarks</div>
+    <div id="add_remark_link">
+      <%=render :partial=>"remarks/adding_custom_remark"%>
+    </div>
+  </div>
+  <div id="remarks_list">
+    <%=render :partial=>"list_custom_remarks"%>
+  </div>
+</div>

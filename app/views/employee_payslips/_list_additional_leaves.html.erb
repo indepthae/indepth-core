@@ -1,0 +1,160 @@
+<div id="MB_lop_frame">
+    <div class="part" id="MB_header_part">
+        <a class="remove-icon" href="#" onclick="hideLopModalBox(this)" id="close"></a>
+        <h4><%= "#{t('loss_of_pay')}" %></h4>
+    </div>
+    <% total_count= @additional_leaves.inject(0){|sum,e| sum += (e.is_half_day ? 0.5 : 1)}  %>
+    <div class="part">
+        <div class="fields-details">
+            <div class="field-label"><%= t('employee_text') %></div>
+            <div class="fields-val"><%= @employee.full_name %></div>
+        </div>
+        <div class="fields-details" id="add_leaves">
+            <div class="field-label"><%= t('total_deductable_lop_leaves') %></div>
+            <div class="fields-val"><%= "#{total_count}" %></div>
+        </div>
+        <table align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head">
+                <td class="check_all"><input type="checkbox" class="select_all" onclick="checkAll()"/></td>
+                <td class="category"><%= t('leave_type') %></td>
+                <td class="from"><%= t('date_text') %></td>
+                <td class="reason"><%= t('reason') %></td>
+            </tr>
+            <% @additional_leaves.each do |leave| %>
+              <tr class="tr-<%= cycle('even', 'odd')%>">
+                  <td class="check_all"><input type="checkbox" id="<%= leave.id %>" class="select_leave" onclick="selectLeave(this)" day ="<%=  leave.is_half_day ? 0.5 : 1 %>"/></td>
+                  <td class="category"><%= leave.name %></td>
+                  <td class="from"><%= "#{format_date(leave.attendance_date, :short)} #{leave.is_half_day ? ("("+t("half_day")+")") : ""}" %></td>
+                  <td class="reason"><%= leave.reason %></td>
+              </tr>
+            <% end %>
+        </table>
+    </div>
+    <% count= @selected_leaves.inject(0){|sum,e| sum += (e.is_half_day ? 0.5 : 1)}  %>
+    <div class="part" id="MB_footer">
+        <div id="selected-leaves" class="fields-details"><%= "#{count} #{t('additional_leave_text', {:count => @additional_leaves.length})}" %></div>
+        <%= submit_tag "#{t('select_additional_leaves')}", :class => 'submit_button', :id => 'submit_button' %>
+    </div>
+</div>
+<script type="text/javascript">
+  var state = <%= @additional_leaves.each_with_object({}){|e,h| h[e.id] = @selected_leaves.collect(&:id).include? e.id }.to_json %>;
+  var changed = <%= @additional_leaves.each_with_object({}){|e,h| h[e.id] = @selected_leaves.collect(&:id).include? e.id }.to_json %>;
+  var checked = [];
+  var prorated_method = <%= @payroll_group.deduct_lop_from_categories? %>;
+  var payroll_hash;
+  function checkAll()
+  {
+      if (j('.select_all').prop('checked') == true)
+      {
+          j('.select_leave').each(function () {
+              j(this).prop('checked', true);
+              selectLeave(this);
+          });
+      }
+      else {
+          j('.select_leave').each(function () {
+              j(this).prop('checked', false);
+              selectLeave(this);
+          });
+      }
+  }
+
+  function selectLeave(elm)
+  {
+      count = leaveCount();
+      if (count == 0)
+          j('#selected-leaves').text('<%= t('additional_leave_text',{:count => 0}) %>');
+      else if (count == 1 || count == 0.5)
+          j('#selected-leaves').text(count + ' <%= t('additional_leave_text',{:count => 1}) %>');
+      else
+          j('#selected-leaves').text(count + ' <%= t('additional_leave_text',{:count => 2}) %>');
+      changed[elm.id] = j(elm).is(":checked");
+      allLeaves();
+  }
+  j('#MB_footer .submit_button').click(function () {
+      count = leaveCount();
+      if (prorated_method)
+          calucate_lop_values(count);
+      else
+          direct_deduct_lop(count);
+  });
+
+  function checkLeaves()
+  {
+      j.each(state, function (key, value) {
+          j(".select_leave#" + key).prop("checked", value);
+      });
+      allLeaves()
+  }
+  function allLeaves()
+  {
+      if (j(".select_leave").not(":checked").length > 0)
+          j('.select_all').prop("checked", false);
+      else
+          j('.select_all').prop("checked", true);
+  }
+  function leaveCount()
+  {
+      count = 0;
+      j(".select_leave:checked").each(function () {
+          count += parseFloat(j(this).attr("day"))
+      });
+      return count;
+  }
+
+  function calucate_lop_values(count)
+  {
+      new Ajax.Request('/employee_payslips/calculate_lop_values', {
+          parameters: {'payroll_group_id': '<%= @payroll_group.id %>', 'employee_id': '<%= @employee.id %>', 'lop_count': count, 'month': '<%= @date_ranges.first.month %>'},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'post',
+          onLoading: function () {
+              j('#loader').hide();
+          },
+          onComplete: function (resp) {
+              payroll_hash = resp.responseJSON;
+              j('input[pc_code]').each(function () {
+                  code = j(this).attr('pc_code');
+                  amount = parseFloat(payroll_hash[code]).toFixed(precision).toString();
+                  j(this).val(amount);
+              });
+              j('#loader').hide();
+              update_lop_values(count);
+          }
+      });
+  }
+
+  function direct_deduct_lop(count)
+  {
+      amount = parseFloat(j('#lop-amount').val());
+      precision = <%= FedenaPrecision.get_precision_count %>;
+      j('#loss_of_pay').val((amount * count).toFixed(precision).toString());
+      j('#lop_amount-dis').text((amount * count).toFixed(precision).toString());
+      update_lop_values(count);
+  }
+
+  function update_lop_values(count)
+  {
+      if (count == 0)
+          j('#lop_days').text(count + ' <%= t('days_text',{:count => 0}) %>');
+      else if (count == 1 || count == 0.5)
+          j('#lop_days').text(count + ' <%= t('days_text',{:count => 1}) %>');
+      else
+          j('#lop_days').text(count + ' <%= t('days_text',{:count => 2}) %>');
+      j('#lop_count').text(count);
+      calculate_net_pay();
+      hideLopModalBox();
+      state = JSON.parse(JSON.stringify(changed));
+      checked = [];
+      j.each(state, function (key, value) {
+          if (value)
+              checked.push(key)
+      });
+      j("#additional_leaves").val(checked.join(","));
+      j("#days_count").val(count);
+      amount = parseFloat(j('#lop-amount').val());
+      precision = <%= FedenaPrecision.get_precision_count %>;
+      j('#lop_amount-dis').text((amount * count).toFixed(precision).toString());
+  }
+</script>

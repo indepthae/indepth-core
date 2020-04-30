@@ -1,0 +1,191 @@
+<% if @base_template.columns.present? and @report_result.present? and (@report_result.values.present? or @report_values.present?)%>
+  <div class ="columns_section" id="<%= @base_template.name %>_columns">
+      <div class="div_link" onClick="build_columns_form();"><%= t('customize_columns') %></div>
+  </div>
+  <div id="columns_list">
+      <% form_for :column_values, :url => {:action => 'fetch_reports'}, :html => {:id => "column_form", :onsubmit => "return send_request('columns');"} do |f| %>
+        <% if @base_template.columns.include? :employee_details %>
+          <div class="sections">
+              <div class="section_header"><%= t('employee_details').titleize %></div>
+              <div class="description"><%= t('employee_details_desc') %></div>
+              <% HrReportBaseTemplate::EMPLOYEE_COLUMNS.each do |column| %>
+                <div class="fields">
+                    <%= check_box_tag 'column_values[columns]', column, (@default_columns.include? column.to_s), :id => column.to_s + "_col", :text => t(column), :class => "rep_col" %>
+                    <label for="<%= column.to_s + "_col" %>"><%= t(column) %></label>
+                </div>
+              <% end %>
+              <% if @additional_fields.present? %>
+                <div id="additional_details"><%= t('add_additional_detail') %></div>
+                <% @additional_fields.each do |field| %>
+                  <div class="fields">
+                      <%= check_box_tag 'column_values[columns]', "additional_detail_#{field.id}", (@default_columns.include? "additional_detail_#{field.id}"), :id => "additional_detail_#{field.id}_col", :text => field.name, :class => "rep_col" %>
+                      <label for="<%= 'additional_detail_' + field.id.to_s + '_col' %>"><%= field.name %></label>
+                  </div>
+                <% end %>
+              <% end %>
+          </div>
+          <% if @bank_fields.present? %>
+            <div class="sections">
+                <div class="section_header"><%= t('bank_details').titleize %></div>
+                <% @bank_fields.each do |field| %>
+                  <div class="fields">
+                      <%= check_box_tag 'column_values[columns]', "bank_detail_#{field.id}", (@default_columns.include? "bank_detail_#{field.id}"), :id => "bank_detail_#{field.id}_col", :text => field.name, :class => "rep_col" %>
+                      <label for="<%= 'bank_detail_' + field.id.to_s + '_col' %>"><%= field.name %></label>
+                  </div>
+                <% end %>
+            </div>
+          <% end %>
+        <% end %>
+        <% if @base_template.columns.include? :payslip_details %>
+          <div class="sections">
+              <% total_columns = HrReportBaseTemplate::PAYSLIP_TOTAL_COLUMNS %>
+              <div class="section_header"><%= t('payslip_details') %></div>
+              <div class="description"><%= t('payslip_details_desc') %></div>
+              <% payslip_details = ((@custom_report.present? and @custom_report.report_columns.present?) ? (@custom_report.report_columns[:payslip_details].to_s == "true") : true) %>
+              <div class="fields">
+                  <div class="payslip_sec">
+                      <%= f.radio_button :payslip_details, true, :id => "payslip_details_true", :onclick => "show_payslip_section();", :checked => payslip_details %>
+                      <label for="payslip_details_true"><%= t('detailed_report').titleize %></label>
+                      <div class="description"><%= t('detailed_report_desc') %></div>
+                  </div>
+                  <div class="payslip_sec">
+                      <%= f.radio_button :payslip_details, false, :id => "payslip_details_false", :onclick => "show_payslip_section();", :checked => !payslip_details %>
+                      <label for="payslip_details_false"><%= t('salary_summary').titleize %></label>
+                      <div class="description"><%= t('salary_summary_desc') %></div>
+                  </div>
+              </div>
+              <div class="description"><%= t('show_total_desc') %></div>
+              <div  id="detailed_sec">
+                  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+                      <tr class="tr-head">
+                          <td class="check_all"><input type="checkbox" class="select_all" onclick="check_all('#detailed_sec')"/></td>
+                          <td class="columns"><%= t('columns_text') %></td>
+                          <td class="total"></td>
+                      </tr>
+                      <% columns = ((@base_template.name == "overall_salary_report") ? HrReportBaseTemplate::DETAILED_OVERALL_REPORT_COLUMNS : HrReportBaseTemplate::DETAILED_PAYSLIP_COLUMNS) %>
+                      <% columns.each do |column| %>
+                        <% unless [:earnings, :deductions].include? column %>
+                          <% is_default = (payslip_details ? (@default_columns.include? column.to_s) : false) %>
+                          <tr class="tr-<%= cycle('even', 'odd')%>">
+                              <td class="check_all">
+                                  <%= check_box_tag 'column_values[payslip_columns]', column, is_default, :id => column.to_s + "_col", :class => "columns_select rep_col", :onclick => "individual_column_select(this);", :text => t(column) %>
+                              </td>
+                              <td class="columns"><label for="<%= column.to_s + "_col" %>"><%= t(column) %></label></td>
+                              <td class="total">
+                                  <% if total_columns.include? column %>
+                                    <%= check_box_tag 'column_values[payslip_totals]', column, false, :id => column.to_s + "_total", :class => "columns_total", :is_disabled => !is_default, :disabled => !is_default %>
+                                    <label for="<%= column.to_s + "_total" %>" class="<%= is_default ? '' : 'disable_label' %>"><%= t('show_total') %></label>
+                                  <% end %>
+                              </td>
+                          </tr>
+                        <% else %>
+                          <% if column == :earnings %>
+                            <% @earnings.each do |ear| %>
+                              <% is_default = (payslip_details ? (@default_columns.include? "payroll_category_#{ear.id}") : false) %>
+                              <tr class="tr-<%= cycle('even', 'odd')%>">
+                                  <td class="check_all">
+                                      <%= check_box_tag 'column_values[payslip_columns]', "payroll_category_#{ear.id}", is_default, :id => "#{column.to_s}_#{ear.id}_col", :class => "columns_select rep_col", :onclick => "individual_column_select(this);", :text => ear.name %>
+                                  </td>
+                                  <td class="columns"><label for="<%= "#{column.to_s}_#{ear.id}_col" %>"><%= ear.name %></label></td>
+                                  <td class="total">
+                                      <% if total_columns.include? column %>
+                                        <%= check_box_tag 'column_values[payslip_totals]', "payroll_category_#{ear.id}", false, :id => "#{column.to_s}_#{ear.id}_total", :class => "columns_total", :is_disabled => !is_default, :disabled => !is_default %>
+                                        <label for="<%= "#{column.to_s}_#{ear.id}_total" %>" class="<%= is_default ? '' : 'disable_label' %>"><%= t('show_total') %></label>
+                                      <% end %>
+                                  </td>
+                              </tr>
+                            <% end %>
+                          <% end %>
+                          <% if column == :deductions %>
+                            <% @deductions.each do |ded| %>
+                              <% is_default = (payslip_details ? (@default_columns.include? "payroll_category_#{ded.id}") : false) %>
+                              <tr class="tr-<%= cycle('even', 'odd')%>">
+                                  <td class="check_all">
+                                      <%= check_box_tag 'column_values[payslip_columns]', "payroll_category_#{ded.id}", is_default, :id => "#{column.to_s}_#{ded.id}_col", :class => "columns_select rep_col", :onclick => "individual_column_select(this);", :text => ded.name %>
+                                  </td>
+                                  <td class="columns"><label for="<%= "#{column.to_s}_#{ded.id}_col" %>"><%= ded.name %></label></td>
+                                  <td class="total">
+                                      <% if total_columns.include? column %>
+                                        <%= check_box_tag 'column_values[payslip_totals]', "payroll_category_#{ded.id}", false, :id => "#{column.to_s}_#{ded.id}_total", :class => "columns_total", :is_disabled => !is_default, :disabled => !is_default %>
+                                        <label for="<%= "#{column.to_s}_#{ded.id}_total" %>" class="<%= is_default ? '' : 'disable_label' %>"><%= t('show_total') %></label>
+                                      <% end %>
+                                  </td>
+                              </tr>
+                            <% end %>
+                          <% end %>
+                        <% end %>
+                      <% end %>
+                  </table>
+                  <% if @inactive_categories.present? %>
+                    <div class="div_link" onClick="show_categories();"><%= t('show_inactive_categories') %></div>
+                    <table align="center" width="100%" cellpadding="1" cellspacing="1" id="inactive_categories">
+                        <tr class="tr-head">
+                            <td class="check_all"><input type="checkbox" class="select_all" onclick="check_all('#inactive_categories')"/></td>
+                            <td class="columns"><%= t('columns_text') %></td>
+                            <td class="total"></td>
+                        </tr>
+                        <% @inactive_categories.each do |cat| %>
+                          <% is_default = (payslip_details ? (@default_columns.include? "payroll_category_#{cat.id}") : false) %>
+                          <tr class="tr-<%= cycle('even', 'odd')%>">
+                              <td class="check_all">
+                                  <%= check_box_tag 'column_values[payslip_columns]', "payroll_category_#{cat.id}", is_default, :id => "payroll_category_#{cat.id}_col", :class => "columns_select rep_col", :onclick => "individual_column_select(this);", :text => cat.name %>
+                              </td>
+                              <td class="columns"><label for="<%= "payroll_category_#{cat.id}_col" %>"><%= cat.name %></label></td>
+                              <td class="total">
+                                  <%= check_box_tag 'column_values[payslip_totals]', "payroll_category_#{cat.id}", false, :id => "payroll_category_#{cat.id}_total", :class => "columns_total", :is_disabled => !is_default, :disabled => !is_default  %>
+                                  <label for="<%= "payroll_category_#{cat.id}_total" %>" class="<%= is_default ? '' : 'disable_label' %>"><%= t('show_total') %></label>
+                              </td>
+                          </tr>
+                        <% end %>
+                    </table>
+                  <% end %>
+              </div>
+              <table align="center" width="100%" cellpadding="1" cellspacing="1" id="summary_sec">
+                  <tr class="tr-head">
+                      <td class="check_all"><input type="checkbox" class="select_all" onclick="check_all('#summary_sec')"/></td>
+                      <td class="columns"><%= t('columns_text') %></td>
+                      <td class="total"></td>
+                  </tr>
+                  <% summary_columns = ((@base_template.name == "overall_salary_report") ? HrReportBaseTemplate::SUMMARY_OVERALL_REPORT_COLUMNS : HrReportBaseTemplate::SALARY_SUMMARY_COLUMNS) %>
+                  <% summary_columns.each do |column| %>
+                    <% summary_details = ((@custom_report.present? and @custom_report.report_columns.present?) ? (@custom_report.report_columns[:payslip_details].to_s == "false") : true) %>
+                    <% is_default = (summary_details ? (@default_columns.include? column.to_s) : false) %>
+                    <tr class="tr-<%= cycle('even', 'odd')%>">
+                        <td class="check_all">
+                            <%= check_box_tag 'column_values[summary_columns]', column, is_default, :id => 'summary_columns_' + column.to_s + "_col", :class => "columns_select rep_col", :onclick => "individual_column_select(this);", :disabled => true, :text => t(column) %>
+                        </td>
+                        <td class="columns"><label for="<%= 'summary_columns' + column.to_s + "_col" %>"><%= t(column) %></label></td>
+                        <td class="total">
+                            <% if total_columns.include? column %>
+                              <%= check_box_tag 'column_values[summary_totals]', column, false, :id => column.to_s + "_total", :class => "columns_total", :is_disabled => !is_default, :disabled => true %>
+                              <label for="<%= column.to_s + "_total" %>" class="<%= is_default ? '' : 'disable_label' %>"><%= t('show_total') %></label>
+                            <% end %>
+                        </td>
+                    </tr>
+                  <% end %>
+              </table>
+          </div>
+        <% end %>
+        <% if @base_template.columns.include? :leave_type_detials %>
+          <div class="sections">
+              <div class="section_header"><%= t('leave_details').titleize %></div>
+              <% HrReportBaseTemplate::LEAVE_DATA.each do |column| %>
+                <div class="fields">
+                    <%= check_box_tag 'column_values[leave_type_detials]', column, (@default_columns.include? column.to_s), :id => column.to_s + "_col", :text => t(column), :class => "rep_col" %>
+                    <label for="<%= column.to_s + "_col" %>"><%= t(column) %></label>
+                </div>
+              <% end %>
+          </div>
+        <% end %>
+      <% end %>
+  </div>
+  <div id="columns_form_footer">
+      <%= submit_tag "#{t('save_columns')}", :class => 'submit-button', :id => 'submit_button columns_submit', :onclick => "return send_request('columns');" %>
+      <%= submit_tag "#{t('cancel')}", :class => 'submit-button', :id => 'cancel-btn', :onclick => "hide_popup_box();" %>
+  </div>
+<% else %>
+  <div class ="columns_section" id="<%= @base_template.name %>_columns"></div>
+<% end %>
+<script type="text/javascript">
+  show_payslip_section();
+</script>

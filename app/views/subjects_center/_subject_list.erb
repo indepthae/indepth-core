@@ -1,0 +1,120 @@
+<div class="main_actions">
+    <div class="col-65 pull-left desc" id="course_subject_main_desc"><%= t('subjects_center_course_subjects_desc') %></div>
+    <div class="col-37 pull-right">
+        <div class="link_button pull-left">
+            <%= link_to_remote "#{t('import_subjects')}", {:url => { :action => 'import_subjects', :course_id => @course.id },:method => :get,}, :class => "" %>
+        </div>
+        <div class="link_button pull-left">
+            <%= link_to_remote "+ #{t('subject')}", {:url => { :action => 'new_component', :parent_id => @course.id, :parent_type => 'Course' , :type => 'course_subject', :course_id => @course.id },:method => :get,}, :class => "" %>
+        </div>
+        <div class="link_button pull-left">
+            <%= link_to_remote "+ #{t('elective_group')}", {:url => { :action => 'new_component', :parent_id => @course.id, :parent_type => 'Course', :type => 'course_elective_group', :course_id => @course.id}, :method => :get},  :class => "" %>
+        </div>
+        <div class="link_button pull-left">
+            <%= link_to_remote "+ #{t('subject_group')}", {:url => { :action => 'new_component', :parent_id => @course.id, :parent_type => 'Course' , :type => 'subject_group', :course_id => @course.id}, :method => :get}, :class => "" %>
+        </div>
+    </div>
+</div>
+<% if @components.present? %>
+  <div id="priority">
+      <div id="priority_text_1">
+          <%= t('reorder') %>
+      </div>              
+  </div>
+  <div class="drag_drop_msg hidden_sec"><i></i><%=t('drag_drop_subject_msg')%></div>
+  
+  <%remote_form_for :course_subjects,:url => {:action => 'reorder_components', :course_id => @course.id} do |f|%>
+    
+    <div class="subjects_container">
+        <div class="subject_groups pull-left" id="sortable_subjects">
+            <% @components.each do |component| %>
+              <table align="center" width="100%" cellpadding="1" cellspacing="1" id="logs" class="subject_list_table">
+                  <% if component.is_a? CourseSubject %>
+                    <%= render :partial => 'subject', :locals => {:subject => component, :klass => 'level-1', :tbody_required => true} %>
+                  <% elsif component.is_a? CourseElectiveGroup %>
+                    <%= render :partial => 'elective_group', :locals => {:e_group => component, :klass => 'level-1'} %>
+                  <% elsif component.is_a? SubjectGroup %>
+                    <%= render :partial => 'subject_group', :locals => {:subject_group => component} %>
+                  <% end %>
+              </table>
+            <% end %>
+        </div>
+    </div>
+    
+    <div id="save_button" class="hidden_sec"><%=f.submit%></div>
+    <div id="cancel_link" class="hidden_sec"><%=t('cancel')%></div>
+  <% end  %>
+<% else %>
+  <div class="empty-info"><%= t('no_subjects_and_groups_created') %></div>
+<% end %>
+
+<script type="text/javascript">
+  updateSortorder = function () {
+      j('.priority_field').each(function (i) {
+        j(this).val(i+1)
+      })
+  }
+  
+  j('#priority_text_1').on('click',function(){
+    j('td.reorder-drag').show();
+    j('.hidden_sec').show();
+    j('#priority').hide();
+    j('.link_button').hide();
+    j('#course_subject_main_desc').addClass('w100');
+    j('#course_subject_main_desc').html('<%= t('subjects_center_course_subjects_desc_reorder') %>')
+    
+    j('#sortable_subjects').sortable({
+        cursor: 'move',
+        opacity: 0.8,
+        nested: true,
+        start: function (event, ui) {
+        },
+        stop: function (event, ui) {
+            updateSortorder();
+        },
+        items: "table:not(.disable_sorts)"
+
+    }).disableSelection();
+
+    j(".subject_list_table").sortable({
+        cursor: 'move',
+        opacity: 0.6,
+        nested: true,
+        start: function (event, ui) {
+        },
+        stop: function (event, ui) {
+            updateSortorder(ui);
+        },
+        items: "tbody:not(.disable_sort)"
+    }).disableSelection();
+
+    j(".subject_list_table tbody").sortable({
+        cursor: 'move',
+        opacity: 0.6,
+        nested: true,
+        start: function (event, ui) {
+        },
+        stop: function (event, ui) {
+            updateSubSortorder(ui);
+        },
+        items: "tr:not(.disable_sort)"
+    }).disableSelection();
+
+
+  })
+  
+  j('#cancel_link').click(function () {
+      j.ajax({
+          type: 'GET',
+          url: "/subjects_center/list_subjects",
+          data: {
+              course_id: <%= @course.id %>
+          }
+      });
+    j('td.reorder-drag').hide();
+    j('.hidden_sec').hide();
+    j('.link_button').show();
+    j('#course_subject_main_desc').removeClass('w100');
+    j('#course_subject_main_desc').html('<%= t('subjects_center_course_subjects_desc') %>')
+  });
+</script>

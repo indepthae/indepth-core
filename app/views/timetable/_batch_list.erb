@@ -1,0 +1,18 @@
+<div class="label-field-pair">
+  <label for="timetable_entry_batch_id"><%= t('batch') %>
+    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader2", :style =>"display: none;" ) %>
+  </label>
+  <div class="text-input-bg">
+    <% batches = @batches || @batch.course.batches.active %>
+    <% option_hsh = {:prompt => t('select_a_batch')} %>
+    <% option_hsh[:selected] = @batch.id if @batch.present? %>
+    <%= select :batch, :id,
+      batches.map {|b| [b.full_name, b.id] },
+      option_hsh,
+      {:onchange => "#{remote_function(
+      :url => { :action => 'load_work_allocations' },
+      :with => "'batch_id='+value",
+      :before => "Element.show('loader2')",
+      :success => "Element.hide('loader2')"  )}"} %>
+  </div>
+</div>

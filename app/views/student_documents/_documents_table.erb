@@ -1,0 +1,24 @@
+<% if documents.present? %>
+  <table id="listing" width="100%">
+      <tbody>
+          <tr class="tr-head">
+              <td class="col-1"><%= t('document_name') %></td>
+              <td class="col-2"><%= t('added_on') %></td>
+              <% if (permitted_to? :edit, :student_documents) || (permitted_to? :destroy, :student_documents) %> 
+                <td class="col-3"></td>
+              <% end %>
+          </tr>
+          <% documents.sort_by {|document| document.created_at}.reverse.each do |document| %>
+            <tr class="tr-<%= cycle('odd', 'even')%>" id='<%= "document_row_#{document.id}" %>'>
+                <%= render :partial => 'document_row', :locals => {:document => document, :category => category} %>
+            </tr>
+          <% end %>
+      </tbody>
+  </table>
+<% else %>  
+  <div class="table">
+      <div class="no-documents">
+          <%= t('documents_not_present') %>        
+      </div>
+  </div>
+<% end %>    

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.employee_salary_structure_detail{
+  @xml.payroll_group(@employee.payroll_group.try(:name))
+  @xml.gross_salary(@employee_salary_structure.gross_salary)
+  @total_earning = 0
+  @earnings.each do |earning|
+    @earning = earning
+    @xml.earning do
+      @xml.payroll_category(@earning.payroll_category.try(:name))
+      @xml.amount(@earning.amount)
+      @total_earning += @earning.amount.to_f
+    end
+  end
+  @xml.total_earning(@total_earning)
+  @total_deduction = 0
+  @deductions.each do |deduction|
+    @deduction = deduction
+    @xml.deduction do
+      @xml.payroll_category(@deduction.payroll_category.try(:name))
+      @xml.amount(@deduction.amount)
+      @total_deduction += @deduction.amount.to_f
+    end
+  end
+  @xml.total_deduction(@total_deduction)
+  @xml.net_pay(@employee_salary_structure.net_pay)
+}%>
+
+

@@ -1,0 +1,102 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<% remote_form_for :fine_transaction, :url => {:controller => 'finance_extensions', 
+  :action => "remove_pay_all_auto_fine" }, 
+  :html => {:method => :post, :id => @student.id}, :before=>"$('submit_button_fine').disable()",
+  :complete=>"setTimeout(function(){$('submit_button').enable();},5000)"  do |f| %>
+  <%= session_fingerprint_field %> 
+  <%= hidden_field_tag :student_id, @student.id %>
+  <%= hidden_field_tag :transaction_date, @transaction_date %>
+  <%= hidden_field_tag :batch_id, @current_batch.id %>
+  <%= f.hidden_field :fee_type %>
+  <% if @temporary_manual_fines.present? %>
+    <% @temporary_manual_fines.each_pair do |fee_type, fee_data| %>
+      <% fee_data.each_pair do |fee_id, fi_amt| %>
+        <% if !fi_amt.is_a?(Hash) and fi_amt.to_f != 0 %>
+          <%= hidden_field_tag "manual_fines[#{fee_type}][#{fee_id}]", fi_amt %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% @grouped_fees.each_pair do |fee_type, fees| %>
+    <% fees.each do |fee| %>
+      <% next if fee_type == 'finance_fee' and @disabled_fee_ids.include?(fee.id) %>
+      <% unless (fee.is_paid and fee.balance != 0) %>
+        <%= f.hidden_field "#{fee_type}_ids", :multiple => true, :value => fee.id, :class => "#{fee_type}_ids" %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div id="pay_all_manual_fine_form">      
+      <div class="label-field-pair">
+          <label for="collections"><%= "Collections" %></label>
+          <div class="text-input-bg">  
+              <% over_all_options = [["Overall"]] %>
+              <% fee_options = @grouped_fees.map do |fee_type, fees| 
+                 fees.reject!{|fee| (fee_type == 'finance_fee' or fee_type == 'transport_fee') and @disabled_fee_ids.include?(fee.id) }
+                ["#{fee_type.capitalize.gsub('_',' ')}", fees.map{|fee| [fee.collection_name, fee.id]}]
+                end %>
+              <%= f.select :fee_id, options_for_select(over_all_options) +
+                grouped_options_for_select(fee_options), {:include_blank => t('select_fee_collection')},
+                {:class=> "select_collection", :onchange => "calculate_total_fine(j(this).val())"}
+                 %>
+          </div>
+
+          <%= image_tag("loader.gif",
+            :align => "absmiddle",
+            :border => 0,
+            :id => "loader",
+            :style =>"display: none;" ) %>
+          <div class="wrapper error_wrapper" id="collection_err_msg" style="display: none;"><div class="error-icon"></div><div class="error-msg"><%= " #{t('cant_be_blank')}" %></div></div>
+      </div>
+      
+      <div class="label-field-pair">
+          <label for="name"><%= t('fine') %></label>
+          <div class="text-input-bg" id="fine_amount">
+              <%= f.text_field :removal_fine_amt, :class => "precision_text", :id=>"fine_amt_res", :readonly=>"true" %>
+          </div>
+          <div class="wrapper error_wrapper" id="fine_amt_err_msg" style="display: none;"><div class="error-icon"></div><div class="error-msg"><%= " #{t('cant_be_blank_or_zero')}" %></div></div>
+      </div>
+      <div class="wrapper">
+        <div class="error-icon"></div>
+        <div class="error-msg"><%= t('add_auto_fine_warning_msg') %></div>
+      </div>
+  </div>
+  <div id="popup_footer">
+      <%= submit_tag "#{t('remove')}", :class => "submit-button", :id => "submit_button_fine" %>
+      <div class="submit-button" onclick="remove_popup_box();">
+          <%= t('cancel') %>
+      </div>
+  </div>
+<% end %>
+<script type="text/javascript">
+  j('#popup_footer.part').remove();
+  j('#popup_box_overlay').click(remove_popup_box);
+  reset_selected_fee();
+  //function update_particular_list() {
+
+  //}
+    
+    j("#submit_button_fine").click(function (e) {
+      is_fine_empty = (j('#fine_amt_res').val() == "")
+      is_fine_zero =  (j('#fine_amt_res').val() == 0)
+      j('#collection_err_msg').hide();
+      j('#fine_amt_err_msg').hide();
+      if (is_fine_empty && is_fine_zero){
+        j('#collection_err_msg').show();
+        j('#fine_amt_err_msg').show();
+          e.preventDefault();
+      } else if (is_fine_empty) {
+          j('#collection_err_msg').show();
+          e.preventDefault();
+      } else if (is_fine_zero) {
+        j('#fine_amt_err_msg').show();
+          e.preventDefault();
+      };
+  });
+  
+  
+</script>

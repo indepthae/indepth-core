@@ -1,0 +1,96 @@
+<div id="vehicle_form">
+    <% form_for @maintenance_record, :html => {:multipart=>true} do |v| %>
+      <%= session_fingerprint_field %>
+      <div class="label-field-pair">
+          <label for="name"><%= t('academic_year') %></label>
+          <div class="text-input-bg"><span><%= @academic_year.try(:name) %></span></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="mode"><%= t('vehicle') %></label>
+          <div class="text-input-bg">
+              <%= v.select :vehicle_id, options_for_select(@vehicles.map{|ve| [ve.vehicle_no, ve.id]}, v.object.vehicle_id), 
+                {:include_blank => t('select_vehicle')}  %>
+          </div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="name"><%= t('name_of_maintenance') %></label>
+          <div class="text-input-bg"><%= v.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="note"><%= t('notes') %></label>
+          <div class="text-input-bg"><%= v.text_area :notes %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="maintenance_date"><%= t('maintenance_date') %></label>
+          <div class="text-input-bg"><%= v.calendar_date_select :maintenance_date, :popup=>"force" %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="next_maintenance_date"><%= t('next_maintenance_date') %></label>
+          <div class="text-input-bg"><%= v.calendar_date_select :next_maintenance_date, :popup=>"force" %></div>
+      </div>
+
+      <div class="label-field-pair">
+          <label for="amount"><%= "#{t('amount')} &#x200E;(#{@currency})&#x200E;" %></label>
+          <div class="text-input-bg">
+              <%= v.text_field :amount, :class=>'precision_text', :value => precision_label(@maintenance_record.amount)%>
+          </div>
+      </div>
+
+      <h5><%= t('maintenance_attachments') %></h5>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" id="stops_listing">
+          <tr class="row-head">
+              <td class="col-1"><%= t('name_of_attachment') %></td>  
+              <td class="col-2"><%= t('upload_attachment') %></td>  
+              <td class="col-3"></td>
+          </tr>
+          <% v.fields_for :vehicle_maintenance_attachments do |attch| %>
+            <%= render "vehicle_maintenance_attachment_fields" ,:a => attch %>
+          <%end%>
+          <tr>
+              <td colspan='3'>
+                  <%= link_to_add_attachments "<span>#{t('add')}</span>", v, :vehicle_maintenance_attachments %>
+              </td>
+          </tr>
+      </table>
+
+      <%= submit_tag "", :value => "#{t('save')}", :class => "submit-button", :disable_with => "#{t('please_wait')}" %>
+      <%= link_to t('cancel'), vehicle_maintenances_path, :class => "submit-button", :id => "cancel-link" %>
+    <% end %>
+</div>
+<script type="text/javascript">
+  limit_checking();
+  function add_fields(link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).up().up().insert({
+          before: content.replace(regexp, new_id)
+      });
+      limit_checking()
+  }
+
+
+  function remove_fields(link) {
+      $(link).previous("input[type=hidden]").value = '1';
+      $(link).closest('tr').hide();
+      previous = j(link).closest('tr').find('.stop-list').val();
+      limit_checking()
+  }
+
+  function delete_attachment(elm) {
+      j(elm).parent().find(".delete-attachment-field").val(true);
+      j(elm).parent().find(".prev-certificate").remove();
+      j(elm).remove();
+  }
+
+  function limit_checking() {
+      if (j(".fields:visible").length >= 3)
+          j('.add_button_img').hide();
+      else
+          j('.add_button_img').show();
+  }
+</script>

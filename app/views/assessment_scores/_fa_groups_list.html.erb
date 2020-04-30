@@ -1,0 +1,13 @@
+<div class="label-field-pair">
+    <label for="">Fa Group</label>
+    <div class="text-input-bg">
+        <%= select '','fa_group_id',
+          @fa_groups.map {|fg| [fg.name, fg.id]},
+          {:prompt => "Select an FA Group"}
+      %>
+    </div>
+    <%=hidden_field_tag 'cce_exam_category_id',@cce_exam_category.try(:id)%>
+</div>
+<div id="submit_button1">
+    <%= submit_tag "Go",:class=>'submit-button margin_extra'%>
+</div>

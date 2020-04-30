@@ -1,0 +1,132 @@
+<% if @schol_report.present? %>
+  <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_term_report">
+      <% header = @schol_report.try(:report).try(:header)||[] %>
+      <% marks = @schol_report.try(:report).try(:marks)||[] %>
+      <% excluded_marks = @schol_report.try(:report).try(:excluded_marks)||[] %>
+      <% co_sch = @schol_report.try(:report).try(:activities)||[] %>
+      <% agg_marks = @schol_report.try(:report).try(:overall_marks) || [] %>
+      <% agg_grades = @schol_report.try(:report).try(:overall_grades) || [] %>
+      <% agg_percentage = @schol_report.try(:report).try(:overall_percentage) || [] %>
+      <% attendance = @schol_report.try(:report).try(:attendance)||[] %>
+      <% records = @schol_report.try(:report).try(:records)||[] %>
+      <% remarks = @schol_report.try(:report).try(:remarks)||[] %>
+      <%if  header.present? %>
+        <tr class="tr-head">
+            <td class="col-2"><%= t('scholastic_areas') %></td>
+            <td class="col-1" colspan="<%= header.length %>"><%= @term.try(:term_name_with_max_marks) || @reportable.try(:term_name_with_max_marks) || 'Term 1 (100)'%></td>
+        </tr>
+        <tr class="header-text">
+            <td><%= t('subject') %></td>
+            <% header.each do |name| %>
+              <td><%= name %></td>
+            <% end %>
+        </tr>
+        <% marks.each do |row| %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <% row.each do |cell| %>
+                <% if cell.kind_of?(Hash) %>
+                  <td rowspan="<%= cell[:row_span] %>" class='sub_remark'><%= cell[:remark] %></td>
+                <% else %>
+                  <td><%= cell %></td>
+                <% end %>
+              <% end %>
+          </tr>
+        <% end %>
+        <% [agg_marks, agg_grades, agg_percentage].reject{|a| a.blank? }.each do |score| %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <td colspan="<%= score.second %>"><b><%= score.first %></b></td>
+              <% score.third.each do |cell| %>
+                <td><%= cell %></td>
+              <% end %>
+          </tr>
+        <% end %>
+          <% excluded_marks.each do |row| %>
+          <tr class="tr-<%= cycle('even', 'odd') %>">
+              <% row.each do |cell| %>
+                <% if cell.kind_of?(Hash) %>
+                  <td rowspan="<%= cell[:row_span] %>" class='sub_remark'><%= cell[:remark] %></td>
+                <% else %>
+                  <td><%= cell %></td>
+                <% end %>
+              <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+  </table>
+  <% if attendance.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_exam_report attendance_table">
+        <% attendance.each do |row| %>
+          <tr>
+              <% row.each do |cell| %>
+                <td><%= cell %></td>
+              <% end %>
+          </tr>
+        <% end %>
+    </table>
+  <% end %>
+  <% if co_sch.present? %>
+    <table align="center" width="100%" cellpadding="1" cellspacing="1" class="coscholastic_area_table">
+        <% co_sch.each_with_index do |section, i| %>
+          <% header = true %>
+          <% if i > 0 %>
+            <tr class="empty_row">
+                <td class="2"></td>
+            </tr>
+          <% end %>
+          <% section.each do |row| %>
+            <tr class="tr-<%= cycle('even', 'odd') %> <%= header ? 'header-text' : '' %>">
+                <% header = false %>
+                <% row.each_with_index do |cell, index| %>
+                  <td class="<%= (index%2 == 0) ? 'even' : 'odd' %>"><%= cell %></td>
+                <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+  <% end %>
+  <% if records.present? %>
+    <% records.each do |record_table| %>
+      <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_exam_report records_table">
+          <% record_table.each do |row| %>
+            <tr>
+                <% row.each do |cell| %>
+                  <td colspan="<%= cell.first %>"><%= cell.last %></td>
+                <% end %>
+            </tr>
+          <% end %>
+      </table>
+    <% end %>
+  <% end %>
+
+  <% if remarks.flatten.present? %>
+    <% remarks.each do |remarks_array| %>
+      <% unless remarks_array.first.is_a? Array %>
+        <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_exam_report records_table">
+            <tr>
+                <td class="remark_head"><%= remarks_array.first %></td>
+            </tr>
+            <tr>
+                <td><%= remarks_array.last %></td>
+            </tr>
+        </table>
+      <% else %>
+        <% remarks_array.each do |ra| %>
+          <% count = ra.count %>
+          <table align="center" width="100%" cellpadding="1" cellspacing="1" class="student_exam_report records_table">
+              <tr>
+                  <td colspan='<%= count %>' class="remark_head"><%= ra.first.first %></td>
+              </tr>
+              <tr>
+                  <% ra.each do |r| %>
+                    <td style="width:<%= "#{100/count}%" %>"><b><%= r.second %></b><br><%= r.last %></td>
+                  <% end %>
+              </tr>
+          </table>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+<% else %>
+  <p class="flash-msg"> <%= t('no_students_for_this_batch') %> </p>
+<% end %>

@@ -1,0 +1,185 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<div class="report" id="report">
+    <div id="pdf_header">
+        <div id="tt_name"><%=t('timetable_text')%> : <%=format_date(@current.start_date,:format=>:long_date)%> - <%=format_date(@current.end_date,:format=>:long_date)%></div>
+        <div id="batch_name"><%=t('employee_text')%> : <%= "#{@employee.full_name}(&rlm;#{@employee.employee_number})"%></div>
+    </div>
+    <div id="pdf-info">
+        <div id="pdf-table">
+
+            <% @all_weekdays.each do |weekday| %>
+              <% c = cycle('even','even ') %>
+              <div class="<%= "#{c}"%>" id="<%="#{c}_#{weekday}"%>">
+                  <div class="row-col col-pdf_weekday" id="<%="#{c}_#{weekday}"%>">                       
+                      <div class="weekday_name">
+                          <% WeekdaySet.shortened_weekday_name(weekday) -%>
+                          <%= WeekdaySet.weekday_name(weekday) -%>
+                      </div>
+                  </div>
+
+                  <% @all_classtimings.each do |ct| -%>
+                    <% unless @timetable_entries[weekday][ct.id].blank? %>
+                      <div class="row-col col-pdf-slots <%= (@timetable_entries[weekday][ct.id].size > 1) ? 'splitted' : ''%>">
+                          <div class="class_timing">
+                              <% if @timetable_entries[weekday][ct.id].size > 1 %>
+                                <span class="warning">⚠</span>
+                              <% end %>                              
+                              <span class="period_name">
+                                  <%= shorten_string(ct.name, 12) %>
+                              </span>
+                              <span class="period_time">
+                                  <%="&lrm;#{format_date(ct.start_time,:format=>:time_en)}&lrm; - &lrm;#{format_date(ct.end_time,:format=>:time_en)}&lrm;"%>
+                              </span>
+                          </div>
+                          <% if @timetable_entries[weekday][ct.id].size > 1 %>
+                            <% @timetable_entries[weekday][ct.id].each_pair do |k, tte| %>
+                              <div class="split_slot">
+
+                                  <span class="pdf_period">
+                                      <% period = subject_name_by_settings(tte.entry, @config_value) %>
+                                      <% if tte.entry.kind_of? ElectiveGroup %>
+                                        <div class="elective_sub"><%= shorten_string(@electives[tte.entry_id].collect(&:name).join(", "),22) %></div>
+                                        <div class="elective_text">(<%= t('elective') %>)</div>
+                                      <% else %>
+                                        <%= period %>
+                                      <% end %>
+                                  </span>
+                                  <% tte_batch = "#{shorten_string(tte.batch.full_name,34)}" %>
+                                  <span class="batch_name">
+                                      <%= split_str(tte_batch.to_s,25) %>
+                                  </span>
+                              </div>
+                            <% end %>
+                          <% else %>
+                            <% tte = @timetable_entries[weekday][ct.id].first %>
+                            <% unless tte.blank? %>
+                              <span class="pdf_period">
+                                  <% if tte.last.entry_type == 'Subject' %>
+                                    <% period = subject_name_by_settings(tte.last.entry, @config_value) %>
+                                    <%= period  -%>
+                                  <% else %>
+                                    <% period = (@electives[tte.last.entry_id].is_a?(Array)) ? @electives[tte.last.entry_id].last : @electives[tte.last.entry_id] %>
+                                    <% period = subject_name_by_settings(period, @config_value) %>
+                                    <div class="elective_sub"><%= shorten_string((@electives[tte.last.entry_id].is_a? Array) ? @electives[tte.last.entry_id].collect(&:name).join(", ") : @electives[tte.last.entry_id].name,22) %></div>
+                                    <div class="elective_text">(<%= t('elective') %>)</div>
+                                  <% end %>
+                              </span>
+                            <% end %>
+                            <% tte_batch = "#{shorten_string(tte.last.batch.full_name,34)}" %>
+                            <span class="batch_name">
+                                <%= "#{split_str(tte_batch.to_s,34)}" %>
+                            </span>
+                          <% end %>
+                      </div>
+                    <% end %>
+                  <% end %>
+
+              </div>
+            <% end %>
+
+        </div>
+
+    </div>
+
+</div>
+<script type="text/javascript">
+  var max_width = 0;
+  //var min_height = 725;
+  var min_width = 1084;
+  var max_height = 0;
+  var v_max_width = 1693; // with zoom 1
+  var max_width = 0; // with zoom 1
+  var period_limit = 14; // with zoom 1
+  var period_before_limit = 0;
+  var max_period = 0;
+  var row_width = 0;
+  var max_row_width = 0;
+  var weekday_width = 0;
+  var row_lines = 0;
+  var i = 0;
+  $$('.report .even').each(function (row) {
+      i += 1;
+      elements = row.getElementsByClassName('row-col');
+      row_width = 0;
+      row_lines = 0;
+      period_before_limit = 0;
+      var last_element;
+      for (var itr in elements) {
+          if (elements.hasOwnProperty(itr) && !isNaN(itr)) {
+
+              if (elements[itr].classList.contains('col-pdf_weekday')) {
+                  row_lines = 0;
+                  weekday_width = elements[itr].getWidth();
+                  row_width = weekday_width;
+              } else {
+                  if (elements[itr].classList.contains('splitted')) {
+                      s_elements = elements[itr].getElementsByClassName('split_slot');
+                      for (var sitr in s_elements) {
+                          if (s_elements.hasOwnProperty(sitr) && !isNaN(sitr)) {
+                              if (period_before_limit == period_limit) {
+                                  row_lines += 1;
+                                  max_period = max_period > period_before_limit ? max_period : period_before_limit;
+                                  max_row_width = max_row_width > row_width ? max_row_width : row_width;
+                                  row_width = weekday_width;
+                                  period_before_limit = 0;
+                              }
+                              period_before_limit += 1;
+                              cell_width = s_elements[sitr].getWidth();
+                              row_width += cell_width;
+                              s_last_element = s_elements[sitr];
+                          }
+                      }
+                      row_width += 1;
+                  } else {
+                      if (period_before_limit == period_limit) {
+                          row_lines += 1;
+                          max_period = max_period > period_before_limit ? max_period : period_before_limit;
+                          max_row_width = max_row_width > row_width ? max_row_width : row_width;
+                          row_width = weekday_width;
+                          period_before_limit = 0;
+                      }
+                      period_before_limit += 1;
+                      cell_width = elements[itr].getWidth();
+                      row_width += cell_width;
+                      last_element = elements[itr];
+                  }
+              }
+          }
+      }
+      if (period_before_limit == period_limit) {
+          row_lines += 1;
+          max_period = max_period > period_before_limit ? max_period : period_before_limit;
+          max_row_width = max_row_width > row_width ? max_row_width : row_width;
+          row_width = weekday_width;
+          period_before_limit = 0;
+      } else if (period_before_limit > 0) {
+          row_lines += 1;
+          max_period = max_period > period_before_limit ? max_period : period_before_limit;
+          max_row_width = max_row_width > row_width ? max_row_width : row_width;
+          row_width = weekday_width;
+      }
+      row.className += " even_" + row_lines;
+      max_row_width = max_row_width > row_width ? max_row_width : row_width;
+  });
+  max_width = v_max_width < max_row_width ? v_max_width : max_row_width;
+  document.getElementById('report').style.width = (max_width > min_width ? max_width : min_width) + 'px';
+  document.getElementById('pdf-table').style.width = (max_width) + 'px';
+</script>

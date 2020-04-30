@@ -1,0 +1,32 @@
+<div id="div-loader">
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "table-loader",
+      :style =>"display: none;" ) %>
+</div>
+<table width="100%" cellpadding="1" cellspacing="1" id="passenger_details">
+    <tr class="tr-head header">
+        <td class="name"><%= t("#{@type}_name") %></td>
+        <td class="status"><%= t('route_stop_details') %></td>
+        <td class="fare"><%= "#{t('fare')} &#x200E;(#{@currency})&#x200E;" %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @passengers.empty? %>
+      <% @passengers.each do |p| %>
+        <%= render :partial => 'passenger_details', :locals => {:p => p} %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4" class="action"><%= t('no_passengers_found') %></td>
+      </tr>
+    <% end %>
+</table>
+
+<script type="text/javascript">
+  j('#passenger_details tr:not(.header) td:not(.action)').click(function () {
+      elm = j(this).closest('tr');
+      passenger_form(elm);
+  });
+  unassign_passenger();
+</script>

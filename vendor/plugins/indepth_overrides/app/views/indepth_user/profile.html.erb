@@ -1,0 +1,108 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('user_profile') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('user_information') %></div>
+
+    <% if @current_user.id == @user.id %>
+      <div id="inner-tab-menu">
+          <ul><li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('change_password')}", :controller => "user", :action => "change_password" %></li>
+              <% if (FedenaOauth2Provider rescue nil) && (can_access_request? :index, :oauth_user_tokens)  %>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('apps')}",:action=>:index,:controller=>:oauth_user_tokens %></li>
+              <% end %>
+          </ul>
+      </div>
+    <% end %>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :user_profile, @user %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %><p class="flash-msg"> <%= flash[:notice] %> </p><% end %>
+    <table id="profile_view">
+        <tr class="odd">
+            <td class="profile_label_td"><%= t('username') %></td>
+            <td class="profile_text_td"><%= @user.username %></td>
+        </tr>
+        <tr class="even">
+            <td class="profile_label_td"><%= t('name') %></td>
+            <td class="profile_text_td"><%= @user.full_name %></td>
+        </tr>
+        <tr class="odd">
+            <td class="profile_label_td"><%= t('role') %></td>
+            <td class="profile_text_td"><%= @user.role_name %></td>
+        </tr>
+        <tr class="even">
+            <td class="profile_label_td"><%= t('email') %></td>
+            <td class="profile_text_td"><%= @user.email %></td>
+        </tr>
+        <% if @current_user.id == @user.id %>
+          <tr class="odd">
+              <td class="profile_label_td"><%= t('language') %></td>
+              <td class="profile_text_td">
+                  <%= select :configuration, :locale, available_language_options ,{:selected=>"#{@lan}"},
+                    {:onchange => "#{remote_function(
+                    :url => { :controller=>'application',:action => 'set_language' },
+                    :with => "'language='+value" ,:before=>"$('loader').show();",:success=>"$('loader').hide();" )}"}%>
+                  <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+              </td>
+          </tr>
+        <% end %>
+    </table>
+
+
+
+    <% if @current_user.admin? or @current_user.privileges.map(&:name).include?("ManageUsers") %>
+      <div class="submit-buttons">
+
+          <% if @user.role_name == "#{t('employee_text')}" %>
+            <% if @config.include?('HR') %>
+              <%= link_to "► #{t('view_profile')}",{:controller => "employee", :action => "profile", :id => @employee.id }, :class => "user_button" unless @employee.nil?%>
+            <% end %>
+          <% elsif @user.role_name == "#{t('student_text')}" %>
+            <%= link_to "► #{t('view_profile')}",{:controller => "student", :action => "profile", :id => @student.id }, :class => "user_button"%>
+          <% elsif @user.role_name == "#{t('parent')}" %>
+    <%#= link_to "►#{t('view')} #{t('student_profile')}",{:controller => "student", :action => "profile", :id => @ward.id }, :class => "user_button"%>
+          <% else %>
+            <% if @config.include?('HR') %>
+              <%= link_to "► #{t('view_profile')}",{:controller => "employee", :action => "profile", :id => @employee.id }, :class => "user_button" unless @employee.nil?%>
+            <% end %>
+          <% end %>
+          <% unless @current_user.id == @user.id %>
+            <%= link_to "#{t('change_password')}", {:controller => "user", :action => "user_change_password", :id =>@user.username}, :class => "user_button" %>
+          <% end %>
+          <% unless @user.general_admin?%>
+          <% unless @user.admin or @current_user == @user%>
+            <% unless @user.role_name == "#{t('student_text')}" or @user.role_name == "#{t('parent')}" %>
+              <%= link_to "► #{t('edit_privilege_text')}", {:controller => "user", :action => "edit_privilege", :id => @user.username } ,:class => "user_button" %>
+            <% end %>
+          <% end %>
+          <%end%>
+          <% if @user.admin and @current_user.id != @user.id and @employee.nil? %>
+            <%= link_to "► #{t('delete_text')}", { :controller => "user", :action => "delete", :id => @user.username}, :class => "user_button", :confirm=>"#{t('are_you_sure_to_delete_user')}" %>
+          <% end %>
+      </div>
+
+    <% end %>
+</div>

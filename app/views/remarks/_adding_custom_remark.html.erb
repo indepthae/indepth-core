@@ -1,0 +1,20 @@
+<div id="add_remark_link_for_<%=@object_id%>" class="remarks_widget">
+  <% if permitted_to? :add_custom_remarks, :remarks %>
+    <%=link_to t('add_remarks_text'),"javascript:void(0);",:class=>"themed_text add_link",:student_id=>@student.id,:target_id=>@target.id,:onclick=>'completeReq(this)'%>
+  <% end %>
+</div>
+<script type="text/javascript">
+  function completeReq(elm){
+    j(elm).removeAttr('onclick')
+    new Ajax.Request('/remarks/add_custom_remarks',{
+      parameters:'student_id='+elm.getAttribute('student_id')+'&target_id='+elm.getAttribute('target_id'),
+      asynchronous:true,
+      evalScripts:true,
+      method:'get',
+      onComplete:function(resp){
+        j(elm).parent().append(resp.responseText);
+        j(elm).hide();
+      }
+    });
+  }
+</script>

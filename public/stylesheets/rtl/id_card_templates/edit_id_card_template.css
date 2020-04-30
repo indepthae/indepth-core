@@ -1,0 +1,395 @@
+.id_card_templates-icon {
+  background-position-x: -158px;
+  background-position-y: -261px;
+}
+
+div.head {
+  margin-top: 50px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+div.sub_text {
+  color: #777;
+  font-size:  14px;
+  margin-bottom:  50px;
+}
+
+div.sub_head {
+  color: #555;
+  font-size:  16px;
+  font-weight: bold;
+  margin-bottom:  20px;
+  margin-top: 50px;
+}
+
+div.section {
+  padding: 25px;
+  border-style:  solid;
+  border-width: 1px;
+  border-color: #ddd;
+  border-top-style: hidden;
+}
+
+div.first_section {
+  border-top-style:  solid;
+}
+
+div.section_head {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+div.section_field{
+  font-size: 14px;
+  color: #333;
+}
+
+.section input[type="text"]{
+  height: 30px;
+  padding: 3px;
+  width: 500px;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #bbb;
+  border-radius: 1px
+}
+
+.section input[type="text"]:focus{
+  border-color: #333;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 20px;
+  vertical-align: bottom;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  right: 3px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(-20px);
+  -ms-transform: translateX(-20px);
+  transform: translateX(-22px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.redactor_editor{
+  height: 450px !important;
+}
+
+div.redactor{
+  width:750px;
+  display: inline-block;
+  vertical-align: top;
+  letter-spacing: 0mm;
+  word-spacing: 0mm;
+}
+
+div.keys{
+  width: 200px;
+  float: left;
+  height: 498px;
+  display: inline-block;
+  vertical-align: top;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ddd;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+div.key_head{
+  font-size: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #ccc;
+  color: #333;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  text-align: center;
+}
+
+input.check {
+  width: 16px !important;
+  vertical-align: bottom;
+  margin-bottom: 3px;
+}
+
+.check_label {
+  margin-bottom: 2px;
+  margin-top: 2px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.extra_small_field {
+  width: 50px !important;
+}
+
+.small_field{
+  width: 150px !important;
+}
+
+.section select{
+  height:30px;
+  background: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #bbb;
+  width:500px;
+  border-radius: 1px;
+}
+
+.section select:focus{
+  border-color: #333;
+}
+
+.solid_button{
+  padding: 10px 20px 10px 20px;
+  background-color: #333;
+  color:#ffffff;
+  border-radius: 4px;
+  border-width: 0px;
+  cursor: pointer;
+  font-weight: bold;
+  cursor:pointer;
+  text-decoration: none;
+  font-size: 14px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+#page-yield .solid_button:hover{
+  background-color: #626262;
+  color: #fff !important;
+}
+
+.cancel {
+  margin-right: 20px;
+}
+
+div.submit_controls{
+  margin-top: 30px;
+}
+
+div.sub_head_desc {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.notice {
+  padding: 10px;
+  font-size: 12px;
+  color: #333;
+  background: #F6E2E4;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ddd;
+  border-radius: 4px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
+div.preview {
+  position: relative;
+  margin: 0 auto;
+  border-style: dashed;
+  border-width: 1px;
+  border-color: #333;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin-top:20px;
+  margin-bottom: 20px;
+  transform: scale(2);
+  transform-origin: 50% 0%;
+  font-size: 6pt;
+  line-height: 1.2;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+div.preview img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+div.id_card_preview{
+  min-height: 680px;
+}
+
+
+div.id_card_keys {
+  overflow-y:  auto;
+  height: 387px;
+}
+
+.key {
+  padding: 10px;
+  font-size: 13px;
+  color: #333;
+  border-bottom-style:  solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #ddd;
+}
+
+.key_code {
+  padding-top: 4px;
+  font-size: 12px;
+  color: steelblue;
+}
+
+.key_desc {
+  padding: 10px;
+  font-size: 12px;
+  color: #777;
+  border-bottom-style: solid;
+  box-sizing: border-box;
+  border-bottom-width: 1px;
+  height: 77px;
+  border-bottom-color: #ddd;
+}
+
+.remove_field {
+  background: white;
+  background-image: url(/images/iconsprite-1.png);
+  background-position: -31px 1px;
+  display: inline-block;
+  height: 16px;
+  width: 18px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.add_button_img{
+  text-decoration: none;
+  color:#777;
+  cursor: pointer;
+  background: none !important;
+}
+.add_button_img:hover{
+  color:#333;
+}
+
+.add_button_img:before {
+  content: '+';
+  margin-left: 8px;
+}
+
+.field {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.activity_strip {
+  margin-bottom: 15px;
+}
+
+div.dimension {
+  display: inline-block;
+}
+
+div.section_head_desc{
+  font-size: 12px;
+  margin-bottom: 20px;
+  color: #777;
+}
+
+div.remove_image {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: beige;
+  background: url(/images/iconsprite-1.png) no-repeat center;
+  background-position-x: 0px;
+  vertical-align: bottom;
+  background-position-y: -340px;
+  cursor: pointer;
+  display: none;
+  margin-bottom: 12px;
+}
+
+
+input#field_id_card_template_front_background_image, input#field_id_card_template_back_background_image {
+  border-radius: 0px !important;
+  width: 180px !important;
+  height: 30px !important;
+}
+
+
+.style {
+  border-radius: 0px;
+}
+
+.paperclip_field {
+  display: inline-block;
+  width: 290px;
+  margin: 0px !important;
+}
+
+.image_link {
+  display: inline-block;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 12px;
+}
+
+.image_link a {
+  color: #222;
+}
+
+.photo_check {
+  margin-bottom: 8px !important;
+}

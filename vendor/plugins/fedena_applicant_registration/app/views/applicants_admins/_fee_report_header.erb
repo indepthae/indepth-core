@@ -1,0 +1,40 @@
+<div id="pdf-header">
+    <div class="logo">
+        <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+    </div>
+    <div class="header-content" style='text-align:<%= @config[:pdf_receipt_halignment].present? ? "#{@config[:pdf_receipt_halignment]}" : "left" %>;'>
+        <p><%=Configuration.get_config_value('InstitutionName'); %></p>
+        <p class="institution_address"><%=Configuration.get_config_value('InstitutionAddress'); %></p>
+    </div>
+
+</div>   
+<div class="top">
+    <hr class="hor_line"/>
+    <span class="title"><%= "#{t('applicant_fee_receipt')}" %></span>
+    <span class="receipt_no"><%= t('receipt_no') %>: <%= @financetransaction.receipt_number %></span>
+    <span class="date"><%= t('applicants_admins.da_te') %>: <%=format_date(@financetransaction.transaction_date,:format=>:short_date)%></span>
+    <hr class="hor_line"/>
+</div>
+<div id="basic_info_section">
+
+    
+      <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%="#{t('applicant_name')} :"%></div>
+              <div class="value_span" style="font-weight:bold;"><%= @applicant.full_name %></div>
+          </div>
+          <div class="label_part_left label_right">
+              <div class="label_name label_right_value"><%="#{t('course_text')}" %>: </div>
+              <div class="value_span" style="font-weight:bold;"><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} &#x200E;(#{@registration_course.course.code})&#x200E;" %></div>
+          </div>    
+      </div>
+    
+      <div class="label_collection_part">
+          <div class="label_part">
+              <div class="label_name"><%="#{t('registration_num')} :"%></div>
+              <div class="value_span" style="font-weight:bold;"><%=@applicant.reg_no%></div>
+          </div>
+      </div>
+      
+
+</div>

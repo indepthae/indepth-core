@@ -1,0 +1,12 @@
+<div class="course_batch_selection_advanced">
+  <span id="course_batch_name_label"><%="Class - #{t('batch')}"%></span><div id="course_batch_name"><%=@batch.full_name%></div>
+  <%if can_access_request? :get_course_batch_selector,@batch,:context=>:cce_report_settings%>
+    <div id="link_for_change">
+      <%=link_to_remote "#{t('change_batch')}",:url=>{:controller=>'cce_report_settings',:action=>'get_course_batch_selector',:id=>@batch.id},:html=>{:class=>"change_date"}%>
+    </div>
+  <%end%>
+</div>
+<%if @batch.employees.present?%>
+  <div id="tutor_text"><%="#{t('tutor')}"%> : </div>
+  <div id="tutor_name"><%=@batch.employees.collect{|e|"#{e.full_name} <span>(#{e.employee_number})</span>"}.join(', ')%></div>
+<%end%>

@@ -1,0 +1,46 @@
+<% if @course_subject.parent_type == 'CourseElectiveGroup' %>
+  <% if @remaining_subjects.present? %>
+      <div class="headers"><%= t('elective_groups_text') %></div>
+      <% @remaining_subjects.each do |e_group| %>
+        <table align="center" width="75%" cellpadding="1" cellspacing="1" id="right_table">
+            <tr class="tr-head">
+                <td>
+                    <%= e_group.name %>
+                </td>
+            </tr>
+            <% if e_group.unlinked_active_subjects.present? %>
+              <% e_group.unlinked_active_subjects.each do |sub| %>
+                <tr subject_id="<%= sub.id  %>" batch_id="<%= @batch.id %>" class="connectable">
+                    <td class="name"><%= sub.name %></td>
+                </tr>
+              <% end %>
+            <% else %>
+                <tr>
+                    <td class="empty_td"><%= t('no_subjects_remaning_connect') %></td>
+                </tr>
+            <% end %>
+        </table>
+      <% end %>
+  <% else %>
+    <div class="empty_td"><%= t('no_subjects_remaning_connect') %></div>
+  <% end %>
+<% else %>
+  <table align="center" width="75%" cellpadding="1" cellspacing="1" id="right_table">
+      <tr class="tr-head">
+          <td>
+              <%= t('subjects_to_be_linked') %>
+          </td>
+      </tr>
+      <% if @remaining_subjects.present? %>
+        <% @remaining_subjects.each do |sub| %>
+          <tr subject_id="<%= sub.id  %>" batch_id="<%= @batch.id %>" class="connectable">
+              <td class="name"><%= sub.name %></td>
+          </tr>
+        <% end %>
+      <% else %>
+          <tr>
+              <td class="empty_td"><%= t('no_subjects_remaning_connect') %></td>
+          </tr>
+      <% end %>
+  </table>
+<% end %>

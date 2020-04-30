@@ -1,0 +1,138 @@
+<tr class="name_slots_edit">
+    <td class="tc_field_labels_edit">
+        <label for="field_names">
+            <div class="field_names">
+                <%= @student_details[id][:field_name]%>
+                <%if @student_details[id][:is_mandatory] == "1"%>
+                  <span class="necessary-field">*</span>
+                <%end%>
+            </div>
+        </label>
+    </td>
+    <%  field_format,value_1,value_2 = get_field_type_and_value(@student_details[id],@student) %>
+    <% if field_format == "text_field" %>
+        <% status = ((@student_details[id][:field_format_value] == "admission_number") || (@student_details[id][:field_format_value] == "student_name") || (@student_details[id][:field_format_value] == "last_batch_and_course") || (@student_details[id][:field_format_value] == "guardian_name") || (@student_details[id][:field_format_value] == "mother_name") || (@student_details[id][:field_format_value] == "working_days") || (@student_details[id][:field_format_value] == "student_present_days") || (@student_details[id][:field_format_value] == "student_category") || (@student_details[id][:field_format_value] == "nationality") || (@student_details[id][:field_format_value] == "religion_and_cast") || (@student_details[id][:field_format] == "additional_field") || (@student_details[id][:field_format_value] == "birth_place") || (@student_details[id][:field_format_value] == "reason_for_leaving") || (@student_details[id][:field_format_value] == "mother_tongue")) %>
+        <td class="tc_field_values_edit">
+            <div class="tc_field_value_edit "><%= text_field_tag "generate_report[record_data][#{id}][value_1]", (value_1 ||"#{value_2}" ), :readonly=> status %></div>
+        </td>
+    <%elsif field_format == "calander" %>
+      <td class="tc_field_values_edit date">
+          <div class="tc_field_value_edit date">                   
+              <%if @student_details[id][:field_type] == "system"%>
+
+                <%= calendar_date_select_tag "generate_report[record_data][#{id}][value_1]",
+                  I18n.l(value_1 || @student.date_of_birth || FedenaTimeSet.current_time_to_local_time(Time.now).to_date-5.years,:format=>:default) , :year_range => 72.years.ago..0.years.ago,:popup=>"force", :onChange => "Element.hide('loader_#{id}');set_date_in_words(this,#{id},#{@student_details[id][:is_in_words_enabled]});" %>
+              <%else%>
+                <%= calendar_date_select_tag "generate_report[record_data][#{id}][value_1]",
+                  I18n.l(value_1 || FedenaTimeSet.current_time_to_local_time(Time.now).to_date,:format=>:default) , :year_range => 72.years.ago..0.years.ago,:popup=>"force", :onChange => "Element.hide('loader_#{id}');set_date_in_words(this,#{id},#{@student_details[id][:is_in_words_enabled]});" %> 
+              <% end %>
+
+              <%= image_tag("loader.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "loader_#{id}",
+                :style =>"display: none;" ) %>
+              <div class="extra_field" id="extra_<%=id%>">
+                  <%if @student_details[id][:is_in_words_enabled]%>
+                    <table>
+                        <tr>
+                            <td class="tc_field_values_edit inner">
+                                <% if  @student_details[id][:field_type] == "system" %>
+                                  <% p @student.date_of_birth.to_s %>
+                                  <div class="tc_field_value_edit inner"><%= text_field_tag "generate_report[record_data][#{id}][value_2]", ( value_2 || get_date_in_words(@student.date_of_birth || FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s)), :readonly=> true %></div>
+                                <% else %>
+                                  <div class="tc_field_value_edit inner"><%= text_field_tag "generate_report[record_data][#{id}][value_2]", ( value_2 || get_date_in_words(FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s)) %></div>
+                                <% end %>
+                            </td>
+                        </tr>
+                    </table>
+                  <% end %>
+              </div>
+          </div> 
+      </td>
+    <%elsif field_format == "admission_date" %>
+      <td class="tc_field_values_edit date">
+          <div class="tc_field_value_edit date">                   
+              <%= text_field_tag "generate_report[record_data][#{id}][value_3]", (format_date(value_1 ||"#{value_2}",:format=>:short_date)), :readonly=> true %>
+              <%= hidden_field_tag "generate_report[record_data][#{id}][value_1]", (value_1 ||"#{value_2}") %>
+              <div class="extra_field" id="extra_<%=id%>">
+                  <%if @student_details[id][:is_in_words_enabled]%>
+                    <table>
+                        <tr>
+                            <td class="tc_field_values_edit inner">
+                                <div class="tc_field_value_edit inner"><%= text_field_tag "generate_report[record_data][#{id}][value_2]", (get_date_in_words(@student.admission_date || FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s)), :readonly=> true %></div>
+                            </td>
+                        </tr>
+                    </table>
+                  <% end %>
+              </div>
+          </div> 
+      </td>
+      <%elsif field_format == "date_of_birth" %>
+      <td class="tc_field_values_edit date">
+          <div class="tc_field_value_edit date">                   
+              <%= text_field_tag "generate_report[record_data][#{id}][value_3]", (format_date(value_1 ||"#{value_2}",:format=>:short_date)), :readonly=> true %>
+              <%= hidden_field_tag "generate_report[record_data][#{id}][value_1]", (value_1 ||"#{value_2}") %>
+              <div class="extra_field" id="extra_<%=id%>">
+                  <%if @student_details[id][:is_in_words_enabled]%>
+                    <table>
+                        <tr>
+                            <td class="tc_field_values_edit inner">
+                                <div class="tc_field_value_edit inner"><%= text_field_tag "generate_report[record_data][#{id}][value_2]", (get_date_in_words(@student.date_of_birth || FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s)), :readonly=> true %></div>
+                            </td>
+                        </tr>
+                    </table>
+                  <% end %>
+              </div>
+          </div> 
+      </td>
+      <%elsif field_format == "date_of_leaving" %>
+      <td class="tc_field_values_edit date">
+          <div class="tc_field_value_edit date">                   
+              <%= text_field_tag "generate_report[record_data][#{id}][value_3]", (format_date(value_1 ||"#{value_2}",:format=>:short_date)), :readonly=> true %>
+              <%= hidden_field_tag "generate_report[record_data][#{id}][value_1]", (format_date(value_1 ||"#{value_2}",:format=>:short_date)) %>
+              <div class="extra_field" id="extra_<%=id%>">
+                  <%if @student_details[id][:is_in_words_enabled]%>
+                    <table>
+                        <tr>
+                            <td class="tc_field_values_edit inner">
+                                <div class="tc_field_value_edit inner"><%= text_field_tag "generate_report[record_data][#{id}][value_2]", (get_date_in_words(@student.date_of_leaving || FedenaTimeSet.current_time_to_local_time(Time.now).to_date.to_s)), :readonly=> true %></div>
+                            </td>
+                        </tr>
+                    </table>
+                  <% end %>
+              </div>
+          </div> 
+      </td>
+    <%elsif field_format == "radio"%>
+      <td class="tc_field_values_edit">
+          <div class="tc_field_value_edit ">
+              <%if @student_details[id][:field_format] == "yes_or_no_radio"%>
+                <div class="radio_one"><%= radio_button_tag("generate_report[record_data][#{id}][value_1]","Yes", (value_1 == "yes")) %><%="#{t('yes_text')}" %></div>
+                <div class="radio_two"><%= radio_button_tag("generate_report[record_data][#{id}][value_1]","No", (value_1 != "yes") ) %><%="#{t('no_texts')}" %></div>
+              <%else%>
+                <div class="radio_buttons">
+                    <div class="radio_one"><%= radio_button_tag("generate_report[record_data][#{id}][value_1]","Male", ((value_1 == "Male")||(@student.gender == "m")),:disabled => true) %><%="#{t('male')}" %></div>
+                    <%= hidden_field_tag "generate_report[record_data][#{id}][value_1]", (value_1 = "Male") if @student.gender == "m" %>
+                    <div class="radio_two"><%= radio_button_tag("generate_report[record_data][#{id}][value_1]","Female",((value_1== "Female")||(@student.gender != "m")),:disabled => true) %><%="#{t('female')}" %></div>
+                    <%= hidden_field_tag "generate_report[record_data][#{id}][value_1]",(value_1 = "Female") if @student.gender != "m" %>
+                </div>
+              <% end %>
+          </div>
+      </td>
+    <%elsif field_format == "text_area"%>
+      <td class="tc_field_values_edit">
+          <%if @student_details[id][:field_format_value] == "subjects_studied"%>
+            <div class="textarea-input-bg"><%= text_area_tag "generate_report[record_data][#{id}][value_1]" , (value_1 || value_2) %></div>
+          <%else%>
+            <div class="textarea-input-bg"><%= text_area_tag "generate_report[record_data][#{id}][value_1]" , (value_1 || value_2) %></div>
+          <%end%>
+      </td>
+    <%elsif field_format == "select_box"%>
+      <td class="tc_field_values_edit">
+          <div class="tc_field_value_edit ">
+              <%= select_tag "generate_report[record_data][#{id}][value_1]", options_for_select(value_1.map{ |obj| obj.value}, :selected=> value_2)%>
+          </div>
+      </td>
+    <% end %>
+</tr>

@@ -1,0 +1,52 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('form_builder_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('form_templates.create') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('form_templates')}", form_templates_path%></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="flash-msg">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+  </div>
+  <div class="overlay"></div>
+  <% form_for @form_template do |template| %>
+    <%= javascript_include_tag "form_templates/template" %>
+    <div class="form_template_container">
+      <div class="template_element_selection">
+        <%= render :partial => 'elements_pane' %>
+      </div>
+      <div class="template_form">
+        <%= render :partial => 'template_form', :locals => {:template => template} %>
+      </div>
+    </div>
+    <div id="dragplaceholder"></div>
+    <div id="dragged_fields"></div>
+    <div class="settings_data">
+
+    </div>
+    <div id="submit_result"></div>
+  <% end %>
+</div>
+<style>
+  #template_drag_area:after{
+    content: "<%= t('drag_here') %>"
+  }
+  .ui-sortable-placeholder{
+    display: block;
+    visibility: visible;
+  }
+</style>

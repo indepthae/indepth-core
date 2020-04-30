@@ -1,0 +1,61 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('subjects_center_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('link_batches') %></div>
+    <div id="inner-tab-menu">
+        <ul id="assign_batch">
+            <%= render :partial => 'assign_batch_link' if @course.present? and @old_school %>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div class="list_box">
+        <div class="course_batches">
+            <div class="label-field-pair">
+                <label for="timetable_entry_course_id"><%= t('course') %>
+                    <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+                </label>
+                <div class="text-input-bg">
+                    <%= select :course, :id,
+                      @courses.map {|c| [c.full_name, c.id] },
+                      {:prompt => t('select_a_course'), :selected => @course.try(:id)},
+                      {
+                      :onchange => "#{remote_function(
+                      :url => { :action => 'subject_link_form' },
+                      :with => "'course_id='+value",
+                      :before => "Element.show('loader')",
+                      :success => "Element.hide('loader')"  )}"} %>
+                </div>
+            </div>
+        </div>
+        <hr class="sec_div" />
+        <div id="subject_list">
+            <%= render :partial => 'subject_link_form' if @course.present? %>
+        </div>
+    </div>
+    <div class="extender"></div>
+</div>
+<script type="text/javascript">
+  select_batch = function(el) {
+    e_id = j(el).attr('id');
+    e_array  = e_id.split('_');
+    e_array.pop();
+    e_array.push('_destroy');
+    destroy_id = e_array.join('_');
+    
+    if(!j(el).is(':checked')){
+      j('#'+destroy_id).val(1);
+    }else{
+      j('#'+destroy_id).val(0);
+    }
+  }
+</script>

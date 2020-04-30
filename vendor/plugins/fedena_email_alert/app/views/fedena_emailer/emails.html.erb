@@ -1,0 +1,69 @@
+
+<html>
+  <body >
+    <%if @rtl%>
+      <div class="yut" style=" width:100%; float:right; height:0px;text-align: right;">
+        <p style="float:right;direction:rtl;">
+          <% if @message.include?("RECEIPT_LINK") %>
+            <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/finance/generate_fee_receipt_pdf?transaction_id=#{@other_details[:id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="FinanceFee" %>
+            <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/hostel_fee/student_fee_receipt_pdf/#{@other_details[:finance_id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="HostelFee" %>
+            <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/transport_fee/transport_fee_receipt_pdf/#{@other_details[:id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="TransportFee" %>
+          <% end %>
+          <% if @message.include?("FEE_LINK") %>
+            <% @message = @message.gsub("FEE_LINK","<a href='#{@hostname}/student/fee_details/#{@other_details[:student_id]}/#{@other_details[:finance_fee_collection_id]}'>#{t('click_here_to_view_fee')}</a>") %>
+          <% end %>
+          <%=@message.gsub("URL","#{@hostname}")%>
+        </p>
+      </div>
+      <%  if FedenaSetting.company_details[:company_name].present?%>
+        <div class="yut" style=" width:100%; float:right;display:block;direction:rtl;">
+          <p style="float:right"> --</p>
+          <br/><br/>
+          <%="#{t('powered_by')}#{" "}#{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"}"%>
+          <br/>
+          <%@em=Digest::SHA1.hexdigest( "#{@email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )%>
+          <%if user=User.active.find_by_email_and_first_name(@email,@other_details[:recipient_name])
+            user.reset_password_code=@em
+            user.save(false)
+          end%>
+          <p style="float:right">  <%=@footer.gsub("URL","#{@hostname}")%>
+            <%if user && user.student%>
+              <font size="1">
+                <%=link_to "#{t('unsubscribe')}","#{@hostname}/email_alerts/email_subscription/#{@em}" %>
+              </font>
+            <%end%>
+          </p>
+        </div>
+      <%end%>
+    <%else%>
+      <% @message=@message.gsub("URL","#{@hostname}")%>
+      <% if @message.include?("RECEIPT_LINK") %>
+        <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/finance/generate_fee_receipt_pdf?transaction_id=#{@other_details[:id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="FinanceFee" %>
+        <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/hostel_fee/student_fee_receipt_pdf/#{@other_details[:finance_id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="HostelFee" %>
+        <% @message = @message.gsub("RECEIPT_LINK","<a href='#{@hostname}/transport_fee/transport_fee_receipt_pdf/#{@other_details[:id]}'>#{t('click_here_to_view_receipt')}</a>") if @other_details[:finance_type]=="TransportFee" %>
+      <% end %>
+      <% if @message.include?("FEE_LINK") %>
+        <% @message = @message.gsub("FEE_LINK","<a href='#{@hostname}/student/fee_details/#{@other_details[:student_id]}/#{@other_details[:finance_fee_collection_id]}'>#{t('click_here_to_view_fee')}</a>") %>
+      <% end %>
+      <p ><%=simple_format(@message)%> </p>
+      <p>
+        --<br/>
+        <%@em=Digest::SHA1.hexdigest( "#{@email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )%>
+        <%if user=User.active.find_by_email_and_first_name(@email,@other_details[:recipient_name])
+          user.reset_password_code=@em
+          user.save(false)
+        end%>
+        <%if FedenaSetting.company_details[:company_name].present?%>
+          <%="#{t('powered_by')}#{" "}#{link_to "#{FedenaSetting.company_details[:company_name]}","#{FedenaSetting.company_details[:company_url]}"}"%>
+        <%end%>
+        <br/>
+        <%="#{@footer.gsub("URL","#{@hostname}")}#{" "}"%>
+        <%if user && user.student%>
+          <font size="1">
+            <%=link_to "#{t('unsubscribe')}","#{@hostname}/email_alerts/email_subscription/#{@em}" %>
+          </font>
+        <%end%>
+      </p>
+    <%end%>
+  </body>
+</html>

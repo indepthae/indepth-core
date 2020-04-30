@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%= @xml.applicant_detail{
+  @applicants.each do |applicant|
+    @applicant = applicant
+    applicant_profile_data = applicant.get_profile_data
+    @additional_data = applicant_profile_data.second
+    @xml.applicant do
+      @xml.applicant_name(@applicant.full_name)
+      @xml.joining_date(@applicant.joining_date)
+      @xml.applicant_department(@applicant.applicant_department.try(:name))
+      @xml.applicant_category(@applicant.applicant_category.try(:name))
+      @xml.applicant_position(@applicant.applicant_position.try(:name))
+      @xml.applicant_grade(@applicant.applicant_grade.try(:name))
+      @xml.job_title(@applicant.job_title)
+      @xml.reporting_manager(@applicant.reporting_manager.try(:full_name))
+      @xml.gender(@applicant.gender)
+      @xml.email(@applicant.email)
+      @xml.status(@applicant.status)
+      @xml.qualification(@applicant.qualification)
+      @xml.total_experiance(@total_years.to_s+" #{t('years')} "+@total_months.to_s+" #{t('months')}")
+      @xml.experiance_info(@applicant.experience_detail)
+      @xml.date_of_birth(@applicant.date_of_birth)
+      @xml.marital_status(@applicant.marital_status)
+      @xml.children_count(@applicant.children_count)
+      @xml.father_name(@applicant.father_name)
+      @xml.mother_name(@applicant.mother_name)
+      @xml.spouse_name(@applicant.husband_name)
+      @xml.blood_group(@applicant.blood_group)
+      @xml.nationality(@applicant.nationality.try(:full_name))
+      @xml.home_address("#{@applicant.home_address_line1} #{@applicant.home_address_line2}")
+      @xml.city(@applicant.home_city)
+      @xml.state(@applicant.home_state)
+      @xml.country(@applicant.home_country.try(:full_name))
+      @xml.pin_code(@applicant.home_pin_code)
+      @xml.office_address("#{@applicant.office_address_line1} #{@applicant.office_address_line2}")
+      @xml.office_city(@applicant.office_city)
+      @xml.office_country(@applicant.office_country.try(:full_name))
+      @xml.office_pin_code(@applicant.office_pin_code)
+      @xml.office_phone1(@applicant.office_phone1)
+      @xml.office_phone2(@applicant.office_phone2)
+      @xml.mobile(@applicant.mobile_phone)
+      @xml.home_phone(@applicant.home_phone)
+      @xml.fax(@applicant.fax)
+      @xml.applicant_photo do
+        @xml.photo do
+          begin
+            unless @applicant.photo.path.nil?
+              @xml.image("data:image;base64" + ',' + ActiveSupport::Base64.encode64(File.read("#{Rails.root}/public" + @applicant.photo.url(:original, false))))
+            else
+              @xml.image("No Photo")
+            end
+          rescue Errno::ENOENT
+            @xml.image("Photo not found")
+            logger.info "Binary data not found"
+          end
+        end
+      end
+
+      @xml.applicant_additional_details do
+        @additional_data.each_pair do |key,value|
+          @xml.additional_field do
+            @xml.name(key)
+            @xml.value(value)
+          end
+        end
+      end
+      @xml.applicant_bank_details do
+        @bank_data.each_pair do |key,value|
+          @xml.bank_field do
+            @xml.name(key)
+            @xml.value(value)
+          end
+        end
+      end
+      @xml.applicant_salary_details do
+        @applicant_salary_details.each do |applicant_salary_detail|
+          @xml.salary do
+            @xml.payroll_category(applicant_salary_detail.payroll_category.try(:name))
+            @xml.amount(applicant_salary_detail.amount.try(:to_f))
+          end
+        end
+      end
+    end
+  end
+}%>

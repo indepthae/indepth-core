@@ -1,0 +1,287 @@
+.assessment_groups_box{
+    font-size: 14px;
+}
+.assessment_course_details{
+    width: 100%;
+    border-bottom: 1px solid #999;
+    padding-bottom: 30px;
+    overflow: auto;
+    margin-bottom: 30px;
+}
+.assessment_course_details .left {
+    width: 50%;
+    float: right;
+}
+.clm:last-child {
+    margin-left: 0px !important;
+    margin-right: 150px;
+}
+.assessment_course_details .right {
+    width: 50%;
+    float: right;
+    display: flex;
+}
+.clm{
+    float :right;
+}
+.right .clm {
+    margin-left: 30px;
+    flex: 1;
+    text-align: left;
+}
+.clm .value {
+    font-weight: bold;
+    margin-top: 10px;
+}
+.tabrow {
+    width: 978px;
+    list-style: none;
+    margin: 15px 0px 0px 0px;
+    padding: 0;
+    line-height: 30px;
+    height: 54px;
+    overflow: hidden;
+    font-size: 12px;
+    position: relative;
+    border-bottom: none;
+}
+.tabrow:before {
+    position: absolute;
+    content: " ";
+    width: 100%;
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px solid #ccc;
+    z-index: 1;
+}
+.tabrow li {
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    margin-top: 20px;
+    width: 132px;
+    text-align: center;
+    padding-top: 3px;
+    /*margin-left: 10px;*/
+}
+.tabrow li.selected {
+    border: 1px solid #ccc;
+    background: #FFF;
+    color: #333;
+    z-index: 2;
+    border-bottom-color: #FFF;
+    font-weight: 600;
+}
+.tabrow li.selected a, .tabrow li.selected a:hover {
+    color: #000 !important;
+    display: block;
+    /*width: 110px;*/
+    text-align: center;
+    cursor: default;
+}
+.tabrow a {
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+}
+#page-yield .tabrow a:hover {
+    color: #000 !important;
+}
+#questions-main {
+    margin-bottom: 60px;
+    width: 978px;
+    border: 1px solid #ccc;
+    height: auto;
+    float: right;
+    border-top: none;
+}
+#right-panel {
+    float: right;
+    width: 941px;
+    height: auto;
+    font-size: 13px;
+    padding: 20px;
+}
+.plan_details_box .header{
+    padding: 20px 0px;
+    /*border-bottom: 1px solid #ccc;*/
+}
+.term_listing{
+    margin-top: 20px;
+}
+.term_listing .header{
+    border: none;
+    padding-bottom: 10px;
+}
+.term_listing .header .left{
+    font-weight: bold;
+    font-size: 15px;
+    float: right;
+}
+table{
+    border: 1px solid #bfbfbf;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 30px 0;
+}
+td{
+    padding: 15px;
+    border-left: 1px solid #bfbfbf;
+}
+#page-yield table .tr-head{
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #bfbfbf;
+    color: black !important
+}
+tr{
+    border-bottom: 1px solid #bfbfbf;
+}
+table a, #page-yield table a:hover {
+    color: black !important;
+    margin-left: 10px;
+    float: right;
+}
+table a{
+    /*text-decoration: none !important;*/
+}
+table a:hover{
+    text-decoration: underline !important;
+}
+
+td.col-2{
+    width:20%;
+}
+td.col-1{
+    width:15%;
+}
+.empty-flash{
+    border: 1px solid #bfbfbf;
+    padding: 10px;
+    text-align: center;
+    /*margin-top: 33px;*/
+}
+.plan_details_banner{
+    width: 104%;
+    margin-right: -20px;
+    /* margin-right: 38px; */
+    background: #f0f0f0;
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+}
+.banner_col{
+    flex: 1;
+}
+.banner_col .label{
+    margin-left: 10px;
+}
+.banner_col .value{
+    font-weight: bold;
+}
+.header .right{
+    float: left;
+}
+.show {display:block !important;}
+#page-yield .right a.dropbtn, #page-yield .right a.dropbtn:hover{
+    color: white !important;
+    text-decoration: none !important;
+    font-weight: normal;
+}
+.dropbtn {
+    color: black !important;
+    cursor: pointer;
+    margin: 0 !important;
+    border-radius: 1px;
+    background: white;
+    border: 1px solid #ccc;
+    font-weight: normal;
+    font-size: 13px;
+}
+.options-dropbutton{
+    border: none;
+}
+.actions_col{
+    width: 15% !important;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 200px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    top: 50px;
+    width: auto !important;
+    border: 1px solid #ccc;
+}
+.options-dropdown{
+    top: 33px;
+    right: -10px;
+}
+.term_box td{
+    position: relative;
+}
+
+.dropdown-content a {
+    /*padding: 12px 16px;*/
+    text-decoration: none;
+    display: block;
+    padding: 5px 8px;
+    color: black !important;
+}
+
+.dropdown a:hover {background-color: #f1f1f1}
+.text-input-bg{
+    width:auto !important;
+}
+.term_box{
+    position: relative;
+}
+.term_box .table{
+    clear: both;
+    margin-top: 34px;
+}
+.plan_assessment_group_listing td{
+    position: relative;
+}
+td.links .primary_links{
+    padding: 7px;
+    float: right;
+}
+td.links{
+    position: relative;
+}
+.bold{
+    font-weight: bold;
+}
+.pull_right{
+    float: left;
+}
+.hollow_btn{
+    color: black !important;
+    cursor: pointer;
+    margin-top: -11px !important;
+    border-radius: 1px;
+    background: white;
+    border: 1px solid #ccc;
+    font-weight: normal;
+    font-size: 13px;
+    padding: 8px 0px;
+}
+.hollow_btn a{
+    color: black !important;
+    text-decoration: none;
+    padding: 8px 11px;
+}
+.hollow_btn:hover{
+    border: 1px solid #999;
+}

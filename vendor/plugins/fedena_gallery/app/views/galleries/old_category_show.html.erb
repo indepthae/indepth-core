@@ -1,0 +1,333 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('gallery') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('galleries.images') %></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <%  if ((permitted_to? :more_option,:galleries))  %>
+        <li id="drop_header" class='themed_bg themed-dark-hover-background'>
+          <a href="#" id="drop_header_link"><%= t('more') %> &#9660;</a>
+          <ul id="box_1" class="more-menu-div" style="display: none;">
+            <%  if permitted_to? :category_delete,:galleries %>
+              <li class='themed_bg themed-dark-hover-background'><a href="#" onclick="delete_album_pressed()"><%=t('delete_album') %> </a></li>
+            <% end %>
+
+            <%  if ((permitted_to? :more_option,:galleries) and @photos.count!=0)  %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to t('delete_images') , {:action=>"more_option", :id=>@category.id} %> </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+ <div class="bread_crumb">
+    <%breadcrumb :galleries_old_category_show,@category%>
+    <%=render_breadcrumbs%>
+  </div>
+
+  <div id="loading_overlay" class="loading_overlay">
+    <div class="loading_overlay_text"><%=t('galleries.deleting_image')%></div>
+  </div>
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice]  %> </p>
+  <% end %>
+
+<div class="show_photo" onclick="carousel_outside_click(event)" id="show_photo">
+  <div class="inner_box">
+    <div class="image_box">
+      <div class="upper_panel">
+        <div class="full_description" id="full_description">
+        </div>
+        <div class="close_photo" onclick="close_image()"></div>
+
+      </div>
+      <div class="full_image" id="full_image">
+      </div>
+      <div class="controls">
+        <div class="previous">
+          <button class="control" id="previous" ><div class="image_previous"></div><div class="previous_text"><%=t('galleries.carousel_previous')%></div></button>
+        </div>
+        <div class="current_image" id="current_image">
+
+        </div>
+        <div class="next">
+          <button class="control" id="next" ><div class="next_text"><%=t('galleries.carousel_next')%></div><div class="image_next"></div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="album_photos">
+  <div class="head">
+    <%= @category.name%>
+  </div>
+  <div class="line"></div>
+  <div class="album_status">
+    <div class="photo_count elements">
+      <%=t('galleries.images_collen')%><b> <span id="photos_count"><%= @total_images_count %></span></b>
+    </div>
+
+    <div id="published_on" class="published_on elements">
+     <%= @category.published? ? t('galleries.published_on') : t('galleries.created_on')%><b> <%= @category.published? ? format_date(@category.published_date) : format_date(@category.created_at.to_date) %></b>
+    </div>
+  </div>
+
+
+
+    <div id="album_images" class="album_images">
+    <% @photos.each_with_index do |image,index| %>
+    <% index= index+1%>
+
+      <%= '<div class="row">' if ((index+2)%3) == 0  %>
+
+
+      <div class="album_photo <%= (index+1)%3 == 0 ? " photo_middle" : "" %>" style="background-image: url('<%=  image.photo.url(:thumb, false)%>');" data-value='<%=(index-1)+@offset%>'>
+        <div class="photo_extra">
+          <div id=<%="desc"+image.id.to_s %> class="photo_description <%= @admin_mode ? "" : "full_width" %>"> <%= (image.name.nil?) ? "" : image.name %></div>
+          <%if @admin_mode%>
+          <div class="photo_options">
+            <div class="dropdown">
+              <button disabled class="dropbtn"><%=t('galleries.editt')%></button>
+              <div class="dropdown-content">
+                <a href="#" class="delete_link" data-value= <%=image.id %>  data-index= <%=index-1%> ><%=t('galleries.delete')%></a>
+              </div>
+            </div>
+          </div>
+          <%end%>
+        </div>
+      </div>
+
+
+
+<% #row %>
+  <%= '</div>'if (index%3) == 0%>
+
+    <% end %>
+    <% #In case row doesnt get closed - In last case where no of photos is less than 3 %>
+    <%= '</div>'if (@photos.count%3) != 0%>
+
+    <%if @photos.count>0%>
+    <%= will_paginate @photos,:params=>{:controller => "galleries",:action => "old_category_show", :id=> @category.id},:remote=>{:update=>'album_images'}%>
+    <%end%>
+    </div>
+
+  </div>
+
+  <%if @photos.count==0 %>
+  <div class="add_photo_box">
+    <div class="box_center">
+      <center>
+        <div class="box_head">
+          <div class="img_icon">
+          </div>
+          <%=t('galleries.no_images_to_show_old_gallery')%>
+        </div>
+
+      </center>
+    </div>
+  </div>
+  <%end%>
+
+</div>
+<script>
+j(document).ready(function() {
+  j("#drop_header").hover(
+  function () {
+    link_off = j("#drop_header").offset();
+    link_width = j("#drop_header").width();
+    link_height = j("#drop_header").height();
+    box_width = j("#box_1").width();
+    //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+    j("#box_1").css({top: (link_off.top + link_height),left: ((link_off.left + link_width) - box_width)});
+    j("#box_1").css("display","block");
+  },
+  function () {
+    j("#box_1").css("display","none");
+  });
+});
+
+
+  var gallery_category_id = <%= @category.id %>
+
+
+
+  function carousel_outside_click(e) {
+    if (j(e.target).closest(".image_box").length > 0) {
+      //click on carousel .. do nothing
+    } else {
+      close_image();
+    }
+
+  }
+
+  // carousel open or not
+  var carousel_state = false;
+
+  //holds current image
+  var activeimg = 0;
+  var url_array = <%= raw @original_images_url.to_json %>;
+  var description_array = <%= raw @image_description.to_json %>;
+
+  set_delete_action();
+  set_image_carousel();
+
+  function confirmation_delete(element) {
+    j("#loading_overlay").css("display","block");
+    j('#yes').click(function () {
+      j.ajax({
+        type: "POST",
+        data: {
+          "id": j(element).data("value"), "page":<%= raw (params[:page]==nil ?  "1" : params[:page]).to_json%>,"session_fingerprint":"<%=session_fingerprint%>"
+        },
+        url: "/galleries/old_photo_delete",
+        success: function (msg) {
+          j("#loading_overlay").css("display","none");
+          var index = j(element).data("index");
+          set_delete_action();
+          set_image_carousel();
+        }
+      });
+      remove_popup_box();
+    });
+
+  }
+
+
+
+  function set_delete_action() {
+    j(".delete_link").click(function (e) {
+      e.stopPropagation();
+      console.log("delete clicked");
+      make_popup_box(this, 'confirm', "<%=t('galleries.photo_delete_description')%>", {
+        'ok': "<%=t('galleries.delete_photo')%>",
+        'cancel': "<%=t('galleries.cancel')%>",
+        'title': "<%=t('galleries.delete_photo')%>",
+        'popup_class': 'remove_lt',
+        'return_status': true
+      });
+      return confirmation_delete(this);
+
+    });
+  }
+
+
+
+
+  function delete_album_pressed(){
+    console.log("delete pressed");
+    make_popup_box(this, 'confirm', "<%=t('galleries.delete_album_text')%>", {
+      'ok': "<%=t('galleries.delete_album')%>",
+      'cancel': "<%=t('galleries.cancel')%>",
+      'title': "<%=t('galleries.delete_album')%>",
+      'popup_class': 'remove_lt',
+      'return_status': true
+    });
+    return confirmation_album_delete(this);
+
+
+  }
+
+  function confirmation_album_delete(){
+    j('#yes').click(function () {
+      window.location.replace("/galleries/category_delete/"+gallery_category_id);
+    });
+
+  }
+
+  j(document).keydown(function (e) {
+    if (carousel_state == true) {
+      switch (e.which) {
+        case 37: // left
+          previous();
+          break;
+
+        case 38: // up
+          break;
+
+        case 39: // right
+          next();
+          break;
+
+        case 40: // down
+          break;
+
+        case 27: //escape button
+          close_image();
+          break;
+
+        default:
+          return; // exit this handler for other keys
+      }
+    }
+
+  });
+
+  function display_image(id) {
+    carousel_state = true;
+    id = parseInt(id);
+    j(document.body).addClass("lock_scroll");
+    j("#show_photo").css("display", "block");
+    activeimg = id;
+    if(url_array.length>1){
+      j("#previous").css("display","inline-block");
+      j("#next").css("display","inline-block");
+    }
+    else{
+      j("#previous").css("display","none");
+      j("#next").css("display","none");
+    }
+    setimage();
+  }
+
+  function set_image_carousel() {
+    j(".album_photo").click(function () {
+      display_image(j(this).data("value"));
+    });
+  }
+
+  function setimage() {
+    //this function sets image and its description
+    var image = new Image();
+    image.src = url_array[activeimg];
+    document.getElementById("full_image").style.backgroundImage = "url('" + image.src + "')";
+    j("#current_image").html("<%=t('galleries.carousel_showing')%> <b>" + (activeimg + 1) + "</b> out of <b>" + url_array.length + "</b>");
+    j("#full_description").html(description_array[activeimg]);
+    console.log(activeimg);
+  }
+
+  function close_image() {
+    carousel_state = false;
+    j(document.body).removeClass("lock_scroll");
+    j("#show_photo").css("display", "none");
+  }
+  function previous() {
+    if (activeimg == 0) {
+      activeimg = (url_array.length - 1);
+    } else {
+      activeimg = activeimg - 1;
+    }
+
+    setimage();
+  }
+  //previous
+  j("#previous").click(function () {
+    previous();
+  });
+  function next() {
+    if (activeimg == (url_array.length - 1)) {
+      activeimg = 0;
+    } else {
+      activeimg = activeimg + 1;
+    }
+    setimage();
+  }
+  j("#next").click(function () {
+    next();
+  });
+</script>

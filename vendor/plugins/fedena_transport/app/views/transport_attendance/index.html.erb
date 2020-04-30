@@ -1,0 +1,76 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_attendance_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('mark_attendance') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('transport_attendance_description') %></div>
+    <%= render :partial => 'search_form' %>
+    <div id="passengers_list"></div>
+    <div id="loading" class="substitute">
+        <%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader") %>
+        <span><%= "#{t('loading')}.." %></span>
+    </div>
+</div>
+<script type="text/javascript">
+
+  function delete_confirmed(elem) {
+      (function () {
+
+          var e = elem;
+
+          j('#yes').click(function () {
+              j('#new_transport_attendance_form').submit();
+              remove_popup_box();
+          });
+      })();
+  }
+
+  j("#search-form #submit_button").click(function (e) {
+      if ((j("span[changed='true']").length > 0)) {
+          e.preventDefault();
+
+          make_popup_box(this, 'confirm', "<%=t('save_attendance_confirmation')%> ", {
+              'ok': "<%=t('yes_text')%>",
+              'cancel': "<%=t('no_texts')%>",
+              'title': "<%=t('save_attendance')%>",
+              'popup_class': 'remove_lt',
+              'return_status': true
+          });
+          return delete_confirmed(this);
+      }
+  });
+  function mark_attendance(row) {
+      elm = j(row).find(".mark_icon");
+      j(elm).toggleClass('marked');
+      mark = j(elm).prev('.mark_attendance');
+      if (mark.val() == "0")
+          mark.val("1");
+      else
+          mark.val("0");
+      j('.selected_count').html(j("input.mark_attendance[value='1']").length);
+      j('#passengers_list .submit-button').attr('disabled', false);
+      j(elm).attr('changed', function (index, attr) {
+          return attr == "true" ? "false" : "true";
+      })
+      if ((j("input.mark_attendance[value='1']").length > 0)) {
+          j('#all_present').prop('checked', false);
+          j('#all_present').attr('disabled', true)
+      } else {
+          j('#all_present').attr('disabled', false)
+      }
+  }
+
+  function enable_submit() {
+      j('#passengers_list .submit-button').attr('disabled', false);
+  }
+</script>

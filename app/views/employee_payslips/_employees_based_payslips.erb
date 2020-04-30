@@ -1,0 +1,8 @@
+<div class="label-field-pair">
+  <label for="department"><%= t('department') %></label>
+  <div class="text-input-bg">
+    <%= select_tag :department_id, options_for_select([["#{t('all_departments')}",'All']] + @departments.map { |c| [c.name, c.id] }), :onchange => ""%>
+  </div>
+</div>
+
+<%= render :partial => "list_employees" %>

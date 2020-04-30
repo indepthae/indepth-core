@@ -1,0 +1,79 @@
+<% @total_fine=0 %>
+  <% total_fees1=total_fees %>
+  <% if @paid_fees %>
+    <% if @total_fine==0 %>
+      <tr class="tr-blank"></tr>
+      <tr class="tr-head" cellpadding="1" cellspacing="1">
+          <td class="col-1"></td>
+          <td class="col-1 bold_font" colspan="2">
+              <span><%= t('fine') %></span>
+          </td>
+      </tr>
+      <tr class="tr-blank"></tr>
+    <% end %>
+    <tr class="tr-<%= cycle("odd", "even") %>">
+        <td class="col-1"><%= i+=1 %></td>
+        <td class="col-2">
+            <span><%= t('fine_on') %>
+                <%= format_date(@date.due_date.to_date+@fine_rule.fine_days.days) %><%= discount_text = @fine_rule.is_amount ? "" : " (#{@fine_rule.fine_amount}&#x200E;%)" %></span>
+        </td>
+        <td class="col-6 normal_font">
+            <%= precision_label(@fine_amount) %>
+            <% @total_fine=@total_fine+@fine_amount %>
+        </td>
+    </tr>
+  <%# end %>
+  <% hide_fine=(!@transport_fee.is_paid and @date.due_date < (@payment_date || Date.today) ) ? '' : 'none' %>
+    <tr id="fine-slab" style="display: <%= hide_fine %>">
+      <td class="col-2 fine_text align_right">
+        <label><%= "#{t('due_date_has_been_exceeded')}" %></label>
+      </td>
+      <td>
+      <div class="instant-particular">
+
+        <%#= link_to_remote '+ Add Fine', :url => {
+                          :controller => "transport_fee",
+                          :action => "update_fine_ajax", "fine[student]" => @student.id,"fine[batch_id]"=>@batch.id,"fine[date]"=> @date.id,
+                          :current_action => @target_action,
+                          :current_controller=>@target_controller,
+                          :payment_date=>@payment_date
+                          },
+                          :method=>:get %>
+          <%= link_to_remote "+ Add Fine", :url => {:action => "update_fine_ajax", "fine[student]" => @student.id,"fine[date]"=> @date.id,"fine[transport_fee]"=> @transport_fee.id} %>
+        <div class="extender"></div>
+
+      </div>
+      </td>
+    </tr>
+<% end %>
+<script>
+  j(document).undelegate(".fine-deletion", "click");
+  j(document).delegate('.fine-deletion', 'click', function (e) {
+      student = j(this).attr('student');
+      batch_id = j(this).attr('batch_id');
+      date = j(this).attr('date');
+      payment_note = j("#fees_reference_no").val();
+      payment_mode = j("#fees_payment_mode").val();
+      transaction_date = j("#transaction_date").val();
+      reference_no = j("#fees_payment_note").val();
+      proceed = confirm('<%=t('delete_confirm_msg') %>');
+      j('#fine_amount').val(0);
+      if (proceed) {
+          j.ajax({
+              method: "post",
+              url: '/finance/update_fine_ajax',
+              data: {
+                  "fine[student]": student,
+                  "fine[batch_id]": batch_id,
+                  "fine[date]": date,
+                  "fine[payment_date]": transaction_date,
+                  "payment_note": payment_note,
+                  "payment_mode": payment_mode,
+                  "reference_no": reference_no
+              }
+
+          });
+      }
+  });
+
+</script>

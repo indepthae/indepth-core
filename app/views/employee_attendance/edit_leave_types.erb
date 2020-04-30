@@ -1,0 +1,340 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('leave_types') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit_leave_types') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to t('delete') , {:action => "delete_leave_types", :id => @leave_type.id}, :confirm=>"#{t('are_you_sure_to_delete_leave_type')}" %></li>
+        </ul>
+    </div>
+</div>
+
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%=breadcrumb :employee_attendance_edit_leave_types , @leave_type%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <% form_for :leave_type do |c| %>
+      <%= session_fingerprint_field %>
+
+      <div class="leave_type_from">
+          <div class="left-section">
+              <div class="label-field-pair">
+                  <label for="category_name"><%= t('leave_name') %></label>
+                  <div class="text-input-bg"><%= c.text_field :name %></div>
+              </div>
+              <div class="label-field-pair" id="code">
+                  <label for="category_name"><%= t('leave_code') %></label>
+                  <div class="text-input-bg"><%= c.text_field :code %></div>
+              </div>
+              <% config  = leave_reset_configuration %>
+              <% if config == '1' %>
+                <div id="credit_frequency" class="label-field-pair">
+                    <label for="category_name"><%= t('credit_frequency') %><div class="tooltip_info2" tooltip ="<%= t('credit_frequency_text') %>"></div></label>
+                    <div class="text-input-bg">
+                        <%= c.select :credit_frequency, EmployeeLeaveType::CREDIT_FREQUENCIES.sort.map {|k,v| [t(v), k]}, {:include_blank => t(:select_frequency)}, {:onchange => "show_slab_form();"} %>
+                    </div>
+                </div>
+
+                <div  id="credit_type" class="label-field-pair">
+                    <label for="category_name"><%= t('credit_type') %><div class="tooltip_info2" tooltip ="<%= t('credit_type_text') %>"></div></label>
+                    <div class="text-input-bg">
+                        <%= c.select :credit_type, [['Select type', " " ], ['Flat' ,'Flat'], ['Slab', 'Slab']],{}, {:onchange => "show_slab_form();"} %>
+                    </div>
+                </div>
+              <% end %>
+              <div class="label-field-pair days-count" id="code" style="display: <%= (@leave_type.credit_frequency == 1 ? 'block' : 'none') %>">
+                  <label for="category_name"><%= t('no_of_days') %></label>
+                  <div class="text-input-bg"><%= c.text_field :days_count %></div>
+              </div>
+
+              <div class="label-field-pair" id="leave_count">
+                  <label for="category_name"><%= t('leave_count').capitalize %><div class="tooltip_info2" tooltip ="<%= t('leave_count_text') %>"></div></label>
+                  <div class="text-input-bg"><%= c.text_field :max_leave_count,  :placeholder => "E.g., 0.5, 1, 3.5, etc."  %></div>
+
+              </div>
+              <div id ="leave_cf">
+                  <div class="label-radio-pair">
+                      <label class="status"><%=  t('employee_leave_balance') %></label>
+                      <div id="max_leaves"><%= t('leave_credit_carry_forward') %></div>
+                  </div>
+                  <div class="label-radio-pair" id="leave_carry_forward">
+                      <label class="status"></label>
+                      <%= c.radio_button  "carry_forward", "true"%>
+                      <label class="label_for_status" for="leave_type_carry_forward_true"><%= t('allow_leave_carry_forward') %></label>
+
+                      <%= c.radio_button  "carry_forward", "false" %>
+                      <label class="label_for_status" for="leave_type_carry_forward_false"><%= t('discard_leave_balance') %></label>
+                  </div>
+
+                  <div id="max_leave_types"><%= t('max_carry_forwarded_leaves') %></div>
+                  <div class="label-radio-pair" id="leave_carry_forward_type" >
+                      <label class="status"></label>
+                      <%= c.radio_button  "carry_forward_type", 1 , :checked => @leave_type.carry_forward_type == 1  %>
+                      <label class="label_for_status" for="leave_type_carry_forward_type_1"><%= t('any_count') %></label>
+                      <%= c.radio_button  "carry_forward_type", 2, :checked => @leave_type.carry_forward_type == 2 %>
+                      <label class="label_for_status" for="leave_type_carry_forward_type_2"><%= t('specific_count') %></label>
+                      <div class="label-field-pair"  id="max_carry_forward" style="display:none;">
+                          <div class="text-input-bg"><%= c.text_field :max_carry_forward_leaves, :placeholder => "E.g., 0.5, 1, 3.5, etc."  %></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div id="leave_count_form" class="right-section" style="display:none">
+              <div class="leave_count_title"><%= t('leave_count_title') %></div>
+              <div class="leave_count_desc"><%= t('leave_count_desc') %></div>
+              <div id="months" class="months-box" style="display:none">
+              </div>
+              <div id="quarters" class="months-box" style="display:none">
+              </div>
+              <div id="half_yearly" class="months-box" style="display:none">
+              </div>
+          </div>
+          <div class="extender"></div>
+
+          <div class="label-radio-pair">
+              <label class="status"><%= t('additional_leaves').capitalize %></label>
+              <div id="max_leaves"><%= t('set_additional_leaves') %></div>
+          </div>
+          <div class="label-radio-pair" id="lop_enabled">
+              <label class="status"></label>
+              <%= c.radio_button  "lop_enabled", "true", :checked => "checked" %>
+              <label class="label_for_status" for="leave_type_lop_enabled_true"><%= t('enable_loss_of_pay_deduction') %></label>
+
+              <%= c.radio_button  "lop_enabled", "false" %>
+              <label class="label_for_status" for="leave_type_lop_enabled_false"><%= t('discard_loss_of_pay_deduction') %></label>
+          </div>
+
+          <div class="label-radio-pair" id="is_active">
+              <label class="status"><%= t('status') %></label>
+              <div class="text-input-bg" id="status_div">
+                  <%= c.radio_button  "is_active", "true" %>
+                  <label class="label_for_status" for="leave_type_is_active_true"><%= t('active') %></label>
+
+                  <%= c.radio_button  "is_active", "false" %>
+                  <label class="label_for_status" for="leave_type_is_active_false"><%= t('inactive') %></label>
+              </div>
+              <div class="description" id="leave_status_text" style="display:none;"><%= t('leave_inactive_status_warning') %></div>
+          </div>
+
+
+      </div>
+      <div id="submit-button">
+          <%=submit_tag "#{t('update')}", :disable_with => "► #{t('please_wait')}" %>
+      </div>
+    <% end %>
+</div>
+
+<script type="text/javascript">
+  var rtl = "<%= (rtl?) ? 'rtl' : 'ltr'  %>"
+  if (rtl == 'rtl') {
+      j("#leave_carry_forward_type label:odd").css('margin-left', '30px')
+      j("#leave_carry_forward label:odd").css('margin-left', '30px')
+      j("#lop_enabled label:odd").css('margin-left', '20px')
+      j("#is_active label:odd").css('margin-left', '30px')
+  }
+  else {
+      j("#leave_carry_forward_type label:odd").css('margin-right', '30px')
+      j("#leave_carry_forward label:odd").css('margin-right', '30px')
+      j("#lop_enabled label:odd").css('margin-right', '20px')
+      j("#is_active label:odd").css('margin-right', '30px')
+  }
+
+
+  j("#leave_type_max_leave_count").change(function () {
+      leave_count = j(this).val();
+      j("#leave_type_max_carry_forward_leaves").val(leave_count);
+  })
+
+  j("#leave_carry_forward input").click(function () {
+      if (j("#leave_type_carry_forward_true:checked").length > 0)
+      {
+          j("#max_leave_types").show();
+          j("#leave_carry_forward_type").show();
+      }
+      else {
+          j("#max_leave_types").hide();
+          j("#leave_carry_forward_type").hide();
+
+      }
+
+  });
+
+
+  j("#leave_carry_forward_type input").click(function () {
+      if (j("#leave_type_carry_forward_type_2:checked").length > 0)
+      {
+          j("#max_carry_forward").show();
+      }
+      else {
+          j("#max_carry_forward").hide();
+          j("#leave_type_max_carry_forward_leaves").val(j("#leave_type_max_leave_count").val());
+      }
+  });
+
+  if (j("#leave_type_carry_forward_type_2:checked").length == 0 && j("#leave_type_carry_forward_type_1:checked").length == 0)
+      j("#leave_type_carry_forward_type_1").prop("checked", "checked")
+
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click', function () {
+      new CalendarDateSelect(this.previous(), {date_format: "<%= date_format %>", locale_months: month_names, popup: 'force', year_range: 10});
+  });
+
+  j("#leave_carry_forward input").click(function () {
+      hide_max_count_field();
+  });
+
+  hide_max_count_field();
+  function hide_max_count_field() {
+      if (j("#leave_type_carry_forward_type_2:checked").length > 0)
+      {
+          j("#max_carry_forward").show();
+      }
+      else {
+          j("#max_carry_forward").hide();
+          j("#leave_type_max_carry_forward_leaves").val(j("#leave_type_max_leave_count").val());
+      }
+  }
+
+
+
+  if (j("#leave_type_carry_forward_true:checked").length > 0)
+  {
+      j("#max_leave_types").show();
+      j("#leave_carry_forward_type").show();
+  }
+  else {
+      j("#max_leave_types").hide();
+      j("#leave_carry_forward_type").hide();
+
+  }
+
+  if (j("#leave_type_carry_forward_type_2:checked").length > 0)
+  {
+      j("#max_carry_forward").show();
+  }
+  else {
+      j("#max_carry_forward").hide();
+  }
+
+
+
+<%#*j('#leave_count input').on("focus", function() {%>
+<%#*j("#leave_count_text").show();%>
+<%#*}).on("blur", function () {%>
+<%#*j("#leave_count_text").hide();%>
+<%#*});%>
+
+  j('#reset_date input').on("focus", function () {
+      j("#valid_from_text").show();
+  }).on("blur", function () {
+      j("#valid_from_text").hide();
+  });
+
+  j('#is_active input').click(function () {
+      if (j('#leave_type_is_active_false').is(':checked'))
+          j("#leave_status_text").show();
+      else
+          j("#leave_status_text").hide();
+  });
+
+  j("#is_active > label:nth-last-of-type(-n+2)").css({"cursor": "pointer"})
+  j("#leave_carry_forward_type > label:nth-last-of-type(-n+2)").css({"cursor": "pointer"})
+  function fetch_days_option() {
+      frequency = j('#leave_type_credit_frequency').val();
+      if (frequency == "1")
+          j('.days-count').show();
+      else
+          j('.days-count').hide();
+
+  }
+  show_slab_form();
+  function show_slab_form() {
+      frequency = j('#leave_type_credit_frequency').val();
+      credit_type = j('#leave_type_credit_type').val();
+      if (frequency == "1") {
+          j('.days-count').show();
+          j('#credit_type').hide();
+          j('#leave_count_form').hide();
+          j('#leave_count').show();
+      }
+      else {
+          j('.days-count').hide();
+          j('#credit_type').show();
+      }
+      if (frequency == "5") {
+          j('#credit_type').hide();
+          j('#leave_count_form').hide();
+          j('#leave_count').show();
+      }
+
+      if (credit_type == 'Slab') {
+          if (frequency == "2") {
+              update_form();
+              j('#months').html('')
+              j('#months').append('<%=escape_javascript(render(:partial => "monthly_slab"))%>');
+              j('#months').show();
+              j('#quarters').html('');
+              j('#half_yearly').html('');
+              j('#quarters').hide();
+              j('#half_yearly').hide();
+          }
+          if (frequency == "3") {
+              update_form();
+              j('#quarters').html('')
+              j('#quarters').append('<%=escape_javascript(render :partial => "quarterly_slab")%>');
+              j('#quarters').show();
+              j('#months').html('');
+              j('#half_yearly').html('');
+              j('#months').hide();
+              j('#half_yearly').hide();
+          }
+          if (frequency == "4") {
+              update_form();
+              j('#half_yearly').html('');
+              j('#half_yearly').append('<%=escape_javascript(render :partial => "half_yearly_slab")%>');
+              j('#half_yearly').show();
+              j('#months').html('');
+              j('#quarters').html('');
+              j('#months').hide();
+              j('#quarters').hide();
+
+          }
+      }
+      else {
+          j('#leave_count_form').hide();
+          j('#leave_count').show();
+      }
+  }
+
+  function update_form() {
+      j('#leave_count').hide();
+      j('#leave_count_form').show();
+  }
+
+
+</script>

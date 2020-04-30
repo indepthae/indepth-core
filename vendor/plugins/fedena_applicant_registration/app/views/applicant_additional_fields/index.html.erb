@@ -1,0 +1,52 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('additional_fields') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= @course.course.full_name%></div>
+
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('ne_w')}", {:action=>"new"} %></li>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('applicant_s'), {:controller=>"applicants_admin",:action=>"index"} %></li>
+    </ul>
+  </div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <% unless @addl_fields.empty? %>
+    <ul id="category-list">
+      <% @addl_fields.each_with_index do |asset,i| %>
+        <li class="list<%=cycle('odd', 'even')%>">
+          <div class="category-name">
+            <%=link_to asset.name,:action=>"show",:id=>asset.id%>
+          </div>
+          <div class="category-status">
+            <%= asset.is_active ? t('active') : t('inactive') %>
+          </div>
+          <div class="pos">
+            <span class="category-up-down <%= "inactive" if i==0 %>"><%= link_to_remote "▲",:url=>{:action=>"change_order",:order=>"up",:id=>asset.id} %></span>
+            <span class="category-up-down <%= "inactive" if i+1==@addl_fields.count%>"><%= link_to_remote "▼",:url=>{:action=>"change_order",:order=>"down",:id=>asset.id} %></span>
+          </div>
+          <div class="category-toggle">
+            <%= link_to (asset.is_active ? t('make_inactive') : t('make_active')) ,:action=>:toggle,:id=>asset.id %>
+          </div>
+          <div class="category-edit">
+            <%=link_to "#{t('edit')}",:action=>"edit",:id=>asset.id%>
+          </div>
+          <div class="category-delete">
+            <%= link_to "#{t('delete')}" ,{:action=>:destroy,:id=>asset.id},:method=>:delete,:confirm=>"#{t('delete_confirmation')}"%>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_addl_fields') %> </p>
+  <% end %>
+</div>

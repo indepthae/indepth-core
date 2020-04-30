@@ -1,0 +1,288 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('employee_attendance_text') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('attendance_report').titleize %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <h4><%= t('attendance_report').titleize %></h4>
+
+  <% if @employees.present? %>
+    <div id ="filters" style="display:none;">
+      <label><%= t('filter_by_date')%></label>
+      <div class="label-field-pair">
+        <label for="leave_type"><%= t('from') %></label>
+        <div class="text-input-bg start_date">
+          <%= calendar_date_select_tag 'date[start_date]' ,"",:popup=>:force, :id => "start_date"  %>
+        </div>
+      </div>
+
+
+      <div class="label-field-pair">
+        <label for="end_date"><%= t('to') %></label>
+        <div class="text-input-bg end_date">
+          <%= calendar_date_select_tag 'date[end_date]' ,"",:popup=>:force, :id => "end_date"   %></div>
+      </div>
+
+
+      <%= submit_tag "", :value => "#{t('view')}", :class => "submit_button" , :id => 'submit_button' %>
+      <div id="cancel"><%= t('cancel') %></div>
+      <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none; margin-top: 5px;" ) %>
+      <div class="error-msg" style="display:none;"><div class="error-icon"></div><%= t('select_valid_date')%></div>
+      <hr></hr>
+    </div>
+
+    <div id="leave_category_select">
+        <div class="label-field-pair" style="width: 245px;">
+        <label for="employee_department_select"><%= t('leave_type') %></label>
+        <div class="text-input-bg"><%= select_tag 'leave_category', options_for_select([["#{t('active')}","active"],["#{t('all')}", "all"]]) %>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %></div>
+    </div>
+  
+    <div id="department_select">
+      <div class="label-field-pair">
+        <label for="employee_department_select"><%= t('select_the_department') %></label>
+        <div class="text-input-bg"><%= select_tag 'department_id', options_for_select([["#{t('all_departments')}","All Departments"]]+@departments.map {|c| [c.name, c.id]})      %>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %></div>
+    </div>
+
+    <div id="leave_type_select">
+      <div class="label-field-pair">
+        <label for="employee_department_select"><%= t('employees_with_leave_critereas') %></label>
+        <div class="text-input-bg"><%= select_tag 'leave_criteria', options_for_select([["#{t('all')}","All"], ["#{t('additional_leaves')}", "additional_leaves"], ["#{t('lop_deducted')}", "lop_deducted"], ["#{t('lop_not_deducted')}", "lop_not_deducted"]])      %>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader1", :style =>"display: none;" ) %></div>
+    </div>
+    <hr id="date_range_hr1" class="date-range-hr" style="display:none;">
+    <div id="date_range"  style="display:none;">
+      <div class="label-field-pair">
+        <label for="leave_type"><%= t('date_text') %></label>
+        <div class="text-input-bg start_date_text">
+        </div>
+      </div>
+      <div class="label-field-pair">
+        <label for="end_date"><%= t('to') %></label>
+        <div class="text-input-bg end_date_text">
+        </div>
+
+      </div>
+      <div id="change_date"><%= t('change_date') %></div>
+      <div id="reset"><%= t('reset') %></div>
+    </div>
+    <hr id="date_range_hr2" class="date-range-hr" style="display:none;">
+    <div id ="advance_search"><%= t('filter_with_dates') %></div>
+
+    <div id="attendance_report"> <%= render :partial => 'attendance_report'%> </div>
+  <% else %>
+    <p class="flash-msg"><%= flash[:notice] %></p>
+  <% end %>
+</div>
+
+
+<script type="text/javascript">   
+  j("select#department_id").val("All Departments");
+  j("select#leave_criteria").val("All");
+  
+  j("#advance_search").click(function(){
+    j("#filters").show();
+    j(this).hide();
+  })
+
+  j("#cancel").click(function(){
+    if (j("#start_date").val() == "" || j("#end_date").val() == "" || j(".error-msg").length > 0){
+      j("#filters").hide();
+      j("#advance_search").show();
+    }
+    else
+    {
+      j("#date_range").show();
+      j("#date_range_hr1").show();
+      j("#date_range_hr2").show();
+      j("#filters").hide();
+    }
+      
+  })
+
+  var month_names = "<%= I18n.t('date.month_names').compact.join(',') %>";
+  j('.calendar_label').on('click',function(){
+    new CalendarDateSelect( this.previous(), {date_format:"<%= date_format %>", locale_months:month_names, popup:'force', year_range:10} );
+  });
+
+  j("#submit_button").click(function(){
+    if (validate_dates()){
+      var start_date = j("#start_date").val();
+      var end_date = j("#end_date").val();
+      var dpt_id= j("#department_id").val();
+      var leave_criteria = j("#leave_criteria").val();
+      var leave_category = j("#leave_category").val();
+      j("#loader").show();
+      new Ajax.Request('/employee_attendance/report',{
+        parameters: {
+          start_date: start_date,
+          end_date: end_date,
+          department_id: dpt_id||"All Departments",
+          leave_criteria: leave_criteria,
+          leave_category: leave_category,
+          from: "report"
+        },
+        asynchronous:true,
+        evalScripts:true,
+        method:'post',
+        onComplete:function(resp){
+          j("#loader").hide();
+          j("#advance_search").hide();
+          j("#date_range").show();
+          j("#date_range_hr1").show();
+          j("#date_range_hr2").show();
+          j(".start_date_text").text(formattedDate(j("#start_date").val()));
+          j(".end_date_text").text(formattedDate(j("#end_date").val()));
+          j("#filters").hide();
+        }
+      });
+      
+    }else
+      j(".error-msg").show();
+    return false;
+  })
+
+  j("#leave_category").change(function(){
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    var leave_category = j("#leave_category").val();
+    j("#loader2").show();
+    new Ajax.Request('/employee_attendance/report',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id||"All Departments",
+        leave_criteria: leave_criteria,
+        leave_category: leave_category
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader2").hide();
+      }
+    });
+  })
+  
+  j("#department_id").change(function(){
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    var leave_category = j("#leave_category").val();
+    j("#loader1").show();
+    new Ajax.Request('/employee_attendance/report',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id||"All Departments",
+        leave_criteria: leave_criteria,
+        leave_category: leave_category
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader1").hide();
+      }
+    });
+  })
+
+  j("#leave_criteria").change(function(){
+    var start_date = j("#start_date").val();
+    var end_date = j("#end_date").val();
+    var dpt_id= j("#department_id").val();
+    var leave_criteria = j("#leave_criteria").val();
+    var leave_category = j("#leave_category").val();
+    j("#loader").show();
+    new Ajax.Request('/employee_attendance/report',{
+      parameters: {
+        start_date: start_date,
+        end_date: end_date,
+        department_id: dpt_id||"All Departments",
+        leave_criteria: leave_criteria,
+        leave_category: leave_category
+      },
+      asynchronous:true,
+      evalScripts:true,
+      method:'post',
+      onComplete:function(resp){
+        j("#loader").hide();
+      }
+    });
+  })
+  
+  j("#change_date").click(function(){
+    j("#filters").show();
+    j("#date_range").hide();
+    j("#date_range_hr1").hide();
+    j("#date_range_hr2").hide();
+  })
+
+  j("#reset").click(function(){
+    location.reload();
+  })
+
+  function validate_dates(){
+    valid = true;
+    if (j("#start_date").val() == "") valid = false;
+    if (j("#end_date").val() == "") valid = false;
+    if (j("#end_date").val() < j("#start_date").val() ) valid = false;
+    return valid
+  }
+
+  function formattedDate(date) {
+    var d = new Date(date || Date.now()),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+    if (month.length < 2) {month = '0' + month};
+    if (day.length < 2) {day = '0' + day};
+    date_format = <%= @format %>;
+
+    if(date_format == 1){
+      return [day, month, year].join('<%= @seperator.to_s %>');
+    }
+
+    if(date_format == 2){
+      return [month, day, year].join('<%= @seperator.to_s %>');
+    }
+
+    if(date_format == 3){
+      return [year, month, day].join('<%= @seperator.to_s %>');
+    }
+
+  }
+</script>

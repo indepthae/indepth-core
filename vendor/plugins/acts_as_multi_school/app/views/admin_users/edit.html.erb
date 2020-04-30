@@ -1,0 +1,45 @@
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head">Edit <%= @admin_user.full_name %></h1>
+</fieldset>
+<div class="content-div  bg-light grey-border shadow">
+  <% form_for @admin_user,:html=>{:class=>'form'} do |f| %>
+    <fieldset>
+      <%= error_string_for(f) %>
+      <%= f.error_message_on :base %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.label :username %>
+      <% if @admin_user.higher_user_id == admin_user_session.id %>
+      <%= f.text_field :username %>
+      <% else %>
+      <%= f.text_field :username, :readonly=>true, :disabled=>true %>
+      <% end %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.label :email %>
+      <%= f.text_field :email %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.label :contact_no %>
+      <%= f.text_field :contact_no %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.label :full_name %>
+      <%= f.text_field :full_name %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.label :description %>
+      <%= f.text_area :description, :rows=>5 %>
+    </fieldset>
+
+    <fieldset>
+      <%= f.submit 'Save', :class  => 'button-red float-right-with-margin',:disable_with => "Please wait..." %>
+    </fieldset>
+
+  <% end %>
+</div>

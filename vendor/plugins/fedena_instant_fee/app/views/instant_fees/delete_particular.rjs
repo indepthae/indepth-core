@@ -1,0 +1,2 @@
+page.replace_html 'flash_box', :text => "<p class='flash-msg'>#{t('instant_fee_particular_deleted_successfully')}</p>"
+page.replace_html 'information',:partial=>"list_category_particulars",:locals=>{:instant_fee_particulars=>@instant_fee_particulars}

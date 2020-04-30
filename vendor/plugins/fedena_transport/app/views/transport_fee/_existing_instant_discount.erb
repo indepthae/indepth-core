@@ -1,0 +1,20 @@
+<% if @transport_fee_discounts.present? %>
+  <tr class="tr-head">
+      <td><%= "#{t('discount')}" %></td>
+      <td></td>
+  </tr>
+  <% @transport_fee_discounts.each do |tfd| %>
+    <% tfd.is_amount ?  discount_amt = tfd.discount : discount_amt = (total_fees*(tfd.discount/100)) %>
+    <tr class="tr-<%= cycle("odd", "even") %>" cellpadding="1" cellspacing="1">
+        <td class="col-2"><%= "#{tfd.name}" %><%= tfd.is_amount ? "" : " - #{tfd.discount}%" %></td>
+        <td class="col-6">
+            <%= precision_label discount_amt %>
+        </td>
+        <% unless @receiver_profile.present? %>
+          <% unless transport_fee.is_paid %>
+            <td id="delete-instant-discount" style="width:1%;cursor: pointer;background: #c3d9ff"><%= link_to_remote "x", :url => {:action => 'delete_instant_discount', :transport_fee => transport_fee.id, :transport_fee_discount => tfd.id} %></td>
+          <% end %>
+        <% end %>
+    </tr>
+  <% end %>
+<% end %>

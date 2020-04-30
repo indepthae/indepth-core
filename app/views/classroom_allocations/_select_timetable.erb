@@ -1,0 +1,14 @@
+<div id="timetable-list">
+<div class="label-field-pair" id="course_batches">
+  <label for="student_batch"><%= t('timetable_text') + " :" %></label>
+  <div class="text-input-bg">
+    <%= select :timetable_entry, :timetable_id, @timetables.map {|c| ["#{format_date(c.start_date,:format=>:long)}  -  #{format_date(c.end_date,:format=>:long)}", c.id]},
+            {:selected=>@current_timetable.present? ? @current_timetable.id : nil}%>
+        </div>
+</div>
+<div id="sub-button">
+<%= submit_tag "", :value => "► #{t('view')}", :class => "submit_button" , :id => 'submit_button', :onclick => "j('#flash').show();getjson([j('#timetable_entry_timetable_id').val()],'weekly');" %>
+</div>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader2", :style =>"display: none;" ) %>
+
+</div>

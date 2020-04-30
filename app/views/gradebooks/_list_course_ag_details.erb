@@ -1,0 +1,9 @@
+<div class="ag_details_box">
+    <% if @assessment_groups.present? %>
+      <div class="assessment_group_listing">
+          <%= render :partial => 'assessment_group_listing', :locals=>{:assessment_groups=>@assessment_groups} %>
+      </div>
+    <%else%>
+      <div class="empty-flash"><%= t('no_assessment_groups_created')  %> </div>
+    <%end%>
+</div>

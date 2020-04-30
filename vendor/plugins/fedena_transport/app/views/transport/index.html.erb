@@ -1,0 +1,285 @@
+<%= javascript_include_tag 'jquery.multiple.select' %>
+<%= stylesheet_link_tag 'multiple-select' %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('assign_transport') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('transport_passenger_imports.import_passengers')}", transport_passenger_imports_path %></li>
+        </ul>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id ="description"><%= t('transport_description') %></div>
+    <div class="label-radio-pair">
+        <label class="status" for="status"><%= t('passenger') %></label>
+        <div id="radio-buttons">
+            <%= radio_button_tag  "passenger", "student", true, {:onchange => 'show_passengers()'} %>
+            <label for="passenger_student"><%= t('student_text') %></label>
+
+            <%= radio_button_tag  "passenger", 'employee',false, {:onchange => 'show_passengers()'} %>
+            <label for="passenger_employee"><%= t('employee_text') %></label>
+
+            <%= image_tag("loader.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "loader1",
+              :style =>"display: none;" ) %>
+        </div>
+    </div>
+    <div id="search_options">
+        <%= render :partial => 'select_course' %>
+    </div>
+    <div id="list_passengers">
+    </div>
+</div>
+<script type="text/javascript">
+  var pickup_fare = 0, drop_fare = 0;
+  var pickup_stop_fares, drop_stop_fares;
+  common_route = <%= (@config[:different_routes].nil? ? false : (@config[:different_routes].to_i == 0)) %>;
+  stop_based_fee = <%= (@config[:transport_fee_collection_type].nil? ? true : (@config[:transport_fee_collection_type].to_i == 1)) %>;
+  single_route_fee = parseFloat(<%= (@config[:single_route_fee_percentage].nil? ? 50 : @config[:single_route_fee_percentage].to_i) %>);
+  function show_passengers()
+  {
+      var passenger = j("[name=passenger]:checked").val();
+      j.ajax({
+          method: 'get',
+          url: "/transport/",
+          data: {passenger: passenger},
+          beforeSend: function () {
+              j("#loader1").show();
+          },
+          success: function (data) {
+              j("#loader1").hide();
+          }
+      });
+  }
+
+  function fetch_mode(elm) {
+      parent = j(elm).closest('#vehicle_transport_form');
+      parent.find('.pick_up, .drop').show();
+      parent.find('.pick_up select, .drop select').attr('disabled', false);
+      parent.find('.pick_up select, .drop select').val('');
+      if (elm.value == "2")
+      {
+          parent.find('.drop').hide();
+          parent.find('.drop select').attr('disabled', true);
+      } else if (elm.value == "3")
+      {
+          parent.find('.pick_up:not(.common)').hide();
+          parent.find('.pick_up:not(.common) select').attr('disabled', true);
+
+      }
+      mode_based_fare(elm)
+  }
+
+  function mode_based_fare(elm) {
+      fare = j(elm).closest('tr').find("#transport_bus_fare");
+      val = elm.value;
+      if (common_route && !stop_based_fee) {
+          if (val == "1")
+              fare.val(pickup_fare);
+          else {
+              total = parseFloat((single_route_fee / 100) * pickup_fare);
+              fare.val(total);
+          }
+      } else {
+          if (val == "2")
+              fare.val(pickup_fare);
+          else if (val == "3")
+              fare.val(drop_fare);
+          else if (val == "1")
+              fare.val(pickup_fare + drop_fare);
+      }
+  }
+
+  function fetch_stops(elm, type) {
+      route_type = j(elm).attr('route_type');
+      passngr_id = j(elm).attr('passenger_id');
+      passngr_type = j(elm).attr('passenger_type');
+      error_icon = j(elm).closest('.label-field-pair').find('label').find('.error-icon');
+      new Ajax.Request('/transport/show_stops', {
+          parameters: {'route_id': elm.value, 'route_type': route_type, 'common_route': common_route,
+              'passenger_id': passngr_id, 'passenger_type': passngr_type},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function () {
+              j(elm).next('#loader').show();
+              error_icon.hide();
+          },
+          onComplete: function (resp) {
+              tr = j(elm).closest('tr');
+              if (common_route)
+                  all_types = ['transport_pickup_stop_id', 'transport_drop_stop_id'];
+              else
+                  all_types = [type];
+              j.each(all_types, function (i, t) {
+                  select = j(tr).find('#' + t);
+                  select.children('option:not(:first)').remove();
+                  j.each(resp.responseJSON.stops, function (key, value) {
+                      select.append(j("<option></option>")
+                              .attr("value", key)
+                              .text(value));
+                  });
+                  j(elm).next('#loader').hide();
+                  if (stop_based_fee) {
+                      if (t == "transport_pickup_stop_id") {
+                          pickup_stop_fares = resp.responseJSON.stop_fares;
+                          j('#transport_pickup_stop_id').trigger('change');
+                      } else {
+                          drop_stop_fares = resp.responseJSON.stop_fares;
+                          j('#transport_drop_stop_id').trigger('change');
+                      }
+                  } else {
+                      if (t == "transport_pickup_stop_id") {
+                          pickup_fare = parseFloat(resp.responseJSON.route_fare);
+                      } else {
+                          drop_fare = parseFloat(resp.responseJSON.route_fare);
+                      }
+                  }
+              });
+              calculate_route_fare(tr);
+              if (resp.responseJSON.status.length > 0) {
+                  error_icon.attr('tooltip', resp.responseJSON.status);
+                  error_icon.show();
+              }
+              j('#transport_drop_stop_id').trigger('change');
+          }
+      });
+  }
+
+  function calculate_route_fare(row) {
+      mode = j(row).find('#transport_mode').val();
+      total = 0;
+      if (!stop_based_fee) {
+          if (common_route) {
+              if (mode == "1")
+                  total = pickup_fare;
+              else
+                  total = parseFloat((single_route_fee / 100) * pickup_fare);
+              j(row).find("#transport_bus_fare").val(total);
+          } else {
+              calculate_fare(row);
+          }
+      }
+  }
+
+  function set_stop_fare(elm, type) {
+      if (stop_based_fee) {
+          row = j(elm).closest('tr');
+          val = parseInt(j(elm).val());
+          if (type == 'pick_up')
+              pickup_fare = pickup_stop_fares[val];
+          else if (type == 'drop')
+              drop_fare = drop_stop_fares[val];
+          calculate_fare(row)
+      }
+  }
+
+  function calculate_fare(row) {
+      mode = j(row).find('#transport_mode').val();
+      if (mode == "1") {
+          if ((pickup_fare != null) && (drop_fare != null))
+              total = pickup_fare + drop_fare;
+          else if (drop_fare == null)
+              total = pickup_fare;
+          else if (pickup_fare == null)
+              total = drop_fare;
+      } else if (mode == "2")
+          total = pickup_fare;
+      else if (mode == "3")
+          total = drop_fare;
+      j(row).find("#transport_bus_fare").val(total);
+  }
+
+  function passenger_form(elm) {
+      passngr_id = j(elm).attr('passenger_id');
+      passngr_type = j(elm).attr('passenger_type');
+      j(elm).find('td:not(.action)').unbind('click');
+      j(elm).find('td:not(.action)').bind('click', false);
+      j('td.action a:not(:visible)').show();
+      j(elm).find('td.action a').hide()
+      j('#vehicle_transport_form').closest('tr').remove();
+      j('.selected').removeClass('selected');
+      new Ajax.Request('/transport/assign_passenger', {
+          parameters: {'passenger_id': passngr_id, 'passenger_type': passngr_type, 'common_route': common_route},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+          onLoading: function () {
+              j('#table-loader').show();
+          },
+          onComplete: function (resp) {
+              j(elm).after(resp.responseText);
+              j(elm).addClass('selected');
+              j(elm).find('td:not(.action)').click(function () {
+                  enable_clicks();
+              });
+              pickup_stop_id = j('#transport_pickup_stop_id').val();
+              if (pickup_stop_fares[pickup_stop_id])
+                  pickup_fare = pickup_stop_fares[pickup_stop_id];
+              else
+                  pickup_fare = 0;
+              drop_stop_id = j('#transport_drop_stop_id').val();
+              if (drop_stop_fares[drop_stop_id])
+                  drop_fare = drop_stop_fares[drop_stop_id];
+              else
+                  pickup_fare = 0;
+              j('#table-loader').hide();
+          }
+      });
+  }
+
+  function complete_action() {
+      disable_clicks();
+      j('#vehicle_transport_form').closest('tr').remove();
+      j('#passenger_details tr:not(.header) td:not(.action)').click(function () {
+          elm = j(this).closest('tr');
+          passenger_form(elm);
+      });
+      j('.selected').removeClass('selected');
+      j('td.action a:not(:visible)').show();
+  }
+
+  function unassign_passenger() {
+      j('.remove_link').click(function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          passenger_id = j(this).attr('passenger_id')
+          remove_passenger(passenger_id);
+          complete_action();
+          disable_clicks();
+      });
+  }
+
+  function remove_passenger(passenger_id) {
+      new Ajax.Request('/transport/unassign_passenger', {
+          parameters: {'id': passenger_id},
+          asynchronous: true,
+          evalScripts: true,
+          method: 'get',
+      });
+
+  }
+
+  function disable_clicks() {
+      j('.remove_link').unbind('click');
+      j('.remove_link').bind('click', false);
+      j('#passenger_details tr:not(.header) td:not(.action)').unbind('click');
+      j('#passenger_details tr:not(.header) td:not(.action)').bind('click', false);
+  }
+
+  function enable_clicks() {
+      complete_action();
+      unassign_passenger();
+  }
+
+</script>

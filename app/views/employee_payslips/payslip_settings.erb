@@ -1,0 +1,112 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('payslip_settings') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="page_header_box">
+        <div class="page_header"><%= t('payslip_settings') %></div>
+        <div class="description" ><%= t('payslip_settings_desc') %>.</div>
+    </div>
+    <% form_for 'payslip_setting', :url => {:action => "update_payslip_settings"} do |f|  %>
+      <% @settings.each_with_index do |day,index| %>
+        <% ids = day.fields %>
+        <% if day.section != "bank_details" && day.section != "additional_details"%>
+          <div class="section" id="<%= day.section.to_s %>">
+
+              <div class="sub_header"><%= t(day.section).titleize %></div>
+              <% eval("PayslipSetting::#{day.section.camelize.titleize.split(" ").join("_").upcase}").sort.each do |field_id, val|  %>
+                <div class="label-field-pair">
+                    <div class="text-input-bg">
+                        <% field_name = eval("PayslipSetting::#{day.section.camelize.titleize.split(" ").join("_").upcase}[#{field_id}]")  %>
+                        <%= hidden_field_tag "payslip_setting[#{day.section}][#{field_id}]", 0 , :id => "payslip_setting_#{day.section}"%>
+                        <%= check_box_tag "payslip_setting[#{day.section}][#{field_id}]",1, (ids.include?(field_id)) %>
+                        <label for=<%= "payslip_setting_#{day.section}_#{field_id}" %> ><%= "#{t(field_name)}" %></label>
+                    </div>
+                </div>
+              <% end %>
+          </div>
+        <% else %>
+          <% details = eval("@#{day.section}") %>
+          <% if details.present? %>
+            <div class="section" id="<%= day.section.to_s %>">
+                <div class="sub_header"><%= t(day.section).titleize %></div>
+                <% details.each do |detail| %>
+                  <div class="label-field-pair">
+                      <div class="text-input-bg">
+                          <%= hidden_field_tag "payslip_setting[#{day.section}][#{detail.id}]" , 0, :id => "payslip_setting_#{day.section}" %>
+                          <%= check_box_tag "payslip_setting[#{day.section}][#{detail.id}]" , 1, (ids.include?(detail.id))%>
+                          <label for=<%= "payslip_setting_#{day.section}_#{detail.id}" %>><%= detail.name %></label>
+                      </div>
+                  </div>
+                <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="section" id="footnote">
+
+        <div class="sub_header"><%= t(:footnote) %></div>
+            <div class="label-field-pair footnote_block">
+              <div class="footnote_option">
+                <%= radio_button  :payslip_setting, :footnote,"0",:checked=>@payslip_footnote.fields.nil? %>
+                <label for="payslip_setting_footnote_0"><%= "#{t(:disable_footnote)}" %></label>
+              </div>
+              <div class="footnote_option">
+                <%= radio_button  :payslip_setting, :footnote,"1",:checked=>@payslip_footnote.fields.present? %>
+                <label for="payslip_setting_footnote_1"><%= "#{t(:enable_footnote)}" %></label>
+              </div>
+            </div>
+
+            <div class="label-field-pair" id="footnote_text" style="display:<%= @payslip_footnote.fields.nil? ? 'none' : 'block' %>;">
+              <label for="payslip_setting_footnote_text"><%= "#{t(:add_footnote)}" %></label>
+              <div class="text-input-bg">
+                <%= text_field :payslip_setting, :footnote_text, :value=>(@payslip_footnote.fields.present? ? @payslip_footnote.fields.first : t(:default_footnote)), :disabled=>@payslip_footnote.fields.nil? %>
+                <% if @errors and @errors['footnote'].present? %>
+                    <div class="warning"><div class="error-icon"></div><%= @errors['footnote'] %></div>
+                <% end %>
+              </div>
+            </div>
+
+        </div>
+
+      <%= submit_tag "#{t('save_changes')}",:disable_with => "#{t('please_wait')}", :class => "submit-button" %>
+      <%= link_to "#{t('view_sample_payslip')}" , {:action => "view_sample_payslip"}, :class => "submit-button", :id => "view_sample", :target => "_blank"%>
+    <% end %>
+
+</div>
+
+
+
+
+<script type ="text/javascript">
+  j("input#payslip_setting_employee_details_0").click(function () {
+    return false;
+  });
+  j("input#payslip_setting_employee_details_1").click(function () {
+    return false;
+  });
+
+  j('.footnote_option input').change(function(){
+
+      if(j('.footnote_option input:checked').val() == "0"){
+          j("#footnote_text").hide();
+          j("#footnote_text input").prop('disabled', true);
+      } else{
+          j("#footnote_text").show();
+          j("#footnote_text input").prop('disabled', false);
+      }
+
+  });
+
+</script>

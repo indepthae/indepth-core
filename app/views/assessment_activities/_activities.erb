@@ -1,0 +1,16 @@
+<table>
+    <tr class="tr-head">
+        <td class="col-3"><%= t('activities') %></td>
+        <td class="col-4"><%= t('description') %></td>
+    </tr>
+    <% activities.each do |activity| %>
+      <tr>
+          <td class="col-3"><%= activity.name %></td>
+          <td class="col-4"><%= activity.description %></td>
+      </tr>
+    <% end %>
+</table>
+<% if @activities.present? %>
+  <%= pagination_status(@activities) %>
+<% end %>
+<%= will_paginate @activities, :renderer => 'RemoteLinkRenderer',:params=>{:controller => "assessment_activities",:action => "load_activities"}%>

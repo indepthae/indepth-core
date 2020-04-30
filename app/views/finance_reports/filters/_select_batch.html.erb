@@ -1,0 +1,16 @@
+<div class="label-field-pair">
+    <label for="batch"><%= t('batch') %></label>
+    <div class="text-input-bg">
+        <%= select_tag "search[batch_id]", options_from_collection_for_select(@batches, "id", "name"),
+                       :multiple => true, :id => 'batch_filter' %>
+        <%= error_message_box(t('cant_be_blank')) %>
+    </div>
+</div>
+<script type="text/javascript">
+  j('#batch_filter').multipleSelect({
+      placeholder: '<%= t('select_batch') %>',
+      countSelected: '<%= t('batch_text') %>',
+      noMatchesFound: '<%= t('no_batches_present') %>'
+  });
+  j('#batch_filter').multipleSelect('checkAll');
+</script>

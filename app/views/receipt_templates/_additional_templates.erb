@@ -1,0 +1,22 @@
+<div class="additional_receipt_templates">
+    <div class="heading">
+        <%= "+ #{t('additional_header_templates')}" %>
+    </div>
+    <div class="description">
+        <%= t('additional_header_templates_desc') %>
+    </div>
+    <div class="text-input-bg">
+        <%= select_tag 'additional_templates', options_for_select( [["#{t('select_template')}", '']] + 
+            @additional_templates.map {|k,v| [v,k]}) %>
+    </div>
+
+    <div id="header_content-1" class="header_contents a5p_width">
+<%# TODO :: load redactor with default receipt header %>      
+        <%= f.redactor :header_content_a5_portrait, {:plugin=>[:fontfamily, :fontsize], :exclude => [:video, :file, :link]} %>
+    </div>
+
+    <div id="header_content-3" class="header_contents thermal_width">
+<%# TODO :: load redactor with default receipt header %>      
+        <%= f.redactor :header_content_thermal_responsive, {:exclude => [:video, :file, :fontcolor, :image, :link]} %>
+    </div>
+</div>

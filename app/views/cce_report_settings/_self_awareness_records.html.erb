@@ -1,0 +1,39 @@
+<div class="hor_line_1"></div>
+<%if @self_awareness_rg.present? and @self_awareness_rg.records.present?%>
+  <div class="label-field-pair no_bottom_margin">
+    <label for="configuration_currency_type" class="style_1">Map Records</label>
+  </div>
+  <div class="messages modal_spec_style fleft">Map each student record detail to the fields in the “Self Awareness” section.</div>
+  <div class="all_sub_sec">
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">My Goals</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :my_goals, options_for_select(@self_awareness_rg.records.map{|b| [b.name,b.id]},@setting[:my_goals].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">My Strengths</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :my_strengths, options_for_select(@self_awareness_rg.records.map{|b| [b.name,b.id]},@setting[:my_strengths].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">My Interests and Hobbies</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :interest_hobbies, options_for_select(@self_awareness_rg.records.map{|b| [b.name,b.id]},@setting[:interest_hobbies].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+    <div class="label-field-pair">
+      <label for="configuration_currency_type">Responsibilities Discharged/Exceptional Achievements</label>
+      <div class="text-input-bg">
+        <%= select :cce_report_setting, :responsibility, options_for_select(@self_awareness_rg.records.map{|b| [b.name,b.id]},@setting[:responsibility].to_i),{:include_blank=>t('select_an_option')} %>
+      </div>
+    </div>
+  </div>
+<%elsif @self_awareness_rg.present? and !@self_awareness_rg.records.present?%>
+  <div class="label-field-pair no_bottom_margin">
+    <label for="configuration_currency_type" class="style_1">Map Records</label>
+  </div>
+  <div class="messages modal_spec_style fleft  no_bottom_margin">Map each student record detail to the fields in the “Self Awareness” section.</div>
+  <div class="messages modal_spec_style no_bottom_margin fleft">No records added to this record group yet.</div>
+<%end%>

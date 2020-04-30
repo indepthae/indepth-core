@@ -1,0 +1,192 @@
+<script type="text/javascript">
+  function show_members_if_exists(){
+    if($('members').value != ''){
+      members = $('members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+    }
+  }
+  function add_member(member) {
+    var member_list = new Array();
+    if($('members').value != '')
+      member_list = $('members').value.split(',');
+    else
+      member_list = [];
+
+    var member_exists = false;
+
+    for(i=0; i<member_list.length; i++)
+      if(member_list[i] == member)
+        member_exists = true;
+
+    if(!member_exists) {
+      member_list.push(member);
+    }
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+  }
+
+  function add_all_member(member) {
+    var member_list = new Array();
+    if($('members').value != '')
+      member_list = $('members').value.split(',');
+    else
+      member_list = [];
+
+    var new_list = member.split(',');
+
+    for(i=0;i<new_list.length;i++)
+    {
+      var member_exists = false;
+      for(k=0; k<member_list.length; k++)
+        if(member_list[k] == new_list[i])
+          member_exists = true;
+      if(!member_exists) member_list.push(new_list[i]);
+    }
+
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+  }
+
+
+  function remove_member(member) {
+    members = $('members').value;
+    var member_list = new Array();
+    member_list = $('members').value.split(',');
+
+    for(i=0; i<member_list.length; i++)
+      if (member_list[i] == member)
+    {
+      member_list.splice(i,1);
+      break;
+    }
+
+    $('members').value = member_list.join();
+    members = $('members').value;
+<%= remote_function(:url => {:action => 'update_member_list'}, :with => "'members='+members" ) %>
+
+  }
+
+</script>
+
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('doc_manager_text')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('edit_privileged_document')}"%></div>
+  <%= javascript_include_tag "document"%>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'> <%= link_to "#{t('doc_manager_text')}", doc_managers_path %>  </li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <%form_for(@document, :url => edit_privileged_document_path, :html => {:multipart => true}) do |f| %>
+    <%= error_messages_for 'document', :header_message => nil %>
+    <%= hidden_field_tag :page,params[:page].present? ? params[:page] : '' %>
+    <%= hidden_field_tag :members,@members.present? ? @members : '' %>
+    <%= hidden_field_tag :query,@query.present? ? @query : '' %>
+    <%= hidden_field_tag :action_text,@action.present? ? @action : '' %>
+
+    <% if @document.folder_id.present? %>
+
+      <div id="create_document_form">
+        <div class="fields-wrap">
+          <div class="span-sub-heading">
+
+            <div class="label-checkbox-pair">
+              <label class="status" ><%= t('visibility') %></label>
+              <div id="radio-buttons">
+                <div class="radio_area">
+                  <%= radio_button_tag 'public', 'true', @document.check_public_true("public"), :onchange => "show_hide_depts_courses(this.value);" %>
+                  <label class="label_for_status" ><%= t('public') %></label>
+                </div>
+                <div class="radio_area">
+                  <%= radio_button_tag 'public', 'false',@document.check_public_true("private"), :onchange => "show_hide_depts_courses(this.value);" %>
+                  <label class="label_for_status" ><%= t('private') %></label>
+                </div>
+              </div>
+            </div>
+
+            <div id="depts_courses" style="display:none;" >
+              <div class="fields-wrap1">
+                <div class="themed_text themed_text_doc"><%= t('select_users') %>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader",
+                    :style =>"display: none;" ) %></div>
+
+                <div id="select-employee-department">
+                  <%= render "select_employee_department" %>
+                </div>
+                <div class="label-field-to">
+                  <div id="to_users">         </div>
+                </div>
+
+                <div class="extender"></div>
+                <div id="select-student-course">
+                  <%=  render "select_student_course" %>
+                </div>
+
+                <div class="label-field-to">
+                  <div id="to_users2">         </div>
+                </div>
+
+                <div class="extender"></div>
+              </div>
+              <div id="fields-wrap2">
+                <div id="member-list">
+
+                  <script type="text/javascript"> show_members_if_exists();</script>
+                </div>
+              </div>
+            </div>
+            <% if @document.check_public_true("private") %>
+              <script type="text/javascript">
+                $("depts_courses").show();
+              </script>
+            <% end %>
+          </div>
+        </div>
+        <div class="fields-wrap">
+          <div class="span-sub-heading">
+            <div class="themed_text themed_text_doc"><%= t('add_documents') %> &#x200E;(<%= t('maxi_size') %>)&#x200E;</div>
+          </div>
+        </div>
+        <div class="fields-wrap">
+          <div id="add">
+            <%= render "document_fields", :f=>f %>
+          </div>
+        </div>
+        <div class="fields-wrap">
+          <%= submit_tag "", :value => "#{t('update')}", :class => "submit_button" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<script type="text/javascript">
+  function show_hide_depts_courses(value){
+    if (value == 'false'){
+      $("depts_courses").show();
+      $("fields-wrap2").show();
+    }
+    else{
+      $("depts_courses").hide();
+      $("fields-wrap2").hide();
+    }
+  }
+</script>

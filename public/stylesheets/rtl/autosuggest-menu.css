@@ -1,0 +1,75 @@
+/* Autocomplete
+   ----------------------------------*/
+.ui-autocomplete { position: absolute; cursor: default; }
+.ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') left center no-repeat; }
+
+/* workarounds */
+* html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
+/*Menu Container*/
+#menu-container {
+  width: 287px;
+}
+/* Menu
+   ----------------------------------*/
+#menu-container > .ui-menu {
+    list-style:none;
+    padding: 2px;
+    margin: 0;
+    border: 1px solid #e7e7e7;
+    border-top: none;
+    display:block;
+}
+#menu-container > .ui-menu .ui-menu {
+    margin-top: -3px;
+}
+
+#menu-container >  .ui-front {
+/*    position:fixed !important;*/
+    z-index:100;
+}
+#menu-container >  .ui-menu {
+    margin:2px 0px 2px 0px;
+    padding: 0px;
+    font-size: 13px;
+    background-color: #fefdf9;
+    border-radius: 0px;
+}
+#menu-container >  .ui-menu .ui-menu-item a {
+    text-decoration:none;
+    display:block;
+    padding:.2em .8em;
+    line-height:1.3;
+    zoom:1;
+    width:265px;
+    border-width: 0px ;
+    border-right-width: 2px !important;
+    border-style: solid;
+}
+#menu-container > .ui-menu .ui-menu-item{
+    padding:0px;
+    margin: 1px 0px 1px 0px;
+}
+#menu-container  .ui-menu .ui-menu-item a.ui-state-hover,  #menu-container .ui-menu .ui-menu-item a.ui-state-focus, #menu-container .ui-menu .ui-menu-item a.ui-state-active {
+    background-color: #f8f1d1;
+    color: #bb0000 ;
+    border-right-width: 2px;
+    margin: 0px;
+}
+#menu-container  .ui-menu .ui-menu-item .ui-corner-all {
+  border-color: #FEFDF9;
+  border-radius: 0px;
+}
+#autosuggest_menu_input{
+    background: url("../../images/search.png") no-repeat scroll 265px 50% #FFFFFF;
+    border: 1px solid #C6C6C6;
+    border-radius: 1px 1px 1px 1px;
+    float: right;
+    font-size: 13px;
+    padding: 2px 7px 2px 20px;
+}
+#menu-container  .ui-menu  li.ui-menu-item a.action{
+  border-right-color: #bb0000;
+}
+.ui-helper-hidden-accessible{
+    display:none;
+}

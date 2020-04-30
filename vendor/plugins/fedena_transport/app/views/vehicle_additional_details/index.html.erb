@@ -1,0 +1,58 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('vehicle_settings') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('vehicle_additional_details_text') %></div>
+    <% if permitted_to? :new , :vehicle_additional_details %>
+      <div id="inner-tab-menu">
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('add_details')}", :url => {:controller => "vehicle_additional_details", :action => "new"} %></li>
+          </ul>
+      </div>
+    <% end %>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id ="description"><%= t('vehicle_additional_details_description') %></div>
+    <div id ="addl_details_list">
+        <%= render :partial => 'additional_fields' %>
+    </div>
+</div>
+
+<script type="text/javascript">
+  function add_fields(link, association, content) {
+      var new_id = new Date().getTime();
+      var regexp = new RegExp("new_" + association, "g");
+      $(link).up().insert({
+          before: content.replace(regexp, new_id)
+      });
+      if ($$('.input-type-select') != "") {
+          $$('.input-type-select').invoke('observe', 'change', toggle_custom);
+      }
+  }
+
+
+  function remove_fields(link) {
+      //    console.log($(link).previous("input[type=hidden]"));
+      $(link).previous("input[type=hidden]").value = '1';
+      $(link).up(".fields").hide();
+  }
+
+  function toggle_custom(val) {
+      //j(this).parent().siblings('.wrapper').hide();
+      dest = j(this).closest('#addl_detail_form').children('.custom');
+      //if(dest != null)
+      if (this.value == 'text') {
+          dest.hide();
+      } else {
+          dest.show();
+      }
+      return true;
+  }
+</script>

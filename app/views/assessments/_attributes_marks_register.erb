@@ -1,0 +1,330 @@
+
+<div class="form_container">
+    <% form_for @assessment, :url => attribute_scores_assessments_path(:batch_id=>@batch.id, :assessment_id =>@assessment.id,:assessment_group_id=>@assessment_group.id) do |af| %>
+      <% roll_num_enabled = Configuration.enabled_roll_number? %>
+      <table cellspacing="0" cellpadding="0" border="0" id="enclosure" >
+          <tr>
+              <td id="firstTd"></td>
+              <td rowspan="2">
+                  <div id="divHeader" style="">
+                      <table cellspacing="0" cellpadding="0" border="1" id="main_header_table">
+                          <tr id="main_heading"> 
+                              <td><div class="tableHeader th_0"</td>
+                              <% ind = 0 %>
+                              <% @assessment.attribute_assessments.each_with_index do |as,i| %>
+                                <td colspan=<%=@grades.present? ? "2" : "1" %>>
+                                    <% name = as.assessment_attribute.try(:name)  %>
+                                    <div class="tableHeader th_<%=i+1%>" title="<%=name%>"><%= truncate(name,:length => 15) %></div>
+                                    <% ind = i %>
+                                </td>
+                              <% end %>
+                              <td><div class="tableHeader th_<%=ind+1%>"></div></td>
+                          </tr>
+                          <tr id="sub_header">
+                              <td><div class="tableSubHeader tsh_1"><%= t('absent') %></div></td>
+                              <% i = 1 %>
+                              <% @assessment.attribute_assessments.each do |as| %>
+                                <% i = i + 1 %>
+                                <% claz = "tableSubHeader tsh_#{i}" %>
+                                <% if @grades.present? %>
+                                  <td><div class="<%=claz%>"><%= "#{as.assessment_attribute.maximum_marks}"  %></div></td>
+                                  <td><div class="<%=claz%>">Grade</div></td>
+                                <% else %>
+                                  <td><div class="<%=claz%>"><%= "#{as.assessment_attribute.maximum_marks}" %></div></td>
+                                <% end %>
+                              <% end %>
+                              <td><div class="tableSubHeader tsh_<%=i+1%>"><%= t('final_score') %></div></td>
+                          </tr>
+                      </table>
+                  </div>
+              </td>
+          </tr>
+          <tr>
+              <td id="sl_no"><%= t('no_text') %></td>
+              <td id="firstSubTd"><%= t('single_student') %></td>
+              <% if roll_num_enabled %>
+                <td id="roll_number"><%= t('roll_nos')%>  </td>
+              <% else %>
+                <td id="adn_number"><%=t('admission_no') %> </td>
+              <% end %>
+          </tr>
+          <tr>
+              <td valign="top">
+                  <div id="firstcol">
+                      <table width="350px" cellspacing="0" cellpadding="0" border="1" id="student_list_table" >
+                            <% j=0 %>
+                            <%@students.each do |student|%>
+                            <% j=j+1 %>
+                            <tr class="<%=cycle('odd', 'even')%>">
+                                <td class="tableFirstCol"><div class="sl_no"><%=j%> </<div></td>
+                                <td class="tableFirstCol" id="st_<%=student.s_id%>"><div class="student_names" title="<%= student.full_name %> "><%= truncate(student.full_name,:length => 40)  %> </div></td>
+                                <% if roll_num_enabled %>
+                                    <td class="tableFirstCol"><div class="roll_number"> <%=student.roll_number%> </<div></td>
+                                <% else %>              
+                                    <td class="tableFirstCol"><div class="adn_number"> <%=student.admission_no%> </<div></td>           
+                                <% end %>
+                            </tr>
+                          <%end%>
+                      </table>
+                  </div>
+              </td>
+              <%reset_cycle%>
+              <td valign="top">
+                  <div id="table_div" class="scrollbar" onscroll="fnScroll()" >
+                      <table cellspacing="0" cellpadding="0" border="1" id="scores_table">
+                          <%@students.each_with_index do |s,i|%>
+                            <tr class="<%=cycle('odd', 'even')%> st_<%=s.s_id%>" id=<%= i ==0 ? "firstTr" : "" %>>
+                                <td>
+                                    <div class="check_box">
+                                        <%= check_box_tag "is_absent",'true', (@scores['presence'][s.s_id] == false) ,:disabled=>@mark_entry_locked,
+                                          :class=>'mark_absent', :id=>"check_all_absent_#{s.s_id}", :onclick => "check_all_absent(this,#{s.s_id})" %>
+                                    </div>
+                                </td>
+                                <% max_total = [] %>
+                                <% @assessment.attribute_assessments.each_with_index do |as,i| %>
+                                  <% element_name = "subject_attribute_assessment[attribute_assessments_attributes][#{as.id}][assessment_marks_attributes][#{s.s_id}]" %>
+                                  <% max_total << as.assessment_attribute.maximum_marks || 0 %>
+                                  <% if @scores["marks"][as.id][s.s_id].present?  %>
+                                    <%= hidden_field_tag "#{element_name}[id]",  @scores["marks"][as.id][s.s_id].id %>
+                                  <% end %>
+                                  <% grade =  @scores["marks"][as.id][s.s_id].present? ? @scores["marks"][as.id][s.s_id].grade : ''%>
+                                  <% grade_id =  @scores["marks"][as.id][s.s_id].present? ? @scores["marks"][as.id][s.s_id].grade_id : ''%>
+                                  <td>
+                                      <div class="scores">
+                                          <%= text_field_tag "#{element_name}[marks]",
+                                            (@scores["marks"][as.id][s.s_id].present? ? @scores["marks"][as.id][s.s_id].marks : ''),
+                                            :max_marks=> as.assessment_attribute.maximum_marks, :class=>"field_#{s.s_id} precision_text mark_row_#{i}",:disabled=>@mark_entry_locked,
+                                            :formula=>@formula,:assess_id=>as.id  ,:student_id=>s.s_id,
+                                            :onkeyup => "return validate_mark(this)",:onblur=> "return validate_mark(this)",:autocomplete=>"off"%>
+                                      </div>
+                                  </td>
+                                  <% if @grades.present? %>
+                                    <td><div class="scores"><div id="grade_field_<%=as.id%>_<%=s.s_id%>" class="grade_of_<%=s.s_id%> grade_column"><%=grade%></div></div></td>
+                                  <% end %>
+                                  <%= hidden_field_tag "#{element_name}[grade]", grade, :id=>"grade_hidden_field_#{as.id}_#{s.s_id}", :class=>"hidden_grade_of_#{s.s_id}" %>
+                                  <%= hidden_field_tag "#{element_name}[grade_id]", grade_id, :id=>"grade_id_hidden_field_#{as.id}_#{s.s_id}", :class=>"hidden_grade_of_#{s.s_id}" %>
+                                  <%= hidden_field_tag "#{element_name}[student_id]", s.s_id %>
+                                  <%= hidden_field_tag "#{element_name}[assessment_id]", as.id %>
+                                  <%= hidden_field_tag "#{element_name}[is_absent]", false, {:class => "check_absent_#{s.s_id}"} %>
+                                  <%= hidden_field_tag "subject_attribute_assessment[attribute_assessments_attributes][#{as.id}][id]", as.id %>
+                                <% end %>
+                                <td>
+                                    <div class="scores" id="result_<%=s.s_id%>", maximum="<%=max_total.max%>">-</div>
+                                </td>
+                            </tr>
+                          <%end%>
+                      </table>
+                  </div>
+              </td>
+          </tr>
+      </table>
+      <%= submit_tag t('submit_marks'), :class => 'submit-button',:name=> 'save_and_submit_marks'%>
+      <% unless @mark_entry_locked %>       
+        <%= submit_tag t('save_marks') , :class => 'submit-button', :name=> 'save_marks' %>
+      <% end %>      
+      <%#= link_to "#{t('cancel')}", :back, :class => 'submit-button cancel-button' %>
+      <%= link_to "#{t('cancel')}", assessment_path(:id => @assessment_group.id, :course_id => @course.id), :class => 'submit-button cancel-button' %>
+    <% end %>
+</div>
+<div class="overlay">
+    <div id="loading_big"><%= image_tag("filler_ring_loader.gif", :align => "absmiddle", :border => 0, :id => "loader1") %>
+        <span><%= "#{t('loading')}.." %></span>
+    </div>
+</div>
+<script type="text/javascript">
+  grades_present = <%=@grades.present? ? true : false %>
+  group_max = <%= @assessment_group.maximum_marks %>
+  check_all_absent = function (obj, stud_id) {
+      absent = j(obj).prop("checked")
+      j('.field_' + stud_id).each(function () {
+          j(this).prop('disabled', absent);
+      })
+      j('.check_absent_' + stud_id).each(function () {
+          j(this).val(absent);
+          if (j('#check_all_absent_'+stud_id).prop('checked') == true){
+            j('#result_'+stud_id).css('visibility','hidden');
+          }
+          else{
+            j('#result_'+stud_id).css('visibility','visible');
+          }
+      })
+  }
+
+  j('.mark_absent').each(function () {
+      if (j(this).prop("checked")) {
+          el_id = j(this).attr("id").match(/\d+/)
+          if (el_id != null) {
+              check_all_absent(this, el_id[0]);
+          }
+      }
+  });
+
+  var error_entries = new Array();
+  validate_mark = function (text_box) {
+      var max_marks = j(text_box).attr('max_marks');
+      if (parseFloat(text_box.value) > max_marks) {
+          makeError(text_box, 'Marks entered for the attributes should not exceed the maximum mark');
+          curr_id = j(text_box).attr('id');
+          if (j.inArray(curr_id, error_entries) === -1)
+          {
+              error_entries.push(curr_id);
+              //j(text_box).tooltip('open');
+              makeError(text_box, 'Marks entered for the attributes should not exceed the maximum mark');
+              j('.submit-button').attr('disabled', 'disabled');
+              j(text_box).closest('tr').css('background-color', '#fff2f3');
+              j(text_box).closest('tr').find('td.tableFirstCol').css('background-color', '#fff2f3');
+              j(text_box).css('border', '1px solid #9e0f15');
+          }
+          if (navigator.userAgent.indexOf("Firefox") !== -1)
+          {
+              j("input.precision_text").keyup(function (e) {
+                  var code = e.which;
+                  if (code === 9) {
+                      return;
+                  }
+              });
+              setTimeout("j('#" + curr_id + "').focus();", 1);
+          } else {
+              j(text_box).focus();
+          }
+          return false;
+      } else
+      {
+          curr_id = j(text_box).attr('id');
+          if (j.inArray(curr_id, error_entries) !== -1)
+          {
+              if (grades_present){
+                set_grade(text_box);
+              }
+              error_entries.splice(error_entries.indexOf(curr_id), 1);
+              removeError(text_box);
+              j(text_box).removeAttr('style');
+              j(text_box).closest('tr').removeAttr('style');
+              j(text_box).closest('tr').find('td.tableFirstCol').removeAttr('style');
+          }
+          if (error_entries.length === 0)
+          {
+              if (grades_present)
+                  set_grade(text_box);
+              j('.submit-button').removeAttr('disabled');
+          }
+          show_max_sub_marks(text_box);
+          
+
+      }
+  }
+
+  set_grade = function (text_field) {
+      student_id = j(text_field).attr('student_id')
+      assess_id = j(text_field).attr('assess_id')
+      if (j(text_field).val() != '') {
+          attr_max = 100;//parseFloat(j('#result_'+student_id).attr('maximum')) || 0
+          maximum_marks = parseFloat(j(text_field).attr('max_marks')) || 0
+          converted_mark = ((parseFloat(j(text_field).val()) || 0) * attr_max).round(2) / maximum_marks
+          grade = get_grade(converted_mark)
+          j('#grade_field_' + assess_id + '_' + student_id).html(grade[0]) // setting grade
+          j('#grade_hidden_field_' + assess_id + '_' + student_id).val(grade[0])
+          j('#grade_id_hidden_field_' + assess_id + '_' + student_id).val(grade[1])
+      }else{
+          j('#grade_field_' + assess_id + '_' + student_id).html('')
+          j('#grade_hidden_field_' + assess_id + '_' + student_id).val('')
+          j('#grade_id_hidden_field_' + assess_id + '_' + student_id).val('')
+      }
+  }
+
+  makeError = function (elm, msg) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).addClass("error-field");
+      icon = j('<div></div', {'class': 'error-icon'});
+      icon.attr('tooltip', msg);
+      j(elm).parent().append(icon);
+  }
+
+  removeError = function (elm) {
+      j(elm).siblings('.error-icon').remove();
+      j(elm).removeClass("error-field");
+  }
+
+  get_grade = function (mark) {
+      grades = <%= raw @grades.to_json %>
+      var grade;
+      var smallest = 10000;
+      var least_grade;
+      var least_score = 10000;
+
+      j.each(grades, function (i, v) {
+          score = parseFloat(v.score)
+          if (score < least_score) {
+              least_score = score;
+              least_grade = v.grade
+              least_id = v.grade_id
+          }
+          diff = parseFloat(mark) - score
+          if (diff >= 0 && diff < smallest) {
+              smallest = diff
+              grade = v.grade
+              grade_id = v.grade_id
+          }
+      })
+      if (mark < least_score) {
+          grade = least_grade
+          grade_id = least_id
+      }
+      return [grade, grade_id]
+  }
+
+
+  show_max_sub_marks = function (text_field) {
+      student_id = j(text_field).attr('student_id')
+      assess_id = j(text_field).attr('assess_id')
+      attr_max = parseFloat(j('#result_'+student_id).attr('maximum')) || 0
+      values = []
+      marks = []
+      sum_of_max_marks = 0
+      j('.field_' + student_id).each(function () {
+          marks.push(parseFloat(j(this).val()) || 0)
+          maximum_marks = parseFloat(j(this).attr('max_marks')) || 0
+          sum_of_max_marks += maximum_marks
+          temp = ((parseFloat(j(this).val()) || 0) * attr_max) / maximum_marks
+          values.push(temp);
+      })
+      var final_val = 0.0;
+      var formula = j(text_field).attr('formula')
+      if (formula == 'sum') {
+          for (var i = 0; i < marks.length; i++) {
+              temp = marks[i];
+              final_val += temp;
+          }
+          final_val = (final_val * parseFloat(group_max)) / sum_of_max_marks;
+      }
+      if (formula == 'average') {
+          total = 0;
+          for (var i = 0; i < values.length; i++) {
+              temp = values[i];
+              total += temp;
+          }
+          final_val = total / values.length;
+          final_val = (final_val * parseFloat(group_max)) / attr_max;
+      }
+      if (formula == 'Best of') {
+          final_val = Math.max.apply(Math, values);
+          final_val = (final_val * parseFloat(group_max)) / attr_max;
+      }
+      j('#result_' + student_id).html(final_val.toFixed(2));
+  }
+
+  student_count = j('.student_names').length
+  for (var i = 0; i < student_count; i++) {
+      j('.mark_row_' + i).each(function () {
+          if (j(this).val() == '') {
+              return true;
+          }
+          show_max_sub_marks(this);
+      })
+  }
+
+  j(document).ready(function () {
+      fnAdjustTable();
+  });
+
+</script>

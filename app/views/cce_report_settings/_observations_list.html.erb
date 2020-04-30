@@ -1,0 +1,19 @@
+<%unless @observations.blank?%>
+  <span class="span-sub-heading">Observation</span>
+  <span class="span-sub-heading">Code</span>
+  <% form_for :cbse_co_scholastic_setting,:url=>{:action=>'save_cbse_co_scholastic_settings'} do |c| %>
+    <%=hidden_field_tag :course_id,params[:course_id]%>
+    <%@observations.each_with_index do |o,i|%>
+      <div class="label-field-pair">
+        <label for="student_grade"><%= o.name %></label>
+        <%entry = @cbse_co_scholastic_entries.find_by_observation_id(o.id)%>
+        <div class="text-input-bg"><%= text_field "cbse_co_scholastic_setting[#{i}]","#{o.id}",:value=>entry.present? ? entry.code : "" %></div>
+      </div>
+    <%end%>
+    <div id="submit_button">
+      <%= submit_tag "Save settings",:id=>'submit-button'%>
+    </div>
+  <%end%>
+<%else%>
+  <div class="flash-msg">No observations in this class</div>
+<%end%>

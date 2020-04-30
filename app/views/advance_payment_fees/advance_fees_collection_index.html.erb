@@ -1,0 +1,222 @@
+<%- # Fedena
+    #Copyright 2010 Foradian Technologies Private Limited
+    #
+    #This product includes software developed at
+    #Project Fedena - http://www.projectfedena.org/
+    #
+    #Licensed under the Apache License, Version 2.0 (the "License");
+    #you may not use this file except in compliance with the License.
+    #You may obtain a copy of the License at
+    #
+    #  http://www.apache.org/licenses/LICENSE-2.0
+    #
+    #Unless required by applicable law or agreed to in writing,
+    #software distributed under the License is distributed on an
+    #"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    #KIND, either express or implied.  See the License for the
+    #specific language governing permissions and limitations
+    #under the License.                   -%>
+
+<% content_for :head do %>
+  <%= javascript_include_tag "jquery.ajaxAutocomplete.ch" %>
+<% end %>
+<% if rtl? %>
+  <%= stylesheet_link_tag "rtl/gray_table_design" %>
+<% else %>
+  <%= stylesheet_link_tag "gray_table_design" %>
+<% end %>
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('advance_fee_collection_text') %></h1>
+
+  <div class='header-sep'>|</div>
+  <div class='sub-header'>
+    <%= "#{t('fee_collections')}" %>
+  </div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs %>
+    <%= render :partial => "finance/financial_year_info" %>
+  </div>
+
+  <div id="batch_or_department">
+    <div class="label-field-pair-1">
+    <label><%= t('search_text') %>: </label>
+    <div class="text-input-bg">
+      <div class="field">
+        <%= text_field_tag("query", params['query'], :autocomplete => 'off',:placeholder => "#{t('student_name_or_admi_no')}") %>
+        <%= hidden_field_tag 'user_selector',""%>
+      </div>
+    </div>
+  </div>
+
+    <div class="set_border"></div>
+
+    <div class="batch_fee_collection">
+      <div class="label-field-pair">
+        <label><%= t('batch') %>: </label>
+        <div class="text-input-bg" id="batches_list">
+          <%= select :batch, :batch_id, @batches.map { |b| [b.full_name, b.id] },
+                     {:prompt => "#{t('select_batch')}"},
+                     {:onChange => "#{remote_function(:url => {:controller => "advance_payment_fees",
+                                                               :action => "list_students_by_batch"},
+                                                      :with => "'batch_id='+value",
+                                                      :before => "Element.show('loader_batch')",
+                                                      :success => "Element.hide('loader_batch')"
+                     )}"} %>
+
+          <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader_batch",
+                        :style => "display: none;") %>
+        </div>
+      </div>
+      <div id="fee_collections"></div>
+    </div>
+  </div>
+  
+  <div id="flash-div">
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"><%= flash[:notice] %></p>
+    <% end %>
+  </div>
+
+  <div class="fee_head_section_p" id="fee_head_section_main"></div>
+
+  <div id="revert-pop-up">
+      <%= t('fees_refund_exists_cant_revert_transaction') %>
+      <br/>
+      <div class="revert_arrow_down"></div>
+  </div>
+
+  <iframe class="" style="display:block;visibility:hidden;" id="receipt_printer_template_container"></iframe>
+
+
+</div>
+
+<script type="text/javascript">
+  precision = parseInt("<%= @precision %>");
+
+  j('#query').click(function(e)
+  {
+    //var j = jQuery.noConflict();
+    var a;
+    jQuery(function(){
+    a = j('#query').autocompleteAjax({serviceUrl:'/advance_payment_fees/search_students',
+        onSelect: function(value,data){update_value_set(value,data);}});
+      });
+  })
+ 
+  function update_value_set(value,data)
+  {
+    j('#query').val(value);
+    j('#user_selector').val(data);
+    j.ajax({
+      url: '/advance_payment_fees/fee_head_by_student',
+      type: 'GET',
+      data:  {
+        student_id: j('#user_selector').val(),
+      },
+      success: function(data, textStatus, jqXHR)
+      {
+        j('.autocomplete-w1').hide();
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  }
+
+  function show_print_dialog(adf_id) {
+      var iframe = document.getElementById('receipt_printer_template_container');
+
+      j('#receipt_printer_template_container').unbind();
+
+      j('#receipt_printer_template_container').load(function () {
+          var iframe_window = (iframe.contentWindow || iframe.contentDocument);
+          result = iframe_window.document.execCommand('print', false, null) || iframe_window.print();
+      });
+      var obj = {advance_fee_collection_id: adf_id};
+      iframe.src = window.location.origin + "/advance_payment_fees/generate_fee_receipt?" + j.param(obj);
+  }
+
+  function update_total_amount_by_particular(){
+    var amount_boxes = j('.amount_box');
+    var amount = 0;
+    for (var i = 0; i < amount_boxes.length; i++) {
+      if (!amount_boxes[i].disabled){
+          amount = amount + parseFloat(amount_boxes[i].value);
+      }
+    }
+    j('#advance_fees_collection_fees_paid').val(parseFloat(amount).toFixed(precision));
+  }
+
+  function update_total_amount(ch, idx){
+    var class_name_amount = ".amount_box_idx"+idx
+    var class_name_category = ".category_id_"+idx
+    var total_amount = parseFloat(j('#advance_fees_collection_fees_paid').val()).toFixed(precision);
+    if (ch.checked) {
+      j(class_name_amount).prop('disabled', false)
+      j(class_name_category).prop('disabled', false)
+      j('#advance_fees_collection_fees_paid').val(parseFloat(total_amount + j(class_name_amount).val()).toFixed(precision))
+    } else {
+      j(class_name_amount).prop('disabled', true)
+      j(class_name_category).prop('disabled', false)
+      j('#advance_fees_collection_fees_paid').val(parseFloat(total_amount - j(class_name_amount).val()).toFixed(precision))
+    }
+  }
+
+   function empty_student_list() {
+       j('#fee_head_section_main').html();
+   }
+
+   MakeBox = function (f,s) {
+       remove_popup_box();
+       options = {'submit': '<%=t('revert_transaction')%>', 'cancel': '<%=t('cancel')%>', 'field_name': 'reason',
+           'input_type': 'text_area', 'title': '<%=t('revert_transaction')%>'};
+       build_modal_box(options);
+       build_prompt_popup_box('<%=t('reason')%>', options)
+       j('#popup_window #popup_footer > #yes').click(function () {
+           if(j(this).attr('disabled') == undefined) {
+               j(this).attr('disabled','disabled');
+               j.ajax({
+                   url: '/advance_payment_fees/delete_advance_fee_payment_transaction',
+                   method: 'post',
+                   data: {
+                       'id': s,
+                       'adfc_id': f,
+                       'reason': j('#popup_content #prompt_value').val(),
+                       'session_fingerprint': '<%= session_fingerprint %>'
+                   },
+                   success: function () {
+                       remove_popup_box();
+                   }
+               });
+           }
+       });
+   };
+
+   j('#batch_batch_id').change(function(){
+     j('#query').val('');
+   });
+
+   j('#query').change(function(){
+     j('#batch_batch_id').val('');
+     j('#student_students_id').val('');
+   });
+   
+   function validate_payment_amount() {
+     if (j('#advance_fees_collection_fees_paid').val() <= 0 ){
+       alert(("<%= t('amount_failed_text') %>"));
+       return false;
+     }
+  }
+
+
+</script>

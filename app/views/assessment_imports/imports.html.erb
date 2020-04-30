@@ -1,0 +1,80 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('assessment_mark_import_logs') %></div>
+    <div id="inner-tab-menu">
+        <ul>
+            <% if @agb.present? %>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('download_mark_sheet')}", {:controller => "assessment_imports", :action => "import_form", :batch_id => @batch.id, :assessment_group_id => @assessment_group.id} %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_imports,[@batch, @assessment_group] %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="planner_box">
+        <div class="import-form">
+            <% form_for :import, @import , :url => {:action => 'create'}, :html=> {:multipart=>true,:id=>'import'} do |m| %>
+              <%#= error_messages_for :import, :header_message => nil %>
+              <div class="form_cont">
+                  <div class="reply_actions">
+                      <div class="left-actions">
+                          <label><%= t('import_csv') %></label>
+                          <div class="label-field-pair_column left" id="attachment-field-div">
+                              <div class="text-input-bg" id="browse-style">
+                                  <%= m.paperclip_file_field :attachment, :direct => true %>
+                                  <div class="remove-field"><a onclick="remove_uploaded_file();check_disable();"></a></div>
+                              </div>
+                          </div>
+                      </div>
+                      <%= m.hidden_field :assessment_group_id  %>
+                      <%= m.hidden_field :batch_id  %>
+                      <div class="right-actions">
+                          <%=  m.submit "#{t('import_text')}", :class => 'submit-button', :id => 'submit_button' %>
+                      </div>
+                  </div>
+                  <%= m.hidden_field :attachment_content_type, :disabled => true %>
+              </div>
+            <%end%>
+        </div>
+
+        <div class='page_head'><%= t('import_logs') %></div>
+        <% if @imports.present? %>
+          <%= render :partial => 'assessment_import_logs' %>
+        <% else %>
+          <p class="flash-msg"> <%= t('no_imports_present') %> </p>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+    open_log = function(el){
+      j.ajax({
+        type: 'POST',
+        url: '/assessment_imports/show_log',
+        data: {
+          import_id: j(el).attr('import_id')
+        },
+        success: function (resp) {
+          console.log(resp);
+        }
+      });
+    }
+    
+    MakeLogBox = function () {
+        options = {'title': '<%="#{t('assessment_error_logs')}"%>'};
+        build_modal_box(options);
+        j('#popup_window').addClass('import_popup');
+        j('#popup_footer').remove();
+        j('#popup_box_overlay').click(close_modal_box);
+    }
+</script>

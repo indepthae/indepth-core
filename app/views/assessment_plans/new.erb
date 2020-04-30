@@ -1,0 +1,100 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('exam_planner') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_plans_new %>
+        <%= render_breadcrumbs %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="assessment_plans_box">
+        <div class="head"><%=t('create_an_exam_plan')%></div>
+        <div class="desc"><%=t('exam_plan_desc')%></div>
+        <div class="form_cont">
+            <% form_for @plan, :url => assessment_plans_path(@plan, :academic_year_id => @academic_year.id) do |form| %>
+              <div class="plan_name">
+                  <div class="label"><%="#{t('exam_plan_name')}"%></div>
+                  <div class="name"><%= form.text_field :name  %></div>
+              </div>
+
+              <div class="academic_year_select_box">
+                  <span class="label"><%=t('academic_year')%> :</span> <span class="date_range">
+                      <%=@academic_year.name%>
+                  </span>
+              </div>
+
+              <%= form.hidden_field :academic_year_id, :value=>@academic_year.id %>
+              <div class="terms_select_box">
+                  <div class="head"><%=t('number_of_terms_in_year')%></div>
+                  <div class="terms_select">
+                      <!--<div class="terms_select_pair">
+                          <%#= form.radio_button :terms_count, 0 ,:checked=>true, :class=>'choose_term', :onchange=>"build_terms(this,'#{@plan.id}')" %>
+                          <label class="label_for_terms_count" for="assessment_plan_terms_count_0"><%#=t('no_terms')%></label>
+                      </div> --> 
+                      
+                      <% #Todo : Change this in GradeBook phase 2. and check for dependencies %>
+                      <% (1..AssessmentPlan::MaxTermCount).each do |index|%>
+                        <div class="terms_select_pair">
+                            <%= form.radio_button :terms_count, index, :checked => (index == (form.object.terms_count || 1)),:class=>'choose_term', :onchange=>"build_terms(this,'#{@plan.id}')"  %>
+                            <label class="label_for_terms_count" for="assessment_plan_terms_count_<%=index%>"><%=index%></label>
+                        </div>
+                      <% end %>
+                      <div id='terms'>
+                          <% index = 0 %>
+                          <% form.fields_for :assessment_terms do |t| %>
+                            <div class="assessment_terms_fields">
+                                <% index += 1 %>
+                                <div class="label-field-pair left">
+                                    <label for="termname"><%= "#{t('term_number',:index=>index)}" %></label>
+                                    <div class="text-area-bg">
+                                        <%= t.text_field  :name, :class => "formula" %>
+                                    </div>
+                                </div>
+                                <div class="right">
+                                    <div class="label-field-pair start_date">
+                                        <label for="start_date"><%= t('from') %></label>
+                                        <div class="text-input-bg start_date">
+                                            <%= t.calendar_date_select :start_date,:popup=>"force", :id=>'start_date'%>
+                                        </div>
+                                    </div>
+                                    <div class="label-field-pair end_date">
+                                        <label for="end_date"><%= t('to') %></label>
+                                        <div class="text-input-bg end_date">
+                                            <%= t.calendar_date_select :end_date,:popup=>"force", :id=>'end_date' %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <%= t.hidden_field :academic_year_id, :value=>@academic_year.id %>
+                            </div>
+                          <% end %>
+                      </div>
+                      <%= form.submit t('create_exam_plan'),:class=>'submit-button'%>
+                      <%= link_to "#{t('cancel')}",:back,:class=>'submit-button cancel-button' %>
+                  </div>
+                <% end %>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        build_terms = function(el,object_id){
+        count = el.value;
+        j.ajax({
+        type: 'POST',
+        url: "/assessment_plans/build_terms",
+        data: {
+        count: count,
+        object_id: object_id,
+        academic_year_id: '<%= @academic_year.id %>'
+        }
+        });
+        }
+    </script>

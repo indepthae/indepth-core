@@ -1,0 +1,57 @@
+
+<% if false %>
+  <div class="custom_attendacne_page">
+      <div class="custom_form">
+          <% form_for  @attendance_label, :url => {:controller => 'attendance_labels' , :action => 'create'} ,:method => :post do |f| %>
+            <div id="error"></div>
+
+            <div class="label-field-pair">
+                <label for="name"><%= t('label_name') %></label>
+                <div class="text-input-bg"> <%= f.text_field :name %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="code"><%= t('label_code')  %></label>
+                <div class="text-input-bg"><%= f.text_field :code %></div>
+            </div>
+
+            <div class="label-field-pair">
+                <label for="type"><%= t('label_type') %></label>
+                <div class="text-input-bg"><%= f.select :attendance_type, [['Select type', " " ], ['Present' ,'Present'], ['Late', 'Late'] , ['Absent', 'Absent']] %></div>
+            </div>
+            <div class="notification">
+                <div class="label-field-pair">
+                    <label for="notification"><%= t('sent_notification')  %></label>
+                    <div class=""><%= f.check_box :has_notification %></div>
+                </div>
+            </div>
+            <div class="custom_submit_button">
+                <%= f.submit "save", :class => 'submit_button',:id => 'submit_button' %>
+            </div>
+          <% end %>
+      </div>
+
+    <% end %>
+    <div class="labels_list">
+        <table id="custom_attendance_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+            <tr class="tr-head"><td><%= t('s_n')%></td> <td><%= t('status_name')%></td><td><%= t('label_code')%></td><td><%= t('label_type')%></td><td><%= t('label_actions')%></td></tr>
+            <% @attendance_labels.each_with_index do |a, i| %>
+              <tr>
+                  <td><%= i+1 %></td>
+                  <td><%= a.name %></td>
+                  <td><%= a.code %></td>
+                  <td><%=  a.attendance_type %></td>
+                  <td> <div class="edit_option"> 
+                          <% if a.attendance_type == 'Present' %>
+                          <span id ="pdf_tooltip" tooltip = "<%= 'dddd' %>" onclick ="return false">    <%= link_to  t('edit') ,edit_attendance_label_path(a), :disabled => true ,  :class=>"custom_link disabled" %></span>
+                          <%else%>
+                            <%= link_to  t('edit') , edit_attendance_label_path(a),  :class=>"custom_link" %>
+                          <% end %>
+                      </div>
+                      <span class="delete_option small-strike"> <%#= t('delete') %></span>
+                  </td>
+              </tr>
+            <% end %>
+        </table>
+    </div>
+</div>

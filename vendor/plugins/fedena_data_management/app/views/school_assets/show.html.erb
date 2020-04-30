@@ -1,0 +1,28 @@
+<div id="content-header">
+<%= show_header_icon %>
+  <h1><%= "#{t('data_management')}"%></h1>
+<div class='header-sep'>|</div>
+<div class='sub-header'><%= "#{t('categories')}"%></div>
+
+<div id="inner-tab-menu">
+  <ul>
+    <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('data_management')}", school_assets_path %></li>
+  </ul>
+</div>
+
+</div>
+<div id="page-yield">
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+
+  <div class="label-field-pair">
+    <div class="label-container"><%=  %></div>
+    <div class="label-container"><%= @school_asset.asset_name %></div>
+  </div>
+  <hr/>
+  <%= render :partial=>"fields",:locals=>{:f=>f} %>
+
+</div>

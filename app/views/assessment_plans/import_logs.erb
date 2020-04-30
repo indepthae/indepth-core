@@ -1,0 +1,26 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('import_planner_logs') %></div>
+</div>
+
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :assessment_planner_import_logs %>
+        <%= render_breadcrumbs %>
+    </div>
+    <div class='page_head'><%= t('import_planner_logs') %></div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    
+    <div class="planner_box">
+      <% if @imports.present? %>
+        <%= render :partial => 'planner_import_logs' %>
+      <% else %>
+        <p class="flash-msg"> <%= t('no_imports_present') %> </p>
+      <% end %>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gradebook') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('manage_gradebook') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div class="label-field-pair select_course">
+        <label for="department"><%= t('course_name') %></label>
+        <div class="text-input-bg">
+            <div id="course-text"><%= @course.course_name %></div>
+        </div>
+    </div> 
+
+    <div id="course_details">
+        <% if @course.present? %>
+          <%= render :partial => 'course_details' %>
+        <% end %>
+    </div>
+</div>
+<script type="text/javascript">
+  render_form = function (elm) {
+      if (elm.value != "")
+      {
+          new Ajax.Request('/assessment_groups/course_exam_form', {
+              parameters: {'course_id': elm.value},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j(elm).closest('.text-input-bg').next('#loader').show();
+              },
+              onComplete: function (resp) {
+                  j('#course_details').html(resp.responseText);
+                  j(elm).closest('.text-input-bg').next('#loader').hide();
+              }
+          });
+      } else
+          j('#course_details').html('');
+  }
+</script>

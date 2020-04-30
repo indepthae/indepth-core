@@ -1,0 +1,19 @@
+
+<h5 class="field_head"><%= t('select_batch') %></h5>
+<%= select '', :batch , @batches.map{|b| [b.full_name,b.id]}, {:include_blank=>t('select_batch')},  :class=>"drop_select group_selector", :id=>"batch" %>
+
+<script>
+  j("#batch").change(function(){
+    j.ajax({
+      url: "load_guardian_sms_send",
+      type: 'POST',
+      data: {batch_id: j(this).val()},
+      success: function(data, textStatus, jqXHR)
+      {
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      }
+    });
+  });
+</script>

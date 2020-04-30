@@ -1,0 +1,28 @@
+<%unless params[:fa_group].present?%>
+  <div class="label-field-pair">
+      <label for="">Subject</label>
+      <div class="text-input-bg">
+          <%= select '','subject_id',
+            @subjects.map {|s| [s.name, s.id]},
+            {:include_blank=>"Select a subject",:selected=>@subject.try(:id).to_i},
+            {:onChange => "#{remote_function(:url => {:action=>"get_fa_groups"},:method=>:get,
+            :with => "'subject_id='+ value+ '&cce_exam_category_id=#{@exam_group.cce_exam_category_id}'",
+            :before => "Element.show('loader')",
+            :success => "Element.hide('loader')"
+            )}"} %>
+      </div>
+      <%= image_tag("loader.gif",:align => "absmiddle",:border => 0,:id => "loader", :style =>"display: none;" ) %>
+  </div>
+<%else%>
+  <div class="label-field-pair">
+      <label for="">Subject</label>
+      <div class="text-input-bg">
+          <%= select '','subject_id',@subjects.map {|s| [s.name, s.id]},{:include_blank=>"Select a subject"} %>
+      </div>
+  </div>
+  <%=hidden_field_tag 'cce_exam_category_id',@cce_exam_category.try(:id)%>
+  <%=hidden_field_tag 'fa_group_id',params[:fa_group]%>
+  <div id="submit_button1">
+      <%= submit_tag "Go",:class=>'submit-button margin_extra'%>
+  </div>
+<%end%>

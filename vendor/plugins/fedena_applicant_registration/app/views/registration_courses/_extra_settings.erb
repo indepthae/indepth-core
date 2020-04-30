@@ -1,0 +1,28 @@
+<div class="label-field-pair">
+  <label for="subject_based_fee_collection"><%= t('subject_based_fee_collection') %></label>
+  <div class="text-input-bg">
+    <% val = @registration_course.present? ? @registration_course.subject_based_fee_colletion : nil %>
+    <%= select :registration_course,:subject_based_fee_colletion,
+      [[t('active'),"1"],[t('inactive'),"0"]],
+      {:prompt=>t('set_subject_based_fee_collection'),
+      :selected => val.present? ? val : "0"},
+      {:onchange=>"#{remote_function(
+      :url => { :action => 'amount_load' },
+      :with => "'settings='+value",:before=>"$('loader').show();",:success=>"$('loader').hide();")}"} %>
+    <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;" ) %>
+  </div>
+</div>
+
+<div class="label-field-pair">
+  <label for="max_electives"><%= t('max_electives') %></label>
+  <div class="text-input-bg">
+    <%= text_field :registration_course,:max_electives %>
+  </div>
+</div>
+
+<div class="label-field-pair">
+  <label for="min_electives"><%= t('min_electives') %></label>
+  <div class="text-input-bg">
+    <%= text_field :registration_course,:min_electives %>
+  </div>
+</div>

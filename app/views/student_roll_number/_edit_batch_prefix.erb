@@ -1,0 +1,20 @@
+<% remote_form_for :roll_number_prefix, :url => {:action => "update_batch_prefix", :id => params[:id]}  do %>
+  <div class="label-field-pair">
+    <label for="roll_number_prefix"><%= t('roll_no_prefix') %></label>
+    <div class="text-input-bg" id="test">
+      <%= text_field :batch, :roll_number_prefix, :value => @batch_prefix %>
+      <div id="info"><%= t('max_characters') %></div>
+    </div>
+  </div>
+
+  <div id="buttons">
+    <%= submit_tag "Save",:class=>'submit_button' , :disable_with => "► #{t('please_wait')}"%>
+    <%= link_to_remote "Cancel", :url => {:action => 'update_batch_prefix'}, :html => {:class => "submit_button", :id => "cancel",:onclick=>"Modalbox.hide();"}%>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  j(".submit_button").click(function(){
+    j(".prefix_val").text(j("#batch_roll_number_prefix").val())
+  });
+</script>

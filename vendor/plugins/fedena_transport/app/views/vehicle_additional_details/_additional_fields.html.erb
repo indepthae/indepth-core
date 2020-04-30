@@ -1,0 +1,58 @@
+<table align="center" width="100%" cellpadding="1" cellspacing="1" id="adl_details">
+    <tr class="tr-head">
+        <td class="name"><%= t('name') %></td>
+        <td class="mandatory"><%= t('is_mandatory') %></td>
+        <td class="input_type"><%= t('input_method') %></td>
+        <td class="action"></td>
+    </tr>
+    <% unless @additional_details.empty? and @inactive_additional_details.empty? %>
+      <% unless @additional_details.empty? %>
+        <tr><td colspan="4"><b><%= t('active_fields') %></b></td></tr>
+        <% @additional_details.each_with_index do |ad, i|  %>
+          <tr>
+              <td><%= ad.name %></td>
+              <td><%= ad.mandatory_text %></td>
+              <td><%= ad.input_type_text %></td>
+              <td>
+                  <%= link_to_remote t('edit'), :url => edit_vehicle_additional_detail_path(ad), :method => :get  %>
+                  <% if ad.transport_additional_details.empty? %>
+                    <%= link_to t('delete'), delete_details_vehicle_additional_detail_path(ad), :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_additional_detail_confirmation', {:name => ad.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_additional_detail')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% else %>
+                    <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                  <% end %>
+                  <div class="field_order">
+                      <span class="category-up-down <%= "inactive" if i+1==@additional_details.length%>">
+                          <%= link_to_remote "▼", :url => {:action => "change_field_priority", :order => "down", :id => ad.id} %>
+                      </span>
+                      <span class="category-up-down <%= "inactive" if i==0 %>">
+                          <%= link_to_remote "▲", :url => {:action => "change_field_priority", :order => "up", :id => ad.id} %>
+                      </span>
+                  </div>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+      <% unless @inactive_additional_details.empty? %>
+        <tr><td colspan="4"><b><%= t('inactive_fields') %></b></td></tr>
+        <% @inactive_additional_details.each do |ad|  %>
+          <tr>
+              <td><%= ad.name %></td>
+              <td><%= ad.mandatory_text %></td>
+              <td><%= ad.input_type_text %></td>
+              <td>
+                  <%= link_to_remote t('edit'), :url => edit_vehicle_additional_detail_path(ad), :method => :get  %>
+                  <% if ad.transport_additional_details.empty? %>
+                    <%= link_to t('delete'), delete_details_vehicle_additional_detail_path(ad), :onclick => "return make_popup_box(this, 'confirm', '#{t('delete_vehicle_additional_detail_confirmation', {:name => ad.name})}',{'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('delete_vehicle_additional_detail')}', 'popup_class' : 'delete_confirmation'}); " %>
+                  <% else %>
+                    <div class="info_wrapper"><div class="info_header" tooltip="<%= t('dependencies_exist') %>"><%= t('delete') %></div></div>
+                      <% end %>
+              </td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr>
+          <td colspan="4"><%= t('create_a_vehicle_additional_details') %></td>
+      </tr>
+    <% end %>
+</table>

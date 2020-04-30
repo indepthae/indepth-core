@@ -1,0 +1,161 @@
+
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('email') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('email_logs_text') %></div>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+  <div class="head"><%= t('email_log_page') %></div>
+  <div class="sub_text"><%= t('email_log_page_desc') %></div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="filter-section">
+    <h5 class="field_head"><%= t('select_date_range') %></h5>
+    <div class="start_date">
+      <%= calendar_date_select_tag 'date', I18n.l((Date.today - 1.months) ,:format=>:default), :onChange => 'dateChange()', :id => "start_date", :class => "calender-select-width",:format=>:default  %>
+    </div>
+    <div class="filter_text"><%= t('to') %></div>
+    <div class="end_date">
+      <%= calendar_date_select_tag 'date', I18n.l((Date.today) ,:format=>:default), :onChange => 'dateChange()', :id => "end_date", :class => "calender-select-width",:format=>:default  %>
+    </div>
+  </div>
+  <div class="email_log_conatiner">
+    <div class="messages_section">
+      <div class="container_head message_section_head">
+        <%= t('email_logs_text') %>
+      </div>
+      <div class="content_box">
+        <div class="switcher_container">
+          <div class="switcher">
+            <div id="composed_emails" class="toggle_switch toggle_active" onclick="switchMessages('composed')">
+              <%= t('composed_emails') %>
+            </div>
+            <div id="automatic_alerts" class="border_left toggle_switch" onclick="switchMessages('alerts')">
+              <%= t('email_alerts') %>
+            </div>
+          </div>
+        </div>
+
+        <div class="message_list" id="message_list">
+          <%= render "email_logs"%>
+        </div>
+        <%= image_tag("loader.gif", :align => "absmiddle", :border => 0, :id => "loader", :style =>"display: none;", :class=> "loader_position" ) %>
+      </div>
+    </div>
+    <div id="logs" class="logs">
+    </div>
+  </div>
+
+  <script>
+
+    var type = 'composed';
+    var page_no = 1;
+
+
+    messageToggle = function(el, content_el){
+      if(content_el.is(":visible")){
+        content_el.hide();
+        j(el).html("<%= t('show_message') %>");
+      }else{
+        content_el.show();
+        j(el).html("<%= t('hide_message') %>");
+      }
+    }
+
+    fetchEmailLogs = function(alert_type, page_number, options={}) {
+      j('#loader').show();
+      j.ajax({
+        url: "mail_logs",
+        type: 'GET',
+        data: {
+          start_date: j('#start_date').val(),
+          end_date: j('#end_date').val(),
+          type: alert_type,
+          page: page_number
+        },
+        success: function (data, textStatus, jqXHR)
+        {
+          if(options.success != undefined)
+            options.success();
+        },
+        error: function (jqXHR, textStatus, errorThrown)
+        {
+          if(options.error != undefined)
+            options.error();
+        },
+        complete: function (data, textStatus, jqXHR){
+          j('#loader').hide();
+          if(options.complete != undefined)
+            options.complete();
+        }
+      });
+    }
+
+    dateChange = function(){
+      page_no = 1;
+      fetchEmailLogs(type,1,{
+        complete: function(){j('#logs .content_box').text('')}
+      });
+    }
+
+    switchMessages = function(toggle_type) {
+      j("#logs").html("");
+      page_no = 1;
+      if (toggle_type != type) {
+
+        fetchEmailLogs(toggle_type, 1,{
+              success: function(){
+                type = toggle_type;
+                if (toggle_type == 'alerts')
+                {
+                  j("#automatic_alerts").addClass("toggle_active");
+                  j("#composed_emails").removeClass("toggle_active");
+                } else {
+                  j("#composed_emails").addClass("toggle_active");
+                  j("#automatic_alerts").removeClass("toggle_active");
+                }
+              }
+            }
+        )
+      }
+    }
+
+    function update_bg(obj) {
+      j(".message_element").css("background-color", "white");
+      j("#message_element-" + obj).css("background-color", "rgb(242, 255, 253)");
+    }
+
+    j(document).on('click','.action_link', function(){
+      var message_el = j(this).parents('tbody.group').children('tr.recipient_message');
+      messageToggle(this, message_el);
+    });
+
+    j(document).on('click', '.message_content_toggle', function(){
+      var content_el = j(this).parent().children('.message_content')
+      messageToggle(this, content_el);
+    })
+
+    j('.content_box').on('scroll', function() {
+      if(j(this).scrollTop() + j(this).innerHeight() >= j(this)[0].scrollHeight) {
+        page_no++ ;
+        j('#loader').show();
+
+        fetchEmailLogs(type, page_no,{
+            error: function(){page_no = page_no - 1}
+          }
+        )
+      }
+    });
+
+  </script>
+
+
+</div>

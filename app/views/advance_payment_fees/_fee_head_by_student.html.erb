@@ -1,0 +1,81 @@
+<%= render :partial => "advance_fee_collection_student_details" %>
+<div class="hor_line"></div>
+<% if @advance_fee_categories.present? %>
+  <% form_remote_for :advance_fees_collection, :url => {:action => 'submit_fees'}, :html => {:id => "fees_form"} do |form| %>
+    <%= form.hidden_field :student_id, :value => @student.id %>
+    <%= form.hidden_field :batch_id, :value => @student.batch.id %>
+    <%= form.hidden_field :user_id,:value => @current_user.id %>
+    <% all_paid = true %>
+    <table class="gray_table_list" align="center" width="100%" cellpadding="0" cellspacing="0" >
+      <tr class="main_head tr-list_head">
+          <td class="sl-col"><%= t('sl_no') %></td>
+          <td class="set_border_right fee-head-categories" id="a_f_c" colspan="2"><%= t('fee_head') %></td>
+          <td class="set_border_right" colspan="1">
+              <%= t('amount_rs') %>
+              (<%= currency %>)
+          </td>
+      </tr>
+      <tr class="main_head tr-list_head">
+          <td class="set_border_right"></td>
+          <td class="sl-col" colspan="3"><%= t('advance_fee_categories_text') %></td>
+      </tr>
+      
+      <%= render :partial => "category_list_form" %>
+      
+      <tr class="row-a">
+        <td colspan="4" class="fee-head-submission">
+          <div id="payment_form_details" width="100%">
+            <%= render :partial => "advance_payment_fees/advance_fees_forms/payment_form" %>
+            <div class="reference_no">
+                <label><%= t('reference_no') %> </label>
+                <div class="text-input-bg4">
+                    <%= form.text_field :reference_no %>
+                </div>
+            </div>
+
+            <div class="amount_to_pay_block">
+              <label><%= t('amount_to_pay') %> </label>
+              <div class="text-input-bg4">
+                  <%= form.text_field :fees_paid,
+                    :value => 0.00,
+                    :readonly => true, :class => "precision_text total_amount" %>
+              </div>
+            </div>
+
+            <div class="pay_fees">
+              <div class="pay-fees-date">
+                <label><%= t('payment_date') %> </label></br>
+                <%= form.calendar_date_select :date_of_advance_fee_payment, :value => "#{Date.today}", :popup=>"force" %>
+              </div>
+
+              <div class="payment_notes">
+                  <label><%= t('payment_notes') %> </label>
+                  <div class="textarea-input-bg3">
+                    <%= form.text_area :payment_note, :cols => 50,
+                        :rows => 1, :value => params[:payment_note],
+                        :disabled => @particular_wise_paid %>
+                  </div>
+              </div>
+              <div class="pay_fees_buttons">
+
+                  <%= session_fingerprint_field %>
+
+                  <%= submit_tag "► #{t('pay_fees')}",
+                    :class => 'submit_button', :id => 'submit_button',
+                    :onClick => "return validate_payment_amount()" %>
+
+                  <%= link_to "► #{t('print_summary')}",
+                    {:controller => "advance_payment_fees", :action => "online_fees_receipt_pdf",
+                    :id => @student.id, :category_id => @advance_fee_category.id}, :target => '_blank',
+                    :class => 'user_button' %>
+            </div>
+          </td>
+        </tr>
+      </table>
+  <% end %> 
+<% else %>
+  <div class="no_entries"><%= t('no_advance_fees_categories_text') %></div>
+<% end %>
+<div id="payment_history">
+  <%= render :partial => "payment_history_head" %>
+</div>

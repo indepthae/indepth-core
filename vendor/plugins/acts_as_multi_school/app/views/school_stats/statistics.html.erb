@@ -1,0 +1,96 @@
+<% unless flash[:warn_notice].nil? %>
+  <div class="alert alert-warning pagination-centered" style="color:#cc0000">
+    <%= flash[:warn_notice] %>
+  </div>
+<% end %>
+
+<div id="alert"></div>
+
+<fieldset class="margin-bottom-20">
+  <h1 class="content-head"><%= read_live_entity(@statistics.entity.name.to_s ) %></h1>
+  <%= link_to_function 'Bookmark this page',"bookmark_show();" , :class  => 'button-red float-right',:id=>"bookmark_main_link" if permitted_to? :new, :schools%>
+</fieldset>
+<div id="bookmark_form">
+  <%= render :partial=>"bookmark_form" %>
+</div>
+<ul class="bread_crumb">
+  <% if params[:stat_path].present? %>
+    <li><%= link_to "Statistics",school_statistics_live_path %></li> » <li><%= link_to "Overall Statistics",dashboard_school_stats_path %></li> » <li><%=link_to "#{params[:section].capitalize}","/schools/statistics/#{params[:section]}"%></li> » <li><%= read_live_entity(@statistics.entity.name.to_s ) %></li>
+  <% else %>
+    <li><%= link_to "Statistics",school_statistics_live_path %></li> » <li><%= link_to "Overall Statistics",dashboard_school_stats_path %></li> » <li><%=" #{params[:section].capitalize}" %></li>
+  <% end %>
+</ul>
+<% if @schools.present? %>
+  <ul class="bread_crumb" id="school_name">
+    <%= @schools.count >1 ? "Schools : #{@schools.join(' , ')}" : "School : #{@schools.join(' , ')}" %>
+  </ul>
+<% end %>
+<div class="container-height">
+  <% unless @statistics.empty? %>
+    <div class="content-div  bg-light grey-border shadow">
+      <div class="extender"></div>
+      <div id="page-yield">
+        <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+          <tr class="tr-head sub-heading">
+            <td>No.</td>
+            <% @statistics.entity.fields.keys.each do |field| %>
+              <td><%= read_live_entity(field.to_s) %></td>
+            <% end %>
+          </tr>
+          <% @statistics.each_with_index do |row,i| %>
+            <% if params[:page].present? %>
+              <% if params[:page].to_i >= 1 %>
+                <% i = i  + (params[:page].to_i - 1) * @statistics.per_page.to_i %>
+              <% end %>
+            <%else %>
+              <% i = i %>
+            <% end %>
+            <tr class="tr-<%= cycle('odd', 'even') %>">
+              <td class="col-1"> <%= i+1 %></td>
+              <% @statistics.entity.fields.keys.each do |field| %>
+                <td class="col-6"> <%= "#{row.read(field)}" %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+        <%= will_paginate @statistics,:class=>"pagination stats-pagination" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-warning warn-notice pagination-centered" id="bookmark_alert"> <span> No record found.</span></div>
+  <% end %>
+</div>
+
+<script>
+  var q = jQuery.noConflict();
+
+  q(document).ready(function(){
+    set_link_active();
+    q("#bookmark_form").hide();
+  })
+
+  function bookmark_show(){
+    q("#bookmark_alert").remove();
+    q("#bookmark_main_link").hide();
+    q("#bookmark_form").show();
+    if (j('#school_name').text().strip()==""){
+      var text=j('.content-head').text()
+    }
+    else{
+      var text=j('.content-head').text()+" | "+j('#school_name').text().strip()
+    }
+    q("#bookmark_name").val(text)
+  }
+  function set_link_active(){
+    j('.ul-nav a').each(function(i,el){
+      arr=el.pathname.split("/")
+      if(el.pathname == "/schools/statistics/live_statistics")
+        el.classList.add("active")
+    });
+  }
+ 
+  j('.child-entity').click(function(e){
+    window.location = '/schools/statistics/<%=params[:section]%>/'+this.id
+    e.stopPropagation();
+  })
+</script>

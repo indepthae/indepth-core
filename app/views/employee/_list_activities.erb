@@ -1,0 +1,86 @@
+<% unless @allocations.empty? %>
+  <ul id="display-inline-block-example" class ="header">
+    <li><%= t('class_timing') %> </li>&nbsp;&nbsp;
+    <li><%= t('subject') %></li>&nbsp;&nbsp;
+    <li><%= t('batch') %></li>&nbsp;&nbsp;
+    <li><%= t('room') %> </li>&nbsp;&nbsp;
+    <li><%= t('building') %> </li>&nbsp;&nbsp;
+  </ul>
+
+  <% @allocations.each do |k,v| %>
+    <ul id="display-inline-block-example">
+      <li><%= v["class_timing"]  %></li>&nbsp;&nbsp;
+      <li><%= v["subject"]  %></li>&nbsp;&nbsp;
+      <li><%= v["batch"] %></li>&nbsp;&nbsp;
+      <li>
+        <%  flag = false %>
+        <%  allocation_types = v["classroom"].map{|x| x.keys}.flatten %>        
+        <% if allocation_types.include? "date_specific" %>
+           <% v["classroom"].each do |c| %>
+             <% if !c["date_specific"].nil? && (c["date"] == params[:date] || (!params[:date].present? && c['date'] == "#{I18n.l(Date.today,:format=>:default)}")) %>
+                <%  flag = true %>
+                <div id ="item"><%= c["date_specific"] %></div>
+             <% end %>
+           <% end %>
+        <% end %>
+
+        <% if (allocation_types.include? "weekly") && !(allocation_types.include? "date_specific") %>
+          <% v["classroom"].each do |c| %>
+            <div id ="item"><%= c["weekly"] %></div>
+          <% end %>
+        <% end %>
+
+        <% if (allocation_types.include? "weekly") && (allocation_types.include? "date_specific") %>
+          <% v["classroom"].each do |c| %>
+            <% if !c["date_specific"].nil? && c["date"] != params[:date] && !flag %>
+              <% v["classroom"].each do |c| %>
+                <div id ="item"><%= c["weekly"] %></div>
+                <% c.shift %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if v["classroom"].empty? %> <div id ="item"><%= "-" %></div><% end %>
+      </li>
+
+      <li>
+        <%  flag = false %>
+        <%  allocation_types = v["building"].map{|x| x.keys}.flatten %>
+
+        <% if allocation_types.include? "date_specific" %>
+           <% v["building"].each do |c| %>
+             <% if !c["date_specific"].nil? && c["date"] == params[:date] %>
+                <%  flag = true %>
+                <div id ="item"><%= c["date_specific"] %></div>
+             <% end %>
+           <% end %>
+        <% end %>
+
+        <% if (allocation_types.include? "weekly") && !(allocation_types.include? "date_specific") %>
+          <% v["building"].each do |c| %>
+            <div id ="item"><%= c["weekly"] %></div>
+          <% end %>
+        <% end %>
+
+        <% if (allocation_types.include? "weekly") && (allocation_types.include? "date_specific") %>
+          <% v["building"].each do |c| %>
+            <% if !c["date_specific"].nil? && c["date"] != params[:date] && !flag %>
+              <% v["building"].each do |c| %>
+                <div id ="item"><%= c["weekly"] %></div>
+                <% c.shift %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if v["building"].empty? %> <div id ="item"><%= "-" %></div><% end %>
+      </li>
+    </ul>
+  <% end %>
+<% else %>
+  <p class="flash-msg"> <%= t('no_activities_for_date') %></p>
+<% end %>
+
+
+
+
+

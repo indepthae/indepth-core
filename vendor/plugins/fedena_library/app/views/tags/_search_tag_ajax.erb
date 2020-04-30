@@ -1,0 +1,45 @@
+<table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+  <% unless @tags.empty? %>
+    <tr class="tr-head">
+      <td>
+        <%= t('sl_no') %>
+      </td>
+      <td>
+        <%=t('tags')%>
+      </td>
+      <td></td>
+    </tr>
+    <tr class="tr-blank">
+
+    </tr>
+    <% @tags.each_with_index do |tag,i| %>
+      <% if params[:page].present? %>
+        <% if params[:page].to_i >= 1 %>
+          <% i = i  + (params[:page].to_i - 1) * 10 %>
+        <% end %> <%else %> <% i = i %> <% end %>
+      <tr class="tr-<%= cycle('odd', 'even')%>">
+        <td class="col-1">
+          <%= i+1 %>
+        </td>
+        <td class="col-2">
+          <% @tag=tag %>
+          <div class ="place_editor" >
+            <%= in_place_editor_field :tag, :name,{:tag_options => {:id => @tag.id}},{:save_text => t('ok'),:cancel_text => t('cancel')} %>
+          </div>
+          <% unless tag.taggings.empty? %>
+            <%= link_to t("tagged_books"), tag_path(tag) ,:class => "warning_msg" %>
+            <span class="warning_sym"></span>
+          <% end %>
+        </td>
+        <td class="col-3">
+          <%= link_to '',tag_path(tag),:confirm => "#{t('delete_confirm_msg')}",:method => :delete,:class => 'cross_button' %>
+        </td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr class="tr-<%= cycle('odd', 'even') %>">
+      <td class="col-1"><%= t('no_tags_found') %> </td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @tags,:renderer => 'RemoteLinkRenderer',:params=>{:action => "search_tag_ajax", :query => params[:query]} %>

@@ -1,0 +1,261 @@
+body{
+    font-family: Arial;
+}
+
+#page-yield {
+    width:100%;
+    margin: 0 auto;
+    float: left;
+}
+.left_section, .right_section{ width:50%;}
+.left, .right{
+    float: left;
+}
+.payslip_text, .date_range{
+    width: 49%;
+    font-weight: bold;
+}
+.payslip_text{
+    font-size: 19px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    float: left;
+    padding-left: 10px;
+}
+.date_range{
+    float: right;
+    font-size: 13px;
+    padding-top: 13px;
+    padding-bottom: 10px;
+    text-align: right;
+    padding-right: -22px;
+    width: auto;
+    margin-right: 10px;
+}
+.table-header{
+    width: 100%;
+    border-bottom: 1px solid black;
+    /* padding-top: 10px; */
+    /* padding-bottom: 10px; */
+    float: left;
+}
+#category_name{
+    float:left;
+    width: 40%;
+}
+#currency_symbol{
+    width: 50%;
+    float: left;
+}
+table{
+    width: 100%;
+    border-spacing: 0px;
+}
+.main_info{
+    width: 99.85%;
+    float: left;
+    border: 1px solid black;
+}
+.label{
+    float:left;
+    max-width: 50%;
+    font-size: 12px;
+    padding-top: 5px;
+    word-break: break-all;
+}
+
+.text{
+    float: left;
+    font-size: 12px;
+    color: black;
+    padding-top: 5px;
+}
+
+.employee_info{
+    float: left;
+    width: 100%;
+}
+.info_left{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 100%;
+    float:left;
+    padding-left:  10px;
+}
+.info_right{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 100%;
+    float: left;
+    padding-left: 10px;
+}
+.even{
+    width:100%;
+}
+span{
+    float:left;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-top: 1px;
+}
+
+.col-pdf{
+    width: 38%;
+    float: left;
+    padding: 10px 0 10px 10px;
+    font-size: 12px;
+    color: black;
+}
+#amount_value{
+    width: 27%;
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 12px;
+    color: black;
+    text-align: right;
+    padding-right: 10px;
+    border-left: 1px solid black;
+    /*min-height: 14px;*/
+}
+.categories, .net_pay_sec{
+    width: 100%;
+    float: left;
+    page-break-before: always;
+}
+#category_name span {
+    font-weight: bold;
+    color: black;
+    font-size: 13px;
+}
+.employee_info .left{
+    overflow: hidden;
+    width: 49.8%;
+    border-right-color: black !important;
+}
+.employee_info .right{
+    overflow: hidden;
+    width: 49.4%;
+}
+.header-content {
+    color: #97080e;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 20px;
+    float: left;
+    width: 635px;
+    height: auto;
+    word-wrap: break-word;
+    margin-left: 30px;
+}
+.logo {
+    height: 80px;
+    width: 80px;
+    float: left;
+}
+.earning_header, .tot_earning{
+    font-weight: bold;
+    font-size: 12px;
+}
+.categories .left{
+    width: 50%;
+    padding: 0px !important;
+}
+.categories .right{
+    width: 49.7%;
+    padding: 0px !important;
+}
+.net_pay .right{ width: 100%;border-left: 1px solid black !important;}
+.net_pay #amount_value{
+    font-weight: bold;
+    font-size: 15px;
+    width: 20%;
+    float: left;
+    padding-left: 30px;
+    border-left: 0px !important;
+    text-align: left;
+}
+.net_pay .col-pdf{
+    font-weight: bold;
+    font-size: 13px;
+    border: 0px;
+    padding-top: 15px;
+    width: 10%;
+    float: left;
+}
+
+#pdf-header {
+    width: 800px;
+    padding-top: 0px;
+    overflow: hidden;
+    height: auto;
+}
+.odd, .even{
+    width:100%;
+    float: left;
+}
+#page-yield{
+    margin-top: 0px !important;
+}
+table tr.net_pay{
+    width: 99.85%;
+    float:left;
+    border-top: 1px solid black !important;
+}
+table tr.foot_note{
+    width: 99.85%;
+    float:left;
+}
+table.net-pay{ border-top: 1px solid black !important }
+#net_pay_val{
+    width: 100%;
+    float:right;
+}
+.net_pay td{
+    width: 99.8%;
+    float: left;
+    border: 1px solid black !important;
+    border-top:0px !important;
+}
+.header-content p.institution_address{
+    font-size: 13px;
+}
+.net_pay #amount_value{
+    padding-top: 15px;
+}
+.section{ margin-top: 0px !important;}
+table tr, table tr td{ border: 0px !important}
+table tr td.left{
+    border-left: 1px solid black !important;
+    border-right: 1px solid black !important;
+}
+
+table tr td.right{border-right: 1px solid black !important;}
+/*.categories tbody{ border-bottom: 1px solid black;}*/
+.net_pay tbody{ float: left}
+thead{ border-top: 1px solid black;}
+/*.categories tbody tr:last-child td{border-bottom: 1px solid black !important; }*/
+/*.categories tfoot{width:100%; background: black}*/
+.categories tfoot td{padding:0;height:0px;border-bottom:1px solid black !important;}
+
+/*#page-yield tbody:last{border-bottom: 1px solid black !important }*/
+.net_pay thead td{
+    padding:0;
+    height:0px;
+    border-top: 1px solid black;
+}
+
+table{border-collapse: collapse;}
+td{border: 1px solid black; background: white;}
+
+.footnote{
+    float:  left;
+    width:  100%;
+}
+.footnote p{
+    text-align: left;
+    font-size: 10px;
+    color: #666;
+}
+.employee_info table tr:last-child .info_left, .employee_info table tr:last-child .info_right{ padding-bottom: 10px}
+.table-header #amount_value{text-align: center;padding-right: 5px;padding-left: 5px;}

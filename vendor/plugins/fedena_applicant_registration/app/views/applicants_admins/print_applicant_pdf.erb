@@ -1,0 +1,154 @@
+<div class="available_sections">
+    <div class='student-info'>
+        <div class='info-vertical-pair' style="width:260px;">
+            <label class='info-name'><%= t('course') %></label>
+            <label class='info-value'><%= @registration_course.display_name.present? ? "#{@registration_course.display_name} &#x200E;(#{@registration_course.course.course_name})&#x200E;" : "#{@registration_course.course.course_name} (#{@registration_course.course.code})" %></label>
+        </div>
+        <div class='info-vertical-pair' style="width:160px;">
+            <label class='info-name'><%= t('reg_no') %></label>
+            <label class='info-value'><%= @applicant.reg_no %></label>
+        </div>
+        <div class='info-vertical-pair' style="width:170px;">
+            <label class='info-name'><%= t('status') %></label>
+            <label class='info-value'><%= @applicant.application_status.is_default == true ? (@applicant.application_status.name == "alloted" ? (@applicant.batch_id.present? ? "#{t('alloted')} - #{@applicant.batch.full_name}" : "#{t('alloted')}") : t(@applicant.application_status.name)) : @applicant.application_status.name %></label>
+        </div>
+        <div class='info-vertical-pair' style="width:150px;margin-right:0 !important;">
+            <label class='info-name'><%= "#{t('applicants.application_date')}" %></label>
+            <label class='info-value'><%= format_date(FedenaTimeSet.current_time_to_local_time(@applicant.created_at).to_date,:format=>:long) %></label>
+        </div>
+    </div>
+    <% application_sections = @application_section.present? ? @application_section.section_fields : Marshal.load(Marshal.dump(ApplicationSection::DEFAULT_FORM)) %>
+    <% @default_fields = ApplicationSection::DEFAULT_FIELDS %>
+    <% application_sections.sort_by{|k| k[:section_order].to_i}.each_with_index do|a,i| %>
+      <% field_group = nil %>
+      <% show_section = false %>
+      <% if a[:applicant_addl_field_group_id].present? %>
+        <% field_group = @field_groups.find_by_id(a[:applicant_addl_field_group_id].to_i) %>
+        <% if field_group.present? %>
+          <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?)  %>
+          <% section_name = field_group.name %>
+        <% end %>
+      <% else %>
+        <% show_section = true if (a[:fields].present? and (a[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+        <% section_name = t("#{a[:section_name]}") %>
+        <% if a[:section_name]=="elective_subjects" %>
+          <% if @registration_course.is_subject_based_registration.present? %>
+            <% show_section = true %>
+          <% else %>
+            <% show_section = false %>
+          <% end %>
+        <% end %>
+        <%# show_section = false if (a[:section_name]=="elective_subjects" and @registration_course.present? and @registration_course.is_subject_based_registration == false) %>
+      <% end %>
+      <% if show_section == true %>
+        <% if a[:section_name]=="guardian_personal_details" or a[:section_name]=="guardian_contact_details" %>
+          <% if a[:section_name]=="guardian_personal_details" %>
+            <% guardian_ind = 0 %>
+            <% guardian_contact_section = application_sections.find{|as| as[:section_name] == "guardian_contact_details"} %>
+            <% show_contact_section = false %>
+            <% show_contact_section = true if (guardian_contact_section.present? and guardian_contact_section[:fields].present? and (guardian_contact_section[:fields].map{|s| s[:show_field]} - ["false",false]).present?) %>
+            <% @applicant.applicant_guardians.each do|guardian| %>
+              <div class="section">
+                  <h4 class="section-heading"><%= "#{section_name} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></h4>
+
+                  <div class="section-fields">
+                      <%= render :partial=>"applicants_admins/show_form_section_pdf", :locals=>{:a=>a,:field_group=>field_group,:section_object=>guardian} %>
+                  </div>
+              </div>
+              <% if show_contact_section == true %>
+                <div class="section">
+                    <h4 class="section-heading"><%= "#{t('guardian_contact_details')} - #{t('guardian')} #{guardian_ind.to_i + 1}" %></h4>
+                    <div class="section-fields">
+                        <%= render :partial=>"applicants_admins/show_form_section_pdf", :locals=>{:a=>guardian_contact_section,:field_group=>field_group,:section_object=>guardian} %>
+                    </div>
+                </div>
+              <% end %>
+              <% guardian_ind += 1 %>
+
+
+
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="section">      
+              <h4 class="section-heading"><%= section_name %></h4>
+              <% if a[:section_name] == "previous_institution_details" %>
+
+                <div class="section-fields">
+                    <%= render :partial=>"applicants_admins/show_form_section_pdf", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant.applicant_previous_data} %>
+                </div>
+              <% elsif ["student_personal_details","student_communication_details","elective_subjects"].include?(a[:section_name]) %>
+                <div class="section-fields">
+                    <%= render :partial=>"applicants_admins/show_form_section_pdf", :locals=>{:a=>a,:field_group=>field_group,:section_object=>@applicant} %>
+                </div>
+              <% else %>
+                <div class="section-fields">
+                    <%= render :partial=>"applicants_admins/show_form_section_pdf", :locals=>{:a=>a,:field_group=>field_group,:section_object=>nil} %>
+                </div>
+              <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+    <% unless (@registration_course.amount.to_i == 0 and @applicant.amount.to_i==0) %>
+      <div class="section">
+          <h4 class="section-heading"><%= t('payment_details') %></h4>
+
+          <div class="section-fields">
+              <div class="attr_pair">
+                  <div class='attr_label'><%= t('applicants.registration_amount') %> <%= "(#{@currency})" %></div>
+                  <div class='attr_value'><%= precision_label @applicant.amount %></div>
+              </div>
+              <div class="attr_pair">
+                  <div class='attr_label'><%= t('applicants_admins.has_paid_fees') %></div>
+                  <div class='attr_value'><%= @applicant.has_paid == true ? t('paid_text') : t('not_paid') %></div>
+              </div>
+              <% if @applicant.has_paid==true and @financetransaction.present? %>
+                <div class="attr_pair">
+                    <div class='attr_label'><%= t('payment_mode') %></div>
+                    <div class='attr_value'><%= @online_transaction_id.present? ? t('online') : t('offline') %></div>
+                </div>
+                <div class="attr_pair">
+                    <div class='attr_label'><%= t('receipt_no') %></div>
+                    <div class='attr_value'><%= @financetransaction.receipt_number %></div>
+                </div>
+                <% if @online_transaction_id.present? %>
+                  <div class="attr_pair">
+                      <div class='attr_label'><%= t('online_transaction_id') %></div>
+                      <div class='attr_value'><%= @online_transaction_id %></div>
+                  </div>
+                <% end %>
+              <% end %>
+          </div>
+      </div>
+    <% end %>
+</div>
+<script type="text/javascript">
+  var body = document.body,
+          html = document.documentElement;
+  var pg_height = 0;//Magic number.. TADA
+  var page = new Element('div', {'class': 'page'});
+  var pageBreak = new Element('div', {'class': 'page-break'});
+  var insertPageBreak = function () {
+      body.appendChild(pageBreak.cloneNode(true))
+  };
+  var insertPage = function () {
+      body.appendChild(page.cloneNode(true));
+  };
+  var currPage = function () {
+      return $$('.page').last()
+  }
+  $$('.available_sections .section').each(function (el) {
+      if (currPage() == null) {
+          insertPage();//first page
+      }
+      a = parseInt(el.getHeight());
+      b = parseInt(currPage().getHeight());
+      c = a + b;
+      if (c > pg_height) {
+          insertPage();
+      }
+      currPage().appendChild(el);
+  });
+</script>
+

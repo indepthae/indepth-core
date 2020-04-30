@@ -1,0 +1,27 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= t('student_remarks') %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('remarks') %></div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="box">
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('add_custom_remarks')}", :controller=>"remarks", :action=>"add_employee_custom_remarks"%></div>
+      <div class="link-descr"><%= "#{t('adding_custom_remarks')}" %>.</div>
+    </div>
+
+
+
+    <div class="link-box">
+      <div class="link-heading"><%= link_to "#{t('list_custom_remarks')}", :controller=>"remarks", :action=>"employee_list_custom_remarks"%></div>
+      <div class="link-descr"><%= "#{t('list_custom_remarks')}" %></div>
+    </div>
+
+  </div>
+</div>

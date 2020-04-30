@@ -1,0 +1,166 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div class="institution_details_box">
+    <div class="template_settings_sub_head"><%= t('institution_details')%></div>
+    <div class="com_block">
+        <p class="inst_message"><%= t('tc_general_setting_desc')%></p><div class="message_link"><%= link_to 'General Settings',{:controller=>"configuration",:action=>"settings"},:target=>'_blank' if permitted_to? :settings, :configuration%></div>
+    </div>
+    <div class = "institution_details_form">
+        <div class ="institution_details_row">
+            <div class = "institution_details_label">
+                <%= f.check_box "institution_name[is_enabled]", :checked => (@header["InstitutionName"].is_enabled)%>
+                <label for="header_config_institution_name[is_enabled]" class="cb_value"><%= t('institution_name') %></label>
+            </div>
+            <div class = "institution_details_field">
+                <%= f.text_field "institution_name[value]", :value => @header["InstitutionName"].value, :placeholder=>"Not Entered" ,:disabled => true  %>
+            </div>
+            <%=hidden_field_tag "header_config[institution_name][value]",@header["InstitutionName"].value%>
+        </div>
+        <div class ="institution_details_row">
+            <div class = "institution_details_label">
+                <%= f.check_box "address[is_enabled]", :checked => (@header["Address"].is_enabled) %>
+                <label for="header_config_address[is_enabled]" class="cb_value"><%= t('address') %></label>
+            </div>
+            <div class = "institution_details_field">
+                <%= f.text_area "address[value]", :value => @header["Address"].value, :placeholder=>"Not Entered" ,:disabled => true  %>
+            </div>
+            <%=hidden_field_tag "header_config[address][value]",@header["Address"].value%>
+        </div>
+        <div class ="institution_details_row">
+            <div class = "institution_details_label">
+                <%= f.check_box "email[is_enabled]", :checked => (@header["Email"].is_enabled) %>
+                <label for="header_config_email[is_enabled]" class="cb_value"><%= t('email') %></label>
+            </div>
+            <div class = "institution_details_field">
+                <%= f.text_field "email[value]", :value => @header["Email"].value, :placeholder=>"Not Entered" ,:disabled => true  %>
+            </div>
+            <%=hidden_field_tag "header_config[email][value]",@header["Email"].value%>
+        </div>
+        <div class ="institution_details_row">
+            <div class = "institution_details_label">
+                <%= f.check_box "phone[is_enabled]", :checked => (@header["Phone"].is_enabled) %>
+                <label for="header_config_phone[is_enabled]" class="cb_value"><%= t('phone') %></label>  
+            </div>
+            <div class = "institution_details_field short_details_field">
+                <%= f.text_field "phone[value]", :value => @header["Phone"].value, :placeholder=>"Not Entered" ,:disabled => true  %>
+            </div>
+            <%=hidden_field_tag "header_config[phone][value]",@header["Phone"].value%>
+        </div>
+        <div class ="institution_details_row">
+            <div class = "institution_details_label">
+                <%= f.check_box "website[is_enabled]", :checked => (@header["Website"].is_enabled) %>
+                <label for="header_config_website[is_enabled]" class="cb_value"><%= t('website') %></label>  
+            </div>
+            <div class = "institution_details_field short_details_field">
+                <%= f.text_field "website[value]", :value => @header["Website"].value, :placeholder=>"Not Entered" ,:disabled => true %>
+            </div>
+            <%=hidden_field_tag "header_config[website][value]",@header["Website"].value%>
+        </div>
+        <% i = 0 %>
+        <% if @header["AdditionalField"].present?%>
+          <% @header["AdditionalField"].additional_field.sort_by{|add| add.priority.to_i}.each do |additional_field| %>
+            <% i = i + 1 %>
+            <div class ="institution_details_row additional_field" id="priority_<%= additional_field.priority%>">
+                <div class = "additional_institution_details_label">
+                    <span class="cb_value"><%= text_field_tag "header_config[additional_field][value][#{additional_field.priority}][text]", additional_field.value %></span>
+                </div>
+                <div class = "additional_institution_details_fields">
+                    <span class="text_size_select">
+                        <%= select_tag "header_config[additional_field][value][#{additional_field.priority}][text_size]", options_for_select(["#{t('select_text_size')}"] + [["Very Small","very_small"],["Small","small"],["Normal","normal"],["Medium","medium"],["Large","large"]],  additional_field.text_size) %>
+                    </span>
+                    <span class="text_color_select">
+                        <%= select_tag "header_config[additional_field][value][#{additional_field.priority}][text_color]", options_for_select(["#{t('select_text_color')}"] + [["Grey","grey"],["Black","black"]],  additional_field.text_color) %>
+                    </span>
+                </div>
+                <div class="random_value" id="<%= additional_field.priority%>"></div>
+                <a class="delete_button_img" href="#" onclick="remove_entry(this);
+                        ;
+                        return false;"></a>
+            </div>
+          <% end %>
+        <%  end %>
+
+
+        <div class="added_institution_details"></div>
+
+        <div class ="institution_details_row last">
+            <%= link_to_function "+ Add additional details","create_row(#{i});"%>
+        </div>
+
+    </div>
+    <div class="align_institution_details">
+        <div class = "align_institution_details_label"><%= t('alignment_of_institution_details')%> </div>
+        <div id="radio-buttons">
+            <div class="radio_button_pair">
+                <%= f.radio_button  "align_institution_detail[value]", "left", :checked => (@header["AlignInstitutionDetail"].value == "left") %>
+                <label for="header_config_align_institution_detail[value]_left" class="label_for_align_institution_detail"><%= t('left_align') %></label>
+            </div>
+
+            <div class="radio_button_pair">
+                <%= f.radio_button  "align_institution_detail[value]", "right", :checked => (@header["AlignInstitutionDetail"].value == "right") %>
+                <label for="header_config_align_institution_detail[value]_right" class="label_for_align_institution_detail"><%= t('right_align') %></label>
+            </div>
+
+            <div class="radio_button_pair">
+                <%= f.radio_button  "align_institution_detail[value]", "center", :checked => (@header["AlignInstitutionDetail"].value == "center") %>
+                <label for="header_config_align_institution_detail[value]_center" class="label_for_align_institution_detail"><%= t('center_align') %></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  var field_count = j('.institution_details_row.additional_field').length
+  if (field_count == 5) {
+      j('.institution_details_row.last').hide()
+  }
+  function create_row(i) {
+      if (field_count > 0) {
+          var field = j('.institution_details_row.additional_field').last()
+          var field_prio = field.attr("id").match(/\d+/);
+          var rand = parseInt(field_prio)
+          ++rand
+      } else {
+          var rand = i + 1;
+      }
+      if (field_count < 5) {
+          if (field_count >= 4) {
+              j('.institution_details_row.last').hide();
+          }
+          var row = '<div class ="institution_details_row additional_field" id="priority_' + rand + '">'
+          var label = '<div class = "additional_institution_details_label">'
+          var label_field = '<span class="cb_value"><%= text_field_tag "header_config[additional_field][value]['+rand+'][text]" %></span></div>'
+          var add_fields = '<div class = "additional_institution_details_fields">'
+          var size_select = '<span class="text_size_select"><select id="text_size" name="header_config[additional_field][value][' + rand + '][text_size]"><option value=""><%= "#{t('select_text_size')}"%></option>' +
+                  '<option value="very_small">Very Small</option>' +
+                  '<option value="small">Small</option>' +
+                  '<option value="normal">Normal</option>' +
+                  '<option value="medium">Medium</option>' +
+                  '<option value="large">Large</option></select></span>&nbsp;'
+          var color_select = '<span class="text_color_select"><select id="text_color" name="header_config[additional_field][value][' + rand + '][text_color]"><option value=""><%=  "#{t('select_text_color')}"%></option>' +
+                  '<option value="grey">Grey</option>' +
+                  '<option value="black">Black</option></select></span></div>'
+          var rand_field = '<div class="random_value" id=' + rand + '></div>'
+          var close_field = '<a class="delete_button_img" href="#" onclick="remove_entry(this);; return false;"></a></div>'
+          j(".added_institution_details").append(row + label + label_field + add_fields + size_select + color_select + rand_field + close_field);
+          ++field_count;
+      }
+  }
+
+  function remove_entry(el) {
+
+      //j(el).parent().parent().remove();
+      var a = j(el).parent().find(".random_value");
+      random_key = a.attr("id");
+      var hidden_field = '<input id="header_config_additional_field_value' + random_key + '_is_deleted" name="header_config[additional_field][value][' + random_key + '][is_deleted]" type="hidden" value="true">'
+      j(".added_institution_details").append(hidden_field);
+      j(el).parent().hide();
+      j('.institution_details_row.last').show();
+      --field_count;
+
+  }
+</script>

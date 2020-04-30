@@ -1,0 +1,87 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+
+<table id="tc_data">
+            <% @tc_data["StudentDetailsData"]["student_details_ids"].each do |id| %>
+              <%  code = cycle('odd', 'odd') %>
+              <tr class="preview_additional_student_<%= @tc_data["StudentDetailsData"]["font_value"]%> <%= code %>">
+                  <td class="tc_field_labels"><div class="tc_field_label"><%=@tc_data["StudentDetailsField"][id][:field_name]%></div></td>
+                  <% if @tc_data["StudentDetailsField"][id][:field_format] == "text_field_numeric" or @tc_data["StudentDetailsField"][id][:field_format] == "date"%>
+                    <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                  <%elsif @tc_data["StudentDetailsField"][id][:field_format] == "text_area"%>
+                    <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                  <% elsif @tc_data["StudentDetailsField"][id][:field_format] == "multiple_type" || @tc_data["StudentDetailsField"][id][:field_format] == "admission_date"%>
+                    <td class="tc_field_values">
+                        <div class="tc_field_value">
+                            <table>
+                                <tr>
+                                    <%- if @tc_data["StudentDetailsField"][id][:is_in_figures_enabled]%><span class="in_figures"></span><p>(<%= "#{t('in_figures')}" %>)</p><%- end %>
+                                    <%- if @tc_data["StudentDetailsField"][id][:is_in_words_enabled]%><span class="words"></span><p>(<%=  "#{t('in_words')}"%>)</p><%- end %>
+                                    <%- unless @tc_data["StudentDetailsField"][id][:is_in_figures_enabled] || @tc_data["StudentDetailsField"][id][:is_in_words_enabled] %><td class="in_figures"></td><%- end %>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                  <%else%>
+                    <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                  <% end %>
+              </tr>
+              <%  keys = get_child_field_ids(id) %>
+              <% for key in keys do %>
+                  <% value = @tc_data["StudentDetailsField"][id][:sub_fields][key] %>
+                  <tr class="preview_additional_student_<%= @tc_data["StudentDetailsData"]["font_value"]%> sub_field <%= code %> ">
+                      <td class="tc_field_labels"><div class="tc_field_label"><%= value[:field_name] %></div></td>
+                      <% if @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "text_field_numeric" or @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "date"%>
+                        <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                      <%elsif @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "text_area"%>
+                        <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                      <% elsif @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "multiple_type" || @tc_data["StudentDetailsField"][id][:sub_fields][key][:field_format] == "admission_date"%>
+                        <td class="tc_field_values">
+                            <div class="tc_field_value">
+                                <%- if @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_figures_enabled]%><span class="in_figures"></span><p>(<%= "#{t('in_figures')}" %>)</p><%- end %>
+                                <%- if @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_words_enabled]%><span class="words"></span><p>(<%=  "#{t('in_words')}"%>)</p><%- end %>
+                                <%- unless @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_figures_enabled] || @tc_data["StudentDetailsField"][id][:sub_fields][key][:is_in_words_enabled] %><span class="in_figures"></span><%- end %>
+                            </div>
+                        </td>
+                      <%else%>
+                        <td class="tc_field_values"><div class="tc_field_value"></div></td>
+                          <% end %>
+                  </tr>
+                <% end %>
+              <%end%>
+          </table>  
+  
+  
+
+<div class="page footer-pdf-style">
+        <% if @tc_data["Footer"]["footer_enabled"] %>
+          <div class="footer_preview">
+              <%unless @tc_data["Footer"]["Clause"].value.blank? %>
+                <div class ="footer_head_<%= @tc_data["Footer"]["Clause"].text_size%>">
+                    <div class="footer_head_<%= @tc_data["Footer"]["Clause"].text_color%>">
+                        <%=   @tc_data["Footer"]["Clause"].value %>
+                    </div>
+                </div>
+              <%end%>
+              <div class="footer_signatures">
+                  <% @tc_data["Footer"]["Signature"].additional_field.each do |signature| %>
+                    <div class="signature">
+                        <%=  signature.value %>
+                    </div>
+                  <% end %>
+              </div>
+          </div>        
+        <% end %>
+
+    </div>
+<script type="text/javascript">
+    if (j('#tc_data').height() < 740) {
+        var margin = 740 - j('#tc_data').height();
+        j('#tc_data').css('margin-bottom', margin);
+        console.log("margin==" + margin);
+    }
+  </script>

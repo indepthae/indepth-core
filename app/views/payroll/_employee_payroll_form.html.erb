@@ -1,0 +1,362 @@
+<% if @prev_action == 'employee_admission' or @prev_action == 'add_from_profile' %>
+  <div id="search_details" >
+      <div class="label-field-pair dept_name">
+          <label for="payroll_groups"><%= t('payroll_groups') %></label>
+          <div class="text-input-bg">
+              <label><b><%= @payroll_group.name %></b></label>
+          </div>
+      </div>
+      <div class="div_link" id="change_date" onclick="show_form()"><%= t('change') %></div>
+      <hr/>
+  </div>
+  <h3><%= t('step_2_add_payroll_details') %></h3>
+<% end %>
+<% form_for @salary_structure, :url => {:action => "add_employee_payroll", :id => @payroll_group.id, :employee_id => @employee.id, :struct_id => @salary_structure.id, :from => @prev_action, :start_date => params[:start_date]}, :html => { :onsubmit => "return validate();"} do |f| %>
+  <%= session_fingerprint_field %>
+  <% if @gross_mode %>
+    <div class="label-field-pair" style="<%= @salary_structure.gross_salary.present? ? 'display : none' : '' %>" id="gross_form">
+        <label for="gross_pay"><%= t('gross_pay') %></label>
+        <div class="text-input-bg">
+            <%= text_field_tag 'gross_salary', precision_label(@salary_structure.gross_salary) %>
+            <div class="wrapper" id="live-val"></div>
+        </div>
+        <span class="currency-type"><%= @currency_type %></span>
+        <div id="calculate" class="submit-button"><%= @salary_structure.gross_salary.present? ? t('re_calculate') : t('calculate') %></div>
+        <% if @salary_structure.gross_salary.present? %>
+          <div class="div_link" id="cancel_div" onclick="hide_gross_form()"><%= t('cancel') %></div>
+        <% end %>
+        <%= image_tag("loader.gif",
+          :align => "absmiddle",
+          :border => 0,
+          :id => "loader",
+          :style =>"display: none;" ) %>
+    </div>
+    <% if @salary_structure.gross_salary.present? %>
+      <div class="label-field-pair" id="gross_details">
+          <label for="gross_pay"><%= t('gross_pay') %></label>
+          <div class="text-input-bg">
+              <label for="gross_pay"><%= "#{precision_label(@salary_structure.gross_salary)}#{@currency_type}" %></label>
+              <div class="div_link" id="cancel_div" onclick="show_gross_form()"><%= t('change') %></div>
+              <%= f.hidden_field :gross_salary, :value => precision_label(@salary_structure.gross_salary) %>
+          </div>
+      </div>
+    <% end %>
+  <% else %>
+    <%= hidden_field_tag 'gross_salary', 0 %>
+  <% end %>
+  <%= f.hidden_field :employee_id %>
+  <%= f.hidden_field :payroll_group_id %>
+  <%= f.hidden_field :revision_number %>
+  <h3><%= t('payroll_categories_of_this_payroll_group') %></h3>
+  <% if @gross_mode %>
+    <div class="description"><%= t('gross_based_payroll_categories_of_payroll_group_desc') %></div>
+  <% else %>
+    <div class="description" id="cat_desc"><%= t('payroll_categories_of_payroll_group_category_based_desc') %><span class="refresh_icon"></span> <%= t('icon_text') %></div>
+    <div id="calculate" class="submit-button"><%= t('calculate') %></div>
+    <div class="div_link" id="reset_all"><%= t('reset_all') %></div>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader1",
+      :style =>"display: none;" ) %>
+  <% end %>
+  <%= render :partial => "old_structure" %>
+  <div class="earnings">
+      <div class="sub-head"><%= t('earnings') %></div>
+      <% @net_pay = 0 %>
+      <% total_earnings = 0  %>
+      <% f.fields_for :employee_salary_structure_components, @earnings do |comp| %>
+        <% c_obj = comp.object %>
+        <% cat_hsh = (@dependencies.present? ? @dependencies[c_obj.payroll_category_id.to_s] : []) %>
+        <% unless c_obj.destroyed %>
+          <div class="label-field-pair">
+              <label for="category-name"><%= c_obj.pc_name %></label>
+              <div class="text-input-bg"><%= comp.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount #{(!@gross_mode ? ((cat_hsh["is_numeric"] and cat_hsh["dependency_ids"].present?) ? 'dependency_field dependency_cat' : 'dependency_cat') : 'dependency_cat' )}", :cat_id => c_obj.payroll_category_id %>
+                  <div class="wrapper" id="live-val"></div>
+              </div>
+              <span class="currency-type"><%= @currency_type %></span>
+              <% if cat_hsh["dependency_ids"].present? %>
+                <div class="refresh-div" cat_id="<%= c_obj.payroll_category_id %>" style="display: <%= (cat_hsh["is_changed"] ? 'block' : 'none') %>" tooltip="<%= t('refresh_text') %>"><div class="refresh-icon"></div></div>
+                <%= image_tag("loader.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "loader1",
+                  :style =>"display: none;" ) %>
+              <% end %>
+              <%= comp.hidden_field :payroll_category_id %>
+              <%= comp.hidden_field :pc_name %>
+          </div>
+        <% end %>
+        <%= (comp.hidden_field :_destroy, :value => 1) if c_obj.destroyed %>
+        <% total_earnings += c_obj.amount.to_f %>
+      <% end %>
+      <% if @salary_structure.gross_salary.present? or total_earnings > 0 %>
+        <div class="label-field-pair">
+            <label for="total_earnings"><%= "#{t('total_salary').titleize}" %></label>
+            <div class="total"><%= precision_label(total_earnings) %></div>
+            <span class="currency-type"><%= @currency_type %></span>
+        </div>
+        <div class="wrapper" id="salary_exceeds" style="display : none"><div class="error-icon"></div><div class="error-msg"><%= t('total_salary_cannot_exceed_gross_pay') %></div></div>
+      <% end %>
+  </div>
+  <% total_deductions = 0 %>
+  <% if @deductions.present? %>
+    <div class="deductions">
+        <div class="sub-head"><%= t('deductions') %></div>
+        <% f.fields_for :employee_salary_structure_components, @deductions do |comp| %>
+          <% c_obj = comp.object %>
+          <% cat_hsh = (@dependencies.present? ? @dependencies[c_obj.payroll_category_id.to_s] : []) %>
+          <% unless c_obj.destroyed %>
+            <div class="label-field-pair">
+                <label for="category-name"><%= c_obj.pc_name %></label>
+                <div class="text-input-bg"><%= comp.text_field :amount, :value => precision_label(c_obj.amount), :class => "amount #{(!@gross_mode ? ((cat_hsh["is_numeric"] and cat_hsh["dependency_ids"].present?) ? 'dependency_field dependency_cat' : 'dependency_cat') : (cat_hsh["dependency_ids"].present? ? 'dependency_cat' : ''))}", :cat_id => c_obj.payroll_category_id %>
+                    <div class="wrapper" id="live-val"></div>
+                </div>
+                <span class="currency-type"><%= @currency_type %></span>
+                <% if cat_hsh["dependency_ids"].present? %>
+                  <div class="refresh-div" cat_id="<%= c_obj.payroll_category_id %>" style="display: <%= (cat_hsh["is_changed"] ? 'block' : 'none') %>" tooltip="<%= t('refresh_text') %>"><div class="refresh-icon"></div></div>
+                  <%= image_tag("loader.gif",
+                    :align => "absmiddle",
+                    :border => 0,
+                    :id => "loader1",
+                    :style =>"display: none;" ) %>
+                <% end %>
+                <%= comp.hidden_field :payroll_category_id %>
+                <%= comp.hidden_field :pc_name %>
+            </div>
+          <% end %>
+          <%= (comp.hidden_field :_destroy, :value => 1) if c_obj.destroyed %>
+          <% total_deductions += c_obj.amount.to_f %>
+        <% end %>
+        <% if @salary_structure.gross_salary.present? or total_earnings > 0 %>
+          <div class="label-field-pair">
+              <label for="total_deductions"><%= "#{t('total_deduction').titleize}" %></label>
+              <div class="total"><%= precision_label(total_deductions) %></div>
+              <span class="currency-type"><%= @currency_type %></span>
+          </div>
+        <%end%>
+    </div>
+  <% end %>
+  <% if @salary_structure.gross_salary.present? or total_earnings > 0 %>
+    <% @net_pay = total_earnings - total_deductions %>
+    <% @net_pay = PayrollGroup.rounding_up(@net_pay,Configuration.get_rounding_off_value.config_value.to_i) if  !(Configuration.to_enable_round_off.config_value.to_i.zero?) %>
+    <div class="label-field-pair" id="net_pay">
+        <% unless @gross_mode %>
+          <div class="section">
+              <label for="net_pay"><%= "#{t('gross_pay').titleize} &#x200E;(#{t('total_salary').titleize})&#x200E;" %></label>
+              <div class="gross"><%= precision_label(total_earnings) %></div>
+              <span class="currency-type"><%= @currency_type %></span>
+              <%= f.hidden_field :gross_salary, :value => precision_label(total_earnings) %>
+          </div>
+        <% end %>
+        <div class="section">
+            <label for="net_pay"><%= "#{t('net_pay').titleize}" %></label>
+            <div class="total"><%= precision_label(@net_pay) %></div>
+            <span class="currency-type"><%= @currency_type %></span>
+        </div>
+    </div>
+    <div class="wrapper" id="net_pay_warning" style="display : none"><div class="error-icon"></div><div class="error-msg"><%= t('net_pay_must_be_a_positive_amount') %></div></div>
+            <%= f.hidden_field :net_pay, :value => @net_pay %>
+          <% end %>
+  <hr/>
+  <%=submit_tag "#{t('assign_payroll')}", :disable_with => "#{t('please_wait')}", :class => "submit-button"  %>
+<% end %>
+<% case @prev_action
+  when 'assign_employees' %>
+  <%= link_to t('cancel'), assign_employees_payroll_path(@payroll_group.id), :class => "submit-button", :id => "cancel-link" %>
+<% when 'assigned_employees' %>
+  <%= link_to t('cancel'), {:controller => "payroll", :action => "show", :id=> @payroll_group.id, :emp_id => @employee.id, :from => @prev_action}, :class => "submit-button", :id => "cancel-link" %>
+<% when 'employee_admission' %>
+  <%= link_to t('skip_and_proceed'), {:controller => "leave_groups", :action => "manage_leave_group", :id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+<% when 'add_from_profile', 'employee_profile' %>
+  <%= link_to t('cancel'), {:controller => "employee", :action => "profile", :id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+<% when 'past_payslips' %>
+  <%= link_to t('cancel'), {:controller => "employee_payslips", :action => "view_employee_past_payslips", :employee_id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+<% when 'view_outdated_employees', 'generate_employee_payslip', 'view_employees_with_lop' %>
+  <%= link_to t('cancel'), {:controller => 'employee_payslips', :action => 'generate_employee_payslip', :employee_id => @employee.id, :date => params[:start_date], :from => @prev_action}, :class => "submit-button", :id => "cancel-link" %>
+<% else %>
+  <%= link_to t('cancel'), {:controller => "employee_payslips", :action => @prev_action, :employee_id=> @employee.id}, :class => "submit-button", :id => "cancel-link" %>
+<% end %>
+
+<script type="text/javascript">
+  var json_data = JSON.parse('<%= (@dependencies||{}).to_json.gsub("'", %q(\\\')) %>');
+  var precision = <%= FedenaPrecision.get_precision_count %>;
+  j(document).ready(function () {
+      calculate_salary();
+  });
+  j("input.amount").change(calculate_salary);
+  function show_form() {
+      j('#search-form').show();
+      j('#search_details').hide();
+  }
+  j('#calculate, .refresh-div, #reset_all').click(calculate_payroll);
+  j("input.dependency_cat").change(function () {
+      var amt = j(this).val();
+      if (json_data && amt.length > 0 && !isNaN(amt) && parseInt(amt) >= 0) {
+          json_data[j(this).attr('cat_id')]['amount'] = amt;
+          json_data[j(this).attr('cat_id')]['is_changed'] = true;
+      }
+      if (amt.length > 0 && !isNaN(amt) && parseInt(amt) >= 0)
+          j(this).parent().siblings('.refresh-div').show();
+      else
+          j(this).parent().siblings('.refresh-div').hide();
+  });
+
+  function calculate_payroll() {
+      j('#calculate').unbind('click');
+      var gross_pay = j("#gross_salary").val();
+      elm = this
+      var id = '<%= @salary_structure.payroll_group_id %>';
+      var emp_id = '<%= @salary_structure.employee_id %>';
+      if (elm.id == "reset_all")
+          json_data = j.extend(true, {}, initial_data);
+      if (gross_pay.length > 0 && !isNaN(gross_pay) && parseInt(gross_pay) >= 0) {
+          j("#gross_salary").parent('.text-input-bg').find('#live-val').html('');
+          new Ajax.Request('/payroll/calculate_employee_payroll_components', {
+              parameters: {'gross_pay': gross_pay, 'id': id, 'employee_id': emp_id, 'struct_id': '<%= @salary_structure.id %>', 'apply': '<%= params[:apply]||0 %>', 'form': '<%= @prev_action %>', 'start_date': '<%= params[:start_date] %>', 'dependencies': Object.toJSON(json_data), 'payroll_category_id': j(this).attr('cat_id')},
+              asynchronous: true,
+              evalScripts: true,
+              method: 'post',
+              onLoading: function () {
+                  j('#loader').show();
+                  j(elm).siblings('#loader1').show();
+              },
+              onComplete: function (resp) {
+                  j("#payroll_form").html(resp.responseText);
+                  j('#search-form').hide();
+                  j('#loader').hide();
+                  j(elm).siblings('#loader1').hide();
+              }
+          });
+      }
+      else
+      {
+          make_error_message($("gross_salary"), "<%= "#{t('gross_pay')} " %> ");
+          j('#calculate').click(calculate_payroll);
+      }
+  }
+  function calculate_dependencies() {
+      cat_id = j(this).next().val();
+      amount = j(this).siblings('.text-input-bg').children('.dependency_field').val();
+  }
+  function calculate_salary()
+  {
+      earnings = 0;
+      deductions = 0;
+      gross_salary = parseFloat(j("#employee_salary_structure_gross_salary").val());
+      if (!isNaN(gross_salary) && parseInt(gross_salary) >= 0)
+      {
+          j(".earnings input.amount").each(function () {
+              if (this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+              {
+                  earnings += parseFloat(this.value);
+                  j(this).parent('.text-input-bg').find('#live-val').html('');
+              }
+              else
+                  make_error_message(this, "<%= "#{t('earnings')} " %> ");
+          });
+          j('.earnings .total, .section .gross').text(earnings.toFixed(precision).toString());
+          j(".deductions input.amount").each(function () {
+              if (this.value.length > 0 && !isNaN(this.value) && parseInt(this.value) >= 0)
+              {
+                  deductions += parseFloat(this.value);
+                  j(this).parent('.text-input-bg').find('#live-val').html('');
+              }
+              else
+                  make_error_message(this, "<%= "#{t('deductions')} " %> ");
+          });
+          j('.deductions .total').text(deductions.toFixed(precision).toString());
+          sum = (earnings - deductions);
+          var round_up_to = "<%= Configuration.to_enable_round_off.config_value %>";
+          if( round_up_to != 0)
+          {
+              sum = to_round_off(sum)
+          }
+          j('#net_pay .total').text(sum.toFixed(precision).toString());
+          j('#employee_salary_structure_net_pay').val(sum.toFixed(precision))
+          if (j('.section .gross').length == 0) {
+              if (earnings > gross_salary) {
+                  j('#salary_exceeds .error-msg').text('<%= t('total_salary_cannot_exceed_gross_pay') %>');
+                  j("#salary_exceeds").show();
+              }
+              else if (earnings < gross_salary) {
+                  j('#salary_exceeds .error-msg').text('<%= t('total_salary_is_less_than_gross_pay') %>');
+                  j("#salary_exceeds").show();
+              }
+              else
+                  j("#salary_exceeds").hide();
+          }
+          else {
+              j("#employee_salary_structure_gross_salary").val(earnings.toFixed(precision));
+          }
+          if (j('#employee_salary_structure_net_pay').next('.wrapper').length == 0)
+          {
+              if ((earnings - deductions) < 0)
+                  j('#net_pay_warning').show();
+              else
+                  j('#net_pay_warning').hide();
+          }
+      }
+      else
+      {
+          j('input.amount').prop('disabled', true);
+      }
+  }
+  function make_error_message(elm, flag)
+  {
+      icon = jQuery('<div></div>', {'class': 'error-icon'});
+      if (isNaN(elm.value))
+          msg = jQuery('<div></div>', {'class': 'error-msg', 'text': flag + '<%= t('must_be_a_number') %>'});
+      else if (parseInt(elm.value) < 0)
+          msg = jQuery('<div></div>', {'class': 'error-msg', 'text': flag + '<%= t('cannot_be_a_negative_amount') %>'});
+      else
+          msg = jQuery('<div></div>', {'class': 'error-msg', 'text': "<%= t('please_enter_an_amount') %>"});
+      j(elm).parent('.text-input-bg').find('#live-val').html(icon.add(msg));
+
+  }
+  function validate()
+  {
+      calculate_salary();
+      valid = true
+      gross = $('gross_salary')
+      if ((gross.value.length == 0) || isNaN(gross.value) || (parseInt(gross.value) < 0))
+      {
+          valid = false;
+          make_error_message(gross, "gross");
+      }
+      else
+      {
+          if (!j("#employee_salary_structure_gross_salary").val())
+          {
+              valid = false;
+              icon = jQuery('<div></div>', {'class': 'error-icon'});
+              msg = jQuery('<div></div>', {'class': 'error-msg', 'text': '<%= t('calculate_and_proceed') %>'});
+              j(gross).parent('.text-input-bg').find('#live-val').html(icon.add(msg));
+          }
+      }
+      j('input.amount').each(function () {
+          if ((this.value.length == 0) || isNaN(this.value) || (parseInt(this.value) < 0))
+              valid = false;
+      });
+      if (j('#employee_salary_structure_net_pay').length > 0)
+      {
+          net_pay = j('#employee_salary_structure_net_pay').val();
+          if ((net_pay.length == 0) || isNaN(net_pay) || (parseInt(net_pay) < 0))
+          {
+              valid = false;
+              make_error_message(j('#employee_salary_structure_net_pay'), "net");
+          }
+      }
+      return valid;
+  }
+  function show_gross_form()
+  {
+      j('#gross_form').show();
+      j('#gross_details').hide();
+  }
+  function hide_gross_form()
+  {
+      j('#gross_form').hide();
+      j('#gross_details').show();
+  }
+</script>

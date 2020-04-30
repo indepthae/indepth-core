@@ -1,0 +1,85 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+<% content_for :head do  %>
+  <%= javascript_include_tag("tc_printer") %>
+<% end %>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transfer_certificate') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('tc_template_generated_certificate') %></div>
+
+    <div id="inner-tab-menu">
+        <% if can_access_request? :index, :tc_template_generate_certificates %>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('generate_certificate')}", :action => "index" %></li>
+          </ul>
+        <% end %>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :tc_template_generated_certificate%>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+    <div id="top_section">
+        <div id="course_area">
+            <label for="template_student_details_settings" id="course_text"><%"#{t('generated_transfer_certificates')}"%></label>
+        </div>
+    </div>
+    <div id="middle_section">
+        <div id="description">
+            <div id="description_text">
+                <%"#{t('generated_transfer_certificates_desc')}"%>
+            </div>
+        </div>
+        <div id="priority">
+            <div id="priority_text_1">
+                <div id="search_box_bg">
+                    <form name="search_form" action="" style="display:inline;">
+                        <label for="user_name">
+
+                            <%= image_tag("loader.gif",
+                              :align => "absmiddle",
+                              :border => 0,
+                              :id => "loader",
+                              :style => "display: none;") %>
+                        </label>
+
+                        <div id="search_textbox">
+                            <%= text_field_tag("query", params['query'], :autocomplete => 'off',:placeholder => "#{t('student_name')}/#{t('admission_no') }") %>
+                            <br/>
+                        </div>
+                    </form>
+                </div>
+            </div>              
+        </div>
+    </div>
+    <div id="other_details">
+        <%=render :partial=>'student_list'%>
+    </div>
+    <script type="text/javascript">
+      function search_logic() {
+          if ($('query').value.include("%"))
+              return;
+<%="#{remote_function(:url => {:action => "search_generated_records"},
+:with => "j('form').serialize()",
+:before => "Element.show('loader')",
+:success => "Element.hide('loader')",
+:update=>"other_details"
+)}"%>
+      }
+
+      document.observe("dom:loaded", function () {
+          new Form.Element.Observer('query', 1, search_logic);
+      });
+
+    </script>
+</div>

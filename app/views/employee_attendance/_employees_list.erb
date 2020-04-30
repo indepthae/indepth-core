@@ -1,0 +1,132 @@
+<div id="table_wrapper">
+    <div id="header">
+        <% config = leave_reset_configuration %>
+        <%if @employees.present? %>
+          <div id="head0"><%= check_box_tag "all_employees", @employee_ids.to_json,"",:class=>'batches_box' %></div>
+        <% end %>
+        <div id="head1"><%= t('name') %></div>
+        <div id="head2"><%= t('employee_number') %></div>
+        <div id="head3"><%= t('department') %></div>
+        <% if config == "1" %>
+          <div id="head4"><%= t('last_credit_date') %></div>
+        <% else %>
+          <div id="head4"><%= t('last_reset_date') %></div>
+        <% end %>
+    </div>
+    <div id="table_wrapper">
+        <div id="tbody">
+            <table>
+                <%if @employees.present? %>
+                  <% @employees.each do |e| %>
+                    <tr>
+                        <td class="td0"><%= check_box_tag "employee_id[]", e.id, "" ,:checked => true ,:class=>'batches_box emp' %></td>
+                        <% if config == "1" %>
+                          <td class="td1"><%= "#{e.full_name}" %></td>
+                        <% else %>
+                          <td class="td1"><%= link_to "#{e.full_name}", :controller=>"employee_attendance", :action=>"employee_leave_details", :id=>e.id %></td>
+                        <% end %>
+
+                        <td class="td2"><%= e.employee_number %></td>
+                        <td class="td3"><%= e.employee_department.name %></td>
+                        <% if config == "1" %>
+                          <td class="td4"><%= format_date(e.last_credit_date, :format => :short_date) %></td>
+                        <% else %>
+                          <td class="td4"><%= format_date(e.last_reset_date, :format => :short_date) %></td>
+                        <% end %>
+                    </tr>
+                  <% end %>
+                <% else %>
+                  <tr>
+                      <td colspan="4"><%= t('no_employee_found') %></td>
+                  </tr>
+                <% end %>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+  j(document).ready(function () {
+      if (j("#tbody").height() > 682) {
+          j("#tbody").css({"height": "341", "overflow-y": "scroll"});
+      }
+
+      j("#button").show();
+      j("#reset_type").val(<%= @reset_type %>);
+      if (j("#employee_ids").val() == "") {
+          j("#employee_ids").val('<%= @employee_ids.to_json %>');
+      }
+
+
+      ids = JSON.parse(j("#employee_ids").val());
+
+
+      j.each(j("input[type='checkbox']"), function (i, v) {
+          val = j(v).val();
+          if (j("#employee_ids").val() != "") {
+              index = JSON.parse(j("#employee_ids").val()).indexOf(parseInt(val));
+              if (index > -1)
+                  j("input[value='" + val + "']").prop("checked", true);
+              else
+                  j("input[value='" + val + "']").prop("checked", false);
+          }
+          else
+              j("input[value='" + val + "']").prop("checked", false);
+      });
+      if (j("#all_employees").length > 0)
+          if (JSON.parse(j("#employee_ids").val()).length == JSON.parse(j("#all_employees").val()).length) {
+              j("#all_employees").prop("checked", true);
+          } else {
+              j("#all_employees").prop("checked", false);
+          }
+      verify_check();
+  });
+
+  j("input.emp[type='checkbox']").change(function () {
+      curr_id = parseInt(j(this).val());
+      if (j("#employee_ids").val() != "") {
+          ids = JSON.parse(j("#employee_ids").val());
+          index = ids.indexOf(curr_id);
+          if (this.checked) {
+              if (index < 0) {
+                  ids.push(curr_id);
+              }
+          }
+          else {
+              if (index > -1) {
+                  ids.splice(index, 1);
+              }
+          }
+      }
+      else {
+          ids = [];
+          ids.push(curr_id);
+      }
+      j("#employee_count").html(String(ids.length) + '<%= t('generate_payslip_bulk.of') %>' + '<%= @employee_ids.count %>' + "&nbsp" + '<%= t('employees_selected') %>');
+      j("#employee_ids").val(ids.toJSON());
+      if (JSON.parse(j("#employee_ids").val()).length == JSON.parse(j("#all_employees").val()).length) {
+          j("#all_employees").prop("checked", true);
+      } else {
+          j("#all_employees").prop("checked", false);
+      }
+      verify_check();
+  });
+
+
+  j("#all_employees").change(function () {
+      ids = j(this).val();
+      if (this.checked) {
+          j("#employee_ids").val(ids);
+          j("input[type='checkbox']").prop("checked", true);
+          j("#employee_count").html('<%= t('reset_selected_employee_count', {:total => @employee_ids.count, :selected => @employee_ids.count})%>');
+      } else {
+          j("#employee_ids").val("");
+          j("input[type='checkbox']").prop("checked", false);
+          j("#employee_count").html('<%= t('reset_selected_employee_count', {:total => @employee_ids.count, :selected => 0})%>');
+      }
+      verify_check();
+  })
+
+</script>

@@ -1,0 +1,5 @@
+<div id="settings_enable">
+    <% form_for :settings, :url => {:action=> year_action_name(setting_type) } do |s| %>
+      <%= render :partial => "setting_detail_form", :locals => {:s => s, :setting_type => setting_type} %>
+    <% end %>
+</div>

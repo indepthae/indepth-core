@@ -1,0 +1,2 @@
+<%= select_tag 'master_fee_particular_id[]',
+               options_for_select(@master_particulars.map { |x| [x.name, x.id] }), {:disabled => true} %>

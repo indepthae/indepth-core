@@ -1,0 +1,48 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('transport_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('transport_gps_settings.gps_settings') %></div>
+    <div id="inner-tab-menu">
+        <%unless @transport_gps_settings.present?%>
+          <ul>
+              <li class='themed_bg themed-dark-hover-background'><%= link_to_remote "#{t('new')}",:url => {:controller => "transport_gps_settings", :action => "new"} %></li>
+          </ul>
+        <%end%>
+    </div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %>
+      <p class="flash-msg"> <%= flash[:notice] %> </p>
+    <% end %>
+
+    <div >
+        <table align="center" width="100%" cellpadding="1" cellspacing="1"  id="stop_details">
+            <tr class="tr-head">
+                <td><%=t('transport_gps_settings.vendor_name')%></td>
+                <td><%=t('transport_gps_settings.client_id')%></td>
+                <td><%=t('transport_gps_settings.client_secret')%></td>
+                <td></td>
+            </tr>
+            <%if @transport_gps_settings.present?%>
+                <tr>
+                    <td><%=@transport_gps_settings.vendor_name%></td>  
+                    <td><%=@transport_gps_settings.client_id%></td>  
+                    <td><%=@transport_gps_settings.client_secret%></td>
+                    <td>
+                        <%= link_to_remote "#{t('edit_text')}", :url => edit_transport_gps_setting_path(@transport_gps_settings), :method => :get%>
+                        <%= link_to t('delete'),delete_gps_setting_transport_gps_setting_path(@transport_gps_settings.id), 
+                          :onclick => "return make_popup_box(this, 'confirm', '#{t('transport_gps_settings.delete_gps_setting_conformation')}',
+    {'ok' : '#{t('delete')}', 'cancel' : '#{t('cancel')}', 'title' : '#{t('transport_gps_settings.delete_gps_setting')}', 'popup_class' : 'delete_confirmation'}); " %>
+                    </td>
+                </tr>
+            <%else%>
+              <tr><td colspan="4"><%=t('transport_gps_settings.no_gps_settings')%></td></tr>
+            <%end%>
+        </table>
+    </div>   
+</div>

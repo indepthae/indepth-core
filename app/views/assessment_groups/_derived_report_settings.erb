@@ -1,0 +1,16 @@
+<div id="derived_report_settings">
+    <div class="formula__head"><%=t('report_settings')%></div>
+    <div class="formula__desc"><%= t('report_settings_desc') %></div>
+    <div class="formula__head"><%=t('show_child_groups')%></div>
+    <% report_settings =  obj.derived_assessment? ? obj.report_settings : []%>
+    <div id = "derived_settings_check">
+        <div class="derived_report_setting_field">
+            <%= check_box_tag "derived_assessment_group_settings[report_settings][]", 'term_report' ,(report_settings.include? 'term_report'),:class=>'report_setting_check' %>
+            <label class="general_label" for="derived_assessment_group_settings_report_settings_term_report"><%=t('term_report')%></label>
+        </div>
+        <div class="derived_report_setting_field">
+            <%= check_box_tag "derived_assessment_group_settings[report_settings][]", 'plan_report' ,(report_settings.include? 'plan_report'),:class=>'report_setting_check' %>
+            <label class="general_label" for="derived_assessment_group_settings_report_settings_plan_report"><%=t('planner_report')%></label>
+        </div>
+    </div>
+</div>

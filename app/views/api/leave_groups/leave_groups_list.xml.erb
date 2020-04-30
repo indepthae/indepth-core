@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%=
+@xml.leave_group_detail{
+  @leave_groups.each do |leave_group|
+    @leave_group = leave_group
+    @xml.leave_group do
+      @xml.name(@leave_group.name)
+      @xml.description(@leave_group.description.present? ? @leave_group.description : '-')
+      @xml.leave_types_count(@leave_group.leave_types_count)
+      @xml.employees_count(@leave_group.employees_count)
+      @xml.employee_leave_types do
+        @leave_group.leave_group_leave_types.each do |leave_type|
+          if leave_type.employee_leave_type.present? and leave_type.employee_leave_type.is_active
+            @leave_type = leave_type
+            @xml.employee_leave_type do
+              @xml.name(@leave_type.employee_leave_type.name)
+              @xml.code(@leave_type.employee_leave_type.code)
+              @xml.leave_count(@leave_type.display_leave_count)
+            end
+          end
+        end
+      end
+    end
+  end
+}%>

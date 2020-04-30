@@ -1,0 +1,28 @@
+<%#
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('exams_text') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('students_sorting') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= breadcrumb :exam_students_sorting %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <div id="flash-msg-id"></div>
+    <% unless flash[:warn_notice].nil? %>
+      <div id="errorExplanation" class="errorExplanation"><p><%= flash[:warn_notice] %></p> </div>
+    <% end %>
+    <div class="box">
+        <div id="box">
+            <%= render :partial => "sorting" %>
+        </div>
+    </div>
+</div>

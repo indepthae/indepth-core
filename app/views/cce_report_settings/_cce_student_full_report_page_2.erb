@@ -1,0 +1,309 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<% cgpa=0.0 %>
+<% count=0 %>
+<% e = 'even' %>
+<div  class="section">
+  <div id="score-table">
+    <div class="custom_header">
+      <h3>
+        Part – 1 Academic Performance : Scholastic Areas
+      </h3>
+      <h5>(Refer Scheme of Studies on last page for details)</h5>
+    </div>
+    <table id="pdf-table" width="100%" cellspacing="0">
+      <tr class="table-header">
+        <td class="sl_no" rowspan="2" class="center_aligned">Sl no</td>
+        <td rowspan="2">Subjects</td>
+        <td colspan="4" class="center_aligned">Term 1</td>
+        <td colspan="4" class="center_aligned">Term 2</td>
+        <td colspan="4" class="center_aligned">Overall</td>
+      </tr>
+      <tr class="table-header">
+        <td class="center_aligned">FA1</td>
+        <td class="center_aligned">FA2</td>
+        <td class="center_aligned">SA1</td>
+        <td class="center_aligned">Total</td>
+        <td class="center_aligned">FA3</td>
+        <td class="center_aligned">FA4</td>
+        <td class="center_aligned">SA2</td>
+        <td class="center_aligned">Total</td>
+        <td class="center_aligned">FA Total</td>
+        <td class="center_aligned">SA Total</td>
+        <td class="center_aligned">Overall</td>
+        <td class="center_aligned">Grade Point</td>
+      </tr>
+      <%i,k=0,0%>
+      <%6.times do |i|%>
+        <tr>
+          <td class="sl_no center_aligned"><%=i+1%></td><td class="subject"><%=["Language I","Language II","Mathematics","Science","Social Science","Home Science"][i]%></td>
+          <%11.times do%>
+            <td class="center_aligned"><%=@grading_levels.choice.name%></td>
+          <%end%>
+          <td class="center_aligned"><%=@grading_levels.choice.credit_points%></td>
+        </tr>
+      <%end%>
+      <tr class="table-footer">
+        <td colspan="<%= 6+2*4 %>">Cumulative Grade Point Average(CGPA)  :   <%="%.2f" % @grading_levels.choice.credit_points.to_f %></td>
+      </tr>
+    </table>
+
+  </div>
+  <%j=2%>
+  <div class="custom_header">
+    <h3>Part-<%="#{j}: "%>Scholastic Area</h3>
+    <h5>(Refer Scheme of Studies on last page for details)</h5>
+  </div>
+  <%if @course.present? and @course.observation_groups.all(:conditions=>{:observation_kind=>'1'}).present?%>
+    <%@course.observation_groups.all(:conditions=>{:observation_kind=>'1'}).each do |og|%>
+      <div id="score-table" class="table_div">
+        <div class="custom_header">
+          <p><%=og.name%></p>
+        </div>
+
+        <table id="pdf-table">
+          <tr class="table-header">
+            <td>Observation</td>
+            <td>Descriptive Indicators</td>
+            <td  class="center_aligned">Grade</td>
+          </tr>
+          <%og.observations.active.each do |o|%>
+            <tr>
+              <td><%=o.name%></td>
+              <td class="set_width_td">
+                <%=o.descriptive_indicators.collect{|i| i.name if i.show_in_report}.join(', ')%>
+              </td>
+              <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+            </tr>
+          <%end%>
+        </table>
+      </div>
+    <%end%>
+  <%else%>
+    <div id="score-table" class="table_div">
+      <div class="custom_header">
+        <p>Life Skills</p>
+      </div>
+      <table id="pdf-table">
+        <tr class="table-header">
+          <td>Observation</td>
+          <td>Descriptive Indicators</td>
+          <td class="center_aligned">Grade</td>
+        </tr>
+        <tr>
+          <td>Thinking Skills</td>
+          <td class="set_width_td">
+            Self Awareness, Problem Solving, Decision Making and Creative Thinking
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+        <tr>
+          <td>Social Skills</td>
+          <td class="set_width_td">
+            Interpersonal Relationships, Effective Communication and Empathy
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+        <tr>
+          <td>Emotional Skills</td>
+          <td class="set_width_td">
+            Managing Emotions and Dealing with Stress
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+      </table>
+      <div class="custom_header">
+        <p>Work Education</p>
+      </div>
+      <table id="pdf-table">
+        <tr class="table-header">
+          <td>Observation</td>
+          <td>Descriptive Indicators</td>
+          <td class="center_aligned">Grade</td>
+        </tr>
+        <tr>
+          <td>Cookery</td>
+          <td class="set_width_td">
+
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+      </table>
+      <div class="custom_header">
+        <p>Visual and Performing Arts</p>
+      </div>
+      <table id="pdf-table">
+        <tr class="table-header">
+          <td>Observation</td>
+          <td>Descriptive Indicators</td>
+          <td class="center_aligned">Grade</td>
+        </tr>
+        <tr>
+          <td>Dance</td>
+          <td class="set_width_td">
+            Timing, Steps, Grace
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+      </table>
+      <div class="custom_header">
+        <p>Attitude and values towards</p>
+      </div>
+      <table id="pdf-table">
+        <tr class="table-header">
+          <td>Observation</td>
+          <td>Descriptive Indicators</td>
+          <td class="center_aligned">Grade</td>
+        </tr>
+        <tr>
+          <td>Teachers</td>
+          <td class="set_width_td">
+            Inside Class, Outside Class
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+        <tr>
+          <td>School Mates</td>
+          <td class="set_width_td">
+            For study purposes, Outside Class
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+        <tr>
+          <td>School Programmes and Environment</td>
+          <td class="set_width_td">
+
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+        <tr>
+          <td>Value Systems</td>
+          <td class="set_width_td">
+          </td>
+          <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+        </tr>
+      </table>
+    </div>
+  <%end%>
+  <%j+=1%>
+<%#*</div>%>
+</div>
+<div class="custom_header">
+  <h3>Part-<%="#{j}: "%>Scholastic Activity</h3>
+  <h5>(Refer Scheme of Studies on last page for details)</h5>
+</div>
+<%if @course.present? and @course.observation_groups.all(:conditions=>{:observation_kind=>'2'}).present?%>
+  <%@course.observation_groups.all(:conditions=>{:observation_kind=>'2'}).each do |og|%>
+    <div id="score-table" class="table_div">
+      <div class="custom_header">
+        <p><%=og.name%></p>
+      </div>
+
+      <table id="pdf-table">
+        <tr class="table-header">
+          <td>Observation</td>
+          <td>Descriptive Indicators</td>
+          <td class="center_aligned">Grade</td>
+        </tr>
+        <%og.observations.active.each do |o|%>
+          <tr>
+            <td><%=o.name%></td>
+            <td class="set_width_td">
+              <%=o.descriptive_indicators.collect{|i| i.name if i.show_in_report}.join(', ')%>
+            </td>
+            <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+          </tr>
+        <%end%>
+      </table>
+    </div>
+  <%end%>
+<%else%>
+  <div id="score-table" class="table_div">
+    <div class="custom_header">
+      <p>Suggestive Activities</p>
+    </div>
+    <table id="pdf-table">
+      <tr class="table-header">
+        <td>Observation</td>
+        <td>Descriptive Indicators</td>
+        <td class="center_aligned">Grade</td>
+      </tr>
+      <tr>
+        <td>Literary and Creative Skills</td>
+        <td class="set_width_td">
+          Debate, Declamation, Creative Writing, Recitation
+        </td>
+        <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+      </tr>
+      <tr>
+        <td>Scientific Skills</td>
+        <td class="set_width_td">
+          Science Club, Projects, Math Club, Science Quiz, Science Exhibition, Olympiads etc.
+        </td>
+        <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+      </tr>
+    </table>
+    <div class="custom_header">
+      <p>Health and physical Activities</p>
+    </div>
+    <table id="pdf-table">
+      <tr class="table-header">
+        <td>Observation</td>
+        <td>Descriptive Indicators</td>
+        <td class="center_aligned">Grade</td>
+      </tr>
+      <tr>
+        <td>Sports/Indigenous Sport</td>
+        <td class="set_width_td">
+
+        </td>
+        <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+      </tr>
+      <tr>
+        <td>NCC/NSS</td>
+        <td class="set_width_td">
+
+        </td>
+        <td class="align_center"><%=@cce_grade_set.present? ? @cce_grade_set.cce_grades.choice.name : ["A","B","C","D","E"].choice%></td>
+      </tr>
+    </table>
+  </div>
+<%end%>
+<label class="student_profile_head_label">Self Awareness</label>
+<div id="self_awareness" class="self_awareness_section">
+  <div class="ind_block"><label>My Goals :</label><div class="rg_details"><%=@records['MyGoals'].present? ? "Want to become a successfull computer engineer" : ""%></div></div>
+  <div class="ind_block"><label>My Strengths :</label><div class="rg_details"><%=@records['MyStrengths'].present? ? "My ability to concentrate on my studies for longer periods of time" : ""%></div></div>
+  <div class="ind_block"><label>My Interests and Hobbies :</label><div class="rg_details"><%=@records['InterestHobbies'].present? ? "Watching movies,Playing cricket" : ""%></div></div>
+  <div class="ind_block border_bottom_custom"><label>Responsibilities Discharged/Exceptional Achievements :</label><div class="rg_details"><%=@records['Responsibility'].present? ? "Second rank in science olympiad" : ""%></div></div>
+</div>
+<div  id="footer_pdf">
+  <div class="left_align">
+    <label>Parent</label>
+    <label>Place:</label>
+    <label>Dated:</label>
+  </div>
+  <div class="center_align">
+    <label>Class Teacher</label>
+  </div>
+  <div class="right_align">
+    <label class="right_align">Principal<br/><span>(with School Seal)</span></label>
+  </div>
+</div>

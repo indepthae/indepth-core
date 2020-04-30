@@ -1,0 +1,33 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hr_management')}" %></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payroll_categories') %></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to t('create_payroll_category'), :controller=>"payroll_categories", :action=>"new" %></li>
+    </ul>
+  </div>
+</div>
+
+<div id="page-yield">
+  <div class="bread_crumb">
+    <%= make_breadcrumb %>
+    <%= render_breadcrumbs  %>
+  </div>
+
+
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+
+  <div class="earnings" id="list_earnings">
+    <%= render :partial => 'earnings_list' %>
+  </div>
+
+  <div class="deductions" id="list_deductions">
+    <%= render :partial => 'deductions_list' %>
+  </div>
+    
+  <div id="dialogue"></div>
+</div>

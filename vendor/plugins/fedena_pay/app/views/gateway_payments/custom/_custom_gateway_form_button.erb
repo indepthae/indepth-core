@@ -1,0 +1,16 @@
+<% form_for :custom_gateway_online_pay ,:url => {:controller=>'payment_settings', :action=>'initialize_payment'},:method => :post,:html=>{:class=>'payment-form'} do |f| %>
+  <% @variable_params.each_pair do|k,v|%>
+    <%= hidden_field :online_payment, k.to_sym, :value=>v,:readonly => true %>
+  <% end %>
+  <% if @split_params.present? %>
+    <% @split_params.each_pair do |i,s| %>
+      <% s.each_pair do|k,v| %>
+        <%= hidden_field_tag "online_payment[split_params][#{i}][#{k}]",v  %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <%= hidden_field :online_payment, :current_school, :value=>current_school_name ,:readonly => true %>
+  <%= hidden_field_tag :current_gateway, @active_gateway %>
+  <%= hidden_field_tag :reference_no, @ref_no %>
+  <%= f.submit t('proceed'),:class => "submit_button",:style => @button_style %>
+<% end %>

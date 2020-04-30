@@ -1,0 +1,8 @@
+<div id="error-box">
+  <ul>
+    <%all_errors=@field_group.errors.full_messages%>
+    <% all_errors.each do |msg| %>
+      <li> <%= msg %></li>
+    <% end %>
+  </ul>
+</div>

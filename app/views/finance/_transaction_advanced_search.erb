@@ -1,0 +1,51 @@
+<p><%= t('searched_for') %></p>
+<div class="search-again">
+    <%= link_to "►#{t('search_again')}", {:controller=>"finance",:action=>"transactions_advanced_search"}, :class => 'user_button'%>
+</div>
+<div class="extender"></div>
+<div class="searched_for themed_text">
+    <%= @searched_for %>
+</div>
+
+<%unless @transactions.blank?%>
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td><%= t('sl_no') %></td>
+          <td><%= t('payee_name') %></td>
+          <td><%= t('receipt_no') %></td>
+          <td><%= t('amount') %></td>
+          <td><%= t('cancelled_by') %></td>
+          <td><%= t('reason') %></td>
+          <td><%= t('date_text') %> </td>
+          <td ><%= t('fee_collection_name') %></td>
+          <td ><%= t('finance_type') %></td>
+      </tr>
+      <tr class="tr-blank"></tr>
+      <%i=20*((params[:page].to_i-1) < 0 ? 0 : params[:page].to_i-1)%>
+      <% @transactions.each do |f| %>
+        <tr class="tr-<%= cycle("odd","even") %>">
+            <td class="col-1"><%= i +=1 %></td>
+            <td class="col-3" style="width:20%"> <%=f.payee_name.present? ? f.payee_name : f.other_details.present? ? f.other_details[:payee_name] : '-'%></td>
+            <td class="col-3"><%= f.receipt_no %></td>
+            <td class="col-3"><%= precision_label(f.amount) %></td>
+            <td class="col-3" style="min-width:85px;"><%= f.user.present?? f.user.full_name  : t('user_deleted') %></td>
+            <td class="col-3" style="min-width:85px;"><%= f.cancel_reason.present? ? f.cancel_reason :  "-" %></td>
+            <td class="col-3" ><%= format_date(f.created_at,:format=>:short_date) %></td>
+            <td class="col-2" ><div class="cancel" ><%= f.collection_name %></div></td>
+            <td class="col-3" ><%= f.finance_type.underscore.humanize() %></td>
+        </tr>
+      <% end %>
+  </table>
+  <%params[:search].present? ? search=params[:search] : search={"no_value"=>""}%>
+  <%= will_paginate @transactions,:previous_label=>"<", :next_label=>">", :renderer => 'RemoteLinkRenderer' ,:remote => { :loading =>  "$('loader_paginate').show();",:complete =>"$('loader').hide();"  }, :params => {:controller=>:finance,:action=>:transactions_advanced_search,:search=>search,:date=>params[:date],'transaction[type]'=>params[:transaction][:type],:remote=>"remote"} %>
+  <div class="extender"></div>
+  <%= link_to t('pdf_report'), {:controller => "finance", :action => "advanced_cancelled_transaction_reports",:search=>search,:date=>params[:date],'transaction[type]'=>params[:transaction][:type], :report_format_type => "pdf"},:target => '_blank', :class=> 'user_button addl_margin' %>
+  <%= link_to t('csv_report'), {:controller => "finance", :action => "advanced_cancelled_transaction_reports",:search=>search,:date=>params[:date],'transaction[type]'=>params[:transaction][:type], :report_format_type => "csv"},:class=> 'user_button addl_margin' %>
+<%else%>
+  <table id="listing" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head">
+          <td style="text-align:center;">
+              <%=t('no_reverted_transactions_exists')%></td>
+      </tr>
+  </table>
+<%end%>

@@ -1,0 +1,3 @@
+<% question_rows = exam_group.online_exam_groups_questions %>
+<p><%= t('no_of_questions_selected') %> : <label class="themed_text"><b><%= question_rows.count %></b></label></p>
+<p><%= t('total_marks') %> : <label class="themed_text"><b><%= question_rows.sum(:mark) %></b></label></p>

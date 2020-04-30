@@ -1,0 +1,57 @@
+<div class="fee_type_title"><%= t('master_fees.finance_fee') %></div>
+
+<table class="gray_table_list margin-v-20" align="center" width="100%" cellpadding="0" cellspacing="0">
+  <% data_to_be_linked = categorized_particulars_discounts(@categorized_particulars['core'], @categorized_discounts['core']) %>
+
+
+  <%# data = @categorized_particulars['core'] %>
+  <%# data_2 = @categorized_discounts['core'] %>
+  <% data_to_be_linked.each_pair do |cat_id, data| %>
+      <% next if !data[:particulars].present? and !data[:discounts].present? %>
+      <tr class="row-a main_head">
+        <td colspan="2">
+          <%= t('fee_category_name') %> :
+          <%= cat_name = data[:cat_name] %>
+        </td>
+      </tr>
+
+      <% if data[:particulars].present? %>
+          <tr class="row-a main_head">
+            <td class="col-name"><%= t('name') %></td>
+            <td class="col-desc set_border_right"><%= t('master_fees.master_particular') %></td>
+          </tr>
+          <% data[:particulars].each_pair do |p_name, p_data| %>
+              <% p_ids = p_data.map(&:ffp_id).uniq %>
+              <tr class="row-b">
+                <td class="col-name"><%= p_name %></td>
+                <td class="col-desc set_border_right">
+                  <%= hidden_field_tag "manage_masters_particulars[core_#{cat_id}_#{string_to_underscore(p_name)}]", p_ids.join(',') %>
+                  <%= select_tag "master_fee_particular_id[]",
+                                 options_for_select([[t('select_a_particular'), nil]] + @master_particulars.map { |x| [x.name, x.id] }),
+                                 :onchange => "set_linking('particulars','core', '#{cat_id}', '#{string_to_underscore(p_name)}', this)" %>
+                </td>
+              </tr>
+          <% end %>
+      <% end %>
+
+      <% if data[:discounts].present? %>
+          <tr class="row-a main_head">
+            <td class="col-name"><%= t('name') %></td>
+            <td class="col-desc set_border_right"><%= t('master_fees.master_discount') %></td>
+          </tr>
+          <% data[:discounts].each_pair do |p_name, p_data| %>
+              <% p_ids = p_data.map(&:fd_id).uniq %>
+              <tr class="row-b">
+                <td class="col-name"><%= p_name %></td>
+                <td class="col-desc set_border_right">
+                  <%= hidden_field_tag "manage_masters_discounts[core_#{cat_id}_#{string_to_underscore(p_name)}]", p_ids.join(',') %>
+                  <%= select_tag "master_fee_discount_id[]",
+                                 options_for_select([[t('select_a_discount'), nil]] + @master_discounts.map { |x| [x.name, x.id] }),
+                                 :onchange => "set_linking('discounts','core', '#{cat_id}', '#{string_to_underscore(p_name)}', this)" %>
+                </td>
+              </tr>
+          <% end %>
+      <% end %>
+  <% end %>
+
+</table>

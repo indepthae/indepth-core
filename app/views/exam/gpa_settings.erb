@@ -1,0 +1,109 @@
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('gpa_settings') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('gpa_settings') %></div>
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <%= make_breadcrumb %>
+        <%= render_breadcrumbs  %>
+    </div>
+
+    <%unless flash[:notice].nil?%>
+      <p class="flash-msg"><%= flash[:notice] %></p>
+    <% end %>
+    
+
+    <% form_for('configuration', :url => {:action=> 'gpa_settings'}, :html=> {:multipart=>true}) do |s| %>
+      <h5><%= t('cgpa_calculation_format') %></h5>
+      <div class="by_average">
+          <div class="label_field_pair">
+              <div class="student_gender_value">
+                  <%= s.radio_button  :cgpa_type, "0", :checked => (@config[:cgpa_type].to_i == 0) %>
+                  <label class="label_for_gender" for="configuration_config_value_0"> <%= t('by_gpa_average') %></label>
+              </div>
+          </div>
+          <div class="average_example themed_text">
+              <%= link_to_remote "#{t('view_example')}",:url => { :controller=>"exam",:action => 'cgpa_average_example'},  :html => {:class => 'themed_text'} %>
+          </div>
+
+          <div class="formula">
+              <div class="numerator"><%= t('average_gpas') %></div>
+              <div class="denominator"><%= "#{t('total_batches')}" %> </div>
+          </div>
+      </div>
+
+      <div class="by_credit_hours">
+          <div class="label_field_pair">
+              <div class="student_gender_value">
+                  <%= s.radio_button  :cgpa_type, "1", :checked => (@config[:cgpa_type].to_i == 1) %>
+                  <label class="label_for_gender" for="configuration_config_value_1"> <%= t('by_credit_hours') %></label>
+              </div>
+          </div>
+          <div class="credit_hour_example themed_text">
+              <%= link_to_remote "#{t('view_example')}",:url => { :controller=>"exam",:action => 'cgpa_credit_hours_example'},:method => 'get', :html => {:class => 'themed_text'} %>
+          </div>
+
+          <div class="formula">
+              <div class="numerator"><%= t('total_credit_points') %></div>
+              <div class="denominator"><%= t('total_credit_hours')%> </div>
+          </div>
+      </div>
+      <h5><%= t('mark_calculation_mode') %></h5>
+      <div class="by_average">  
+          <div class="label_field_pair" id="cal_mode">
+              <div class="student_gender_value">
+                  <%= s.radio_button  :calculation_mode,"1" , :checked=> (@config[:calculation_mode].to_i == 1),:onchange=>"display_setting()"%>
+                  <label class="label_for_gender" for="configuration_config_value_0"> <%= t('weighted_marks_mode') %></label>
+              </div>
+          </div>
+          <div class="average_example themed_text" id="setting">
+              <%= link_to_remote "Setting",:url => { :controller=>"exam",:action => 'transcript_settings'},:method => 'get',  :html => {:class => 'themed_text'} %>
+          </div>
+          <div id="description_for_calculation"><%= t('weighted_marks_mode_desc')%></div>
+      </div>
+      <div class="by_credit_hours">
+          <div class="label_field_pair" id="cal_mode">
+              <div class="student_gender_value">
+                  <%= s.radio_button  :calculation_mode, "0", :checked => (@config[:calculation_mode].to_i == 0),:onchange=>"display_setting()" %>
+                  <label class="label_for_gender" for="configuration_config_value_1"> <%= t('weighted_grade_point_mode') %></label>
+              </div>
+          </div>
+          <div class="average_example themed_text"></div>
+          <div id="description_for_calculation"><%= t('weighted_grade_point_mode_desc')%></div>
+      </div>
+
+      <%= submit_tag "", :value => "#{t('submit')}", :class => "submit_button", :disable_with => "► #{t('please_wait')}" %>
+    <% end %>
+
+    <div id="modal-box" style="display:none;"></div>
+
+</div>
+
+
+<script>
+  function display_setting(){
+    if(j("#configuration_calculation_mode_1").is(":checked"))
+      j("#setting").show()
+    else
+      j("#setting").hide()
+  } 
+  j(document).ready(function(){
+    display_setting();
+  });
+  function select_all_fields_for_grade(select_all){
+    if (j(select_all).is(':checked')) {
+      $$('input[id$="show_grade"].MB_focusable').each(function(m){ m.checked = true});
+    }
+    else
+      $$('input[id$="show_grade"].MB_focusable').each(function(m){ m.checked = false});
+  }
+  function select_all_fields_for_percentage(select_all){
+    if (j(select_all).is(':checked')) {
+      $$('input[id$="show_percentage"].MB_focusable').each(function(m){ m.checked = true});
+    }
+    else
+      $$('input[id$="show_percentage"].MB_focusable').each(function(m){ m.checked = false});
+  }
+  </script>

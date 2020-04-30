@@ -1,0 +1,48 @@
+<%# if rtl? %>
+<%# stylesheet_link_tag "rtl/_layout/fee_receipt_template" %>
+<%# else %>
+<%# stylesheet_link_tag "_layout/fee_receipt_template" %>
+<%# end %>
+
+<% content_for :head do %>
+  <% @direction = (rtl?) ? 'rtl/' : '' %>
+  <% if params.key?(:debug) %>
+    <%= stylesheet_link_tag "#{@direction}finance/generate_fee_receipt_pdf.css", :media => "all" %>
+  <% end %>
+  <%= wicked_pdf_stylesheet_link_tag "#{@direction}finance/generate_fee_receipt_pdf" %>
+  <!-- <link rel="stylesheet" type="text/css" href="< %="#{RAILS_ROOT}/public/stylesheets/#{@direction}finance/generate_fee_receipt_pdf.css" %>" media="all" /> -->
+<% end %>
+
+<% @transactions.each do |i, transaction_hash| %>
+  <% transaction_hash.template_id = @frt.id %>
+  <% total_fees = 0 %>
+  <% default_configs ||= nil %>
+  <% @config ||= {} %>
+  <div id="page-yield">
+      <%= render :partial => "finance_extensions/receipts/common/receipt_header",
+        :locals => {:template_id => @frt.id,
+        :default_configs => transaction_hash.default_configs} %>
+
+      <%= render :partial => 'finance_extensions/receipts/common/fee_report_header',
+        :locals => {:transaction_hash => transaction_hash} %>
+
+      <% unless transaction_hash.particular_wise %>
+        <div class="subsection">
+            <div class="light_hor_line"></div>
+            <div id="sub_text_left"><%= t('particulars') %></div>
+            <div id="sub_text_right"><%= t('amount') %> (<%= transaction_hash.currency %>)</div>
+            <div class="light_hor_line"></div>
+            <div class="extender"></div>
+        </div>
+      <% end %>
+
+      <%= render :partial => single_receipt_partial(transaction_hash.finance_type, transaction_hash.particular_wise),
+        :locals => {:transaction_hash => transaction_hash, :total_fees => total_fees} %>
+
+      <div class="small_hor_line"></div>
+
+      <%= render :partial => "finance_extensions/receipts/common/receipt_footer",
+        :locals => {:template_id => transaction_hash.template_id,
+        :default_configs => transaction_hash.default_configs} %>
+  </div>
+<% end %>

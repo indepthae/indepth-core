@@ -1,0 +1,103 @@
+<div id="content-header">
+  <%= show_header_icon %>
+  <h1><%= "#{t('hostel_text')}"%></h1>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= "#{t('edit_hostel_details')}"%></div>
+  <div id="inner-tab-menu">
+    <ul>
+      <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('view_all')}",  :action => "show" %></li>
+    </ul>
+  </div>
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% breadcrumb :hostels_edit, @hostel %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <div id="vehicle_form">
+    <%= error_messages_for :hostel %>
+    <% form_for(@hostel) do |h| %>
+      <% if @hostel.errors.any? %>
+      <% end %>
+
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= "#{t('hostel_name')}"%><span class="necessary-field">*</span> </label>
+        <div class="text-input-bg"><%= h.text_field :name %></div>
+      </div>
+
+      <div class="label-field-pair">
+        <label for="vehicle_no"><%= "#{t('hostel_type')}"%><span class="necessary-field">*</span> </label>
+        <div class="text-input-bg"><%= h.select :hostel_type , [["#{t('common')}",'Common'], ["#{t('gents')}",'Gents'], ["#{t('ladies')}",'Ladies'] ],{ :selected => @hostel.hostel_type } , {:disabled => @hostel.is_allocated? } %></div>
+      </div>
+
+      <div class="label-field-pair-text-area">
+        <label for="vehicle_no"><%= "#{t('other_information')}"%></label>
+        <div class="textarea-input-bg"><%= h.text_area :other_info,:rows => 5,:class => 'other_info' %></div>
+      </div>
+      <%i=0%>
+      <%h.fields_for :hostel_room_additional_details, @hostel_additional_details do |ff|%>
+        <%=ff.hidden_field :hostel_room_additional_field_id%>
+        <% additional = @additional_fields.select{|a| a.id==ff.object.hostel_room_additional_field_id}.first  %>
+        <% prev_record = @hostel_additional_details.find_by_hostel_room_additional_field_id(additional.id) %>
+        <% unless prev_record.nil? or prev_record.additional_info.nil? %>
+          <% if additional.input_type=="has_many" %>
+            <% prev_value = prev_record.additional_info.split(",")%>
+          <% else %>
+            <% prev_value = prev_record.additional_info %>
+          <% end %>
+        <% end %>
+        <% input_val = prev_value %>
+        <% if additional.input_type=="belongs_to" %>
+          <div class="label-field-pair">
+            <label><%= additional.name %>
+              <% if additional.is_mandatory %>
+                <span class="necessary-field">*</span>
+              <% end %>
+            </label>
+            <div class="text-input-bg"><%= ff.select :additional_info,additional.hostel_additional_field_options.map{|b| [b.field_option,b.field_option]},{:include_blank=>"#{t('select_an_option')}"}%></div>
+          </div>
+        <% elsif additional.input_type=="has_many" %>
+          <div class="grades">
+            <div class="label-field-pair">
+              <label><%= additional.name %>
+                <% if additional.is_mandatory %>
+                  <span class="necessary-field">*</span>
+                <% end %></label>
+            </div>
+            <div class="fee_category_scroll">
+              <div class="sel-list">
+                <%= t('select') %>: <%= link_to_function t('all'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = true; });" %>,
+                <%= link_to_function t('none'), "$$('input.check#{i}').each(function(checkbox) { checkbox.checked = false; });" %>
+              </div>
+              <% additional.hostel_additional_field_options.each do |k| %>
+                <div class="each_batch">
+                  <% unless params[:hostel].present? and [:hostel_room_additional_details_attributes].present? %>
+                    <%=check_box_tag "hostel[hostel_room_additional_details_attributes][#{i.to_s}][additional_info][]", k.field_option, (!(input_val.nil?) and input_val.include?(k.field_option)), {:class=>"batches_box check#{i}"}%><label class="check_box_value"><%=k.field_option%></label>
+                  <% else %>
+                    <%=check_box_tag "hostel[hostel_room_additional_details_attributes][#{i.to_s}][additional_info][]", k.field_option, params[:hostel][:hostel_room_additional_details_attributes][i.to_s]["additional_info"].present? ? params[:hostel][:hostel_room_additional_details_attributes][i.to_s]["additional_info"].include?(k.field_option) ? true :false : false, {:class=>"batches_box check#{i}"}%><label class="check_box_value"><%=k.field_option%></label>
+                  <% end %>
+                </div>
+              <% end %>
+              <%= hidden_field_tag "hostel[hostel_room_additional_details_attributes][#{i.to_s}][additional_info][]", nil %>
+            </div>
+          </div>
+        <% else %>
+          <div class="label-field-pair">
+            <label><%= additional.name %>
+              <% if additional.is_mandatory %>
+                <span class="necessary-field">*</span>
+              <% end %></label>
+
+            <div class="text-input-bg"><%= ff.text_field :additional_info%></div>
+          </div>
+        <% end %>
+        <% i+=1 %>
+
+        <div class="extender"></div>
+    <%# end %>
+
+      <%end%>
+      <%= submit_tag "", :value => "►#{t('update')}" , :class => "submit_button" %>
+    <% end %>
+  </div>
+</div>

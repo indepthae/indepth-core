@@ -1,0 +1,148 @@
+<div id="content-header">
+  <%= payslip_management_header_icon(params[:finance].present?) %>
+  <% unless params[:finance].present? %>
+    <h1><%= "#{t('hr_management')}" %></h1>
+  <% else %>
+    <h1><%= t('employee_payslip_management') %></h1>
+  <% end %>
+  <div class='header-sep'>|</div>
+  <div class='sub-header'><%= t('payslip_for_employees') %></div>
+  <% if permitted_to? :view_all_rejected_payslips, :employee_payslips %>
+    <div id="inner-tab-menu">
+      <ul>
+        <% if params[:finance].nil? %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('rejected_payslips')}", :controller=>"employee_payslips", :action=>"view_all_rejected_payslips" %></li>
+        <% else %>
+          <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('rejected_payslips')}", :controller=>"employee_payslips", :action=>"view_all_rejected_payslips", :finance => params[:finance], :from => 'payslip_employees' %></li>
+        <% end %>
+        <% unless @archived_employee.nil? %>
+          <li class='drop_header themed_bg themed-dark-hover-background'>
+            <a href="#" class="drop_header_link"><%= t('more') %> &#9660;</a>
+            <ul id="box_2" class="more-menu-div" style="display:none;">
+              <% if params[:archived].nil? %>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('archived_employee_payslips')}", :controller=>"employee_payslips", :action=>"payslip_for_employees", :finance => params[:finance], :archived => 1 %></li>
+              <% else %>
+                <li class='themed_bg themed-dark-hover-background'><%= link_to "#{t('employee_payslips')}", :controller=>"employee_payslips", :action=>"payslip_for_employees", :finance => params[:finance]%></li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+</div>
+<div id="page-yield">
+  <div class="bread_crumb">
+    <% if params[:finance].nil? and params[:archived].nil? %>
+      <%= make_breadcrumb %>
+    <% elsif params[:finance].present? and params[:archived].nil? %>
+      <% breadcrumb :employee_payslips_payslip_for_employees_finance %>
+    <% elsif params[:finance].nil? and params[:archived].present? %>
+      <% breadcrumb :employee_payslips_payslip_for_employees_archived %>
+    <% else %>
+      <% breadcrumb :employee_payslips_payslip_for_employees_finance_archived %>
+    <% end %>
+    <%= render_breadcrumbs  %>
+  </div>
+  <% unless flash[:notice].nil? %>
+    <p class="flash-msg"> <%= flash[:notice] %> </p>
+  <% end %>
+  <div class="header">
+    <%= t('payslip_for_employees') %>
+  </div>
+
+  <div class="description">
+    <%= params[:finance].present? ? t('generate_payslip_for_employees_finance_desc') : t('generate_payslip_for_employees_desc') %>
+  </div>
+
+  <div class="label-field-pair">
+    <label for="department"><%= t('department') %></label>
+    <div class="text-input-bg">
+      <%= select_tag :department_id, options_for_select([["#{t('all_departments')}",'All']] + @departments.map { |c| [c.name, c.id] }, :selected => 'All'),:onchange => "#{remote_function(:url => {:action => "payslip_for_employees", :finance => params[:finance]},
+      :with => "'dept_id='+value+'&archived='+'#{params[:archived]}'",
+      :before => "Element.show('loader')",
+      :success => "Element.hide('loader')")}; j('#name').val('')"%>
+    </div>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader",
+      :style =>"display: none;" ) %>
+  </div>
+  <div class="label-field-pair" id="search">
+    <div class="text-input-bg">
+      <%= text_field_tag "name", params[:name], :autocomplete => 'off' , :placeholder => t('employee_name_or_no') %>
+    </div>
+    <label for="emp_name"><%= t('search_employee') %></label>
+    <%= image_tag("loader.gif",
+      :align => "absmiddle",
+      :border => 0,
+      :id => "loader1",
+      :style =>"display: none;" ) %>
+  </div>
+
+  <div id="employee_list">
+    <%= render :partial => "list_employees" %>
+  </div>
+
+</div>
+<script type="text/javascript">
+  var flag = 0;
+  function search_employee_ajax(){
+    var elm = j(this);
+    var delay = 1000;
+    clearTimeout(elm.data('timer'));
+    elm.data('timer', setTimeout(function(){
+      elm.removeData('timer');
+
+      if ($('name').value.include("%")) return;
+<%="#{remote_function(:url => {:action => "payslip_for_employees"},
+:with =>  "'name='+ escape($('name').value)+'&dept_id='+ $('department_id').value+'&archived='+'#{params[:archived]}'+'&finance='+'#{params[:finance]}'",
+:before => "Element.show('loader1')",
+:success => "Element.hide('loader1')"
+)}"%>
+    }, delay));
+
+    
+  }
+  j('#name').bind('input', search_employee_ajax)
+
+
+
+<%  if (rtl?) %>
+    j(document).ready(function() {
+      j(".drop_header").hover(
+      function () {
+        link_off = j(this).offset();
+        link_width = j(this).width();
+        link_height = j(this).height();
+        menu_box = j(this).find(".more-menu-div");
+        box_width = menu_box.width();
+        //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+        menu_box.css({top: (link_off.top + link_height),left: (link_off.left)});
+        menu_box.css("display","block");
+      },
+      function () {
+        j(this).find(".more-menu-div").css("display","none");
+      });
+    });
+<% else %>
+    j(document).ready(function() {
+      j(".drop_header").hover(
+      function () {
+        link_off = j(this).offset();
+        link_width = j(this).width();
+        link_height = j(this).height();
+        menu_box = j(this).find(".more-menu-div");
+        box_width = menu_box.width();
+        //  c_b.css({ top: (0 - (child_bottom - main_bottom))});
+        menu_box.css({top: (link_off.top + link_height),left: ((link_off.left + link_width) - box_width)});
+        menu_box.css("display","block");
+      },
+      function () {
+        j(this).find(".more-menu-div").css("display","none");
+      });
+    });
+<% end %>
+</script>

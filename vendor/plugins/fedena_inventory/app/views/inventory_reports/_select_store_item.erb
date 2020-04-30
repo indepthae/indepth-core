@@ -1,0 +1,9 @@
+        <div class="label-field-pair">
+          <label for="sort"><%= t('item_category') %></label>
+          <div class="text-input-bg margin-left-10">
+            <%= select :status, :item_category, @store_items.collect{|x| [x.item_category.name,x.item_category_id] unless x.item_category.nil?}.compact.uniq , {}  %>
+          </div>
+        </div>
+
+        
+

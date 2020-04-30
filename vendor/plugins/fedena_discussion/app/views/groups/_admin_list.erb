@@ -1,0 +1,24 @@
+<div id="members_list">
+  <div class="label-field-pair">
+    <label for="student_grade"><%= t('admins') %></label>
+    <div class ="scrolable1" >
+      <% x = "<span class='individual-x'></span>" %>
+      <div class="scroll-inside">
+        <% group_admin.each do |r|  %>
+          <div class="hover">
+            <%  if @group.user_id==r.id %>
+              <div class="admin">
+                <%= shorten_string(r.full_name,22) %>
+              </div>
+            <%else %>
+              <%= shorten_string(r.full_name,22)  %>
+              <%= link_to x, switch_between_admin_and_normal_group_path(:user_id=>r.id,:group_id=>@group.id), :action=>"switch_between_admin_and_normal" %>
+            <%end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="extender"></div>
+</div>

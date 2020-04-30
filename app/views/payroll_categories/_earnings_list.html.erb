@@ -1,0 +1,32 @@
+<div id="earnings_header"><%= t('earnings') %></div>
+<div id="earnings_desc"><%= t('earnings_description') %></div>
+<div id="earnings_list">
+  <table align="center" width="100%" cellpadding="1" cellspacing="1">
+    <tr class="tr-head">
+      <td class="category_name"><%= t('category_name') %></td>
+      <td class="category_code"><%= t('category_code') %></td>
+      <td class="value"><%= t('value') %></td>
+      <td class="actions"></td>
+    </tr>
+    <%  if @earnings.present?  %>
+      <% @earnings.each do |earning|  %>
+        <tr id="earning-<%=earning.id%>">
+          <td><%= link_to earning.name,payroll_category_path(earning) %></td>
+          <td><%= earning.code %></td>
+          <td><div class="formula-text"><%= earning.hr_formula.try(:formula_html_display) %></div></td>
+          <td class="actions">
+            <%= link_to t('view'),payroll_category_path(earning) %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr class="tr-even" >
+        <td colspan="4"><%= t('add_a_payroll_category') %></td>
+      </tr>
+    <% end %>
+  </table>
+  <% if @earnings.present?  %>
+    <%= pagination_status(@earnings) %>
+    <%= will_paginate @earnings, :renderer => 'RemoteLinkRenderer', :params => {:is_deductions => false} %>
+  <% end %>
+</div>

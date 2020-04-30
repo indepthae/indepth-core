@@ -1,0 +1,2 @@
+sql="update invoices inner join finance_transactions ft on ft.finance_type='Invoice' and ft.finance_id=invoices.id set ft.transaction_date=invoices.date WHERE (ft.transaction_date<>invoices.date) "
+ ActiveRecord::Base.connection.execute(sql)

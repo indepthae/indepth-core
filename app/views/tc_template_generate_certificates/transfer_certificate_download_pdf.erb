@@ -1,0 +1,191 @@
+<% content_for :head do  %>
+
+  <% if rtl? %>
+    <%= stylesheet_link_tag "rtl/tc_template_generate_certificates/transfer_certificate_download_pdf.css", :media => "all" %>
+  <%else %>
+    <%= stylesheet_link_tag "tc_template_generate_certificates/transfer_certificate_download_pdf.css", :media => "all" %>
+  <% end %>
+  <%= stylesheet_link_tag(*get_stylesheet_for_tc)%>
+  <%#= javascript_include_tag("tc_printer") %>
+<% end %>
+<%= wicked_pdf_javascript_include_tag 'cache/javascripts/all' %>
+<%= wicked_pdf_javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% if params[:d].present? %>
+  <%= javascript_include_tag 'jquery/jquery-1.9.1.min.js' %>
+<% end %>
+<script type="text/javascript">
+  var j = jQuery.noConflict();
+</script>
+<style type="text/css">
+    table{
+        page-break-before:avoid !important;
+        page-break-inside:auto;
+        page-break-after: auto;
+    }
+    .page {
+        <%#*page-break-after: auto;%>
+        <%#*page-break-inside: avoid !important;%>
+        //overflow: hidden;
+    }
+    .section{
+        margin-top:10px;
+    }
+    #main_info h4{
+        height:20px;
+        overflow: hidden;
+    }
+    #main_info h3{
+        height:25px;
+        overflow: hidden;
+    }
+
+</style>
+
+<% if @tc_data["Header"]["header_enabled"] %>
+  <div class="header_preview">
+      <div class ="header_head">
+          <% if @tc_data["Header"]["InstitutionLogo"].is_enabled %>
+            <div class="<%= @tc_data["Header"]["InstitutionLogo"].value == "left" ? 'logo_to_left' : 'logo_to_right' %>">
+                <div class="logo">
+                    <%= wicked_pdf_image_tag current_school_detail.logo,:s3=>true,:style=>:original,:timestamp=>false %>
+                </div>
+            </div>
+            <div class="institution_details_to_<%= @tc_data["Header"]['AlignInstitutionDetail'].value%>">
+                <div class="preview_institution_name"><%= @tc_data["Header"]["InstitutionName"].value if @tc_data["Header"]["InstitutionName"].is_enabled%> </div>
+                <%- if @tc_data["Header"]["Address"].is_enabled%><div class="institution_address_preview"><span class="preview_institution_address"><%= @tc_data["Header"]["Address"].value %></span></div><%- end %>
+                <div class="institution_contact_preview"><%- if @tc_data["Header"]["Website"].is_enabled%><span class="preview_institution_website"><%= @tc_data["Header"]["Website"].value %><%- if @tc_data["Header"]["Website"].value.present?%> <%- if @tc_data["Header"]["Phone"].value.present? or @tc_data["Header"]["Email"].value.present?%> <%- if @tc_data["Header"]["Phone"].is_enabled == true or @tc_data["Header"]["Email"].is_enabled == true%> |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @tc_data["Header"]["Phone"].is_enabled%><span class="preview_institution_website"><%= @tc_data["Header"]["Phone"].value %><%- if @tc_data["Header"]["Phone"].value.present?%> <%- if @tc_data["Header"]["Email"].value.present?%>   <%- if @tc_data["Header"]["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @tc_data["Header"]["Email"].is_enabled%><span class="preview_institution_email"><%= @tc_data["Header"]["Email"].value %></span><%- end %></div>
+                    <% if  @tc_data["Header"]["AdditionalField"].present?%>
+                      <% @tc_data["Header"]["AdditionalField"].additional_field.each do |additional_field| %>
+                    <div class="institution_additional_preview"><span class="preview_additional_<%= additional_field.text_size%> preview_additional_<%= additional_field.text_color%>">
+                            <%= additional_field.value%>
+                        </span></div>
+                  <% end %>
+                <% end %>  
+            </div>
+          <%else%>
+            <div class="institution_details_with_no_logo_to_<%= @tc_data["Header"]['AlignInstitutionDetail'].value%>">
+                <div class="preview_institution_name"><%= @tc_data["Header"]["InstitutionName"].value if @tc_data["Header"]["InstitutionName"].is_enabled%> </div>
+                <%- if @tc_data["Header"]["Address"].is_enabled%><div class="institution_address_preview"><span class="preview_institution_address"><%= @tc_data["Header"]["Address"].value %></span></div><%- end %>
+                <%- if @tc_data["Header"]["Website"].is_enabled%><div class="institution_contact_preview"><span class="preview_institution_website"><%= @tc_data["Header"]["Website"].value %><%- if @tc_data["Header"]["Website"].value.present?%> <%- if @tc_data["Header"]["Phone"].value.present? or @tc_data["Header"]["Email"].value.present?%> <%- if @tc_data["Header"]["Phone"].is_enabled == true or @tc_data["Header"]["Email"].is_enabled == true%> |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @tc_data["Header"]["Phone"].is_enabled%><span class="preview_institution_website"><%= @tc_data["Header"]["Phone"].value %><%- if @tc_data["Header"]["Phone"].value.present?%> <%- if @tc_data["Header"]["Email"].value.present?%>   <%- if @tc_data["Header"]["Email"].is_enabled == true%>  |<%- end%><%- end%><%- end%></span><%- end %>
+                    <%- if @tc_data["Header"]["Email"].is_enabled%><span class="preview_institution_email"><%= @tc_data["Header"]["Email"].value %></span></div><%- end %>
+                    <% if  @tc_data["Header"]["AdditionalField"].present?%>
+                      <% @tc_data["Header"]["AdditionalField"].additional_field.each do |additional_field| %>
+                    <div class="institution_additional_preview"><span class="preview_additional_<%= additional_field.text_size%> preview_additional_<%= additional_field.text_color%>">
+                            <%= additional_field.value%>
+                        </span></div>
+                  <% end %>
+                <% end %>  
+            </div>
+          <%  end %>  
+
+
+      </div>
+      <div class="header_bottom">
+          <div class="preview_certificate_name">
+              <%= @tc_data["Header"]["CertificateName"].value%>
+          </div>
+          <%  if @tc_data["Header"]["DateOfIssue"].value == "" %>
+            <% date_text = t('date_of_issue') %>
+          <% else %>
+            <% date_text = @tc_data["Header"]["DateOfIssue"].value %>
+          <% end %>
+          <div class="preview_certificate_date_and_serial">
+              <div class="certificate_serial"><span class="certificate_serial_label"><%=t('certification_no')%></span> : <span class="certificate_serial_field"><%=  (@tc_data["Header"]["serial_number"])%></span> </div>
+<% if @tc_data["Header"]["DateOfIssue"].is_enabled%><div class="certificate_date"><div class="date_label"><%= date_text %> : </div><div class="date_format"><%=  format_date @tc_data["Header"]["date_of_issue"]%></div></div><% end %>
+
+          </div>
+
+      </div>
+  </div>
+<% else %>
+  <div  style="height: <%= @tc_data["Header"]["header_space"] %>mm"></div>
+  <% if @tc_data["Header"]["CertificateName"].is_enabled.present?%>
+  <div class="header_preview">
+          <div class="preview_certificate_name">
+              <%= @tc_data["Header"]["CertificateName"].value%>
+          </div>
+          <%  if @tc_data["Header"]["DateOfIssue"].value == "" %>
+            <% date_text = t('date_of_issue') %>
+          <% else %>
+            <% date_text = @tc_data["Header"]["DateOfIssue"].value %>
+          <% end %>
+          <div class="preview_certificate_date_and_serial">
+              <div class="certificate_serial"><span class="certificate_serial_label"><%=t('certification_no')%></span> : <span class="certificate_serial_field"><%=  (@tc_data["Header"]["serial_number"])%></span> </div>
+<% if @tc_data["Header"]["DateOfIssue"].is_enabled%><div class="certificate_date"><div class="date_label"><%= date_text %> : </div><div class="date_format"><%=  format_date @tc_data["Header"]["date_of_issue"]%></div></div><% end %>
+
+          </div>
+
+      </div>
+  <%end%>
+<% end %>
+  <%#*<div id="body_end" style="background: yellow"></div>%>
+<%= render :partial=>"tc_data_print_bck" %>
+<script type="text/javascript">
+
+  
+   if (j('.logo_to_left').length == 1) {
+   j('.institution_details_to_center').css('float', 'left');
+   } else {
+   j('.institution_details_to_center').css('float', 'right');
+   }
+   if(j('.institution_contact_preview').children().length == 0){
+   j('.institution_contact_preview').css('display', 'none');
+   }
+   else{
+   j('.institution_contact_preview').css('display', 'inline-block');
+   }
+   
+  var width = 0;
+  j(".tc_field_label").each(function () {
+      console.log("log_working");
+      var text = j(this).text();
+      j(this).css({position: "absolute", visibility: "hidden", display: "block"});
+      console.log(j(this).width())
+      j(this).css({position: "", visibility: "", display: ""});
+      var div_width = get_width(this);
+      if (div_width > width) {
+          width = div_width;
+      }
+  });
+  if (width > 300) {
+      width = 300;
+  }
+  j(".tc_field_labels").css('max-width','450px');
+  
+  j(".tc_field_labels").width(width + 30);
+
+  if (j('span.words').length > 0)
+  {
+      j('span.words').parent().css('white-space', 'normal');
+  }
+  if (j('span.in_figures').length > 0)
+  {
+      j('span.in_figures').parent().css('white-space', 'normal');
+  }
+
+  function get_width(el) {
+      var html_org = j(el).html();
+      var html_calc = '<span>' + html_org + '</span>';
+      j(el).html(html_calc);
+      var width = j(el).find('span:first').width();
+      j(el).html(html_org);
+      return width;
+  }
+  ;
+  var hp_h = j('.header_preview').outerHeight();
+  var tcd_h = j('#tc_data').outerHeight();
+  var b_h = j('body').outerHeight();
+  var f_h = j('.footer-pdf-style').outerHeight();
+j('#body_end').html('hp_h:'+hp_h+'tcd_h:'+tcd_h+'b_h:'+b_h+'f_h:'+f_h);
+//j('#body_end').html(j('body').height());
+if(tcd_h > 790){
+    //j('.footer-pdf-style').css('position','static');
+    //j('.footer-pdf-style').css('margin-top','200px !important');
+  }
+
+  
+
+</script>

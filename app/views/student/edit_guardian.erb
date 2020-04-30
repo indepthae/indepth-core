@@ -1,0 +1,210 @@
+<%-# Fedena
+#Copyright 2010 Foradian Technologies Private Limited
+#
+#This product includes software developed at
+#Project Fedena - http://www.projectfedena.org/
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.  See the License for the
+#specific language governing permissions and limitations
+#under the License. -%>
+
+
+<div id="content-header">
+    <%= show_header_icon %>
+    <h1><%= t('parent_information') %></h1>
+    <div class='header-sep'>|</div>
+    <div class='sub-header'><%= t('edit_parent_guardian_details') %></div>
+
+</div>
+<div id="page-yield">
+    <div class="bread_crumb">
+        <% breadcrumb :student_edit_guardian, [@student,@parent] %>
+        <%= render_breadcrumbs  %>
+    </div>
+    <% unless flash[:notice].nil? %> <p class="flash-msg"> <%= flash[:notice] %> </p> <% end %>
+
+    <% form_for :parent_detail , :html=> {:multipart=>true} do |s| %>
+
+      <%= error_messages_for 'parent' %>
+
+      <div id="admission1_form">
+
+
+
+          <div class="label-field-pair">
+              <label for="parent_detail_student_id"><%= t('student_admission_no') %></label>
+              <div class="text_display"><%= @student.admission_no %></div>
+              <%= s.hidden_field :ward_id, :value => @student.id %>
+          </div>
+          <br/>
+          <span class="span-sub-heading"><%= t('parent_personal_details') %></span>
+          <hr class="sub-heading"></hr>
+
+          <div class="personal_details">
+              <div class="label-field-pair">
+                  <label for="parent_detail_name"><%= t('first_name') %> <span class="necessary-field">*</span> </label>
+                  <div class="text-input-bg"><%= s.text_field :first_name, :value => @parent.first_name %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_name"><%= t('last_name') %></label>
+                  <div class="text-input-bg"><%= s.text_field :last_name, :value => @parent.last_name %></div>
+              </div>
+              
+              <% if (@parent.relation.present? and !["father","mother"].include?(@parent.relation)) or (@parent.relation_type.present? and @parent.relation_type == "other") %>
+                <div class="label-field-pair">
+                    <label for="parent_detail_relation"><%= t('relation') %><span class="necessary-field">*</span></label>
+                    <div class="text-input-bg left-float"> <%= select :parent_detail, :relation_type, [["#{t('father')}","father"],["#{t('mother')}","mother"],["#{t('other')}","other"]], {:selected => "other"},{:id=>"relation-select",:onchange=>"toggle_relation_box(); return false;"} %> </div>
+                    <div id="parent-relation" class="left-float">
+                        <div class="text-input-bg"><%= s.text_field :relation, :value=>@parent.relation %></div>
+                    </div>
+                </div>
+              <% else %>
+                <div class="label-field-pair">
+                    <label for="parent_detail_relation"><%= t('relation') %><span class="necessary-field">*</span></label>
+                    <div class="text-input-bg left-float"> <%= select :parent_detail, :relation, [["#{t('father')}","father"],["#{t('mother')}","mother"],["#{t('other')}","other"]], {:selected => @parent.relation}, {:id=>"relation-select",:onchange=>"toggle_relation_box(); return false;"} %> </div>
+                    <div id="parent-relation" class="left-float"></div>
+                </div>
+              <% end %>
+
+              <% unless @parent.dob.nil? %>
+                <div class="label-field-pair">
+                    <label for="parent_detail_dob"><%= t('date_of_birth') %></label>
+                    <div class="text-input-bg"><%= calendar_date_select_tag 'parent_detail[dob]', I18n.l(@parent.dob,:format=>:default),:year_range => 100.years.ago..4.years.ago ,:popup=>"force" %></div>
+                </div>
+              <% else %>
+                <div class="label-field-pair">
+                    <label for="parent_detail_dob"><%= t('date_of_birth') %></label>
+                    <div class="text-input-bg"><%= calendar_date_select_tag 'parent_detail[dob]', nil,:year_range => 100.years.ago..4.years.ago ,:popup=>"force" %></div>
+                </div>
+              <% end %>
+              <div class="label-field-pair">
+                  <label for="parent_detail_education"><%= t('education') %></label>
+                  <div class="text-input-bg"><%= s.text_field :education, :value => @parent.education %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_occupation"><%= t('occupation') %></label>
+                  <div class="text-input-bg"><%= s.text_field :occupation, :value => @parent.occupation %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_income"><%= t('income') %></label>
+                  <div class="text-input-bg"><%= s.text_field :income, :value => @parent.income %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_email"><%= t('email') %></label>
+                  <div class="text-input-bg"><%= s.text_field :email, :value => @parent.email %></div>
+              </div>
+          </div>
+          <br/>
+          <span class="span-sub-heading"><%= t('parent_contact_details') %></span>
+          <hr class="sub-heading"></hr>
+
+          <div class ="address_details">
+              <div class="label-field-pair">
+                  <label for="master_student_city"><%= t('office_address_line1') %></label>
+                  <% unless @parent.office_address_line1.to_s.empty? %>
+                    <div class="text-input-bg"><%= s.text_field :office_address_line1, :value => @parent.office_address_line1 %></div>
+                  <% else %>
+                    <div class="text-input-bg"><%= s.text_field :office_address_line1, :value => @student.address_line1 %></div>
+                  <% end %>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="master_student_city"><%= t('office_address_line2') %></label>
+                  <% unless @parent.office_address_line2.to_s.empty? %>
+                    <div class="text-input-bg"><%= s.text_field :office_address_line2, :value => @parent.office_address_line2 %></div>
+                  <% else %>
+                    <div class="text-input-bg"><%= s.text_field :office_address_line2, :value => @student.address_line2 %></div>
+                  <% end %>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_city"><%= t('city') %></label>
+                  <% unless @parent.city.to_s.empty? %>
+                    <div class="text-input-bg"><%= s.text_field :city, :value => @parent.city %></div>
+                  <% else %>
+                    <div class="text-input-bg"><%= s.text_field :city, :value => @student.city %></div>
+                  <% end %>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_state"><%= t('state') %></label>
+                  <% unless @parent.state.to_s.empty? %>
+                    <div class="text-input-bg"><%= s.text_field :state, :value => @parent.state %></div>
+                  <% else %>
+                    <div class="text-input-bg"><%= s.text_field :state, :value => @student.state %></div>
+                  <% end %>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_country"><%= t('country') %></label>
+                  <% unless @parent.country.to_s.empty?  %>
+                    <div class="text-input-bg"> <%= select :parent_detail, :country_id, @countries.map {|c| [c.full_name, c.id]}, :selected => @parent.country.id %> </div>
+                  <% else %>
+                    <div class="text-input-bg"> <%= select :parent_detail, :country_id, @countries.map {|c| [c.full_name, c.id]}, :selected => @student.country.id %> </div>
+                  <% end %>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_office_phone1"><%= t('office_phone1') %></label>
+                  <div class="text-input-bg"><%= s.text_field :office_phone1, :value => @parent.office_phone1 %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_office_phone2"><%= t('office_phone2') %></label>
+                  <div class="text-input-bg"><%= s.text_field :office_phone2, :value => @parent.office_phone2 %></div>
+              </div>
+
+              <div class="label-field-pair">
+                  <label for="parent_detail_mob_phone"><%= t('mobile_phone_no') %></label>
+                  <div class="text-input-bg"><%= s.text_field :mobile_phone, :value => @parent.mobile_phone %></div>
+              </div>
+          </div>
+
+          <span class="span-sub-heading"><%= t('upload_photo') %></span>
+          <hr class="sub-heading"></hr>
+          <div class="label-field-pair" id="user_photo">
+            <label for="guardian_image_file"><%= t('upload_photo') %></label>
+            <div class="text-input-bg"><%= s.paperclip_file_field :photo, :size=>12, :direct => true %></div>
+            <div id="warning_info">
+              <p><%= t('maximum_image_size') %></p>
+              <p><%= t('recomended_resolution') %></p>
+            </div>
+          </div>
+
+      </div>
+
+      <div class="extender">
+      </div>
+
+      <%= submit_tag "",  :name => "commit", :class => "submit_button3", :value => "► #{t('update')}" %>
+
+
+
+    <% end %>
+
+</div>
+<script>
+  function toggle_relation_box(){
+    if(j("#relation-select").val()==="other"){
+      j("#parent-relation").html('<div class="text-input-bg"><input id="parent_detail_relation" type="text" value="" size="30" name="parent_detail[relation]"></div>');
+      j("#relation-select").attr("name","parent_detail[relation_type]");
+    }
+    else{
+      j("#parent-relation").html('');
+      j("#relation-select").attr("name","parent_detail[relation]");
+    }
+  }
+</script>

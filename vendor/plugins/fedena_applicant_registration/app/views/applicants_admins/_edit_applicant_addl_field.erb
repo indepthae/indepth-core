@@ -1,0 +1,73 @@
+<div class="label-field-pair">
+    <label><%= addl_field.field_name %><% if [true,"true","default_true"].include?(fld[:mandatory]) %><% @mandatory_addl_attributes.push addl_field.id %><span class="necessary-field">*</span><% end %> </label>
+
+    <% addl_value = nil %>
+    <% if (c.present? and c.object.class.name == "ApplicantGuardian" and c.object.new_record? == false) %>
+      <% addl_value = @applicant.applicant_addl_values.select{|s| (s.applicant_addl_field_id==addl_field.id and s.applicant_guardian_id==c.object.id)}.first %>
+    <% else %>
+      <% addl_value = @applicant.applicant_addl_values.find_by_applicant_addl_field_id(addl_field.id) %>
+    <% end %>
+    <% f.fields_for :applicant_addl_values, (addl_value.present? ? addl_value : @applicant.applicant_addl_values.build) do|build| %>
+      <% if (c.present? and c.object.class.name == "ApplicantGuardian") %>
+        <% if c.object.new_record? %>
+          <%= build.hidden_field :temp_guardian_ind, :value=>guardian_ind %>
+        <% else %>
+          <%= build.hidden_field :applicant_guardian_id, :value=>c.object.id %>
+        <% end %>
+      <% end %>
+      <%= build.hidden_field :applicant_addl_field_id, :value=>addl_field.id %>
+      <% if addl_field.field_type == "singleline" %>
+        <div class="text-input-bg">
+            <%= build.text_field :option %>
+        </div>
+        <% if addl_field.suffix.present? %>
+          <div class="input-suffix"><%= addl_field.suffix %></div>
+        <% end %>
+      <% elsif addl_field.field_type == "multiline" %>
+        <div class="textarea-input-bg">
+            <%= build.text_area :option,:cols => 27, :rows => 5,:class => 'admission1-textarea' %>
+        </div>
+      <% elsif addl_field.field_type == "single_select" %>
+        <% field_options = addl_field.applicant_addl_field_values %>
+        <% if field_options.count < 4 %>
+          <% field_options.each do|o| %>
+            <div class="radio-label-pair">
+                <%= build.radio_button  :option, o.id, :checked => ((addl_value.present? and addl_value.option.present?) ? (addl_value.option.to_i == o.id) : o.is_default) %>
+                <label class="radio-label"> <%= o.option %></label>
+            </div>
+          <% end %>
+        <% else %>
+          <% default_option = (addl_value.present? and addl_value.option.present?) ? field_options.select{|p| addl_value.option.to_i == p.id}.first : field_options.select{|p| p.is_default==true}.first %>
+          <div class="text-input-bg">
+              <%#= build.select :option, field_options.map{|m| [m.option,m.id]}, :selected=>(default_option.present? ? default_option : nil),:prompt=>"#{t('select_an_option')}"%>
+              <%= build.select :option, options_for_select([["#{t('select_an_option')}",'']]+field_options.map{|m| [m.option,m.id]},:selected=>(default_option.present? ? default_option.id : nil))%>
+          </div>
+        <% end %>
+      <% elsif addl_field.field_type == "multi_select" %>
+        <% field_options = addl_field.applicant_addl_field_values %>
+        <div class="fee_category_scroll1">
+            <div class="sel_batches">
+                <%= check_box_tag "select_all", "", false, {:class=>'batches_box select_all_check',:onclick=>"select_all_fields(this);"}%>
+                <label for="all_active_batches" class="special_prop"><%= "#{t('select_all')}"%></label>
+            </div>
+            <% field_options.each do |o| %>
+              <div class="each_batch">
+                  <%= build.check_box :option,{:multiple=>true,:checked=>((addl_value.present? and addl_value.option.present?) ? (addl_value.option.split(", ").include?(o.id.to_s)) : o.is_default),:class=>'batches_box active_batch_list',:onclick=>"toggle_field_selector(this);"}, o.id, nil %>
+                  <label class="special_prop no_margin_top"><%= o.option %></label>
+              </div>
+            <% end %>
+        </div>
+      <% elsif addl_field.field_type == "attachment" %>
+        <div class="text-input-bg"><%= build.paperclip_file_field :attachment, :size=>12, :direct => false, :style=>"width:200px;" %></div>
+        <% if !(build.object.new_record?) and build.object.attachment.present? %>
+          <label class="prev-attachment"><%=link_to build.object.attachment_file_name, build.object.attachment.url(:original,false),:target => "_blank"  %></label>
+          <% unless [true,"true","default_true"].include?(fld[:mandatory]) %>
+            <div class="delete-button" onclick="delete_attachment(this);"></div>
+            <%= build.hidden_field :delete_attachment, :value=>false, :class=>"delete-attachment-field" %>
+          <% end %>
+        <% end %>
+      <% elsif addl_field.field_type == "date" %>
+        <%= build.calendar_date_select :option, :value=>((addl_value.present? and addl_value.option.present?) ? I18n.l(addl_value.option.to_date,:format=>:default) : nil),:year_range => 72.years.ago..5.years.from_now,:readonly=>true,:popup=>"force" %>
+      <% end %>
+    <% end %>
+</div>

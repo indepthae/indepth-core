@@ -1,0 +1,116 @@
+<% unless @hostels.blank? %>
+  <div class="submit-button">
+    <%= link_to "#{t('export_as_csv')}" ,{:action=>'room_availability_details_csv',:sort_order=>@sort_order} %>
+  </div>
+  <div class="extender"></div>
+  <div id="page-yield">
+    <div class="extender"></div>
+    <table id="report_table" align="center" width="100%" cellpadding="1" cellspacing="1">
+      <tr class="tr-head sub-heading">
+        <td><%= t('no_text') %></td>
+
+        <% if @sort_order=="name DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('name')} &#8595;", :url=>{:action=>"room_availability_details",:sort_order=>"name ASC"} %>
+          </td>
+        <% elsif @sort_order=="name ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('name')} &#8593;", :url=>{:action=>"room_availability_details",:sort_order=>"name DESC"} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('name')}", :url=>{:action=>"room_availability_details",:sort_order=>"name DESC"} %>
+          </td>
+        <% end %>
+
+        <% if @sort_order=="hostel_type DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('hostel_type')} &#8595;", :url=>{:action=>"room_availability_details",:sort_order=>"hostel_type ASC"} %>
+          </td>
+        <% elsif @sort_order=="hostel_type ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('hostel_type')} &#8593;", :url=>{:action=>"room_availability_details",:sort_order=>"hostel_type DESC"} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('hostel_type')}", :url=>{:action=>"room_availability_details",:sort_order=>"hostel_type DESC"} %>
+          </td>
+        <% end %>
+
+        <% if @sort_order=="total_rooms DESC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('total_rooms')} &#8595;", :url=>{:action=>"room_availability_details",:sort_order=>"total_rooms ASC"} %>
+          </td>
+        <% elsif @sort_order=="total_rooms ASC" %>
+          <td class="batch_order_select">
+            <%= link_to_remote  "#{t('total_rooms')} &#8593;", :url=>{:action=>"room_availability_details",:sort_order=>"total_rooms DESC"} %>
+          </td>
+        <% else %>
+          <td class="batch_order">
+            <%= link_to_remote  "#{t('total_rooms')}", :url=>{:action=>"room_availability_details",:sort_order=>"total_rooms DESC"} %>
+          </td>
+        <% end %>
+        <td><%= t('available_rooms') %></td>
+        <td><%= t('occupied_rooms') %></td>
+        <td><%= t('warden')  %></td>
+      </tr>
+      <% page_count=0 %>
+      <% @hostels.each_with_index do |s,@i| %>
+        <% if params[:page].present? %>
+          <% if params[:page].to_i >= 1 %>
+            <% @i = @i  + (params[:page].to_i - 1) * @hostels.per_page.to_i %>
+          <% end %> <%else %> <% @i = @i %>
+        <% end %>
+        <% page_count+=1 %>
+        <tr class="tr-<%= cycle('odd', 'even') %>">
+          <td class="col-5"> <%=@i+1 %></td>
+          <% if @sort_order=="name ASC" or @sort_order=="name DESC" %>
+            <td class="col-2 batch_order_select"><%=s.name%></td>
+          <% else %>
+            <td class="col-2"><%=s.name%></td>
+          <% end %>
+          <% if @sort_order=="hostel_type ASC" or @sort_order=="hostel_type DESC" %>
+            <td class="col-3 batch_order_select"><%= s.hostel_type %></td>
+          <% else %>
+            <td class="col-3"><%= s.hostel_type %></td>
+          <% end %>
+          <% if @sort_order=="total_rooms ASC" or @sort_order=="total_rooms DESC" %>
+            <td class="col-4 batch_order_select"><%= link_to "#{s.total_rooms}",{:action=>'room_list',:id=>s.hostel_id} %></td>
+          <% else %>
+            <td class="col-4"><%= link_to "#{s.total_rooms}",{:action=>'room_list',:id=>s.hostel_id} %></td>
+          <% end %>
+          <% if @sort_order=="available ASC" or @sort_order=="available DESC" %>
+            <td class="col-4 batch_order_select"><%= link_to "#{s.available.nil?? 0 : s.available}",{:action=>'room_list',:id=>s.hostel_id,:type=>'available'} %></td>
+          <% else %>
+            <td class="col-4"><%= link_to "#{s.available.nil?? 0 : s.available}",{:action=>'room_list',:id=>s.hostel_id,:type=>'available'}  %></td>
+          <% end %>
+          <% if @sort_order=="occupied ASC" or @sort_order=="occupied DESC" %>
+            <td class="col-4 batch_order_select"><%= link_to "#{s.occupied}",{:action=>'room_list',:id=>s.hostel_id,:type=>'occupied'} %></td>
+          <% else %>
+            <td class="col-4"><%= link_to "#{s.occupied}",{:action=>'room_list',:id=>s.hostel_id,:type=>'occupied'} %></td>
+          <% end %>
+          <% warden=@warden[s.hostel_id.to_i] %>
+          <% unless warden.nil? %>
+            <td class="col-2">
+              <% warden.each do |w| %>
+                <div class="warden_name"><%=link_to "#{ w.first_name} #{w.middle_name} #{w.last_name}", {:controller=>'employee',:action=>'profile',:id=>w.emp_id}%></div>
+              <% end %>
+            </td>
+          <% else %>
+            <td class="col-2">-</td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    <% unless @hostels.per_page.to_i > @hostels.total_entries.to_i %>
+      <div class="pagination_list">
+        <div class="pagination_text">
+          <%= "#{t('showing')} #{@i+1-(page_count-1)}-#{@i+1} #{t('of')} #{@hostels.total_entries}" %>
+        </div>
+        <%= will_paginate @hostels,:renderer => 'RemoteLinkRenderer' ,:page_links=>false ,:params=>{:sort_order=>@sort_order}%>
+      </div>
+    <% end %>
+  <% else %>
+    <p class="flash-msg"> <%= t('no_record_found') %></p>
+  <% end %>
+</div>

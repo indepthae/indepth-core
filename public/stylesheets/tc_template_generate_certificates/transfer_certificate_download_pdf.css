@@ -1,0 +1,790 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29 Feb, 2016, 12:16:50 PM
+    Author     : foradian
+*/
+
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19 Feb, 2016, 12:48:37 PM
+    Author     : foradian
+*/
+
+
+html, body, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    /*    line-height: 1;*/
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+/*table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}*/
+@page {
+    /*size: A4;*/
+    margin-left: 8mm ;
+    margin-right: 8mm;
+    margin-top: 8mm;
+    margin-bottom: 8mm;
+    padding: 0px;
+    width: auto;
+    /*width: 148.5mm*/
+}
+body {
+    min-width: 700px;
+    /*width: 100mm;*/
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    font-family: arial !important;
+    font-size: 14px;
+    /*margin: 0 auto;*/
+}
+/* The declarations for print output */
+/*Print css defaults*/
+/* Reset quotes */
+div{
+    display: block;
+}
+q {quotes: none}
+q:before, q:after {content: ""}
+
+/* Hide everything unneeded */
+
+/* font sizes */
+body {
+    font-family: Arial;
+    /*        line-height: 1.3;*/
+}
+
+h1 {font-size: 24pt}
+
+h2 {font-size: 14pt; margin-top: 25px}
+
+aside h2 {font-size: 18pt}
+
+
+/* Show printer-frindly logo. */
+header .print {display: block}
+
+/* If you like things a little bit easier and more semantic you can alternatively just leave the h1 of the header visible, switch off the margin and make it bigger than the rest of the headlines */
+/*header nav, footer, img {display: none}
+
+header h1 {
+        margin: 0;
+        font-size: 30pt;
+}*/
+
+/* Some browsers like to show a border around images. Switch it off */
+img {border: 0}
+
+/* Mover the header a little bit awy from the content */
+header {margin-bottom: 40px}
+
+/* Display the URL of the site so that the user knows where the printout came from */
+header:after {display: block; content: "www.smashing-winery.com"}
+
+/* Additionally/optionally a little message could be displayed */
+/*header:before {
+        display: block;
+        content: "Thank your for printing our content at www.smashing-winery.com. Please check back soon for new offers about delicious wine from our winery.";
+        margin-bottom: 10px;
+        border: 1px solid #bbb;
+        padding: 3px 5px;
+        font-style: italic;
+}*/
+
+/* Separate blockquotes a little bit from the rest */
+blockquote {
+    font-size: 13pt;
+    font-style: italic;
+}
+
+/* By default links are blue. For optimal legibility change them to black */
+p a {color: #000}
+
+/* Show the URL after each link, whereby internal links are preceeded by the site's URL */
+p a:after {
+    content: " (http://www.smashing-winery.com/" attr(href) ")";
+    font-size: 80%;
+    word-wrap: break-word;
+}
+
+/* External links don't get this treatment */
+p a[href^="http://"]:after, p a[href^="https://"]:after {
+    content: " (" attr(href) ")";
+}
+
+/* Append the source of the citation */
+q:after {content: " (" attr(cite) ")"}
+
+/* The Sidebar is placed under the content automatically. To distinguish it from the rest a border and a gap is set before */
+aside {
+    border-top: 1px solid #bbb;
+    margin-top: 30px;
+    display: block;
+    width: auto;
+    /* Reset the element for IE < 8 */
+    position: static;
+    width: auto;
+    padding: 10px 0 0;
+    /*page-break-before: always; */ /* Moves the sidebar to new page */
+}
+
+/* Custom bullets for the list */
+/*ul {list-style: none}
+
+.main ul li:before {content: "» "}*/
+
+#content_wrapper {
+    width: 100% !important;
+    background-color: #fff;
+    overflow: auto;
+}
+#content{
+    float: none;
+    width: 100%;
+}
+
+#header_bg {
+    display: none;
+}
+#footer {
+    display: none;
+}
+
+
+
+.bold {
+    font-weight: bold;
+}
+
+
+.text{
+    color: #666;
+    font-size: 13px;
+    margin-top: 10px;
+
+}
+
+.header_preview_box{
+    float: left;
+    width: 100%;
+}
+
+
+.header_preview{
+    border-bottom: 1px solid;
+    border-color: #999;
+    border-right: none;
+    border-left: none;
+    overflow: auto;
+    width: 100%;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    /*    margin: 30px 0px 30px 0px;*/
+}
+.header_head{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    border-bottom: 1px solid #999;
+    padding: 5px 0px 20px 0px;
+    text-align: center;
+    overflow: auto;
+    /*padding-bottom: 10px;*/
+
+}
+.header_bottom{
+    padding: 5px 0px;
+    margin-top: 5px;
+}
+.logo{
+    height: 50px;
+    width: auto;
+    /* margin-top: 27px; */
+    float: left;
+
+}
+.logo img{
+    width: 100%;
+}
+
+
+.logo_to_left{
+    float: left;
+    margin-right: 2%;
+    width: 12%;
+}
+.logo_to_right{
+    float: right;
+    margin-left: 2%;
+    width: 12%;
+}
+.institution_details_to_left{
+    width: 86%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_to_center{
+    display: inline-block;
+
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 72%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_to_right{
+    width: 86%;
+    margin: 0 auto;
+    text-align: right;
+    float: left;
+    overflow: overlay;
+}
+
+.institution_details_with_no_logo_to_left{
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    float: left;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_center{
+    display: inline-block;
+
+    margin: 0 auto;
+    /* width: 100%; */
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    overflow: overlay;
+}
+.institution_details_with_no_logo_to_right{
+    width: 100%;
+    margin: 0 auto;
+    text-align: right;
+    float: left;
+    overflow: overlay;
+}
+
+
+.institution_details_with_no_logo_to_right span{
+    margin-left: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_left span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.institution_details_with_no_logo_to_center span{
+    margin-right: 10px;
+    display: inline-block;
+}
+.preview_institution_name{
+    font-weight: 600;
+    font-size: 19px;
+    /*        margin-bottom: 15px;*/
+}
+.preview_institution_address, .preview_institution_email, .preview_institution_website{
+    font-weight: normal;
+    font-size: 0.813em;
+}
+.preview_certificate_name{
+    font-weight: 600;
+    font-size: 16px;
+    /*        margin-top: 20px;*/
+    margin-bottom: 5px;
+    width:100%;
+    text-align: center;
+}
+.preview_certificate_date_and_serial{
+    font-size: 14px !important;
+    height:20px;
+    width: 99%;
+}
+.certificate_serial{
+    float: left;
+}
+.certificate_serial_field{
+    font-weight: bold;
+}
+.certificate_serial_label{
+    float: left;
+}
+.certificate_date{
+    float:right;
+    min-width: 100px;
+    width: auto;
+}
+.date_label{
+    float: left;
+}
+.date_format{
+    /*    color:rgb(226, 226, 226);*/
+    font-weight: bold;
+    padding-left: 1px; 
+    float:left;
+}
+.date_placeholder{
+    color:rgb(226, 226, 226);  
+}
+
+.preview_additional_large{
+    font-size: 15px;
+}
+.preview_additional_small{
+    font-size: 12px;
+}
+.preview_additional_medium{
+    font-size: 14px;
+}
+.preview_additional_very_small{
+    font-size: 11px;
+}
+.preview_additional_normal{
+    font-size: 13px;
+}
+.preview_additional_black{
+    color: black;
+}
+.preview_additional_grey{
+    color: grey;
+}
+.preview_additional_student_large{
+    font-size: 10.5pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_large td{
+    line-height: 1;
+}
+.preview_additional_student_large.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 10.5pt !important;
+}
+.preview_additional_student_large.sub_field > p{
+    font-size: 10.5pt;
+}
+.preview_additional_student_large .tc_field_value p{
+    font-size: 10.5pt;
+}
+
+
+.preview_additional_student_very_large{
+    font-size: 12pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_very_large td{
+    line-height: 1;
+}
+.preview_additional_student_very_large.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 12pt !important;
+}
+.preview_additional_student_very_large.sub_field > p{
+    font-size: 12pt;
+}
+.preview_additional_student_very_large .tc_field_value p{
+    font-size: 12pt;
+}
+
+
+.preview_additional_student_small{
+    font-size: 7.5pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_small td{
+    line-height: 1;
+}
+.preview_additional_student_small.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 7.5pt !important;
+}
+.preview_additional_student_small.sub_field > p{
+    font-size: 7.5pt;
+}
+.preview_additional_student_small .tc_field_value p{
+    font-size: 7.5pt;
+}
+
+
+.preview_additional_student_medium{
+    font-size: 9pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_medium td{
+    line-height: 1;
+}
+.preview_additional_student_medium.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 9pt !important;
+}
+.preview_additional_student_medium.sub_field > p{
+    font-size: 9pt;
+}
+.preview_additional_student_medium .tc_field_value p{
+    font-size: 9pt;
+}
+
+
+.preview_additional_student_very_small{
+    font-size: 6.75pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_very_small td{
+    line-height: 1;
+}
+.preview_additional_student_very_small.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 6.75pt !important;
+}
+.preview_additional_student_very_small.sub_field > p{
+    font-size: 6.75pt;
+}
+.preview_additional_student_very_small .tc_field_value p{
+    font-size: 6.75pt;
+}
+
+
+.preview_additional_student_normal{
+    font-size: 8.25pt !important;
+    width: 100%;
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+}
+.preview_additional_student_normal td{
+    line-height: 1;
+}
+.preview_additional_student_normal.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 8.25pt !important;
+}
+.preview_additional_student_normal.sub_field > p{
+    font-size: 8.25pt;
+}
+.preview_additional_student_normal .tc_field_value p{
+    font-size: 8.25pt;
+}
+
+
+/*----------Footer--------------*/
+.footer_preview_box{
+    page-break-after: auto;
+    page-break-inside: avoid;
+    float: left;
+    width: 100%;
+}
+.template_settings_sub_head{
+    margin-top: 30px;
+    color: rgb(113, 113, 113);
+    font-weight: bold;
+}
+.footer_preview{
+    padding: 0px !important;
+    color: #666;
+}
+
+div[class^="footer_head"]{
+    /*    display:table-cell;*/
+    vertical-align:middle;
+    text-decoration: none;
+    overflow: auto;
+    justify-content: center;
+    margin-bottom: 30px; 
+}
+.footer_head_large{
+    font-size: 16px;
+}
+.footer_head_small{
+    font-size: 13px;
+}
+.footer_head_medium{
+    font-size: 15px;
+}
+.footer_head_very_small{
+    font-size: 12px;
+}
+.footer_head_normal{
+    font-size: 14px;
+}
+.footer_head_black{
+    color: black;
+}
+.footer_head_grey{
+    color: grey;
+}
+
+.footer_signatures{
+    /*    display:flex;                                     Problem with wicked pdf
+        justify-content:space-between;*/ 
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    color: black;
+    font-size: 12px !important;
+    margin-top: 8px;
+    /*margin-right: 5px;*/
+}
+.signature{
+    display: table-cell;                 /* Uncheck if using flex*/
+    text-align: center;                    /* Uncheck if using flex*/
+}
+
+.footer_signatures div:first-child {           /* Uncheck if using flex*/
+    text-align: left;
+}
+.footer_signatures div:last-child {             /* Uncheck if using flex*/
+    text-align: right;
+    margin-right: 5px;
+}
+
+
+
+/*--------------tc_data------------------*/
+.tc_data{
+
+
+}
+
+input[type="text"], input[type="password"], textarea, select{
+    -webkit-border-radius: 10px;
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #C6C6C6;
+    padding: 5px;
+}
+.tc_field_value{
+    float: left;
+    /*margin-right: 40%;*/
+    padding-bottom: 3px;
+    /*border-bottom: 1px solid #999;*/
+    width: 98%;
+    page-break-inside: avoid;
+    white-space: pre-wrap;
+}
+.tc_field_label{
+    page-break-inside: avoid;
+}
+
+.other_details{
+    border: 1px solid;
+    border-color: rgb(226, 226, 226);
+    overflow: auto;
+    margin: 30px 0px 30px 0px;
+}
+.name_slots{
+    display: inline-block !important;
+    font-size: 0.8em;
+    /*width: 100%;*/
+    vertical-align: bottom;
+    margin-bottom: 0px !important;
+    line-height: 1;
+    page-break-inside: avoid !important;
+    width: 725px;
+}
+.name_slots td{
+    line-height: 1;
+}
+table{
+    width:100%;
+    table-layout: fixed;
+    border-collapse: collapse;    
+    page-break-inside: auto !important;  
+    page-break-after: avoid !important;
+}
+.page-break{
+    display: block;
+    page-break-before: always;
+}
+.student_details{
+    padding: 5px 0px;
+    overflow: auto;
+}
+.space_slot{
+    margin-left: 140px;
+    float: left;
+
+}
+.tc_field_labels{
+    padding:10px 0px 2px 5px;
+    max-width: 450px !important;
+    vertical-align: top;
+}
+.tc_field_label{
+    max-width:450px !important;
+}
+.tc_field_labels:first-child{
+    max-width: 450px !important;
+}
+.tc_field_values{
+    padding: 10px 0px 2px 5px; 
+    text-align: left;
+        min-width: 385px;
+    vertical-align: top;
+}
+tr{
+    /*page-break-inside: avoid !important;*/
+}
+/*.name_slots{
+    page-break-before: auto !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+}*/
+table.print-friendly tr td, table.print-friendly tr th {
+    page-break-inside: avoid;
+}
+
+.tc_field_value p {
+    display: inline;
+    font-size: 12px;
+    color: #666;
+}
+.name_slots.sub_field > td:first-child{
+    padding-left: 20px;
+    font-size: 11px !important;
+}
+.name_slots.sub_field > p{
+    font-size: 10px;
+}
+.odd{
+    background: white;
+}
+.even{
+    background: #e6e6e6;
+}
+td { word-wrap: break-word; }
+
+td > p{
+    float: right;
+    margin: 0 !important;
+}
+.institution_details_to_right span{
+    display: inline-block;
+}
+.institution_details_to_left span{
+    display: inline-block;
+}
+.institution_details_to_center span{
+    display: inline-block;
+}
+.institution_address_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}
+.institution_contact_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+.institution_additional_preview{
+    display: inline-block;
+    width: 100%;
+    line-height: 1;
+}
+@media print {
+    body {-webkit-print-color-adjust: exact;}
+}
+.institution_details_to_left .institution_address_preview span{
+    float: left;
+    width: 100%;
+}
+.institution_details_to_left .institution_additional_preview span{
+    float: left;
+    width: 100%;
+}
+.institution_details_to_center .institution_address_preview span{
+    float: left;
+    width: 100%;
+}
+.institution_details_to_center .institution_additional_preview span{
+    float: left;
+    width: 100%;
+}
+.institution_details_to_right .institution_address_preview span{
+    float: right;
+    width: 100%;
+}
+.institution_details_to_right .institution_additional_preview span{
+    float: right;
+    width: 100%;
+}
+.tc_field_values:before {
+    content: ':';
+    float: left;
+    width: 2%;
+    padding-bottom: 3px;
+}
+.page{
+    float: bottom;
+}
+.footer-pdf-style{
+    width: 100%;page-break-before: avoid;page-break-inside: avoid;padding-top: 50px !important;
+}
